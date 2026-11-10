@@ -27,6 +27,27 @@ Status: **built** = in the app; **planned** = to build. Book topics outside
 machining (careers, thermodynamics, aerodynamics, pressure vessels and similar)
 are not part of BenchMate.
 
+## Currency check
+
+The books are dated (Engineers Black Book 2004; Machinery's Handbook 2020)
+and standards move. For every topic we cite the **current** edition of the
+standard and check whether the books' approach still holds. Known changes to
+watch, each to be confirmed against the standards body's own catalogue page:
+
+- Surface texture: ISO 1302 and ISO 4287 superseded by ISO 21920 (2021).
+- General tolerances: ISO 2768-2 withdrawn; ISO 22081 (2021) is the GPS
+  replacement for general geometric tolerances.
+- GD&T: ASME Y14.5-2018 removed concentricity and symmetry; ISO 1101 2017
+  edition.
+- Old national standards (BS 1452, BS 2789, DIN 1691/1693, BS 970 EN
+  numbers) are withdrawn; shown as "old" names next to current EN names.
+- Hardness conversion: ISO 18265 (2013) and ASTM E140 current revision.
+- Tool and insert codes: check current ISO 1832, ISO 5608 and ISO 513
+  editions.
+
+Where a book's reasoning or rule of thumb is superseded, BenchMate uses the
+current practice and says so in the tool's notes.
+
 ## Machining
 
 | Topic | Books | Status | Planned source |
