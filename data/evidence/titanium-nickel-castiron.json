@@ -1,0 +1,492 @@
+{
+ "sources": {
+  "KENNAMETAL": {
+   "title": "Kennametal Material Data Base (titanium, high-temperature alloy and cast iron sections), hosted by MSC",
+   "url": "https://www1.mscdirect.com/images/solutions/kennametal/materialDataBase.pdf",
+   "publisher": "Kennametal",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "Ti CP Grade 1 (Ti 99.8)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Ti 99.8",
+      "astm": "B381 F1",
+      "uns": null,
+      "w_nr": null,
+      "din_en_name": null,
+      "bs": "TA 1",
+      "other": "AIR 9182 T35"
+     },
+     "verbatim_row": "Ti 99.8 ASTM: B381F1 Ti 99.8 TA 1 AIR: 9182 T35"
+    }
+   ],
+   "disagreements": "Single source; no UNS or W.-Nr printed."
+  },
+  {
+   "grade": "Ti CP Grade 2 (Ti 99.7)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Ti 99.7",
+      "astm": "B381 F2",
+      "uns": null,
+      "w_nr": null,
+      "din_en_name": null,
+      "bs": "TA 2-5",
+      "other": "AIR 9182 T40"
+     },
+     "verbatim_row": "Ti 99.7 ASTM: B381F2 Ti 99.7 TA 2-5 AIR: 9182 T40"
+    }
+   ],
+   "disagreements": "Single source."
+  },
+  {
+   "grade": "Ti CP Grade 3 (Ti 99.6)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Ti 99.6",
+      "astm": "B381 F3",
+      "uns": null,
+      "w_nr": null,
+      "din_en_name": null,
+      "bs": null,
+      "other": "AIR 9182 T50"
+     },
+     "verbatim_row": "Ti 99.6 ASTM: B381F3 Ti 99.6 AIR: 9182 T50"
+    }
+   ],
+   "disagreements": "Single source."
+  },
+  {
+   "grade": "Ti CP Grade 4 (Ti 99.5)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Ti 99.5",
+      "astm": "B381 F4",
+      "uns": null,
+      "w_nr": null,
+      "din_en_name": null,
+      "bs": "TA 6",
+      "other": "AIR 9182 T60"
+     },
+     "verbatim_row": "Ti 99.5 ASTM: B381F4 Ti 99.5 TA 6 AIR: 9182 T60"
+    }
+   ],
+   "disagreements": "Single source."
+  },
+  {
+   "grade": "Ti-6Al-4V (Grade 5)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Ti-6Al-4V",
+      "astm": null,
+      "uns": null,
+      "w_nr": null,
+      "din_en_name": "TiAl6V4",
+      "bs": "TA 10-13; TA 28",
+      "other": "AMS 4906, 4920, 4928, 4965, 4967; AFNOR T-A6V"
+     },
+     "verbatim_row": "Ti-6Al-4V 4906, 4920, 4928, 4965, 4967 TiAl6V4 TA 10-13; TA 28 T-A6V"
+    }
+   ],
+   "disagreements": "Single source; ELI (Grade 23) appears only as 'Allvac 6-4ELI 4907, 4930, 4931' (AMS numbers). No UNS R56400 / W.-Nr 3.7165 printed."
+  },
+  {
+   "grade": "Inconel 600",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Inconel 600",
+      "astm": null,
+      "uns": null,
+      "w_nr": "2.4816",
+      "din_en_name": "NiCr15Fe",
+      "bs": null,
+      "other": "AMS 5540; BS 3072-76; AFNOR NC15Fe"
+     },
+     "verbatim_row": "Inconel 600 5540 2.4816 NiCr15Fe 3072-76 NC15Fe"
+    }
+   ],
+   "disagreements": "Single source; UNS N06600 not printed."
+  },
+  {
+   "grade": "Inconel 625",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Inconel 625",
+      "astm": null,
+      "uns": null,
+      "w_nr": "2.4856",
+      "din_en_name": "NiCr22Mo9Nb",
+      "bs": null,
+      "other": "ASME SB443; AFNOR NC22FeDNB"
+     },
+     "verbatim_row": "Inconel 625 ASME SB443 2.4856 NiCr22Mo9Nb NC22FeDNB"
+    }
+   ],
+   "disagreements": "Single source."
+  },
+  {
+   "grade": "Inconel 718",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Inconel 718",
+      "astm": null,
+      "uns": null,
+      "w_nr": "2.4668",
+      "din_en_name": "NiCr19Fe19NbMo",
+      "bs": "HR8",
+      "other": "AMS 5383; AFNOR NC19FeNb"
+     },
+     "verbatim_row": "Inconel 718 5383 2.4668 NiCr19Fe19NbMo HR8 NC19FeNb"
+    }
+   ],
+   "disagreements": "Single source."
+  },
+  {
+   "grade": "Monel 400",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Monel 400",
+      "astm": null,
+      "uns": null,
+      "w_nr": "2.4360",
+      "din_en_name": "NiCu30Fe",
+      "bs": null,
+      "other": "AMS 4544; BS 3072-76; AFNOR NU30"
+     },
+     "verbatim_row": "Monel 400 4544 2.4360 NiCu30Fe 3072-76 NU30"
+    }
+   ],
+   "disagreements": "Single source."
+  },
+  {
+   "grade": "Monel K-500",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Monel K 500",
+      "astm": null,
+      "uns": null,
+      "w_nr": "2.4375",
+      "din_en_name": "NiCu30Al",
+      "bs": null,
+      "other": "AMS 4676; BS 3072-76"
+     },
+     "verbatim_row": "Monel K 500 4676 2.4375 NiCu30Al 3072-76"
+    }
+   ],
+   "disagreements": "Single source."
+  },
+  {
+   "grade": "Hastelloy C-276",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": "Nimonic C-276 (sic)",
+      "astm": null,
+      "uns": null,
+      "w_nr": "2.4819",
+      "din_en_name": null,
+      "bs": null,
+      "other": "ASME SB575"
+     },
+     "verbatim_row": "Nimonic C-276 ASME SB575 2.4819"
+    }
+   ],
+   "disagreements": "Kennametal labels the alloy 'Nimonic C-276' - Hastelloy C-276 is the usual trade name (Nimonic is a different trade family). Single source."
+  },
+  {
+   "grade": "Grey iron GG 10",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A48 No 20 B",
+      "uns": null,
+      "w_nr": "0.6010",
+      "din_en_name": "GG 10",
+      "bs": "Grade 100 (BS 1452, column inferred)",
+      "other": "AFNOR Ft 10 D; first number is HB"
+     },
+     "verbatim_row": "175 No 20 B 0.6010 GG 10 Grade 100 Ft 10 D"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
+  },
+  {
+   "grade": "Grey iron GG 15",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A48 No 25 B",
+      "uns": null,
+      "w_nr": "0.6015",
+      "din_en_name": "GG 15",
+      "bs": "Grade 150 (BS 1452, column inferred)",
+      "other": "AFNOR Ft 15 D; first number is HB"
+     },
+     "verbatim_row": "185 No 25 B 0.6015 GG 15 Grade 150 Ft 15 D"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
+  },
+  {
+   "grade": "Grey iron GG 20",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A48 No 30 B",
+      "uns": null,
+      "w_nr": "0.6020",
+      "din_en_name": "GG 20",
+      "bs": "Grade 220 (BS 1452, column inferred)",
+      "other": "AFNOR Ft 20 D; first number is HB"
+     },
+     "verbatim_row": "205 No 30 B 0.6020 GG 20 Grade 220 Ft 20 D"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
+  },
+  {
+   "grade": "Grey iron GG 25",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A48 No 35 B",
+      "uns": null,
+      "w_nr": "0.6025",
+      "din_en_name": "GG 25",
+      "bs": "Grade 260 (BS 1452, column inferred)",
+      "other": "AFNOR Ft 25 D; first number is HB"
+     },
+     "verbatim_row": "220 No 35 B 0.6025 GG 25 Grade 260 Ft 25 D"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
+  },
+  {
+   "grade": "Grey iron GG 30",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A48 No 45 B",
+      "uns": null,
+      "w_nr": "0.6030",
+      "din_en_name": "GG 30",
+      "bs": "Grade 300 (BS 1452, column inferred)",
+      "other": "AFNOR R 30 D; first number is HB"
+     },
+     "verbatim_row": "230 No 45 B 0.6030 GG 30 Grade 300 R 30 D"
+    }
+   ],
+   "disagreements": "Single source. Kennametal prints old DIN 'GG' names, not EN-GJL. Note it pairs GG 30 with ASTM 'No 45 B' (no class 40 row), and AFNOR 'R 30 D' (others 'Ft') - possible typo."
+  },
+  {
+   "grade": "Grey iron GG 35",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A48 No 50 B",
+      "uns": null,
+      "w_nr": "0.6035",
+      "din_en_name": "GG 35",
+      "bs": "Grade 350 (BS 1452, column inferred)",
+      "other": "AFNOR Ft 35 D; first number is HB"
+     },
+     "verbatim_row": "235 No 50 B 0.6035 GG 35 Grade 350 Ft 35 D"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
+  },
+  {
+   "grade": "Grey iron GG 40",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A48 No 55 B",
+      "uns": null,
+      "w_nr": "0.6040",
+      "din_en_name": "GG 40",
+      "bs": "Grade 400 (BS 1452, column inferred)",
+      "other": "AFNOR Ft 40 D; first number is HB"
+     },
+     "verbatim_row": "250 No 55 B 0.6040 GG 40 Grade 400 Ft 40 D"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
+  },
+  {
+   "grade": "Ductile iron GGG 35.3",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A536 60-40-18",
+      "uns": null,
+      "w_nr": "0.7033",
+      "din_en_name": "GGG 35.3",
+      "bs": "350/22 (BS 2789, column inferred)",
+      "other": "AFNOR FGS 350-22"
+     },
+     "verbatim_row": "143-187 60-40-18 0.7033 GGG 35.3 350/22 FGS 350-22"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GGG name printed, not EN-GJS."
+  },
+  {
+   "grade": "Ductile iron GGG 40",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A536 65-45-12",
+      "uns": null,
+      "w_nr": "0.7040",
+      "din_en_name": "GGG 40",
+      "bs": "420/12 (BS 2789, column inferred)",
+      "other": null
+     },
+     "verbatim_row": "156-217 65-45-12 0.7040 GGG 40 420/12"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GGG name printed, not EN-GJS."
+  },
+  {
+   "grade": "Ductile iron GGG 50",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A536 80-55-06",
+      "uns": null,
+      "w_nr": "0.7050",
+      "din_en_name": "GGG 50",
+      "bs": "500/7 (BS 2789, column inferred)",
+      "other": "AFNOR FGS 500-7"
+     },
+     "verbatim_row": "187-255 80-55-06 0.7050 GGG 50 500/7 FGS 500-7"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GGG name printed, not EN-GJS."
+  },
+  {
+   "grade": "Ductile iron GGG 60",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A536 80-60-03 (sic)",
+      "uns": null,
+      "w_nr": "0.7060",
+      "din_en_name": "GGG 60",
+      "bs": "600/3 (BS 2789, column inferred)",
+      "other": "AFNOR FGS 600-3"
+     },
+     "verbatim_row": "210-280 80-60-03 0.7060 GGG 60 600/3 FGS 600-3"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GGG name printed, not EN-GJS. Kennametal prints ASTM '80-60-03'; A536's standard grade near this is 100-70-03 / 80-55-06 - '80-60-03' looks non-standard."
+  },
+  {
+   "grade": "Ductile iron GGG 70",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A536 100-70-03",
+      "uns": null,
+      "w_nr": "0.7070",
+      "din_en_name": "GGG 70",
+      "bs": "700/2 (BS 2789, column inferred)",
+      "other": "AFNOR FGS 700-2"
+     },
+     "verbatim_row": "241-302 100-70-03 0.7070 GGG 70 700/2 FGS 700-2"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GGG name printed, not EN-GJS."
+  },
+  {
+   "grade": "Ductile iron GGG 80",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "common": null,
+      "astm": "A536 120-90-02",
+      "uns": null,
+      "w_nr": "0.7080",
+      "din_en_name": "GGG 80",
+      "bs": "900/2 (BS 2789, column inferred)",
+      "other": "AFNOR FGS 900-2"
+     },
+     "verbatim_row": "265-302 120-90-02 0.7080 GGG 80 900/2 FGS 900-2"
+    }
+   ],
+   "disagreements": "Single source. Old DIN GGG name printed, not EN-GJS. GGG 80 paired with BS 2789 '900/2' (an 800 MPa class would be expected) - likely misalignment."
+  }
+ ]
+}

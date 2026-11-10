@@ -79,30 +79,60 @@ function renderCustom(t) {
   t.render($('.body', card));
 }
 
-const MAT_COLS = [['aisi','AISI / SAE'],['uns','UNS'],['en_number','EN / W.-Nr.'],['en_name','EN name'],['bs970','BS 970 / BS 4659'],['uk_en','UK old EN'],['jis','JIS'],['gb','GB (China)']];
 let MAT = null;
 async function renderMaterials(el) {
-  el.innerHTML = '<input id="msearch" type="search" placeholder="Type any grade: 304, 1.4404, EN24, SKD11, 42CrMo4..." style="width:100%;max-width:520px;margin-bottom:10px"><div class="mfilter"></div><div id="mres"></div><div id="msrc" class="note"></div>';
+  el.innerHTML = '<input id="msearch" type="search" placeholder="Type any grade: 304, 1.4404, EN24, SKD11, 6082, HE30, CZ121, CW614N..." style="width:100%;max-width:560px;margin-bottom:10px"><div class="mfilter"></div><div id="mres"></div><div id="mev"></div><div id="msrc" class="note"></div>';
   if (!MAT) { try { MAT = await (await fetch('data/materials.json')).json(); } catch (e) { el.textContent = 'Material data not found (run scripts/build-web.sh).'; return; } }
-  const fams = [...new Set(MAT.materials.map(m => m.family))];
-  const ff = $('.mfilter', el);
-  ff.innerHTML = '<select id="mfam"><option value="">All families</option>' + fams.map(f => '<option>' + f + '</option>').join('') + '</select> <label class="chk"><input type="checkbox" id="mconf"> Confirmed only</label>';
-  const esc = x => String(x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const fams = Object.keys(MAT.families).filter(f => MAT.materials.some(m => m.family === f));
+  const esc = x => String(x ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const norm = x => String(x).toLowerCase().replace(/[\s.\-\/]/g, '');
-  function draw() {
-    const q = norm($('#msearch').value), fam = $('#mfam').value, conf = $('#mconf').checked;
-    const rows = MAT.materials.filter(m => (!fam || m.family === fam) && (!conf || m.status === 'confirmed') && (!q ||
-      [m.id, ...Object.values(m.fields).map(f => f.value), ...Object.values(m.unsourced)].some(v => norm(v).includes(q))));
-    $('#mres').innerHTML = '<div class="res mtab"><table><tr><th>Status</th>' + MAT_COLS.map(c => '<th>' + c[1] + '</th>').join('') + '</tr>' +
-      rows.map(m => '<tr><td><span class="badge ' + m.status + '">' + (m.status === 'confirmed' ? 'Confirmed' : 'Review') + '</span><div class="fam">' + esc(m.family) + ' · ISO ' + m.iso_group + '</div></td>' +
-        MAT_COLS.map(([k]) => { const f = m.fields[k]; const u = m.unsourced[k];
-          return '<td>' + (f ? '<div class="mv">' + esc(f.value) + '</div><div class="ms">' + f.sources.join(', ') + '</div>' : '') +
-            (u ? '<div class="mu" title="Not yet sourced">' + esc(u) + ' <i>unsourced</i></div>' : '') + '</td>'; }).join('') + '</tr>' +
-        (m.notes ? '<tr class="mn"><td></td><td colspan="' + MAT_COLS.length + '">' + esc(m.notes) + '</td></tr>' : '')).join('') +
-      '</table></div><p class="desc">' + rows.length + ' of ' + MAT.materials.length + ' grades shown.</p>';
+  const ff = $('.mfilter', el);
+  ff.innerHTML = '<select id="mfam"><option value="">All families</option>' + fams.map(f => '<option>' + f + '</option>').join('') + '</select>' +
+    '<select id="mst"><option value="">Any status</option><option value="confirmed">Confirmed</option><option value="differs">Sources differ</option><option value="review">Needs a second source</option></select>';
+  const LABEL = { confirmed: 'Confirmed', differs: 'Sources differ', review: 'Needs 2nd source' };
+  const pub = k => (MAT.sources[k] || {}).publisher_norm || k;
+  function cell(vals, uns) {
+    let h = '';
+    (vals || []).forEach((v, i) => {
+      const n = v.publishers.length;
+      h += '<div class="' + (i ? 'malt' : 'mv') + '" title="' + esc(v.publishers.join(', ')) + '">' + esc(v.value) + ' <span class="mc ' + (n >= 2 ? 'ok' : '') + '">' + n + '</span></div>';
+    });
+    if (uns) h += '<div class="mu" title="Not printed by any source yet">' + esc(uns) + ' <i>unsourced</i></div>';
+    return h;
   }
-  $('#msrc').innerHTML = '<b>Source key</b><br>' + Object.entries(MAT.sources).map(([k, v]) => '<b>' + k + '</b>: ' + esc(v)).join('<br>');
-  $('#msearch').oninput = draw; $('#mfam').onchange = draw; $('#mconf').onchange = draw; draw();
+  function draw() {
+    const q = norm($('#msearch').value), fam = $('#mfam').value, st = $('#mst').value;
+    const hit = m => !q || norm(m.grade).includes(q) || Object.values(m.fields).some(vs => vs.some(v => norm(v.value).includes(q))) || Object.values(m.unsourced).some(v => norm(v).includes(q));
+    const rows = MAT.materials.filter(m => (!fam || m.family === fam) && (!st || m.status === st) && hit(m));
+    let h = '';
+    fams.filter(f => rows.some(m => m.family === f)).forEach(f => {
+      const cols = MAT.families[f];
+      h += '<h3 class="mfh">' + esc(f) + '</h3><div class="res mtab"><table><tr><th>Grade</th>' + cols.map(c => '<th>' + c[1] + '</th>').join('') + '</tr>' +
+        rows.filter(m => m.family === f).map(m => {
+          const i = MAT.materials.indexOf(m);
+          return '<tr class="mrow" data-i="' + i + '"><td><b>' + esc(m.grade) + '</b><div><span class="badge ' + m.status + '">' + LABEL[m.status] + '</span></div><div class="fam">' +
+            esc([m.subfamily, m.iso_group ? 'ISO ' + m.iso_group : ''].filter(Boolean).join(' · ')) + ' · ' + m.publishers.length + ' publisher' + (m.publishers.length === 1 ? '' : 's') + '</div></td>' +
+            cols.map(([k]) => '<td>' + cell(m.fields[k], m.unsourced[k]) + '</td>').join('') + '</tr>' +
+            (m.notes.length ? '<tr class="mn"><td></td><td colspan="' + cols.length + '">' + esc(m.notes.join(' ')) + '</td></tr>' : '');
+        }).join('') + '</table></div>';
+    });
+    $('#mres').innerHTML = (h || '<p class="warn">No grade matches.</p>') + '<p class="desc">' + rows.length + ' of ' + MAT.materials.length + ' grades shown. The number next to each value is how many independent publishers print it. Click a grade to see exactly what each source prints.</p>';
+    el.querySelectorAll('.mrow').forEach(r => r.onclick = () => evidence(MAT.materials[+r.dataset.i]));
+  }
+  function evidence(m) {
+    const ev = $('#mev');
+    ev.innerHTML = '<div class="res" style="max-width:none;margin-top:12px"><div class="h">What each source prints for ' + esc(m.grade) + ' <button class="btn" id="mevx" style="float:right;height:20px;padding:0 6px">Close</button></div><table>' +
+      m.printed.map(p => { const s = MAT.sources[p.source] || {};
+        return '<tr><td style="width:220px"><b>' + esc(s.publisher_norm || p.source) + '</b><div class="ms">' + esc(s.title || '') + '</div>' + (s.url ? '<div class="ms">' + esc(s.url) + '</div>' : '') + '<div class="ms">Accessed ' + esc(s.accessed || '') + '</div></td><td>' +
+          Object.entries(p.values).filter(([k, v]) => v).map(([k, v]) => '<span class="kv"><i>' + esc(k) + '</i> ' + esc(v) + '</span>').join(' ') +
+          (p.verbatim_row ? '<div class="verb">' + esc(p.verbatim_row) + '</div>' : '') + (p.transcription ? '<div class="ms">' + esc(p.transcription) + '</div>' : '') + '</td></tr>'; }).join('') + '</table></div>';
+    $('#mevx').onclick = () => { ev.innerHTML = ''; };
+    ev.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  const pubs = {}; Object.values(MAT.sources).forEach(s => { (pubs[s.publisher_norm] = pubs[s.publisher_norm] || []).push(s); });
+  $('#msrc').innerHTML = '<b>Sources (' + Object.keys(pubs).length + ' publishers, ' + Object.keys(MAT.sources).length + ' documents)</b><br>' +
+    Object.entries(pubs).sort().map(([p, ss]) => '<b>' + esc(p) + '</b>: ' + ss.map(s => esc(s.title) + (s.url ? ' (' + esc(s.url) + ')' : '')).join('; ')).join('<br>');
+  $('#msearch').oninput = draw; $('#mfam').onchange = draw; $('#mst').onchange = draw; draw();
 }
 
 function setUnits(u) {

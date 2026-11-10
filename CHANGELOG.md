@@ -3,6 +3,10 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Changed (materials)
+- Material data rebuilt on an evidence model: per-source printed values with verbatim rows, URLs and access dates (`data/evidence/`), consensus and status built by `scripts/build_materials.py`. Now 122 grades from 102 documents across steels, aluminium, copper alloys, titanium, nickel alloys and cast irons. Statuses: Confirmed / Sources differ / Needs 2nd source.
+- App: per-value publisher counts, alternatives shown, click a grade for each source's exact printing; family and status filters.
+- `docs/material-sources.md` generated list of every material source.
 ### Added (machines)
 - Machine profiles: add machines (speed range, power, torque, live tool speed, max feed); pick the active machine in the top bar; results over a limit are highlighted with the reason. Power is checked against the torque curve at low speed. Export/import as a JSON file for air-gapped PCs.
 - Core: `spindle_power_available_kw`, `torque_for_power_nm` with tests.

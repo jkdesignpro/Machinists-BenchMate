@@ -61,3 +61,14 @@ label.f .u{color:var(--muted);min-width:34px;font-size:11.5px}
 tr.over td{background:color-mix(in srgb,var(--warn) 12%,transparent)}
 .wmsg{color:var(--warn);font-size:11.5px}
 #machine{height:26px}
+
+.mfh{margin:14px 0 6px;font-size:13px}
+.malt{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.mc{font-family:var(--sans);font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 3px}
+.mc.ok{color:var(--ok);border-color:var(--ok)}
+.badge.differs{color:var(--warn);border-color:var(--warn)}
+.badge.review{color:var(--muted);border-color:var(--line)}
+.mrow{cursor:pointer}.mrow:hover td{background:var(--soft)}
+.kv{display:inline-block;margin:0 10px 3px 0;font-family:var(--mono);font-size:11.5px}
+.kv i{font-family:var(--sans);font-style:normal;color:var(--muted);font-size:10.5px}
+.verb{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--soft);padding:3px 6px;border-radius:3px;margin-top:3px;white-space:pre-wrap}

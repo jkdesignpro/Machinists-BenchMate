@@ -1,17 +1,27 @@
 # Material equivalents tool
 
-Goal: a large, trustworthy cross-reference of material grades across standards, because mismatched equivalents cause real problems on the shop floor.
+Goal: a large, trustworthy cross-reference of material grades across standards, because published equivalence tables often disagree or contain typos.
 
-## Rules
-1. **Every value is sourced.** Each designation lists the source keys that print it (see `docs/sources.md`). A value with no source yet is kept in `unsourced` and shown greyed with an "unsourced" tag; it is never presented as fact.
-2. **Confirmed means two sources.** A grade is *Confirmed* only when two independent sources agree on the main pairing (US grade to EN/W.-Nr. number). Otherwise it is *Review*.
-3. **Disagreements are shown, not fixed.** Sources often disagree or contain typos (examples found so far: Wikipedia lists 431 as S41623; one stockholder prints 4140's JIS grade as SCN440). These go in the grade's notes.
-4. **Equivalent means comparable, not identical.** Chemistry and properties differ between standards; the app says so on every screen.
+## How the data works
+- **Evidence, not opinion.** `data/evidence/*.json` records what each source actually prints for a grade: one record per source, with the verbatim table row where available, the URL and the access date. Nothing is typed in from memory. Values a source doesn't print are null.
+- **Built consensus.** `scripts/build_materials.py` builds `data/materials.json`. For every designation field it groups the values sources print (ignoring spacing, hyphens, "UNS"/"EN AW" prefixes and bracketed notes), counts independent publishers per value, and keeps every alternative.
+- **Independence.** Publishers, not documents, are counted. Sources found to copy another publisher's text word for word are counted as that publisher (`COPIES` in the script).
+- **Status per grade**, judged on the key designation (EN/W.-Nr. number for steels and copper, DIN/W.-Nr. or old BS for aluminium, W.-Nr. for titanium, nickel, cast iron):
+  - *Confirmed*: the top value is printed by 2+ independent publishers and no other value has 2+.
+  - *Sources differ*: two or more values each have 2+ publishers (e.g. 304L is 1.4306 and 1.4307).
+  - *Needs 2nd source*: fewer than two independent publishers so far.
+- **Disagreements and typos are shown, never silently fixed.** Examples found: Wikipedia gives 431 the 416Se UNS number; one stockholder prints 4140's JIS grade as "SCN440"; another prints "1.652" for 1.6582; Outokumpu prints 316Ti's UNS as S32100 (that is 321); 708M40 and 709M40 are each given for 4140/EN19 by five publishers.
+- **In the app:** each value shows a count of publishers; click a grade to see exactly what each source prints, with links.
+- **Equivalent means comparable, not identical.** Chemistry and properties differ between standards; check the standard or mill certificate before substituting.
 
-## Data
-Generated: `data/materials.json` from `scripts/materials_seed.py`. Fields per grade: family, ISO 513 machining group (P/M/K/N/S/H), designations (`aisi`, `uns`, `en_number`, `en_name`, `bs970`, `uk_en`, `jis`, `gb`) each with sources, `unsourced`, `pair_sources`, `status`, `notes`.
+## Coverage (data v2)
+122 grades from 102 source documents: steels (stainless, carbon, alloy, tool, old UK EN numbers), aluminium (wrought and LM casting alloys), copper alloys, titanium, nickel alloys, grey and ductile cast iron. Run the build script for current counts by status.
 
-Current coverage (v0.1 data): 53 grades (stainless, carbon and alloy, tool steels); 21 confirmed by two or more sources.
+## Gaps to fill
+- Copper: second sources for PB102, CA104, plain coppers, beryllium copper, LG2; JIS for copper alloys.
+- Aluminium JIS beyond 2014, 2024, 6061, 7075.
+- Titanium and nickel: UNS numbers and second sources (Special Metals, Haynes, Smiths datasheets).
+- Cast iron: EN-GJL / EN-GJS names and old BS 1452 / BS 2789 grades.
+- Plastics (engineering plastics trade vs generic names).
 
-## Next data batches
-Aluminium (EN AW / AA / old BS such as HE30, HE15), copper alloys (CW/CC numbers, CDA C-numbers, old BS CZ/PB/CA), titanium (ASTM grades, W.-Nr. 3.7xxx), nickel alloys (UNS N0xxxx, W.-Nr. 2.4xxx), cast irons (EN-GJL/GJS vs ASTM A48/A536), plastics (common engineering plastics trade and generic names), plus more steels and the UK old EN numbers (EN1A, EN8, EN19, EN24...). Each batch needs at least two independent sources per grade, and ideally the governing standard.
+All sources: `docs/material-sources.md` (generated).

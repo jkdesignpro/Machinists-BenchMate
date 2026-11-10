@@ -13,14 +13,10 @@ These are standard machining formulas, published in many references. Each functi
 
 Status: the formulas are standard and were checked against worked examples; page-level citations (edition and page) are still to be added for each function.
 
-## Material equivalents (`data/materials.json`)
-All accessed 2026-11-10. Read through an automated page reader, so values were transcribed, not copy-pasted; "Confirmed" grades are cross-checked between sources, which also guards against transcription slips.
-- **TWI**: TWI Ltd, "What are the equivalent European and American standards for common stainless steels?" https://www.twi-global.com/technical-knowledge/faqs/faq-what-are-the-equivalent-european-and-american-standards-for-common-stainless-steels (based on BS EN 10088-1:2005; BS EN 10028-7:2007 for 1.4951).
-- **WYS**: West Yorkshire Steel Co. Ltd, international standards tables: stainless https://www.westyorkssteel.com/steel-specifications/international-standards/stainless-steel/ ; carbon and alloy https://www.westyorkssteel.com/steel-specifications/international-standards/carbon-and-alloy-steel/ ; tool steel https://www.westyorkssteel.com/steel-specifications/international-standards/tool-steel/
-- **MMC**: Mitsubishi Materials Corporation, cutting tools general catalogue, "Material cross reference" (pages N028-N031). https://www.mitsubishicarbide.net/contents/mhg/ru/manual/material_cross_reference.pdf
-- **WIKI**: Wikipedia, "SAE steel grades" (stainless SAE to UNS table). https://en.wikipedia.org/wiki/SAE_steel_grades (CC BY-SA 4.0).
+## Material equivalents (`data/evidence/`, `data/materials.json`)
+Every material source document (102 so far, from publishers including TWI, Outokumpu, the International Stainless Steel Forum (ISO 15510), Atlas Steels, Aalco, Lucefin, Ovako, Smiths Metal Centres, Kennametal, Mitsubishi Materials, West Yorkshire Steel, Doerrenberg, Erasteel, BGH, Aubert & Duval, the Aluminum Association, Diehl, Alumeco and others) is listed with title, URL and access date in **`docs/material-sources.md`** (generated) and in the app under the table. Values were read through an automated page reader; verbatim rows are stored so any transcription can be checked.
 
-Underlying standards the designations come from (not yet read directly): EN 10027-1/-2 (steel names and numbers), EN 10088 (stainless), EN 10083 / 10084 / 10087 (quenched and tempered, case hardening, free-cutting steels), EN ISO 4957 (tool steels), BS 970 (wrought steels), BS 4659 (tool steels), JIS G4051/G4053/G4303/G4404, SAE J403/J404, ASTM/SAE UNS (SAE HS-1086).
+Underlying standards the designations come from (not yet read directly): EN 10027-1/-2, EN 10088, EN 10083/10084/10087, EN ISO 4957, ISO 15510, BS 970, BS 4659, EN 573-3, EN 1706, EN 1412/CEN TS 13388, EN 1561, EN 1563, ASTM A48, ASTM A536, JIS G4051/G4053/G4303/G4404, SAE J403/J404, SAE HS-1086 (UNS).
 
 ## Feature research
 - CNC Machinist Calculator Ultra: in-app menus viewed 2026-11-10 and public pages https://cncmachinistcalculatorultra.com/homePage , https://cncmachinistcalculatorultra.com/tools/machining-chatter , https://apps.apple.com/app/id6474093839 . Used only as a feature checklist.

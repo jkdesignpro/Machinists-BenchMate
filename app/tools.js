@@ -316,9 +316,9 @@ const TOOLS = [
 },
 {
   id: 'materials', group: 'Materials', title: 'Material equivalents',
-  desc: 'Find comparable grades across US (AISI/SAE, UNS), European (EN/W.-Nr.), UK (BS 970, old EN), Japanese (JIS) and Chinese (GB) systems. Every value shows which source prints it.',
+  desc: 'Find comparable grades for steels, aluminium, copper alloys, titanium, nickel alloys and cast irons across US, European, UK, Japanese and Chinese systems. Every value shows how many independent publishers print it, and you can see exactly what each source says.',
   render: el => renderMaterials(el),
   working: 'Equivalents are comparable grades, not identical: chemistry and properties differ between standards. Check the actual standard or mill certificate before substituting.',
-  source: 'See the source list under the table. Grades are marked Confirmed only when two independent sources agree on the main pairing.',
+  source: 'Listed under the table and in docs/sources.md. Confirmed = two or more independent publishers agree on the key designation and none disagree with equal support.',
 },
 ];
