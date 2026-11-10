@@ -5,7 +5,8 @@ All builds run on GitHub Actions; the repository is public, so the minutes are f
 
 | Workflow | When | What |
 |---|---|---|
-| `.github/workflows/ci.yml` | every push and pull request | version check, `cargo test`, WebAssembly build, headless Chromium smoke test of `app/` (every tool, inch and mm, the desktop CSP, no console errors), `clippy` and tests of the desktop crate |
+| `.github/workflows/ci.yml` | every push and pull request | version check, `cargo test`, WebAssembly build, headless Chromium smoke test of `app/` (every tool, inch and mm, the desktop CSP, no console errors), `clippy` and tests of the desktop crate. Run it by hand (Actions > CI > Run workflow) with *Also build the desktop installers* ticked to test-build every installer as workflow artifacts, without a release |
+| `.github/workflows/build-desktop.yml` | called by `ci.yml` (by hand) and `release.yml` | the per-platform installer builds (reusable workflow) |
 | `.github/workflows/release.yml` | you run it, or push a tag `v*` | Windows x64 `.msi` and NSIS `-setup.exe`, Linux x86_64 `.AppImage` and `.deb`, macOS Apple Silicon `.app.zip` (ad hoc signed, verified) and `.dmg`; optional macOS Intel; a **draft** GitHub Release with the CHANGELOG notes, the files and `SHA256SUMS.txt` |
 
 Nothing is published until you press **Publish release** on the draft.

@@ -6,12 +6,17 @@ on:
     tags-ignore: ["v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      desktop_bundles:
+        description: "Also build the desktop installers for every platform (test build, no release)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -82,3 +87,12 @@ jobs:
       - name: cargo test (desktop)
         working-directory: desktop
         run: cargo test --locked
+
+  bundles:
+    name: Desktop installers (test build)
+    if: github.event_name == 'workflow_dispatch' && inputs.desktop_bundles
+    needs: [core-and-web, desktop]
+    uses: ./.github/workflows/build-desktop.yml
+    with:
+      version: ci-${{ github.run_number }}
+      macos_intel: false
