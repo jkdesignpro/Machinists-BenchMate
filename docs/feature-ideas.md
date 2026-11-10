@@ -5,9 +5,9 @@ Ideas from looking at other machinist tools (G-Wizard, HSMAdvisor, FSWizard, ope
 ## Tier 1: high value
 1. **Machine profiles.** Spindle RPM range, power and torque curve, max feed, rigidity, control type. Every result is checked against the machine and flagged if it can't be reached (e.g. RPM capped, torque short at low RPM). Multiple machines, L20 first.
 2. **Cut optimiser with deflection and torque checks.** Tool stick-out and diameter give tool deflection (cantilever beam); spindle torque/power curve gives a limit; solve for the best width/depth/feed inside those limits. Shows *why* a limit binds.
-3. **Arc and helix feed correction.** Feed compensation for internal/external arcs (tool centre vs cutting edge), helical interpolation and ramp angles, plunge roughing. Common cause of broken tools and rarely done by hand.
-4. **Cost per part and tool life.** Taylor tool-life equation, economic cutting speed, cycle time x machine rate + tool cost per edge + material cost. Answers "is running faster actually cheaper?".
-5. **Bar stock planner (Swiss and bar-fed lathes).** Parts per bar from part length, cutoff width, facing allowance, remnant and guide-bushing loss; bar weight and material cost per part.
+3. **Arc and helix feed correction.** *(Done: Arc feed correction, Helical interpolation and ramping. Plunge roughing still to do.)* Feed compensation for internal/external arcs (tool centre vs cutting edge), helical interpolation and ramp angles, plunge roughing. Common cause of broken tools and rarely done by hand.
+4. **Cost per part and tool life.** *(Done: Tool life and cost per part.)* Taylor tool-life equation, economic cutting speed, cycle time x machine rate + tool cost per edge + material cost. Answers "is running faster actually cheaper?".
+5. **Bar stock planner (Swiss and bar-fed lathes).** *(Done. Guide-bushing loss can be entered as part of the remnant.)* Parts per bar from part length, cutoff width, facing allowance, remnant and guide-bushing loss; bar weight and material cost per part.
 6. **Shop knowledge base.** Log what worked for a tool + material + machine, searchable; feeds the adaptive learning profile already planned.
 7. **Material equivalents.** AISI/SAE, EN/BS, DIN W.Nr, JIS cross-reference with machinability groups (ISO P/M/K/N/S/H). Useful in UK shops quoting US drawings.
 
