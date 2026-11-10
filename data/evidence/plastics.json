@@ -1,0 +1,231 @@
+{
+ "sources": {
+  "CURBELL_XREF": {
+   "title": "Curbell Plastics - Brand Cross Reference Guide (Common Name / Trade Name)",
+   "url": "https://www.curbellplastics.com/resource-library/material-selection-tools/brand-cross-reference-guide/",
+   "publisher": "Curbell Plastics",
+   "accessed": "2026-11-10"
+  },
+  "AIRCRAFTMATERIALS_PLAS": {
+   "title": "Aircraft Materials - plastics index (abbreviation / trade name / chemical name)",
+   "url": "https://aircraftmaterials.com/data/plastics/plasall.html",
+   "publisher": "Aircraft Materials",
+   "accessed": "2026-11-10"
+  },
+  "ENSINGER_POM": {
+   "title": "Ensinger - POM plastic - Polyoxymethylene (engineering plastics shapes page)",
+   "url": "https://www.ensingerplastics.com/shapes/engineering-plastics/pom",
+   "publisher": "Ensinger",
+   "accessed": "2026-11-10"
+  },
+  "ENSINGER_CAT2024": {
+   "title": "Ensinger Stock Shapes catalogue (en, 2024)",
+   "url": "https://www.ensingerplastics.com/-/media/Ensinger/Files/Document%20Teaser%20Files/Brochures/Shapes/Stock%20Shapes-catalog-en-2024",
+   "publisher": "Ensinger",
+   "accessed": "2026-11-10"
+  },
+  "MCAM_TIVAR1000": {
+   "title": "Mitsubishi Chemical Advanced Materials TIVAR 1000 UHMW-PE ASTM product data sheet (hosted by Polymershapes)",
+   "url": "https://www.polymershapes.com/wp-content/uploads/2020/09/Material_Data_TIVAR_1000_UHMW-PE.pdf",
+   "publisher": "Mitsubishi Chemical Advanced Materials",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "Acetal (POM)",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "CURBELL_XREF",
+     "values": {
+      "generic": "Acetal",
+      "abbrev": null,
+      "trade": "Acetron; Celcon; Delrin; Ensital SD; Ertacetal; Pomalux; Semitron ESD; SUSTARIN; TECAFORM; Ultraform",
+      "other": "Curbell does not separate copolymer (POM-C) from homopolymer (POM-H)"
+     },
+     "verbatim_row": "Common Name | Trade Name ; Acetal | Acetron®, Celcon®, Delrin®, Ensital® SD, Ertacetal™, Pomalux®, Semitron® ESD, SUSTARIN®, TECAFORM®, Ultraform®"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS_PLAS",
+     "values": {
+      "generic": "Polyacetal (Acetal Copolymer)",
+      "abbrev": "POM",
+      "trade": "Hostaform; Ultraform",
+      "other": "Copolymer row; closing bracket missing on the page"
+     },
+     "verbatim_row": "Abbreviation | Trade name | Chemical name ; POM | Hostaform, Ultraform | Polyacetal (Acetal Copolymer"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS_PLAS",
+     "values": {
+      "generic": "Polyacetal (Acetal Homopolymer)",
+      "abbrev": "POM",
+      "trade": "Delrin",
+      "other": "Homopolymer row"
+     },
+     "verbatim_row": "Abbreviation | Trade name | Chemical name ; POM | Delrin | Polyacetal (Acetal Homopolymer)"
+    },
+    {
+     "source": "ENSINGER_POM",
+     "values": {
+      "generic": "Polyoxymethylene; acetal",
+      "abbrev": "POM",
+      "trade": "Delrin; TECAFORM",
+      "other": "POM-H = acetal homopolymer, POM-C = acetal copolymer; TECAFORM AH listed as acetal copolymer, TECAFORM AD as acetal homopolymer (made from Delrin resin)"
+     },
+     "verbatim_row": "POM plastic - Polyoxymethylene ; POM material, also called acetal plastic ; acetal homopolymer (POM-H) ; acetal copolymer (POM-C) ; It is known under the brand name Delrin® from Delrin USA LLC ; offered by Ensinger under the brand name TECAFORM ; Unfilled Acetal copolymer - TECAFORM AH natural ; Acetal homopolymer manufactured from Delrin® resin - TECAFORM AD natural"
+    },
+    {
+     "source": "ENSINGER_CAT2024",
+     "values": {
+      "generic": null,
+      "abbrev": "POM-C; POM-H",
+      "trade": "TECAFORM AH; TECAFORM AD",
+      "other": "TECAFORM AH = POM-C, TECAFORM AD = POM-H"
+     },
+     "verbatim_row": "TECAFORM AH (POM-C) and TECAFORM AD (POM-H) [p. 19]"
+    }
+   ],
+   "disagreements": "Aircraft Materials and Ensinger both tie Delrin to acetal homopolymer (POM-H); Aircraft Materials gives Hostaform and Ultraform as copolymer, Ensinger its TECAFORM AH as copolymer (POM-C) and TECAFORM AD as homopolymer. Curbell lists all acetal brands, including Delrin and Celcon, under one 'Acetal' heading."
+  },
+  {
+   "grade": "Nylon (PA)",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "CURBELL_XREF",
+     "values": {
+      "generic": "Nylon",
+      "abbrev": null,
+      "trade": "Ensilon; Ertalon; Hydlar ZF; Nylatron; SUSTAMID; TECAMID; Ultramid; Zytel",
+      "other": "Curbell does not separate PA6 / PA66 / cast nylon"
+     },
+     "verbatim_row": "Common Name | Trade Name ; Nylon | Ensilon®, Ertalon™, Hydlar® ZF, Nylatron®, SUSTAMID®, TECAMID®, Ultramid®, Zytel®"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS_PLAS",
+     "values": {
+      "generic": "Polyamide (Nylon)",
+      "abbrev": "PA",
+      "trade": "Zytel",
+      "other": "Rows: PA Type 12u, PA Type 66uJ, PA Type 6J, PA Cast Type 6 - all with trade name Zytel"
+     },
+     "verbatim_row": "Abbreviation | Trade name | Chemical name ; PA Type 12u | Zytel | Polyamide (Nylon) ; PA Type 66uJ | Zytel | Polyamide (Nylon) ; PA Type 6J | Zytel | Polyamide (Nylon) ; PA Cast Type 6 | Zytel | Polyamide (Nylon)"
+    },
+    {
+     "source": "ENSINGER_CAT2024",
+     "values": {
+      "generic": null,
+      "abbrev": "PA 6 C",
+      "trade": "TECAST; TECARIM; TECAMID",
+      "other": "Cast nylon printed as PA 6 C (TECAST, TECARIM); extruded TECAMID 6/66 as 'PA 6/66', TECAMID 12 as PA 12"
+     },
+     "verbatim_row": "TECAST (PA 6 C) and TECARIM (PA 6 C) [p. 17] ; TECAMID 6/66 (PA 6/66) and TECAMID 12 (PA 12) [p. 18]"
+    }
+   ],
+   "disagreements": "Aircraft Materials prints the same trade name (Zytel) against PA 12, PA 66, PA 6 and cast PA 6 alike; Curbell lists Zytel among many nylon brands without a type. A trade name does not identify the nylon type. Ensinger separates cast nylon (PA 6 C: TECAST, TECARIM) from extruded PA 6/66 (TECAMID). The abbreviation stays 'needs 2nd source' because each publisher prints a different one (PA vs PA 6 C)."
+  },
+  {
+   "grade": "PEEK",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "CURBELL_XREF",
+     "values": {
+      "generic": "polyetheretherketone",
+      "abbrev": "PEEK",
+      "trade": "Ketron; SustaPEEK; TECAPEEK",
+      "other": null
+     },
+     "verbatim_row": "Common Name | Trade Name ; PEEK (polyetheretherketone) | Ketron®, SustaPEEK, TECAPEEK®"
+    },
+    {
+     "source": "ENSINGER_CAT2024",
+     "values": {
+      "generic": null,
+      "abbrev": "PEEK",
+      "trade": "TECAPEEK",
+      "other": null
+     },
+     "verbatim_row": "TECAPEEK (PEEK) [p. 11]"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "PTFE",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "CURBELL_XREF",
+     "values": {
+      "generic": "polytetrafluoroethylene",
+      "abbrev": "PTFE",
+      "trade": "Fluorosint; Interplast; Rulon; Semitron ESD",
+      "other": "Semitron ESD is listed under both Acetal and PTFE (a product family, not one material)"
+     },
+     "verbatim_row": "Common Name | Trade Name ; PTFE (polytetrafluoroethylene) | Fluorosint®, Interplast, Rulon®, Semitron® ESD"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS_PLAS",
+     "values": {
+      "generic": "Polytetrafluoroethylene",
+      "abbrev": "PTFE",
+      "trade": "Teflon PTFE",
+      "other": "Abbreviation printed 'PTFE u' (trailing 'u' qualifier not explained on the page)"
+     },
+     "verbatim_row": "Abbreviation | Trade name | Chemical name ; PTFE u | Teflon PTFE | Polytetrafluoroethylene"
+    },
+    {
+     "source": "ENSINGER_CAT2024",
+     "values": {
+      "generic": null,
+      "abbrev": "PTFE",
+      "trade": "TECAFLON PTFE",
+      "other": null
+     },
+     "verbatim_row": "TECAFLON PTFE (PTFE) [p. 14]"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "UHMW-PE",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "CURBELL_XREF",
+     "values": {
+      "generic": "Polyethylene (UHMW, ultra high molecular weight)",
+      "abbrev": null,
+      "trade": "BRAXX; FLEXI FEND; GUR; Lennite; LubX C; LUNS; POLY FEND; Polystone M; Ramex; Tivar; ULTRA FEND",
+      "other": null
+     },
+     "verbatim_row": "Common Name | Trade Name ; Polyethylene (UHMW, ultra high molecular weight) | BRAXX®, FLEXI FEND®, GUR®, Lennite®, LubX® C, LUNS®, POLY FEND®, Polystone® M, Ramex®, Tivar®, ULTRA FEND®"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS_PLAS",
+     "values": {
+      "generic": "Ultra High Molecular Weight Polypropylene",
+      "abbrev": "UHMWPE",
+      "trade": null,
+      "other": "No trade name listed"
+     },
+     "verbatim_row": "Abbreviation | Trade name | Chemical name ; UHMWPE | | Ultra High Molecular Weight Polypropylene"
+    },
+    {
+     "source": "MCAM_TIVAR1000",
+     "values": {
+      "generic": null,
+      "abbrev": "UHMW-PE",
+      "trade": "TIVAR 1000",
+      "other": null
+     },
+     "verbatim_row": "Mitsubishi Chemical Advanced Materials TIVAR® 1000 UHMW-PE, (Natural & Colors except Black) UHMW-PE (ASTM Product Data Sheet)"
+    }
+   ],
+   "disagreements": "Aircraft Materials prints 'UHMWPE' and Mitsubishi Chemical Advanced Materials 'UHMW-PE' (same after ignoring the hyphen). ERROR in source: Aircraft Materials prints the chemical name of UHMWPE as 'Ultra High Molecular Weight Polypropylene' (and HDPE as 'High Density Polypropylene'); the abbreviation says polyethylene. Recorded as printed."
+  }
+ ]
+}

@@ -1,0 +1,339 @@
+{
+ "sources": {
+  "XOMETRY_AL": {
+   "title": "Xometry Europe - Aluminium alloys: cross-reference (DIN / EN / ISO / ANSI-AA / BS / AFNOR / UNE / UNS / JIS / CSA / SIS)",
+   "url": "https://xometry.eu/en/?p=1222",
+   "publisher": "Xometry Europe",
+   "accessed": "2026-11-10"
+  },
+  "GRAVITA_AL": {
+   "title": "Gravita India - aluminium alloys (equivalents table US / EUROPEAN / UK / ASIA)",
+   "url": "https://www.gravitaindia.com/manufacturing/aluminium-alloys",
+   "publisher": "Gravita India",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "1050 / 1050A",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "1050A",
+      "en_aw": "EN AW-1050A",
+      "en_name": "Al99,5",
+      "bs_old": "1B",
+      "uns": "A91050",
+      "jis": "A1050",
+      "din_wnr": "3.0255",
+      "other": "AFNOR A5.; UNE L-3051; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.0255 | EN AW-1050A | Al99,5 | AA1050A | 1B | A5. | L-3051 | A91050 | A1050 | 995(2S) | 4007"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "1200",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "1200",
+      "en_aw": "EN AW-1200",
+      "en_name": "Al99",
+      "bs_old": "1C",
+      "uns": "A91200",
+      "jis": "A1200",
+      "din_wnr": "3.0205",
+      "other": "AFNOR A4; UNE L-3001; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.0205 | EN AW-1200 | Al99 | AA1200 | 1C | A4 | L-3001 | A91200 | A1200 | 990(2S) | 4010"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "2011",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "2011",
+      "en_aw": "EN AW-2011",
+      "en_name": "Al-Cu6BiPb",
+      "bs_old": "FC 1",
+      "uns": "A92011",
+      "jis": "A2011",
+      "din_wnr": "3.1655",
+      "other": "AFNOR A-U5PbBi; UNE L-3192; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.1655 | EN AW-2011 | Al-Cu6BiPb | AA2011 | FC 1 | A-U5PbBi | L-3192 | A92011 | A2011 | CB60(28S) | 4338"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "2014 / 2014A",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "2014",
+      "en_aw": "EN AW-2014",
+      "en_name": "Al-Cu4SiMg",
+      "bs_old": "H 15",
+      "uns": "A92014",
+      "jis": "A2014",
+      "din_wnr": "3.1255",
+      "other": "AFNOR A-U4SG; UNE L-3130; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.1255 | EN AW-2014 | Al-Cu4SiMg | AA2014 | H 15 | A-U4SG | L-3130 | A92014 | A2014 | CS4IN |"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "2024",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "2024",
+      "en_aw": "EN AW-2024",
+      "en_name": "Al-Cu4Mg1",
+      "bs_old": "L97 / L98",
+      "uns": "A92024",
+      "jis": "A2024",
+      "din_wnr": "3.1355",
+      "other": "AFNOR A-U4G1; UNE L-3140; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.1355 | EN AW-2024 | Al-Cu4Mg1 | AA2024 | L97/L98 | A-U4G1 | L-3140 | A92024 | A2024 | CGA2(24S) | 5"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "5052",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "5052",
+      "en_aw": "EN AW-5052",
+      "en_name": "Al-Mg2,5",
+      "bs_old": "L80 / L81",
+      "uns": "A95052",
+      "jis": "A5052",
+      "din_wnr": "3.3523",
+      "other": "AFNOR A-G2,5C; UNE L-3360; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3523 | EN AW-5052 | Al-Mg2,5 | AA5052 | L80/L81 | A-G2,5C | L-3360 | A95052 | A5052 | GR20(57S) | 4120"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "5083",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "5083",
+      "en_aw": "EN AW-5083",
+      "en_name": "Al-Mg4,5Mn",
+      "bs_old": "N8",
+      "uns": "A95083",
+      "jis": "A5083",
+      "din_wnr": "3.3547",
+      "other": "AFNOR A-G4,5MC; UNE L-3321; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3547 | EN AW-5083 | Al-Mg4,5Mn | AA5083 | N8 | A-G4,5MC | L-3321 | A95083 | A5083 | GM4I(D54S) | 4140"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "5251",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "5251",
+      "en_aw": "EN AW-5251",
+      "en_name": "Al-Mg2",
+      "bs_old": "N4",
+      "uns": "A95251",
+      "jis": null,
+      "din_wnr": "3.3525",
+      "other": "AFNOR A-G2M; UNE L-3361; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3525 | EN AW-5251 | Al-Mg2 | AA5251 | N4 | A-G2M | L-3361 | A95251 | | |"
+    }
+   ],
+   "disagreements": "Xometry prints BS N4 for 5251; Aircraft Materials lists BS 3 L80 / 3 L81 under 5251 and the AA table lists L.80 / L.81 under 5052 (Xometry also gives L80/L81 to 5052)."
+  },
+  {
+   "grade": "5754",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "5754",
+      "en_aw": "EN AW-5754",
+      "en_name": "Al-Mg3",
+      "bs_old": null,
+      "uns": "A95754",
+      "jis": null,
+      "din_wnr": "3.3535",
+      "other": "AFNOR A-G3M; UNE L-3390; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3535 | EN AW-5754 | Al-Mg3 | AA5754 | | A-G3M | L-3390 | A95754 | | | 4130"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "6060",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "6060",
+      "en_aw": "EN AW-6060",
+      "en_name": "Al-MgSi",
+      "bs_old": "H9",
+      "uns": "A96060",
+      "jis": null,
+      "din_wnr": "3.3206",
+      "other": "AFNOR AGS; UNE L-3442; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3206 | EN AW-6060 | Al-MgSi | AA6060 | H9 | AGS | L-3442 | A96060 | | | 4140"
+    }
+   ],
+   "disagreements": "Round 2: Xometry prints 6060 = 3.3206 / AlMgSi / BS H9. two other publishers in this data give 3.3206 to 6063, so the same W.-Nr. is printed for two different alloys (6060 and 6063) by different publishers; check which alloy you actually have."
+  },
+  {
+   "grade": "6061",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "6061",
+      "en_aw": "EN AW-6061",
+      "en_name": "Al-Mg1SiCu",
+      "bs_old": "H20",
+      "uns": "A96061",
+      "jis": "A6061",
+      "din_wnr": "3.3211",
+      "other": "AFNOR A-GSUC; UNE L-3420; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3211 | EN AW-6061 | Al-Mg1SiCu | AA6061 | H20 | A-GSUC | L-3420 | A96061 | A6061 | GS11N |"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "6082",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "6082",
+      "en_aw": "EN AW-6082",
+      "en_name": "Al-Si1Mg",
+      "bs_old": "H30",
+      "uns": "A96082",
+      "jis": null,
+      "din_wnr": "3.2315",
+      "other": "AFNOR A-SGM0,7; UNE L-3453; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.2315 | EN AW-6082 | Al-Si1Mg | AA6082 | H30 | A-SGM0,7 | L-3453 | A96082 | | | 4212"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "7020",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "7020",
+      "en_aw": "EN AW-7020",
+      "en_name": "Al-Zn4,5Mg1",
+      "bs_old": "H17",
+      "uns": "A97020",
+      "jis": null,
+      "din_wnr": "3.4335",
+      "other": "AFNOR A-Z5G; UNE L-3741; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.4335 | EN AW-7020 | Al-Zn4,5Mg1 | AA7020 | H17 | A-Z5G | L-3741 | A97020 | | | 4425"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "7075",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "XOMETRY_AL",
+     "values": {
+      "aa": "7075",
+      "en_aw": "EN AW7075",
+      "en_name": "Al-Zn6MgCu",
+      "bs_old": "2L95",
+      "uns": "A97075",
+      "jis": "A7075",
+      "din_wnr": "3.4365",
+      "other": "AFNOR A-Z5GU; UNE L-3710; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+     },
+     "verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.4365 | EN AW7075 | Al-Zn6MgCu | AA7075 | 2L95 | A-Z5GU | L-3710 | A97075 | A7075 | ZG62 |"
+    }
+   ],
+   "disagreements": "Xometry prints the EN number without its hyphen as 'EN AW7075' (recorded as printed)."
+  },
+  {
+   "grade": "LM24 (AlSi8Cu3Fe)",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "GRAVITA_AL",
+     "values": {
+      "aa": "A380 (ASTM B85)",
+      "en_aw": "46500 (EN1706)",
+      "en_name": null,
+      "bs_old": "LM24 (BS1490)",
+      "uns": null,
+      "jis": "ADC10 (JIS5302)",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "US | EUROPEAN | UK | ASIA ; A380 (ASTM B85) | 46500 (EN1706) | LM24 (BS1490) | ADC10 (JIS5302)"
+    }
+   ],
+   "disagreements": "Round 2: Gravita India agrees with MES: LM24 = A380 = EN AC 46500 = JIS ADC10 (MES also prints AC4B)."
+  },
+  {
+   "grade": "6063",
+   "family": "Aluminium",
+   "printed": [],
+   "disagreements": "Round 2: note Xometry prints 3.3206 against 6060 (no 6063 row). The same W.-Nr. is used for both alloys across sources."
+  }
+ ]
+}

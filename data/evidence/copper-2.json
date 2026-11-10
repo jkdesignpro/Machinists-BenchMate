@@ -1,0 +1,349 @@
+{
+ "sources": {
+  "AIRCRAFTMATERIALS_PB102": {
+   "title": "Phosphor Bronze PB 102 (UNS C51000) data page",
+   "url": "https://aircraftmaterials.com/data/copper/pb102.html",
+   "publisher": "Aircraft Materials",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_CA104": {
+   "title": "Smiths Metal Centres CA104 Technical Datasheet",
+   "url": "https://www.smithmetal.com/pdf/bronze/ca104.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_C63000": {
+   "title": "Smiths Metal Centres C63000 Technical Datasheet",
+   "url": "https://www.smithmetal.com/pdf/bronze/c63000.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_LG2": {
+   "title": "Smiths Metal Centres LG2 (CC491K) datasheet",
+   "url": "https://www.smithmetal.com/pdf/bronze/lg2.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_C101": {
+   "title": "Smiths Metal Centres C101 datasheet",
+   "url": "https://www.smithmetal.com/pdf/copper/c101.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "ALUMECO_CW307G": {
+   "title": "CW307G rolled data sheet (EN CuAl10Ni5Fe4 / CW307G)",
+   "url": "https://www.metalcentergroup.fi/media/5v0pcvdq/cw307g_rolled.pdf",
+   "publisher": "Alumeco A/S",
+   "accessed": "2026-11-10"
+  },
+  "RIGHTON_CC491K": {
+   "title": "Righton Blackburns CC491K (LG2) Bar & Castings grade page",
+   "url": "https://www.rightonblackburns.co.uk/datasheets/view/copper-alloy-cc491k-lg2-bar-castings",
+   "publisher": "Righton Blackburns",
+   "accessed": "2026-11-10"
+  },
+  "STUDER_CW101C": {
+   "title": "Studer-Biennaform material page 2.1247 - CuBe2 / CW101C / C17200",
+   "url": "https://www.studersa.com/en/materials/21247-cube2-cw101c-c17200;116",
+   "publisher": "Studer-Biennaform",
+   "accessed": "2026-11-10"
+  },
+  "ALLEMANN_CW101C": {
+   "title": "Jacques Allemann material page CW101C - Copper beryllium / CuBe2 / C17200",
+   "url": "https://www.jacques-allemann.com/en/materials/cw101c-copper-beryllium-cube2-c17200;20",
+   "publisher": "Jacques Allemann",
+   "accessed": "2026-11-10"
+  },
+  "KEMPER_CUOF": {
+   "title": "Gebr. KEMPER rolled products - Cu-OF alloy page",
+   "url": "https://www.kemper-group.com/en-en/rolled-products/alloys/cu-of/",
+   "publisher": "Gebr. KEMPER",
+   "accessed": "2026-11-10"
+  },
+  "ALUMECO_CW008A": {
+   "title": "CW008A rods and bars data sheet (EN Cu-OF / CW008A)",
+   "url": "https://www.metalcentergroup.fi/media/ittfbmpg/cw008a_rods-_bars_ep.pdf",
+   "publisher": "Alumeco A/S",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_C106": {
+   "title": "Smiths Metal Centres C106 datasheet",
+   "url": "https://www.smithmetal.com/pdf/copper/c106.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_CZ108": {
+   "title": "Smiths Metal Centres CZ108 (CW508L) datasheet",
+   "url": "https://www.smithmetal.com/pdf/brass/cz108.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_CZ114": {
+   "title": "Smiths Metal Centres CZ114 (CW721R) datasheet",
+   "url": "https://www.smithmetal.com/pdf/brass/cz114.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "CW451K CuSn5 (PB102, phosphor bronze)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AIRCRAFTMATERIALS_PB102",
+     "values": {
+      "en_number": "CW451K",
+      "en_name": null,
+      "uns": "C51000 / C54400",
+      "bs_old": "PB 102",
+      "jis": null,
+      "iso": "CuSn5",
+      "din_wnr": null,
+      "other": "CDA 510; NES 838; DEF STAN 02-838; BS 2870/2875 'Superceded by BSEN 1652, BSEN 1653 and BSEN 1654 (1998)'"
+     },
+     "verbatim_row": "Phosphor Bronze PB 102 (UNS C51000) ... Specifications: UNS C51000 and UNS C54400 | CDA 510 | ISO CuSn5 | CW451K | NES 838 and DEF STAN 02-838"
+    }
+   ],
+   "disagreements": "Round 2: Aircraft Materials agrees with Aalco on CW451K / C51000 / CuSn5 for PB102. Aircraft Materials also lists UNS C54400 under PB102; C54400 is a leaded free-machining phosphor bronze (Cu-Sn-Pb-Zn), so treat it as the source's broader grouping, not an equivalent."
+  },
+  {
+   "grade": "CW307G (CA104, aluminium bronze)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "SMITHS_CA104",
+     "values": {
+      "en_number": "CW307G",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "CA104",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": "BS B23; DTD197A; cast comparison BS1400 AB2"
+     },
+     "verbatim_row": "CA104 Technical Datasheet ... Related material specifications: CW307G | BS B23 | DTD197A ; 'usually compared with BS1400 AB2 when a cast alternative is acceptable'"
+    },
+    {
+     "source": "SMITHS_C63000",
+     "values": {
+      "en_number": "CW307G",
+      "en_name": null,
+      "uns": "C63000",
+      "bs_old": "CA104",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": "AMS4640"
+     },
+     "verbatim_row": "C63000 Technical Datasheet ... Related material specifications: AMS4640 | CW307G | CA104"
+    },
+    {
+     "source": "ALUMECO_CW307G",
+     "values": {
+      "en_number": "CW307G",
+      "en_name": "CuAl10Ni5Fe4",
+      "uns": "C63000",
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "EN CuAl10Ni5Fe4 / CW307G ; Internal alloy name: CW307G ; EN: CuAl10Ni5Fe4 ; UNS: C63000 ; SIS: - ; GB: - ; JIS: -"
+    }
+   ],
+   "disagreements": "Round 2: Smiths (two datasheets) and Alumeco agree with Aalco's table on CA104 = CW307G; Smiths' C63000 sheet and Alumeco both give UNS C63000. Alumeco prints the JIS field as '-' (no JIS equivalent given)."
+  },
+  {
+   "grade": "CW004A Cu-ETP (C101)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "SMITHS_C101",
+     "values": {
+      "en_number": "CW004A",
+      "en_name": null,
+      "uns": "C11000",
+      "bs_old": "C101",
+      "jis": null,
+      "iso": "Cu-ETP",
+      "din_wnr": "2.0060",
+      "other": "BS1433; printed 'BS13601' (presumably BS EN 13601)"
+     },
+     "verbatim_row": "C101 ... Related material specifications: C11000 ETP | BS1433 | BS13601 CW004A | Cu-ETP | DIN 2.0060"
+    }
+   ],
+   "disagreements": "Round 2: Smiths' C101 sheet prints CW004A, agreeing with Aalco's datasheet rather than the 'CR004A' in Aalco's conversion table. Smiths prints 'BS13601', which reads as a typo for BS EN 13601 (recorded as printed)."
+  },
+  {
+   "grade": "LG2 leaded gunmetal (CC491K)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "SMITHS_LG2",
+     "values": {
+      "en_number": "CC491K",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "LG2",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "LG2 (CC491K)"
+    },
+    {
+     "source": "RIGHTON_CC491K",
+     "values": {
+      "en_number": "CC491K",
+      "en_name": "CuSn5Zn5Pb5-C",
+      "uns": "C83600",
+      "bs_old": "LG2 (BS1400)",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CC491K (LG2) Bar & Castings ... Related Specifications: BS1400 LG2 | CuSn5Zn5Pb5-C | C83600"
+    }
+   ],
+   "disagreements": "Round 2: Smiths and Righton Blackburns both print LG2 = CC491K. Only Righton prints the EN name (CuSn5Zn5Pb5-C) and UNS C83600. Righton's text is not the Aalco text here (Aalco has no LG2 sheet in this data)."
+  },
+  {
+   "grade": "Beryllium copper CW101C (CuBe2)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "STUDER_CW101C",
+     "values": {
+      "en_number": "CW101C",
+      "en_name": "CuBe2",
+      "uns": "C17200",
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": "2.1247",
+      "other": null
+     },
+     "verbatim_row": "2.1247 - CuBe2 / CW101C / C17200 ; Material 2.1247, also known as CuBe2, CW101C or C17200."
+    },
+    {
+     "source": "ALLEMANN_CW101C",
+     "values": {
+      "en_number": "CW101C",
+      "en_name": "CuBe2",
+      "uns": "C17200",
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CW101C - Copper beryllium / CuBe2 / C17200 ; Material CW101C, also referred to as CuBe2 or C17200, is a high-strength copper-beryllium alloy ..."
+    }
+   ],
+   "disagreements": "Round 2 (first data): Studer-Biennaform and Jacques Allemann (both Swiss) agree CW101C = CuBe2 = C17200; Studer also prints W.-Nr. 2.1247. The two sites share a page template ('- Werkstoffe -' titles) but the wording differs, so they are counted as separate publishers."
+  },
+  {
+   "grade": "CW008A Cu-OF (C103?)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "KEMPER_CUOF",
+     "values": {
+      "en_number": "CW008A",
+      "en_name": null,
+      "uns": "C10200",
+      "bs_old": null,
+      "jis": null,
+      "iso": "Cu-OF",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "Cu-OF ; Standard designations: EN CW008A / UNS C10200"
+    },
+    {
+     "source": "ALUMECO_CW008A",
+     "values": {
+      "en_number": "CW008A",
+      "en_name": "Cu-OF",
+      "uns": "C10200",
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": "SS 5011; GB TU0.008 / C10800"
+     },
+     "verbatim_row": "EN Cu-OF / CW008A ; Internal alloy name: CW008A ; EN: EN Cu-OF ; UNS: C10200 ; SS: 5011 ; GB: TU0.008 / C10800 ; JIS: - ; Also known as: -"
+    }
+   ],
+   "disagreements": "Round 2: KEMPER and Alumeco both print CW008A = Cu-OF = UNS C10200, against Aalco's conversion-table 'CR008A' (a refinery-shape number). Neither prints an old BS number, so the link to C103 (or Aalco's C104) is still unconfirmed. Alumeco's GB field prints 'TU0.008 / C10800'; that C10800 differs from the C10200 in its own UNS field (recorded as printed)."
+  },
+  {
+   "grade": "CW024A Cu-DHP (C106)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "SMITHS_C106",
+     "values": {
+      "en_number": "CW024A",
+      "en_name": null,
+      "uns": "C12200",
+      "bs_old": "C106 (BS2874)",
+      "jis": null,
+      "iso": "Cu-DHP",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "C106 ... BS2874: C106 | BS EN 13601: CW024A | C12200 | Cu-DHP"
+    }
+   ],
+   "disagreements": "Round 2: Smiths prints C106 = CW024A (BS EN 13601) = C12200 = Cu-DHP, agreeing with Aalco's datasheet rather than Aalco's table ('CR024A')."
+  },
+  {
+   "grade": "CW508L CuZn37 (CZ108)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "SMITHS_CZ108",
+     "values": {
+      "en_number": "CW508L",
+      "en_name": "CuZn37",
+      "uns": "C27200",
+      "bs_old": "CZ108",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ108 (CW508L) ... Related Material Specifications: CW508L | CZ108 | C27200 | CuZn37"
+    }
+   ],
+   "disagreements": "Round 2: Smiths agrees with Aalco: CZ108 = CW508L = C27200 = CuZn37."
+  },
+  {
+   "grade": "CW721R (CZ114, high tensile brass / 'manganese bronze')",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "SMITHS_CZ114",
+     "values": {
+      "en_number": "CW721R",
+      "en_name": null,
+      "uns": "C67500",
+      "bs_old": "CZ114",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ114 (CW721R) ... Related Material Specifications: Corresponds to UNS C67500."
+    }
+   ],
+   "disagreements": "Round 2: Smiths agrees with Aalco's datasheet: CZ114 = CW721R = UNS C67500. Aalco's conversion table also names CW722R for CZ114; Smiths does not."
+  }
+ ]
+}

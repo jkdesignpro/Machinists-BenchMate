@@ -89,6 +89,10 @@
 [
 "iso",
 "ISO"
+],
+[
+"jis",
+"JIS"
 ]
 ],
 "Titanium": [
@@ -99,6 +103,10 @@
 [
 "astm",
 "ASTM / AISI"
+],
+[
+"uns",
+"UNS"
 ],
 [
 "w_nr",
@@ -123,6 +131,10 @@
 "ASTM / AISI"
 ],
 [
+"uns",
+"UNS"
+],
+[
 "w_nr",
 "W.-Nr."
 ],
@@ -141,20 +153,46 @@
 "Common name"
 ],
 [
-"astm",
-"ASTM / AISI"
+"en_name",
+"EN 1561 / 1563 name"
 ],
 [
-"w_nr",
-"W.-Nr."
+"en_number",
+"EN number"
 ],
 [
 "din_en_name",
-"DIN / EN name"
+"Old DIN name"
+],
+[
+"w_nr",
+"Old DIN W.-Nr."
+],
+[
+"astm",
+"ASTM"
 ],
 [
 "bs",
-"BS"
+"Old BS"
+],
+[
+"jis",
+"JIS"
+]
+],
+"Plastic": [
+[
+"abbrev",
+"Abbreviation"
+],
+[
+"generic",
+"Generic name"
+],
+[
+"trade",
+"Trade names"
 ]
 ]
 },
@@ -178,9 +216,26 @@
 ],
 "Cast iron": [
 "w_nr"
+],
+"Plastic": [
+"abbrev"
 ]
 },
 "sources": {
+"aluminium-2:XOMETRY_AL": {
+"title": "Xometry Europe - Aluminium alloys: cross-reference (DIN / EN / ISO / ANSI-AA / BS / AFNOR / UNE / UNS / JIS / CSA / SIS)",
+"url": "https://xometry.eu/en/?p=1222",
+"publisher": "Xometry Europe",
+"accessed": "2026-11-10",
+"publisher_norm": "Xometry Europe"
+},
+"aluminium-2:GRAVITA_AL": {
+"title": "Gravita India - aluminium alloys (equivalents table US / EUROPEAN / UK / ASIA)",
+"url": "https://www.gravitaindia.com/manufacturing/aluminium-alloys",
+"publisher": "Gravita India",
+"accessed": "2026-11-10",
+"publisher_norm": "Gravita India"
+},
 "aluminium:AALCO_1050A": {
 "title": "Aluminium Alloy 1050A H14 Sheet datasheet",
 "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-1050A-H14-Sheet_57.ashx",
@@ -300,6 +355,104 @@
 "accessed": "2026-11-10",
 "publisher_norm": "Yamaha Motor"
 },
+"copper-2:AIRCRAFTMATERIALS_PB102": {
+"title": "Phosphor Bronze PB 102 (UNS C51000) data page",
+"url": "https://aircraftmaterials.com/data/copper/pb102.html",
+"publisher": "Aircraft Materials",
+"accessed": "2026-11-10",
+"publisher_norm": "Aircraft Materials"
+},
+"copper-2:SMITHS_CA104": {
+"title": "Smiths Metal Centres CA104 Technical Datasheet",
+"url": "https://www.smithmetal.com/pdf/bronze/ca104.pdf",
+"publisher": "Smiths Metal Centres",
+"accessed": "2026-11-10",
+"publisher_norm": "Smiths Metal Centres"
+},
+"copper-2:SMITHS_C63000": {
+"title": "Smiths Metal Centres C63000 Technical Datasheet",
+"url": "https://www.smithmetal.com/pdf/bronze/c63000.pdf",
+"publisher": "Smiths Metal Centres",
+"accessed": "2026-11-10",
+"publisher_norm": "Smiths Metal Centres"
+},
+"copper-2:SMITHS_LG2": {
+"title": "Smiths Metal Centres LG2 (CC491K) datasheet",
+"url": "https://www.smithmetal.com/pdf/bronze/lg2.pdf",
+"publisher": "Smiths Metal Centres",
+"accessed": "2026-11-10",
+"publisher_norm": "Smiths Metal Centres"
+},
+"copper-2:SMITHS_C101": {
+"title": "Smiths Metal Centres C101 datasheet",
+"url": "https://www.smithmetal.com/pdf/copper/c101.pdf",
+"publisher": "Smiths Metal Centres",
+"accessed": "2026-11-10",
+"publisher_norm": "Smiths Metal Centres"
+},
+"copper-2:ALUMECO_CW307G": {
+"title": "CW307G rolled data sheet (EN CuAl10Ni5Fe4 / CW307G)",
+"url": "https://www.metalcentergroup.fi/media/5v0pcvdq/cw307g_rolled.pdf",
+"publisher": "Alumeco A/S",
+"accessed": "2026-11-10",
+"publisher_norm": "Alumeco A/S"
+},
+"copper-2:RIGHTON_CC491K": {
+"title": "Righton Blackburns CC491K (LG2) Bar & Castings grade page",
+"url": "https://www.rightonblackburns.co.uk/datasheets/view/copper-alloy-cc491k-lg2-bar-castings",
+"publisher": "Righton Blackburns",
+"accessed": "2026-11-10",
+"publisher_norm": "Righton Blackburns"
+},
+"copper-2:STUDER_CW101C": {
+"title": "Studer-Biennaform material page 2.1247 - CuBe2 / CW101C / C17200",
+"url": "https://www.studersa.com/en/materials/21247-cube2-cw101c-c17200;116",
+"publisher": "Studer-Biennaform",
+"accessed": "2026-11-10",
+"publisher_norm": "Studer-Biennaform"
+},
+"copper-2:ALLEMANN_CW101C": {
+"title": "Jacques Allemann material page CW101C - Copper beryllium / CuBe2 / C17200",
+"url": "https://www.jacques-allemann.com/en/materials/cw101c-copper-beryllium-cube2-c17200;20",
+"publisher": "Jacques Allemann",
+"accessed": "2026-11-10",
+"publisher_norm": "Jacques Allemann"
+},
+"copper-2:KEMPER_CUOF": {
+"title": "Gebr. KEMPER rolled products - Cu-OF alloy page",
+"url": "https://www.kemper-group.com/en-en/rolled-products/alloys/cu-of/",
+"publisher": "Gebr. KEMPER",
+"accessed": "2026-11-10",
+"publisher_norm": "Gebr. KEMPER"
+},
+"copper-2:ALUMECO_CW008A": {
+"title": "CW008A rods and bars data sheet (EN Cu-OF / CW008A)",
+"url": "https://www.metalcentergroup.fi/media/ittfbmpg/cw008a_rods-_bars_ep.pdf",
+"publisher": "Alumeco A/S",
+"accessed": "2026-11-10",
+"publisher_norm": "Alumeco A/S"
+},
+"copper-2:SMITHS_C106": {
+"title": "Smiths Metal Centres C106 datasheet",
+"url": "https://www.smithmetal.com/pdf/copper/c106.pdf",
+"publisher": "Smiths Metal Centres",
+"accessed": "2026-11-10",
+"publisher_norm": "Smiths Metal Centres"
+},
+"copper-2:SMITHS_CZ108": {
+"title": "Smiths Metal Centres CZ108 (CW508L) datasheet",
+"url": "https://www.smithmetal.com/pdf/brass/cz108.pdf",
+"publisher": "Smiths Metal Centres",
+"accessed": "2026-11-10",
+"publisher_norm": "Smiths Metal Centres"
+},
+"copper-2:SMITHS_CZ114": {
+"title": "Smiths Metal Centres CZ114 (CW721R) datasheet",
+"url": "https://www.smithmetal.com/pdf/brass/cz114.pdf",
+"publisher": "Smiths Metal Centres",
+"accessed": "2026-11-10",
+"publisher_norm": "Smiths Metal Centres"
+},
 "copper:AALCO_ENSTD": {
 "title": "Copper and Copper Alloys - EN Standards for Copper Alloys (Old BS Alloy to EN Alloy table)",
 "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-EN-Standards-for-Copper-Alloys_245.ashx",
@@ -418,6 +571,41 @@
 "publisher": "datasheets.copper.org (Copper Development Association US domain; publisher not named on page)",
 "accessed": "2026-11-10",
 "publisher_norm": "datasheets.copper.org"
+},
+"plastics:CURBELL_XREF": {
+"title": "Curbell Plastics - Brand Cross Reference Guide (Common Name / Trade Name)",
+"url": "https://www.curbellplastics.com/resource-library/material-selection-tools/brand-cross-reference-guide/",
+"publisher": "Curbell Plastics",
+"accessed": "2026-11-10",
+"publisher_norm": "Curbell Plastics"
+},
+"plastics:AIRCRAFTMATERIALS_PLAS": {
+"title": "Aircraft Materials - plastics index (abbreviation / trade name / chemical name)",
+"url": "https://aircraftmaterials.com/data/plastics/plasall.html",
+"publisher": "Aircraft Materials",
+"accessed": "2026-11-10",
+"publisher_norm": "Aircraft Materials"
+},
+"plastics:ENSINGER_POM": {
+"title": "Ensinger - POM plastic - Polyoxymethylene (engineering plastics shapes page)",
+"url": "https://www.ensingerplastics.com/shapes/engineering-plastics/pom",
+"publisher": "Ensinger",
+"accessed": "2026-11-10",
+"publisher_norm": "Ensinger"
+},
+"plastics:ENSINGER_CAT2024": {
+"title": "Ensinger Stock Shapes catalogue (en, 2024)",
+"url": "https://www.ensingerplastics.com/-/media/Ensinger/Files/Document%20Teaser%20Files/Brochures/Shapes/Stock%20Shapes-catalog-en-2024",
+"publisher": "Ensinger",
+"accessed": "2026-11-10",
+"publisher_norm": "Ensinger"
+},
+"plastics:MCAM_TIVAR1000": {
+"title": "Mitsubishi Chemical Advanced Materials TIVAR 1000 UHMW-PE ASTM product data sheet (hosted by Polymershapes)",
+"url": "https://www.polymershapes.com/wp-content/uploads/2020/09/Material_Data_TIVAR_1000_UHMW-PE.pdf",
+"publisher": "Mitsubishi Chemical Advanced Materials",
+"accessed": "2026-11-10",
+"publisher_norm": "Mitsubishi Chemical Advanced Materials"
 },
 "steels-1:TWI": {
 "title": "FAQ: equivalent European and American standards for common stainless steels",
@@ -888,6 +1076,55 @@
 "accessed": "2026-11-10",
 "publisher_norm": "Aubert & Duval"
 },
+"ti-ni-castiron-2:ZAPP_TI": {
+"title": "Zapp Precision Metals Titanium Stocklist (columns Grade 1 / Grade 2 / Grade 5 / Grade 7 with DIN and UNS rows)",
+"url": "https://www.zapp.com/fileadmin/_documents/Downloads/HPA/stock_lists/Titanium_Stocklist.pdf",
+"publisher": "Zapp",
+"accessed": "2026-11-10",
+"publisher_norm": "Zapp"
+},
+"ti-ni-castiron-2:NEONICKEL_NI": {
+"title": "NeoNickel specifications - nickel alloys (Alloy / UNS No. / Werkstoff No. / ASTM / AMS / Other)",
+"url": "https://www.neonickel.com/specifications/nickel-alloys",
+"publisher": "NeoNickel",
+"accessed": "2026-11-10",
+"publisher_norm": "NeoNickel"
+},
+"ti-ni-castiron-2:NEONICKEL_TI": {
+"title": "NeoNickel specifications - titanium alloys (Alloy / UNS No. / Werkstoff No. / ASTM / AMS / Other)",
+"url": "https://www.neonickel.com/specifications/titanium-alloys",
+"publisher": "NeoNickel",
+"accessed": "2026-11-10",
+"publisher_norm": "NeoNickel"
+},
+"ti-ni-castiron-2:MAKEITFROM_TI": {
+"title": "MakeItFrom.com - Wrought Titanium material group (grade names with W.-Nr. and UNS)",
+"url": "https://makeitfrom.com/material-group/Wrought-Titanium",
+"publisher": "MakeItFrom.com",
+"accessed": "2026-11-10",
+"publisher_norm": "MakeItFrom.com"
+},
+"ti-ni-castiron-2:HDC_CASTIRON": {
+"title": "HDC (Wuxi Henderchan Industrial) Cast Iron & Heat-Resistant Steel Code Comparison table",
+"url": "https://hdcmfg.com/resources/data/cast-iron-and-heat-resistant-steel-code-comparison-table/",
+"publisher": "HDC Manufacturing",
+"accessed": "2026-11-10",
+"publisher_norm": "HDC Manufacturing"
+},
+"ti-ni-castiron-2:KIPP_GJL250": {
+"title": "KIPP material overview - cast iron with lamellar graphite (EN-GJL-250)",
+"url": "https://sk.kipp.sk/sk/en/Service/Material-overview/Casting/pid.1097.1108.1244.9811.9815/Cast-iron-with-lamellar-graphite.html",
+"publisher": "KIPP (Heinrich Kipp Werk)",
+"accessed": "2026-11-10",
+"publisher_norm": "KIPP"
+},
+"ti-ni-castiron-2:VDM_PORTFOLIO": {
+"title": "VDM Metals - Portfolio Service Center Europe (VDM Trade Designation / DIN EN / UNS tables for sheet and plate, rod and bar)",
+"url": "https://www.vdm-metals.com/en/products-and-services/service-centers/service-center-europe/portfolio-service-center-europe",
+"publisher": "VDM Metals",
+"accessed": "2026-11-10",
+"publisher_norm": "VDM Metals"
+},
 "titanium-nickel-castiron:KENNAMETAL": {
 "title": "Kennametal Material Data Base (titanium, high-temperature alloy and cast iron sections), hosted by MSC",
 "url": "https://www1.mscdirect.com/images/solutions/kennametal/materialDataBase.pdf",
@@ -907,7 +1144,8 @@
 "Aalco",
 "Aircraft Materials",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -927,10 +1165,23 @@
 {
 "value": "1050A",
 "publishers": [
-"Aircraft Materials"
+"Aircraft Materials",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"en_aw": [
+{
+"value": "EN AW-1050A",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 }
 ],
@@ -939,9 +1190,11 @@
 "value": "Al99,5",
 "publishers": [
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL"
 ]
@@ -961,9 +1214,11 @@
 "value": "3.0255",
 "publishers": [
 "Aircraft Materials",
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:KENNAMETAL",
 "aluminium:AIRCRAFTMATERIALS"
 ]
@@ -974,9 +1229,11 @@
 "value": "1B",
 "publishers": [
 "Aircraft Materials",
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:KENNAMETAL",
 "aluminium:AIRCRAFTMATERIALS"
 ]
@@ -995,10 +1252,23 @@
 {
 "value": "A91050",
 "publishers": [
-"Aalco"
+"Aalco",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_1050A"
+]
+}
+],
+"jis": [
+{
+"value": "A1050",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 }
 ]
@@ -1008,6 +1278,20 @@
 "Aalco gives the UNS for 1050 (A91050) on a 1050A datasheet; 1050 and 1050A are distinct EN 573-3 alloys. Old BS: 'S1B' (Aalco, sheet form prefix) vs '1B' (Kennametal, Aircraft Materials)."
 ],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "1050A",
+"en_aw": "EN AW-1050A",
+"en_name": "Al99,5",
+"bs_old": "1B",
+"uns": "A91050",
+"jis": "A1050",
+"din_wnr": "3.0255",
+"other": "AFNOR A5.; UNE L-3051; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.0255 | EN AW-1050A | Al99,5 | AA1050A | 1B | A5. | L-3051 | A91050 | A1050 | 995(2S) | 4007"
+},
 {
 "source": "aluminium:AALCO_1050A",
 "values": {
@@ -1071,10 +1355,11 @@
 "family": "Aluminium",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
 "Aircraft Materials",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -1082,11 +1367,24 @@
 "value": "1200",
 "publishers": [
 "Aircraft Materials",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"en_aw": [
+{
+"value": "EN AW-1200",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 }
 ],
@@ -1094,9 +1392,11 @@
 {
 "value": "Al99",
 "publishers": [
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2"
 ]
 }
@@ -1105,9 +1405,11 @@
 {
 "value": "3.0205",
 "publishers": [
-"Aircraft Materials"
+"Aircraft Materials",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AIRCRAFTMATERIALS"
 ]
 }
@@ -1116,10 +1418,34 @@
 {
 "value": "1C",
 "publishers": [
-"Aircraft Materials"
+"Aircraft Materials",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"uns": [
+{
+"value": "A91200",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"jis": [
+{
+"value": "A1200",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 }
 ]
@@ -1127,6 +1453,20 @@
 "unsourced": {},
 "notes": [],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "1200",
+"en_aw": "EN AW-1200",
+"en_name": "Al99",
+"bs_old": "1C",
+"uns": "A91200",
+"jis": "A1200",
+"din_wnr": "3.0205",
+"other": "AFNOR A4; UNE L-3001; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.0205 | EN AW-1200 | Al99 | AA1200 | 1C | A4 | L-3001 | A91200 | A1200 | 990(2S) | 4010"
+},
 {
 "source": "aluminium:AA_TABLE_1.2",
 "values": {
@@ -1168,7 +1508,8 @@
 "Aircraft Materials",
 "Kennametal",
 "Parker Steel",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -1178,9 +1519,11 @@
 "Aalco",
 "Aircraft Materials",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_2011",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL",
@@ -1190,11 +1533,13 @@
 ],
 "en_aw": [
 {
-"value": "AW-2011",
+"value": "EN AW-2011",
 "publishers": [
-"Parker Steel"
+"Parker Steel",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:PARKER"
 ]
 }
@@ -1204,9 +1549,11 @@
 "value": "AlCu6BiPb",
 "publishers": [
 "Aalco",
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_2011",
 "aluminium:KENNAMETAL"
 ]
@@ -1228,9 +1575,11 @@
 "Aalco",
 "Aircraft Materials",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_2011",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL",
@@ -1245,9 +1594,11 @@
 "Aalco",
 "Aircraft Materials",
 "Kennametal",
-"Parker Steel"
+"Parker Steel",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_2011",
 "aluminium:KENNAMETAL",
 "aluminium:PARKER",
@@ -1259,10 +1610,23 @@
 {
 "value": "A92011",
 "publishers": [
-"Aalco"
+"Aalco",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_2011"
+]
+}
+],
+"jis": [
+{
+"value": "A2011",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 }
 ]
@@ -1272,6 +1636,20 @@
 "Consistent: FC1 / AlCu6BiPb / 3.1655."
 ],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "2011",
+"en_aw": "EN AW-2011",
+"en_name": "Al-Cu6BiPb",
+"bs_old": "FC 1",
+"uns": "A92011",
+"jis": "A2011",
+"din_wnr": "3.1655",
+"other": "AFNOR A-U5PbBi; UNE L-3192; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.1655 | EN AW-2011 | Al-Cu6BiPb | AA2011 | FC 1 | A-U5PbBi | L-3192 | A92011 | A2011 | CB60(28S) | 4338"
+},
 {
 "source": "aluminium:AALCO_2011",
 "values": {
@@ -1354,7 +1732,8 @@
 "Aircraft Materials",
 "Parker Steel",
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -1362,9 +1741,11 @@
 "value": "2014",
 "publishers": [
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:TI_XREF"
 ]
@@ -1383,18 +1764,29 @@
 ],
 "en_aw": [
 {
-"value": "AW-2014",
+"value": "EN AW-2014",
 "publishers": [
 "Parker Steel",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:PARKER",
 "aluminium:TI_XREF"
 ]
 }
 ],
 "en_name": [
+{
+"value": "Al-Cu4SiMg",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+},
 {
 "value": "EN AW-AlCu4SiMg",
 "publishers": [
@@ -1411,9 +1803,11 @@
 "publishers": [
 "Aircraft Materials",
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:TI_XREF",
 "aluminium:AIRCRAFTMATERIALS"
@@ -1422,6 +1816,19 @@
 ],
 "bs_old": [
 {
+"value": "H 15",
+"publishers": [
+"Aircraft Materials",
+"Titanium Industries Inc.",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:TI_XREF",
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
 "value": "HE15",
 "publishers": [
 "Aircraft Materials",
@@ -1429,17 +1836,6 @@
 ],
 "sources": [
 "aluminium:PARKER",
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "H 15",
-"publishers": [
-"Aircraft Materials",
-"Titanium Industries Inc."
-],
-"sources": [
-"aluminium:TI_XREF",
 "aluminium:AIRCRAFTMATERIALS"
 ]
 },
@@ -1502,9 +1898,11 @@
 {
 "value": "A92014",
 "publishers": [
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF"
 ]
 }
@@ -1513,9 +1911,11 @@
 {
 "value": "A2014",
 "publishers": [
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF"
 ]
 }
@@ -1526,6 +1926,20 @@
 "Parker pairs EN AW-2014 with name 'AlCu4SiMg' - Aircraft Materials and the AA table attach AlCu4SiMg / 3.1255 to 2014A (2014 vs 2014A are distinct EN alloys; check EN 573-3). Aalco's 2014A datasheet has no designations section."
 ],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "2014",
+"en_aw": "EN AW-2014",
+"en_name": "Al-Cu4SiMg",
+"bs_old": "H 15",
+"uns": "A92014",
+"jis": "A2014",
+"din_wnr": "3.1255",
+"other": "AFNOR A-U4SG; UNE L-3130; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.1255 | EN AW-2014 | Al-Cu4SiMg | AA2014 | H 15 | A-U4SG | L-3130 | A92014 | A2014 | CS4IN |"
+},
 {
 "source": "aluminium:AA_TABLE_1.2",
 "values": {
@@ -1594,7 +2008,8 @@
 "Aircraft Materials",
 "Kennametal",
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -1604,9 +2019,11 @@
 "Aircraft Materials",
 "Kennametal",
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL",
 "aluminium:TI_XREF",
@@ -1618,20 +2035,24 @@
 {
 "value": "EN AW-2024",
 "publishers": [
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF"
 ]
 }
 ],
 "en_name": [
 {
-"value": "AlCu4Mg1",
+"value": "Al-Cu4Mg1",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:KENNAMETAL"
 ]
 }
@@ -1643,9 +2064,11 @@
 "Aircraft Materials",
 "Kennametal",
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL",
 "aluminium:TI_XREF",
@@ -1677,9 +2100,11 @@
 "publishers": [
 "Aircraft Materials",
 "Kennametal",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:KENNAMETAL",
 "aluminium:TI_XREF",
 "aluminium:AIRCRAFTMATERIALS"
@@ -1689,9 +2114,11 @@
 "value": "L98",
 "publishers": [
 "Aircraft Materials",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF",
 "aluminium:AIRCRAFTMATERIALS"
 ]
@@ -1719,9 +2146,11 @@
 {
 "value": "A92024",
 "publishers": [
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF"
 ]
 }
@@ -1730,9 +2159,11 @@
 {
 "value": "A2024",
 "publishers": [
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF"
 ]
 }
@@ -1743,6 +2174,20 @@
 "Consistent."
 ],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "2024",
+"en_aw": "EN AW-2024",
+"en_name": "Al-Cu4Mg1",
+"bs_old": "L97 / L98",
+"uns": "A92024",
+"jis": "A2024",
+"din_wnr": "3.1355",
+"other": "AFNOR A-U4G1; UNE L-3140; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.1355 | EN AW-2024 | Al-Cu4Mg1 | AA2024 | L97/L98 | A-U4G1 | L-3140 | A92024 | A2024 | CGA2(24S) | 5"
+},
 {
 "source": "aluminium:AA_TABLE_1.2",
 "values": {
@@ -1806,11 +2251,12 @@
 "family": "Aluminium",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
 "Aalco",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -1819,16 +2265,40 @@
 "publishers": [
 "Aalco",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5052",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL"
 ]
 }
 ],
+"en_aw": [
+{
+"value": "EN AW-5052",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
 "en_name": [
+{
+"value": "Al-Mg2,5",
+"publishers": [
+"Kennametal",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:KENNAMETAL"
+]
+},
 {
 "value": "Al Mg 2.5",
 "publishers": [
@@ -1839,29 +2309,40 @@
 "aluminium:AALCO_5052",
 "aluminium:AA_TABLE_1.2"
 ]
-},
-{
-"value": "AlMg2,5",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"aluminium:KENNAMETAL"
-]
 }
 ],
 "din_wnr": [
 {
 "value": "3.3523",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:KENNAMETAL"
 ]
 }
 ],
 "bs_old": [
+{
+"value": "L80",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+},
+{
+"value": "L81",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+},
 {
 "value": "2L.55",
 "publishers": [
@@ -1907,6 +2388,28 @@
 "aluminium:KENNAMETAL"
 ]
 }
+],
+"uns": [
+{
+"value": "A95052",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"jis": [
+{
+"value": "A5052",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
 ]
 },
 "unsourced": {},
@@ -1914,6 +2417,20 @@
 "AA table lists L.80/L.81 under 5052, whereas Aircraft Materials lists BS 3 L80 / 3 L81 under 5251 - conflicting."
 ],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "5052",
+"en_aw": "EN AW-5052",
+"en_name": "Al-Mg2,5",
+"bs_old": "L80 / L81",
+"uns": "A95052",
+"jis": "A5052",
+"din_wnr": "3.3523",
+"other": "AFNOR A-G2,5C; UNE L-3360; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3523 | EN AW-5052 | Al-Mg2,5 | AA5052 | L80/L81 | A-G2,5C | L-3360 | A95052 | A5052 | GR20(57S) | 4120"
+},
 {
 "source": "aluminium:AALCO_5052",
 "values": {
@@ -1968,7 +2485,8 @@
 "Aalco",
 "Aircraft Materials",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -1978,13 +2496,26 @@
 "Aalco",
 "Aircraft Materials",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5083",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL",
 "aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"en_aw": [
+{
+"value": "EN AW-5083",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 }
 ],
@@ -1998,6 +2529,15 @@
 "sources": [
 "aluminium:AA_TABLE_1.2",
 "aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "Al-Mg4,5Mn",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 },
 {
@@ -2025,9 +2565,11 @@
 "publishers": [
 "Aircraft Materials",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL",
 "aluminium:AIRCRAFTMATERIALS"
@@ -2040,9 +2582,11 @@
 "publishers": [
 "Aircraft Materials",
 "Kennametal",
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:KENNAMETAL",
 "aluminium:AIRCRAFTMATERIALS"
@@ -2053,10 +2597,23 @@
 {
 "value": "A95083",
 "publishers": [
-"Aalco"
+"Aalco",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5083"
+]
+}
+],
+"jis": [
+{
+"value": "A5083",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 }
 ]
@@ -2066,6 +2623,20 @@
 "Kennametal prints 'ASlMg4,5Mn' (typo for AlMg4,5Mn). Aalco prints 'AlMG4.5Mn'. Old BS printed as N8 by all three (form-prefixed NS8 = sheet is not printed by these sources)."
 ],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "5083",
+"en_aw": "EN AW-5083",
+"en_name": "Al-Mg4,5Mn",
+"bs_old": "N8",
+"uns": "A95083",
+"jis": "A5083",
+"din_wnr": "3.3547",
+"other": "AFNOR A-G4,5MC; UNE L-3321; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3547 | EN AW-5083 | Al-Mg4,5Mn | AA5083 | N8 | A-G4,5MC | L-3321 | A95083 | A5083 | GM4I(D54S) | 4140"
+},
 {
 "source": "aluminium:AALCO_5083",
 "values": {
@@ -2129,10 +2700,11 @@
 "family": "Aluminium",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
 "Aalco",
-"Aircraft Materials"
+"Aircraft Materials",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -2140,21 +2712,36 @@
 "value": "5251",
 "publishers": [
 "Aalco",
-"Aircraft Materials"
+"Aircraft Materials",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5251",
 "aluminium:AIRCRAFTMATERIALS"
 ]
 }
 ],
-"en_name": [
+"en_aw": [
 {
-"value": "Al Mg2",
+"value": "EN AW-5251",
 "publishers": [
-"Aalco"
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"en_name": [
+{
+"value": "Al-Mg2",
+"publishers": [
+"Aalco",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5251"
 ]
 }
@@ -2163,9 +2750,11 @@
 {
 "value": "3.3525",
 "publishers": [
-"Aircraft Materials"
+"Aircraft Materials",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AIRCRAFTMATERIALS"
 ]
 }
@@ -2174,19 +2763,47 @@
 {
 "value": "N4",
 "publishers": [
-"Aircraft Materials"
+"Aircraft Materials",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"uns": [
+{
+"value": "A95251",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
 ]
 }
 ]
 },
 "unsourced": {},
 "notes": [
+"Xometry prints BS N4 for 5251; Aircraft Materials lists BS 3 L80 / 3 L81 under 5251 and the AA table lists L.80 / L.81 under 5052 (Xometry also gives L80/L81 to 5052).",
 "Not in AA Table 1.2 or Kennametal."
 ],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "5251",
+"en_aw": "EN AW-5251",
+"en_name": "Al-Mg2",
+"bs_old": "N4",
+"uns": "A95251",
+"jis": null,
+"din_wnr": "3.3525",
+"other": "AFNOR A-G2M; UNE L-3361; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3525 | EN AW-5251 | Al-Mg2 | AA5251 | N4 | A-G2M | L-3361 | A95251 | | |"
+},
 {
 "source": "aluminium:AALCO_5251",
 "values": {
@@ -2222,10 +2839,11 @@
 "family": "Aluminium",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
 "Aalco",
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -2233,9 +2851,11 @@
 "value": "5754",
 "publishers": [
 "Aalco",
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5754",
 "aluminium:KENNAMETAL"
 ]
@@ -2243,23 +2863,27 @@
 ],
 "en_aw": [
 {
-"value": "AW-5754",
+"value": "EN AW-5754",
 "publishers": [
-"Aalco"
+"Aalco",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5754"
 ]
 }
 ],
 "en_name": [
 {
-"value": "Al Mg3",
+"value": "Al-Mg3",
 "publishers": [
 "Aalco",
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5754",
 "aluminium:KENNAMETAL"
 ]
@@ -2269,9 +2893,11 @@
 {
 "value": "3.3535",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:KENNAMETAL"
 ]
 }
@@ -2291,9 +2917,11 @@
 {
 "value": "A95754",
 "publishers": [
-"Aalco"
+"Aalco",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AALCO_5754"
 ]
 }
@@ -2302,6 +2930,20 @@
 "unsourced": {},
 "notes": [],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "5754",
+"en_aw": "EN AW-5754",
+"en_name": "Al-Mg3",
+"bs_old": null,
+"uns": "A95754",
+"jis": null,
+"din_wnr": "3.3535",
+"other": "AFNOR A-G3M; UNE L-3390; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3535 | EN AW-5754 | Al-Mg3 | AA5754 | | A-G3M | L-3390 | A95754 | | | 4130"
+},
 {
 "source": "aluminium:AALCO_5754",
 "values": {
@@ -2338,13 +2980,98 @@
 "subfamily": null,
 "iso_group": null,
 "status": "review",
-"publishers": [],
-"fields": {},
+"publishers": [
+"Xometry Europe"
+],
+"fields": {
+"aa": [
+{
+"value": "6060",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"en_aw": [
+{
+"value": "EN AW-6060",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"en_name": [
+{
+"value": "Al-MgSi",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"din_wnr": [
+{
+"value": "3.3206",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"bs_old": [
+{
+"value": "H9",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"uns": [
+{
+"value": "A96060",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+]
+},
 "unsourced": {},
 "notes": [
+"Round 2: Xometry prints 6060 = 3.3206 / AlMgSi / BS H9. two other publishers in this data give 3.3206 to 6063, so the same W.-Nr. is printed for two different alloys (6060 and 6063) by different publishers; check which alloy you actually have.",
 "No designation section found: Aalco 6060 datasheet has none; not in AA Table 1.2, Kennametal or Aircraft Materials (truncated). Kennametal maps old-DIN AlMgSi0,5 / 3.3206 to 6063 instead."
 ],
-"printed": []
+"printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "6060",
+"en_aw": "EN AW-6060",
+"en_name": "Al-MgSi",
+"bs_old": "H9",
+"uns": "A96060",
+"jis": null,
+"din_wnr": "3.3206",
+"other": "AFNOR AGS; UNE L-3442; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3206 | EN AW-6060 | Al-MgSi | AA6060 | H9 | AGS | L-3442 | A96060 | | | 4140"
+}
+]
 },
 {
 "grade": "6061",
@@ -2355,7 +3082,8 @@
 "publishers": [
 "Aircraft Materials",
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "fields": {
 "aa": [
@@ -2364,9 +3092,11 @@
 "publishers": [
 "Aircraft Materials",
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:TI_XREF",
 "aluminium:AIRCRAFTMATERIALS"
@@ -2377,20 +3107,24 @@
 {
 "value": "EN AW-6061",
 "publishers": [
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF"
 ]
 }
 ],
 "en_name": [
 {
-"value": "AlMg1SiCu",
+"value": "Al-Mg1SiCu",
 "publishers": [
-"The Aluminum Association"
+"The Aluminum Association",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2"
 ]
 }
@@ -2400,9 +3134,11 @@
 "value": "3.3211",
 "publishers": [
 "Aircraft Materials",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF",
 "aluminium:AIRCRAFTMATERIALS"
 ]
@@ -2414,9 +3150,11 @@
 "publishers": [
 "Aircraft Materials",
 "The Aluminum Association",
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:AA_TABLE_1.2",
 "aluminium:TI_XREF",
 "aluminium:AIRCRAFTMATERIALS"
@@ -2454,9 +3192,11 @@
 {
 "value": "A96061",
 "publishers": [
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF"
 ]
 }
@@ -2465,9 +3205,11 @@
 {
 "value": "A6061",
 "publishers": [
-"Titanium Industries Inc."
+"Titanium Industries Inc.",
+"Xometry Europe"
 ],
 "sources": [
+"aluminium-2:XOMETRY_AL",
 "aluminium:TI_XREF"
 ]
 }
@@ -2478,6 +3220,20 @@
 "Consistent: H20 / 3.3211. Aalco 6061 datasheet has no designations section."
 ],
 "printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "6061",
+"en_aw": "EN AW-6061",
+"en_name": "Al-Mg1SiCu",
+"bs_old": "H20",
+"uns": "A96061",
+"jis": "A6061",
+"din_wnr": "3.3211",
+"other": "AFNOR A-GSUC; UNE L-3420; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.3211 | EN AW-6061 | Al-Mg1SiCu | AA6061 | H20 | A-GSUC | L-3420 | A96061 | A6061 | GS11N |"
+},
 {
 "source": "aluminium:AA_TABLE_1.2",
 "values": {
@@ -2519,6 +3275,823 @@
 "other": null
 },
 "verbatim_row": "6061: WS 3.3211, WS 3.3214; ... BS L117; BS L118; H20; HE20 6061 Extrusions; HP20 6061 Plate; HS20 6061 Sheet"
+}
+]
+},
+{
+"grade": "6082",
+"family": "Aluminium",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aalco",
+"Aircraft Materials",
+"Kennametal",
+"Parker Steel",
+"Xometry Europe"
+],
+"fields": {
+"aa": [
+{
+"value": "6082",
+"publishers": [
+"Aalco",
+"Aircraft Materials",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AALCO_6082",
+"aluminium:SMITHS_6082",
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "6351",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"aluminium:KENNAMETAL"
+]
+}
+],
+"en_aw": [
+{
+"value": "EN AW-6082",
+"publishers": [
+"Aalco",
+"Parker Steel",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AALCO_6082",
+"aluminium:SMITHS_6082",
+"aluminium:PARKER"
+]
+}
+],
+"en_name": [
+{
+"value": "Al-Si1Mg",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+},
+{
+"value": "Al Si1MgMn",
+"publishers": [
+"Aalco"
+],
+"sources": [
+"aluminium:AALCO_6082",
+"aluminium:SMITHS_6082"
+]
+},
+{
+"value": "EN AW-AlSilMgMn",
+"publishers": [
+"Parker Steel"
+],
+"sources": [
+"aluminium:PARKER"
+]
+},
+{
+"value": "AlSiMg0,5Mn",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"aluminium:KENNAMETAL"
+]
+}
+],
+"din_wnr": [
+{
+"value": "3.2315",
+"publishers": [
+"Aalco",
+"Aircraft Materials",
+"Kennametal",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AALCO_6082",
+"aluminium:SMITHS_6082",
+"aluminium:KENNAMETAL",
+"aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"bs_old": [
+{
+"value": "HE30",
+"publishers": [
+"Aalco",
+"Aircraft Materials",
+"Parker Steel"
+],
+"sources": [
+"aluminium:AALCO_6082",
+"aluminium:SMITHS_6082",
+"aluminium:PARKER",
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "H30",
+"publishers": [
+"Kennametal",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:KENNAMETAL"
+]
+},
+{
+"value": "HP30",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "HT30",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "HG30",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "HS30",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"uns": [
+{
+"value": "A96082",
+"publishers": [
+"Aalco",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AALCO_6082",
+"aluminium:SMITHS_6082"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Parker prints 'AlSilMgMn' (lower-case L for digit 1 - typo). Kennametal attaches 3.2315/H30 to AA 6351 (no 6082 row) - a known 'nearest alloy' pairing, but 6351 and 6082 are different AA alloys. Not listed in AA Table 1.2."
+],
+"printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "6082",
+"en_aw": "EN AW-6082",
+"en_name": "Al-Si1Mg",
+"bs_old": "H30",
+"uns": "A96082",
+"jis": null,
+"din_wnr": "3.2315",
+"other": "AFNOR A-SGM0,7; UNE L-3453; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.2315 | EN AW-6082 | Al-Si1Mg | AA6082 | H30 | A-SGM0,7 | L-3453 | A96082 | | | 4212"
+},
+{
+"source": "aluminium:AALCO_6082",
+"values": {
+"aa": "6082",
+"en_aw": "EN AW-6082",
+"en_name": "Al Si1MgMn",
+"bs_old": "HE30",
+"uns": "A96082",
+"jis": null,
+"din_wnr": "3.2315",
+"other": null
+},
+"verbatim_row": "Aluminium alloy 6082 also corresponds to the following standard designations and specifications but may not be a direct equivalent: AA6082 HE30 DIN 3.2315 EN AW-6082 ISO: Al Si1MgMn A96082"
+},
+{
+"source": "aluminium:SMITHS_6082",
+"values": {
+"aa": "6082",
+"en_aw": "EN AW-6082",
+"en_name": "Al Si1MgMn",
+"bs_old": "HE30",
+"uns": "A96082",
+"jis": null,
+"din_wnr": "3.2315",
+"other": "Identical to Aalco text - NOT independent"
+},
+"verbatim_row": "AA6082 HE30 DIN 3.2315 EN AW-6082 ISO: Al Si1MgMn A96082"
+},
+{
+"source": "aluminium:PARKER",
+"values": {
+"aa": null,
+"en_aw": "AW-6082",
+"en_name": "EN AW-AlSilMgMn",
+"bs_old": "HE30",
+"uns": null,
+"jis": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "1 AW-6082 EN AW-AlSilMgMn HE30 Red"
+},
+{
+"source": "aluminium:KENNAMETAL",
+"values": {
+"aa": "6351",
+"en_aw": null,
+"en_name": "AlSiMg0,5Mn",
+"bs_old": "H30",
+"uns": null,
+"jis": null,
+"din_wnr": "3.2315",
+"other": "Kennametal row is for AA 6351, not 6082, but uses 3.2315 and H30"
+},
+"verbatim_row": "58-95 6351 3.2315 AlSiMg0,5Mn H30"
+},
+{
+"source": "aluminium:AIRCRAFTMATERIALS",
+"values": {
+"aa": "6082",
+"en_aw": null,
+"en_name": null,
+"bs_old": "HE30 / HP30 / HT30 / HG30 / HS30",
+"uns": null,
+"jis": null,
+"din_wnr": "3.2315",
+"other": "old DIN AlMgSi1Mn; AFNOR A-SGM0.7"
+},
+"verbatim_row": "6082: WS 3.2315; AlMgSi1Mn, A-SGM0.7; BS HE30 6082 Extrusions; BS HP30 Plate; BS HT30 Tube; BS HG30 Wire; BS HS30 Sheet; BS L111-L115"
+}
+]
+},
+{
+"grade": "7020",
+"family": "Aluminium",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aircraft Materials",
+"Xometry Europe"
+],
+"fields": {
+"aa": [
+{
+"value": "7020",
+"publishers": [
+"Aircraft Materials",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"en_aw": [
+{
+"value": "EN AW-7020",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+],
+"en_name": [
+{
+"value": "Al-Zn4,5Mg1",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+},
+{
+"value": "AlZn4.5Mg1",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"din_wnr": [
+{
+"value": "3.4335",
+"publishers": [
+"Aircraft Materials",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"bs_old": [
+{
+"value": "H17",
+"publishers": [
+"Aircraft Materials",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"uns": [
+{
+"value": "A97020",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Only one source found in this pass."
+],
+"printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "7020",
+"en_aw": "EN AW-7020",
+"en_name": "Al-Zn4,5Mg1",
+"bs_old": "H17",
+"uns": "A97020",
+"jis": null,
+"din_wnr": "3.4335",
+"other": "AFNOR A-Z5G; UNE L-3741; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.4335 | EN AW-7020 | Al-Zn4,5Mg1 | AA7020 | H17 | A-Z5G | L-3741 | A97020 | | | 4425"
+},
+{
+"source": "aluminium:AIRCRAFTMATERIALS",
+"values": {
+"aa": "7020",
+"en_aw": null,
+"en_name": "AlZn4.5Mg1",
+"bs_old": "H17",
+"uns": null,
+"jis": null,
+"din_wnr": "3.4335",
+"other": "AFNOR A-Z5G"
+},
+"verbatim_row": "7020: WS 3.4335; EN AW-AlZn4.5Mg1, A-Z5G; BS H17 Alloy 7020"
+}
+]
+},
+{
+"grade": "7075",
+"family": "Aluminium",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aircraft Materials",
+"Kennametal",
+"Parker Steel",
+"The Aluminum Association",
+"Titanium Industries Inc.",
+"Xometry Europe"
+],
+"fields": {
+"aa": [
+{
+"value": "7075",
+"publishers": [
+"Aircraft Materials",
+"Kennametal",
+"The Aluminum Association",
+"Titanium Industries Inc.",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AA_TABLE_1.2",
+"aluminium:KENNAMETAL",
+"aluminium:TI_XREF",
+"aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"en_aw": [
+{
+"value": "EN AW7075",
+"publishers": [
+"Parker Steel",
+"Titanium Industries Inc.",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:PARKER",
+"aluminium:TI_XREF"
+]
+}
+],
+"en_name": [
+{
+"value": "Al-Zn6MgCu",
+"publishers": [
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL"
+]
+},
+{
+"value": "AlZn5,5MgCu",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"aluminium:KENNAMETAL"
+]
+},
+{
+"value": "EN AW-AlZn5,5MgCu",
+"publishers": [
+"Parker Steel"
+],
+"sources": [
+"aluminium:PARKER"
+]
+}
+],
+"din_wnr": [
+{
+"value": "3.4365",
+"publishers": [
+"Kennametal",
+"The Aluminum Association",
+"Titanium Industries Inc.",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:AA_TABLE_1.2",
+"aluminium:KENNAMETAL",
+"aluminium:TI_XREF"
+]
+}
+],
+"bs_old": [
+{
+"value": "2L95",
+"publishers": [
+"Titanium Industries Inc.",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:TI_XREF"
+]
+},
+{
+"value": "L.95",
+"publishers": [
+"The Aluminum Association"
+],
+"sources": [
+"aluminium:AA_TABLE_1.2"
+]
+},
+{
+"value": "L.96",
+"publishers": [
+"The Aluminum Association"
+],
+"sources": [
+"aluminium:AA_TABLE_1.2"
+]
+},
+{
+"value": "DTD5074",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"aluminium:KENNAMETAL"
+]
+},
+{
+"value": "L95",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "L88",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "L160-L170",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "DTD 5110",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+},
+{
+"value": "5124",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"aluminium:AIRCRAFTMATERIALS"
+]
+}
+],
+"uns": [
+{
+"value": "A97075",
+"publishers": [
+"Titanium Industries Inc.",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:TI_XREF"
+]
+}
+],
+"jis": [
+{
+"value": "A7075",
+"publishers": [
+"Titanium Industries Inc.",
+"Xometry Europe"
+],
+"sources": [
+"aluminium-2:XOMETRY_AL",
+"aluminium:TI_XREF"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Xometry prints the EN number without its hyphen as 'EN AW7075' (recorded as printed).",
+"Consistent on 3.4365 / L95. TI prints 'EN AW7075' (missing hyphen)."
+],
+"printed": [
+{
+"source": "aluminium-2:XOMETRY_AL",
+"values": {
+"aa": "7075",
+"en_aw": "EN AW7075",
+"en_name": "Al-Zn6MgCu",
+"bs_old": "2L95",
+"uns": "A97075",
+"jis": "A7075",
+"din_wnr": "3.4365",
+"other": "AFNOR A-Z5GU; UNE L-3710; BS/AFNOR/CSA/SIS cells are run together in the page text; their column placement is less certain than DIN/EN/AA/UNS/JIS"
+},
+"verbatim_row": "DIN (Germany) | EN | ISO | ANSI/AA (USA) | BS (Great Britain) | AFNOR (France) | UNE (Spain) | UNS | JIS (Japan) | CSA (Canada) | SIS (Sweden) ; 3.4365 | EN AW7075 | Al-Zn6MgCu | AA7075 | 2L95 | A-Z5GU | L-3710 | A97075 | A7075 | ZG62 |"
+},
+{
+"source": "aluminium:AA_TABLE_1.2",
+"values": {
+"aa": "7075",
+"en_aw": null,
+"en_name": null,
+"bs_old": "L.95, L.96",
+"uns": null,
+"jis": null,
+"din_wnr": "3.4365",
+"other": "'AIZn6MgCu' printed with capital I; AFNOR A-Z5GU"
+},
+"verbatim_row": "AlZnMgCu1.5 R } 7075 3.4365 T ; L.95, L.96 (BS) Y 7075 ; AlZnMgCu1,5 7075 ; ZG62 7075 ; ... AIZn6MgCu 7075 ; A-Z5GU 7075"
+},
+{
+"source": "aluminium:KENNAMETAL",
+"values": {
+"aa": "7075",
+"en_aw": null,
+"en_name": "AlZn5,5MgCu",
+"bs_old": "DTD5074",
+"uns": null,
+"jis": null,
+"din_wnr": "3.4365",
+"other": null
+},
+"verbatim_row": "60-150 7075 3.4365 AlZn5,5MgCu DTD5074 A-Z5GU"
+},
+{
+"source": "aluminium:PARKER",
+"values": {
+"aa": null,
+"en_aw": "AW-7075",
+"en_name": "EN AW-AlZn5,5MgCu",
+"bs_old": null,
+"uns": null,
+"jis": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "7 AW-7075 EN AW-AlZn5,5MgCu - White"
+},
+{
+"source": "aluminium:TI_XREF",
+"values": {
+"aa": "7075",
+"en_aw": "EN AW7075",
+"en_name": null,
+"bs_old": "2L95",
+"uns": "A97075",
+"jis": "A7075",
+"din_wnr": "3.4365",
+"other": null
+},
+"verbatim_row": "A97075 | AA7075 | 3.4365 | EN AW7075 | A-Z5GU | A7075 | 2L95"
+},
+{
+"source": "aluminium:AIRCRAFTMATERIALS",
+"values": {
+"aa": "7075",
+"en_aw": null,
+"en_name": null,
+"bs_old": "L95 / L88 / L160-L170; DTD 5110 / 5124",
+"uns": null,
+"jis": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "7075: EN 2127; BS 2 L95 Alloy 7075-T651 Plate; BS 2 L88 ...; BS L160; L161; L162; L170; DTD 5110; DTD 5124"
+}
+]
+},
+{
+"grade": "LM24 (AlSi8Cu3Fe)",
+"family": "Aluminium",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Gravita India",
+"MES Inc."
+],
+"fields": {
+"aa": [
+{
+"value": "A380 (ASTM B85)",
+"publishers": [
+"Gravita India",
+"MES Inc."
+],
+"sources": [
+"aluminium-2:GRAVITA_AL",
+"aluminium:MES_CHART"
+]
+}
+],
+"en_aw": [
+{
+"value": "46500 (EN1706)",
+"publishers": [
+"Gravita India",
+"MES Inc."
+],
+"sources": [
+"aluminium-2:GRAVITA_AL",
+"aluminium:MES_CHART"
+]
+}
+],
+"bs_old": [
+{
+"value": "LM24 (BS1490)",
+"publishers": [
+"Gravita India",
+"MES Inc."
+],
+"sources": [
+"aluminium-2:GRAVITA_AL",
+"aluminium:MES_CHART"
+]
+}
+],
+"jis": [
+{
+"value": "ADC10 (JIS5302)",
+"publishers": [
+"Gravita India",
+"MES Inc."
+],
+"sources": [
+"aluminium-2:GRAVITA_AL",
+"aluminium:MES_CHART"
+]
+},
+{
+"value": "AC4B",
+"publishers": [
+"MES Inc."
+],
+"sources": [
+"aluminium:MES_CHART"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: Gravita India agrees with MES: LM24 = A380 = EN AC 46500 = JIS ADC10 (MES also prints AC4B).",
+"Single (lower-tier) source."
+],
+"printed": [
+{
+"source": "aluminium-2:GRAVITA_AL",
+"values": {
+"aa": "A380 (ASTM B85)",
+"en_aw": "46500 (EN1706)",
+"en_name": null,
+"bs_old": "LM24 (BS1490)",
+"uns": null,
+"jis": "ADC10 (JIS5302)",
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "US | EUROPEAN | UK | ASIA ; A380 (ASTM B85) | 46500 (EN1706) | LM24 (BS1490) | ADC10 (JIS5302)"
+},
+{
+"source": "aluminium:MES_CHART",
+"values": {
+"aa": "A380",
+"en_aw": "46500 (EN AC)",
+"en_name": null,
+"bs_old": "LM24",
+"uns": null,
+"jis": "AC4B / ADC10",
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "LM24 Al-Si8Cu3Fe 46500 A-S9U3A-Y4 G-AlSi8Cu3(226) 5075 / 3601 A380 306 AC4B / ADC10"
 }
 ]
 },
@@ -2669,6 +4242,7 @@
 },
 "unsourced": {},
 "notes": [
+"Round 2: note Xometry prints 3.3206 against 6060 (no 6063 row). The same W.-Nr. is used for both alloys across sources.",
 "OLD BS DISAGREES: H9/HE9 (Kennametal, Parker, Aircraft Materials) vs H19 (AA Table 1.2) vs HE19 (Aalco). The '19' variants may be a different BS alloy or a long-propagated error - verify against BS 1474. Aalco DIN number '3.32206' has an extra digit (3.3206 elsewhere). EN name: AlMg0,7Si (Aalco, Parker) vs Kennametal 'AlMg0,5Si'."
 ],
 "printed": [
@@ -2741,253 +4315,6 @@
 "other": null
 },
 "verbatim_row": "6063: BS H9 Alloy 6063; DTD 372B 6063 Bars and Sections"
-}
-]
-},
-{
-"grade": "6082",
-"family": "Aluminium",
-"subfamily": null,
-"iso_group": null,
-"status": "confirmed",
-"publishers": [
-"Aalco",
-"Aircraft Materials",
-"Kennametal",
-"Parker Steel"
-],
-"fields": {
-"aa": [
-{
-"value": "6082",
-"publishers": [
-"Aalco",
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AALCO_6082",
-"aluminium:SMITHS_6082",
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "6351",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"aluminium:KENNAMETAL"
-]
-}
-],
-"en_aw": [
-{
-"value": "EN AW-6082",
-"publishers": [
-"Aalco",
-"Parker Steel"
-],
-"sources": [
-"aluminium:AALCO_6082",
-"aluminium:SMITHS_6082",
-"aluminium:PARKER"
-]
-}
-],
-"en_name": [
-{
-"value": "Al Si1MgMn",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"aluminium:AALCO_6082",
-"aluminium:SMITHS_6082"
-]
-},
-{
-"value": "EN AW-AlSilMgMn",
-"publishers": [
-"Parker Steel"
-],
-"sources": [
-"aluminium:PARKER"
-]
-},
-{
-"value": "AlSiMg0,5Mn",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"aluminium:KENNAMETAL"
-]
-}
-],
-"din_wnr": [
-{
-"value": "3.2315",
-"publishers": [
-"Aalco",
-"Aircraft Materials",
-"Kennametal"
-],
-"sources": [
-"aluminium:AALCO_6082",
-"aluminium:SMITHS_6082",
-"aluminium:KENNAMETAL",
-"aluminium:AIRCRAFTMATERIALS"
-]
-}
-],
-"bs_old": [
-{
-"value": "HE30",
-"publishers": [
-"Aalco",
-"Aircraft Materials",
-"Parker Steel"
-],
-"sources": [
-"aluminium:AALCO_6082",
-"aluminium:SMITHS_6082",
-"aluminium:PARKER",
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "H30",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"aluminium:KENNAMETAL"
-]
-},
-{
-"value": "HP30",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "HT30",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "HG30",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "HS30",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-}
-],
-"uns": [
-{
-"value": "A96082",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"aluminium:AALCO_6082",
-"aluminium:SMITHS_6082"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Parker prints 'AlSilMgMn' (lower-case L for digit 1 - typo). Kennametal attaches 3.2315/H30 to AA 6351 (no 6082 row) - a known 'nearest alloy' pairing, but 6351 and 6082 are different AA alloys. Not listed in AA Table 1.2."
-],
-"printed": [
-{
-"source": "aluminium:AALCO_6082",
-"values": {
-"aa": "6082",
-"en_aw": "EN AW-6082",
-"en_name": "Al Si1MgMn",
-"bs_old": "HE30",
-"uns": "A96082",
-"jis": null,
-"din_wnr": "3.2315",
-"other": null
-},
-"verbatim_row": "Aluminium alloy 6082 also corresponds to the following standard designations and specifications but may not be a direct equivalent: AA6082 HE30 DIN 3.2315 EN AW-6082 ISO: Al Si1MgMn A96082"
-},
-{
-"source": "aluminium:SMITHS_6082",
-"values": {
-"aa": "6082",
-"en_aw": "EN AW-6082",
-"en_name": "Al Si1MgMn",
-"bs_old": "HE30",
-"uns": "A96082",
-"jis": null,
-"din_wnr": "3.2315",
-"other": "Identical to Aalco text - NOT independent"
-},
-"verbatim_row": "AA6082 HE30 DIN 3.2315 EN AW-6082 ISO: Al Si1MgMn A96082"
-},
-{
-"source": "aluminium:PARKER",
-"values": {
-"aa": null,
-"en_aw": "AW-6082",
-"en_name": "EN AW-AlSilMgMn",
-"bs_old": "HE30",
-"uns": null,
-"jis": null,
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "1 AW-6082 EN AW-AlSilMgMn HE30 Red"
-},
-{
-"source": "aluminium:KENNAMETAL",
-"values": {
-"aa": "6351",
-"en_aw": null,
-"en_name": "AlSiMg0,5Mn",
-"bs_old": "H30",
-"uns": null,
-"jis": null,
-"din_wnr": "3.2315",
-"other": "Kennametal row is for AA 6351, not 6082, but uses 3.2315 and H30"
-},
-"verbatim_row": "58-95 6351 3.2315 AlSiMg0,5Mn H30"
-},
-{
-"source": "aluminium:AIRCRAFTMATERIALS",
-"values": {
-"aa": "6082",
-"en_aw": null,
-"en_name": null,
-"bs_old": "HE30 / HP30 / HT30 / HG30 / HS30",
-"uns": null,
-"jis": null,
-"din_wnr": "3.2315",
-"other": "old DIN AlMgSi1Mn; AFNOR A-SGM0.7"
-},
-"verbatim_row": "6082: WS 3.2315; AlMgSi1Mn, A-SGM0.7; BS HE30 6082 Extrusions; BS HP30 Plate; BS HT30 Tube; BS HG30 Wire; BS HS30 Sheet; BS L111-L115"
 }
 ]
 },
@@ -3077,344 +4404,6 @@
 "other": null
 },
 "verbatim_row": "8 AW-6262 AlMg1SiPb - Pink"
-}
-]
-},
-{
-"grade": "7020",
-"family": "Aluminium",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [
-"Aircraft Materials"
-],
-"fields": {
-"aa": [
-{
-"value": "7020",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-}
-],
-"en_name": [
-{
-"value": "AlZn4.5Mg1",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-}
-],
-"din_wnr": [
-{
-"value": "3.4335",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-}
-],
-"bs_old": [
-{
-"value": "H17",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Only one source found in this pass."
-],
-"printed": [
-{
-"source": "aluminium:AIRCRAFTMATERIALS",
-"values": {
-"aa": "7020",
-"en_aw": null,
-"en_name": "AlZn4.5Mg1",
-"bs_old": "H17",
-"uns": null,
-"jis": null,
-"din_wnr": "3.4335",
-"other": "AFNOR A-Z5G"
-},
-"verbatim_row": "7020: WS 3.4335; EN AW-AlZn4.5Mg1, A-Z5G; BS H17 Alloy 7020"
-}
-]
-},
-{
-"grade": "7075",
-"family": "Aluminium",
-"subfamily": null,
-"iso_group": null,
-"status": "confirmed",
-"publishers": [
-"Aircraft Materials",
-"Kennametal",
-"Parker Steel",
-"The Aluminum Association",
-"Titanium Industries Inc."
-],
-"fields": {
-"aa": [
-{
-"value": "7075",
-"publishers": [
-"Aircraft Materials",
-"Kennametal",
-"The Aluminum Association",
-"Titanium Industries Inc."
-],
-"sources": [
-"aluminium:AA_TABLE_1.2",
-"aluminium:KENNAMETAL",
-"aluminium:TI_XREF",
-"aluminium:AIRCRAFTMATERIALS"
-]
-}
-],
-"en_aw": [
-{
-"value": "AW-7075",
-"publishers": [
-"Parker Steel",
-"Titanium Industries Inc."
-],
-"sources": [
-"aluminium:PARKER",
-"aluminium:TI_XREF"
-]
-}
-],
-"en_name": [
-{
-"value": "AlZn5,5MgCu",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"aluminium:KENNAMETAL"
-]
-},
-{
-"value": "EN AW-AlZn5,5MgCu",
-"publishers": [
-"Parker Steel"
-],
-"sources": [
-"aluminium:PARKER"
-]
-}
-],
-"din_wnr": [
-{
-"value": "3.4365",
-"publishers": [
-"Kennametal",
-"The Aluminum Association",
-"Titanium Industries Inc."
-],
-"sources": [
-"aluminium:AA_TABLE_1.2",
-"aluminium:KENNAMETAL",
-"aluminium:TI_XREF"
-]
-}
-],
-"bs_old": [
-{
-"value": "L.95",
-"publishers": [
-"The Aluminum Association"
-],
-"sources": [
-"aluminium:AA_TABLE_1.2"
-]
-},
-{
-"value": "L.96",
-"publishers": [
-"The Aluminum Association"
-],
-"sources": [
-"aluminium:AA_TABLE_1.2"
-]
-},
-{
-"value": "DTD5074",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"aluminium:KENNAMETAL"
-]
-},
-{
-"value": "2L95",
-"publishers": [
-"Titanium Industries Inc."
-],
-"sources": [
-"aluminium:TI_XREF"
-]
-},
-{
-"value": "L95",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "L88",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "L160-L170",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "DTD 5110",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-},
-{
-"value": "5124",
-"publishers": [
-"Aircraft Materials"
-],
-"sources": [
-"aluminium:AIRCRAFTMATERIALS"
-]
-}
-],
-"uns": [
-{
-"value": "A97075",
-"publishers": [
-"Titanium Industries Inc."
-],
-"sources": [
-"aluminium:TI_XREF"
-]
-}
-],
-"jis": [
-{
-"value": "A7075",
-"publishers": [
-"Titanium Industries Inc."
-],
-"sources": [
-"aluminium:TI_XREF"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Consistent on 3.4365 / L95. TI prints 'EN AW7075' (missing hyphen)."
-],
-"printed": [
-{
-"source": "aluminium:AA_TABLE_1.2",
-"values": {
-"aa": "7075",
-"en_aw": null,
-"en_name": null,
-"bs_old": "L.95, L.96",
-"uns": null,
-"jis": null,
-"din_wnr": "3.4365",
-"other": "'AIZn6MgCu' printed with capital I; AFNOR A-Z5GU"
-},
-"verbatim_row": "AlZnMgCu1.5 R } 7075 3.4365 T ; L.95, L.96 (BS) Y 7075 ; AlZnMgCu1,5 7075 ; ZG62 7075 ; ... AIZn6MgCu 7075 ; A-Z5GU 7075"
-},
-{
-"source": "aluminium:KENNAMETAL",
-"values": {
-"aa": "7075",
-"en_aw": null,
-"en_name": "AlZn5,5MgCu",
-"bs_old": "DTD5074",
-"uns": null,
-"jis": null,
-"din_wnr": "3.4365",
-"other": null
-},
-"verbatim_row": "60-150 7075 3.4365 AlZn5,5MgCu DTD5074 A-Z5GU"
-},
-{
-"source": "aluminium:PARKER",
-"values": {
-"aa": null,
-"en_aw": "AW-7075",
-"en_name": "EN AW-AlZn5,5MgCu",
-"bs_old": null,
-"uns": null,
-"jis": null,
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "7 AW-7075 EN AW-AlZn5,5MgCu - White"
-},
-{
-"source": "aluminium:TI_XREF",
-"values": {
-"aa": "7075",
-"en_aw": "EN AW7075",
-"en_name": null,
-"bs_old": "2L95",
-"uns": "A97075",
-"jis": "A7075",
-"din_wnr": "3.4365",
-"other": null
-},
-"verbatim_row": "A97075 | AA7075 | 3.4365 | EN AW7075 | A-Z5GU | A7075 | 2L95"
-},
-{
-"source": "aluminium:AIRCRAFTMATERIALS",
-"values": {
-"aa": "7075",
-"en_aw": null,
-"en_name": null,
-"bs_old": "L95 / L88 / L160-L170; DTD 5110 / 5124",
-"uns": null,
-"jis": null,
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "7075: EN 2127; BS 2 L95 Alloy 7075-T651 Plate; BS 2 L88 ...; BS L160; L161; L162; L170; DTD 5110; DTD 5124"
 }
 ]
 },
@@ -3814,87 +4803,1093 @@
 ]
 },
 {
-"grade": "LM24 (AlSi8Cu3Fe)",
-"family": "Aluminium",
+"grade": "CW451K CuSn5 (PB102, phosphor bronze)",
+"family": "Copper alloy",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"MES Inc."
+"Aalco",
+"Aircraft Materials"
 ],
 "fields": {
-"aa": [
+"en_number": [
 {
-"value": "A380",
+"value": "CW451K",
 "publishers": [
-"MES Inc."
+"Aalco",
+"Aircraft Materials"
 ],
 "sources": [
-"aluminium:MES_CHART"
+"copper-2:AIRCRAFTMATERIALS_PB102",
+"copper:AALCO_CW451K",
+"copper:AALCO_ENSTD"
 ]
 }
 ],
-"en_aw": [
+"uns": [
 {
-"value": "46500 (EN AC)",
+"value": "C51000",
 "publishers": [
-"MES Inc."
+"Aalco",
+"Aircraft Materials"
 ],
 "sources": [
-"aluminium:MES_CHART"
+"copper-2:AIRCRAFTMATERIALS_PB102",
+"copper:AALCO_CW451K"
+]
+},
+{
+"value": "C54400",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"copper-2:AIRCRAFTMATERIALS_PB102"
 ]
 }
 ],
 "bs_old": [
 {
-"value": "LM24",
+"value": "PB102",
 "publishers": [
-"MES Inc."
+"Aalco",
+"Aircraft Materials"
 ],
 "sources": [
-"aluminium:MES_CHART"
+"copper-2:AIRCRAFTMATERIALS_PB102",
+"copper:AALCO_CW451K",
+"copper:AALCO_ENSTD"
 ]
 }
 ],
-"jis": [
+"iso": [
 {
-"value": "AC4B",
+"value": "CuSn5",
 "publishers": [
-"MES Inc."
+"Aalco",
+"Aircraft Materials"
 ],
 "sources": [
-"aluminium:MES_CHART"
-]
-},
-{
-"value": "ADC10",
-"publishers": [
-"MES Inc."
-],
-"sources": [
-"aluminium:MES_CHART"
+"copper-2:AIRCRAFTMATERIALS_PB102",
+"copper:AALCO_CW451K"
 ]
 }
 ]
 },
 "unsourced": {},
 "notes": [
-"Single (lower-tier) source."
+"Round 2: Aircraft Materials agrees with Aalco on CW451K / C51000 / CuSn5 for PB102. Aircraft Materials also lists UNS C54400 under PB102; C54400 is a leaded free-machining phosphor bronze (Cu-Sn-Pb-Zn), so treat it as the source's broader grouping, not an equivalent.",
+"Only Aalco. Smiths phosphor-bronze page could not be fetched (fetch budget exhausted)."
 ],
 "printed": [
 {
-"source": "aluminium:MES_CHART",
+"source": "copper-2:AIRCRAFTMATERIALS_PB102",
 "values": {
-"aa": "A380",
-"en_aw": "46500 (EN AC)",
+"en_number": "CW451K",
 "en_name": null,
-"bs_old": "LM24",
-"uns": null,
-"jis": "AC4B / ADC10",
+"uns": "C51000 / C54400",
+"bs_old": "PB 102",
+"jis": null,
+"iso": "CuSn5",
+"din_wnr": null,
+"other": "CDA 510; NES 838; DEF STAN 02-838; BS 2870/2875 'Superceded by BSEN 1652, BSEN 1653 and BSEN 1654 (1998)'"
+},
+"verbatim_row": "Phosphor Bronze PB 102 (UNS C51000) ... Specifications: UNS C51000 and UNS C54400 | CDA 510 | ISO CuSn5 | CW451K | NES 838 and DEF STAN 02-838"
+},
+{
+"source": "copper:AALCO_CW451K",
+"values": {
+"en_number": "CW451K",
+"en_name": null,
+"uns": "C51000",
+"bs_old": "PB102",
+"jis": null,
+"iso": "CuSn5",
 "din_wnr": null,
 "other": null
 },
-"verbatim_row": "LM24 Al-Si8Cu3Fe 46500 A-S9U3A-Y4 G-AlSi8Cu3(226) 5075 / 3601 A380 306 AC4B / ADC10"
+"verbatim_row": "CW451K/PB102 Bronze corresponds to the following designations but may not be a direct equivalent: UNS C51000 ISO CuSn5"
+},
+{
+"source": "copper:AALCO_ENSTD",
+"values": {
+"en_number": "CW451K",
+"en_name": null,
+"uns": null,
+"bs_old": "PB102",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "PB102 | CW451K | Phosphor Bronze"
+}
+]
+},
+{
+"grade": "CW307G (CA104, aluminium bronze)",
+"family": "Copper alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aalco",
+"Alumeco A/S",
+"Smiths Metal Centres"
+],
+"fields": {
+"en_number": [
+{
+"value": "CW307G",
+"publishers": [
+"Aalco",
+"Alumeco A/S",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CA104",
+"copper-2:SMITHS_C63000",
+"copper-2:ALUMECO_CW307G",
+"copper:AALCO_ENSTD"
+]
+}
+],
+"en_name": [
+{
+"value": "CuAl10Ni5Fe4",
+"publishers": [
+"Alumeco A/S"
+],
+"sources": [
+"copper-2:ALUMECO_CW307G"
+]
+}
+],
+"uns": [
+{
+"value": "C63000",
+"publishers": [
+"Alumeco A/S",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C63000",
+"copper-2:ALUMECO_CW307G"
+]
+}
+],
+"bs_old": [
+{
+"value": "CA104",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CA104",
+"copper-2:SMITHS_C63000",
+"copper:AALCO_ENSTD"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: Smiths (two datasheets) and Alumeco agree with Aalco's table on CA104 = CW307G; Smiths' C63000 sheet and Alumeco both give UNS C63000. Alumeco prints the JIS field as '-' (no JIS equivalent given).",
+"Only Aalco; its CW307G datasheet has no designations section. EN name (CuAl10Ni5Fe4) and UNS not printed by any fetched source."
+],
+"printed": [
+{
+"source": "copper-2:SMITHS_CA104",
+"values": {
+"en_number": "CW307G",
+"en_name": null,
+"uns": null,
+"bs_old": "CA104",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": "BS B23; DTD197A; cast comparison BS1400 AB2"
+},
+"verbatim_row": "CA104 Technical Datasheet ... Related material specifications: CW307G | BS B23 | DTD197A ; 'usually compared with BS1400 AB2 when a cast alternative is acceptable'"
+},
+{
+"source": "copper-2:SMITHS_C63000",
+"values": {
+"en_number": "CW307G",
+"en_name": null,
+"uns": "C63000",
+"bs_old": "CA104",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": "AMS4640"
+},
+"verbatim_row": "C63000 Technical Datasheet ... Related material specifications: AMS4640 | CW307G | CA104"
+},
+{
+"source": "copper-2:ALUMECO_CW307G",
+"values": {
+"en_number": "CW307G",
+"en_name": "CuAl10Ni5Fe4",
+"uns": "C63000",
+"bs_old": null,
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "EN CuAl10Ni5Fe4 / CW307G ; Internal alloy name: CW307G ; EN: CuAl10Ni5Fe4 ; UNS: C63000 ; SIS: - ; GB: - ; JIS: -"
+},
+{
+"source": "copper:AALCO_ENSTD",
+"values": {
+"en_number": "CW307G",
+"en_name": null,
+"uns": null,
+"bs_old": "CA104",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CA104 | CW307G | Aluminium Bronze"
+}
+]
+},
+{
+"grade": "CW004A Cu-ETP (C101)",
+"family": "Copper alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"fields": {
+"en_number": [
+{
+"value": "CW004A",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C101",
+"copper:AALCO_CW004A"
+]
+},
+{
+"value": "CR004A",
+"publishers": [
+"Aalco"
+],
+"sources": [
+"copper:AALCO_ENSTD"
+]
+}
+],
+"uns": [
+{
+"value": "C11000",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C101",
+"copper:AALCO_CW004A"
+]
+}
+],
+"bs_old": [
+{
+"value": "C101",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C101",
+"copper:AALCO_CW004A",
+"copper:AALCO_ENSTD"
+]
+}
+],
+"din_wnr": [
+{
+"value": "2.0060",
+"publishers": [
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C101"
+]
+}
+],
+"iso": [
+{
+"value": "Cu-ETP",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C101",
+"copper:AALCO_CW004A"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: Smiths' C101 sheet prints CW004A, agreeing with Aalco's datasheet rather than the 'CR004A' in Aalco's conversion table. Smiths prints 'BS13601', which reads as a typo for BS EN 13601 (recorded as printed).",
+"Aalco is internally inconsistent: its conversion table prints C101 -> 'CR004A' (and C104 -> CR008A, C106 -> CR024A) while its datasheet prints CW004A. CR-prefix numbers are refinery-shape designations; the wrought product number is CW004A. Treat 'CR004A' as an error for a wrought-bar lookup."
+],
+"printed": [
+{
+"source": "copper-2:SMITHS_C101",
+"values": {
+"en_number": "CW004A",
+"en_name": null,
+"uns": "C11000",
+"bs_old": "C101",
+"jis": null,
+"iso": "Cu-ETP",
+"din_wnr": "2.0060",
+"other": "BS1433; printed 'BS13601' (presumably BS EN 13601)"
+},
+"verbatim_row": "C101 ... Related material specifications: C11000 ETP | BS1433 | BS13601 CW004A | Cu-ETP | DIN 2.0060"
+},
+{
+"source": "copper:AALCO_CW004A",
+"values": {
+"en_number": "CW004A",
+"en_name": null,
+"uns": "C11000",
+"bs_old": "C101",
+"jis": null,
+"iso": "Cu-ETP",
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "C101/CW004A HC Copper corresponds to the following designations but may not be a direct equivalent: UNS C11000 ISO Cu-ETP"
+},
+{
+"source": "copper:AALCO_ENSTD",
+"values": {
+"en_number": "CR004A",
+"en_name": null,
+"uns": null,
+"bs_old": "C101",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "C101 | CR004A |"
+}
+]
+},
+{
+"grade": "LG2 leaded gunmetal (CC491K)",
+"family": "Copper alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Righton Blackburns",
+"Smiths Metal Centres"
+],
+"fields": {
+"en_number": [
+{
+"value": "CC491K",
+"publishers": [
+"Righton Blackburns",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_LG2",
+"copper-2:RIGHTON_CC491K"
+]
+}
+],
+"en_name": [
+{
+"value": "CuSn5Zn5Pb5-C",
+"publishers": [
+"Righton Blackburns"
+],
+"sources": [
+"copper-2:RIGHTON_CC491K"
+]
+}
+],
+"uns": [
+{
+"value": "C83600",
+"publishers": [
+"Righton Blackburns"
+],
+"sources": [
+"copper-2:RIGHTON_CC491K"
+]
+}
+],
+"bs_old": [
+{
+"value": "LG2",
+"publishers": [
+"Righton Blackburns",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_LG2",
+"copper-2:RIGHTON_CC491K",
+"copper:SMITHS_LEADEDBRONZE"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: Smiths and Righton Blackburns both print LG2 = CC491K. Only Righton prints the EN name (CuSn5Zn5Pb5-C) and UNS C83600. Righton's text is not the Aalco text here (Aalco has no LG2 sheet in this data).",
+"Not researched to completion: fetch budget exhausted before LG2 / CC491K / C83600 cross-reference could be read. No equivalence data recorded."
+],
+"printed": [
+{
+"source": "copper-2:SMITHS_LG2",
+"values": {
+"en_number": "CC491K",
+"en_name": null,
+"uns": null,
+"bs_old": "LG2",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "LG2 (CC491K)"
+},
+{
+"source": "copper-2:RIGHTON_CC491K",
+"values": {
+"en_number": "CC491K",
+"en_name": "CuSn5Zn5Pb5-C",
+"uns": "C83600",
+"bs_old": "LG2 (BS1400)",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CC491K (LG2) Bar & Castings ... Related Specifications: BS1400 LG2 | CuSn5Zn5Pb5-C | C83600"
+},
+{
+"source": "copper:SMITHS_LEADEDBRONZE",
+"values": {
+"en_number": null,
+"en_name": null,
+"uns": null,
+"bs_old": "LG2",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "LG2 Leaded Bronze: https://www.smithmetal.com/lg2.htm"
+}
+]
+},
+{
+"grade": "Beryllium copper CW101C (CuBe2)",
+"family": "Copper alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Jacques Allemann",
+"Studer-Biennaform"
+],
+"fields": {
+"en_number": [
+{
+"value": "CW101C",
+"publishers": [
+"Jacques Allemann",
+"Studer-Biennaform"
+],
+"sources": [
+"copper-2:STUDER_CW101C",
+"copper-2:ALLEMANN_CW101C"
+]
+}
+],
+"en_name": [
+{
+"value": "CuBe2",
+"publishers": [
+"Jacques Allemann",
+"Studer-Biennaform"
+],
+"sources": [
+"copper-2:STUDER_CW101C",
+"copper-2:ALLEMANN_CW101C"
+]
+}
+],
+"uns": [
+{
+"value": "C17200",
+"publishers": [
+"Jacques Allemann",
+"Studer-Biennaform"
+],
+"sources": [
+"copper-2:STUDER_CW101C",
+"copper-2:ALLEMANN_CW101C"
+]
+}
+],
+"din_wnr": [
+{
+"value": "2.1247",
+"publishers": [
+"Studer-Biennaform"
+],
+"sources": [
+"copper-2:STUDER_CW101C"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2 (first data): Studer-Biennaform and Jacques Allemann (both Swiss) agree CW101C = CuBe2 = C17200; Studer also prints W.-Nr. 2.1247. The two sites share a page template ('- Werkstoffe -' titles) but the wording differs, so they are counted as separate publishers.",
+"Not researched: Smiths CW101C page fetch failed (budget exhausted). No values recorded."
+],
+"printed": [
+{
+"source": "copper-2:STUDER_CW101C",
+"values": {
+"en_number": "CW101C",
+"en_name": "CuBe2",
+"uns": "C17200",
+"bs_old": null,
+"jis": null,
+"iso": null,
+"din_wnr": "2.1247",
+"other": null
+},
+"verbatim_row": "2.1247 - CuBe2 / CW101C / C17200 ; Material 2.1247, also known as CuBe2, CW101C or C17200."
+},
+{
+"source": "copper-2:ALLEMANN_CW101C",
+"values": {
+"en_number": "CW101C",
+"en_name": "CuBe2",
+"uns": "C17200",
+"bs_old": null,
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CW101C - Copper beryllium / CuBe2 / C17200 ; Material CW101C, also referred to as CuBe2 or C17200, is a high-strength copper-beryllium alloy ..."
+}
+]
+},
+{
+"grade": "CW008A Cu-OF (C103?)",
+"family": "Copper alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aalco",
+"Alumeco A/S",
+"Gebr. KEMPER"
+],
+"fields": {
+"en_number": [
+{
+"value": "CW008A",
+"publishers": [
+"Alumeco A/S",
+"Gebr. KEMPER"
+],
+"sources": [
+"copper-2:KEMPER_CUOF",
+"copper-2:ALUMECO_CW008A"
+]
+},
+{
+"value": "CR008A",
+"publishers": [
+"Aalco"
+],
+"sources": [
+"copper:AALCO_ENSTD"
+]
+}
+],
+"en_name": [
+{
+"value": "Cu-OF",
+"publishers": [
+"Alumeco A/S"
+],
+"sources": [
+"copper-2:ALUMECO_CW008A"
+]
+}
+],
+"uns": [
+{
+"value": "C10200",
+"publishers": [
+"Alumeco A/S",
+"Gebr. KEMPER"
+],
+"sources": [
+"copper-2:KEMPER_CUOF",
+"copper-2:ALUMECO_CW008A"
+]
+}
+],
+"bs_old": [
+{
+"value": "C104",
+"publishers": [
+"Aalco"
+],
+"sources": [
+"copper:AALCO_ENSTD"
+]
+}
+],
+"iso": [
+{
+"value": "Cu-OF",
+"publishers": [
+"Gebr. KEMPER"
+],
+"sources": [
+"copper-2:KEMPER_CUOF"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: KEMPER and Alumeco both print CW008A = Cu-OF = UNS C10200, against Aalco's conversion-table 'CR008A' (a refinery-shape number). Neither prints an old BS number, so the link to C103 (or Aalco's C104) is still unconfirmed. Alumeco's GB field prints 'TU0.008 / C10800'; that C10800 differs from the C10200 in its own UNS field (recorded as printed).",
+"Aalco maps old BS C104 (not C103) to CR008A. Commonly C103 = Cu-OF = CW008A, but no fetched source printed that; flag for verification. OF copper UNS (C10200) not printed by any fetched source."
+],
+"printed": [
+{
+"source": "copper-2:KEMPER_CUOF",
+"values": {
+"en_number": "CW008A",
+"en_name": null,
+"uns": "C10200",
+"bs_old": null,
+"jis": null,
+"iso": "Cu-OF",
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "Cu-OF ; Standard designations: EN CW008A / UNS C10200"
+},
+{
+"source": "copper-2:ALUMECO_CW008A",
+"values": {
+"en_number": "CW008A",
+"en_name": "Cu-OF",
+"uns": "C10200",
+"bs_old": null,
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": "SS 5011; GB TU0.008 / C10800"
+},
+"verbatim_row": "EN Cu-OF / CW008A ; Internal alloy name: CW008A ; EN: EN Cu-OF ; UNS: C10200 ; SS: 5011 ; GB: TU0.008 / C10800 ; JIS: - ; Also known as: -"
+},
+{
+"source": "copper:AALCO_ENSTD",
+"values": {
+"en_number": "CR008A",
+"en_name": null,
+"uns": null,
+"bs_old": "C104",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "C104 | CR008A |"
+}
+]
+},
+{
+"grade": "CW024A Cu-DHP (C106)",
+"family": "Copper alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"fields": {
+"en_number": [
+{
+"value": "CW024A",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C106",
+"copper:AALCO_CW024A"
+]
+},
+{
+"value": "CR024A",
+"publishers": [
+"Aalco"
+],
+"sources": [
+"copper:AALCO_ENSTD"
+]
+}
+],
+"uns": [
+{
+"value": "C12200",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C106",
+"copper:AALCO_CW024A"
+]
+}
+],
+"bs_old": [
+{
+"value": "C106",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C106",
+"copper:AALCO_CW024A",
+"copper:AALCO_ENSTD"
+]
+}
+],
+"iso": [
+{
+"value": "Cu-DHP",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_C106",
+"copper:AALCO_CW024A"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: Smiths prints C106 = CW024A (BS EN 13601) = C12200 = Cu-DHP, agreeing with Aalco's datasheet rather than Aalco's table ('CR024A').",
+"Same CR/CW inconsistency as C101."
+],
+"printed": [
+{
+"source": "copper-2:SMITHS_C106",
+"values": {
+"en_number": "CW024A",
+"en_name": null,
+"uns": "C12200",
+"bs_old": "C106 (BS2874)",
+"jis": null,
+"iso": "Cu-DHP",
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "C106 ... BS2874: C106 | BS EN 13601: CW024A | C12200 | Cu-DHP"
+},
+{
+"source": "copper:AALCO_CW024A",
+"values": {
+"en_number": "CW024A",
+"en_name": null,
+"uns": "C12200",
+"bs_old": "C106",
+"jis": null,
+"iso": "Cu-DHP",
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "C106/CW024A Copper corresponds to the following designations but may not be a direct equivalent: UNS C12200 ISO Cu-DHP"
+},
+{
+"source": "copper:AALCO_ENSTD",
+"values": {
+"en_number": "CR024A",
+"en_name": null,
+"uns": null,
+"bs_old": "C106",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "C106 | CR024A |"
+}
+]
+},
+{
+"grade": "CW508L CuZn37 (CZ108)",
+"family": "Copper alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"fields": {
+"en_number": [
+{
+"value": "CW508L",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CZ108",
+"copper:AALCO_CW508L",
+"copper:AALCO_ENSTD"
+]
+}
+],
+"en_name": [
+{
+"value": "CuZn37",
+"publishers": [
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CZ108"
+]
+}
+],
+"uns": [
+{
+"value": "C27200",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CZ108",
+"copper:AALCO_CW508L"
+]
+}
+],
+"bs_old": [
+{
+"value": "CZ108",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CZ108",
+"copper:AALCO_CW508L",
+"copper:AALCO_ENSTD"
+]
+}
+],
+"iso": [
+{
+"value": "CuZn37",
+"publishers": [
+"Aalco"
+],
+"sources": [
+"copper:AALCO_CW508L"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: Smiths agrees with Aalco: CZ108 = CW508L = C27200 = CuZn37.",
+"Only Aalco."
+],
+"printed": [
+{
+"source": "copper-2:SMITHS_CZ108",
+"values": {
+"en_number": "CW508L",
+"en_name": "CuZn37",
+"uns": "C27200",
+"bs_old": "CZ108",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CZ108 (CW508L) ... Related Material Specifications: CW508L | CZ108 | C27200 | CuZn37"
+},
+{
+"source": "copper:AALCO_CW508L",
+"values": {
+"en_number": "CW508L",
+"en_name": null,
+"uns": "C27200",
+"bs_old": "CZ108",
+"jis": null,
+"iso": "CuZn37",
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CZ108 / CW508L corresponds to the following designations but may not be a direct equivalent: UNS C27200 ISO CuZn37"
+},
+{
+"source": "copper:AALCO_ENSTD",
+"values": {
+"en_number": "CW508L",
+"en_name": null,
+"uns": null,
+"bs_old": "CZ108",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CZ108 | CW508L |"
+}
+]
+},
+{
+"grade": "CW721R (CZ114, high tensile brass / 'manganese bronze')",
+"family": "Copper alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"fields": {
+"en_number": [
+{
+"value": "CW721R",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CZ114",
+"copper:AALCO_CW721R"
+]
+},
+{
+"value": "CW721R & CW722R",
+"publishers": [
+"Aalco"
+],
+"sources": [
+"copper:AALCO_ENSTD"
+]
+}
+],
+"uns": [
+{
+"value": "C67500",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CZ114",
+"copper:AALCO_CW721R"
+]
+}
+],
+"bs_old": [
+{
+"value": "CZ114",
+"publishers": [
+"Aalco",
+"Smiths Metal Centres"
+],
+"sources": [
+"copper-2:SMITHS_CZ114",
+"copper:AALCO_CW721R",
+"copper:AALCO_ENSTD"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: Smiths agrees with Aalco's datasheet: CZ114 = CW721R = UNS C67500. Aalco's conversion table also names CW722R for CZ114; Smiths does not.",
+"Only Aalco (one publisher)."
+],
+"printed": [
+{
+"source": "copper-2:SMITHS_CZ114",
+"values": {
+"en_number": "CW721R",
+"en_name": null,
+"uns": "C67500",
+"bs_old": "CZ114",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CZ114 (CW721R) ... Related Material Specifications: Corresponds to UNS C67500."
+},
+{
+"source": "copper:AALCO_CW721R",
+"values": {
+"en_number": "CW721R",
+"en_name": null,
+"uns": "C67500",
+"bs_old": "CZ114",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CW721R/CZ114 Brass corresponds to the following designations but may not be a direct equivalent: UNS C67500 ... CZ114 is also sometimes called Manganese Bronze."
+},
+{
+"source": "copper:AALCO_ENSTD",
+"values": {
+"en_number": "CW721R & CW722R",
+"en_name": null,
+"uns": null,
+"bs_old": "CZ114",
+"jis": null,
+"iso": null,
+"din_wnr": null,
+"other": null
+},
+"verbatim_row": "CZ114 | CW721R & CW722R | High Tensile Brass / Manganese Bronze"
 }
 ]
 },
@@ -4350,642 +6345,875 @@
 ]
 },
 {
-"grade": "CW721R (CZ114, high tensile brass / 'manganese bronze')",
-"family": "Copper alloy",
+"grade": "Acetal (POM)",
+"family": "Plastic",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Aalco"
+"Aircraft Materials",
+"Curbell Plastics",
+"Ensinger"
 ],
 "fields": {
-"en_number": [
+"abbrev": [
 {
-"value": "CW721R",
+"value": "POM",
 "publishers": [
-"Aalco"
+"Aircraft Materials",
+"Ensinger"
 ],
 "sources": [
-"copper:AALCO_CW721R"
+"plastics:AIRCRAFTMATERIALS_PLAS",
+"plastics:ENSINGER_POM"
 ]
 },
 {
-"value": "CW721R & CW722R",
+"value": "POM-C",
 "publishers": [
-"Aalco"
+"Ensinger"
 ],
 "sources": [
-"copper:AALCO_ENSTD"
+"plastics:ENSINGER_CAT2024"
+]
+},
+{
+"value": "POM-H",
+"publishers": [
+"Ensinger"
+],
+"sources": [
+"plastics:ENSINGER_CAT2024"
 ]
 }
 ],
-"uns": [
+"generic": [
 {
-"value": "C67500",
+"value": "Acetal",
 "publishers": [
-"Aalco"
+"Curbell Plastics",
+"Ensinger"
 ],
 "sources": [
-"copper:AALCO_CW721R"
+"plastics:CURBELL_XREF",
+"plastics:ENSINGER_POM"
+]
+},
+{
+"value": "Polyacetal (Acetal Copolymer)",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"plastics:AIRCRAFTMATERIALS_PLAS"
+]
+},
+{
+"value": "Polyoxymethylene",
+"publishers": [
+"Ensinger"
+],
+"sources": [
+"plastics:ENSINGER_POM"
 ]
 }
 ],
-"bs_old": [
+"trade": [
 {
-"value": "CZ114",
+"value": "Delrin",
 "publishers": [
-"Aalco"
+"Aircraft Materials",
+"Curbell Plastics",
+"Ensinger"
 ],
 "sources": [
-"copper:AALCO_CW721R",
-"copper:AALCO_ENSTD"
+"plastics:CURBELL_XREF",
+"plastics:AIRCRAFTMATERIALS_PLAS",
+"plastics:ENSINGER_POM"
+]
+},
+{
+"value": "TECAFORM",
+"publishers": [
+"Curbell Plastics",
+"Ensinger"
+],
+"sources": [
+"plastics:CURBELL_XREF",
+"plastics:ENSINGER_POM"
+]
+},
+{
+"value": "Ultraform",
+"publishers": [
+"Aircraft Materials",
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF",
+"plastics:AIRCRAFTMATERIALS_PLAS"
+]
+},
+{
+"value": "Acetron",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Celcon",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Ensital SD",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Ertacetal",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Pomalux",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Semitron ESD",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "SUSTARIN",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Hostaform",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"plastics:AIRCRAFTMATERIALS_PLAS"
+]
+},
+{
+"value": "TECAFORM AH",
+"publishers": [
+"Ensinger"
+],
+"sources": [
+"plastics:ENSINGER_CAT2024"
+]
+},
+{
+"value": "TECAFORM AD",
+"publishers": [
+"Ensinger"
+],
+"sources": [
+"plastics:ENSINGER_CAT2024"
 ]
 }
 ]
 },
 "unsourced": {},
 "notes": [
-"Only Aalco (one publisher)."
+"Aircraft Materials and Ensinger both tie Delrin to acetal homopolymer (POM-H); Aircraft Materials gives Hostaform and Ultraform as copolymer, Ensinger its TECAFORM AH as copolymer (POM-C) and TECAFORM AD as homopolymer. Curbell lists all acetal brands, including Delrin and Celcon, under one 'Acetal' heading."
 ],
 "printed": [
 {
-"source": "copper:AALCO_CW721R",
+"source": "plastics:CURBELL_XREF",
 "values": {
-"en_number": "CW721R",
-"en_name": null,
-"uns": "C67500",
-"bs_old": "CZ114",
-"jis": null,
-"iso": null,
-"din_wnr": null,
-"other": null
+"generic": "Acetal",
+"abbrev": null,
+"trade": "Acetron; Celcon; Delrin; Ensital SD; Ertacetal; Pomalux; Semitron ESD; SUSTARIN; TECAFORM; Ultraform",
+"other": "Curbell does not separate copolymer (POM-C) from homopolymer (POM-H)"
 },
-"verbatim_row": "CW721R/CZ114 Brass corresponds to the following designations but may not be a direct equivalent: UNS C67500 ... CZ114 is also sometimes called Manganese Bronze."
+"verbatim_row": "Common Name | Trade Name ; Acetal | Acetron®, Celcon®, Delrin®, Ensital® SD, Ertacetal™, Pomalux®, Semitron® ESD, SUSTARIN®, TECAFORM®, Ultraform®"
 },
 {
-"source": "copper:AALCO_ENSTD",
+"source": "plastics:AIRCRAFTMATERIALS_PLAS",
 "values": {
-"en_number": "CW721R & CW722R",
-"en_name": null,
-"uns": null,
-"bs_old": "CZ114",
-"jis": null,
-"iso": null,
-"din_wnr": null,
-"other": null
+"generic": "Polyacetal (Acetal Copolymer)",
+"abbrev": "POM",
+"trade": "Hostaform; Ultraform",
+"other": "Copolymer row; closing bracket missing on the page"
 },
-"verbatim_row": "CZ114 | CW721R & CW722R | High Tensile Brass / Manganese Bronze"
+"verbatim_row": "Abbreviation | Trade name | Chemical name ; POM | Hostaform, Ultraform | Polyacetal (Acetal Copolymer"
+},
+{
+"source": "plastics:AIRCRAFTMATERIALS_PLAS",
+"values": {
+"generic": "Polyacetal (Acetal Homopolymer)",
+"abbrev": "POM",
+"trade": "Delrin",
+"other": "Homopolymer row"
+},
+"verbatim_row": "Abbreviation | Trade name | Chemical name ; POM | Delrin | Polyacetal (Acetal Homopolymer)"
+},
+{
+"source": "plastics:ENSINGER_POM",
+"values": {
+"generic": "Polyoxymethylene; acetal",
+"abbrev": "POM",
+"trade": "Delrin; TECAFORM",
+"other": "POM-H = acetal homopolymer, POM-C = acetal copolymer; TECAFORM AH listed as acetal copolymer, TECAFORM AD as acetal homopolymer (made from Delrin resin)"
+},
+"verbatim_row": "POM plastic - Polyoxymethylene ; POM material, also called acetal plastic ; acetal homopolymer (POM-H) ; acetal copolymer (POM-C) ; It is known under the brand name Delrin® from Delrin USA LLC ; offered by Ensinger under the brand name TECAFORM ; Unfilled Acetal copolymer - TECAFORM AH natural ; Acetal homopolymer manufactured from Delrin® resin - TECAFORM AD natural"
+},
+{
+"source": "plastics:ENSINGER_CAT2024",
+"values": {
+"generic": null,
+"abbrev": "POM-C; POM-H",
+"trade": "TECAFORM AH; TECAFORM AD",
+"other": "TECAFORM AH = POM-C, TECAFORM AD = POM-H"
+},
+"verbatim_row": "TECAFORM AH (POM-C) and TECAFORM AD (POM-H) [p. 19]"
 }
 ]
 },
 {
-"grade": "CW508L CuZn37 (CZ108)",
-"family": "Copper alloy",
+"grade": "Nylon (PA)",
+"family": "Plastic",
 "subfamily": null,
 "iso_group": null,
 "status": "review",
 "publishers": [
-"Aalco"
+"Aircraft Materials",
+"Curbell Plastics",
+"Ensinger"
 ],
 "fields": {
-"en_number": [
+"abbrev": [
 {
-"value": "CW508L",
+"value": "PA",
 "publishers": [
-"Aalco"
+"Aircraft Materials"
 ],
 "sources": [
-"copper:AALCO_CW508L",
-"copper:AALCO_ENSTD"
+"plastics:AIRCRAFTMATERIALS_PLAS"
+]
+},
+{
+"value": "PA 6 C",
+"publishers": [
+"Ensinger"
+],
+"sources": [
+"plastics:ENSINGER_CAT2024"
 ]
 }
 ],
-"uns": [
+"generic": [
 {
-"value": "C27200",
+"value": "Nylon",
 "publishers": [
-"Aalco"
+"Curbell Plastics"
 ],
 "sources": [
-"copper:AALCO_CW508L"
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Polyamide (Nylon)",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"plastics:AIRCRAFTMATERIALS_PLAS"
 ]
 }
 ],
-"bs_old": [
+"trade": [
 {
-"value": "CZ108",
+"value": "TECAMID",
 "publishers": [
-"Aalco"
+"Curbell Plastics",
+"Ensinger"
 ],
 "sources": [
-"copper:AALCO_CW508L",
-"copper:AALCO_ENSTD"
+"plastics:CURBELL_XREF",
+"plastics:ENSINGER_CAT2024"
 ]
-}
-],
-"iso": [
+},
 {
-"value": "CuZn37",
+"value": "Zytel",
 "publishers": [
-"Aalco"
+"Aircraft Materials",
+"Curbell Plastics"
 ],
 "sources": [
-"copper:AALCO_CW508L"
+"plastics:CURBELL_XREF",
+"plastics:AIRCRAFTMATERIALS_PLAS"
+]
+},
+{
+"value": "Ensilon",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Ertalon",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Hydlar ZF",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Nylatron",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "SUSTAMID",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Ultramid",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "TECAST",
+"publishers": [
+"Ensinger"
+],
+"sources": [
+"plastics:ENSINGER_CAT2024"
+]
+},
+{
+"value": "TECARIM",
+"publishers": [
+"Ensinger"
+],
+"sources": [
+"plastics:ENSINGER_CAT2024"
 ]
 }
 ]
 },
 "unsourced": {},
 "notes": [
-"Only Aalco."
+"Aircraft Materials prints the same trade name (Zytel) against PA 12, PA 66, PA 6 and cast PA 6 alike; Curbell lists Zytel among many nylon brands without a type. A trade name does not identify the nylon type. Ensinger separates cast nylon (PA 6 C: TECAST, TECARIM) from extruded PA 6/66 (TECAMID). The abbreviation stays 'needs 2nd source' because each publisher prints a different one (PA vs PA 6 C)."
 ],
 "printed": [
 {
-"source": "copper:AALCO_CW508L",
+"source": "plastics:CURBELL_XREF",
 "values": {
-"en_number": "CW508L",
-"en_name": null,
-"uns": "C27200",
-"bs_old": "CZ108",
-"jis": null,
-"iso": "CuZn37",
-"din_wnr": null,
-"other": null
+"generic": "Nylon",
+"abbrev": null,
+"trade": "Ensilon; Ertalon; Hydlar ZF; Nylatron; SUSTAMID; TECAMID; Ultramid; Zytel",
+"other": "Curbell does not separate PA6 / PA66 / cast nylon"
 },
-"verbatim_row": "CZ108 / CW508L corresponds to the following designations but may not be a direct equivalent: UNS C27200 ISO CuZn37"
+"verbatim_row": "Common Name | Trade Name ; Nylon | Ensilon®, Ertalon™, Hydlar® ZF, Nylatron®, SUSTAMID®, TECAMID®, Ultramid®, Zytel®"
 },
 {
-"source": "copper:AALCO_ENSTD",
+"source": "plastics:AIRCRAFTMATERIALS_PLAS",
 "values": {
-"en_number": "CW508L",
-"en_name": null,
-"uns": null,
-"bs_old": "CZ108",
-"jis": null,
-"iso": null,
-"din_wnr": null,
-"other": null
+"generic": "Polyamide (Nylon)",
+"abbrev": "PA",
+"trade": "Zytel",
+"other": "Rows: PA Type 12u, PA Type 66uJ, PA Type 6J, PA Cast Type 6 - all with trade name Zytel"
 },
-"verbatim_row": "CZ108 | CW508L |"
+"verbatim_row": "Abbreviation | Trade name | Chemical name ; PA Type 12u | Zytel | Polyamide (Nylon) ; PA Type 66uJ | Zytel | Polyamide (Nylon) ; PA Type 6J | Zytel | Polyamide (Nylon) ; PA Cast Type 6 | Zytel | Polyamide (Nylon)"
+},
+{
+"source": "plastics:ENSINGER_CAT2024",
+"values": {
+"generic": null,
+"abbrev": "PA 6 C",
+"trade": "TECAST; TECARIM; TECAMID",
+"other": "Cast nylon printed as PA 6 C (TECAST, TECARIM); extruded TECAMID 6/66 as 'PA 6/66', TECAMID 12 as PA 12"
+},
+"verbatim_row": "TECAST (PA 6 C) and TECARIM (PA 6 C) [p. 17] ; TECAMID 6/66 (PA 6/66) and TECAMID 12 (PA 12) [p. 18]"
 }
 ]
 },
 {
-"grade": "CW451K CuSn5 (PB102, phosphor bronze)",
-"family": "Copper alloy",
+"grade": "PEEK",
+"family": "Plastic",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Aalco"
+"Curbell Plastics",
+"Ensinger"
 ],
 "fields": {
-"en_number": [
+"abbrev": [
 {
-"value": "CW451K",
+"value": "PEEK",
 "publishers": [
-"Aalco"
+"Curbell Plastics",
+"Ensinger"
 ],
 "sources": [
-"copper:AALCO_CW451K",
-"copper:AALCO_ENSTD"
+"plastics:CURBELL_XREF",
+"plastics:ENSINGER_CAT2024"
 ]
 }
 ],
-"uns": [
+"generic": [
 {
-"value": "C51000",
+"value": "polyetheretherketone",
 "publishers": [
-"Aalco"
+"Curbell Plastics"
 ],
 "sources": [
-"copper:AALCO_CW451K"
+"plastics:CURBELL_XREF"
 ]
 }
 ],
-"bs_old": [
+"trade": [
 {
-"value": "PB102",
+"value": "TECAPEEK",
 "publishers": [
-"Aalco"
+"Curbell Plastics",
+"Ensinger"
 ],
 "sources": [
-"copper:AALCO_CW451K",
-"copper:AALCO_ENSTD"
+"plastics:CURBELL_XREF",
+"plastics:ENSINGER_CAT2024"
+]
+},
+{
+"value": "Ketron",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "SustaPEEK",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [],
+"printed": [
+{
+"source": "plastics:CURBELL_XREF",
+"values": {
+"generic": "polyetheretherketone",
+"abbrev": "PEEK",
+"trade": "Ketron; SustaPEEK; TECAPEEK",
+"other": null
+},
+"verbatim_row": "Common Name | Trade Name ; PEEK (polyetheretherketone) | Ketron®, SustaPEEK, TECAPEEK®"
+},
+{
+"source": "plastics:ENSINGER_CAT2024",
+"values": {
+"generic": null,
+"abbrev": "PEEK",
+"trade": "TECAPEEK",
+"other": null
+},
+"verbatim_row": "TECAPEEK (PEEK) [p. 11]"
+}
+]
+},
+{
+"grade": "PTFE",
+"family": "Plastic",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aircraft Materials",
+"Curbell Plastics",
+"Ensinger"
+],
+"fields": {
+"abbrev": [
+{
+"value": "PTFE",
+"publishers": [
+"Aircraft Materials",
+"Curbell Plastics",
+"Ensinger"
+],
+"sources": [
+"plastics:CURBELL_XREF",
+"plastics:AIRCRAFTMATERIALS_PLAS",
+"plastics:ENSINGER_CAT2024"
 ]
 }
 ],
-"iso": [
+"generic": [
 {
-"value": "CuSn5",
+"value": "polytetrafluoroethylene",
 "publishers": [
-"Aalco"
+"Aircraft Materials",
+"Curbell Plastics"
 ],
 "sources": [
-"copper:AALCO_CW451K"
+"plastics:CURBELL_XREF",
+"plastics:AIRCRAFTMATERIALS_PLAS"
+]
+}
+],
+"trade": [
+{
+"value": "Fluorosint",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Interplast",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Rulon",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Semitron ESD",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Teflon PTFE",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"plastics:AIRCRAFTMATERIALS_PLAS"
+]
+},
+{
+"value": "TECAFLON PTFE",
+"publishers": [
+"Ensinger"
+],
+"sources": [
+"plastics:ENSINGER_CAT2024"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [],
+"printed": [
+{
+"source": "plastics:CURBELL_XREF",
+"values": {
+"generic": "polytetrafluoroethylene",
+"abbrev": "PTFE",
+"trade": "Fluorosint; Interplast; Rulon; Semitron ESD",
+"other": "Semitron ESD is listed under both Acetal and PTFE (a product family, not one material)"
+},
+"verbatim_row": "Common Name | Trade Name ; PTFE (polytetrafluoroethylene) | Fluorosint®, Interplast, Rulon®, Semitron® ESD"
+},
+{
+"source": "plastics:AIRCRAFTMATERIALS_PLAS",
+"values": {
+"generic": "Polytetrafluoroethylene",
+"abbrev": "PTFE",
+"trade": "Teflon PTFE",
+"other": "Abbreviation printed 'PTFE u' (trailing 'u' qualifier not explained on the page)"
+},
+"verbatim_row": "Abbreviation | Trade name | Chemical name ; PTFE u | Teflon PTFE | Polytetrafluoroethylene"
+},
+{
+"source": "plastics:ENSINGER_CAT2024",
+"values": {
+"generic": null,
+"abbrev": "PTFE",
+"trade": "TECAFLON PTFE",
+"other": null
+},
+"verbatim_row": "TECAFLON PTFE (PTFE) [p. 14]"
+}
+]
+},
+{
+"grade": "UHMW-PE",
+"family": "Plastic",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Aircraft Materials",
+"Curbell Plastics",
+"Mitsubishi Chemical Advanced Materials"
+],
+"fields": {
+"abbrev": [
+{
+"value": "UHMWPE",
+"publishers": [
+"Aircraft Materials",
+"Mitsubishi Chemical Advanced Materials"
+],
+"sources": [
+"plastics:AIRCRAFTMATERIALS_PLAS",
+"plastics:MCAM_TIVAR1000"
+]
+}
+],
+"generic": [
+{
+"value": "Polyethylene (UHMW",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "ultra high molecular weight)",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Ultra High Molecular Weight Polypropylene",
+"publishers": [
+"Aircraft Materials"
+],
+"sources": [
+"plastics:AIRCRAFTMATERIALS_PLAS"
+]
+}
+],
+"trade": [
+{
+"value": "BRAXX",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "FLEXI FEND",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "GUR",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Lennite",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "LubX C",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "LUNS",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "POLY FEND",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Polystone M",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Ramex",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "Tivar",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "ULTRA FEND",
+"publishers": [
+"Curbell Plastics"
+],
+"sources": [
+"plastics:CURBELL_XREF"
+]
+},
+{
+"value": "TIVAR 1000",
+"publishers": [
+"Mitsubishi Chemical Advanced Materials"
+],
+"sources": [
+"plastics:MCAM_TIVAR1000"
 ]
 }
 ]
 },
 "unsourced": {},
 "notes": [
-"Only Aalco. Smiths phosphor-bronze page could not be fetched (fetch budget exhausted)."
+"Aircraft Materials prints 'UHMWPE' and Mitsubishi Chemical Advanced Materials 'UHMW-PE' (same after ignoring the hyphen). ERROR in source: Aircraft Materials prints the chemical name of UHMWPE as 'Ultra High Molecular Weight Polypropylene' (and HDPE as 'High Density Polypropylene'); the abbreviation says polyethylene. Recorded as printed."
 ],
 "printed": [
 {
-"source": "copper:AALCO_CW451K",
+"source": "plastics:CURBELL_XREF",
 "values": {
-"en_number": "CW451K",
-"en_name": null,
-"uns": "C51000",
-"bs_old": "PB102",
-"jis": null,
-"iso": "CuSn5",
-"din_wnr": null,
+"generic": "Polyethylene (UHMW, ultra high molecular weight)",
+"abbrev": null,
+"trade": "BRAXX; FLEXI FEND; GUR; Lennite; LubX C; LUNS; POLY FEND; Polystone M; Ramex; Tivar; ULTRA FEND",
 "other": null
 },
-"verbatim_row": "CW451K/PB102 Bronze corresponds to the following designations but may not be a direct equivalent: UNS C51000 ISO CuSn5"
+"verbatim_row": "Common Name | Trade Name ; Polyethylene (UHMW, ultra high molecular weight) | BRAXX®, FLEXI FEND®, GUR®, Lennite®, LubX® C, LUNS®, POLY FEND®, Polystone® M, Ramex®, Tivar®, ULTRA FEND®"
 },
 {
-"source": "copper:AALCO_ENSTD",
+"source": "plastics:AIRCRAFTMATERIALS_PLAS",
 "values": {
-"en_number": "CW451K",
-"en_name": null,
-"uns": null,
-"bs_old": "PB102",
-"jis": null,
-"iso": null,
-"din_wnr": null,
+"generic": "Ultra High Molecular Weight Polypropylene",
+"abbrev": "UHMWPE",
+"trade": null,
+"other": "No trade name listed"
+},
+"verbatim_row": "Abbreviation | Trade name | Chemical name ; UHMWPE | | Ultra High Molecular Weight Polypropylene"
+},
+{
+"source": "plastics:MCAM_TIVAR1000",
+"values": {
+"generic": null,
+"abbrev": "UHMW-PE",
+"trade": "TIVAR 1000",
 "other": null
 },
-"verbatim_row": "PB102 | CW451K | Phosphor Bronze"
+"verbatim_row": "Mitsubishi Chemical Advanced Materials TIVAR® 1000 UHMW-PE, (Natural & Colors except Black) UHMW-PE (ASTM Product Data Sheet)"
 }
 ]
-},
-{
-"grade": "CW307G (CA104, aluminium bronze)",
-"family": "Copper alloy",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [
-"Aalco"
-],
-"fields": {
-"en_number": [
-{
-"value": "CW307G",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_ENSTD"
-]
-}
-],
-"bs_old": [
-{
-"value": "CA104",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_ENSTD"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Only Aalco; its CW307G datasheet has no designations section. EN name (CuAl10Ni5Fe4) and UNS not printed by any fetched source."
-],
-"printed": [
-{
-"source": "copper:AALCO_ENSTD",
-"values": {
-"en_number": "CW307G",
-"en_name": null,
-"uns": null,
-"bs_old": "CA104",
-"jis": null,
-"iso": null,
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "CA104 | CW307G | Aluminium Bronze"
-}
-]
-},
-{
-"grade": "CW004A Cu-ETP (C101)",
-"family": "Copper alloy",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [
-"Aalco"
-],
-"fields": {
-"en_number": [
-{
-"value": "CW004A",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_CW004A"
-]
-},
-{
-"value": "CR004A",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_ENSTD"
-]
-}
-],
-"uns": [
-{
-"value": "C11000",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_CW004A"
-]
-}
-],
-"bs_old": [
-{
-"value": "C101",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_CW004A",
-"copper:AALCO_ENSTD"
-]
-}
-],
-"iso": [
-{
-"value": "Cu-ETP",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_CW004A"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Aalco is internally inconsistent: its conversion table prints C101 -> 'CR004A' (and C104 -> CR008A, C106 -> CR024A) while its datasheet prints CW004A. CR-prefix numbers are refinery-shape designations; the wrought product number is CW004A. Treat 'CR004A' as an error for a wrought-bar lookup."
-],
-"printed": [
-{
-"source": "copper:AALCO_CW004A",
-"values": {
-"en_number": "CW004A",
-"en_name": null,
-"uns": "C11000",
-"bs_old": "C101",
-"jis": null,
-"iso": "Cu-ETP",
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "C101/CW004A HC Copper corresponds to the following designations but may not be a direct equivalent: UNS C11000 ISO Cu-ETP"
-},
-{
-"source": "copper:AALCO_ENSTD",
-"values": {
-"en_number": "CR004A",
-"en_name": null,
-"uns": null,
-"bs_old": "C101",
-"jis": null,
-"iso": null,
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "C101 | CR004A |"
-}
-]
-},
-{
-"grade": "CW024A Cu-DHP (C106)",
-"family": "Copper alloy",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [
-"Aalco"
-],
-"fields": {
-"en_number": [
-{
-"value": "CW024A",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_CW024A"
-]
-},
-{
-"value": "CR024A",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_ENSTD"
-]
-}
-],
-"uns": [
-{
-"value": "C12200",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_CW024A"
-]
-}
-],
-"bs_old": [
-{
-"value": "C106",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_CW024A",
-"copper:AALCO_ENSTD"
-]
-}
-],
-"iso": [
-{
-"value": "Cu-DHP",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_CW024A"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Same CR/CW inconsistency as C101."
-],
-"printed": [
-{
-"source": "copper:AALCO_CW024A",
-"values": {
-"en_number": "CW024A",
-"en_name": null,
-"uns": "C12200",
-"bs_old": "C106",
-"jis": null,
-"iso": "Cu-DHP",
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "C106/CW024A Copper corresponds to the following designations but may not be a direct equivalent: UNS C12200 ISO Cu-DHP"
-},
-{
-"source": "copper:AALCO_ENSTD",
-"values": {
-"en_number": "CR024A",
-"en_name": null,
-"uns": null,
-"bs_old": "C106",
-"jis": null,
-"iso": null,
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "C106 | CR024A |"
-}
-]
-},
-{
-"grade": "CW008A Cu-OF (C103?)",
-"family": "Copper alloy",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [
-"Aalco"
-],
-"fields": {
-"en_number": [
-{
-"value": "CR008A",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_ENSTD"
-]
-}
-],
-"bs_old": [
-{
-"value": "C104",
-"publishers": [
-"Aalco"
-],
-"sources": [
-"copper:AALCO_ENSTD"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Aalco maps old BS C104 (not C103) to CR008A. Commonly C103 = Cu-OF = CW008A, but no fetched source printed that; flag for verification. OF copper UNS (C10200) not printed by any fetched source."
-],
-"printed": [
-{
-"source": "copper:AALCO_ENSTD",
-"values": {
-"en_number": "CR008A",
-"en_name": null,
-"uns": null,
-"bs_old": "C104",
-"jis": null,
-"iso": null,
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "C104 | CR008A |"
-}
-]
-},
-{
-"grade": "LG2 leaded gunmetal (CC491K)",
-"family": "Copper alloy",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [
-"Smiths Metal Centres"
-],
-"fields": {
-"bs_old": [
-{
-"value": "LG2",
-"publishers": [
-"Smiths Metal Centres"
-],
-"sources": [
-"copper:SMITHS_LEADEDBRONZE"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Not researched to completion: fetch budget exhausted before LG2 / CC491K / C83600 cross-reference could be read. No equivalence data recorded."
-],
-"printed": [
-{
-"source": "copper:SMITHS_LEADEDBRONZE",
-"values": {
-"en_number": null,
-"en_name": null,
-"uns": null,
-"bs_old": "LG2",
-"jis": null,
-"iso": null,
-"din_wnr": null,
-"other": null
-},
-"verbatim_row": "LG2 Leaded Bronze: https://www.smithmetal.com/lg2.htm"
-}
-]
-},
-{
-"grade": "Beryllium copper CW101C (CuBe2)",
-"family": "Copper alloy",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [],
-"fields": {},
-"unsourced": {},
-"notes": [
-"Not researched: Smiths CW101C page fetch failed (budget exhausted). No values recorded."
-],
-"printed": []
 },
 {
 "grade": "301",
@@ -16699,12 +18927,25 @@
 "family": "Titanium",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"MakeItFrom.com",
+"Zapp"
 ],
 "fields": {
 "common": [
+{
+"value": "Grade 1",
+"publishers": [
+"MakeItFrom.com",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+},
 {
 "value": "Ti 99.8",
 "publishers": [
@@ -16726,6 +18967,32 @@
 ]
 }
 ],
+"uns": [
+{
+"value": "R50250",
+"publishers": [
+"MakeItFrom.com",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+}
+],
+"w_nr": [
+{
+"value": "3.7025",
+"publishers": [
+"MakeItFrom.com",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+}
+],
 "bs": [
 {
 "value": "TA 1",
@@ -16740,9 +19007,38 @@
 },
 "unsourced": {},
 "notes": [
+"Round 2: Zapp and MakeItFrom both print 3.7025 / R50250.",
 "Single source; no UNS or W.-Nr printed."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:ZAPP_TI",
+"values": {
+"common": "Grade 1",
+"astm": null,
+"uns": "R50250",
+"w_nr": "3.7025",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "Number paired with grade by column order of the stocklist table"
+},
+"verbatim_row": "Grade 1 | Grade 2 | Grade 5 | Grade 7 ; DIN 3.7025 3.7035 3.7164/3.7165 3.7235 ; UNS R50250 R50400 R56400/1 R52400"
+},
+{
+"source": "ti-ni-castiron-2:MAKEITFROM_TI",
+"values": {
+"common": "Grade 1",
+"astm": null,
+"uns": "R50250",
+"w_nr": "3.7025",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": null
+},
+"verbatim_row": "Grade 1 (3.7025, R50250) Titanium"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -16763,12 +19059,35 @@
 "family": "Titanium",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"MakeItFrom.com",
+"NeoNickel",
+"Zapp"
 ],
 "fields": {
 "common": [
+{
+"value": "Grade 2",
+"publishers": [
+"MakeItFrom.com",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+},
+{
+"value": "Titanium Grade 2",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
 {
 "value": "Ti 99.7",
 "publishers": [
@@ -16781,12 +19100,96 @@
 ],
 "astm": [
 {
+"value": "B265",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B348",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B363",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B337",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B338",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
 "value": "B381 F2",
 "publishers": [
 "Kennametal"
 ],
 "sources": [
 "titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"uns": [
+{
+"value": "R50400",
+"publishers": [
+"MakeItFrom.com",
+"NeoNickel",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:NEONICKEL_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+}
+],
+"w_nr": [
+{
+"value": "3.7035",
+"publishers": [
+"MakeItFrom.com",
+"NeoNickel",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:NEONICKEL_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+},
+{
+"value": "3.7034",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
 ]
 }
 ],
@@ -16804,9 +19207,52 @@
 },
 "unsourced": {},
 "notes": [
+"Round 2: Zapp and MakeItFrom print 3.7035 / R50400; NeoNickel prints 3.7034, 3.7035 / R50400. 3.7035 confirmed; 3.7034 has one publisher.",
 "Single source."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:ZAPP_TI",
+"values": {
+"common": "Grade 2",
+"astm": null,
+"uns": "R50400",
+"w_nr": "3.7035",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "Number paired with grade by column order of the stocklist table"
+},
+"verbatim_row": "Grade 1 | Grade 2 | Grade 5 | Grade 7 ; DIN 3.7025 3.7035 3.7164/3.7165 3.7235 ; UNS R50250 R50400 R56400/1 R52400"
+},
+{
+"source": "ti-ni-castiron-2:NEONICKEL_TI",
+"values": {
+"common": "Titanium Grade 2",
+"astm": "B265, B348, B363, B337, B338",
+"uns": "R50400",
+"w_nr": "3.7034, 3.7035",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "ASME SB348, SB381"
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Titanium Grade 2 | UNS R50400 | 3.7034, 3.7035 | B265, B348, B363, B337, B338 | - | ASME SB348. SB381"
+},
+{
+"source": "ti-ni-castiron-2:MAKEITFROM_TI",
+"values": {
+"common": "Grade 2",
+"astm": null,
+"uns": "R50400",
+"w_nr": "3.7035",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": null
+},
+"verbatim_row": "Grade 2 (3.7035, R50400) Titanium"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -16823,140 +19269,136 @@
 ]
 },
 {
-"grade": "Ti CP Grade 3 (Ti 99.6)",
-"family": "Titanium",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [
-"Kennametal"
-],
-"fields": {
-"common": [
-{
-"value": "Ti 99.6",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"astm": [
-{
-"value": "B381 F3",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Single source."
-],
-"printed": [
-{
-"source": "titanium-nickel-castiron:KENNAMETAL",
-"values": {
-"common": "Ti 99.6",
-"astm": "B381 F3",
-"uns": null,
-"w_nr": null,
-"din_en_name": null,
-"bs": null,
-"other": "AIR 9182 T50"
-},
-"verbatim_row": "Ti 99.6 ASTM: B381F3 Ti 99.6 AIR: 9182 T50"
-}
-]
-},
-{
-"grade": "Ti CP Grade 4 (Ti 99.5)",
-"family": "Titanium",
-"subfamily": null,
-"iso_group": null,
-"status": "review",
-"publishers": [
-"Kennametal"
-],
-"fields": {
-"common": [
-{
-"value": "Ti 99.5",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"astm": [
-{
-"value": "B381 F4",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"bs": [
-{
-"value": "TA 6",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-]
-},
-"unsourced": {},
-"notes": [
-"Single source."
-],
-"printed": [
-{
-"source": "titanium-nickel-castiron:KENNAMETAL",
-"values": {
-"common": "Ti 99.5",
-"astm": "B381 F4",
-"uns": null,
-"w_nr": null,
-"din_en_name": null,
-"bs": "TA 6",
-"other": "AIR 9182 T60"
-},
-"verbatim_row": "Ti 99.5 ASTM: B381F4 Ti 99.5 TA 6 AIR: 9182 T60"
-}
-]
-},
-{
 "grade": "Ti-6Al-4V (Grade 5)",
 "family": "Titanium",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "differs",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"MakeItFrom.com",
+"NeoNickel",
+"Zapp"
 ],
 "fields": {
 "common": [
 {
-"value": "Ti-6Al-4V",
+"value": "Grade 5",
 "publishers": [
-"Kennametal"
+"MakeItFrom.com",
+"Zapp"
 ],
 "sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+},
+{
+"value": "Ti-6Al-4V (Grade 5)",
+"publishers": [
+"Kennametal",
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI",
 "titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"astm": [
+{
+"value": "B265",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B348",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B381",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B337",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B338",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+}
+],
+"uns": [
+{
+"value": "R56400",
+"publishers": [
+"MakeItFrom.com",
+"NeoNickel",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:NEONICKEL_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+},
+{
+"value": "R56401",
+"publishers": [
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI"
+]
+}
+],
+"w_nr": [
+{
+"value": "3.7165",
+"publishers": [
+"MakeItFrom.com",
+"NeoNickel",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:NEONICKEL_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+},
+{
+"value": "3.7164",
+"publishers": [
+"NeoNickel",
+"Zapp"
+],
+"sources": [
+"ti-ni-castiron-2:ZAPP_TI",
+"ti-ni-castiron-2:NEONICKEL_TI"
 ]
 }
 ],
@@ -16972,6 +19414,15 @@
 }
 ],
 "bs": [
+{
+"value": "3TA11",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
 {
 "value": "TA 10-13",
 "publishers": [
@@ -16994,9 +19445,52 @@
 },
 "unsourced": {},
 "notes": [
+"Round 2: Zapp and NeoNickel both print two W.-Nr. for grade 5 (3.7164 and 3.7165); MakeItFrom prints only 3.7165. Because 3.7164 reaches 2 publishers the status shows 'Sources differ', but no source contradicts another: both numbers are printed for Ti-6Al-4V. All three print UNS R56400 (Zapp as 'R56400/1'; MakeItFrom lists R56401 as a separate material and gives grade 23 R56407). DISAGREEMENT elsewhere: NeoNickel prints R56400 and 3.7164, 3.7165 against Ti 6-2-4-2 too, whereas MakeItFrom gives Ti 6-2-4-2 3.7145 / R54620 - NeoNickel's 6-2-4-2 row looks like a copy-down error.",
 "Single source; ELI (Grade 23) appears only as 'Allvac 6-4ELI 4907, 4930, 4931' (AMS numbers). No UNS R56400 / W.-Nr 3.7165 printed."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:ZAPP_TI",
+"values": {
+"common": "Grade 5",
+"astm": null,
+"uns": "R56400 / R56401",
+"w_nr": "3.7164 / 3.7165",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "Number paired with grade by column order of the stocklist table; UNS printed as 'R56400/1'"
+},
+"verbatim_row": "Grade 1 | Grade 2 | Grade 5 | Grade 7 ; DIN 3.7025 3.7035 3.7164/3.7165 3.7235 ; UNS R50250 R50400 R56400/1 R52400"
+},
+{
+"source": "ti-ni-castiron-2:NEONICKEL_TI",
+"values": {
+"common": "Ti-6Al-4V (Grade 5)",
+"astm": "B265, B348, B381, B337, B338",
+"uns": "R56400",
+"w_nr": "3.7164, 3.7165",
+"din_en_name": null,
+"bs": "3TA11",
+"jis": null,
+"other": "AMS 4911, 4928, 6931, 4965; T-9047; MSRR 8610, 8614, 8652"
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Ti-6Al-4V (Grade 5) | R56400 | 3.7164, 3.7165 | B265, B348, B381, MSRR 8610, 8614, 8652, 4920, 4934, 4935, 4967, 6930, B337, B338 | 4911, 4928, 6931, 4965, T-9047 | BS 3TA11"
+},
+{
+"source": "ti-ni-castiron-2:MAKEITFROM_TI",
+"values": {
+"common": "Grade 5",
+"astm": null,
+"uns": "R56400",
+"w_nr": "3.7165",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": null
+},
+"verbatim_row": "Grade 5 (Ti-6Al-4V, 3.7165, R56400) Titanium"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17013,16 +19507,302 @@
 ]
 },
 {
-"grade": "Inconel 600",
-"family": "Nickel alloy",
+"grade": "Ti CP Grade 4 (Ti 99.5)",
+"family": "Titanium",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Kennametal",
+"MakeItFrom.com",
+"NeoNickel"
+],
+"fields": {
+"common": [
+{
+"value": "Titanium Grade 4",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "Grade 4",
+"publishers": [
+"MakeItFrom.com"
+],
+"sources": [
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+},
+{
+"value": "Ti 99.5",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"astm": [
+{
+"value": "B265",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "348",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "381",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI"
+]
+},
+{
+"value": "B381 F4",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"uns": [
+{
+"value": "R50700",
+"publishers": [
+"MakeItFrom.com",
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+}
+],
+"w_nr": [
+{
+"value": "3.7065",
+"publishers": [
+"MakeItFrom.com",
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_TI",
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+}
+],
+"bs": [
+{
+"value": "TA 6",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: NeoNickel and MakeItFrom both print 3.7065 / R50700.",
+"Single source."
+],
+"printed": [
+{
+"source": "ti-ni-castiron-2:NEONICKEL_TI",
+"values": {
+"common": "Titanium Grade 4",
+"astm": "B265, 348, 381",
+"uns": "R50700",
+"w_nr": "3.7065",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": null
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Titanium Grade 4 | UNS R50700 | 3.7065 | B265, 348, 381 | - | -"
+},
+{
+"source": "ti-ni-castiron-2:MAKEITFROM_TI",
+"values": {
+"common": "Grade 4",
+"astm": null,
+"uns": "R50700",
+"w_nr": "3.7065",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": null
+},
+"verbatim_row": "Grade 4 (3.7065, R50700) Titanium"
+},
+{
+"source": "titanium-nickel-castiron:KENNAMETAL",
+"values": {
+"common": "Ti 99.5",
+"astm": "B381 F4",
+"uns": null,
+"w_nr": null,
+"din_en_name": null,
+"bs": "TA 6",
+"other": "AIR 9182 T60"
+},
+"verbatim_row": "Ti 99.5 ASTM: B381F4 Ti 99.5 TA 6 AIR: 9182 T60"
+}
+]
+},
+{
+"grade": "Ti CP Grade 3 (Ti 99.6)",
+"family": "Titanium",
 "subfamily": null,
 "iso_group": null,
 "status": "review",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"MakeItFrom.com"
 ],
 "fields": {
 "common": [
+{
+"value": "Grade 3",
+"publishers": [
+"MakeItFrom.com"
+],
+"sources": [
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+},
+{
+"value": "Ti 99.6",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"astm": [
+{
+"value": "B381 F3",
+"publishers": [
+"Kennametal"
+],
+"sources": [
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"uns": [
+{
+"value": "R50550",
+"publishers": [
+"MakeItFrom.com"
+],
+"sources": [
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+}
+],
+"w_nr": [
+{
+"value": "3.7055",
+"publishers": [
+"MakeItFrom.com"
+],
+"sources": [
+"ti-ni-castiron-2:MAKEITFROM_TI"
+]
+}
+]
+},
+"unsourced": {},
+"notes": [
+"Round 2: only MakeItFrom prints a W.-Nr. (3.7055) and UNS (R50550) so far.",
+"Single source."
+],
+"printed": [
+{
+"source": "ti-ni-castiron-2:MAKEITFROM_TI",
+"values": {
+"common": "Grade 3",
+"astm": null,
+"uns": "R50550",
+"w_nr": "3.7055",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": null
+},
+"verbatim_row": "Grade 3 (3.7055, R50550) Titanium"
+},
+{
+"source": "titanium-nickel-castiron:KENNAMETAL",
+"values": {
+"common": "Ti 99.6",
+"astm": "B381 F3",
+"uns": null,
+"w_nr": null,
+"din_en_name": null,
+"bs": null,
+"other": "AIR 9182 T50"
+},
+"verbatim_row": "Ti 99.6 ASTM: B381F3 Ti 99.6 AIR: 9182 T50"
+}
+]
+},
+{
+"grade": "Inconel 600",
+"family": "Nickel alloy",
+"subfamily": null,
+"iso_group": null,
+"status": "confirmed",
+"publishers": [
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
+],
+"fields": {
+"common": [
+{
+"value": "Alloy 600",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "VDM® Alloy 600",
+"publishers": [
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+},
 {
 "value": "Inconel 600",
 "publishers": [
@@ -17033,13 +19813,131 @@
 ]
 }
 ],
+"astm": [
+{
+"value": "B163",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B166",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B167",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B168",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B516",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B517",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B564",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B366",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B751",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B775",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B829",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+}
+],
+"uns": [
+{
+"value": "N06600",
+"publishers": [
+"NeoNickel",
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+}
+],
 "w_nr": [
 {
 "value": "2.4816",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
@@ -17062,6 +19960,34 @@
 ],
 "printed": [
 {
+"source": "ti-ni-castiron-2:NEONICKEL_NI",
+"values": {
+"common": "Alloy 600",
+"astm": "B163, B166, B167, B168, B516, B517, B564, B366, B751, B775, B829",
+"uns": "N06600",
+"w_nr": "2.4816",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "AMS 5540, 5665 (ASTM/AMS columns run together in page text)"
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy 600 N06600 2.4816 B163, B166, B167, B168, B516, B517, B564, B366, 5665, B751, B775, B829 5540 -"
+},
+{
+"source": "ti-ni-castiron-2:VDM_PORTFOLIO",
+"values": {
+"common": "VDM® Alloy 600",
+"astm": null,
+"uns": "N06600",
+"w_nr": "2.4816",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+},
+"verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy 600 | 2.4816 | N06600"
+},
+{
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
 "common": "Inconel 600",
@@ -17081,12 +20007,32 @@
 "family": "Nickel alloy",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "fields": {
 "common": [
+{
+"value": "Alloy 625",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "VDM® Alloy 625",
+"publishers": [
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+},
 {
 "value": "Inconel 625",
 "publishers": [
@@ -17097,13 +20043,77 @@
 ]
 }
 ],
+"astm": [
+{
+"value": "B443",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B444",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B446",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B704",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B705",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+}
+],
+"uns": [
+{
+"value": "N06625",
+"publishers": [
+"NeoNickel",
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+}
+],
 "w_nr": [
 {
 "value": "2.4856",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
@@ -17126,6 +20136,34 @@
 ],
 "printed": [
 {
+"source": "ti-ni-castiron-2:NEONICKEL_NI",
+"values": {
+"common": "Alloy 625",
+"astm": "B443, B444, B446, B704, B705",
+"uns": "N06625",
+"w_nr": "2.4856",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "AMS 5599, 5666, 5581, 5869, 5879"
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy 625 N06625 2.4856 B443, B444, B446, B704, B705 5599, 5666, 5581, 5869, 5879 -"
+},
+{
+"source": "ti-ni-castiron-2:VDM_PORTFOLIO",
+"values": {
+"common": "VDM® Alloy 625",
+"astm": null,
+"uns": "N06625",
+"w_nr": "2.4856",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+},
+"verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy 625 | 2.4856 | N06625"
+},
+{
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
 "common": "Inconel 625",
@@ -17145,12 +20183,32 @@
 "family": "Nickel alloy",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "fields": {
 "common": [
+{
+"value": "Alloy 718",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "VDM® Alloy 718",
+"publishers": [
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+},
 {
 "value": "Inconel 718",
 "publishers": [
@@ -17161,13 +20219,50 @@
 ]
 }
 ],
+"astm": [
+{
+"value": "B637",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B670",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+}
+],
+"uns": [
+{
+"value": "N07718",
+"publishers": [
+"NeoNickel",
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+}
+],
 "w_nr": [
 {
 "value": "2.4668",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
@@ -17201,6 +20296,34 @@
 ],
 "printed": [
 {
+"source": "ti-ni-castiron-2:NEONICKEL_NI",
+"values": {
+"common": "Alloy 718",
+"astm": "B637, B670",
+"uns": "N07718",
+"w_nr": "2.4668",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "AMS 5596, 5662, 5663, 5832; NACE MR0175 / MR0103 / ISO 15156-3"
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy 718 N07718 2.4668 B637, B670 5596, 5662, 5663, 5832 API Specification: NACE MR0175 / MR0103 / ISO 15156-3"
+},
+{
+"source": "ti-ni-castiron-2:VDM_PORTFOLIO",
+"values": {
+"common": "VDM® Alloy 718",
+"astm": null,
+"uns": "N07718",
+"w_nr": "2.4668",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+},
+"verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy 718 | 2.4668 | N07718"
+},
+{
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
 "common": "Inconel 718",
@@ -17220,12 +20343,32 @@
 "family": "Nickel alloy",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "fields": {
 "common": [
+{
+"value": "Alloy 400",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "VDM® Alloy 400",
+"publishers": [
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+},
 {
 "value": "Monel 400",
 "publishers": [
@@ -17236,14 +20379,112 @@
 ]
 }
 ],
+"astm": [
+{
+"value": "B127",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B163",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B164",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B165",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B564",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B725",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B730",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B366",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+}
+],
+"uns": [
+{
+"value": "N04400",
+"publishers": [
+"NeoNickel",
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+}
+],
 "w_nr": [
 {
 "value": "2.4360",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"VDM Metals"
 ],
 "sources": [
+"ti-ni-castiron-2:VDM_PORTFOLIO",
 "titanium-nickel-castiron:KENNAMETAL"
+]
+},
+{
+"value": "2.4630",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
 ]
 }
 ],
@@ -17261,9 +20502,38 @@
 },
 "unsourced": {},
 "notes": [
+"DISAGREEMENT: NeoNickel prints Werkstoff No. 2.4630 for Alloy 400 (re-checked); Kennametal and VDM Metals print 2.4360. NeoNickel also lists 2.4630 as an alternate number for Alloy 75 / 80A, so its Alloy 400 entry looks like a digit transposition or copy-down error. 2.4360 is NiCu30Fe per Kennametal's DIN name.",
 "Single source."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:NEONICKEL_NI",
+"values": {
+"common": "Alloy 400",
+"astm": "B127, B163, B164, B165, B564, B725, B730, B366",
+"uns": "N04400",
+"w_nr": "2.4630",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "AMS 4730, 4731, 4675, 4544"
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy 400 N04400 2.4630 B127, B163, B164, B165, B564, B725, B730, B366, 4730, 4731 4675, 4544 -"
+},
+{
+"source": "ti-ni-castiron-2:VDM_PORTFOLIO",
+"values": {
+"common": "VDM® Alloy 400",
+"astm": null,
+"uns": "N04400",
+"w_nr": "2.4360",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+},
+"verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy 400 | 2.4360 | N04400"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17284,12 +20554,32 @@
 "family": "Nickel alloy",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "fields": {
 "common": [
+{
+"value": "Alloy K500",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "VDM® Alloy K-500",
+"publishers": [
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+},
 {
 "value": "Monel K 500",
 "publishers": [
@@ -17300,13 +20590,41 @@
 ]
 }
 ],
+"astm": [
+{
+"value": "B865",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+}
+],
+"uns": [
+{
+"value": "N05500",
+"publishers": [
+"NeoNickel",
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+}
+],
 "w_nr": [
 {
 "value": "2.4375",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
@@ -17329,6 +20647,34 @@
 ],
 "printed": [
 {
+"source": "ti-ni-castiron-2:NEONICKEL_NI",
+"values": {
+"common": "Alloy K500",
+"astm": "B865",
+"uns": "N05500",
+"w_nr": "2.4375",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "AMS 4676"
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy K500 N05500 2.4375 B865 4676 -"
+},
+{
+"source": "ti-ni-castiron-2:VDM_PORTFOLIO",
+"values": {
+"common": "VDM® Alloy K-500",
+"astm": null,
+"uns": "N05500",
+"w_nr": "2.4375",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+},
+"verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy K-500 | 2.4375 | N05500"
+},
+{
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
 "common": "Monel K 500",
@@ -17348,12 +20694,32 @@
 "family": "Nickel alloy",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "fields": {
 "common": [
+{
+"value": "Alloy C276",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "VDM® Alloy C-276",
+"publishers": [
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+},
 {
 "value": "Nimonic C-276 (sic)",
 "publishers": [
@@ -17364,13 +20730,113 @@
 ]
 }
 ],
+"astm": [
+{
+"value": "B564",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B574",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B575",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B619",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B622",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B626",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B366",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B462",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+},
+{
+"value": "B775",
+"publishers": [
+"NeoNickel"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI"
+]
+}
+],
+"uns": [
+{
+"value": "N10276",
+"publishers": [
+"NeoNickel",
+"VDM Metals"
+],
+"sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO"
+]
+}
+],
 "w_nr": [
 {
 "value": "2.4819",
 "publishers": [
-"Kennametal"
+"Kennametal",
+"NeoNickel",
+"VDM Metals"
 ],
 "sources": [
+"ti-ni-castiron-2:NEONICKEL_NI",
+"ti-ni-castiron-2:VDM_PORTFOLIO",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
@@ -17381,6 +20847,34 @@
 "Kennametal labels the alloy 'Nimonic C-276' - Hastelloy C-276 is the usual trade name (Nimonic is a different trade family). Single source."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:NEONICKEL_NI",
+"values": {
+"common": "Alloy C276",
+"astm": "B564, B574, B575, B619, B622, B626, B366, B462, B775",
+"uns": "N10276",
+"w_nr": "2.4819",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": null
+},
+"verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy C276 N10276 2.4819 B564, B574, B575, B619, B622, B626, B366, B462, B775 - -"
+},
+{
+"source": "ti-ni-castiron-2:VDM_PORTFOLIO",
+"values": {
+"common": "VDM® Alloy C-276",
+"astm": null,
+"uns": "N10276",
+"w_nr": "2.4819",
+"din_en_name": null,
+"bs": null,
+"jis": null,
+"other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+},
+"verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy C-276 | 2.4819 | N10276"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17403,16 +20897,19 @@
 "iso_group": null,
 "status": "review",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
-"astm": [
+"din_en_name": [
 {
-"value": "A48 No 20 B",
+"value": "GG 10",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
@@ -17428,9 +20925,18 @@
 ]
 }
 ],
-"din_en_name": [
+"astm": [
 {
-"value": "GG 10",
+"value": "No 20 B",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
+{
+"value": "A48 No 20 B",
 "publishers": [
 "Kennametal"
 ],
@@ -17458,13 +20964,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FC100",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"HDC prints no W.-nr. for GG 10, so 0.6010 still rests on Kennametal alone. HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GG 10",
+"w_nr": null,
+"astm": "No 20 B",
+"uns": null,
+"bs": null,
+"jis": "FC100",
+"other": "AFNOR Ft 10 D; SS 0110; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC100 | – | GG 10 | – | – | Ft 10 D | – | – | 0110 | No 20 B | –"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17485,12 +21019,48 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
+"din_en_name": [
+{
+"value": "GG 15",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.6015",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "No 25 B",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "A48 No 25 B",
 "publishers": [
@@ -17501,29 +21071,16 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.6015",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GG 15",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "Grade 150",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "Grade 150 (BS 1452",
 "publishers": [
@@ -17542,13 +21099,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FC150",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GG 15",
+"w_nr": "0.6015",
+"astm": "No 25 B",
+"uns": null,
+"bs": "Grade 150",
+"jis": "FC150",
+"other": "AFNOR Ft 15 D; UNI G15; UNE FG15; SS 0115; GB HT150; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC150 | 0.6015 | GG 15 | Grade 150 | – | Ft 15 D | G15 | FG15 | 0115 | No 25 B | HT150"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17569,12 +21154,48 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
+"din_en_name": [
+{
+"value": "GG 20",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.6020",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "No 30 B",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "A48 No 30 B",
 "publishers": [
@@ -17585,29 +21206,16 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.6020",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GG 20",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "Grade 220",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "Grade 220 (BS 1452",
 "publishers": [
@@ -17626,13 +21234,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FC200",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GG 20",
+"w_nr": "0.6020",
+"astm": "No 30 B",
+"uns": null,
+"bs": "Grade 220",
+"jis": "FC200",
+"other": "AFNOR Ft 20 D; UNI G20; SS 0120; GB HT200; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC200 | 0.6020 | GG 20 | Grade 220 | – | Ft 20 D | G20 | – | 0120 | No 30 B | HT200"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17653,12 +21289,91 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
+"KIPP",
 "Kennametal"
 ],
 "fields": {
+"en_name": [
+{
+"value": "EN-GJL-250",
+"publishers": [
+"KIPP"
+],
+"sources": [
+"ti-ni-castiron-2:KIPP_GJL250"
+]
+}
+],
+"en_number": [
+{
+"value": "EN-JL-1040",
+"publishers": [
+"KIPP"
+],
+"sources": [
+"ti-ni-castiron-2:KIPP_GJL250"
+]
+},
+{
+"value": "5.1301",
+"publishers": [
+"KIPP"
+],
+"sources": [
+"ti-ni-castiron-2:KIPP_GJL250"
+]
+}
+],
+"din_en_name": [
+{
+"value": "GG 25",
+"publishers": [
+"HDC Manufacturing",
+"KIPP",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"ti-ni-castiron-2:KIPP_GJL250",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.6025",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "No 35 B",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
+{
+"value": "No. 25 B",
+"publishers": [
+"KIPP"
+],
+"sources": [
+"ti-ni-castiron-2:KIPP_GJL250"
+]
+},
 {
 "value": "A48 No 35 B",
 "publishers": [
@@ -17669,29 +21384,16 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.6025",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GG 25",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "Grade 260",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "Grade 260 (BS 1452",
 "publishers": [
@@ -17710,13 +21412,57 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FC250",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"DISAGREEMENT on ASTM A48 class: Kennametal and HDC print No 35 B for GG 25; KIPP prints 'No. 25 B' for EN-GJL-250 / GG-25. KIPP gives the EN name EN-GJL-250, EN number EN-JL1040 / 5.1301; no other source in this data prints the EN name yet. HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GG 25",
+"w_nr": "0.6025",
+"astm": "No 35 B",
+"uns": null,
+"bs": "Grade 260",
+"jis": "FC250",
+"other": "AFNOR Ft 25 D; UNI G25; UNE FG25; SS 0125; GB HT250; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC250 | 0.6025 | GG 25 | Grade 260 | – | Ft 25 D | G25 | FG25 | 0125 | No 35 B | HT250"
+},
+{
+"source": "ti-ni-castiron-2:KIPP_GJL250",
+"values": {
+"common": null,
+"en_name": "EN-GJL-250",
+"en_number": "EN-JL-1040; 5.1301",
+"din_en_name": "GG-25",
+"w_nr": null,
+"astm": "No. 25 B",
+"uns": null,
+"bs": null,
+"jis": null,
+"other": "DIN 1561"
+},
+"verbatim_row": "Material No. EN-JL-1040 | US standard (AISI) No. 25 B | DIN EN 10027-2 5.1301 | Abbreviation EN-GJL-250 | Old designation GG-25 | DIN 1561"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17737,12 +21483,48 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
+"din_en_name": [
+{
+"value": "GG 30",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.6030",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "No 45 B",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "A48 No 45 B",
 "publishers": [
@@ -17753,29 +21535,16 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.6030",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GG 30",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "Grade 300",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "Grade 300 (BS 1452",
 "publishers": [
@@ -17794,13 +21563,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FC300",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Kennametal prints old DIN 'GG' names, not EN-GJL. Note it pairs GG 30 with ASTM 'No 45 B' (no class 40 row), and AFNOR 'R 30 D' (others 'Ft') - possible typo."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GG 30",
+"w_nr": "0.6030",
+"astm": "No 45 B",
+"uns": null,
+"bs": "Grade 300",
+"jis": "FC300",
+"other": "AFNOR Ft 30 D; UNI G30; UNE FG30; SS 0130; GB HT300; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC300 | 0.6030 | GG 30 | Grade 300 | – | Ft 30 D | G30 | FG30 | 0130 | No 45 B | HT300"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17821,12 +21618,48 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
+"din_en_name": [
+{
+"value": "GG 35",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.6035",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "No 50 B",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "A48 No 50 B",
 "publishers": [
@@ -17837,29 +21670,16 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.6035",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GG 35",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "Grade 350",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "Grade 350 (BS 1452",
 "publishers": [
@@ -17878,13 +21698,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FC350",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GG 35",
+"w_nr": "0.6035",
+"astm": "No 50 B",
+"uns": null,
+"bs": "Grade 350",
+"jis": "FC350",
+"other": "AFNOR Ft 35 D; UNI G35; UNE FG35; SS 0135; GB HT350; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC350 | 0.6035 | GG 35 | Grade 350 | – | Ft 35 D | G35 | FG35 | 0135 | No 50 B | HT350"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17905,12 +21753,48 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
+"din_en_name": [
+{
+"value": "GG 40",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.6040",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "No 55 B",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "A48 No 55 B",
 "publishers": [
@@ -17921,29 +21805,16 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.6040",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GG 40",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "Grade 400",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "Grade 400 (BS 1452",
 "publishers": [
@@ -17966,9 +21837,26 @@
 },
 "unsourced": {},
 "notes": [
+"HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GG name printed, not EN-GJL; EN-GJL mapping not printed."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GG 40",
+"w_nr": "0.6040",
+"astm": "No 55 B",
+"uns": null,
+"bs": "Grade 400",
+"jis": null,
+"other": "AFNOR Ft 40 D; SS 0140; GB HT400; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; – | 0.6040 | GG 40 | Grade 400 | – | Ft 40 D | – | – | 0140 | No 55 B | HT400"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -17989,18 +21877,21 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
-"astm": [
+"din_en_name": [
 {
-"value": "A536 60-40-18",
+"value": "GGG 35.3",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
@@ -18009,16 +21900,18 @@
 {
 "value": "0.7033",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
 ],
-"din_en_name": [
+"astm": [
 {
-"value": "GGG 35.3",
+"value": "A536 60-40-18",
 "publishers": [
 "Kennametal"
 ],
@@ -18059,9 +21952,26 @@
 },
 "unsourced": {},
 "notes": [
+"HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GGG name printed, not EN-GJS."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GGG 35.3",
+"w_nr": "0.7033",
+"astm": null,
+"uns": null,
+"bs": null,
+"jis": null,
+"other": "SS 07 17-15; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; – | 0.7033 | GGG 35.3 | – | – | – | – | – | 07 17-15 | – | –"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -18082,12 +21992,48 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
+"din_en_name": [
+{
+"value": "GGG 40",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.7040",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "60-40-18",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "A536 65-45-12",
 "publishers": [
@@ -18098,29 +22044,25 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.7040",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GGG 40",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "SNG 420",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
+{
+"value": "12",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "420",
 "publishers": [
@@ -18148,13 +22090,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FCD400",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"DISAGREEMENT: Kennametal prints ASTM 65-45-12 and BS 420/12 for GGG 40; HDC prints 60-40-18 (Kennametal gives 60-40-18 to GGG 35.3) and SNG 420/12. HDC's AFNOR 'FCS 400-12' looks like a typo for FGS 400-12 (recorded as printed). HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GGG name printed, not EN-GJS."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GGG 40",
+"w_nr": "0.7040",
+"astm": "60-40-18",
+"uns": null,
+"bs": "SNG 420/12",
+"jis": "FCD400",
+"other": "AFNOR FCS 400-12; UNI GS 370-17; UNE FGE 38-17; SS 07 17-02; GB QT400-18; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FCD400 | 0.7040 | GGG 40 | SNG 420/12 | – | FCS 400-12 | GS 370-17 | FGE 38-17 | 07 17-02 | 60-40-18 | QT400-18"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -18175,12 +22145,48 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
+"din_en_name": [
+{
+"value": "GGG 50",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.7050",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "80-55-06",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "A536 80-55-06",
 "publishers": [
@@ -18191,29 +22197,25 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.7050",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GGG 50",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "SNG 500",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
+{
+"value": "7",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "500",
 "publishers": [
@@ -18241,13 +22243,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FCD500",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GGG name printed, not EN-GJS."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GGG 50",
+"w_nr": "0.7050",
+"astm": "80-55-06",
+"uns": null,
+"bs": "SNG 500/7",
+"jis": "FCD500",
+"other": "AFNOR FGS 500-7; UNI GS 500; UNE FGE 50-7; SS 07 27-02; GB QT500-7; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FCD500 | 0.7050 | GGG 50 | SNG 500/7 | – | FGS 500-7 | GS 500 | FGE 50-7 | 07 27-02 | 80-55-06 | QT500-7"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -18270,16 +22300,19 @@
 "iso_group": null,
 "status": "review",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
-"astm": [
+"din_en_name": [
 {
-"value": "A536 80-60-03 (sic)",
+"value": "GGG 60",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
@@ -18295,9 +22328,9 @@
 ]
 }
 ],
-"din_en_name": [
+"astm": [
 {
-"value": "GGG 60",
+"value": "A536 80-60-03 (sic)",
 "publishers": [
 "Kennametal"
 ],
@@ -18307,6 +22340,24 @@
 }
 ],
 "bs": [
+{
+"value": "SNG 600",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
+{
+"value": "3",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "600",
 "publishers": [
@@ -18334,13 +22385,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FCD600",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"HDC prints no W.-nr. or ASTM for GGG 60. HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GGG name printed, not EN-GJS. Kennametal prints ASTM '80-60-03'; A536's standard grade near this is 100-70-03 / 80-55-06 - '80-60-03' looks non-standard."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GGG 60",
+"w_nr": null,
+"astm": null,
+"uns": null,
+"bs": "SNG 600/3",
+"jis": "FCD600",
+"other": "AFNOR FGS 600-3; SS 07 32-03; GB QT600-3; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FCD600 | – | GGG 60 | SNG 600/3 | – | FGS 600-3 | – | – | 07 32-03 | – | QT600-3"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -18361,12 +22440,48 @@
 "family": "Cast iron",
 "subfamily": null,
 "iso_group": null,
-"status": "review",
+"status": "confirmed",
 "publishers": [
+"HDC Manufacturing",
 "Kennametal"
 ],
 "fields": {
+"din_en_name": [
+{
+"value": "GGG 70",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
+"w_nr": [
+{
+"value": "0.7070",
+"publishers": [
+"HDC Manufacturing",
+"Kennametal"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON",
+"titanium-nickel-castiron:KENNAMETAL"
+]
+}
+],
 "astm": [
+{
+"value": "100-70-03",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "A536 100-70-03",
 "publishers": [
@@ -18377,29 +22492,25 @@
 ]
 }
 ],
-"w_nr": [
-{
-"value": "0.7070",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
-"din_en_name": [
-{
-"value": "GGG 70",
-"publishers": [
-"Kennametal"
-],
-"sources": [
-"titanium-nickel-castiron:KENNAMETAL"
-]
-}
-],
 "bs": [
+{
+"value": "SNG 700",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
+{
+"value": "2",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+},
 {
 "value": "700",
 "publishers": [
@@ -18427,13 +22538,41 @@
 "titanium-nickel-castiron:KENNAMETAL"
 ]
 }
+],
+"jis": [
+{
+"value": "FCD700",
+"publishers": [
+"HDC Manufacturing"
+],
+"sources": [
+"ti-ni-castiron-2:HDC_CASTIRON"
+]
+}
 ]
 },
 "unsourced": {},
 "notes": [
+"HDC prints GB 'QT700-18' for GGG 70 / FCD700, which reads as a typo for QT700-2 (recorded as printed). HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty.",
 "Single source. Old DIN GGG name printed, not EN-GJS."
 ],
 "printed": [
+{
+"source": "ti-ni-castiron-2:HDC_CASTIRON",
+"values": {
+"common": null,
+"en_name": null,
+"en_number": null,
+"din_en_name": "GGG 70",
+"w_nr": "0.7070",
+"astm": "100-70-03",
+"uns": null,
+"bs": "SNG 700/2",
+"jis": "FCD700",
+"other": "AFNOR FGS 700-2; UNI GS 700-2; UNE FGS 70-2; SS 07 37-01; GB QT700-18; EN column printed empty ('–')"
+},
+"verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FCD700 | 0.7070 | GGG 70 | SNG 700/2 | – | FGS 700-2 | GS 700-2 | FGS 70-2 | 07 37-01 | 100-70-03 | QT700-18"
+},
 {
 "source": "titanium-nickel-castiron:KENNAMETAL",
 "values": {
@@ -18459,9 +22598,9 @@
 "Kennametal"
 ],
 "fields": {
-"astm": [
+"din_en_name": [
 {
-"value": "A536 120-90-02",
+"value": "GGG 80",
 "publishers": [
 "Kennametal"
 ],
@@ -18481,9 +22620,9 @@
 ]
 }
 ],
-"din_en_name": [
+"astm": [
 {
-"value": "GGG 80",
+"value": "A536 120-90-02",
 "publishers": [
 "Kennametal"
 ],
