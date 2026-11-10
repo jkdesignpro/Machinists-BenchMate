@@ -218,3 +218,8 @@ fn ints(v: &[f64]) -> Vec<u64> { v.iter().filter(|x| **x >= 1.0).map(|x| x.round
         Some(d) => { let mut v = vec![d.approx as f64, d.crank.0 as f64, d.crank.1 as f64, d.crank.2 as f64, d.gear_ratio, if d.same_direction { 1.0 } else { 0.0 }, d.gears.len() as f64];
             v.extend(d.gears.iter().map(|g| *g as f64)); set_out(v); 1.0 }
         None => { set_out(vec![]); 0.0 } } }
+// Other thread forms (core/src/thread_forms.rs)
+f1!(whitworth_value, c::whitworth_value_f, d, p, what);
+f1!(ba_value, c::ba_value_f, n, what);
+f1!(npt_value, c::npt_value_f, d, p, l1, what);
+f1!(round_sig, c::round_sig_f, x, sig);

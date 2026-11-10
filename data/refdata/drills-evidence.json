@@ -20,6 +20,13 @@
    "url": "https://runeberg.org/lobben/0168.html",
    "accessed": "2026-11-10",
    "note": "Public-domain book (Project Runeberg scan). The OCR lost the letter on the row between P (.323) and N (.302); recorded as O by its position."
+  },
+  "MISUMI": {
+   "publisher": "MISUMI USA",
+   "title": "Drill bit size chart (blog), metric to inch table",
+   "url": "https://blog.misumiusa.com/drill-bit-size-chart/",
+   "accessed": "2026-11-10",
+   "note": "Metric table printed in 0.5 mm steps from 0.5 to 20.0 mm with inch decimals to 4 places (e.g. 8.5 mm .3346). Only the metric sizes are used here."
   }
  },
  "number": {
@@ -579,6 +586,48 @@
    "29",
    "29.5",
    "8.9"
+  ],
+  "MISUMI": [
+   "0.5",
+   "1",
+   "1.5",
+   "2",
+   "2.5",
+   "3",
+   "3.5",
+   "4",
+   "4.5",
+   "5",
+   "5.5",
+   "6",
+   "6.5",
+   "7",
+   "7.5",
+   "8",
+   "8.5",
+   "9",
+   "9.5",
+   "10",
+   "10.5",
+   "11",
+   "11.5",
+   "12",
+   "12.5",
+   "13",
+   "13.5",
+   "14",
+   "14.5",
+   "15",
+   "15.5",
+   "16",
+   "16.5",
+   "17",
+   "17.5",
+   "18",
+   "18.5",
+   "19",
+   "19.5",
+   "20"
   ]
  }
 }

@@ -165,8 +165,85 @@ def build_iso286():
     return {'sources': sources_of(ev), 'main_steps': MAIN, 'sub_steps': SUB, 'sub_letters': sorted(SUB_LETTERS), 'it': it, 'shaft': shaft}
 
 
+# ---------------------------------------------------------------- other threads, tapers
+def frac_in(s):
+    """'1 1/8' -> 1.125; '3/8' -> 0.375; '2' -> 2."""
+    return float(sum(Fraction(p) for p in s.split()))
+
+
+def build_series(sec, fields, order=frac_in):
+    """sec: {publisher: {size: {field: printed}}} -> [{size, field: consensus...}] in size order."""
+    sizes = set()
+    for rows in sec.values(): sizes.update(rows)
+    out = []
+    for s in sorted(sizes, key=order):
+        row = {'size': s}
+        for f in fields:
+            printed = {pub: rows[s][f] for pub, rows in sec.items() if s in rows and rows[s].get(f) not in (None, '')}
+            if printed: row[f] = consensus(printed) if all(is_num(v) for v in printed.values()) else text_consensus(printed)
+        out.append(row)
+    return out
+
+
+def is_num(v):
+    try: float(v); return True
+    except ValueError: return False
+
+
+def text_consensus(printed):
+    """Non-numeric values (thread designations): equal when the same text, ignoring case and spaces."""
+    groups = {}
+    for pub, v in printed.items():
+        groups.setdefault(str(v).replace(' ', '').lower(), {'value': str(v), 'publishers': [], 'printed': []})
+        g = groups[str(v).replace(' ', '').lower()]; g['publishers'].append(pub); g['printed'].append(str(v))
+    gs = sorted(groups.values(), key=lambda g: -len(g['publishers']))
+    strong = [g for g in gs if len(g['publishers']) >= 2]
+    status = ('confirmed' if len(gs[0]['publishers']) >= 2 else 'review') if len(gs) == 1 else 'confirmed_with_outlier' if len(strong) == 1 else 'differs'
+    return {'value': gs[0]['value'], 'status': status, 'groups': gs}
+
+
+def build_other_threads():
+    ev = json.loads((EV / 'threads-other-evidence.json').read_text())
+    out = {'sources': sources_of(ev)}
+    out['bsp'] = build_series(ev['bsp'], ['tpi', 'major_mm'])
+    g = {pub: {s: {'gauge_mm': v} for s, v in rows.items()} for pub, rows in ev['iso7_gauge_mm'].items()}
+    gauge = {r['size']: r['gauge_mm'] for r in build_series(g, ['gauge_mm'])}
+    for r in out['bsp']:
+        if r['size'] in gauge: r['gauge_mm'] = gauge[r['size']]
+    out['npt'] = build_series(ev['npt'], ['tpi', 'od', 'l1', 'e1', 'l2'])
+    out['bsw'] = build_series(ev['bsw'], ['tpi'])  # dimensions: BS 84 formula; printed values are checked in core tests
+    out['bsf'] = build_series(ev['bsf'], ['tpi'])
+    if ev.get('ba'):
+        out['ba'] = build_series(ev['ba'], ['tpi'], order=lambda s: int(s))
+    return out
+
+
+def build_tapers():
+    p = EV / 'tapers-evidence.json'
+    if not p.exists(): return None
+    ev = json.loads(p.read_text())
+    out = {'sources': sources_of(ev), 'families': {}}
+    for fam, sec in ev['families'].items():
+        if fam.startswith('_'): continue
+        fields = sorted({f for rows in sec.values() for r in rows.values() for f in r})
+        ordr = ev.get('order', {}).get(fam, [])
+        out['families'][fam] = build_series(sec, fields, order=lambda s, o=ordr: (o.index(s) if s in o else len(o), s))
+    out['notes'] = ev.get('notes', {})
+    return out
+
+
 def main():
-    out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286()}
+    out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
+           'other_threads': build_other_threads(), 'tapers': build_tapers()}
+    for sec in ('other_threads', 'tapers'):
+        if not out[sec]: continue
+        for k, rows in out[sec].items():
+            if k in ('sources', 'notes'): continue
+            for r in (rows.values() if isinstance(rows, dict) else [rows]):
+                for row in (r if isinstance(r, list) else []):
+                    for f, c in row.items():
+                        if isinstance(c, dict) and c['status'] not in ('confirmed', 'review'):
+                            print(' ', sec, k, row['size'], f, c['status'], c['groups'])
     (ROOT / 'data' / 'refdata.json').write_text(json.dumps(out, separators=(',', ':')))
     d = out['drills']['drills']
     st = collections.Counter(x['status'] for x in d)
