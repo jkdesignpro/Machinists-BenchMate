@@ -8,3 +8,4 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - `docs/reference-feature-inventory.md`: checklist of tool categories machinists expect.
 - `ui/tokens.css` and `docs/design.md`: design tokens matching Alkart Mega Wizard.
 - `docs/vendor-data-and-learning.md`: design for manufacturer data, PDF import and the adaptive profile.
+- Reference inventory extended with the full "New Features" list and sample screens.
