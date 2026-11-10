@@ -19,7 +19,8 @@ import json, re, pathlib, collections
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 EVID = ROOT / "data" / "evidence"
 # Sources known to copy another publisher's text word for word (not independent).
-COPIES = {"aluminium:SMITHS_6082": "Aalco", "copper:RIGHTON_CW614N": "Aalco"}
+COPIES = {"aluminium:SMITHS_6082": "Aalco", "copper:RIGHTON_CW614N": "Aalco",
+          "props-round2:SMITHS_C101_PROPS": "Aalco"}  # Smiths C101 physical values = Aalco CW004A figure for figure
 # Same grade under a different label in different evidence files.
 ALIAS = {"17-4PH (630)": "17-4PH"}
 FAMILY_FIELDS = {
