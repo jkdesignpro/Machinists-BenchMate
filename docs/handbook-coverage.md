@@ -64,7 +64,7 @@ current practice and says so in the tool's notes.
 | Grinding: wheel speed, marking system, dressing | MH31 EBB | planned | ISO 525 / ANSI B74.13 (cited), wheel maker guides (Norton, Tyrolit) |
 | Micromachining | MH31 | planned | manufacturer data |
 | Band saw and hacksaw blade selection | EBB | planned | blade maker guides |
-| Cutting fluids, refractometer concentration | MH31 EBB | planned | fluid maker data sheets |
+| Cutting fluids, refractometer concentration | MH31 EBB | built (concentration from Brix x the fluid's factor, mix and top-up; branch `claude/shop-helpers`) | fluid maker data sheets; docs/shop-helpers.md |
 | Machining non-ferrous and plastics | MH31 | planned | material supplier machining guides |
 | EDM (wire and sinker) basics | MH31 | planned | public process guides |
 | Knurling: diameter for pitch | MH31 EBB | planned | ANSI B94.6 (cited), knurl maker data |
@@ -122,7 +122,7 @@ current practice and says so in the tool's notes.
 | Surface texture: Ra/Rz, symbols, process ranges, N grades | MH31 EBB EDB | partial | ISO 21920 / ISO 1302, ASME B46.1 (cited) |
 | Measuring: micrometer, vernier, dial reading | MH31 | planned | own explanations |
 | Temperature compensation of measurements | MH31 | planned | thermal expansion data with sources |
-| Statistics: Cpk, SPC, tolerance stack (worst case, RSS) | MH31 | partial (1D worst-case and RSS stack built) | stack: Accendo, Five Flute (docs/gdt.md); Cpk/SPC: NIST/SEMATECH e-Handbook (public domain) |
+| Statistics: Cpk, SPC, tolerance stack (worst case, RSS) | MH31 | partial (1D worst-case and RSS stack; Cp/Cpk/Pp/Ppk with histogram; control charts still to do) | stack: Accendo, Five Flute (docs/gdt.md); Cpk/SPC: NIST/SEMATECH e-Handbook (public domain) |
 | Hardness conversion | EBB MH31 | planned | ASTM E140 / ISO 18265 (cited); conversion values cross-checked |
 | Drawing standards and abbreviations | EBB EDB | planned | own wording, ISO 128 / ASME Y14 cited |
 
@@ -136,7 +136,7 @@ current practice and says so in the tool's notes.
 | Plane area and solid volume, weight | MH31 EBB | planned | geometry, densities from supplier data |
 | Bar, tube and sheet weights | EBB | planned | geometry × cited density |
 | Sheet gauges, bend allowance, K-factor | EBB MH31 | planned | gauge tables from public standards; bend formula |
-| Fractions, decimals, unit conversions | EBB MH31 | planned | NIST SP 811 (public domain) |
+| Fractions, decimals, unit conversions | EBB MH31 | partial (fraction / decimal / mm converter built) | NIST SP 811 (public domain) |
 | Engineering economics (payback, hourly rate) | MH31 | planned | standard formulas |
 
 ## Mechanics and machine elements

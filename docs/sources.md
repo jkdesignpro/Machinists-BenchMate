@@ -30,6 +30,15 @@ Full list with URLs, access dates (2026-11-10), the per-statement check table an
 - **[FARO]** O. Ekinci, composite positional tolerances, FARO; **[DCS]** 3DCS help manual, Composite GD&T (composite position checker).
 - **[GEN]** Genorma catalogue, ISO 2768-2:1989 status (withdrawn 2021-02-04, revised by ISO 22081:2021).
 
+## Shop helpers (`core/src/shop.rs`, `app/shop.js`)
+Full list with URLs, the statement check table and open items: **`docs/shop-helpers.md`**. Summary:
+- **[NIST]** NIST/SEMATECH e-Handbook of Statistical Methods, 6.1.6 (process capability) and 6.3.2.1 (mean range / d2, A2 table) (public domain).
+- **[MTB]** Minitab support, methods and formulas for normal capability analysis (overall and within standard deviations).
+- **[NR]** Press et al., *Numerical Recipes*, 2nd ed., 6.2 (erfc approximation).
+- **[ISO1]** ISO 1:2022 standard reference temperature (cited); **[DOI]** T. Doiron, J. Res. NIST 112(1), 2007.
+- **[SP811]** NIST SP 811, appendix B: 1 in = 25.4 mm exactly.
+- **[FAS]** Fastenal, Tool Talk: Refractometers; **[ZEB]** Zebra Skimmers, refractometer product profile (concentration = Brix x the fluid's factor).
+
 ## Tool material data (Young's modulus presets, `app/tools.js` `E_PRESETS`)
 - **Solid carbide, 580 GPa:** Ceratizit grade CTS20L (cemented carbide, 10% Co binder), elastic modulus 580 GPa at 23 C. Read from the grade's property listing as republished at https://www.mfgrobots.com/Article/material/composite/33306.html (accessed 2026-11-10); the Ceratizit primary data sheet (cdn.plansee-group.com) could not be fetched in this session and should be checked. Range check: Tungaloy catalogue grade table (page 38, https://allindustrial.com/content/catalogs/vendors/tungaloy/files/basic-html/page38.html, accessed 2026-11-10) lists cemented carbide grades from 490 GPa (UX30) to 660 GPa (G1F); the same listing site shows Ceratizit CTS22D 570, CTU16L 605, CTU06M 665 GPa. The preset is therefore one typical grade, not a universal value; users should enter their tool maker's figure.
 - **HSS (M2, 1.3343), 219 GPa:** voestalpine High Performance Metals Denmark, "Datablad HSS/M2/W 1.3343" (Uddeholm site), physical properties at 20 C, elasticitetsmodul 219 x 10^3 N/mm^2. https://www.uddeholm.com/app/uploads/sites/239/2025/08/Datablad-HSS_M2_W-1.3343.pdf (accessed 2026-11-10).

@@ -556,6 +556,8 @@ pub mod threads;
 pub mod fits;
 pub use threads::*;
 pub use fits::*;
+pub mod shop;
+pub use shop::*;
 
 #[cfg(test)]
 mod tests {

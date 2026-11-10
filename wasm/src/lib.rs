@@ -121,3 +121,39 @@ f1!(iso286_shaft_limit, c::iso286_shaft_limit_f, letter, grade, fd, it, which);
 f1!(iso286_hole_limit, c::iso286_hole_limit_f, letter, grade, shaft_fd, it_n, it_n1, lo, hi, which);
 f1!(iso286_fit, c::iso286_fit_f, hole_es, hole_ei, shaft_es, shaft_ei, which);
 f1!(iso286_shaft_fd_formula, c::iso286_shaft_fd_formula_f, letter, d, it6, it7, it8, it9, it10);
+
+// Shop helpers (core/src/shop.rs)
+/// Shared input buffer for list data (process capability). JS writes up to
+/// `BUF_LEN` values at `buf_ptr()` in the exported memory, then calls a
+/// function with the count.
+const BUF_LEN: usize = 5000;
+static mut BUF: [f64; BUF_LEN] = [0.0; BUF_LEN];
+#[no_mangle] pub extern "C" fn buf_ptr() -> *mut f64 { core::ptr::addr_of_mut!(BUF) as *mut f64 }
+#[no_mangle] pub extern "C" fn buf_len() -> f64 { BUF_LEN as f64 }
+fn buf(n: f64) -> &'static [f64] {
+    let n = (n.max(0.0) as usize).min(BUF_LEN);
+    // SAFETY: single-threaded wasm; the buffer is only read here after JS wrote it.
+    unsafe { core::slice::from_raw_parts(core::ptr::addr_of!(BUF) as *const f64, n) }
+}
+/// Capability results for the first `n` buffer values; `which` as in `capability_flat`.
+#[no_mangle] pub extern "C" fn cap_from_buf(n: f64, lsl: f64, usl: f64, subgroup: f64, which: f64) -> f64 {
+    c::capability_flat(buf(n), lsl, usl, subgroup.max(1.0) as usize, which as u32) }
+/// Indices from a mean and sigma: which 0 Cp, 1 Cpk, 2 Cpl, 3 Cpu, 4 ppm below, 5 ppm above.
+#[no_mangle] pub extern "C" fn cap_from_stats(mean: f64, sigma: f64, lsl: f64, usl: f64, which: f64) -> f64 {
+    let (cp, cpk, cpl, cpu) = c::cap_indices(mean, sigma, lsl, usl);
+    let (lo, hi) = c::cap_ppm(mean, sigma, lsl, usl);
+    [cp, cpk, cpl, cpu, lo, hi].get(which as usize).copied().unwrap_or(f64::NAN) }
+f1!(normal_pdf, c::normal_pdf, x, mean, sigma);
+f1!(temp_length_at_20, c::length_at_20, reading, t_part, t_gauge, a_part, a_gauge);
+f1!(temp_reading_for_length, c::reading_for_length, l20, t_part, t_gauge, a_part, a_gauge);
+f1!(thermal_growth, c::thermal_growth, length, alpha, dt);
+f1!(alpha_uncertainty, c::alpha_uncertainty, length, u_alpha, t);
+f1!(coolant_conc, c::coolant_conc, brix, factor);
+f1!(coolant_add_concentrate, c::coolant_add_concentrate, vol, c_now, c_target, c_conc);
+f1!(coolant_add_water, c::coolant_add_water, vol, c_now, c_target);
+f1!(coolant_topup_mix, c::coolant_topup_mix, v_now, c_now, v_full, c_target);
+f1!(coolant_concentrate_in, c::coolant_concentrate_in, vol, c, c_conc);
+f1!(frac_nearest_num, c::frac_nearest_num, x, den);
+f1!(mixed_to_decimal, c::mixed_to_decimal, whole, num, den);
+#[no_mangle] pub extern "C" fn frac_reduce(num: f64, den: f64, which: f64) -> f64 {
+    let (a, b) = c::frac_reduce(num, den); if which == 0.0 { a } else { b } }

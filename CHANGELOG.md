@@ -3,6 +3,14 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (shop helpers)
+- Process capability: paste measurements (production order) or enter mean and sigma. Cp, Cpk (within sigma: mean moving range / 1.128, or mean range / d2 for subgroups of 2-10), Pp, Ppk (overall sample standard deviation), one-sided limits, expected ppm below/above from the normal tails (within and overall), observed out-of-spec count, histogram SVG with normal fits and limit lines, warnings for fewer than about 50 values and for overall sigma well above within sigma.
+- Temperature compensation: reading corrected to 20 °C (68 °F) for part and gauge expansion, with the reading a to-size part gives, deviation from drawing size and the uncertainty from the part coefficient. Coefficients are entered by the user or picked from Confirmed material data (none confirmed yet, which the screen says).
+- Coolant concentration from refractometer reading x the fluid's factor (never defaulted), with an optional range check; coolant mix and top-up: concentrate or water to add, top-up mix strength to reach target when filling to full, fresh fill amounts.
+- Fraction, decimal and mm converter: reads 1 3/8, 1-3/8, 3/8, 0.375, 0.375", 9.525 mm; nearest fraction at a chosen denominator (default 1/64) with error in inch and mm, plus a table for 1/4 to 1/64.
+- Setup sheet: job, part, operation, machine from Machine profiles, tool list (T no., description, holder, stick-out, length and diameter offsets, notes), work offsets, notes; several sheets in the browser (localStorage), JSON export/import, print layout without the app frame.
+- `benchmate-core` module `shop`: `cap_mean`, `cap_sigma_overall`, `cap_sigma_within`, `d2`, `cap_indices`, `cap_ppm`, `erfc`, `normal_pdf`, `histogram`, `sturges_bins`, `capability_flat`, `length_at_20`, `reading_for_length`, `thermal_growth`, `alpha_uncertainty`, `coolant_*`, `frac_nearest_num`, `frac_reduce`, `mixed_to_decimal`, with tests (hand example, NIST ppm table, d2 against NIST's A2 table). WebAssembly: shared input buffer (`buf_ptr`, `buf_len`) for list data, `cap_from_buf`, `cap_from_stats` and scalar exports.
+- `docs/shop-helpers.md`: sources, statement check table, open items, decisions.
 ### Added (GD&T round 2)
 - Composite position checker: up to 8 holes with basic and measured X/Y and actual size; upper row (PLTZF) checked per hole against its basic location with bonus; lower row (FRTZF) checked after the best shift of the zone group, plus a small rotation when only the primary datum is repeated in the lower row. Shows the tolerance the pattern needs, the best shift and rotation, and the residual per hole. Own diagram; guide section "Composite position" (composite vs multiple single-segment).
 - Unequal profile (U) zone calculator: zone limits on the outside and inside of the material, equivalent offset and +/- t/2 for CMM software, pass/fail margin for a measured deviation.
