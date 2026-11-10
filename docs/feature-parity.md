@@ -32,14 +32,14 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Tools | Lathe taper G-code, keyway broach G-code, custom macros | todo | machine manuals |
 | Tools | Unit conversions, grinding, bandsaw time | todo | standard |
 | Tools | G-code simulator | todo | reuse AMW simulator later |
-| Extras | 2D CAD/DXF generator, knowledge quiz, assistant | later | |
+| Extras | 2D CAD/DXF generator, assistant | later | |
 | Shop | Chatter finder (mic, stable-speed lobes) and vibration check | todo | tooth-passing/lobe formula, FFT |
 | Grinding | Equivalent diameter, grit conversion, plunge, surface, wheel/workpiece speed | todo | MH grinding chapter |
 | Threads | UNJ/UNR/UNS/UNEF/UNM, BSPP, NPT, STI, Whitworth, ACME, Stub ACME, plating allowance | todo | ASME B1.1, B1.5, B1.8, B1.20.1, ISO 228, BS 84 |
 | Gears/splines | Spur gear data, involute splines (ISO 4156, ANSI B92.1), SAE J499a | todo | standards, MH |
 | Geometry | Sine bar, height over ball, countersink/tapered bore over ball, socket head cap screw holes | todo | trig, ASME B18.3 |
 | Cycles | G81/82/83/73, G84, G76, thread mill, keyway broach, lathe cycle generator, taper | todo | machine manuals |
-| Library | Formula library (172+ in Ultra), tips, quiz, tool wear info, indexable insert catalogue | todo | own writing, ISO 1832 |
+| Library | Formula library (172+ in Ultra), tips, tool wear info, indexable insert catalogue | todo | own writing, ISO 1832 |
 | Shop | Tool library (save end mills, drills, taps, reamers; one-tap fill into any calculator), reorderable menu, link to a web/desktop session | todo | own design |
 | Platform | Offline, favourites, many languages, mobile later | todo | |
 
@@ -47,3 +47,5 @@ Beyond parity (ours): manufacturer speeds and feeds with PDF import, an adaptive
 
 
 **Scope rule:** BenchMate is for all machinists and all machines. The Citizen L20 is just the first machine profile to be verified. Nothing machine-specific goes in the general tools: G/M codes, cycles and limits live in selectable control/machine profiles.
+
+**Dropped by Jacob:** quiz and tolerance-stack mini game (not wanted).
