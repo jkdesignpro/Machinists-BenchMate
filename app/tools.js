@@ -40,9 +40,14 @@ function toolGeom(v, s) {
 }
 const LIMIT_NAMES = { 1: 'Tool deflection', 2: 'Spindle power', 3: 'Spindle torque (below base speed)', 4: 'Flute length', 5: 'Tool diameter (ae = D)' };
 
+// Shared note for the DXF screens (see docs/cad-dxf.md).
+const DXF_NOTE = 'Geometry and the DXF text are made in the Rust core. Layers: OUTLINE (outer profile), HOLES (round holes), CENTRE (centre marks, pitch circle, slot centreline). Outer profiles are closed polylines, counter-clockwise; arcs inside a polyline are stored as bulges, bulge = tan(included angle / 4). R2000 files store the units in $INSUNITS (1 = inches, 4 = millimetres); R12 files cannot, so set the units when you import them. All values are in the units chosen in the title bar.';
+const DXF_SOURCE = 'Autodesk DXF Reference (HEADER $INSUNITS and $MEASUREMENT; LINE, CIRCLE, ARC, LWPOLYLINE, POLYLINE/VERTEX bulge). Output checked with the open-source ezdxf reader (audit). See docs/cad-dxf.md.';
+
 const TOOLS = [
 {
   id: 'rpm', group: 'Speeds and feeds', title: 'Spindle speed',
+  pick: { map: { dia: 'dia' } },
   desc: 'Convert between spindle RPM and surface (cutting) speed.',
   fields: s => [
     { id: 'speed', label: s === 'inch' ? 'Surface speed' : 'Cutting speed Vc', unit: spdU(s), def: s === 'inch' ? 300 : 90 },
@@ -60,6 +65,7 @@ const TOOLS = [
 },
 {
   id: 'feed', group: 'Speeds and feeds', title: 'Milling feed rate',
+  pick: { map: { z: 'flutes' } },
   desc: 'Table feed from feed per tooth, or the reverse.',
   fields: s => [
     { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: 3000 },
@@ -147,6 +153,7 @@ const TOOLS = [
 },
 {
   id: 'arcfeed', group: 'Milling', title: 'Arc feed correction',
+  pick: { map: { d: 'dia' } },
   desc: 'Programmed tool-centre feed so the cutting edge runs at the feed you want on an arc. Inside arcs need a slower centre feed, outside arcs a faster one.',
   fields: s => [
     { id: 'fe', label: 'Desired feed at the cutting edge', unit: feedMinU(s), def: s === 'inch' ? 20 : 500 },
@@ -169,6 +176,7 @@ const TOOLS = [
 },
 {
   id: 'helix', group: 'Milling', title: 'Helical interpolation and ramping',
+  pick: { map: { d: 'dia' } },
   desc: 'Helix pitch per turn from a ramp angle, or the ramp angle from a pitch, and the axial (Z) feed. Angles are at the tool-centre path.',
   fields: s => [
     { id: 'mode', label: 'Feature', unit: '', def: 1, options: [[1, 'Hole (inside)'], [2, 'Boss (outside)']] },
@@ -197,6 +205,7 @@ const TOOLS = [
 },
 {
   id: 'deflection', group: 'Milling', title: 'Tool deflection',
+  pick: { map: { d: 'dia', dsh: 'shank', L: 'stick', lf: 'flute_len', mat: 'material' }, clear: ['dsh', 'lf'] },
   desc: 'Tip deflection of an end mill under a side (radial) force, modelled as a cantilever clamped at the holder face: solid shank, then the fluted length at an effective diameter. Enter the force, or estimate it from cutting power. The radial-to-tangential force ratio depends on engagement and tool geometry; it is yours to enter, BenchMate does not guess it.',
   fields: s => toolGeomFields(s).concat([
     { id: 'F', label: 'Radial force (if known)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
@@ -232,6 +241,7 @@ const TOOLS = [
 },
 {
   id: 'cutopt', group: 'Milling', title: 'Cut check and optimiser',
+  pick: { map: { d: 'dia', dsh: 'shank', L: 'stick', lf: 'flute_len', mat: 'material', z: 'flutes' }, clear: ['dsh', 'lf'] },
   desc: 'Checks a milling cut for speed, feed, removal rate, power, torque and tool deflection against your limits and the active machine, shows which limit binds first, then finds the largest depth (ap) for your width (ae), or the largest width for your depth, inside every limit. kc and the Fr/Ft ratio are yours to enter; BenchMate does not guess them.',
   fields: s => [
     { id: 'mode', label: 'Optimise', unit: '', def: 0, options: [[0, 'Largest ap for this ae'], [1, 'Largest ae for this ap']] },
@@ -311,6 +321,7 @@ const TOOLS = [
 },
 {
   id: 'finish', group: 'Turning', title: 'Surface finish from nose radius',
+  pick: { map: { r: 'cr' }, types: ['Turning insert', 'Grooving', 'Threading', 'Boring bar', 'Other'] },
   desc: 'Theoretical roughness for a given feed and nose radius, or the feed for a target Ra. A geometric ideal: real finish is usually worse.',
   fields: s => [
     { id: 'f', label: 'Feed per rev', unit: feedRevU(s), def: s === 'inch' ? 0.004 : 0.1 },
@@ -399,6 +410,7 @@ const TOOLS = [
 },
 {
   id: 'drillpoint', group: 'Drilling and tapping', title: 'Drill point length',
+  pick: { map: { dia: 'dia', ang: 'point' }, types: ['Drill', 'Spot', 'Other'] },
   desc: 'Axial length of the drill point.',
   fields: s => [
     { id: 'dia', label: 'Drill diameter', unit: lenU(s), def: s === 'inch' ? 0.25 : 6 },
@@ -530,6 +542,55 @@ const TOOLS = [
   render: el => renderDovetail(el),
   working: 'A pin in a corner of angle α touches base and flank; its centre is (d/2) cot(α/2) from the sharp corner along the base. Male: M = W + d (1 + cot(α/2)). Female: M = W - d (1 + cot(α/2)). W from the other face: W = top ∓ 2h cot α. V-groove: pin top above face = (d/2)/sin(β/2) + d/2 - (W/2)/tan(β/2).',
   source: 'Plane geometry (BenchMate derivation, checked in tests by constructing the pin position). See docs/geometry.md.',
+},
+{
+  id: 'dxfbolt', group: 'CAD / DXF', title: 'Bolt circle DXF',
+  desc: 'Equally spaced holes on a circle, with an optional outside diameter and centre bore, as a DXF file for CAM. Live preview with overall size and hole positions.',
+  render: el => renderDxf(el, 'dxfbolt'),
+  working: DXF_NOTE + ' Hole positions: x = (D/2) cos(a0 + 360 i / n), y = (D/2) sin(a0 + 360 i / n), the same function as the Bolt circle calculator.',
+  source: DXF_SOURCE + " Hole circles: Machinery's Handbook.",
+},
+{
+  id: 'dxfgrid', group: 'CAD / DXF', title: 'Hole grid (rectangular pattern) DXF',
+  desc: 'A rectangular grid of holes at a pitch in X and Y, optionally on a plate with a margin and corner radius, as a DXF file.',
+  render: el => renderDxf(el, 'dxfgrid'),
+  working: DXF_NOTE + ' The grid is centred on the origin (or put at the lower-left corner with the origin option). Plate size = (columns - 1) x pitch X + 2 x margin, by (rows - 1) x pitch Y + 2 x margin.',
+  source: DXF_SOURCE,
+},
+{
+  id: 'dxfslot', group: 'CAD / DXF', title: 'Slot DXF (straight and arc)',
+  desc: 'A straight slot from its centre distance and width, at any angle, or an arc slot on a centreline radius with start and sweep angles, as one closed outline.',
+  render: el => renderDxf(el, 'dxfslot'),
+  working: DXF_NOTE + ' Straight slot: two straight sides and two half-circle ends (bulge 1); overall length = centre distance + width. Arc slot: outer arc (R + w/2) and inner arc (R - w/2) with bulge tan(sweep / 4), joined by half-circle ends.',
+  source: DXF_SOURCE,
+},
+{
+  id: 'dxfrect', group: 'CAD / DXF', title: 'Rectangle with corner radii DXF',
+  desc: 'A rectangular plate with an optional corner radius and four corner holes at an inset from the edges, as a DXF file.',
+  render: el => renderDxf(el, 'dxfrect'),
+  working: DXF_NOTE + ' Corner arcs are 90° polyline arcs (bulge tan 22.5° = 0.414214). Corner holes are checked against the edges and the corner radius.',
+  source: DXF_SOURCE,
+},
+{
+  id: 'dxfpoly', group: 'CAD / DXF', title: 'Polygon (hex, square, n sides) DXF',
+  desc: 'A regular polygon of any number of sides from its size across flats or across corners, with rotation and an optional centre bore, as a DXF file. Shows across corners, across flats and side length.',
+  render: el => renderDxf(el, 'dxfpoly'),
+  working: DXF_NOTE + ' Across corners = 2R; across flats = 2R cos(180°/n) (even n); for odd n the flat-to-opposite-corner size is R (1 + cos(180°/n)); side = 2R sin(180°/n); area = n R² sin(360°/n) / 2.',
+  source: DXF_SOURCE + " Regular polygons: Machinery's Handbook.",
+},
+{
+  id: 'dxfring', group: 'CAD / DXF', title: 'Circle and ring (washer) DXF',
+  desc: 'A disc or a ring (washer, spacer) from its outside and inside diameters, as a DXF file.',
+  render: el => renderDxf(el, 'dxfring'),
+  working: DXF_NOTE,
+  source: DXF_SOURCE,
+},
+{
+  id: 'dxfprofile', group: 'CAD / DXF', title: 'Keyhole, D-flat and double-D DXF',
+  desc: 'Simple profiles as one closed outline: a keyhole (head circle and slot), a D-flat (a circle with one flat) and a double-D (two parallel flats), with rotation.',
+  render: el => renderDxf(el, 'dxfprofile'),
+  working: DXF_NOTE + ' Keyhole: the slot sides meet the head circle at y = -sqrt(R² - (w/2)²). D-flat: the flat is at A - R from the centre (A = across flat). Double-D: flats at ±A/2. The arcs are polyline arcs with bulge tan(included angle / 4).',
+  source: DXF_SOURCE,
 },
 {
   id: 'gdtguide', group: 'GD&T', title: 'GD&T reference guide',
@@ -821,6 +882,13 @@ const TOOLS = [
   render: el => renderMachines(el),
   working: 'Power available at speed n: P(n) = min(P_max, T_max x 2 pi n / 60 000). Constant torque below base speed, constant power above it.',
   source: 'Standard spindle power/torque characteristic [SAN]. Machine limits come from the builder\'s spec sheet or manual.',
+},
+{
+  id: 'toollib', group: 'Setup', title: 'Tool library',
+  desc: 'Save your end mills, drills, taps, reamers and inserts once: type, diameter, flutes, flute length, overall length, stick-out, corner radius, material and coating, maker and part number. Then fill them into the speed, feed, cut, deflection, helix, drill point, tap drill and finish calculators. Saved in this browser; export and import as a JSON file.',
+  render: el => renderToolLibrary(el),
+  working: "Nothing is calculated here. Each tool keeps the units it was entered in; when it is filled into a calculator set to the other units, lengths are converted with 1 in = 25.4 mm (exact). A tap's pitch is mm for a metric tool and TPI for an inch tool. Import adds new tools and skips tools that are already in the library; it never overwrites one. Only a tool marked Solid carbide sets the carbide E preset in the deflection screens; other materials leave E as it is.",
+  source: 'BenchMate design. Inch definition: NIST SP 811, appendix B.',
 },
 {
   id: 'setupsheet', group: 'Setup', title: 'Setup sheet',

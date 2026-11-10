@@ -36,7 +36,8 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Tools | Lathe taper G-code, keyway broach G-code, custom macros | todo | machine manuals |
 | Tools | Unit conversions, grinding, bandsaw time | todo | standard |
 | Tools | G-code simulator | todo | reuse AMW simulator later |
-| Extras | 2D CAD/DXF generator, assistant | later | |
+| Extras | 2D CAD/DXF generator: bolt circle, hole grid, straight and arc slot, rectangle with corner radii and holes, polygon, circle/ring, keyhole, D-flat, double-D; R2000 and R12; live preview | done | `dxf`, `cad` modules; Autodesk DXF Reference; validated with ezdxf (docs/cad-dxf.md) |
+| Extras | Assistant | later | |
 | Shop | Chatter finder (mic, stable-speed lobes) and vibration check | todo | tooth-passing/lobe formula, FFT |
 | Grinding | Equivalent diameter, grit conversion, plunge, surface, wheel/workpiece speed | todo | MH grinding chapter |
 | Threads | UNJ/UNR/UNS/UNEF/UNM, BSPP, NPT, STI, Whitworth, ACME, Stub ACME, plating allowance | todo | ASME B1.1, B1.5, B1.8, B1.20.1, ISO 228, BS 84 |
@@ -44,8 +45,10 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Geometry | Sine bar, height over ball, countersink/tapered bore over ball, socket head cap screw holes | todo | trig, ASME B18.3 |
 | Cycles | G81/82/83/73, G84, G76, thread mill, keyway broach, lathe cycle generator, taper | todo | machine manuals |
 | Library | Formula library (172+ in Ultra), tips, tool wear info, indexable insert catalogue | todo | own writing, ISO 1832 |
-| Shop | Tool library (save end mills, drills, taps, reamers; one-tap fill into any calculator), reorderable menu, link to a web/desktop session | todo | own design |
-| Platform | Offline, favourites, many languages, mobile later | todo | |
+| Shop | Tool library (save end mills, drills, taps, reamers, inserts; fill into speed, feed, cut, deflection, helix, drill point, tap drill, finish) | done | own design, docs/cad-dxf.md |
+| Shop | Reorderable menu, link to a web/desktop session | todo | own design |
+| Platform | Favourites (starred tools at the top of the list) | done | own design |
+| Platform | Offline, many languages, mobile later | todo | |
 
 Beyond parity (ours): manufacturer speeds and feeds with PDF import, an adaptive per-machine learning profile (see `vendor-data-and-learning.md`), Swiss-lathe helpers, "show the working" steps for every result, AMW link-up.
 

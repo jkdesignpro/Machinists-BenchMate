@@ -223,3 +223,28 @@ f1!(whitworth_value, c::whitworth_value_f, d, p, what);
 f1!(ba_value, c::ba_value_f, n, what);
 f1!(npt_value, c::npt_value_f, d, p, l1, what);
 f1!(round_sig, c::round_sig_f, x, sig);
+
+// CAD / DXF (core/src/cad.rs, core/src/dxf.rs)
+static mut TEXT: Vec<u8> = Vec::new();
+fn set_text(s: String) -> f64 { let n = s.len(); unsafe { *core::ptr::addr_of_mut!(TEXT) = s.into_bytes(); } n as f64 }
+/// Address of the last text result (UTF-8, length returned by the call that made it).
+#[no_mangle] pub extern "C" fn text_ptr() -> *const u8 {
+    // SAFETY: single-threaded wasm; TEXT is only replaced by set_text.
+    unsafe { (*core::ptr::addr_of!(TEXT)).as_ptr() } }
+/// Build shape `shape` (see `cad::shape`) from the first `n` buffer values.
+/// On success returns the DXF text length (text at `text_ptr`) and puts the
+/// drawing in `list_out` (`Drawing::flatten`). On bad input returns minus the
+/// length of an error message held at `text_ptr`.
+#[no_mangle] pub extern "C" fn dxf_build(shape: f64, n: f64, inch: f64, r12: f64, marks: f64, lower_left: f64) -> f64 {
+    let p = buf(n).to_vec();
+    match c::cad::build(shape as u32, &p, marks != 0.0) {
+        Ok(mut d) => {
+            if lower_left != 0.0 { d.origin_lower_left(); }
+            set_out(d.flatten());
+            let u = if inch != 0.0 { c::dxf::Units::Inch } else { c::dxf::Units::Mm };
+            let v = if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 };
+            set_text(c::dxf::write_dxf(&d, u, v))
+        }
+        Err(e) => { set_out(vec![]); -set_text(e) }
+    } }
+f1!(polygon_dims, c::cad::polygon_dims, n, size, corners, which);

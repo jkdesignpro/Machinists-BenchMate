@@ -3,6 +3,19 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (CAD / DXF)
+- New **CAD / DXF** group with seven screens: bolt circle (optional outside diameter and centre bore), hole grid on an optional plate with corner radius, straight and arc slot, rectangle with corner radii and four corner holes, regular polygon (across flats or corners, rotation, bore; shows across corners, across flats, side and area), circle and ring, keyhole / D-flat / double-D.
+- Live SVG preview of the exact entities with overall width and height dimensions, hole callouts, a hole position table and the part extents; errors in plain words for impossible shapes (overlapping holes, corner radius too large, slot ends touching, holes breaking out).
+- Download as DXF (Blob link; `saveFile` lets the native wrapper show a save dialog). R2000 (AC1015, LWPOLYLINE with bulges, handles, `$INSUNITS` 1 inch / 4 mm, `$MEASUREMENT`) or R12 (AC1009, POLYLINE/VERTEX). Layers OUTLINE, HOLES, CENTRE; optional centre marks, bolt pitch circle and slot centreline; origin at the centre or lower-left; file name editable.
+- `benchmate-core` modules `dxf` (drawing model, exact arc extents, bulge to arc, polyline area and length, DXF writer) and `cad` (shape builders, `polygon_dims`), following the Autodesk DXF Reference. Tests read the output back with a small DXF parser and check units, handles, layers, extents, hole positions and outline areas against closed forms. WebAssembly: `dxf_build`, `text_ptr`, `polygon_dims`.
+- `scripts/check_dxf.py`: loads and audits generated files with ezdxf; 50 sample files (all shapes, R2000/R12, inch/mm) load with 0 audit errors and 0 fixes, and the outline areas ezdxf reads match the closed forms.
+- `docs/cad-dxf.md`: format sources, check table, validation record, open items.
+### Added (tool library and favourites)
+- **Tool library** (Setup): end mills, drills, taps, reamers, inserts and more with type, units, tool number, diameter, shank, flutes, flute length, overall length, stick-out, corner/nose radius, point angle, pitch, material, coating, maker, part number and notes; filter and search; edit, copy, delete; saved in the browser; JSON export and import that adds new tools and skips identical ones, never overwriting.
+- "Fill from tool library" on spindle speed, milling feed, arc feed, helical interpolation, tool deflection, cut optimiser, drill point, tap drill (selects the matching standard thread and tap type) and surface finish (insert nose radius); lengths converted between inch and mm.
+- **Favourites**: star a tool in the side list or with the button by its title; a Favourites group at the top of the list, kept in the browser.
+### Fixed
+- Phones (390 px): wide result tables scroll inside their box and long values and labels wrap, so no screen scrolls sideways (11 screens did before).
 ### Added (geometry)
 - Triangle solver: right or any triangle from any three values with at least one side; the ambiguous side-side-angle case shows both solutions with a picker; area and perimeter; own SVG drawing.
 - Chord, arc, sagitta: solve from radius and angle, radius and chord, radius and sagitta, chord and sagitta, or radius and arc length; segment and sector areas; diagram. Circle through three points.

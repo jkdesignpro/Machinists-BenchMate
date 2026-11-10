@@ -562,6 +562,8 @@ pub mod geometry;
 pub use geometry::*;
 pub mod thread_forms;
 pub use thread_forms::*;
+pub mod dxf;
+pub mod cad;
 
 #[cfg(test)]
 mod tests {
