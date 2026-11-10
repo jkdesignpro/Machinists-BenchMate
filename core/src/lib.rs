@@ -565,6 +565,10 @@ pub use thread_forms::*;
 pub mod cycles;
 pub use cycles::*;
 pub mod gcode;
+pub mod dxf;
+pub mod cad;
+pub mod tooling;
+pub use tooling::*;
 
 #[cfg(test)]
 mod tests {

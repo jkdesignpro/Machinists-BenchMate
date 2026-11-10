@@ -60,7 +60,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Tools | Scientific calculator | missing | | U80 |
 | Tools | Bandsaw cut time | missing | | U90 |
 | Tools | G-code simulator | missing | | U95 |
-| Tools | 2D CAD / DXF generator | missing | | U96 |
+| Tools | 2D CAD / DXF generator | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` (parametric shapes, live preview, DXF R2000/R12 export; no free sketching, snapping or angle measure) | U96 |
 | Shop | Coolant concentration and mix | done | `coolconc`, `coolmix` | U89 |
 | Shop | Chatter finder (mic, stable-speed lobes) and vibration check | missing | | U26, U27 |
 | Grinding | Equivalent diameter, grit conversion, plunge, surface, wheel/workpiece speed, cylindricity | missing | | U55-U60 |
@@ -68,7 +68,8 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Library | Formula library | partial (working shown per tool; no library view) | all tools | U97 |
 | Library | Tips, tool wear info, assistant, community cut data | missing | | U91, U98, U101, U102 |
 | Library | Indexable insert catalogue | missing (in progress, `claude/ref-data-3`) | | U103 |
-| Shop | Tool library, favourites, decimal precision, home dashboard, reorderable menu | missing | | U105-U109 |
+| Shop | Tool library and favourites | done | `toollib` (fill into rpm, feed, arcfeed, helix, deflection, cutopt, drillpoint, tapdrill, finish); star in the side list or by the title | U106, U109 |
+| Shop | Decimal precision, home dashboard, reorderable menu | missing | | U105, U107, U108 |
 | Platform | Inch/metric toggle | done | `app.js` | U104 |
 | Platform | Offline, web/desktop link | partial (local web app; no installable offline build) | | U110, U111 |
 | Platform | Mobile apps, languages | missing (later phase) | | U112, U113 |

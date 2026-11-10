@@ -44,9 +44,10 @@ watch, each to be confirmed against the standards body's own catalogue page:
   edition.
 - Old national standards (BS 1452, BS 2789, DIN 1691/1693, BS 970 EN
   numbers) are withdrawn; shown as "old" names next to current EN names.
-- Hardness conversion: ISO 18265 (2013) and ASTM E140 current revision.
-- Tool and insert codes: check current ISO 1832, ISO 5608 and ISO 513
-  editions.
+- Hardness conversion: ISO 18265:2013 is current; ASTM E140-26 is the current
+  ASTM edition (DIN Media listing, 2026-11-10).
+- Tool and insert codes: ISO 1832:2017, ISO 5608:2012 and ISO 513:2012 are
+  current (iso.org, 2026-11-10).
 
 Where a book's reasoning or rule of thumb is superseded, BenchMate uses the
 current practice and says so in the tool's notes.
@@ -70,7 +71,7 @@ current practice and says so in the tool's notes.
 | Cutting fluids, refractometer concentration | MH31 EBB | partial (concentration from Brix x the fluid's factor, mix and top-up built; fluid selection missing) | fluid maker data sheets; docs/shop-helpers.md |
 | Machining non-ferrous and plastics | MH31 | missing | material supplier machining guides |
 | EDM (wire and sinker) basics | MH31 | missing | public process guides |
-| Knurling: diameter for pitch | MH31 EBB | missing | ANSI B94.6 (cited), knurl maker data |
+| Knurling: diameter for pitch | MH31 EBB | built (blank diameter for a whole tooth count, CP/TPI/DP, straight and 30 deg; diameter growth left to trial, makers' tables cited) | DIN 82:1973-01, DIN 403; Dorian and Hommel+Keller catalogues |
 | Broaching | MH31 | missing | geometry, maker data |
 | Indexing (dividing head, rotary table) | EBB | missing (in progress on `claude/geometry`) | own derivation (40:1 ratio arithmetic) |
 | Sine bar, sine plate, gauge block stack | MH31 EBB | missing (in progress on `claude/geometry`) | geometry; gauge sets from ISO 3650 / maker lists |
@@ -88,8 +89,8 @@ current practice and says so in the tool's notes.
 | Thread chasers | EBB | missing | maker data |
 | Drill point geometry by material, grinding faults | EBB MH31 | missing | own diagrams, maker data |
 | End mill types, cutter geometry | EBB MH31 | missing | own explanations |
-| Carbide grades, ISO P/M/K/N/S/H groups | EBB MH31 | partial (ISO group shown per work material; no grade chart) | ISO 513 (cited), maker grade charts |
-| Insert designation (ISO 1832) and holder designation (ISO 5608) | EBB | missing (insert codes in progress on `claude/ref-data-3`) | decoder built from the code structure, cited |
+| Carbide grades, ISO P/M/K/N/S/H groups | EBB MH31 | partial (ISO 513 groups, colours and numbering built; no maker grade chart) | ISO 513:2012 (cited), maker pages |
+| Insert designation (ISO 1832) and holder designation (ISO 5608) | EBB | built (metric insert decoder and builder, external holder decoder; inch ANSI B212.4 inserts and ISO 6261 boring bars not decoded; some letters one maker only) | ISO 1832:2017, ISO 5608:2012 (cited); eight maker code keys |
 | Tool coatings | EBB | missing | coating maker data (Oerlikon Balzers, Ionbond) |
 | Tool steels and cutting tool materials | MH31 EBB | partial (10 tool-steel grades in material equivalents; no selection or heat-treatment data) | supplier data |
 | Tapers: Morse, Jacobs, ISO/SK, BT, CAT, HSK, R8 | EBB MH31 | partial: Morse, Jacobs, CAT and BT checked against two publishers; ISO/SK, HSK-A and R8 one source so far; Brown & Sharpe, Jarno, British and DIN metric tapers missing | standards cited (ISO 296, DIN 238, ISO 7388, ISO 12164, JIS B 6339, ASME B5.50), dimensions cross-checked against maker data |
@@ -122,11 +123,11 @@ current practice and says so in the tool's notes.
 | ISO limits and fits (IT grades, all hole/shaft deviations) | MH31 EBB EDB | partial: up to 500 mm, without j/J | ISO 286-1 formulas (cited), computed and checked |
 | ANSI preferred fits (RC, LC, LT, LN, FN) | MH31 | missing | ANSI B4.1 (cited) |
 | General tolerances (ISO 2768) | EDB | missing | ISO 2768 (cited) |
-| Surface texture: Ra/Rz, symbols, process ranges, N grades | MH31 EBB EDB | partial (theoretical turning Ra/Rt only; conversions, symbols and process ranges in progress on `claude/ref-data-3`) | ISO 21920 / ISO 1302, ASME B46.1 (cited) |
+| Surface texture: Ra/Rz, symbols, process ranges, N grades | MH31 EBB EDB | built (N grades, Ra/Rz caution with computed profile ratios, ISO 21920-1 vs ISO 1302 in our words, process ranges from two publishers; no symbol drawing tool) | ISO 21920-1/-2/-3:2021 (cited), ISO 1302:2002 withdrawn |
 | Measuring: micrometer, vernier, dial reading | MH31 | missing | own explanations |
 | Temperature compensation of measurements | MH31 | built (`tempcomp`) | thermal expansion data with sources |
 | Statistics: Cpk, SPC, tolerance stack (worst case, RSS) | MH31 | partial (1D worst-case and RSS stack; Cp/Cpk/Pp/Ppk with histogram; control charts still to do) | stack: Accendo, Five Flute (docs/gdt.md); Cpk/SPC: NIST/SEMATECH e-Handbook (public domain) |
-| Hardness conversion | EBB MH31 | missing (in progress on `claude/ref-data-3`) | ASTM E140 / ISO 18265 (cited); conversion values cross-checked |
+| Hardness conversion | EBB MH31 | built (steel, ISO 18265 table from two publishers, interpolation shown; no ASTM E140 tables, no non-steel tables) | ISO 18265:2013, ASTM E140-26 (cited) |
 | Drawing standards and abbreviations | EBB EDB | missing | own wording, ISO 128 / ASME Y14 cited |
 
 ## Mathematics and geometry

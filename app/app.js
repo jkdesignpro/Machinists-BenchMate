@@ -9,18 +9,67 @@ function fmt(v, dp) {
   return v.toLocaleString('en-GB', { minimumFractionDigits: dp, maximumFractionDigits: dp });
 }
 
+// Save a file. A native wrapper (Tauri) can set window.BenchMateSave to show a save dialog.
+function saveFile(name, data, type) {
+  if (typeof window.BenchMateSave === 'function') return window.BenchMateSave(name, data, type);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// Favourite tools, in the order they were starred; kept in this browser.
+const Favs = (() => {
+  let ids = [];
+  try { ids = JSON.parse(localStorage.getItem('bm.favs') || '[]'); if (!Array.isArray(ids)) ids = []; } catch (e) { ids = []; }
+  const save = () => { try { localStorage.setItem('bm.favs', JSON.stringify(ids)); } catch (e) {} };
+  return {
+    has: id => ids.includes(id),
+    toggle: id => { ids = ids.includes(id) ? ids.filter(x => x !== id) : ids.concat(id); save(); },
+    tools: () => ids.map(id => TOOLS.find(t => t.id === id)).filter(Boolean),
+  };
+})();
+const STAR_SVG = '<svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.9l1.85 3.85 4.2.55-3.07 2.93.77 4.17L8 11.37l-3.75 2.03.77-4.17L1.95 6.3l4.2-.55z"/></svg>';
+function toggleFav(id) { Favs.toggle(id); renderList($('#search').value); const b = $('#favbtn'); if (b && b.dataset.id === id) favButton(b, id); }
+function favButton(b, id) {
+  const on = Favs.has(id);
+  b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  b.innerHTML = STAR_SVG + '<span>' + (on ? 'Favourite' : 'Add to favourites') + '</span>';
+}
+
 function renderList(filter = '') {
   const list = $('#list'); list.innerHTML = '';
   const q = filter.trim().toLowerCase();
-  let last = '';
-  TOOLS.filter(t => !q || (t.title + ' ' + t.group + ' ' + t.desc).toLowerCase().includes(q)).forEach(t => {
-    if (t.group !== last) { const h = document.createElement('h3'); h.textContent = t.group; list.appendChild(h); last = t.group; }
+  const match = t => !q || (t.title + ' ' + t.group + ' ' + t.desc).toLowerCase().includes(q);
+  const head = txt => { const h = document.createElement('h3'); h.textContent = txt; list.appendChild(h); };
+  const row = t => {
+    const r = document.createElement('div'); r.className = 'li';
     const b = document.createElement('button');
-    b.textContent = t.title; b.dataset.id = t.id;
-    if (t.id === state.tool) b.className = 'on';
+    b.className = 't' + (t.id === state.tool ? ' on' : ''); b.textContent = t.title; b.dataset.id = t.id;
     b.onclick = () => { state.tool = t.id; try { localStorage.setItem('bm.tool', t.id); } catch (e) {} renderList($('#search').value); renderTool(); };
-    list.appendChild(b);
+    const st = document.createElement('button');
+    const fav = Favs.has(t.id);
+    st.className = 'star' + (fav ? ' on' : ''); st.innerHTML = STAR_SVG;
+    st.setAttribute('aria-pressed', fav ? 'true' : 'false');
+    st.title = (fav ? 'Remove ' : 'Add ') + t.title + (fav ? ' from favourites' : ' to favourites');
+    st.setAttribute('aria-label', st.title);
+    st.onclick = () => toggleFav(t.id);
+    r.append(b, st); list.appendChild(r);
+  };
+  const favs = Favs.tools().filter(match);
+  if (favs.length) { head('Favourites'); favs.forEach(row); }
+  let last = '';
+  TOOLS.filter(match).forEach(t => {
+    if (t.group !== last) { head(t.group); last = t.group; }
+    row(t);
   });
+}
+
+// Title row of a tool card: heading and the favourite toggle.
+function cardHead(card, t) {
+  const h = document.createElement('div'); h.className = 'thead';
+  const h1 = document.createElement('h1'); h1.textContent = t.title;
+  const b = document.createElement('button'); b.className = 'btn favbtn'; b.id = 'favbtn'; b.dataset.id = t.id;
+  favButton(b, t.id); b.onclick = () => toggleFav(t.id);
+  h.append(h1, b); card.prepend(h);
 }
 
 function renderTool() {
@@ -32,8 +81,8 @@ function renderTool() {
   const main = $('#main');
   main.innerHTML = '';
   const card = document.createElement('div'); card.className = 'card';
-  card.innerHTML = '<h1></h1><p class="desc"></p><div class="grid"></div>';
-  $('h1', card).textContent = t.title; $('.desc', card).textContent = t.desc;
+  card.innerHTML = '<p class="desc"></p>' + (t.pick ? toolPickRow(t.pick) : '') + '<div class="grid"></div>';
+  cardHead(card, t); $('.desc', card).textContent = t.desc;
   const grid = $('.grid', card);
   fields.forEach(f => {
     const lab = document.createElement('label'); lab.className = 'f';
@@ -64,14 +113,22 @@ function renderTool() {
       ? '<table>' + rows.map(r => { const w = checkRow(r, state.sys, state.W); return '<tr' + (w ? ' class="over"' : '') + '><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v">' + fmt(r.value, r.dp) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>'
       : '<table><tr><td class="warn">Enter the values above.</td></tr></table>');
   }
+  const pick = $('#tpick', card);
+  if (pick) pick.onchange = () => {
+    const tool = ToolLib.get(pick.value); if (!tool) return;
+    const vals = toolPickValues(t.pick, tool, state.sys);
+    Object.entries(vals).forEach(([id, val]) => { const e = grid.querySelector('[data-id="' + id + '"]'); if (e) { e.value = val; saved[id] = String(val); } });
+    $('#tpickmsg', card).textContent = 'Filled from ' + ToolLib.describe(tool) + ': ' + (Object.keys(vals).map(id => (fields.find(f => f.id === id) || {}).label).filter(Boolean).join(', ') || 'nothing to fill') + '.';
+    pick.value = ''; update();
+  };
   update();
 }
 
 function renderCustom(t) {
   const main = $('#main'); main.innerHTML = '';
   const card = document.createElement('div'); card.className = 'card wide';
-  card.innerHTML = '<h1></h1><p class="desc"></p><div class="body"></div>';
-  $('h1', card).textContent = t.title; $('.desc', card).textContent = t.desc;
+  card.innerHTML = '<p class="desc"></p><div class="body"></div>';
+  cardHead(card, t); $('.desc', card).textContent = t.desc;
   const note = document.createElement('div'); note.className = 'note';
   note.innerHTML = '<b>Note:</b> <span id="w"></span><br><b>Sources:</b> <span id="s"></span>';
   $('#w', note).textContent = t.working; $('#s', note).textContent = t.source;

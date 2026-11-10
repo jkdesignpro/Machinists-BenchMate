@@ -84,7 +84,8 @@ async function renderTapDrill(el) {
   const R = await loadRef(el); if (!R) return;
   const W = state.W, opts = threadOptions(R);
   const m = RMEM.tap || (RMEM.tap = { key: 'M10x1.5', type: 'cut', pct: '', d: 10, p: 1.5 });
-  el.innerHTML = '<div class="grid" style="max-width:760px">' +
+  const TAP_PICK = { map: { d: 'dia', p: 'pitch' }, types: ['Tap'] };
+  el.innerHTML = toolPickRow(TAP_PICK) + '<div class="grid" style="max-width:760px">' +
     '<label class="f"><span>Thread</span><div class="row"><select id="tk">' + threadSelect(opts, m.key) + '</select></div></label>' +
     '<label class="f"><span>Tap type</span><div class="row"><select id="tt"><option value="cut">Cutting tap</option><option value="form">Forming (roll) tap</option></select></div></label>' +
     '<label class="f"><span>Percent of thread (blank = 75 cut, 65 form)</span><div class="row"><input id="tp" type="number" step="any"><span class="u">%</span></div></label>' +
@@ -124,6 +125,18 @@ async function renderTapDrill(el) {
         return '<tr' + (warn ? ' class="over"' : '') + '><td>' + rEsc(drillLabel(x)) + ' ' + badge(x.status) + '</td><td class="v">' + fBoth(mm) + '</td><td class="v">' + fx(pc, 1) + ' %' + (warn ? '<div class="wmsg">' + (pc > 100 ? 'over 100 %: tap will bind or break' : 'under 50 %: weak thread') + '</div>' : '') + '</td></tr>';
       }).join('') + '</table></div>';
   }
+  const pick = $('#tpick', el);
+  if (pick) pick.onchange = () => {
+    const t = ToolLib.get(pick.value); pick.value = ''; if (!t) return;
+    const d = t.units === 'in' ? Number(t.dia) * IN_MM : Number(t.dia), p = ToolLib.pitchMm(t);
+    if (!(d > 0 && p > 0)) { $('#tpickmsg', el).textContent = ToolLib.describe(t) + ' needs a diameter and a pitch.'; return; }
+    // A standard thread with the same size is selected; anything else goes in as "Other".
+    const std = opts.find(o => Math.abs(o.d - d) < 1e-6 && Math.abs(o.p - p) < 1e-6);
+    m.d = d; m.p = p; k.value = std ? std.key : 'custom';
+    if (t.type === 'Tap (forming)') tt.value = 'form'; else if (t.type === 'Tap (cutting)') tt.value = 'cut';
+    $('#tpickmsg', el).textContent = 'Filled from ' + ToolLib.describe(t) + (std ? ' (' + std.label + ')' : '') + '.';
+    setCustomFields(); upd();
+  };
   k.onchange = () => { setCustomFields(); upd(); }; tt.onchange = upd; tp.oninput = upd; td.oninput = upd; tpp.oninput = upd;
   setCustomFields(); upd();
 }

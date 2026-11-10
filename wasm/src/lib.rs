@@ -285,3 +285,40 @@ fn prog() -> Option<&'static c::gcode::Program> { unsafe { (*core::ptr::addr_of!
 #[no_mangle] pub extern "C" fn holes_csv(n: f64, metric: f64) -> f64 {
     let v = buf(2.0 * n); let h: Vec<(f64, f64)> = v.chunks(2).filter(|c| c.len() == 2).map(|c| (c[0], c[1])).collect();
     set_str(&c::gcode::holes_csv(&h, metric != 0.0)) }
+// CAD / DXF (core/src/cad.rs, core/src/dxf.rs)
+static mut TEXT: Vec<u8> = Vec::new();
+fn set_text(s: String) -> f64 { let n = s.len(); unsafe { *core::ptr::addr_of_mut!(TEXT) = s.into_bytes(); } n as f64 }
+/// Address of the last text result (UTF-8, length returned by the call that made it).
+#[no_mangle] pub extern "C" fn text_ptr() -> *const u8 {
+    // SAFETY: single-threaded wasm; TEXT is only replaced by set_text.
+    unsafe { (*core::ptr::addr_of!(TEXT)).as_ptr() } }
+/// Build shape `shape` (see `cad::shape`) from the first `n` buffer values.
+/// On success returns the DXF text length (text at `text_ptr`) and puts the
+/// drawing in `list_out` (`Drawing::flatten`). On bad input returns minus the
+/// length of an error message held at `text_ptr`.
+#[no_mangle] pub extern "C" fn dxf_build(shape: f64, n: f64, inch: f64, r12: f64, marks: f64, lower_left: f64) -> f64 {
+    let p = buf(n).to_vec();
+    match c::cad::build(shape as u32, &p, marks != 0.0) {
+        Ok(mut d) => {
+            if lower_left != 0.0 { d.origin_lower_left(); }
+            set_out(d.flatten());
+            let u = if inch != 0.0 { c::dxf::Units::Inch } else { c::dxf::Units::Mm };
+            let v = if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 };
+            set_text(c::dxf::write_dxf(&d, u, v))
+        }
+        Err(e) => { set_out(vec![]); -set_text(e) }
+    } }
+f1!(polygon_dims, c::cad::polygon_dims, n, size, corners, which);
+// Tooling (core/src/tooling.rs)
+f1!(insert_edge_length, c::insert_edge_length, d, a1, a2);
+f1!(insert_edge_length_shape, c::insert_edge_length_f, d, letter_code);
+f1!(insert_size_code, c::insert_size_code, edge_len);
+f1!(knurl_blank_dia_cp, c::knurl_blank_dia_cp, p, n);
+f1!(knurl_blank_dia_dp, c::knurl_blank_dia_dp, dp, n);
+f1!(knurl_teeth_cp, c::knurl_teeth_cp, d, p);
+f1!(knurl_teeth_dp, c::knurl_teeth_dp, d, dp);
+f1!(lerp, c::lerp, x, x0, y0, x1, y1);
+f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
+f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
+f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
+f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);

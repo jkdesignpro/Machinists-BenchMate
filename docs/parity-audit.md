@@ -30,14 +30,14 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 33 | 17 | 61 (8) | 2 | 0 | 30 % |
-| Machinery's Handbook 31 | 306 | 15 | 45 | 212 (15) | 6 | 28 | 6 % |
+| CNC Machinist Calculator Ultra | 113 | 35 | 18 | 58 (8) | 2 | 0 | 32 % |
+| Machinery's Handbook 31 | 306 | 15 | 45 | 212 (14) | 6 | 28 | 6 % |
 | Engineers' Data Book | 94 | 3 | 20 | 33 (1) | 12 | 26 | 5 % |
-| Engineers Black Book | 80 | 9 | 14 | 56 (11) | 1 | 0 | 11 % |
+| Engineers Black Book | 80 | 9 | 14 | 56 (10) | 1 | 0 | 11 % |
 | CNC Machining handbook | 83 | 1 | 9 | 69 (0) | 0 | 4 | 1 % |
-| **All** | **676** | **61** | **105** | **431 (35)** | **21** | **58** | **10 %** |
+| **All** | **676** | **63** | **106** | **428 (32)** | **21** | **58** | **11 %** |
 
-**Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1 and the summary counts include them.
+**Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -224,7 +224,7 @@ Store list is the fuller of the two store lists.
 | U93 | M-code reference | missing | | |
 | U94 | Custom macro information | missing | | |
 | U95 | G-code simulator (2D/3D, cycle time) | missing | | |
-| U96 | 2D CAD and DXF generator (snapping, angle measure) | missing | | |
+| U96 | 2D CAD and DXF generator (snapping, angle measure) | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | Parametric shapes with DXF export (branch `claude/dxf-toollib`); no free sketching, snapping or angle measure |
 
 ### Learning and data
 
@@ -244,10 +244,10 @@ Store list is the fuller of the two store lists.
 |---|---|---|---|---|
 | U104 | Inch/metric toggle | done | `app.js` | |
 | U105 | Adjustable decimal precision | missing | | |
-| U106 | Favourites | missing | | |
+| U106 | Favourites | done | side list, title button | Branch `claude/dxf-toollib` |
 | U107 | Home dashboard | missing | | |
 | U108 | Arrange menu (reorder) | missing | | |
-| U109 | Tool library (save tools, one-tap fill) | missing | | `setupsheet` stores a tool list per job only |
+| U109 | Tool library (save tools, one-tap fill) | done | `toollib` | Branch `claude/dxf-toollib`: fill into the nine calculators that take a tool diameter, flutes or lengths |
 | U110 | Offline use | partial | | Runs from local files with no network calls; no installable offline build (no manifest or service worker) |
 | U111 | Web app / link to desktop | partial | | BenchMate is a web app; no phone-to-desktop link |
 | U112 | iOS and Android apps | missing | | Later phase |
