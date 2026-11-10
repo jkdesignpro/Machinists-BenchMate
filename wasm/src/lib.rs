@@ -47,6 +47,14 @@ f1!(taylor_speed, c::taylor_speed, t, n, c);
 f1!(cost_per_part, c::cost_per_part, cycle, rate, tool, cut, life, material);
 f1!(economic_tool_life, c::economic_tool_life, n, tool, rate, change);
 f1!(max_production_tool_life, c::max_production_tool_life, n, change);
+f1!(second_moment_round, c::second_moment_round, d);
+f1!(tool_deflection_mm, c::tool_deflection_mm, f, stickout, flute, d_shank, d_flute, e_gpa);
+f1!(tangential_force_n, c::tangential_force_n, pc, vc);
+f1!(engagement_angle_deg, c::engagement_angle_deg, ae, d);
+f1!(chip_thickness_max, c::chip_thickness_max, fz, ae, d);
+f1!(chip_thickness_mean, c::chip_thickness_mean, fz, ae, d);
+f1!(cut_check, c::cut_check_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, out);
+f1!(cut_optimise, c::cut_optimise_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, vary_ae, out);
 
 /// X of hole `i` (0-based) on a bolt circle.
 #[no_mangle] pub extern "C" fn bolt_x(n: f64, dia: f64, start: f64, cx: f64, cy: f64, i: f64) -> f64 {

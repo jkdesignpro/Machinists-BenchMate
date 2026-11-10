@@ -3,6 +3,11 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (milling: deflection and cut optimiser)
+- Tool deflection (Milling): end mill as a two-section cantilever (solid shank + fluted length at an effective diameter), load at the tip. Force entered directly, or from net cutting power and speed (Ft = Pc x 60 000 / Vc) times a user-entered Fr/Ft ratio. Young's modulus presets: solid carbide 580 GPa (Ceratizit CTS20L), HSS M2 219 GPa (voestalpine data sheet), or enter E. Effective flute diameter / D is an editable input, blank by default (no verified source for a default).
+- Cut check and optimiser (Milling): RPM, feed, MRR, mean and max chip thickness, net and spindle power, spindle torque, tangential and radial force, deflection; share of each limit used and which binds first; largest ap for the given ae (or largest ae for the given ap) inside deflection, spindle power, spindle torque (below base speed), flute length and tool diameter limits. Machine power/torque come from the active machine profile unless entered. RPM, feed and power rows carry machine checks.
+- `benchmate-core`: `second_moment_round`, `cantilever_tip_deflection`, `stepped_cantilever_tip_deflection`, `tool_deflection_mm`, `tangential_force_n`, `engagement_angle_deg`, `chip_thickness_max`, `chip_thickness_mean`, `cut_check` (`CutInput`/`CutResult`), `proportional_limit`, `cut_optimise`, with worked-example tests (including stepped = uniform when diameters match, and a torque-limited case); matching WebAssembly exports.
+- `docs/sources.md`: Gere and Goodno, Roark, Altintas, Kops and Vo, and the E preset sources.
 ### Changed (materials)
 - Material data rebuilt on an evidence model: per-source printed values with verbatim rows, URLs and access dates (`data/evidence/`), consensus and status built by `scripts/build_materials.py`. Now 122 grades from 102 documents across steels, aluminium, copper alloys, titanium, nickel alloys and cast irons. Statuses: Confirmed / Sources differ / Needs 2nd source.
 - App: per-value publisher counts, alternatives shown, click a grade for each source's exact printing; family and status filters.

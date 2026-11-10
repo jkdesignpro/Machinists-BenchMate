@@ -7,6 +7,39 @@ const spdU = s => (s === 'inch' ? 'SFM' : 'm/min');
 const feedRevU = s => (s === 'inch' ? 'in/rev' : 'mm/rev');
 const feedMinU = s => (s === 'inch' ? 'in/min' : 'mm/min');
 
+// Unit conversion only (exact or defined factors).
+const IN_MM = 25.4, FT_M = 0.3048, LBF_N = 4.4482216152605, MPSI_GPA = 6.894757293168, IN3_CM3 = 16.387064, KW_HP = 1.34102;
+
+// Young's modulus presets for the tool body. Data, each with its source (see docs/sources.md).
+const E_PRESETS = {
+  1: { gpa: 580, name: 'Solid carbide', src: 'Ceratizit grade CTS20L, 10% Co' },
+  2: { gpa: 219, name: 'HSS (M2, 1.3343)', src: 'voestalpine data sheet HSS M2 1.3343, at 20 C' },
+};
+const eField = s => s === 'inch' ? { u: 'Mpsi', k: MPSI_GPA, dp: 1 } : { u: 'GPa', k: 1, dp: 0 };
+// Effective (equivalent solid) diameter of the fluted part as a fraction of D.
+// Blank by default unless a verified source is recorded in docs/sources.md.
+const FLUTE_FACTOR_DEF = '';
+
+// Shared tool-geometry fields for the deflection and cut tools.
+const toolGeomFields = s => [
+  { id: 'd', label: 'Tool (cutting) diameter D', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
+  { id: 'dsh', label: 'Shank diameter (blank = D)', unit: lenU(s), def: '' },
+  { id: 'L', label: 'Stick-out (holder face to tip)', unit: lenU(s), def: s === 'inch' ? 1.5 : 40 },
+  { id: 'lf', label: 'Flute length (blank = treat as solid)', unit: lenU(s), def: s === 'inch' ? 1 : 26 },
+  { id: 'kf', label: 'Effective flute diameter / D (approximation)', unit: 'x D', def: FLUTE_FACTOR_DEF },
+  { id: 'mat', label: 'Tool material (sets E)', unit: '', def: 1, options: [[1, 'Solid carbide'], [2, 'HSS (M2)'], [0, 'Other: enter E below']] },
+  { id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
+];
+// Returns metric geometry {d, dsh, L, lf, kf, e} plus E notes, or an error string.
+function toolGeom(v, s) {
+  const k = s === 'inch' ? IN_MM : 1, ef = eField(s);
+  const p = E_PRESETS[v.mat];
+  const e = v.E > 0 ? v.E * ef.k : (p ? p.gpa : NaN);
+  return { d: v.d * k, dsh: v.dsh > 0 ? v.dsh * k : 0, L: v.L * k, lf: v.lf > 0 ? v.lf * k : 0, kf: v.kf > 0 ? v.kf : 0, e,
+    eSrc: v.E > 0 ? 'as entered' : (p ? p.name + ' preset, ' + p.src : ''), eShow: e / ef.k, eU: ef.u, eDp: ef.dp };
+}
+const LIMIT_NAMES = { 1: 'Tool deflection', 2: 'Spindle power', 3: 'Spindle torque (below base speed)', 4: 'Flute length', 5: 'Tool diameter (ae = D)' };
+
 const TOOLS = [
 {
   id: 'rpm', group: 'Speeds and feeds', title: 'Spindle speed',
@@ -161,6 +194,120 @@ const TOOLS = [
   },
   working: 'Hole: Dpath = Dhole - Dtool. Boss: Dpath = Dboss + Dtool. Pitch = pi x Dpath x tan(angle); angle = atan(pitch / (pi x Dpath)). Axial feed = F x tan(angle) when the control applies F to the circular move in the plane (usual ISO/Fanuc default), or F x sin(angle) when F applies along the full helix path. Check your control manual. For the cutting-edge feed in a hole, use Arc feed correction.',
   source: "Sandvik Coromant milling formulas (circular ramping, helical interpolation); Machinery's Handbook (helix geometry)",
+},
+{
+  id: 'deflection', group: 'Milling', title: 'Tool deflection',
+  desc: 'Tip deflection of an end mill under a side (radial) force, modelled as a cantilever clamped at the holder face: solid shank, then the fluted length at an effective diameter. Enter the force, or estimate it from cutting power. The radial-to-tangential force ratio depends on engagement and tool geometry; it is yours to enter, BenchMate does not guess it.',
+  fields: s => toolGeomFields(s).concat([
+    { id: 'F', label: 'Radial force (if known)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { id: 'pc', label: 'Or net cutting power at the cut', unit: 'kW', def: '' },
+    { id: 'vc', label: s === 'inch' ? 'Surface speed' : 'Cutting speed Vc', unit: spdU(s), def: '' },
+    { id: 'ratio', label: 'Radial / tangential force ratio Fr/Ft', unit: '', def: '' },
+  ]),
+  calc: (v, W, s) => {
+    const g = toolGeom(v, s), k = s === 'inch' ? IN_MM : 1, fU = s === 'inch' ? 'lbf' : 'N', fk = s === 'inch' ? LBF_N : 1;
+    if (!(g.d > 0 && g.L > 0 && g.e > 0)) return [];
+    const rows = [R("Young's modulus used (" + g.eSrc + ')', g.eShow, g.eU, g.eDp)];
+    const ds = g.dsh || g.d;
+    if (g.lf > 0 && !(g.kf > 0)) return rows.concat([R('Flute section', 'Enter the effective flute diameter / D (see the note below), or blank the flute length to treat the tool as solid', '', 0)]);
+    const df = g.lf > 0 ? g.kf * g.d : ds;
+    rows.push(R(g.lf > 0 ? 'Effective flute diameter (approximation)' : 'Section diameter (solid)', df / k, lenU(s), 4));
+    let F = NaN;
+    if (v.F > 0) F = v.F * fk;
+    else if (v.pc > 0 && v.vc > 0) {
+      const ft = W.tangential_force_n(v.pc, s === 'inch' ? v.vc * FT_M : v.vc);
+      rows.push(R('Mean tangential force Ft', ft / fk, fU, 1));
+      if (v.ratio > 0) { F = v.ratio * ft; rows.push(R('Radial force Fr = ratio x Ft', F / fk, fU, 1)); }
+      else rows.push(R('Radial force', 'Enter the Fr/Ft ratio for your cut', '', 0));
+    }
+    if (F > 0) {
+      const d = W.tool_deflection_mm(F, g.L, g.lf, ds, df, g.e);
+      rows.push(R('Tip deflection', d / k, lenU(s), s === 'inch' ? 5 : 4));
+      rows.push(R('Tip deflection', s === 'inch' ? d / k * 1000 : d * 1000, s === 'inch' ? 'thou' : 'um', s === 'inch' ? 2 : 1));
+    }
+    return rows;
+  },
+  working: 'I = pi d^4 / 64. Two-section cantilever, load F at the tip, stick-out L, fluted length a from the tip: deflection = F / (3 E) x [ (L^3 - a^3) / I_shank + a^3 / I_flute ]. With no flutes (or equal diameters) this is F L^3 / (3 E I). Force from power: Ft = Pc x 60 000 / Vc (Pc in kW at the cut, Vc in m/min, Ft in N); Fr = (Fr/Ft) x Ft. The effective flute diameter is an approximation for the reduced section of the fluted part. Holder, collet and spindle flex are not included, so a real setup deflects more. The load is put at the tip, which overstates deflection a little for shallow cuts. E presets: solid carbide 580 GPa (Ceratizit grade CTS20L, 10% Co; carbide grades span about 490-670 GPa in Tungaloy and Ceratizit grade tables, so use your tool maker\'s figure if you have it); HSS 219 GPa (voestalpine data sheet for M2, 1.3343, at 20 C). The effective flute diameter / D is left blank: enter your tool maker\'s figure or your own measured value.',
+  source: "Cantilever and stepped (nonprismatic) beam deflection: Gere and Goodno, Mechanics of Materials; Roark's Formulas for Stress and Strain (Ch. 8). Equivalent flute diameter concept: Kops and Vo, CIRP Annals 1990. Force from power: Sandvik Coromant milling formulas. E presets: Ceratizit and voestalpine grade data (docs/sources.md).",
+},
+{
+  id: 'cutopt', group: 'Milling', title: 'Cut check and optimiser',
+  desc: 'Checks a milling cut for speed, feed, removal rate, power, torque and tool deflection against your limits and the active machine, shows which limit binds first, then finds the largest depth (ap) for your width (ae), or the largest width for your depth, inside every limit. kc and the Fr/Ft ratio are yours to enter; BenchMate does not guess them.',
+  fields: s => [
+    { id: 'mode', label: 'Optimise', unit: '', def: 0, options: [[0, 'Largest ap for this ae'], [1, 'Largest ae for this ap']] },
+  ].concat(toolGeomFields(s), [
+    { id: 'z', label: 'Number of flutes', unit: '', def: 3 },
+    { id: 'ae', label: 'Radial width ae', unit: lenU(s), def: s === 'inch' ? 0.1 : 2.4 },
+    { id: 'ap', label: 'Axial depth ap', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
+    { id: 'fz', label: 'Feed per tooth fz', unit: lenU(s), def: s === 'inch' ? 0.002 : 0.05 },
+    { id: 'speed', label: s === 'inch' ? 'Surface speed' : 'Cutting speed Vc', unit: spdU(s), def: s === 'inch' ? 500 : 150 },
+    { id: 'rpm', label: 'Or spindle speed (wins over speed)', unit: 'RPM', def: '' },
+    { id: 'kc', label: 'Specific cutting force kc', unit: 'N/mm2', def: '' },
+    { id: 'eta', label: 'Machine efficiency', unit: '0-1', def: 0.8 },
+    { id: 'ratio', label: 'Radial / tangential force ratio Fr/Ft', unit: '', def: '' },
+    { id: 'F', label: 'Or radial force at this cut', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { id: 'lim', label: 'Deflection limit', unit: lenU(s), def: '' },
+    { id: 'pmax', label: 'Spindle power limit (blank = active machine)', unit: 'kW', def: '' },
+    { id: 'tmax', label: 'Spindle torque limit (blank = active machine)', unit: 'N·m', def: '' },
+  ]),
+  calc: (v, W, s) => {
+    const g = toolGeom(v, s), k = s === 'inch' ? IN_MM : 1, fk = s === 'inch' ? LBF_N : 1, fU = s === 'inch' ? 'lbf' : 'N';
+    if (!(g.d > 0 && v.z > 0 && v.ae > 0 && v.ap > 0 && v.fz > 0)) return [];
+    const vc = v.rpm > 0 ? W.vc_from_rpm(v.rpm, g.d) : (s === 'inch' ? v.speed * FT_M : v.speed);
+    if (!(vc > 0)) return [];
+    const m = typeof Profiles !== 'undefined' ? Profiles.active() : null;
+    const mnum = x => (x === '' || x == null) ? 0 : (Number(x) > 0 ? Number(x) : 0);
+    const pmax = v.pmax > 0 ? v.pmax : (m ? mnum(m.power_kw) : 0);
+    const tmax = v.tmax > 0 ? v.tmax : (m ? mnum(m.torque_nm) : 0);
+    const pSrc = v.pmax > 0 ? 'entered' : (m && pmax > 0 ? m.name : '');
+    const z0 = x => x > 0 ? x : 0;
+    const args = ap => [g.d, g.dsh, z0(g.L), g.lf, g.kf, z0(g.e), v.z, v.ae * k, ap, v.fz * k, vc, z0(v.kc), z0(v.eta), z0(v.ratio), z0(v.F) * fk, z0(v.lim) * k, pmax, tmax];
+    const a = args(v.ap * k), C = i => W.cut_check(...a, i);
+    const rpm = C(0), vf = C(1), q = C(2), pNet = C(3), pSp = C(4), tq = C(5), ft = C(6), fr = C(7), defl = C(8), pAv = C(9), bind = C(10);
+    const rows = [
+      R('Spindle speed', rpm, 'RPM', 0, 'rpm'),
+      R('Table feed', vf / k, feedMinU(s), s === 'inch' ? 2 : 0, 'feed'),
+      R('Material removal rate', s === 'inch' ? q / IN3_CM3 : q, s === 'inch' ? 'in3/min' : 'cm3/min', 2),
+      R('Mean chip thickness hm (exact arc average)', W.chip_thickness_mean(v.fz, v.ae, v.d), lenU(s), s === 'inch' ? 5 : 4),
+      R('Max chip thickness hex', W.chip_thickness_max(v.fz, v.ae, v.d), lenU(s), s === 'inch' ? 5 : 4),
+    ];
+    if (v.kc > 0) {
+      rows.push(R('Power at the cut (net)', pNet, 'kW', 3));
+      if (v.eta > 0) {
+        rows.push(R('Power at the spindle', pSp, 'kW', 3, 'power_kw', { rpm }));
+        if (s === 'inch') rows.push(R('Power at the spindle', pSp * KW_HP, 'hp', 3));
+        rows.push(R('Spindle torque', tq, 'N·m', 2));
+      }
+      rows.push(R('Mean tangential force Ft', ft / fk, fU, 1));
+    } else rows.push(R('Power, torque, force', 'Enter kc for your material (tool maker or handbook)', '', 0));
+    if (isFinite(fr)) rows.push(R('Radial force used', fr / fk, fU, 1));
+    if (g.lf > 0 && !(g.kf > 0)) rows.push(R('Deflection', 'Enter the effective flute diameter / D, or blank the flute length', '', 0));
+    else if (isFinite(defl)) {
+      rows.push(R("Young's modulus used (" + g.eSrc + ')', g.eShow, g.eU, g.eDp));
+      rows.push(R('Tool tip deflection', defl / k, lenU(s), s === 'inch' ? 5 : 4));
+    }
+    else if (!(v.F > 0 || v.ratio > 0)) rows.push(R('Deflection', 'Enter the Fr/Ft ratio or the radial force', '', 0));
+    if (pmax > 0) rows.push(R('Spindle power available at this speed (' + pSrc + ')', pAv, 'kW', 3));
+    [1, 2, 3].forEach(i => { const u = C(10 + i); if (isFinite(u)) rows.push(R(LIMIT_NAMES[i] + ': share of limit used', u * 100, '%', 1)); });
+    rows.push(R('Binds first', bind > 0 ? LIMIT_NAMES[bind] : 'No limits to check (enter a deflection limit or machine power)', '', 0));
+    // Optimiser: largest ap (or ae) inside every limit.
+    const vary = v.mode === 1 ? 1 : 0;
+    const x = W.cut_optimise(...a, vary, 0), lk = W.cut_optimise(...a, vary, 1);
+    if (isFinite(x) && lk > 0) {
+      const name = vary ? 'ae' : 'ap';
+      rows.push(R('Largest ' + name + ' inside the limits', x / k, lenU(s), s === 'inch' ? 4 : 2));
+      rows.push(R('Set by', LIMIT_NAMES[lk], '', 0));
+      const b = vary ? [...a.slice(0, 7), x, ...a.slice(8)] : args(x);
+      const Cb = i => W.cut_check(...b, i);
+      const qb = Cb(2);
+      rows.push(R('Removal rate at that ' + name, s === 'inch' ? qb / IN3_CM3 : qb, s === 'inch' ? 'in3/min' : 'cm3/min', 2));
+      if (v.kc > 0 && v.eta > 0) rows.push(R('Power at the spindle at that ' + name, Cb(4), 'kW', 3, 'power_kw', { rpm }));
+      if (isFinite(Cb(8))) rows.push(R('Deflection at that ' + name, Cb(8) / k, lenU(s), s === 'inch' ? 5 : 4));
+    }
+    return rows;
+  },
+  working: 'n = 1000 Vc / (pi D). Vf = n x fz x z. Q = ae x ap x Vf. Pc = Q x kc / 60 000 (Q cm3/min, kc N/mm2, kW); spindle power = Pc / efficiency; torque T = P x 60 000 / (2 pi n). Ft = Pc x 60 000 / Vc; Fr = (Fr/Ft) x Ft or as entered. Deflection: two-section cantilever as in Tool deflection. Power available P(n) = min(P_max, T_max x 2 pi n / 60 000); below base speed the torque limit is the one that binds. Chip thickness, engagement angle phi = acos(1 - 2 ae / D): hex = fz sin(phi) (fz when ae >= D/2), hm = fz (1 - cos phi) / phi (exact arc average; tends to fz sqrt(ae/D) for small ae). Optimiser: with kc taken as constant, removal rate, power, torque, force and deflection are all proportional to ap at fixed ae (and to ae at fixed ap), so each limit allows (current value) / (share of the limit used); the smallest wins. Caps: ap <= flute length, ae <= D. The force you enter directly is scaled the same way. Real kc rises as chips get thinner, so check the result. E presets: solid carbide 580 GPa (Ceratizit grade CTS20L, 10% Co; carbide grades span about 490-670 GPa in Tungaloy and Ceratizit grade tables, so use your tool maker\'s figure if you have it); HSS 219 GPa (voestalpine data sheet for M2, 1.3343, at 20 C). The effective flute diameter / D is left blank: enter your tool maker\'s figure or your own measured value.',
+  source: "Sandvik Coromant milling formulas (n, Vf, Q, Pc, hm); Machinery's Handbook; Altintas, Manufacturing Automation, Ch. 2 (chip thickness); Gere and Goodno / Roark (beam deflection); machine limits from the active machine profile or entered here.",
 },
 {
   id: 'finish', group: 'Turning', title: 'Surface finish from nose radius',
