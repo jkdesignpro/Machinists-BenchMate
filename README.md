@@ -13,10 +13,10 @@ A free, open-source (AGPLv3) machinist's calculator, built to sit beside the mac
 ## Layout
 - `core/` - `benchmate-core`, pure Rust formulas (no dependencies)
 - `wasm/` - plain C-ABI WebAssembly wrapper so the UI calls the same Rust formulas (no JS copies)
-- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `app.js`, `tokens.css`
+- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `app.js`, `tokens.css`
 - `scripts/build-web.sh` - builds the WebAssembly module
 - `data/` - reference data (material equivalents), generated from `scripts/materials_seed.py`
-- `docs/sources.md` - every source referenced
+- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions
 - `CHANGELOG.md` - every change, per version
 
 ## Build, test and run
@@ -27,6 +27,9 @@ scripts/build-web.sh            # builds app/benchmate.wasm
 cd app && python3 -m http.server 8765   # then open http://localhost:8765
 ```
 Adding a calculator means adding one entry to `app/tools.js` and, if needed, a formula to `core/` with a cited source and a test.
+
+## GD&T
+A GD&T reference guide (datums, Rule #1 vs ISO independency, every characteristic, modifiers, ASME/ISO comparison), a feature control frame builder with plain-English explanation and validity checks, and calculators for true position, bonus/virtual/resultant condition, position/plus-minus conversion, fastener tolerances and worst-case/RSS stacks. Written for ASME Y14.5-2018 and current ISO GPS editions; see `docs/gdt.md`.
 
 ## Planned
 Speeds and feeds, turning/finish, drilling and tapping, threads (UN, metric, NPT), taper and trig, bolt circles, drill/tap/fit charts, unit converter, materials table, Swiss-lathe helpers, second-opinion feeds from published manufacturer data, link-up with Alkart Mega Wizard.

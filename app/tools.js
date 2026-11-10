@@ -455,6 +455,145 @@ const TOOLS = [
   source: "Machinery's Handbook (hole circles)",
 },
 {
+  id: 'gdtguide', group: 'GD&T', title: 'GD&T reference guide',
+  desc: 'Datums, Rule #1 versus ISO independency, every geometric characteristic with its tolerance zone, inspection and common mistakes, modifiers, and an ASME Y14.5-2018 / ISO comparison.',
+  render: el => renderGdtGuide(el),
+  working: 'Reference only. Your drawing\'s standard and edition govern. Source keys next to each rule resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
+  source: 'ASME Y14.5-2018 (R2024); ISO 1101:2017, ISO 5459:2024, ISO 2692:2021, ISO 8015:2011, ISO 22081:2021 (cited by name only). Public explanations from Mitutoyo, KEYENCE, Geometric Learning Systems, GD&T Basics, University of Illinois ME 170 notes, Humienny and Zdrojewski (2023) and others: see docs/gdt.md.',
+},
+{
+  id: 'gdtfcf', group: 'GD&T', title: 'Feature control frame builder',
+  desc: 'Build a feature control frame, see it drawn, read it in plain English, and get a warning for combinations that are invalid or doubtful.',
+  render: el => renderFcfBuilder(el),
+  working: 'The checks cover the common rules (datums on form tolerances, MMC on surfaces, runout at MMC, diameter zones, modifier use, datum order). They are not a full standards review.',
+  source: 'Rules as confirmed in docs/gdt.md (Geometric Learning Systems Y14.5-2018 chart, GD&T Basics, KEYENCE, University of Illinois ME 170 notes, Mitutoyo, Skill-Lync).',
+},
+{
+  id: 'gdttp', group: 'GD&T', title: 'True position check',
+  desc: 'Diametral position deviation from measured X and Y (and Z) deviations, compared with the position tolerance plus any bonus. All lengths in one unit.',
+  fields: s => [
+    { id: 'dx', label: 'Measured deviation dX from true position', unit: lenU(s), def: s === 'inch' ? 0.003 : 0.05 },
+    { id: 'dy', label: 'Measured deviation dY', unit: lenU(s), def: s === 'inch' ? 0.004 : 0.04 },
+    { id: 'dz', label: 'dZ (spherical zone only, else blank)', unit: lenU(s), def: '' },
+    { id: 'tol', label: 'Position tolerance (diameter)', unit: lenU(s), def: s === 'inch' ? 0.010 : 0.1 },
+    { id: 'mc', label: 'Material condition', unit: '', def: 1, options: [[0, 'RFS (no modifier)'], [1, 'MMC'], [2, 'LMC']] },
+    { id: 'int', label: 'Feature', unit: '', def: 1, options: [[1, 'Internal (hole, slot)'], [0, 'External (pin, boss)']] },
+    { id: 'lo', label: 'Size lower limit', unit: lenU(s), def: s === 'inch' ? 0.250 : 6.0 },
+    { id: 'hi', label: 'Size upper limit', unit: lenU(s), def: s === 'inch' ? 0.255 : 6.1 },
+    { id: 'act', label: 'Actual (mating) size', unit: lenU(s), def: s === 'inch' ? 0.253 : 6.04 },
+  ],
+  calc: (v, W, s) => {
+    if (!(isFinite(v.dx) && isFinite(v.dy))) return [];
+    const dp = s === 'inch' ? 4 : 3, u = lenU(s);
+    const tp = isFinite(v.dz) ? W.gdt_true_position_3d(v.dx, v.dy, v.dz) : W.gdt_true_position(v.dx, v.dy);
+    const rows = [R(isFinite(v.dz) ? 'Position deviation (spherical diameter)' : 'Position deviation (diameter)', tp, u, dp), R('Radial offset from true position', tp / 2, u, dp)];
+    if (!(v.tol >= 0)) return rows;
+    let allowed = v.tol;
+    if (v.mc > 0) {
+      if (!(v.lo > 0 && v.hi >= v.lo && v.act > 0)) return rows.concat([R('Bonus', 'Enter the size limits and actual size', '', 0)]);
+      const b = W.gdt_bonus(v.lo, v.hi, v.act, v.int, v.mc);
+      if (!isFinite(b)) return rows.concat([R('Size', 'Actual size is outside the size limits: reject for size', '', 0)]);
+      rows.push(R('Bonus tolerance', b, u, dp));
+      allowed = W.gdt_total_tol(v.tol, v.lo, v.hi, v.act, v.int, v.mc);
+    }
+    rows.push(R('Position tolerance allowed at this size', allowed, u, dp));
+    rows.push(R('Used', allowed > 0 ? 100 * tp / allowed : NaN, '%', 1));
+    rows.push(R('Result', tp <= allowed + 1e-12 ? 'PASS' : 'FAIL (over by ' + (tp - allowed).toFixed(dp) + ' ' + u + ')', '', 0));
+    return rows;
+  },
+  working: 'Position deviation (diameter) = 2 x sqrt(dX^2 + dY^2); with dZ for a spherical zone, 2 x sqrt(dX^2 + dY^2 + dZ^2). The factor 2 is because the tolerance is a diameter and sqrt(...) is the radial offset. Bonus (MMC) = |actual size - MMC size|; (LMC) = |actual size - LMC size|; none at RFS. Allowed = stated tolerance + bonus. Hole MMC = smallest size, pin MMC = largest size. Measure dX, dY in the datum reference frame. Datum feature shift (MMB) is not included.',
+  source: 'GD&T Basics (true position, MMC); Wevolver (true position formula); Skill-Lync and JLCCNC (bonus at MMC and LMC). Standard: ASME Y14.5-2018 (position). See docs/gdt.md.',
+},
+{
+  id: 'gdtbonus', group: 'GD&T', title: 'Bonus, virtual and resultant condition',
+  desc: 'MMC and LMC sizes, bonus tolerance at an actual size, virtual condition and resultant condition for internal and external features of size.',
+  fields: s => [
+    { id: 'int', label: 'Feature', unit: '', def: 1, options: [[1, 'Internal (hole, slot)'], [0, 'External (pin, boss)']] },
+    { id: 'mc', label: 'Material condition modifier', unit: '', def: 1, options: [[1, 'MMC'], [2, 'LMC'], [0, 'RFS (no modifier)']] },
+    { id: 'lo', label: 'Size lower limit', unit: lenU(s), def: s === 'inch' ? 0.500 : 10.0 },
+    { id: 'hi', label: 'Size upper limit', unit: lenU(s), def: s === 'inch' ? 0.510 : 10.2 },
+    { id: 'tol', label: 'Geometric tolerance', unit: lenU(s), def: s === 'inch' ? 0.010 : 0.1 },
+    { id: 'act', label: 'Actual (mating) size (optional)', unit: lenU(s), def: s === 'inch' ? 0.506 : '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.lo > 0 && v.hi >= v.lo && v.tol >= 0)) return [];
+    const dp = s === 'inch' ? 4 : 3, u = lenU(s);
+    const rows = [R('MMC size', W.gdt_mmc_size(v.lo, v.hi, v.int), u, dp), R('LMC size', W.gdt_lmc_size(v.lo, v.hi, v.int), u, dp),
+      R('Maximum possible bonus (size tolerance)', v.mc > 0 ? v.hi - v.lo : 0, u, dp)];
+    if (v.act > 0) {
+      const b = W.gdt_bonus(v.lo, v.hi, v.act, v.int, v.mc);
+      if (isFinite(b)) { rows.push(R('Bonus at actual size', b, u, dp)); rows.push(R('Total geometric tolerance at actual size', v.tol + b, u, dp)); }
+      else rows.push(R('Actual size', 'Outside the size limits: reject for size', '', 0));
+    }
+    if (v.mc > 0) {
+      rows.push(R('Virtual condition', W.gdt_virtual_condition(v.lo, v.hi, v.tol, v.int, v.mc), u, dp));
+      rows.push(R('Resultant condition' + (v.mc === 2 ? ' (derived, see note)' : ''), W.gdt_resultant_condition(v.lo, v.hi, v.tol, v.int, v.mc), u, dp));
+      if (v.mc === 1) rows.push(R(v.int ? 'Functional gauge pin size' : 'Functional gauge hole size', W.gdt_virtual_condition(v.lo, v.hi, v.tol, v.int, 1), u, dp));
+    } else {
+      rows.push(R(v.int ? 'Inner boundary (RFS)' : 'Outer boundary (RFS)', v.int ? v.lo - v.tol : v.hi + v.tol, u, dp));
+      rows.push(R(v.int ? 'Outer boundary (RFS)' : 'Inner boundary (RFS)', v.int ? v.hi + v.tol : v.lo - v.tol, u, dp));
+    }
+    return rows;
+  },
+  working: 'MMC: hole = smallest size, pin = largest. LMC: the opposite. Bonus = |actual - MMC| (MMC modifier) or |actual - LMC| (LMC modifier); none at RFS. Virtual condition: MMC hole = MMC - tol; MMC pin = MMC + tol; LMC hole = LMC + tol; LMC pin = LMC - tol. Resultant condition (the other worst case, with the full bonus used): MMC hole = LMC + tol + size tolerance; MMC pin = LMC - tol - size tolerance. For the LMC modifier BenchMate derives it the same way (hole = MMC - tol - size tolerance; pin = MMC + tol + size tolerance): this LMC case is to be verified against a second published source. At RFS the inner and outer boundaries are shown instead (same arithmetic, but not a virtual condition).',
+  source: 'GD&T Basics (virtual condition, inner/outer boundary at RFS); Skill-Lync and JLCCNC (MMC/LMC virtual condition, bonus); Open Exam Prep GDTP study guide (resultant condition at MMC). Standard: ASME Y14.5-2018. See docs/gdt.md.',
+},
+{
+  id: 'gdtconv', group: 'GD&T', title: 'Position and plus/minus conversion',
+  desc: 'Diameter position zone that just contains a plus/minus coordinate zone, and the plus/minus zone that fits inside a position diameter.',
+  fields: s => [
+    { id: 'tx', label: 'Plus/minus tolerance in X', unit: lenU(s), def: s === 'inch' ? 0.005 : 0.1 },
+    { id: 'ty', label: 'Plus/minus tolerance in Y (blank = same as X)', unit: lenU(s), def: '' },
+    { id: 'd', label: 'Or position tolerance (diameter)', unit: lenU(s), def: s === 'inch' ? 0.014 : 0.28 },
+  ],
+  calc: (v, W, s) => {
+    const dp = s === 'inch' ? 4 : 3, u = lenU(s), rows = [];
+    if (v.tx > 0) {
+      const ty = v.ty > 0 ? v.ty : v.tx;
+      rows.push(R('Position diameter containing the +/- zone', W.gdt_pos_from_pm(v.tx, ty), u, dp));
+      rows.push(R('Area gain of that circle over the +/- zone', 100 * (Math.PI * (v.tx * v.tx + ty * ty) / (4 * v.tx * ty) - 1), '%', 1));
+    }
+    if (v.d > 0) rows.push(R('Equal +/- that fits inside the diameter', W.gdt_pm_from_pos(v.d), u, dp));
+    return rows;
+  },
+  working: 'Circle round a +/-tx by +/-ty rectangle: diameter = 2 x sqrt(tx^2 + ty^2) (equal tx = ty: 2.828 x tx). Square inside a circle of diameter d: +/- d / (2 x sqrt 2) = +/- 0.3536 d. Converting a +/- drawing to position with the circumscribing circle accepts parts in the circle outside the original square, so only do it where function allows. Converting position to +/- with the inscribed square is conservative.',
+  source: 'Geometry (BenchMate derivation, tests in core/src/gdt.rs); square versus round zone explained by GD&T Basics and Wevolver (about 57% more area).',
+},
+{
+  id: 'gdtfast', group: 'GD&T', title: 'Fastener position tolerance',
+  desc: 'Position tolerance (at MMC) for clearance holes from the floating and fixed fastener formulas, or the clearance hole size for given tolerances.',
+  fields: s => [
+    { id: 'mode', label: 'Case', unit: '', def: 1, options: [[1, 'Floating (clearance holes in both parts)'], [2, 'Fixed (fastener held in one part)']] },
+    { id: 'H', label: 'Clearance hole MMC (smallest hole)', unit: lenU(s), def: s === 'inch' ? 0.28 : 9.0 },
+    { id: 'F', label: 'Fastener MMC (largest diameter)', unit: lenU(s), def: s === 'inch' ? 0.25 : 8.0 },
+    { id: 't1', label: 'Fixed: tolerance already given to the threaded/pinned part (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.H > 0 && v.F > 0)) return [];
+    const dp = s === 'inch' ? 4 : 3, u = lenU(s);
+    if (v.H <= v.F) return [R('Clearance', 'Hole MMC must be larger than fastener MMC', '', 0)];
+    if (v.mode === 2) {
+      const rows = [R('Total for both parts (t1 + t2 = H - F)', v.H - v.F, u, dp), R('Equal split, each part', W.gdt_fixed_tol(v.H, v.F), u, dp)];
+      if (v.t1 >= 0 && isFinite(v.t1)) {
+        const t2 = W.gdt_fixed_tol_other(v.H, v.F, v.t1);
+        rows.push(t2 >= 0 ? R('Left for the clearance-hole part', t2, u, dp) : R('Left for the clearance-hole part', 'None: t1 uses more than H - F', '', 0));
+      }
+      rows.push(R('Note', 'Use a projected tolerance zone on the threaded or pinned hole, or allow for its perpendicularity', '', 0));
+      return rows;
+    }
+    return [R('Position tolerance at MMC, each part', W.gdt_floating_tol(v.H, v.F), u, dp)];
+  },
+  working: 'H = clearance hole MMC, F = fastener MMC, both position tolerances at MMC. Floating fastener: T = H - F for each part. Fixed fastener: t1 + t2 = H - F, equal split T = (H - F) / 2. Reverse: H = F + T (floating), H = F + t1 + t2 (fixed). Worst case, zero clearance at the limits: add margin where needed. The fixed formula assumes the fastener is square to the mating face; a projected tolerance zone covers the tilt.',
+  source: 'ASME Y14.5 nonmandatory appendix on fastener formulas (cited, not reproduced); Open Exam Prep GDTP study guide and Skill-Lync (formulas); GD&T Basics (appendix covers fixed and floating fasteners). See docs/gdt.md.',
+},
+{
+  id: 'gdtstack', group: 'GD&T', title: 'Tolerance stack (worst case and RSS)',
+  desc: 'One-dimensional stack of up to 10 dimensions: gap at nominal and mean, worst-case and root-sum-square (RSS) limits.',
+  render: el => renderStack(el),
+  working: 'Each dimension is centred on its mean, nominal + (plus - minus) / 2, with half tolerance (plus + minus) / 2. Gap = sum of (+/-) means. Worst case = sum of half tolerances. RSS = sqrt(sum of squared half tolerances), which assumes independent, normally distributed dimensions centred in their tolerance and made at the same capability (each half tolerance = 3 sigma). Use RSS only where that is true; otherwise use worst case. Geometric tolerances (position, profile) enter a stack as plus/minus half their zone.',
+  source: 'Accendo Reliability (F. Schenkelberg) and Five Flute RSS tolerance analysis guides; BenchMate arithmetic with tests in core/src/gdt.rs.',
+},
+{
   id: 'machines', group: 'Setup', title: 'Machine profiles',
   desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
   render: el => renderMachines(el),

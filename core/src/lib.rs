@@ -19,9 +19,13 @@
 //!   2012, Ch. 2 (milling chip thickness h = c sin(phi))
 //! * [KV] L. Kops, D. T. Vo, "Determination of the equivalent diameter of an end
 //!   mill based on its compliance", CIRP Annals 39(1), 1990 (pages to be verified)
+//! * GD&T formulas (module `gdt`): sources listed in docs/gdt.md
 //!   See docs/sources.md for full references.
 
 use std::f64::consts::PI;
+
+pub mod gdt;
+pub use gdt::*;
 
 /// Spindle speed in RPM from surface speed in SFM and diameter in inches.
 /// `n = 12 * SFM / (pi * D)` [MH]

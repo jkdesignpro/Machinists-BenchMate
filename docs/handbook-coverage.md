@@ -93,14 +93,14 @@ machinist's calculator (left out unless Jacob asks).
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
-| **GD&T: symbols, datums, modifiers, tolerance zones, bonus tolerance, virtual condition** | MH31 EDB | planned (major section) | see "GD&T" below |
+| **GD&T: symbols, datums, modifiers, tolerance zones, bonus tolerance, virtual condition** | MH31 EDB | built (guide, frame builder, calculators; see docs/gdt.md) | see "GD&T" below |
 | ISO limits and fits (IT grades, all hole/shaft deviations) | MH31 EBB EDB | planned | ISO 286-1 formulas (cited), computed and checked |
 | ANSI preferred fits (RC, LC, LT, LN, FN) | MH31 | planned | ANSI B4.1 (cited) |
 | General tolerances (ISO 2768) | EDB | planned | ISO 2768 (cited) |
 | Surface texture: Ra/Rz, symbols, process ranges, N grades | MH31 EBB EDB | partial | ISO 21920 / ISO 1302, ASME B46.1 (cited) |
 | Measuring: micrometer, vernier, dial reading | MH31 | planned | own explanations |
 | Temperature compensation of measurements | MH31 | planned | thermal expansion data with sources |
-| Statistics: Cpk, SPC, tolerance stack (worst case, RSS) | MH31 | planned | NIST/SEMATECH e-Handbook (public domain) |
+| Statistics: Cpk, SPC, tolerance stack (worst case, RSS) | MH31 | partial (1D worst-case and RSS stack built) | stack: Accendo, Five Flute (docs/gdt.md); Cpk/SPC: NIST/SEMATECH e-Handbook (public domain) |
 | Hardness conversion | EBB MH31 | planned | ASTM E140 / ISO 18265 (cited); conversion values cross-checked |
 | Drawing standards and abbreviations | EBB EDB | planned | own wording, ISO 128 / ASME Y14 cited |
 
@@ -162,10 +162,16 @@ not machinist calculator subjects.
 A full guide plus calculators, written in our own words with our own
 diagrams. Standards are cited by name and clause only:
 
-- ASME Y14.5-2018 (US), ASME Y14.5.1-2019 (mathematical definition);
-- ISO 1101:2017 (geometrical tolerancing), ISO 5459 (datums),
-  ISO 2692 (maximum material requirement), ISO 8015 (independency
-  principle), ISO 14405 (size).
+- ASME Y14.5-2018 (R2024) (US), ASME Y14.5.1-2019 (mathematical definition);
+- ISO 1101:2017 (geometrical tolerancing), ISO 5459:2024 (datums),
+  ISO 2692:2021 (maximum material requirement), ISO 8015:2011 (independency
+  principle), ISO 14405 (size), ISO 22081:2021 (general geometrical
+  specifications; ISO 2768-2:1989 is withdrawn).
+
+Status: built on branch `claude/gdt` (guide, frame builder, true position,
+bonus/virtual/resultant condition, position conversion, fasteners, stack).
+Composite position and profile zone offset are still to do. Sources and
+open items: `docs/gdt.md`.
 
 Contents:
 
