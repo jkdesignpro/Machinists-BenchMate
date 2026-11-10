@@ -12,9 +12,9 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Turning | Spindle speed conversion | done | `rpm` | U3 |
 | Turning | Feed rate conversion (per rev / per minute) | missing | | U4 |
 | Turning | Roughing pass cut time | partial (one pass, fixed RPM) | `passtime` | U5 |
-| Turning | Part-off / grooving cut time (CSS) | missing | | U6 |
+| Turning | Part-off / grooving cut time (CSS) | done (groove and cut-off program with CSS time) | `cycgroove` | U6 |
 | Turning | Taper calculation | done | `taper` | U7 |
-| Turning | Lathe taper G-code, lathe cycle generator | missing | | U8, U11 |
+| Turning | Lathe taper G-code, lathe cycle generator | done (taper) / partial (G71/G70 from typed points, no CAD input) | `cyctaper`, `cycg71` | U8, U11 |
 | Turning | Boring bar deflection | partial (end-mill cantilever model only) | `deflection` | U9 |
 | Turning | C-axis feed converter | missing | | U10 |
 | Turning | Surface finish from nose radius | done | `finish` | U12 |
@@ -28,7 +28,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Milling | Tool deflection, cut optimiser | done (ours) | `deflection`, `cutopt` | |
 | Milling | Ball end mill cusp height and effective diameter | missing | | U19, U20 |
 | Milling | Tool runout, slitting saw speeds and feeds | missing | | U22, U23 |
-| Milling | Thread milling calculator and program | missing | | U24, U25 |
+| Milling | Thread milling calculator and program | done | `cyctmill` | U24, U25 |
 | Economics | Taylor tool life, cost per part, economic tool life | done (ours) | `toollife` | |
 | Drilling | Drill speed/feed recommendations | missing | | U28 |
 | Drilling | Drill point length | done | `drillpoint` | U29 |
@@ -48,14 +48,14 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Reference | Thermal expansion | partial (measurement correction only) | `tempcomp` | U68 |
 | Reference | Socket head cap screw holes, knurling, reaming | missing | | U71, U87, U33 |
 | Geometry | Bolt circle | done | `bolt` | U72 |
-| Geometry | Rectangular hole pattern, coordinate export | missing | | U73, U74 |
+| Geometry | Rectangular hole pattern, coordinate export | done (grid, bolt circle, pasted list; CSV and G-code) | `cycdrill` | U73, U74 |
 | Geometry | Triangle solver, arc calculator, geometry, angles | missing (in progress, `claude/geometry`) | | U75-U78 |
 | Geometry | Sine bar, gauge block stack | missing (in progress, `claude/geometry`) | | U69, U65 |
 | Geometry | Height over ball (countersinks, tapered bores) | missing | | U70 |
 | GD&T | True position with MMC/LMC bonus | done | `gdttp`, `gdtbonus` | U62 |
 | GD&T | Learning centre (no quiz), frame builder | done | `gdtguide`, `gdtfcf`, `gdtdof` and others | U63, U64 |
 | Finish | Surface finish (lathe, mill, conversions) | partial (lathe only; conversions in progress) | `finish` | U66 |
-| Tools | Keyway broach G-code, G76, G84, G81/82/83/73 generators | missing | | U36, U37, U53, U88 |
+| Tools | Keyway broach G-code, G76, G84, G81/82/83/73 generators | done (generic Fanuc-style and Haas; other controls not yet supported, see `cycles.md`) | `cycbroach`, `cycthread`, `cycdrill` | U36, U37, U53, U54, U88 |
 | Tools | Unit conversions | partial (length only) | `fraction` | U79 |
 | Tools | Scientific calculator | missing | | U80 |
 | Tools | Bandsaw cut time | missing | | U90 |

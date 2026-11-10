@@ -22,13 +22,13 @@ Check a download against `SHA256SUMS.txt` on the release page if you like (`sha2
 ## Layout
 - `core/` - `benchmate-core`, pure Rust formulas (no dependencies)
 - `wasm/` - plain C-ABI WebAssembly wrapper so the UI calls the same Rust formulas (no JS copies)
-- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `cad.js` (DXF generator screens), `toollib.js` (tool library), `app.js` (shell, favourites), `tokens.css`
+- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `cad.js` (DXF generator screens), `toollib.js` (tool library), `cycles.js` (G-code cycle generators), `app.js` (shell, favourites), `tokens.css`
 - `desktop/` - the Tauri 2 desktop wrapper: serves `app/` from the app bundle (no network), native save dialog for exports, icons in `desktop/icons/` (from `icon.svg`)
 - `tests/smoke/` - headless Chromium smoke test of `app/`; `scripts/check-versions.py` - checks the version is the same everywhere
 - `.github/workflows/` - CI (`ci.yml`) and release builds (`release.yml`); see `docs/release.md`
 - `scripts/build-web.sh` - builds the WebAssembly module; `scripts/check_dxf.py` - checks generated DXF files with the independent ezdxf reader
 - `data/` - reference data (material equivalents), generated from `scripts/materials_seed.py`
-- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions; `docs/shop-helpers.md` - shop helper sources and decisions; `docs/geometry.md` - geometry sources and decisions; `docs/cad-dxf.md` - DXF format, shapes, validation, tool library and favourites
+- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions; `docs/shop-helpers.md` - shop helper sources and decisions; `docs/geometry.md` - geometry sources and decisions; `docs/cad-dxf.md` - DXF format, shapes, validation, tool library and favourites; `docs/cycles.md` - G-code cycle syntax sources, dialect support and decisions
 - `CHANGELOG.md` - every change, per version
 
 ## Build, test and run
@@ -57,6 +57,8 @@ Triangle solver (right and oblique, incl. the two-solution case) with a drawing;
 ## Shop helpers
 Process capability (Cp, Cpk, Pp, Ppk, expected ppm, histogram with normal fit) from pasted measurements or a mean and sigma; temperature compensation of measurements to 20 °C for part and gauge expansion; coolant concentration from a refractometer reading and the fluid's own factor, plus mix and top-up amounts; fraction / decimal inch / mm converter with nearest fraction and error; a printable setup sheet (job, machine, tools, work offsets, notes) saved in the browser with JSON export and import. See `docs/shop-helpers.md`.
 
+## G-code cycles
+Program generators for drilling and tapping (G81, G82, G83, G73, G84 rigid or floating) on a bolt circle, grid or pasted holes with CSV export; thread milling (internal/external, climb/conventional, arc-in/out, optional G41/G42, several passes); lathe threading with G76 or G92 passes and an infeed table (constant volume, constant depth, custom, minimum cut, spring passes); taper turning and boring; groove and cut-off with CSS; keyway broaching; G71/G70 from a simple profile. Output for a generic ISO 6983 / Fanuc-style control and for Haas; other controls are shown as not yet supported until their syntax is confirmed. Each program has a backplot, an estimated cycle time and a check against the active machine. Always prove out a generated program in single block. See `docs/cycles.md`.
 ## CAD / DXF
 Parametric 2D shapes exported as DXF for CAM: bolt circle (with outside diameter and centre bore), rectangular hole grid on an optional plate, straight and arc slots, rectangle with corner radii and corner holes, regular polygon from across flats or corners, circle and ring, keyhole, D-flat and double-D. Live SVG preview with overall dimensions, hole callouts and a hole position table. Inch or mm (`$INSUNITS` set), layers OUTLINE / HOLES / CENTRE, optional centre marks, origin at the centre or lower-left, DXF R2000 (LWPOLYLINE with bulges) or R12 (POLYLINE/VERTEX). The writer is in the Rust core, tested by reading its own output back, and the files load and audit cleanly in ezdxf. See `docs/cad-dxf.md`.
 

@@ -329,3 +329,8 @@ All were accessed 2026-11-10.
 
 ## Design
 - Alkart Mega Wizard (jkdesignpro) UI tokens, `amw/static/index.html`.
+
+## G-code cycles (`core/src/cycles.rs`, `core/src/gcode.rs`, `app/cycles.js`)
+Full list with URLs, access dates (2026-11-10), the dialect support matrix and decisions is in **`docs/cycles.md`**. Summary:
+- **Control syntax:** FANUC Series 0i-F Plus Operator's Manual B-64694EN-2/01 (canned cycles, public copy); Haas Automation Mill Programming Workbook, Haas G84 Tapping guide and lathe G76 page (haascnc.com); Haas Factory Outlet Lathe Programming (G71 one-block, G70, G92, G50, G96/G97, G98/G99); CIMCO CNC programming book ch. 5 and appendix D; CIMCO Edit Fanuc turning exercise (G76 words without decimal point); Cutting Tool Engineering, single-point thread programming (two-block G76); NPTEL Module 7 (G71/G70); Industrial Monitor Direct (Fanuc G71, G76 and G-code systems A/B/C); makeitfrommetal.com and CNCCookbook (Fanuc dwell P in ms, M29 rigid tapping); P. Smid, CNC Programming Handbook ch. 45 (helical milling).
+- **Formulas:** ISCAR threading catalogue 2023 (constant chip area infeed and worked example); Haas G76 (D x sqrt(N)); Harvey Performance and Travers Tool (thread-mill feed adjustment worked examples); [SAN] (CSS spindle speed); ISO 965-1 / ISO 68-1 thread depths (cited by name).
