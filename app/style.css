@@ -96,6 +96,8 @@ svg.gdia .gd text{fill:var(--ink);font:600 11px var(--mono)}
 svg.gdia .gl{fill:var(--muted);font:10.5px var(--sans)}
 svg.gdia .gdot{fill:var(--accent);stroke:none}
 svg.gdia .gplane{fill:var(--soft);stroke:var(--line)}
+svg.gdia .gplane.on{fill:color-mix(in srgb,var(--accent) 14%,var(--panel));stroke:var(--accent)}
+svg.gdia .gzs{stroke:var(--accent);stroke-width:1.6}
 .gtoc{display:flex;flex-wrap:wrap;gap:4px 14px;padding:6px 10px;margin-bottom:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--head)}
 .gtoc a{color:var(--accent);text-decoration:none}
 .gtoc a:hover{text-decoration:underline}

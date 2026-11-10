@@ -184,8 +184,9 @@ diagrams. Standards are cited by name and clause only:
 
 Status: built on branch `claude/gdt` (guide, frame builder, true position,
 bonus/virtual/resultant condition, position conversion, fasteners, stack).
-Composite position and profile zone offset are still to do. Sources and
-open items: `docs/gdt.md`.
+Round 2 (branch `claude/gdt-2`) added the composite position checker, the
+unequal profile (U) zone offset calculator and a degrees-of-freedom
+explainer. Sources and open items: `docs/gdt.md`.
 
 Contents:
 

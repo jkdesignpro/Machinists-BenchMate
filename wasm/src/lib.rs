@@ -64,6 +64,7 @@ f1!(gdt_total_tol, c::total_tolerance_f, geo, lower, upper, actual, internal, mc
 f1!(gdt_virtual_condition, c::virtual_condition_f, lower, upper, geo, internal, mc);
 f1!(gdt_resultant_condition, c::resultant_condition_f, lower, upper, geo, internal, mc);
 f1!(gdt_true_position, c::true_position_dia, dx, dy);
+f1!(gdt_tp_coords, c::true_position_dia_from_coords, nx, ny, mx, my);
 f1!(gdt_true_position_3d, c::true_position_dia_3d, dx, dy, dz);
 f1!(gdt_pos_from_pm, c::position_dia_from_plus_minus, tx, ty);
 f1!(gdt_pm_from_pos, c::plus_minus_from_position_dia, dia);
@@ -78,6 +79,18 @@ f1!(gdt_fixed_hole, c::fixed_fastener_hole, fastener, t1, t2);
 #[no_mangle] #[allow(clippy::too_many_arguments)]
 pub extern "C" fn gdt_stack(n0: f64, p0: f64, m0: f64, d0: f64, n1: f64, p1: f64, m1: f64, d1: f64, n2: f64, p2: f64, m2: f64, d2: f64, n3: f64, p3: f64, m3: f64, d3: f64, n4: f64, p4: f64, m4: f64, d4: f64, n5: f64, p5: f64, m5: f64, d5: f64, n6: f64, p6: f64, m6: f64, d6: f64, n7: f64, p7: f64, m7: f64, d7: f64, n8: f64, p8: f64, m8: f64, d8: f64, n9: f64, p9: f64, m9: f64, d9: f64, out: f64) -> f64 {
     c::tolerance_stack_flat(&[n0, p0, m0, d0, n1, p1, m1, d1, n2, p2, m2, d2, n3, p3, m3, d3, n4, p4, m4, d4, n5, p5, m5, d5, n6, p6, m6, d6, n7, p7, m7, d7, n8, p8, m8, d8, n9, p9, m9, d9], out as u32) }
+
+f1!(gdt_profile_u_outside, c::profile_unequal_outside, total, u);
+f1!(gdt_profile_u_inside, c::profile_unequal_inside, total, u);
+f1!(gdt_profile_u_offset, c::profile_unequal_offset, total, u);
+f1!(gdt_profile_u_margin, c::profile_unequal_margin, total, u, e);
+
+/// Composite position lower segment for up to 8 holes, each passed as
+/// (nominal x, nominal y, measured x, measured y, bonus); `out` as in
+/// `composite_frtzf_flat`.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gdt_composite(x0: f64, y0: f64, dx0: f64, dy0: f64, b0: f64, x1: f64, y1: f64, dx1: f64, dy1: f64, b1: f64, x2: f64, y2: f64, dx2: f64, dy2: f64, b2: f64, x3: f64, y3: f64, dx3: f64, dy3: f64, b3: f64, x4: f64, y4: f64, dx4: f64, dy4: f64, b4: f64, x5: f64, y5: f64, dx5: f64, dy5: f64, b5: f64, x6: f64, y6: f64, dx6: f64, dy6: f64, b6: f64, x7: f64, y7: f64, dx7: f64, dy7: f64, b7: f64, rotate: f64, out: f64) -> f64 {
+    c::composite_frtzf_flat(&[x0, y0, dx0, dy0, b0, x1, y1, dx1, dy1, b1, x2, y2, dx2, dy2, b2, x3, y3, dx3, dy3, b3, x4, y4, dx4, dy4, b4, x5, y5, dx5, dy5, b5, x6, y6, dx6, dy6, b6, x7, y7, dx7, dy7, b7], rotate, out as u32) }
 
 /// X of hole `i` (0-based) on a bolt circle.
 #[no_mangle] pub extern "C" fn bolt_x(n: f64, dia: f64, start: f64, cx: f64, cy: f64, i: f64) -> f64 {
