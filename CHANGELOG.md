@@ -18,3 +18,4 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - Reference inventory and parity tracker extended from the public website and store listing.
 - Parity tracker: all-machinists scope rule, control profiles for G/M codes, tool library, from the full menu screenshots.
 - Dropped quiz/mini game from parity scope.
+- `docs/feature-ideas.md`: ranked ideas beyond parity.
