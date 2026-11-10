@@ -56,6 +56,29 @@ f1!(chip_thickness_mean, c::chip_thickness_mean, fz, ae, d);
 f1!(cut_check, c::cut_check_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, out);
 f1!(cut_optimise, c::cut_optimise_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, vary_ae, out);
 
+// GD&T: internal 1 = hole/slot, 0 = pin/boss; mc 0 RFS, 1 MMC, 2 LMC.
+f1!(gdt_mmc_size, c::mmc_size_f, lower, upper, internal);
+f1!(gdt_lmc_size, c::lmc_size_f, lower, upper, internal);
+f1!(gdt_bonus, c::bonus_tolerance_f, lower, upper, actual, internal, mc);
+f1!(gdt_total_tol, c::total_tolerance_f, geo, lower, upper, actual, internal, mc);
+f1!(gdt_virtual_condition, c::virtual_condition_f, lower, upper, geo, internal, mc);
+f1!(gdt_resultant_condition, c::resultant_condition_f, lower, upper, geo, internal, mc);
+f1!(gdt_true_position, c::true_position_dia, dx, dy);
+f1!(gdt_true_position_3d, c::true_position_dia_3d, dx, dy, dz);
+f1!(gdt_pos_from_pm, c::position_dia_from_plus_minus, tx, ty);
+f1!(gdt_pm_from_pos, c::plus_minus_from_position_dia, dia);
+f1!(gdt_floating_tol, c::floating_fastener_tol, hole, fastener);
+f1!(gdt_fixed_tol, c::fixed_fastener_tol, hole, fastener);
+f1!(gdt_fixed_tol_other, c::fixed_fastener_tol_other, hole, fastener, t_fixed);
+f1!(gdt_floating_hole, c::floating_fastener_hole, fastener, tol);
+f1!(gdt_fixed_hole, c::fixed_fastener_hole, fastener, t1, t2);
+
+/// One-dimensional tolerance stack of up to 10 dimensions, each passed as
+/// (nominal, plus, minus, dir); `out` as in `tolerance_stack_flat`.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gdt_stack(n0: f64, p0: f64, m0: f64, d0: f64, n1: f64, p1: f64, m1: f64, d1: f64, n2: f64, p2: f64, m2: f64, d2: f64, n3: f64, p3: f64, m3: f64, d3: f64, n4: f64, p4: f64, m4: f64, d4: f64, n5: f64, p5: f64, m5: f64, d5: f64, n6: f64, p6: f64, m6: f64, d6: f64, n7: f64, p7: f64, m7: f64, d7: f64, n8: f64, p8: f64, m8: f64, d8: f64, n9: f64, p9: f64, m9: f64, d9: f64, out: f64) -> f64 {
+    c::tolerance_stack_flat(&[n0, p0, m0, d0, n1, p1, m1, d1, n2, p2, m2, d2, n3, p3, m3, d3, n4, p4, m4, d4, n5, p5, m5, d5, n6, p6, m6, d6, n7, p7, m7, d7, n8, p8, m8, d8, n9, p9, m9, d9], out as u32) }
+
 /// X of hole `i` (0-based) on a bolt circle.
 #[no_mangle] pub extern "C" fn bolt_x(n: f64, dia: f64, start: f64, cx: f64, cy: f64, i: f64) -> f64 {
     c::bolt_circle(n as u32, dia, start, cx, cy)[i as usize].0 }

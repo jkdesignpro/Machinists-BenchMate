@@ -72,3 +72,60 @@ tr.over td{background:color-mix(in srgb,var(--warn) 12%,transparent)}
 .kv{display:inline-block;margin:0 10px 3px 0;font-family:var(--mono);font-size:11.5px}
 .kv i{font-family:var(--sans);font-style:normal;color:var(--muted);font-size:10.5px}
 .verb{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--soft);padding:3px 6px;border-radius:3px;margin-top:3px;white-space:pre-wrap}
+
+/* GD&T: symbols, diagrams, guide, frame builder. Colours only from tokens. */
+svg.gsym,svg.gmod{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;flex:none}
+svg.gsym .fill{fill:currentColor;stroke:none}
+svg.gsym.in{width:15px;height:15px}
+svg.gmod{width:17px;height:17px;stroke-width:1.2}
+svg.gmod.wide{width:25px}
+svg.gmod text{fill:currentColor;stroke:none;font:600 11px var(--sans)}
+.gbig svg.gsym{width:30px;height:30px;stroke-width:1.3}
+.gbig{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+.gtx{font-family:var(--mono);font-weight:600;padding:0 1px}
+svg.gdia{width:220px;max-width:100%;height:auto;flex:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+svg.gdia.big{width:320px;display:block;margin:6px 0 10px}
+svg.gdia path,svg.gdia circle{fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+svg.gdia .gp{stroke:var(--ink);stroke-width:1.8}
+svg.gdia .gz{stroke:var(--accent);stroke-dasharray:4 3}
+svg.gdia .gb,svg.gdia .gm{stroke:var(--muted)}
+svg.gdia .gm{stroke-width:1}
+svg.gdia .gd path,svg.gdia .gd rect{fill:none;stroke:var(--muted)}
+svg.gdia .gd path:first-child{fill:var(--muted)}
+svg.gdia .gd text{fill:var(--ink);font:600 11px var(--mono)}
+svg.gdia .gl{fill:var(--muted);font:10.5px var(--sans)}
+svg.gdia .gdot{fill:var(--accent);stroke:none}
+svg.gdia .gplane{fill:var(--soft);stroke:var(--line)}
+.gtoc{display:flex;flex-wrap:wrap;gap:4px 14px;padding:6px 10px;margin-bottom:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--head)}
+.gtoc a{color:var(--accent);text-decoration:none}
+.gtoc a:hover{text-decoration:underline}
+.card.wide h2{font-size:14px;margin:22px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.card.wide h3.gcat{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:16px 0 6px}
+.card.wide p{max-width:880px;line-height:1.55}
+.gchar{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:10px;margin-bottom:10px;max-width:980px}
+.gch{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.gch h3{margin:0;font-size:13px}
+.gcg{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.gcg dl{flex:1;min-width:260px;margin:0}
+.gcg dt{font-weight:600;margin-top:4px}
+.gcg dd{margin:0 0 4px;color:var(--ink);line-height:1.5}
+abbr.gsrc{font:10px var(--mono);text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 3px;margin-right:3px;cursor:help;white-space:nowrap}
+.gtbv{font-size:10.5px;color:var(--warn);border:1px solid var(--warn);border-radius:3px;padding:0 4px;white-space:nowrap}
+.gwarn{color:var(--warn);font-weight:600}
+.gerr{color:var(--err);font-weight:600}
+.gok{color:var(--ok)}
+.gtab th{text-align:left;padding:5px 10px;background:var(--raise);border-bottom:1px solid var(--line);font-weight:600}
+.gtab td{vertical-align:top;line-height:1.45}
+.gsc{white-space:nowrap;width:44px}
+.gkey{display:inline-block;width:18px;height:0;border-top:2px solid;vertical-align:middle;margin:0 3px}
+.gkp{border-color:var(--ink)}.gkz{border-top-style:dashed;border-color:var(--accent)}.gkb{border-top-width:1px;border-color:var(--muted)}
+.gsl{margin:4px 0;padding-left:18px;color:var(--muted);line-height:1.6}.gsl b{color:var(--ink);font-family:var(--mono);font-size:11px}
+.gframe{padding:18px 14px}
+.fcf{display:inline-flex;border:1.5px solid var(--ink);color:var(--ink);background:var(--panel)}
+.fcf .fc{display:flex;align-items:center;gap:3px;padding:0 8px;height:30px;font-size:14px}
+.fcf .fc+.fc{border-left:1.5px solid var(--ink)}
+.fcf .fs svg.gsym{width:20px;height:20px}
+.gcf{display:inline-block;margin-right:6px}
+.gexp{padding:4px 10px}
+.gexp p{margin:6px 0}
+.gmods{flex-wrap:wrap}
