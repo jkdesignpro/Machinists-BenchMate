@@ -1,0 +1,739 @@
+{
+ "sources": {
+  "ZAPP_TI": {
+   "title": "Zapp Precision Metals Titanium Stocklist (columns Grade 1 / Grade 2 / Grade 5 / Grade 7 with DIN and UNS rows)",
+   "url": "https://www.zapp.com/fileadmin/_documents/Downloads/HPA/stock_lists/Titanium_Stocklist.pdf",
+   "publisher": "Zapp",
+   "accessed": "2026-11-10"
+  },
+  "NEONICKEL_NI": {
+   "title": "NeoNickel specifications - nickel alloys (Alloy / UNS No. / Werkstoff No. / ASTM / AMS / Other)",
+   "url": "https://www.neonickel.com/specifications/nickel-alloys",
+   "publisher": "NeoNickel",
+   "accessed": "2026-11-10"
+  },
+  "NEONICKEL_TI": {
+   "title": "NeoNickel specifications - titanium alloys (Alloy / UNS No. / Werkstoff No. / ASTM / AMS / Other)",
+   "url": "https://www.neonickel.com/specifications/titanium-alloys",
+   "publisher": "NeoNickel",
+   "accessed": "2026-11-10"
+  },
+  "MAKEITFROM_TI": {
+   "title": "MakeItFrom.com - Wrought Titanium material group (grade names with W.-Nr. and UNS)",
+   "url": "https://makeitfrom.com/material-group/Wrought-Titanium",
+   "publisher": "MakeItFrom.com",
+   "accessed": "2026-11-10"
+  },
+  "HDC_CASTIRON": {
+   "title": "HDC (Wuxi Henderchan Industrial) Cast Iron & Heat-Resistant Steel Code Comparison table",
+   "url": "https://hdcmfg.com/resources/data/cast-iron-and-heat-resistant-steel-code-comparison-table/",
+   "publisher": "HDC Manufacturing",
+   "accessed": "2026-11-10"
+  },
+  "KIPP_GJL250": {
+   "title": "KIPP material overview - cast iron with lamellar graphite (EN-GJL-250)",
+   "url": "https://sk.kipp.sk/sk/en/Service/Material-overview/Casting/pid.1097.1108.1244.9811.9815/Cast-iron-with-lamellar-graphite.html",
+   "publisher": "KIPP (Heinrich Kipp Werk)",
+   "accessed": "2026-11-10"
+  },
+  "VDM_PORTFOLIO": {
+   "title": "VDM Metals - Portfolio Service Center Europe (VDM Trade Designation / DIN EN / UNS tables for sheet and plate, rod and bar)",
+   "url": "https://www.vdm-metals.com/en/products-and-services/service-centers/service-center-europe/portfolio-service-center-europe",
+   "publisher": "VDM Metals",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "Ti CP Grade 1 (Ti 99.8)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "ZAPP_TI",
+     "values": {
+      "common": "Grade 1",
+      "astm": null,
+      "uns": "R50250",
+      "w_nr": "3.7025",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "Number paired with grade by column order of the stocklist table"
+     },
+     "verbatim_row": "Grade 1 | Grade 2 | Grade 5 | Grade 7 ; DIN 3.7025 3.7035 3.7164/3.7165 3.7235 ; UNS R50250 R50400 R56400/1 R52400"
+    },
+    {
+     "source": "MAKEITFROM_TI",
+     "values": {
+      "common": "Grade 1",
+      "astm": null,
+      "uns": "R50250",
+      "w_nr": "3.7025",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 1 (3.7025, R50250) Titanium"
+    }
+   ],
+   "disagreements": "Round 2: Zapp and MakeItFrom both print 3.7025 / R50250."
+  },
+  {
+   "grade": "Ti CP Grade 2 (Ti 99.7)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "ZAPP_TI",
+     "values": {
+      "common": "Grade 2",
+      "astm": null,
+      "uns": "R50400",
+      "w_nr": "3.7035",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "Number paired with grade by column order of the stocklist table"
+     },
+     "verbatim_row": "Grade 1 | Grade 2 | Grade 5 | Grade 7 ; DIN 3.7025 3.7035 3.7164/3.7165 3.7235 ; UNS R50250 R50400 R56400/1 R52400"
+    },
+    {
+     "source": "NEONICKEL_TI",
+     "values": {
+      "common": "Titanium Grade 2",
+      "astm": "B265, B348, B363, B337, B338",
+      "uns": "R50400",
+      "w_nr": "3.7034, 3.7035",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "ASME SB348, SB381"
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Titanium Grade 2 | UNS R50400 | 3.7034, 3.7035 | B265, B348, B363, B337, B338 | - | ASME SB348. SB381"
+    },
+    {
+     "source": "MAKEITFROM_TI",
+     "values": {
+      "common": "Grade 2",
+      "astm": null,
+      "uns": "R50400",
+      "w_nr": "3.7035",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 2 (3.7035, R50400) Titanium"
+    }
+   ],
+   "disagreements": "Round 2: Zapp and MakeItFrom print 3.7035 / R50400; NeoNickel prints 3.7034, 3.7035 / R50400. 3.7035 confirmed; 3.7034 has one publisher."
+  },
+  {
+   "grade": "Ti-6Al-4V (Grade 5)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "ZAPP_TI",
+     "values": {
+      "common": "Grade 5",
+      "astm": null,
+      "uns": "R56400 / R56401",
+      "w_nr": "3.7164 / 3.7165",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "Number paired with grade by column order of the stocklist table; UNS printed as 'R56400/1'"
+     },
+     "verbatim_row": "Grade 1 | Grade 2 | Grade 5 | Grade 7 ; DIN 3.7025 3.7035 3.7164/3.7165 3.7235 ; UNS R50250 R50400 R56400/1 R52400"
+    },
+    {
+     "source": "NEONICKEL_TI",
+     "values": {
+      "common": "Ti-6Al-4V (Grade 5)",
+      "astm": "B265, B348, B381, B337, B338",
+      "uns": "R56400",
+      "w_nr": "3.7164, 3.7165",
+      "din_en_name": null,
+      "bs": "3TA11",
+      "jis": null,
+      "other": "AMS 4911, 4928, 6931, 4965; T-9047; MSRR 8610, 8614, 8652"
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Ti-6Al-4V (Grade 5) | R56400 | 3.7164, 3.7165 | B265, B348, B381, MSRR 8610, 8614, 8652, 4920, 4934, 4935, 4967, 6930, B337, B338 | 4911, 4928, 6931, 4965, T-9047 | BS 3TA11"
+    },
+    {
+     "source": "MAKEITFROM_TI",
+     "values": {
+      "common": "Grade 5",
+      "astm": null,
+      "uns": "R56400",
+      "w_nr": "3.7165",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 5 (Ti-6Al-4V, 3.7165, R56400) Titanium"
+    }
+   ],
+   "disagreements": "Round 2: Zapp and NeoNickel both print two W.-Nr. for grade 5 (3.7164 and 3.7165); MakeItFrom prints only 3.7165. Because 3.7164 reaches 2 publishers the status shows 'Sources differ', but no source contradicts another: both numbers are printed for Ti-6Al-4V. All three print UNS R56400 (Zapp as 'R56400/1'; MakeItFrom lists R56401 as a separate material and gives grade 23 R56407). DISAGREEMENT elsewhere: NeoNickel prints R56400 and 3.7164, 3.7165 against Ti 6-2-4-2 too, whereas MakeItFrom gives Ti 6-2-4-2 3.7145 / R54620 - NeoNickel's 6-2-4-2 row looks like a copy-down error."
+  },
+  {
+   "grade": "Ti CP Grade 4 (Ti 99.5)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "NEONICKEL_TI",
+     "values": {
+      "common": "Titanium Grade 4",
+      "astm": "B265, 348, 381",
+      "uns": "R50700",
+      "w_nr": "3.7065",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": null
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Titanium Grade 4 | UNS R50700 | 3.7065 | B265, 348, 381 | - | -"
+    },
+    {
+     "source": "MAKEITFROM_TI",
+     "values": {
+      "common": "Grade 4",
+      "astm": null,
+      "uns": "R50700",
+      "w_nr": "3.7065",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 4 (3.7065, R50700) Titanium"
+    }
+   ],
+   "disagreements": "Round 2: NeoNickel and MakeItFrom both print 3.7065 / R50700."
+  },
+  {
+   "grade": "Ti CP Grade 3 (Ti 99.6)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "MAKEITFROM_TI",
+     "values": {
+      "common": "Grade 3",
+      "astm": null,
+      "uns": "R50550",
+      "w_nr": "3.7055",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 3 (3.7055, R50550) Titanium"
+    }
+   ],
+   "disagreements": "Round 2: only MakeItFrom prints a W.-Nr. (3.7055) and UNS (R50550) so far."
+  },
+  {
+   "grade": "Inconel 600",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "NEONICKEL_NI",
+     "values": {
+      "common": "Alloy 600",
+      "astm": "B163, B166, B167, B168, B516, B517, B564, B366, B751, B775, B829",
+      "uns": "N06600",
+      "w_nr": "2.4816",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "AMS 5540, 5665 (ASTM/AMS columns run together in page text)"
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy 600 N06600 2.4816 B163, B166, B167, B168, B516, B517, B564, B366, 5665, B751, B775, B829 5540 -"
+    },
+    {
+     "source": "VDM_PORTFOLIO",
+     "values": {
+      "common": "VDM® Alloy 600",
+      "astm": null,
+      "uns": "N06600",
+      "w_nr": "2.4816",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+     },
+     "verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy 600 | 2.4816 | N06600"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "Inconel 625",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "NEONICKEL_NI",
+     "values": {
+      "common": "Alloy 625",
+      "astm": "B443, B444, B446, B704, B705",
+      "uns": "N06625",
+      "w_nr": "2.4856",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "AMS 5599, 5666, 5581, 5869, 5879"
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy 625 N06625 2.4856 B443, B444, B446, B704, B705 5599, 5666, 5581, 5869, 5879 -"
+    },
+    {
+     "source": "VDM_PORTFOLIO",
+     "values": {
+      "common": "VDM® Alloy 625",
+      "astm": null,
+      "uns": "N06625",
+      "w_nr": "2.4856",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+     },
+     "verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy 625 | 2.4856 | N06625"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "Inconel 718",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "NEONICKEL_NI",
+     "values": {
+      "common": "Alloy 718",
+      "astm": "B637, B670",
+      "uns": "N07718",
+      "w_nr": "2.4668",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "AMS 5596, 5662, 5663, 5832; NACE MR0175 / MR0103 / ISO 15156-3"
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy 718 N07718 2.4668 B637, B670 5596, 5662, 5663, 5832 API Specification: NACE MR0175 / MR0103 / ISO 15156-3"
+    },
+    {
+     "source": "VDM_PORTFOLIO",
+     "values": {
+      "common": "VDM® Alloy 718",
+      "astm": null,
+      "uns": "N07718",
+      "w_nr": "2.4668",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+     },
+     "verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy 718 | 2.4668 | N07718"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "Monel 400",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "NEONICKEL_NI",
+     "values": {
+      "common": "Alloy 400",
+      "astm": "B127, B163, B164, B165, B564, B725, B730, B366",
+      "uns": "N04400",
+      "w_nr": "2.4630",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "AMS 4730, 4731, 4675, 4544"
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy 400 N04400 2.4630 B127, B163, B164, B165, B564, B725, B730, B366, 4730, 4731 4675, 4544 -"
+    },
+    {
+     "source": "VDM_PORTFOLIO",
+     "values": {
+      "common": "VDM® Alloy 400",
+      "astm": null,
+      "uns": "N04400",
+      "w_nr": "2.4360",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+     },
+     "verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy 400 | 2.4360 | N04400"
+    }
+   ],
+   "disagreements": "DISAGREEMENT: NeoNickel prints Werkstoff No. 2.4630 for Alloy 400 (re-checked); Kennametal and VDM Metals print 2.4360. NeoNickel also lists 2.4630 as an alternate number for Alloy 75 / 80A, so its Alloy 400 entry looks like a digit transposition or copy-down error. 2.4360 is NiCu30Fe per Kennametal's DIN name."
+  },
+  {
+   "grade": "Monel K-500",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "NEONICKEL_NI",
+     "values": {
+      "common": "Alloy K500",
+      "astm": "B865",
+      "uns": "N05500",
+      "w_nr": "2.4375",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "AMS 4676"
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy K500 N05500 2.4375 B865 4676 -"
+    },
+    {
+     "source": "VDM_PORTFOLIO",
+     "values": {
+      "common": "VDM® Alloy K-500",
+      "astm": null,
+      "uns": "N05500",
+      "w_nr": "2.4375",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+     },
+     "verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy K-500 | 2.4375 | N05500"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "Hastelloy C-276",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "NEONICKEL_NI",
+     "values": {
+      "common": "Alloy C276",
+      "astm": "B564, B574, B575, B619, B622, B626, B366, B462, B775",
+      "uns": "N10276",
+      "w_nr": "2.4819",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": null
+     },
+     "verbatim_row": "Alloy | UNS No. | Werkstoff No. | ASTM | AMS | Other ; Alloy C276 N10276 2.4819 B564, B574, B575, B619, B622, B626, B366, B462, B775 - -"
+    },
+    {
+     "source": "VDM_PORTFOLIO",
+     "values": {
+      "common": "VDM® Alloy C-276",
+      "astm": null,
+      "uns": "N10276",
+      "w_nr": "2.4819",
+      "din_en_name": null,
+      "bs": null,
+      "jis": null,
+      "other": "VDM prints the W.-Nr. under the column heading 'DIN EN'"
+     },
+     "verbatim_row": "VDM Trade Designation | DIN EN | UNS ; VDM® Alloy C-276 | 2.4819 | N10276"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "Grey iron GG 10",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GG 10",
+      "w_nr": null,
+      "astm": "No 20 B",
+      "uns": null,
+      "bs": null,
+      "jis": "FC100",
+      "other": "AFNOR Ft 10 D; SS 0110; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC100 | – | GG 10 | – | – | Ft 10 D | – | – | 0110 | No 20 B | –"
+    }
+   ],
+   "disagreements": "HDC prints no W.-nr. for GG 10, so 0.6010 still rests on Kennametal alone. HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Grey iron GG 15",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GG 15",
+      "w_nr": "0.6015",
+      "astm": "No 25 B",
+      "uns": null,
+      "bs": "Grade 150",
+      "jis": "FC150",
+      "other": "AFNOR Ft 15 D; UNI G15; UNE FG15; SS 0115; GB HT150; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC150 | 0.6015 | GG 15 | Grade 150 | – | Ft 15 D | G15 | FG15 | 0115 | No 25 B | HT150"
+    }
+   ],
+   "disagreements": "HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Grey iron GG 20",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GG 20",
+      "w_nr": "0.6020",
+      "astm": "No 30 B",
+      "uns": null,
+      "bs": "Grade 220",
+      "jis": "FC200",
+      "other": "AFNOR Ft 20 D; UNI G20; SS 0120; GB HT200; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC200 | 0.6020 | GG 20 | Grade 220 | – | Ft 20 D | G20 | – | 0120 | No 30 B | HT200"
+    }
+   ],
+   "disagreements": "HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Grey iron GG 25",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GG 25",
+      "w_nr": "0.6025",
+      "astm": "No 35 B",
+      "uns": null,
+      "bs": "Grade 260",
+      "jis": "FC250",
+      "other": "AFNOR Ft 25 D; UNI G25; UNE FG25; SS 0125; GB HT250; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC250 | 0.6025 | GG 25 | Grade 260 | – | Ft 25 D | G25 | FG25 | 0125 | No 35 B | HT250"
+    },
+    {
+     "source": "KIPP_GJL250",
+     "values": {
+      "common": null,
+      "en_name": "EN-GJL-250",
+      "en_number": "EN-JL-1040; 5.1301",
+      "din_en_name": "GG-25",
+      "w_nr": null,
+      "astm": "No. 25 B",
+      "uns": null,
+      "bs": null,
+      "jis": null,
+      "other": "DIN 1561"
+     },
+     "verbatim_row": "Material No. EN-JL-1040 | US standard (AISI) No. 25 B | DIN EN 10027-2 5.1301 | Abbreviation EN-GJL-250 | Old designation GG-25 | DIN 1561"
+    }
+   ],
+   "disagreements": "DISAGREEMENT on ASTM A48 class: Kennametal and HDC print No 35 B for GG 25; KIPP prints 'No. 25 B' for EN-GJL-250 / GG-25. KIPP gives the EN name EN-GJL-250, EN number EN-JL1040 / 5.1301; no other source in this data prints the EN name yet. HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Grey iron GG 30",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GG 30",
+      "w_nr": "0.6030",
+      "astm": "No 45 B",
+      "uns": null,
+      "bs": "Grade 300",
+      "jis": "FC300",
+      "other": "AFNOR Ft 30 D; UNI G30; UNE FG30; SS 0130; GB HT300; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC300 | 0.6030 | GG 30 | Grade 300 | – | Ft 30 D | G30 | FG30 | 0130 | No 45 B | HT300"
+    }
+   ],
+   "disagreements": "HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Grey iron GG 35",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GG 35",
+      "w_nr": "0.6035",
+      "astm": "No 50 B",
+      "uns": null,
+      "bs": "Grade 350",
+      "jis": "FC350",
+      "other": "AFNOR Ft 35 D; UNI G35; UNE FG35; SS 0135; GB HT350; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FC350 | 0.6035 | GG 35 | Grade 350 | – | Ft 35 D | G35 | FG35 | 0135 | No 50 B | HT350"
+    }
+   ],
+   "disagreements": "HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Grey iron GG 40",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GG 40",
+      "w_nr": "0.6040",
+      "astm": "No 55 B",
+      "uns": null,
+      "bs": "Grade 400",
+      "jis": null,
+      "other": "AFNOR Ft 40 D; SS 0140; GB HT400; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; – | 0.6040 | GG 40 | Grade 400 | – | Ft 40 D | – | – | 0140 | No 55 B | HT400"
+    }
+   ],
+   "disagreements": "HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Ductile iron GGG 35.3",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GGG 35.3",
+      "w_nr": "0.7033",
+      "astm": null,
+      "uns": null,
+      "bs": null,
+      "jis": null,
+      "other": "SS 07 17-15; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; – | 0.7033 | GGG 35.3 | – | – | – | – | – | 07 17-15 | – | –"
+    }
+   ],
+   "disagreements": "HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Ductile iron GGG 40",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GGG 40",
+      "w_nr": "0.7040",
+      "astm": "60-40-18",
+      "uns": null,
+      "bs": "SNG 420/12",
+      "jis": "FCD400",
+      "other": "AFNOR FCS 400-12; UNI GS 370-17; UNE FGE 38-17; SS 07 17-02; GB QT400-18; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FCD400 | 0.7040 | GGG 40 | SNG 420/12 | – | FCS 400-12 | GS 370-17 | FGE 38-17 | 07 17-02 | 60-40-18 | QT400-18"
+    }
+   ],
+   "disagreements": "DISAGREEMENT: Kennametal prints ASTM 65-45-12 and BS 420/12 for GGG 40; HDC prints 60-40-18 (Kennametal gives 60-40-18 to GGG 35.3) and SNG 420/12. HDC's AFNOR 'FCS 400-12' looks like a typo for FGS 400-12 (recorded as printed). HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Ductile iron GGG 50",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GGG 50",
+      "w_nr": "0.7050",
+      "astm": "80-55-06",
+      "uns": null,
+      "bs": "SNG 500/7",
+      "jis": "FCD500",
+      "other": "AFNOR FGS 500-7; UNI GS 500; UNE FGE 50-7; SS 07 27-02; GB QT500-7; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FCD500 | 0.7050 | GGG 50 | SNG 500/7 | – | FGS 500-7 | GS 500 | FGE 50-7 | 07 27-02 | 80-55-06 | QT500-7"
+    }
+   ],
+   "disagreements": "HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Ductile iron GGG 60",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GGG 60",
+      "w_nr": null,
+      "astm": null,
+      "uns": null,
+      "bs": "SNG 600/3",
+      "jis": "FCD600",
+      "other": "AFNOR FGS 600-3; SS 07 32-03; GB QT600-3; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FCD600 | – | GGG 60 | SNG 600/3 | – | FGS 600-3 | – | – | 07 32-03 | – | QT600-3"
+    }
+   ],
+   "disagreements": "HDC prints no W.-nr. or ASTM for GGG 60. HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  },
+  {
+   "grade": "Ductile iron GGG 70",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "HDC_CASTIRON",
+     "values": {
+      "common": null,
+      "en_name": null,
+      "en_number": null,
+      "din_en_name": "GGG 70",
+      "w_nr": "0.7070",
+      "astm": "100-70-03",
+      "uns": null,
+      "bs": "SNG 700/2",
+      "jis": "FCD700",
+      "other": "AFNOR FGS 700-2; UNI GS 700-2; UNE FGS 70-2; SS 07 37-01; GB QT700-18; EN column printed empty ('–')"
+     },
+     "verbatim_row": "JIS | W.-nr. | DIN | BS | EN | AFNOR | UNI | UNE | SS | AISI/SAE | GB ; FCD700 | 0.7070 | GGG 70 | SNG 700/2 | – | FGS 700-2 | GS 700-2 | FGS 70-2 | 07 37-01 | 100-70-03 | QT700-18"
+    }
+   ],
+   "disagreements": "HDC prints GB 'QT700-18' for GGG 70 / FCD700, which reads as a typo for QT700-2 (recorded as printed). HDC's row layout and values (AFNOR 'Ft 20 D', ASTM 'No 30 B', BS 'Grade 220') match the cutting-tool makers' cross-reference that Kennametal also prints; the two differ in places (columns, GGG 40 ASTM, GG 10 BS), so HDC is counted as a separate publisher, but treat agreement between them as weaker than two unrelated sources. HDC prints no EN (EN-GJL/EN-GJS) names - its EN column is empty."
+  }
+ ]
+}

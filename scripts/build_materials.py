@@ -25,16 +25,18 @@ FAMILY_FIELDS = {
     "Aluminium": [("aa", "AA / ASTM"), ("en_aw", "EN AW"), ("en_name", "EN name"), ("din_wnr", "DIN / W.-Nr."),
                   ("bs_old", "Old BS"), ("uns", "UNS"), ("jis", "JIS")],
     "Copper alloy": [("en_number", "EN CW / CC"), ("en_name", "EN name"), ("uns", "UNS / CDA"), ("bs_old", "Old BS"),
-                     ("din_wnr", "DIN / W.-Nr."), ("iso", "ISO")],
-    "Titanium": [("common", "Common name"), ("astm", "ASTM / AISI"), ("w_nr", "W.-Nr."), ("din_en_name", "DIN / EN name"), ("bs", "BS")],
-    "Nickel alloy": [("common", "Common name"), ("astm", "ASTM / AISI"), ("w_nr", "W.-Nr."), ("din_en_name", "DIN / EN name"), ("bs", "BS")],
-    "Cast iron": [("common", "Common name"), ("astm", "ASTM / AISI"), ("w_nr", "W.-Nr."), ("din_en_name", "DIN / EN name"), ("bs", "BS")],
+                     ("din_wnr", "DIN / W.-Nr."), ("iso", "ISO"), ("jis", "JIS")],
+    "Titanium": [("common", "Common name"), ("astm", "ASTM / AISI"), ("uns", "UNS"), ("w_nr", "W.-Nr."), ("din_en_name", "DIN / EN name"), ("bs", "BS")],
+    "Nickel alloy": [("common", "Common name"), ("astm", "ASTM / AISI"), ("uns", "UNS"), ("w_nr", "W.-Nr."), ("din_en_name", "DIN / EN name"), ("bs", "BS")],
+    "Cast iron": [("common", "Common name"), ("en_name", "EN 1561 / 1563 name"), ("en_number", "EN number"),
+                  ("din_en_name", "Old DIN name"), ("w_nr", "Old DIN W.-Nr."), ("astm", "ASTM"), ("bs", "Old BS"), ("jis", "JIS")],
+    "Plastic": [("abbrev", "Abbreviation"), ("generic", "Generic name"), ("trade", "Trade names")],
 }
 # Field(s) whose agreement decides the status; the first one with data is used.
 # Aluminium: AA and EN AW numbers are the same registered number, so agreement
 # is judged on the cross-system numbers that actually cause confusion.
 KEY_FIELD = {"Steel": ["en_number"], "Aluminium": ["din_wnr", "bs_old", "en_aw"], "Copper alloy": ["en_number"],
-             "Titanium": ["w_nr"], "Nickel alloy": ["w_nr"], "Cast iron": ["w_nr"]}
+             "Titanium": ["w_nr"], "Nickel alloy": ["w_nr"], "Cast iron": ["w_nr"], "Plastic": ["abbrev"]}
 
 def publisher(key, src):
     if key in COPIES: return COPIES[key]
