@@ -31,3 +31,7 @@ Additional tools not previously on this list (names only, as a checklist):
 - Learning and help: machining formula library (172 formulas), 1,500+ tips of the day, quiz, virtual assistant, GD&T learning centre, community cut library, tool wear information.
 - Platform: web, iOS and Android, offline mode, 23 languages beyond English, favourites.
 BenchMate targets all of these. Language support and mobile are later phases; desktop first.
+
+## Walkthrough 4: Jacob's screenshots of the full menu and New Features list
+Menu order seen: Turning, Milling, Chatter Listener, Vibration Check, Drilling, Tap Drill Size, 2D CAD & DXF, True Position, Surface Finish, Cutting Speed, Hole Pattern, Gauge Block Stack, Thread Size Tolerance Data, CNC Lathe Taper G-code, G-codes, M-codes, Center Drill Hole, Drill Chart, Geometric Tolerancing, Arc Calculator, Hardness Conversions, Gun Drill, Unit Conversions, Tool Wear Info, Material Properties, Custom Macro Info, Geometry, Thread Programming, Machinist Knowledge Test, Material Weight, Keyway Broach G-code, Triangle Solver, Socket Head Cap Screws, Machinist Assistant, Thermal Expansion, Grinding, Knurl, ISO Fit Tolerances, Reaming, Spline Functions, G-Code Simulator, Bandsaw Cut Time, Machining Formulas, Indexable Inserts, Settings.
+New Features also lists: arrange menu (hold an item to move it), tool library (save end mills, drills, taps, reamers once, then fill any calculator with one tap), link to web app.

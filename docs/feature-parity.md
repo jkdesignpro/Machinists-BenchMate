@@ -23,7 +23,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Reference | Tap drill sizes, drill chart (fraction, number, letter, metric) | todo | ASME B94.11M, public tables |
 | Reference | Thread data and tolerances (UN, metric, NPT) | core (partial) | ASME B1.1, ISO 262/965 |
 | Reference | ISO fits and tolerances | todo | ISO 286 |
-| Reference | G-code and M-code reference | todo | Citizen/Mitsubishi manuals (machine-verified) |
+| Reference | G-code and M-code reference, per control dialect | todo | ISO 6983 / RS-274 base, then per-control profiles from public manuals (Fanuc-style, Haas, Siemens, Mitsubishi, Citizen, others); never assumed |
 | Reference | Material properties, weight, hardness conversion, thermal expansion | todo | ASTM E140, public data |
 | Reference | Socket head cap screws, splines, knurling, reaming | todo | ASME/ISO |
 | Geometry | Triangle solver, arc calculator, hole patterns, bolt circle | core (partial) | trig |
@@ -40,6 +40,10 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Geometry | Sine bar, height over ball, countersink/tapered bore over ball, socket head cap screw holes | todo | trig, ASME B18.3 |
 | Cycles | G81/82/83/73, G84, G76, thread mill, keyway broach, lathe cycle generator, taper | todo | machine manuals |
 | Library | Formula library (172+ in Ultra), tips, quiz, tool wear info, indexable insert catalogue | todo | own writing, ISO 1832 |
+| Shop | Tool library (save end mills, drills, taps, reamers; one-tap fill into any calculator), reorderable menu, link to a web/desktop session | todo | own design |
 | Platform | Offline, favourites, many languages, mobile later | todo | |
 
 Beyond parity (ours): manufacturer speeds and feeds with PDF import, an adaptive per-machine learning profile (see `vendor-data-and-learning.md`), Swiss-lathe helpers, "show the working" steps for every result, AMW link-up.
+
+
+**Scope rule:** BenchMate is for all machinists and all machines. The Citizen L20 is just the first machine profile to be verified. Nothing machine-specific goes in the general tools: G/M codes, cycles and limits live in selectable control/machine profiles.
