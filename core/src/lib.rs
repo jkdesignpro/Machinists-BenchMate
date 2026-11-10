@@ -560,6 +560,8 @@ pub mod shop;
 pub use shop::*;
 pub mod thread_forms;
 pub use thread_forms::*;
+pub mod tooling;
+pub use tooling::*;
 
 #[cfg(test)]
 mod tests {

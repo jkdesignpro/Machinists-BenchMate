@@ -162,3 +162,13 @@ f1!(whitworth_value, c::whitworth_value_f, d, p, what);
 f1!(ba_value, c::ba_value_f, n, what);
 f1!(npt_value, c::npt_value_f, d, p, l1, what);
 f1!(round_sig, c::round_sig_f, x, sig);
+
+// Tooling (core/src/tooling.rs)
+f1!(insert_edge_length, c::insert_edge_length, d, a1, a2);
+f1!(insert_edge_length_shape, c::insert_edge_length_f, d, letter_code);
+f1!(insert_size_code, c::insert_size_code, edge_len);
+f1!(knurl_blank_dia_cp, c::knurl_blank_dia_cp, p, n);
+f1!(knurl_blank_dia_dp, c::knurl_blank_dia_dp, dp, n);
+f1!(knurl_teeth_cp, c::knurl_teeth_cp, d, p);
+f1!(knurl_teeth_dp, c::knurl_teeth_dp, d, dp);
+f1!(lerp, c::lerp, x, x0, y0, x1, y1);
