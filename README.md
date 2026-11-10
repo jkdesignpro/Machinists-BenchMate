@@ -22,7 +22,7 @@ Check a download against `SHA256SUMS.txt` on the release page if you like (`sha2
 ## Layout
 - `core/` - `benchmate-core`, pure Rust formulas (no dependencies)
 - `wasm/` - plain C-ABI WebAssembly wrapper so the UI calls the same Rust formulas (no JS copies)
-- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `cad.js` (DXF generator screens), `toollib.js` (tool library), `cycles.js` (G-code cycle generators), `gmcodes.js` (G/M-code and macro reference), `app.js` (shell, favourites), `tokens.css`
+- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `cad.js` (DXF generator screens), `toollib.js` (tool library), `cycles.js` (G-code cycle generators), `gmcodes.js` (G/M-code and macro reference), `millturn.js` (drawings for the small mill and lathe calculators), `chatter.js` (chatter finder), `grinding.js` (grit conversion, wheel marking decoder, grinding drawings), `app.js` (shell, favourites), `tokens.css`
 - `desktop/` - the Tauri 2 desktop wrapper: serves `app/` from the app bundle (no network), native save dialog for exports, icons in `desktop/icons/` (from `icon.svg`)
 - `tests/smoke/` - headless Chromium smoke test of `app/`; `scripts/check-versions.py` - checks the version is the same everywhere
 - `.github/workflows/` - CI (`ci.yml`) and release builds (`release.yml`); see `docs/release.md`
@@ -65,6 +65,15 @@ G and M codes for ten controls: a generic ISO 6983 / RS-274 base (NIST RS274NGC)
 
 ## CAD / DXF
 Parametric 2D shapes exported as DXF for CAM: bolt circle (with outside diameter and centre bore), rectangular hole grid on an optional plate, straight and arc slots, rectangle with corner radii and corner holes, regular polygon from across flats or corners, circle and ring, keyhole, D-flat and double-D. Live SVG preview with overall dimensions, hole callouts and a hole position table. Inch or mm (`$INSUNITS` set), layers OUTLINE / HOLES / CENTRE, optional centre marks, origin at the centre or lower-left, DXF R2000 (LWPOLYLINE with bulges) or R12 (POLYLINE/VERTEX). The writer is in the Rust core, tested by reading its own output back, and the files load and audit cleanly in ezdxf. See `docs/cad-dxf.md`.
+
+## Small mill and lathe calculators
+Radial chip thinning, corner and boss engagement, ball-nose cusp height and effective diameter (with tool tilt), runout and chip load, lathe feed, multi-pass roughing time, boring bar deflection with overhang guidance from three makers, C-axis feed and inverse time F, slitting saw, bandsaw chip per tooth and cut time, spot and centre drill depth. Formulas in `core/src/millturn.rs`; sources in `docs/sources.md`.
+
+## Chatter finder
+Type the chatter frequency or record a few seconds with the microphone. BenchMate draws the spectrum, marks the peaks that are only spindle or tooth-passing harmonics, and lists stable spindle speeds (the tooth-passing rule of thumb, not a full stability lobe diagram), checked against the active machine. The sound stays on your computer. Formulas and FFT in `core/src/chatter.rs`.
+
+## Grinding
+Wheel speed, cylindrical and surface grinding (equivalent diameter, contact length, speed ratio, removal rate, equivalent chip thickness, cycle times), grit size conversion between ANSI, FEPA F and FEPA P, and a wheel marking decoder. The maximum wheel speed is never filled in for you: always obey the speed marked on the wheel. Grit and marking data show each publisher's value and where they disagree (`data/refdata/grinding-evidence.json`).
 
 ## Tool library and favourites
 Save end mills, drills, taps, reamers and inserts (type, diameter, shank, flutes, flute length, overall length, stick-out, corner radius, point angle, pitch, material, coating, maker, part number, notes) in the browser, with JSON export and import that never overwrites. "Fill from tool library" on spindle speed, milling feed, arc feed, helical interpolation, tool deflection, cut optimiser, drill point, tap drill and surface finish, converting inch and mm. Star any tool to put it in a Favourites group at the top of the list.

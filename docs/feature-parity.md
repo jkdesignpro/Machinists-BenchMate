@@ -10,29 +10,30 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 |---|---|---|---|---|
 | Turning | Cutting speed and feed recommendations by material | missing | | U1, U2 |
 | Turning | Spindle speed conversion | done | `rpm` | U3 |
-| Turning | Feed rate conversion (per rev / per minute) | missing | | U4 |
-| Turning | Roughing pass cut time | partial (one pass, fixed RPM) | `passtime` | U5 |
+| Turning | Feed rate conversion (per rev / per minute) | done | `lathefeed` | U4 |
+| Turning | Roughing pass cut time | done (passes from stock and depth, RPM per pass) | `roughtime`, `passtime` | U5 |
 | Turning | Part-off / grooving cut time (CSS) | done (groove and cut-off program with CSS time) | `cycgroove` | U6 |
 | Turning | Taper calculation | done | `taper` | U7 |
 | Turning | Lathe taper G-code, lathe cycle generator | done (taper) / partial (G71/G70 from typed points, no CAD input) | `cyctaper`, `cycg71` | U8, U11 |
-| Turning | Boring bar deflection | partial (end-mill cantilever model only) | `deflection` | U9 |
-| Turning | C-axis feed converter | missing | | U10 |
+| Turning | Boring bar deflection | done (bar materials, coolant bore, cutting force, overhang guidance per maker) | `boringbar` | U9 |
+| Turning | C-axis feed converter | done (deg/min, circumference feed, inverse time F) | `caxis` | U10 |
 | Turning | Surface finish from nose radius | done | `finish` | U12 |
 | Turning | Bar stock planner (parts per bar, weight, cost) | done (ours) | `bar` | |
 | Milling | Speeds and feeds with chip thinning, deflection, power check | partial (checks a cut you enter; no starting data, kc by hand) | `cutopt` | U13, U18 |
 | Milling | Spindle speed and table feed | done | `rpm`, `feed` | U14, U15 |
-| Milling | Radial chip thinning | partial (hm/hex shown; no compensated feed) | `cutopt` | U16 |
+| Milling | Radial chip thinning | done (compensated feed for a target chip) | `chipthin`, `cutopt` | U16 |
 | Milling | MRR and power | done (MRR) / partial (power needs kc) | `mrr`, `cutopt` | U17, U18 |
-| Milling | Arc feed correction (internal/external) | done | `arcfeed` | U21 (partial: no corner-engagement feed) |
+| Milling | Arc feed correction (internal/external), corner engagement feed | done | `arcfeed`, `cornerfeed` | U21 |
 | Milling | Helical interpolation / ramp angle and pitch | done (ours) | `helix` | |
 | Milling | Tool deflection, cut optimiser | done (ours) | `deflection`, `cutopt` | |
-| Milling | Ball end mill cusp height and effective diameter | missing | | U19, U20 |
-| Milling | Tool runout, slitting saw speeds and feeds | missing | | U22, U23 |
+| Milling | Ball end mill cusp height and effective diameter | done (effective diameter with tool tilt) | `ballcusp`, `balleff` | U19, U20 |
+| Milling | Tool runout, slitting saw speeds and feeds | done | `runout`, `slitsaw` | U22, U23 |
 | Milling | Thread milling calculator and program | done | `cyctmill` | U24, U25 |
 | Economics | Taylor tool life, cost per part, economic tool life | done (ours) | `toollife` | |
 | Drilling | Drill speed/feed recommendations | missing | | U28 |
 | Drilling | Drill point length | done | `drillpoint` | U29 |
-| Drilling | Center drill, reaming, gun drill, tapping speed | missing | | U32-U35 |
+| Drilling | Center drill depth / spot drill depth | partial (depth both ways; no centre drill size table) | `spotdepth` | U32 |
+| Drilling | Reaming, gun drill, tapping speed | missing | | U33-U35 |
 | Reference | Drill chart (fraction, number, letter, metric) | done | `drillchart` | U30 |
 | Reference | Tap drill sizes (cut and form) | done | `tapdrill` | U31 |
 | Reference | Thread data and limits: UNC/UNF/UNEF, metric M | done | `threaddata` | U38, U43, U52 |
@@ -58,12 +59,15 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Tools | Keyway broach G-code, G76, G84, G81/82/83/73 generators | done (generic Fanuc-style and Haas; other controls not yet supported, see `cycles.md`) | `cycbroach`, `cycthread`, `cycdrill` | U36, U37, U53, U54, U88 |
 | Tools | Unit conversions | partial (length only) | `fraction` | U79 |
 | Tools | Scientific calculator | missing | | U80 |
-| Tools | Bandsaw cut time | missing | | U90 |
+| Tools | Bandsaw cut time | done (cut rate or down-feed, chip per tooth) | `bandsaw` | U90 |
 | Tools | G-code simulator | missing | | U95 |
 | Tools | 2D CAD / DXF generator | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` (parametric shapes, live preview, DXF R2000/R12 export; no free sketching, snapping or angle measure) | U96 |
 | Shop | Coolant concentration and mix | done | `coolconc`, `coolmix` | U89 |
-| Shop | Chatter finder (mic, stable-speed lobes) and vibration check | missing | | U26, U27 |
-| Grinding | Equivalent diameter, grit conversion, plunge, surface, wheel/workpiece speed, cylindricity | missing | | U55-U60 |
+| Shop | Chatter finder (mic, stable-speed lobes) | done (microphone or typed frequency, mill and lathe, on-device) | `chatter` | U26 |
+| Shop | Vibration check (device sensor) | missing | | U27 |
+| Grinding | Equivalent diameter, grit conversion, plunge, surface, wheel/workpiece speed | done (grit values per publisher with disagreements shown; max wheel speed never defaulted) | `grindspeed`, `grindtime`, `grindsurf`, `gritconv` | U55-U57, U59, U60 |
+| Grinding | Wheel marking decoder | done (marking only; no shapes or selection) | `wheelcode` | MH163, BB60 (partial) |
+| Grinding | Cylindricity error from RPM | missing | | U58 |
 | Gears/splines | Spur gear data, ISO 4156, ANSI B92.1, SAE J499a | missing | | U83-U86 |
 | Library | Formula library | partial (working shown per tool; no library view) | all tools | U97 |
 | Library | Tips, tool wear info, assistant, community cut data | missing | | U91, U98, U101, U102 |
@@ -74,7 +78,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Platform | Offline, web/desktop link | partial (local web app; no installable offline build) | | U110, U111 |
 | Platform | Mobile apps, languages | missing (later phase) | | U112, U113 |
 
-Count against Ultra (from `parity-audit.md`): 113 rows, 22 done, 16 partial, 73 missing (8 of them in progress), 2 out of scope. The build order is in `parity-audit.md` section 6.
+Count against Ultra (from `parity-audit.md`): 113 rows, 54 done, 16 partial, 41 missing (8 of them in progress), 2 out of scope. The build order is in `parity-audit.md` section 6.
 
 Beyond parity (ours): manufacturer speeds and feeds with PDF import, an adaptive per-machine learning profile (see `vendor-data-and-learning.md`), Swiss-lathe helpers, "show the working" steps for every result, AMW link-up.
 
