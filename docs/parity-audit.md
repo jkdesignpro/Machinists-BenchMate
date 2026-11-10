@@ -30,12 +30,14 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 22 | 16 | 73 (8) | 2 | 0 | 20 % |
-| Machinery's Handbook 31 | 306 | 15 | 42 | 215 (15) | 6 | 28 | 6 % |
+| CNC Machinist Calculator Ultra | 113 | 33 | 17 | 61 (8) | 2 | 0 | 30 % |
+| Machinery's Handbook 31 | 306 | 15 | 45 | 212 (15) | 6 | 28 | 6 % |
 | Engineers' Data Book | 94 | 3 | 20 | 33 (1) | 12 | 26 | 5 % |
 | Engineers Black Book | 80 | 9 | 14 | 56 (11) | 1 | 0 | 11 % |
-| CNC Machining handbook | 83 | 1 | 8 | 70 (0) | 0 | 4 | 1 % |
-| **All** | **676** | **50** | **100** | **447 (35)** | **21** | **58** | **8 %** |
+| CNC Machining handbook | 83 | 1 | 9 | 69 (0) | 0 | 4 | 1 % |
+| **All** | **676** | **61** | **105** | **431 (35)** | **21** | **58** | **10 %** |
+
+**Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1 and the summary counts include them.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -92,12 +94,12 @@ Store list is the fuller of the two store lists.
 | U3 | Lathe spindle speed conversion (SFM/Vc and RPM) | done | `rpm` | |
 | U4 | Lathe feed rate conversion (per rev and per minute) | missing | | No IPR/IPM or mm/rev/mm/min converter for turning |
 | U5 | Rough pass cut time | partial | `passtime` | Time for one pass at fixed RPM only; no number of passes from stock and DOC, no CSS |
-| U6 | Groove and cut-off cycle time | missing | | Needs CSS with an RPM limit as the diameter shrinks |
+| U6 | Groove and cut-off cycle time | done | `cycgroove` | Groove and cut-off program with CSS, G50 clamp, cut time integrated as the diameter shrinks (`claude/cycles`) |
 | U7 | Taper calculation | done | `taper` | |
-| U8 | Lathe taper G-code / taper programming | missing | | |
+| U8 | Lathe taper G-code / taper programming | done | `cyctaper` | Roughing along the cone and finish pass, external or internal (`claude/cycles`) |
 | U9 | Boring bar deflection | partial | `deflection` | The cantilever model fits, but the tool is set up for end mills (flute length, end-mill moduli); no boring-bar materials (steel, carbide, heavy metal), no overhang L/D guidance |
 | U10 | C-axis rotational feed converter | missing | | |
-| U11 | Lathe cycle generator, CAD profile to canned cycles (G71/G70 style) | missing | | |
+| U11 | Lathe cycle generator, CAD profile to canned cycles (G71/G70 style) | partial | `cycg71` | G71/G70 from a typed list of points (straight lines, type I only); no CAD/DXF input, no arcs (`claude/cycles`) |
 | U12 | Lathe surface finish | done | `finish` | |
 
 ### Milling
@@ -115,8 +117,8 @@ Store list is the fuller of the two store lists.
 | U21 | Adaptive feed control (rounded corners) | partial | `arcfeed` | Arc feed compensation only; no feed reduction for higher engagement in corners |
 | U22 | Max tool runout / endmill runout | missing | | |
 | U23 | Slitting saw speeds and feeds | missing | | |
-| U24 | Thread milling calculators | missing | | |
-| U25 | Thread mill program generator | missing | | |
+| U24 | Thread milling calculators | done | `cyctmill` | Path radius, tool-centre feed, helix angle and 3D helix feed (`claude/cycles`) |
+| U25 | Thread mill program generator | done | `cyctmill` | Internal/external, RH/LH, climb/conventional, arc-in/out, G41/G42 option, radial and spring passes (`claude/cycles`) |
 
 ### Chatter and vibration
 
@@ -137,8 +139,8 @@ Store list is the fuller of the two store lists.
 | U33 | Reaming speeds, feeds and allowance | missing | | |
 | U34 | Gun drill calculators | missing | | |
 | U35 | Tapping speed calculators | missing | | |
-| U36 | G84 tap cycle generator | missing | | |
-| U37 | G81/G82/G83/G73 drill cycle generator | missing | | |
+| U36 | G84 tap cycle generator | done | `cycdrill` | Rigid (Fanuc-style M29) or floating; F = pitch x rpm (`claude/cycles`) |
+| U37 | G81/G82/G83/G73 drill cycle generator | done | `cycdrill` | Generic Fanuc-style and Haas (`claude/cycles`) |
 
 ### Threads
 
@@ -159,8 +161,8 @@ Store list is the fuller of the two store lists.
 | U50 | Whitworth BSW and BSF | done | `whitworth` | Basic dimensions; no tolerances |
 | U51 | Thread data and over-wire measurement | done | `wires` | 60-degree threads only, lead angle neglected; no ACME/Whitworth wires |
 | U52 | Thread size tolerance data (menu item) | done | `threaddata` | |
-| U53 | G76 lathe thread program generator | missing | | Also infeed/passes table |
-| U54 | Thread programming (menu item) | missing | | |
+| U53 | G76 lathe thread program generator | done | `cycthread` | G76 (Fanuc-style two-block, Haas one-block) or G92 per pass, with infeed table (`claude/cycles`) |
+| U54 | Thread programming (menu item) | done | `cycthread` | (`claude/cycles`) |
 
 ### Grinding
 
@@ -194,8 +196,8 @@ Store list is the fuller of the two store lists.
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | U72 | Bolt circle | done | `bolt` | |
-| U73 | Rectangular hole pattern | missing | | |
-| U74 | Hole pattern coordinate export | missing | | `bolt` shows a table but has no export (CSV/G-code) |
+| U73 | Rectangular hole pattern | done | `cycdrill` | Grid pattern in zigzag order (`claude/cycles`) |
+| U74 | Hole pattern coordinate export | done | `cycdrill` | CSV download and G-code for bolt circle, grid or pasted holes (`claude/cycles`) |
 | U75 | Triangle solver | missing | | In progress (`claude/geometry`) |
 | U76 | Arc calculator | missing | | In progress (`claude/geometry`) |
 | U77 | Geometry calculations | missing | | In progress (`claude/geometry`: chord, sagitta, fillet, dovetail) |
@@ -209,7 +211,7 @@ Store list is the fuller of the two store lists.
 | U85 | Involute splines per ISO 4156 | missing | | |
 | U86 | SAE J499a splines | missing | | |
 | U87 | Knurl calculator | missing | | |
-| U88 | Keyway broach program generator | missing | | |
+| U88 | Keyway broach program generator | done | `cycbroach` | Lathe or mill, depth per stroke, lift, spring strokes (`claude/cycles`) |
 | U89 | Coolant concentration | done | `coolconc`, `coolmix` | |
 | U90 | Bandsaw cut time | missing | | |
 | U91 | Tool wear information | missing | | |
@@ -462,9 +464,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH176 | Tool nose radius compensation | missing | | |
 | MH177 | Rapid, linear, circular and helical interpolation | partial | `helix`, `arcfeed` | Feed maths only; no G-code reference or output |
 | MH178 | Work offsets, tool length offsets, cutter radius offsets | missing | | `setupsheet` records offsets only |
-| MH179 | Fixed (canned) cycles for holes | missing | | |
+| MH179 | Fixed (canned) cycles for holes | partial | `cycdrill` | Generator for G81/G82/G83/G73/G84; no reference text on the cycles |
 | MH180 | Contouring, turning and boring on CNC | missing | | |
-| MH181 | Thread cutting on CNC lathes: depth, infeed, G32, G76, multi-start | missing | | |
+| MH181 | Thread cutting on CNC lathes: depth, infeed, G32, G76, multi-start | partial | `cycthread` | Depth, infeed, G76 and G92; no G32, no multi-start, no tapered threads |
 | MH182 | Subprograms, macros and parametric programming | missing | | |
 | MH183 | Axis nomenclature | missing | | |
 | MH184 | Total indicator reading | missing | | |
@@ -558,7 +560,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH257 | Relieving helical-fluted hobs | out of scope? | | |
 | MH258 | Thread rolling: machines, blank diameter, roll diameter, speeds | missing | | |
 | MH259 | Thread grinding | missing | | |
-| MH260 | Thread milling: methods, helix angles | missing | | |
+| MH260 | Thread milling: methods, helix angles | partial | `cyctmill` | Program, helix angle, feed; no method guide |
 
 ### Gears, splines and cams
 
@@ -863,7 +865,7 @@ One row per learning objective.
 | CN50 | L8 Common lathe tools | missing | | |
 | CN51 | L8 Lathe speeds and feeds | partial | `rpm`, `passtime` | No recommendations |
 | CN52 | L8 Constant surface speed | missing | | |
-| CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | missing | | |
+| CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | partial | `cycg71`, `cycgroove`, `cycthread`, `cyctaper` | Turn, groove, cut-off, thread; no facing or drilling on the lathe |
 | CN54 | L8 Live tools | partial | `machines` | Live-tool speed limit check only |
 | CN55 | L9 3D tool compensation | missing | | |
 | CN56 | L9 3D cut tolerances | missing | | |
@@ -905,8 +907,8 @@ mostly formulas, drawing and screens from knowledge we already have.
 
 | Batch | Contents | Closes | Work type |
 |---|---|---|---|
-| A1 | **Canned-cycle generators, mill**: G81/G82/G83/G73 drilling, G84 tapping, rectangular hole pattern, bolt-circle and pattern coordinate export (CSV and G-code), thread mill program. Generic Fanuc-style output first, then per control profile | U36, U37, U73, U74, U24, U25 | maths/UI; light research (control manuals for syntax) |
-| A2 | **Canned-cycle generators, lathe**: G76 threading with infeed/pass table, lathe taper program, groove/cut-off with CSS time, keyway broach program, G71/G70 profile cycle | U53, U54, U8, U6, U88, U11 | maths/UI; light research |
+| A1 | **Canned-cycle generators, mill** (built on `claude/cycles`): G81/G82/G83/G73 drilling, G84 tapping, rectangular hole pattern, bolt-circle and pattern coordinate export (CSV and G-code), thread mill program. Generic Fanuc-style output first, then per control profile | U36, U37, U73, U74, U24, U25 | maths/UI; light research (control manuals for syntax) |
+| A2 | **Canned-cycle generators, lathe** (built on `claude/cycles`): G76 threading with infeed/pass table, lathe taper program, groove/cut-off with CSS time, keyway broach program, G71/G70 profile cycle | U53, U54, U8, U6, U88, U11 | maths/UI; light research |
 | A3 | **2D CAD and DXF generator**: sketch lines/arcs/circles, snapping (end, mid, intersection, tangent), dimensions and angle measure, DXF export; reuse for A2 profile input | U96 | maths/UI (large; may take two sessions) |
 | A4 | **G-code and M-code reference, custom macro reference** per control profile (generic ISO 6983 set, then Fanuc-style, Haas, Siemens, Mitsubishi, Citizen) | U92, U93, U94, BB73, CN21-24, CN81 | heavy research |
 | A5 | **G-code simulator**: 2D backplot of G0-G3, canned cycles from A1/A2, cycle-time estimate; 3D later | U95 | maths/UI |

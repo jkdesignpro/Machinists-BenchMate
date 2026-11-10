@@ -13,10 +13,10 @@ A free, open-source (AGPLv3) machinist's calculator, built to sit beside the mac
 ## Layout
 - `core/` - `benchmate-core`, pure Rust formulas (no dependencies)
 - `wasm/` - plain C-ABI WebAssembly wrapper so the UI calls the same Rust formulas (no JS copies)
-- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `app.js`, `tokens.css`
+- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `cycles.js` (G-code cycle generators), `app.js`, `tokens.css`
 - `scripts/build-web.sh` - builds the WebAssembly module
 - `data/` - reference data (material equivalents), generated from `scripts/materials_seed.py`
-- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions; `docs/shop-helpers.md` - shop helper sources and decisions; `docs/geometry.md` - geometry sources and decisions
+- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions; `docs/shop-helpers.md` - shop helper sources and decisions; `docs/geometry.md` - geometry sources and decisions; `docs/cycles.md` - G-code cycle syntax sources, dialect support and decisions
 - `CHANGELOG.md` - every change, per version
 
 ## Build, test and run
@@ -36,6 +36,9 @@ Triangle solver (right and oblique, incl. the two-solution case) with a drawing;
 
 ## Shop helpers
 Process capability (Cp, Cpk, Pp, Ppk, expected ppm, histogram with normal fit) from pasted measurements or a mean and sigma; temperature compensation of measurements to 20 °C for part and gauge expansion; coolant concentration from a refractometer reading and the fluid's own factor, plus mix and top-up amounts; fraction / decimal inch / mm converter with nearest fraction and error; a printable setup sheet (job, machine, tools, work offsets, notes) saved in the browser with JSON export and import. See `docs/shop-helpers.md`.
+
+## G-code cycles
+Program generators for drilling and tapping (G81, G82, G83, G73, G84 rigid or floating) on a bolt circle, grid or pasted holes with CSV export; thread milling (internal/external, climb/conventional, arc-in/out, optional G41/G42, several passes); lathe threading with G76 or G92 passes and an infeed table (constant volume, constant depth, custom, minimum cut, spring passes); taper turning and boring; groove and cut-off with CSS; keyway broaching; G71/G70 from a simple profile. Output for a generic ISO 6983 / Fanuc-style control and for Haas; other controls are shown as not yet supported until their syntax is confirmed. Each program has a backplot, an estimated cycle time and a check against the active machine. Always prove out a generated program in single block. See `docs/cycles.md`.
 
 ## Planned
 Speeds and feeds, turning/finish, drilling and tapping, threads (UN, metric, NPT), taper and trig, bolt circles, drill/tap/fit charts, unit converter, materials table, Swiss-lathe helpers, second-opinion feeds from published manufacturer data, link-up with Alkart Mega Wizard.

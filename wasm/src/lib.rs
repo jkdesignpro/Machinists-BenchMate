@@ -223,3 +223,65 @@ f1!(whitworth_value, c::whitworth_value_f, d, p, what);
 f1!(ba_value, c::ba_value_f, n, what);
 f1!(npt_value, c::npt_value_f, d, p, l1, what);
 f1!(round_sig, c::round_sig_f, x, sig);
+
+// Cycle generators (core/src/cycles.rs, core/src/gcode.rs)
+f1!(css_rpm, c::css_rpm_f, v, dia, max_rpm, metric);
+f1!(css_plunge_time_min, c::css_plunge_time_min_f, d0, d1, f_rev, v, max_rpm, metric);
+f1!(thread_mill_path_radius, c::thread_mill_path_radius_f, cut_dia, tool_dia, internal);
+f1!(thread_mill_centre_feed, c::thread_mill_centre_feed_f, edge_feed, cut_dia, tool_dia, internal);
+f1!(helix_path_feed, c::helix_path_feed, f_plane, r, pitch);
+f1!(helix_lead_angle_deg, c::helix_lead_angle_deg, r, pitch);
+f1!(thread_depth_external, c::thread_depth_external, p);
+f1!(thread_depth_internal, c::thread_depth_internal, p);
+f1!(tap_feed, c::tap_feed, pitch, rpm);
+/// Infeed table into list_out (cumulative depths). mode 0: by first cut
+/// (a = first, b = min cut); 1: by passes (a = passes, b = first-pass
+/// factor); 2: constant depth (a = step); 3: custom (buffer holds `a` steps).
+#[no_mangle] pub extern "C" fn infeed(mode: f64, total: f64, a: f64, b: f64, finish: f64) -> f64 {
+    let v = match mode as i32 {
+        0 => c::infeed_by_first_cut(total, a, b, finish),
+        1 => c::infeed_by_passes(total, a.max(0.0) as u32, b, finish),
+        2 => c::infeed_constant_depth(total, a, finish),
+        _ => c::infeed_custom(buf(a)),
+    };
+    set_out(v) }
+/// Rectangular grid (zigzag order) into list_out as x0, y0, x1, y1, ...; returns the hole count.
+#[no_mangle] pub extern "C" fn pattern_grid(x0: f64, y0: f64, nx: f64, ny: f64, dx: f64, dy: f64) -> f64 {
+    let v = c::gcode::pattern_grid(x0, y0, nx.clamp(0.0, 1000.0) as u32, ny.clamp(0.0, 1000.0) as u32, dx, dy);
+    set_out(v.iter().flat_map(|p| [p.0, p.1]).collect()) / 2.0 }
+
+static mut STR: String = String::new();
+fn set_str(s: &str) -> f64 { unsafe { *core::ptr::addr_of_mut!(STR) = s.to_string(); } s.len() as f64 }
+/// Pointer to the last text result (UTF-8; the call that made it returns the length).
+#[no_mangle] pub extern "C" fn str_ptr() -> *const u8 { unsafe { (*core::ptr::addr_of!(STR)).as_ptr() } }
+static mut PROG: Option<c::gcode::Program> = None;
+fn prog() -> Option<&'static c::gcode::Program> { unsafe { (*core::ptr::addr_of!(PROG)).as_ref() } }
+/// Whether a control (0 generic, 1 Haas, 2 Mitsubishi, 3 Siemens, 4 Heidenhain, 5 Okuma) has a generator for a cycle.
+#[no_mangle] pub extern "C" fn cyc_supported(ctrl: f64, cycle: f64) -> f64 { if c::gcode::supported(c::gcode::Ctrl::from_f(ctrl), cycle as u32) { 1.0 } else { 0.0 } }
+/// Generate a program from the first `n` buffer values (layout in
+/// `gcode::run_flat`). Returns 1 if a program was made, 0 on error.
+#[no_mangle] pub extern "C" fn cyc_run(cycle: f64, n: f64) -> f64 {
+    let p = c::gcode::run_flat(cycle as u32, buf(n));
+    let ok = p.error.is_none();
+    unsafe { *core::ptr::addr_of_mut!(PROG) = Some(p); }
+    if ok { 1.0 } else { 0.0 } }
+/// Put text into the string buffer: 0 program, 1 error, 2 warnings (one per line). Returns the length.
+#[no_mangle] pub extern "C" fn cyc_text(which: f64) -> f64 {
+    match prog() { None => set_str(""), Some(p) => match which as i32 {
+        0 => set_str(&p.text), 1 => set_str(p.error.as_deref().unwrap_or("")), _ => set_str(&p.warnings.join("\n")) } } }
+/// Number of moves of the last program.
+#[no_mangle] pub extern "C" fn cyc_moves() -> f64 { prog().map(|p| p.moves.len() as f64).unwrap_or(0.0) }
+/// Move `i` field: 0 kind, 1 x, 2 y, 3 z, 4 cx, 5 cy, 6 feed/min, 7 seconds.
+#[no_mangle] pub extern "C" fn cyc_move(i: f64, f: f64) -> f64 {
+    prog().and_then(|p| p.moves.get(i as usize)).map(|m| [m.kind as f64, m.x, m.y, m.z, m.cx, m.cy, m.f, m.t].get(f as usize).copied().unwrap_or(f64::NAN)).unwrap_or(f64::NAN) }
+/// Program info: 0 max rpm, 1 max feed per min, 2 start x, 3 start y, 4 start z, 5 table length.
+#[no_mangle] pub extern "C" fn cyc_info(which: f64) -> f64 {
+    prog().map(|p| [p.max_rpm, p.max_feed, p.start[0], p.start[1], p.start[2], p.table.len() as f64].get(which as usize).copied().unwrap_or(f64::NAN)).unwrap_or(f64::NAN) }
+#[no_mangle] pub extern "C" fn cyc_table(i: f64) -> f64 { prog().and_then(|p| p.table.get(i as usize).copied()).unwrap_or(f64::NAN) }
+/// Times in seconds with rapids at `rapid` per minute: 0 feed, 1 rapid, 2 dwell.
+#[no_mangle] pub extern "C" fn cyc_time(rapid: f64, which: f64) -> f64 {
+    prog().map(|p| { let t = p.time(rapid); [t.0, t.1, t.2].get(which as usize).copied().unwrap_or(f64::NAN) }).unwrap_or(f64::NAN) }
+/// CSV of the hole list in the buffer (first 2n values); returns the length.
+#[no_mangle] pub extern "C" fn holes_csv(n: f64, metric: f64) -> f64 {
+    let v = buf(2.0 * n); let h: Vec<(f64, f64)> = v.chunks(2).filter(|c| c.len() == 2).map(|c| (c[0], c[1])).collect();
+    set_str(&c::gcode::holes_csv(&h, metric != 0.0)) }

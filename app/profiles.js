@@ -18,6 +18,7 @@ const Profiles = (() => {
     ['torque_nm', 'Main spindle max torque (optional)', 'number', 'N·m'],
     ['live_rpm_max', 'Live / driven tool max speed (optional)', 'number', 'RPM'],
     ['feed_max', 'Max cutting feed (optional)', 'number', 'mm/min'],
+    ['rapid', 'Rapid traverse rate (optional, for cycle times)', 'number', 'mm/min'],
     ['notes', 'Notes', 'text', ''],
   ];
   return {
