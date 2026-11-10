@@ -57,3 +57,7 @@ label.f .u{color:var(--muted);min-width:34px;font-size:11.5px}
 .fam{color:var(--muted);font-size:10.5px;margin-top:3px;white-space:nowrap}
 .mfilter{display:flex;gap:12px;align-items:center;margin-bottom:10px}
 .chk{display:flex;gap:5px;align-items:center}
+
+tr.over td{background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.wmsg{color:var(--warn);font-size:11.5px}
+#machine{height:26px}

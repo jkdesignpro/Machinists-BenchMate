@@ -3,7 +3,7 @@
 Ideas from looking at other machinist tools (G-Wizard, HSMAdvisor, FSWizard, open-source optimisers) and common shop-floor needs. All would be built from free, citable knowledge. Ranked by usefulness vs effort.
 
 ## Tier 1: high value
-1. **Machine profiles.** Spindle RPM range, power and torque curve, max feed, rigidity, control type. Every result is checked against the machine and flagged if it can't be reached (e.g. RPM capped, torque short at low RPM). Multiple machines, L20 first.
+1. **Machine profiles.** (built: v0.1 profiles and checks; cut optimiser next) Spindle RPM range, power and torque curve, max feed, rigidity, control type. Every result is checked against the machine and flagged if it can't be reached (e.g. RPM capped, torque short at low RPM). Multiple machines, L20 first.
 2. **Cut optimiser with deflection and torque checks.** Tool stick-out and diameter give tool deflection (cantilever beam); spindle torque/power curve gives a limit; solve for the best width/depth/feed inside those limits. Shows *why* a limit binds.
 3. **Arc and helix feed correction.** Feed compensation for internal/external arcs (tool centre vs cutting edge), helical interpolation and ramp angles, plunge roughing. Common cause of broken tools and rarely done by hand.
 4. **Cost per part and tool life.** Taylor tool-life equation, economic cutting speed, cycle time x machine rate + tool cost per edge + material cost. Answers "is running faster actually cheaper?".

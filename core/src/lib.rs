@@ -139,6 +139,22 @@ pub fn bolt_circle(n: u32, dia: f64, start_deg: f64, cx: f64, cy: f64) -> Vec<(f
         .collect()
 }
 
+/// Spindle power available at a given speed (kW), for a spindle modelled as
+/// constant torque up to its base speed and constant power above it:
+/// `P(n) = min(P_max, T_max * 2 * pi * n / 60 000)` with T in N*m, n in RPM.
+/// Standard motor/spindle characteristic used by machine builders and in [SAN]
+/// (power and torque diagrams). If `torque_max_nm` <= 0, only `p_max_kw` applies.
+pub fn spindle_power_available_kw(rpm: f64, p_max_kw: f64, torque_max_nm: f64) -> f64 {
+    if torque_max_nm <= 0.0 { return p_max_kw; }
+    p_max_kw.min(torque_max_nm * 2.0 * PI * rpm / 60_000.0)
+}
+
+/// Spindle torque needed for a cutting power (kW) at a speed (RPM), N*m:
+/// `T = P * 60 000 / (2 * pi * n)`.
+pub fn torque_for_power_nm(power_kw: f64, rpm: f64) -> f64 {
+    power_kw * 60_000.0 / (2.0 * PI * rpm)
+}
+
 /// f64-argument helpers used by the WebAssembly layer (teeth as a number).
 pub fn table_feed_f(rpm: f64, fz: f64, teeth: f64) -> f64 { table_feed(rpm, fz, teeth as u32) }
 pub fn feed_per_tooth_f(vf: f64, rpm: f64, teeth: f64) -> f64 { feed_per_tooth(vf, rpm, teeth as u32) }
@@ -180,6 +196,14 @@ mod tests {
         let w = thread_best_wire(p);
         close(w, 0.044411, 1e-6);
         close(thread_three_wire_m(e, w, p), 0.516654, 1e-5);
+    }
+    #[test] fn spindle_power() {
+        // 50 N*m at 1000 RPM = 50*2*pi*1000/60000 = 5.23599 kW, capped at 3.7 kW
+        close(spindle_power_available_kw(1000.0, 3.7, 50.0), 3.7, 1e-12);
+        // at 500 RPM: 2.61799 kW (torque limited)
+        close(spindle_power_available_kw(500.0, 3.7, 50.0), 2.617994, 1e-6);
+        close(spindle_power_available_kw(500.0, 3.7, 0.0), 3.7, 1e-12);
+        close(torque_for_power_nm(2.617994, 500.0), 50.0, 1e-4);
     }
     #[test] fn bolt() {
         let h = bolt_circle(4, 100.0, 0.0, 0.0, 0.0);

@@ -56,7 +56,7 @@ function renderTool() {
     try { rows = t.calc(v, state.W, state.sys); } catch (e) { rows = []; }
     rows = rows.filter(r => typeof r.value === 'string' || isFinite(r.value));
     res.innerHTML = '<div class="h">Results</div>' + (rows.length
-      ? '<table>' + rows.map(r => '<tr><td>' + r.label + '</td><td class="v">' + fmt(r.value, r.dp) + '</td><td class="u">' + r.unit + '</td></tr>').join('') + '</table>'
+      ? '<table>' + rows.map(r => { const w = checkRow(r, state.sys, state.W); return '<tr' + (w ? ' class="over"' : '') + '><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v">' + fmt(r.value, r.dp) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>'
       : '<table><tr><td class="warn">Enter the values above.</td></tr></table>');
   }
   update();
@@ -117,6 +117,8 @@ async function boot() {
   const { instance } = await WebAssembly.instantiate(await resp.arrayBuffer(), {});
   state.W = instance.exports;
   $('#ver').textContent = 'v0.1.0';
+  refreshMachineSelect();
+  $('#machine').onchange = e => { Profiles.setActive(e.target.value); renderTool(); };
   renderList(); setUnits(state.sys);
   $('#search').oninput = e => renderList(e.target.value);
   document.querySelectorAll('#units button').forEach(b => b.onclick = () => setUnits(b.dataset.u));

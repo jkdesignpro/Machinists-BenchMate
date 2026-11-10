@@ -28,6 +28,9 @@ f1!(thread_pitch_dia_basic, c::thread_pitch_dia_basic, major, pitch);
 f1!(thread_best_wire, c::thread_best_wire, pitch);
 f1!(thread_three_wire_m, c::thread_three_wire_m, e, wire, pitch);
 
+f1!(spindle_power_available_kw, c::spindle_power_available_kw, rpm, p_max, t_max);
+f1!(torque_for_power_nm, c::torque_for_power_nm, p, rpm);
+
 /// X of hole `i` (0-based) on a bolt circle.
 #[no_mangle] pub extern "C" fn bolt_x(n: f64, dia: f64, start: f64, cx: f64, cy: f64, i: f64) -> f64 {
     c::bolt_circle(n as u32, dia, start, cx, cy)[i as usize].0 }

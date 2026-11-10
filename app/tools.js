@@ -1,7 +1,7 @@
 // Tool registry. Each tool: id, group, title, desc, fields(sys) -> [{id,label,unit,def}],
 // calc(v, W, sys) -> [{label,value,unit,dp}], working (string), source (string).
 // `W` is the Rust (WebAssembly) formula module; no formulas are duplicated in JS.
-const R = (label, value, unit, dp = 3) => ({ label, value, unit, dp });
+const R = (label, value, unit, dp = 3, chk, extra) => Object.assign({ label, value, unit, dp, chk }, extra || {});
 const lenU = s => (s === 'inch' ? 'in' : 'mm');
 const spdU = s => (s === 'inch' ? 'SFM' : 'm/min');
 const feedRevU = s => (s === 'inch' ? 'in/rev' : 'mm/rev');
@@ -18,7 +18,7 @@ const TOOLS = [
   ],
   calc: (v, W, s) => {
     const rows = [];
-    if (v.speed > 0 && v.dia > 0) rows.push(R('Spindle speed', s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia), 'RPM', 1));
+    if (v.speed > 0 && v.dia > 0) rows.push(R('Spindle speed', s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia), 'RPM', 1, 'rpm'));
     if (v.rpm > 0 && v.dia > 0) rows.push(R(s === 'inch' ? 'Surface speed at that RPM' : 'Cutting speed at that RPM', s === 'inch' ? W.sfm_from_rpm(v.rpm, v.dia) : W.vc_from_rpm(v.rpm, v.dia), spdU(s), 1));
     return rows;
   },
@@ -36,7 +36,7 @@ const TOOLS = [
   ],
   calc: (v, W, s) => {
     const rows = [];
-    if (v.rpm > 0 && v.z > 0 && v.fz > 0) rows.push(R('Table feed', W.table_feed(v.rpm, v.fz, v.z), feedMinU(s), 2));
+    if (v.rpm > 0 && v.z > 0 && v.fz > 0) rows.push(R('Table feed', W.table_feed(v.rpm, v.fz, v.z), feedMinU(s), 2, 'feed'));
     if (v.rpm > 0 && v.z > 0 && v.vf > 0) rows.push(R('Feed per tooth', W.feed_per_tooth(v.vf, v.rpm, v.z), lenU(s), 4));
     return rows;
   },
@@ -65,7 +65,7 @@ const TOOLS = [
     let q;
     if (s === 'inch') { q = W.mrr_turning_in3_min(v.speed, v.doc, v.f); rows.push(R('Material removal rate', q, 'in3/min', 3)); q = q * 16.387064; }
     else { q = W.mrr_turning_cm3_min(v.speed, v.doc, v.f); rows.push(R('Material removal rate', q, 'cm3/min', 2)); }
-    if (v.kc > 0 && v.eta > 0) { const kw = W.power_kw(q, v.kc, v.eta); rows.push(R('Power at the spindle', kw, 'kW', 2)); rows.push(R('Power at the spindle', kw * 1.34102, 'hp', 2)); }
+    if (v.kc > 0 && v.eta > 0) { const kw = W.power_kw(q, v.kc, v.eta); rows.push(R('Power at the spindle', kw, 'kW', 2, 'power_kw')); rows.push(R('Power at the spindle', kw * 1.34102, 'hp', 2)); }
     return rows;
   },
   working: 'Metric Q = Vc x ap x f (cm3/min). Inch Q = 12 x SFM x DOC x IPR. Power Pc = Q x kc / (60 000 x eta), Q in cm3/min, kc in N/mm2.',
@@ -175,6 +175,13 @@ const TOOLS = [
   },
   working: 'x = cx + (D/2) cos(a0 + 360 i / n), y = cy + (D/2) sin(a0 + 360 i / n). Angles measured counter-clockwise from +X.',
   source: "Machinery's Handbook (hole circles)",
+},
+{
+  id: 'machines', group: 'Setup', title: 'Machine profiles',
+  desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
+  render: el => renderMachines(el),
+  working: 'Power available at speed n: P(n) = min(P_max, T_max x 2 pi n / 60 000). Constant torque below base speed, constant power above it.',
+  source: 'Standard spindle power/torque characteristic [SAN]. Machine limits come from the builder\'s spec sheet or manual.',
 },
 {
   id: 'materials', group: 'Materials', title: 'Material equivalents',
