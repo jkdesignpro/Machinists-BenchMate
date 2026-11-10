@@ -68,8 +68,9 @@ Nothing was typed in from memory and no handbook was used. The formulas are in t
 
 ### Drill sizes
 - **[WIKI]** Wikipedia, "Drill bit sizes" (number and letter tables). https://en.wikipedia.org/wiki/Drill_bit_sizes (accessed 2026-11-10).
-- **[STOODY]** Stoody Industrial & Welding Supply, decimal equivalents, catalogue page 444. https://www.stoodyind.com/Catalogs/FISC/current/05catpg444.pdf (accessed 2026-11-10). This is the only source so far for the metric drill list, so those sizes are shown as One source.
+- **[STOODY]** Stoody Industrial & Welding Supply, decimal equivalents, catalogue page 444. https://www.stoodyind.com/Catalogs/FISC/current/05catpg444.pdf (accessed 2026-11-10). It was the first source for the metric drill list; MISUMI (below) confirms the 0.5 mm steps.
 - **[LOBBEN]** P. Lobben, *Machinists' and Draftsmen's Handbook* (1910, public domain), p. 148, Tables 19 and 20. https://runeberg.org/lobben/0168.html (accessed 2026-11-10).
+- **[MISUMI]** MISUMI USA, "Drill bit size chart" (blog), metric table in 0.5 mm steps from 0.5 to 20 mm. https://blog.misumiusa.com/drill-bit-size-chart/ (accessed 2026-11-10). It is the second source for those 40 metric sizes. The other metric sizes still have one source (Stoody).
 - Fractional sizes are n/64 in by definition and are shown as Exact.
 - Disagreements:
   - Letter K: Stoody prints .2610, the same as G and out of sequence. Wikipedia and Lobben print .281.
@@ -86,6 +87,12 @@ Nothing was typed in from memory and no handbook was used. The formulas are in t
   - https://www.engineersedge.com/calculators/theoretical_tapping_hole_size_16209.htm
   - https://www.engineersedge.com/calculators/hole_sizes_cold_form_tapping_metric_threads_16210.htm
   - **No forming-tap maker's own catalogue has confirmed this formula yet.**
+
+- **Forming taps against a tap maker:** Balax, a maker of thread forming taps, publishes "A Balax, Inc. Guide to Tapping in the 21st Century" (2011/2012). It prints hole sizes for 75, 65 and 55 % thread on p. 3 (0-80 to 3-48) and p. 20 (M0.7 to M1.4). Copy read at https://powelltoolsupplyinc.assets-ascend-prod.roccommercecloud.com/assets%2FProduction%2Fc43a93116cca1ca5638577fadbf11477/Balax_10725_Catalog.pdf (accessed 2026-11-10).
+  - Balax does not state a formula.
+  - Its holes are 0 to 0.0016 in larger than D - 0.0068 x % x P gives; one cell is 0.0002 in smaller (test `form_tap_vs_balax`).
+  - The 0.0068 rule is therefore labelled a rule of thumb, and the app tells users to use the tap maker's recommended hole.
+  - No maker catalogue was found that states the formula itself.
 
 ### Threads
 - **[WIKI_ISO]** Wikipedia, "ISO metric screw thread" (preferred sizes from ISO 262). https://en.wikipedia.org/wiki/ISO_metric_screw_thread (accessed 2026-11-10).
@@ -107,6 +114,23 @@ Nothing was typed in from memory and no handbook was used. The formulas are in t
 - **ASME B1.1 class 2A pitch-diameter tolerance:** with length of engagement LE = D, the formula reproduces all 30 American Fastener rows. LE = 5P, which MachiningDoctor (https://machiningdoctor.com/charts/unified-inch-threads-charts) gives as the default, does not.
 - Not computed yet: the minor-diameter limits of Unified internal threads.
 
+- **Unified class 2B, against [AF_2B]:** American Fastener, "Nuts: internal threads, class 2B", https://www.americanfastener.com/wp-content/uploads/2020/06/NUTS-INTERNAL-THREADS-%E2%80%93-CLASS-2B-AMERICAN-FASTENER.pdf (accessed 2026-11-10); 74 rows, used in tests.
+  - **Minor diameter rule.** The ASME B1.1 rule reproduces 71 of the 74 rows:
+    - minimum = basic minor diameter;
+    - tolerance = 0.25 P - 0.40 P^2 for 1/4 in and larger;
+    - tolerance = 0.05 P^(2/3) + 0.03 P/D - 0.002 below 1/4 in, kept between 0.120 P and 0.394 P;
+    - the basic minor diameter and the tolerance are each rounded to 0.0001 in, and the sum is rounded to 4 decimals up to No. 5 and to 3 decimals above.
+  - **The 3 rows it does not reproduce:**
+    - 3/8-24: maximum printed .0340, a digit error for .340.
+    - 1-14 UNS: a special series; the rule gives .939, the table prints .938.
+    - 1 3/4-5: minimum printed 1.534, where the basic minor diameter is 1.53349; the maximum agrees.
+  - **Pitch diameter.** TD2 = 1.3 x the *unrounded* 2A tolerance, added to E rounded to 0.0001. This reproduces 69 rows.
+    - BenchMate previously applied the factor to the rounded 2A tolerance, which was 0.0001 in off in 20 rows; this is now corrected.
+    - 1/4-20 and 1 7/8-8 sit on a rounding tie and are 0.0001 in off.
+    - 3 rows are digit errors in the table.
+  - **Classes 1A, 3A, 1B and 3B** use the standard's class factors and have not been compared with a published table; the app marks them "not checked". The 1B and 3B minor limits are not computed.
+- **Other ISO metric classes** (4h, 6e, 6f, 6h, 8g, 5H, 6G, 7H) are computed from the same ISO 965-1 formulas and are not checked against a published table. The app says so.
+
 ### ISO limits and fits
 - **[WIKI_IT]** Wikipedia, "IT Grade". https://en.wikipedia.org/wiki/IT_Grade (accessed 2026-11-10).
 - **[GANTER_IT]** Otto Ganter GmbH, DIN ISO 286 Grundtoleranzen. https://ganternorm.com/fileadmin/user_upload/downloads/technischer%20anhang/286_1.pdf (accessed 2026-11-10).
@@ -125,6 +149,72 @@ Nothing was typed in from memory and no handbook was used. The formulas are in t
   - Simply Bearings prints E7 over 315-400 mm as +185, but the rule gives +182. The tests treat it as a misprint.
   - Shaft k over 400-500 mm has only one source.
 - Not included: letters j and J (they are tabulated only and have no formula).
+
+## Pipe threads, Whitworth and BA threads (`data/refdata/threads-other-evidence.json`, `core/src/thread_forms.rs`)
+Same evidence model as above. Series values come from at least two publishers where found; dimensions that follow from a formula are computed and checked against the printed values in `core/src/thread_forms.rs`.
+
+### Standards cited (current editions, from catalogue listings found on 2026-11-10)
+- ISO 228-1:2000 (G, parallel; joint not made on the thread).
+- ISO 7-1:1994 with Cor 1:2007 (R, Rp, Rc; pressure-tight joint made on the thread; taper 1:16).
+- ASME B1.20.1-2013, reaffirmed 2018 (NPT), listed on asme.org. ANSI B2.1-1968 is its predecessor.
+- BS 84:2007 (Whitworth form; listed on the BSI knowledge site).
+- BS 93:2008 (BA). This edition is the one Wikipedia names; it was not found on BSI's catalogue in this session.
+
+### Publishers
+- **[WIKI_BSP]** Wikipedia, "British Standard Pipe". https://en.wikipedia.org/wiki/British_Standard_Pipe
+- **[ETB_BSP]** The Engineering ToolBox, "ISO 228 - Pipe threads where pressure tight joints are not made on the threads". https://engineeringtoolbox.com/iso-228-pipe-threads-d_2037.html
+- **[WIKI_NPT]** Wikipedia, "National pipe thread". https://en.wikipedia.org/wiki/National_pipe_thread
+- **[UWASHER_NPT]** Ultimate Washer Inc., NPT dimensions chart (credited to ANSI B2.1-1968). https://ultimatewasher.com/dimensionschart.htm
+- **[WIKI_BSW]** Wikipedia, "British Standard Whitworth". https://en.wikipedia.org/wiki/British_Standard_Whitworth
+- **[EE_WHIT]** Engineers Edge, Whitworth BSW and BSF chart. https://engineersedge.com/hardware/whitworth-screw-threads-chart.htm
+- **[BF_BSF]** British Fasteners, BSF table. https://britishfasteners.com/threads-bsf
+- **[WIKI_BA]** Wikipedia, "British Association screw threads". https://en.wikipedia.org/wiki/British_Association_screw_threads
+- **[BF_BA]** British Fasteners, BA table (inch). https://britishfasteners.com/threads-ba
+
+All were accessed 2026-11-10.
+
+### Findings
+- **NPT.** E0 = D - (0.050 D + 1.1) p, E1 = E0 + 0.0625 L1 and L2 = (0.80 D + 6.8) p reproduce every E1 and L2 that Wikipedia prints, 1/16 to 24 in.
+  - 1/16 is printed with D = .313; the published values come out with 0.3125.
+  - For 4 in, E1 = 4.387125 exactly: Wikipedia prints 4.38713 and Ultimate Washer prints 4.38712. The app shows these as Sources differ.
+- **BSP.** For G 1 3/4, Wikipedia prints 53.746 mm and The Engineering ToolBox prints 53.74 (all its other values are rounded, not cut). The app shows Sources differ.
+  - The Engineering ToolBox "minor (nut) diameter" column is not the basic minor diameter, so it is not compared.
+  - The ISO 7-1 gauge lengths come from one source so far.
+- **BSW/BSF.** Only TPI is compared between publishers; the diameters come from the BS 84 profile (h = 0.640327 P, r = 0.137329 P).
+  - Engineers Edge and British Fasteners print D - 2 x (h rounded to 0.0001 in), which differs from the exact formula in the last digit.
+  - Engineers Edge digit errors: BSW 1/8 minor .0903 (should be .0930); BSF 7/16 minor .3363 (should be .3663, as British Fasteners prints).
+  - An Engineers Edge row labelled 4 3/4 carries the 5 in dimensions; it is not used.
+- **BA.** BS 93 defines P = 0.9^n mm and D = 6 P^1.2 mm, both tabulated to two significant figures. This reproduces Wikipedia's table (0 to 10 BA and 25 BA). The TPI of the two publishers agree.
+  - British Fasteners' inch diameters differ slightly from the metric values converted (0 BA .2360 in, against 6.0 mm = .2362 in), so only TPI is compared.
+
+## Machine tapers (`data/refdata/tapers-evidence.json`)
+### Standards cited (current editions, from catalogue listings found on 2026-11-10)
+- ISO 296:1991 (self-holding tapers, Morse).
+- ISO 7388-1:2007 (7/24 shanks, forms A/AD/AF/U/UD/UF; reviewed and confirmed 2023 per the Indian adoption listing).
+- ISO 7388-2:2007 (forms J/JD/JF, the BT type).
+- ISO 7388-3:2016 (retention knobs AD, AF, UD, UF, JD, JF).
+- ISO 12164-1:2023 (HSK shanks of types A, AB, C, CB and EB; iso.org/standard/77916).
+- ASME B5.50-2015, reaffirmed 2025 (CAT 7/24 taper).
+- JIS B 6339 (BT): edition not confirmed.
+
+### Publishers
+- **[WIKI_MT]** Wikipedia, "Machine taper" (Morse, Jacobs, HSK, R8 in prose). https://en.wikipedia.org/wiki/Machine_taper
+- **[LMS]** Little Machine Shop, "Dimensions of standard tapers". https://littlemachineshop.com/pages/dimensions-of-standard-tapers
+- **[TNG]** Tools-n-Gizmos, taper specifications (credited to the Kennametal catalogue 7060). https://tools-n-gizmos.com/specs/Tapers.html
+- **[PARLEC]** Parlec catalogue p. 6, CAT and BT taper specifications. https://allindustrial.com/content/catalogs/vendors/parlec/files/basic-html/page6.html
+
+All were accessed 2026-11-10.
+
+### Findings
+- **Morse.** The gauge diameters and taper per foot agree between Wikipedia and Little Machine Shop for MT 0 to 7, except MT 4 1/2:
+  - large end: 1.4895 in (Wikipedia) against 1.5000 in (Little Machine Shop);
+  - taper: 1:19.128 against 0.6240 in/ft.
+  - Wikipedia's ratio is converted to taper per foot at 3 decimals for the comparison.
+- **Jacobs.** Small end, large end and length agree between the two publishers for every size.
+- **CAT and BT.** Gauge diameter, flange diameter and retention knob thread agree between Tools-n-Gizmos and Parlec where both print them.
+  - Tools-n-Gizmos prints the CAT 40 flange as "2.500 (63.05)", but 2.500 in is 63.50 mm.
+  - The ISO 7388-1 (SK) rows, HSK and R8 have one source so far; no free second publisher was found. Previews of the paid standards were not used.
+- **Pull studs.** Only the standard references and the thread sizes are given. Knob profiles differ between machine builders.
 
 ## Feature research
 - CNC Machinist Calculator Ultra: in-app menus viewed 2026-11-10 and public pages https://cncmachinistcalculatorultra.com/homePage , https://cncmachinistcalculatorultra.com/tools/machining-chatter , https://apps.apple.com/app/id6474093839 . Used only as a feature checklist.

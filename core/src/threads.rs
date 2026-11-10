@@ -224,7 +224,10 @@ pub fn un_pd_tol_2a_le(d: f64, p: f64, le: f64) -> f64 {
 /// `class`: 1, 2, 3 external (A); 11, 12, 13 internal (B).
 pub fn un_pd_tol(d: f64, p: f64, class: u32) -> f64 {
     let k = match class { 1 => 1.5, 2 => 1.0, 3 => 0.75, 11 => 1.95, 12 => 1.3, 13 => 0.975, _ => return f64::NAN };
-    k * round4(un_pd_tol_2a(d, p))
+    // External classes: the factor applies to Td2(2A) as tabulated (0.0001 in);
+    // internal classes: to the unrounded Td2(2A). This is the order that
+    // reproduces the published 2A and 2B tables (see the tests).
+    if class >= 11 { k * un_pd_tol_2a(d, p) } else { k * round4(un_pd_tol_2a(d, p)) }
 }
 
 /// Allowance (es) for classes 1A and 2A: `0.300 x Td2(2A)` (ASME B1.1);
@@ -240,6 +243,40 @@ pub fn un_major_tol(p: f64, class: u32) -> f64 {
 }
 
 fn round4(x: f64) -> f64 { (x * 10_000.0).round() / 10_000.0 }
+
+/// Round half up to `dp` decimals, guarding against binary representation
+/// (a tabulated 0.9385 must round to 0.939).
+fn round_half_up(x: f64, dp: i32) -> f64 {
+    let k = 10f64.powi(dp);
+    ((x * k) + 1e-7).round() / k
+}
+
+/// Minor diameter tolerance of a class 2B internal Unified thread (inch),
+/// ASME B1.1 rule: sizes 1/4 in and larger `0.25 P - 0.40 P^2`; smaller sizes
+/// `0.05 P^(2/3) + 0.03 P / D - 0.002`, kept between 0.120 P and 0.394 P.
+/// Rounded to 0.0001 in. This rule (with the rounding in [`un_minor_2b`])
+/// reproduces 71 of the 74 rows of a published class 2B table; see
+/// `unified_2b_minor_vs_published`.
+pub fn un_minor_tol_2b(d: f64, p: f64) -> f64 {
+    let t = if d >= 0.25 { 0.25 * p - 0.40 * p * p } else {
+        (0.05 * p.powf(2.0 / 3.0) + 0.03 * p / d - 0.002).clamp(0.120 * p, 0.394 * p)
+    };
+    round4(t)
+}
+
+/// Class 2B minor diameter limits (inch): `which` 0 min, 1 max. The minimum is
+/// the basic minor diameter D - 1.082532 P; the maximum is the basic minor
+/// diameter (to 0.0001) plus the tolerance. Tabulated to 4 decimals for sizes
+/// up to No. 5 (0.125 in) and to 3 decimals above, as the published tables are.
+pub fn un_minor_2b(d: f64, p: f64, which: u32) -> f64 {
+    let basic = thread_basic_minor_dia(d, p);
+    let dp = if d <= 0.125 + 1e-9 { 4 } else { 3 };
+    match which {
+        0 => round_half_up(basic, dp),
+        1 => round_half_up(round4(basic) + un_minor_tol_2b(d, p), dp),
+        _ => f64::NAN,
+    }
+}
 
 /// Unified thread limits, inch, rounded to 0.0001 in as tabulated in ASME B1.1.
 /// `which`: 0 major max, 1 major min, 2 pitch max, 3 pitch min. Internal
@@ -438,6 +475,222 @@ mod tests {
         assert_eq!(r40_steps(iso965_td1(2.5, 6), 450.0), 1.0);
     }
 
+    const AF_2B_MINOR: [(&str, f64, f64, f64, f64); 74] = [
+        ("0-80 UNF", 0.06, 80.0, 0.0465, 0.0514),
+        ("1-64 UNC", 0.073, 64.0, 0.0561, 0.0623),
+        ("1-72 UNF", 0.073, 72.0, 0.058, 0.0635),
+        ("2-56 UNC", 0.086, 56.0, 0.0667, 0.0737),
+        ("2-64 UNF", 0.086, 64.0, 0.0691, 0.0753),
+        ("3-48 UNC", 0.099, 48.0, 0.0764, 0.0845),
+        ("3-56 UNF", 0.099, 56.0, 0.0797, 0.0865),
+        ("4-40 UNC", 0.112, 40.0, 0.0849, 0.0939),
+        ("4-48 UNF", 0.112, 48.0, 0.0894, 0.0968),
+        ("5-40 UNC", 0.125, 40.0, 0.0979, 0.1062),
+        ("5-44 UNF", 0.125, 44.0, 0.1004, 0.1079),
+        ("6-32 UNC", 0.138, 32.0, 0.104, 0.114),
+        ("6-40 UNF", 0.138, 40.0, 0.111, 0.119),
+        ("8-32 UNC", 0.164, 32.0, 0.13, 0.139),
+        ("8-36 UNF", 0.164, 36.0, 0.134, 0.142),
+        ("10-24 UNC", 0.19, 24.0, 0.145, 0.156),
+        ("10-32 UNF", 0.19, 32.0, 0.156, 0.164),
+        ("12-24 UNC", 0.216, 24.0, 0.171, 0.181),
+        ("12-28 UNF", 0.216, 28.0, 0.177, 0.186),
+        ("1/4-20 UNC", 0.25, 20.0, 0.196, 0.207),
+        ("1/4-28 UNF", 0.25, 28.0, 0.211, 0.22),
+        ("5/16-18 UNC", 0.3125, 18.0, 0.252, 0.265),
+        ("5/16-24 UNF", 0.3125, 24.0, 0.267, 0.277),
+        ("3/8-16 UNC", 0.375, 16.0, 0.307, 0.321),
+        ("3/8-24 UNF", 0.375, 24.0, 0.33, 0.034),
+        ("7/16-14 UNC", 0.4375, 14.0, 0.36, 0.376),
+        ("7/16-20 UNF", 0.4375, 20.0, 0.383, 0.395),
+        ("1/2-13 UNC", 0.5, 13.0, 0.417, 0.434),
+        ("1/2-20 UNF", 0.5, 20.0, 0.446, 0.457),
+        ("9/16-12 UNC", 0.5625, 12.0, 0.472, 0.49),
+        ("9/16-18 UNF", 0.5625, 18.0, 0.502, 0.515),
+        ("5/8-11 UNC", 0.625, 11.0, 0.527, 0.546),
+        ("5/8-18 UNF", 0.625, 18.0, 0.565, 0.578),
+        ("3/4-10 UNC", 0.75, 10.0, 0.642, 0.663),
+        ("3/4-16 UNF", 0.75, 16.0, 0.682, 0.696),
+        ("7/8-9 UNC", 0.875, 9.0, 0.755, 0.778),
+        ("7/8-14 UNF", 0.875, 14.0, 0.798, 0.814),
+        ("1-8 UNC", 1.0, 8.0, 0.865, 0.89),
+        ("1-12 UNF", 1.0, 12.0, 0.91, 0.928),
+        ("1-14 UNS", 1.0, 14.0, 0.923, 0.938),
+        ("11/8-7 UNC", 1.125, 7.0, 0.97, 0.998),
+        ("11/8-8 UN", 1.125, 8.0, 0.99, 1.015),
+        ("11/812 UNF", 1.125, 12.0, 1.035, 1.053),
+        ("11/4-7 UNC", 1.25, 7.0, 1.095, 1.123),
+        ("11/4-8 UN", 1.25, 8.0, 1.115, 1.14),
+        ("11/4-12 UNF", 1.25, 12.0, 1.16, 1.178),
+        ("1 3/8-6 UNC", 1.375, 6.0, 1.195, 1.225),
+        ("1 3/8-8 UN", 1.375, 8.0, 1.24, 1.265),
+        ("1 3/8-12 UNF", 1.375, 12.0, 1.285, 1.303),
+        ("11/2-6 UNC", 1.5, 6.0, 1.32, 1.35),
+        ("11/2-8 UN", 1.5, 8.0, 1.365, 1.39),
+        ("11/2-12 UNC", 1.5, 12.0, 1.41, 1.428),
+        ("1 5/8-8 UN", 1.625, 8.0, 1.49, 1.515),
+        ("1 3/4-5 UNC", 1.75, 5.0, 1.534, 1.568),
+        ("1 3/4-8 UN", 1.75, 8.0, 1.615, 1.64),
+        ("1 7/8-8 UN", 1.875, 8.0, 1.74, 1.765),
+        ("2-41/2 UNC", 2.0, 4.5, 1.759, 1.795),
+        ("2-8 UN", 2.0, 8.0, 1.865, 1.89),
+        ("2 1/4-4.5 UNC", 2.25, 4.5, 2.009, 2.045),
+        ("2 1/4-8 UN", 2.25, 8.0, 2.115, 2.14),
+        ("2 1/2-4 UNC", 2.5, 4.0, 2.229, 2.267),
+        ("2 1/2-8 UN", 2.5, 8.0, 2.365, 2.39),
+        ("2 3/4-4 UNC", 2.75, 4.0, 2.479, 2.517),
+        ("2 3/4-8 UN", 2.75, 8.0, 2.615, 2.64),
+        ("3-4 UNC", 3.0, 4.0, 2.729, 2.767),
+        ("3-8 UN", 3.0, 8.0, 2.865, 2.89),
+        ("3 1/4-4 UNC", 3.25, 4.0, 2.979, 3.017),
+        ("31/4-8 UN", 3.25, 8.0, 3.115, 3.14),
+        ("3 1/2-4 UNC", 3.5, 4.0, 3.229, 3.267),
+        ("31/2-8 UN", 3.5, 8.0, 3.365, 3.39),
+        ("3 3/4-4 UNC", 3.75, 4.0, 3.479, 3.517),
+        ("3 3/4-8 UN", 3.75, 8.0, 3.615, 3.64),
+        ("4-4 UNC", 4.0, 4.0, 3.729, 3.767),
+        ("4-8 UN", 4.0, 8.0, 3.865, 3.89),
+    ];
+    const AF_2B_PITCH: [(&str, f64, f64, f64, f64); 74] = [
+        ("0-80 UNF", 0.06, 80.0, 0.0519, 0.0542),
+        ("1-64 UNC", 0.073, 64.0, 0.0629, 0.0655),
+        ("1-72 UNF", 0.073, 72.0, 0.064, 0.0665),
+        ("2-56 UNC", 0.086, 56.0, 0.0744, 0.0772),
+        ("2-64 UNF", 0.086, 64.0, 0.0759, 0.0786),
+        ("3-48 UNC", 0.099, 48.0, 0.0855, 0.0885),
+        ("3-56 UNF", 0.099, 56.0, 0.0874, 0.0902),
+        ("4-40 UNC", 0.112, 40.0, 0.0958, 0.0991),
+        ("4-48 UNF", 0.112, 48.0, 0.0985, 0.1016),
+        ("5-40 UNC", 0.125, 40.0, 0.1088, 0.1121),
+        ("5-44 UNF", 0.125, 44.0, 0.1102, 0.1134),
+        ("6-32 UNC", 0.138, 32.0, 0.1177, 0.1214),
+        ("6-40 UNF", 0.138, 40.0, 0.1218, 0.1252),
+        ("8-32 UNC", 0.164, 32.0, 0.1437, 0.1475),
+        ("8-36 UNF", 0.164, 36.0, 0.146, 0.1496),
+        ("10-24 UNC", 0.19, 24.0, 0.1629, 0.1672),
+        ("10-32 UNF", 0.19, 32.0, 0.1697, 0.1736),
+        ("12-24 UNC", 0.216, 24.0, 0.1889, 0.1933),
+        ("12-28 UNF", 0.216, 28.0, 0.1928, 0.197),
+        ("1/4-20 UNC", 0.25, 20.0, 0.2175, 0.2224),
+        ("1/4-28 UNF", 0.25, 28.0, 0.2268, 0.2311),
+        ("5/16-18 UNC", 0.3125, 18.0, 0.2764, 0.2817),
+        ("5/16-24 UNF", 0.3125, 24.0, 0.2854, 0.2902),
+        ("3/8-16 UNC", 0.375, 16.0, 0.3344, 0.3401),
+        ("3/8-24 UNF", 0.375, 24.0, 0.3479, 0.3528),
+        ("7/16-14 UNC", 0.4375, 14.0, 0.3911, 0.3972),
+        ("7/16-20 UNF", 0.4375, 20.0, 0.405, 0.4104),
+        ("1/2-13 UNC", 0.5, 13.0, 0.45, 0.4565),
+        ("1/2-20 UNF", 0.5, 20.0, 0.4675, 0.4731),
+        ("9/16-12 UNC", 0.5625, 12.0, 0.5084, 0.5152),
+        ("9/16-18 UNF", 0.5625, 18.0, 0.5264, 0.5323),
+        ("5/8-11 UNC", 0.625, 11.0, 0.566, 0.5732),
+        ("5/8-18 UNF", 0.625, 18.0, 0.5889, 0.5949),
+        ("3/4-10 UNC", 0.75, 10.0, 0.685, 0.6927),
+        ("3/4-16 UNF", 0.75, 16.0, 0.7094, 0.7159),
+        ("7/8-9 UNC", 0.875, 9.0, 0.8028, 0.811),
+        ("7/8-14 UNF", 0.875, 14.0, 0.8286, 0.8356),
+        ("1-8 UNC", 1.0, 8.0, 0.9188, 0.9276),
+        ("1-12 UNF", 1.0, 12.0, 0.9459, 0.9535),
+        ("1-14 UNS", 1.0, 14.0, 0.9536, 0.9609),
+        ("11/8-7 UNC", 1.125, 7.0, 1.322, 1.0416),
+        ("11/8-8 UN", 1.125, 8.0, 1.0438, 0.0528),
+        ("11/812 UNF", 1.125, 12.0, 1.0709, 1.0787),
+        ("11/4-7 UNC", 1.25, 7.0, 1.1572, 1.668),
+        ("11/4-8 UN", 1.25, 8.0, 1.1688, 1.178),
+        ("11/4-12 UNF", 1.25, 12.0, 1.1959, 1.2039),
+        ("1 3/8-6 UNC", 1.375, 6.0, 1.2667, 1.2771),
+        ("1 3/8-8 UN", 1.375, 8.0, 1.2938, 1.3031),
+        ("1 3/8-12 UNF", 1.375, 12.0, 1.3209, 1.3291),
+        ("11/2-6 UNC", 1.5, 6.0, 1.3917, 1.4022),
+        ("11/2-8 UN", 1.5, 8.0, 1.4188, 1.4283),
+        ("11/2-12 UNC", 1.5, 12.0, 1.4459, 1.4542),
+        ("1 5/8-8 UN", 1.625, 8.0, 1.5438, 1.5535),
+        ("1 3/4-5 UNC", 1.75, 5.0, 1.6201, 1.6317),
+        ("1 3/4-8 UN", 1.75, 8.0, 1.6688, 1.6786),
+        ("1 7/8-8 UN", 1.875, 8.0, 1.7938, 1.8038),
+        ("2-41/2 UNC", 2.0, 4.5, 1.8557, 1.8681),
+        ("2-8 UN", 2.0, 8.0, 1.9188, 1.9289),
+        ("2 1/4-4.5 UNC", 2.25, 4.5, 2.1057, 2.1183),
+        ("2 1/4-8 UN", 2.25, 8.0, 2.1688, 2.1792),
+        ("2 1/2-4 UNC", 2.5, 4.0, 2.3376, 2.3511),
+        ("2 1/2-8 UN", 2.5, 8.0, 2.4188, 2.4294),
+        ("2 3/4-4 UNC", 2.75, 4.0, 2.5876, 2.6013),
+        ("2 3/4-8 UN", 2.75, 8.0, 2.6688, 2.6796),
+        ("3-4 UNC", 3.0, 4.0, 2.8376, 2.8515),
+        ("3-8 UN", 3.0, 8.0, 2.9188, 2.9299),
+        ("3 1/4-4 UNC", 3.25, 4.0, 3.0876, 3.1017),
+        ("31/4-8 UN", 3.25, 8.0, 3.1688, 3.1801),
+        ("3 1/2-4 UNC", 3.5, 4.0, 3.3376, 3.3519),
+        ("31/2-8 UN", 3.5, 8.0, 3.4188, 3.4303),
+        ("3 3/4-4 UNC", 3.75, 4.0, 3.5876, 3.6021),
+        ("3 3/4-8 UN", 3.75, 8.0, 3.6688, 3.6805),
+        ("4-4 UNC", 4.0, 4.0, 3.8376, 3.8523),
+        ("4-8 UN", 4.0, 8.0, 3.9188, 3.9307),
+    ];
+    /// Balax (a forming-tap maker), "A Balax, Inc. Guide to Tapping in the 21st
+    /// Century" (2011/2012), p. 3 and p. 20: hole sizes for 75 / 65 / 55 %
+    /// thread for its thread forming taps, miniature sizes (inch). The maker
+    /// does not state its formula. The D - 0.0068 x % / TPI rule published by
+    /// FM Carbide and Engineers Edge gives holes 0 to 0.0016 in smaller than
+    /// Balax prints (one cell 0.0002 in larger), so it is an approximation of
+    /// the maker's practice, not its formula.
+    /// American Fastener, "Nuts: internal threads, class 2B" (accessed
+    /// 2026-11-10): minor diameter min and max. Three rows are not reproduced:
+    /// 3/8-24 max printed .0340 (a digit error for .340), 1-14 UNS (special
+    /// series; the rule gives .939 against .938 printed) and 1 3/4-5 min
+    /// printed 1.534 (basic minor 1.53349; the max 1.568 agrees).
+    /// Same American Fastener class 2B table: pitch diameter min and max.
+    /// Printed digit errors: 1 1/8-7 min 1.3220 (1.0322), 1 1/8-8 max 0.0528
+    /// (1.0528), 1 1/4-7 max 1.6680 (1.1668). Two rows sit on a rounding tie
+    /// of the unrounded tolerance and differ by 0.0001 in: 1/4-20 (.2224
+    /// printed, E + TD2 = .222350) and 1 7/8-8 (1.8038 printed).
+    #[test] fn unified_2b_pitch_vs_published() {
+        let misprint = ["11/8-7 UNC", "11/8-8 UN", "11/4-7 UNC"];
+        let tie = ["1/4-20 UNC", "1 7/8-8 UN"];
+        let mut n = 0;
+        for (name, d, tpi, pmin, pmax) in AF_2B_PITCH {
+            let p = 1.0 / tpi;
+            if misprint.contains(&name) { continue; }
+            close(un_limit(d, p, 12, 3), pmin, 1e-9);
+            if tie.contains(&name) { close(un_limit(d, p, 12, 2), pmax, 1.0001e-4); continue; }
+            close(un_limit(d, p, 12, 2), pmax, 1e-9);
+            n += 1;
+        }
+        assert_eq!(n, 69);
+    }
+
+    #[test] fn unified_2b_minor_vs_published() {
+        let skip = ["3/8-24 UNF", "1-14 UNS", "1 3/4-5 UNC"];
+        let mut n = 0;
+        for (name, d, tpi, mn, mx) in AF_2B_MINOR {
+            let p = 1.0 / tpi;
+            if skip.contains(&name) { continue; }
+            close(un_minor_2b(d, p, 0), mn, 1e-9);
+            close(un_minor_2b(d, p, 1), mx, 1e-9);
+            n += 1;
+        }
+        assert_eq!(n, 71);
+        // the exceptions, as recorded
+        close(un_minor_2b(0.375, 1.0 / 24.0, 1), 0.340, 1e-9);
+        close(un_minor_2b(1.0, 1.0 / 14.0, 1), 0.939, 1e-9);
+        close(un_minor_2b(1.75, 0.2, 0), 1.533, 1e-9);
+        close(un_minor_2b(1.75, 0.2, 1), 1.568, 1e-9);
+    }
+
+    #[test] fn form_tap_vs_balax() {
+        let rows: [(f64, f64, [f64; 3]); 9] = [
+            (0.060, 80.0, [0.0546, 0.0552, 0.0558]), (0.073, 64.0, [0.066, 0.067, 0.068]), (0.073, 72.0, [0.067, 0.068, 0.069]),
+            (0.086, 56.0, [0.078, 0.079, 0.080]), (0.086, 64.0, [0.079, 0.080, 0.081]), (0.099, 48.0, [0.090, 0.091, 0.092]),
+            (1.0 / 25.4, 101.6, [0.0348, 0.0353, 0.0358]), (1.2 / 25.4, 101.6, [0.0427, 0.0432, 0.0437]), (1.4 / 25.4, 25.4 / 0.3, [0.0493, 0.0499, 0.0505]),
+        ];
+        for (d, tpi, holes) in rows {
+            for (i, pct) in [75.0, 65.0, 55.0].into_iter().enumerate() {
+                let diff = holes[i] - tap_drill_form(d, 1.0 / tpi, pct);
+                assert!((-0.0003..=0.0017).contains(&diff), "D {d} TPI {tpi} {pct}%: Balax {} formula diff {diff}", holes[i]);
+            }
+        }
+    }
+
     #[test] fn r40_rounding() {
         close(round_r40_um(130.18), 132.0, 0.0);
         close(round_r40_um(233.3), 236.0, 0.0);
@@ -463,8 +716,11 @@ pub fn iso965_value_f(d: f64, p: f64, grade: f64, what: f64) -> f64 {
 }
 
 /// f64 interface for WebAssembly: see [`un_limit`]; `which` 4 = PD tolerance,
+/// 6, 7 = class 2B minor diameter min, max (other classes NaN),
 /// 5 = allowance.
 pub fn un_limit_f(d: f64, p: f64, class: f64, which: f64) -> f64 {
     let c = class as u32;
-    match which as i32 { 4 => round4(un_pd_tol(d, p, c)), 5 => un_allowance(d, p, c), w => un_limit(d, p, c, w as u32) }
+    match which as i32 { 4 => round4(un_pd_tol(d, p, c)), 5 => un_allowance(d, p, c),
+                         6 if c == 12 => un_minor_2b(d, p, 0), 7 if c == 12 => un_minor_2b(d, p, 1), 6 | 7 => f64::NAN,
+                         w => un_limit(d, p, c, w as u32) }
 }

@@ -157,3 +157,8 @@ f1!(frac_nearest_num, c::frac_nearest_num, x, den);
 f1!(mixed_to_decimal, c::mixed_to_decimal, whole, num, den);
 #[no_mangle] pub extern "C" fn frac_reduce(num: f64, den: f64, which: f64) -> f64 {
     let (a, b) = c::frac_reduce(num, den); if which == 0.0 { a } else { b } }
+// Other thread forms (core/src/thread_forms.rs)
+f1!(whitworth_value, c::whitworth_value_f, d, p, what);
+f1!(ba_value, c::ba_value_f, n, what);
+f1!(npt_value, c::npt_value_f, d, p, l1, what);
+f1!(round_sig, c::round_sig_f, x, sig);
