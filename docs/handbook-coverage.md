@@ -23,9 +23,12 @@ Checklist books (names only, never quoted):
 - **[EBB]** Pat Rapp, Engineers Black Book, 2nd ed., 2004.
 - **[CNCH]** CNC Machining for Engineers and Makers (course handbook).
 
-Status: **built** = in the app; **planned** = to build. Book topics outside
-machining (careers, thermodynamics, aerodynamics, pressure vessels and similar)
-are not part of BenchMate.
+Status (re-checked against the code on 2026-11-10; `parity-audit.md`
+sections 2-5 list every book's contents line by line): **built** = in the app
+and working; **partial** = in the app but covers only part of the topic;
+**missing** = not in the app yet, with "in progress" when an unmerged branch is
+building it. Book topics outside machining (careers, thermodynamics,
+aerodynamics, pressure vessels and similar) are not part of BenchMate.
 
 ## Currency check
 
@@ -52,28 +55,28 @@ current practice and says so in the tool's notes.
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
-| Spindle speed, feed, chip load, MRR, power | MH31 EBB | built | [MH] formulas, [SAN] |
+| Spindle speed, feed, chip load, MRR, power | MH31 EBB | partial (formulas built; power needs kc entered by hand, no kc table) | [MH] formulas, [SAN] |
 | Tool life, cost per part (Taylor, Gilbert) | MH31 | built | [TAY] [GIL] |
 | Cut optimiser, tool deflection | MH31 EDB | built | [GERE] [ROARK] |
 | Arc and helix feed, ramping | CNCH | built | geometry |
-| Chip thinning, radial engagement | MH31 | planned | geometry, own derivation |
-| Turning surface finish, cut time, taper | MH31 EBB | built | geometry |
-| Speeds and feeds starting values by material | MH31 EBB | planned | manufacturer catalogues (Sandvik, Kennametal, Guhring, OSG, Dormer Pramet free PDFs) via the vendor import, never book tables |
-| Drilling: point length, thrust, torque, peck | MH31 EBB | partial | geometry; thrust/torque from manufacturer formulas |
-| Reaming allowances | MH31 | planned | manufacturer data |
-| Grinding: wheel speed, marking system, dressing | MH31 EBB | planned | ISO 525 / ANSI B74.13 (cited), wheel maker guides (Norton, Tyrolit) |
-| Micromachining | MH31 | planned | manufacturer data |
-| Band saw and hacksaw blade selection | EBB | planned | blade maker guides |
-| Cutting fluids, refractometer concentration | MH31 EBB | built (concentration from Brix x the fluid's factor, mix and top-up; branch `claude/shop-helpers`) | fluid maker data sheets; docs/shop-helpers.md |
-| Machining non-ferrous and plastics | MH31 | planned | material supplier machining guides |
-| EDM (wire and sinker) basics | MH31 | planned | public process guides |
-| Knurling: diameter for pitch | MH31 EBB | planned | ANSI B94.6 (cited), knurl maker data |
-| Broaching | MH31 | planned | geometry, maker data |
-| Indexing (dividing head, rotary table) | EBB | built (branch `claude/geometry`): simple, angular, differential with user plates and gears | US Navy Machinery Repairman ch. 7 (public domain); docs/geometry.md |
-| Sine bar, sine plate, gauge block stack | MH31 EBB | built (branch `claude/geometry`): sine bar height/angle, fewest-block stack; metric 112 and inch 81 sets confirmed by two makers | Mitutoyo, Insize, Starrett listings; docs/geometry.md |
-| CNC: coordinates, work offsets, G/M codes per control | MH31 CNCH EBB | planned | control makers' public manuals; generic profile from ISO 6983 (cited) |
-| CNC: 2D/3D toolpath concepts, setups | CNCH | planned | own explanations |
-| Shop safety notes | CNCH | planned | HSE / OSHA public guidance |
+| Chip thinning, radial engagement | MH31 | partial (hm and hex in `cutopt`; no compensated feed) | geometry, own derivation |
+| Turning surface finish, cut time, taper | MH31 EBB | partial (finish and taper built; cut time is one pass at fixed RPM, no CSS, no taper set-over) | geometry |
+| Speeds and feeds starting values by material | MH31 EBB | missing | manufacturer catalogues (Sandvik, Kennametal, Guhring, OSG, Dormer Pramet free PDFs) via the vendor import, never book tables |
+| Drilling: point length, thrust, torque, peck | MH31 EBB | partial (point length only) | geometry; thrust/torque from manufacturer formulas |
+| Reaming allowances | MH31 | missing | manufacturer data |
+| Grinding: wheel speed, marking system, dressing | MH31 EBB | missing | ISO 525 / ANSI B74.13 (cited), wheel maker guides (Norton, Tyrolit) |
+| Micromachining | MH31 | missing | manufacturer data |
+| Band saw and hacksaw blade selection | EBB | missing | blade maker guides |
+| Cutting fluids, refractometer concentration | MH31 EBB | partial (concentration from Brix x the fluid's factor, mix and top-up built; fluid selection missing) | fluid maker data sheets; docs/shop-helpers.md |
+| Machining non-ferrous and plastics | MH31 | missing | material supplier machining guides |
+| EDM (wire and sinker) basics | MH31 | missing | public process guides |
+| Knurling: diameter for pitch | MH31 EBB | missing | ANSI B94.6 (cited), knurl maker data |
+| Broaching | MH31 | missing | geometry, maker data |
+| Indexing (dividing head, rotary table) | EBB | missing (in progress on `claude/geometry`) | own derivation (40:1 ratio arithmetic) |
+| Sine bar, sine plate, gauge block stack | MH31 EBB | missing (in progress on `claude/geometry`) | geometry; gauge sets from ISO 3650 / maker lists |
+| CNC: coordinates, work offsets, G/M codes per control | MH31 CNCH EBB | missing | control makers' public manuals; generic profile from ISO 6983 (cited) |
+| CNC: 2D/3D toolpath concepts, setups | CNCH | missing | own explanations |
+| Shop safety notes | CNCH | missing | HSE / OSHA public guidance |
 
 ## Tooling
 
@@ -81,95 +84,95 @@ current practice and says so in the tool's notes.
 |---|---|---|---|
 | Drill sizes: fractional, letter, number, metric, decimal chart | EBB MH31 | built | ASME B94.11M / ISO 235 (cited); number/letter sizes are public facts, cross-checked against several maker charts |
 | Tap drill sizes (cut and form taps), percent thread | EBB MH31 | built | formulas from thread standards; form-tap formula from tap makers |
-| Broken tap removal, screw extractor drill sizes | EBB | planned | maker data |
-| Thread chasers | EBB | planned | maker data |
-| Drill point geometry by material, grinding faults | EBB MH31 | planned | own diagrams, maker data |
-| End mill types, cutter geometry | EBB MH31 | planned | own explanations |
-| Carbide grades, ISO P/M/K/N/S/H groups | EBB MH31 | planned | ISO 513 (cited), maker grade charts |
-| Insert designation (ISO 1832) and holder designation (ISO 5608) | EBB | planned | decoder built from the code structure, cited |
-| Tool coatings | EBB | planned | coating maker data (Oerlikon Balzers, Ionbond) |
-| Tool steels and cutting tool materials | MH31 EBB | planned | supplier data |
-| Tapers: Morse, Jacobs, ISO/SK, BT, CAT, HSK, R8 | EBB MH31 | built: Morse, Jacobs, CAT and BT checked against two publishers; ISO/SK, HSK-A and R8 one source so far | standards cited (ISO 296, DIN 238, ISO 7388, ISO 12164, JIS B 6339, ASME B5.50), dimensions cross-checked against maker data |
-| Pull studs and retention knobs | EBB | planned | maker data, cited standards |
-| Collets (ER sizes and ranges) | MH31 | planned | ISO 15488 (cited), maker data |
-| Burrs, mounted points, files | EBB MH31 | planned | maker data |
-| Hole saws | EBB | planned | maker data |
-| Tool sharpening and wear | MH31 | planned | own explanations |
+| Broken tap removal, screw extractor drill sizes | EBB | missing | maker data |
+| Thread chasers | EBB | missing | maker data |
+| Drill point geometry by material, grinding faults | EBB MH31 | missing | own diagrams, maker data |
+| End mill types, cutter geometry | EBB MH31 | missing | own explanations |
+| Carbide grades, ISO P/M/K/N/S/H groups | EBB MH31 | partial (ISO group shown per work material; no grade chart) | ISO 513 (cited), maker grade charts |
+| Insert designation (ISO 1832) and holder designation (ISO 5608) | EBB | missing (insert codes in progress on `claude/ref-data-3`) | decoder built from the code structure, cited |
+| Tool coatings | EBB | missing | coating maker data (Oerlikon Balzers, Ionbond) |
+| Tool steels and cutting tool materials | MH31 EBB | partial (10 tool-steel grades in material equivalents; no selection or heat-treatment data) | supplier data |
+| Tapers: Morse, Jacobs, ISO/SK, BT, CAT, HSK, R8 | EBB MH31 | partial: Morse, Jacobs, CAT and BT checked against two publishers; ISO/SK, HSK-A and R8 one source so far; Brown & Sharpe, Jarno, British and DIN metric tapers missing | standards cited (ISO 296, DIN 238, ISO 7388, ISO 12164, JIS B 6339, ASME B5.50), dimensions cross-checked against maker data |
+| Pull studs and retention knobs | EBB | partial (standard references only, no dimensions) | maker data, cited standards |
+| Collets (ER sizes and ranges) | MH31 | missing (R8 only, under tapers) | ISO 15488 (cited), maker data |
+| Burrs, mounted points, files | EBB MH31 | missing | maker data |
+| Hole saws | EBB | missing | maker data |
+| Tool sharpening and wear | MH31 | missing | own explanations |
 
 ## Threads
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
-| Thread over wires | MH31 | built | [MH] wire formula, ISO 68-1 |
+| Thread over wires | MH31 | partial (60-degree threads, lead angle neglected; no ACME or Whitworth wires) | [MH] wire formula, ISO 68-1 |
 | Unified (UNC/UNF/UNEF/UN), all classes | MH31 EBB | partial: basic dimensions; 2A and 2B (including 2B minor) checked against published tables; 1A/3A/1B/3B computed, not checked; no 1B/3B minor limits | ASME B1.1 formulas (cited), values computed and cross-checked |
 | ISO metric coarse/fine, tolerance classes | MH31 EBB | partial: coarse/fine basic dimensions, 6g/6H checked; 4h, 6e, 6f, 6h, 8g, 5H, 6G, 7H computed, not checked | ISO 68-1, ISO 261, ISO 965 (cited), computed |
-| BSW, BSF, BA, BSP (G and R), NPT, NPTF | EBB MH31 | built for BSW, BSF, BA, BSP and NPT basic dimensions; NPTF and tolerances not yet | BS 84, BS 93, ISO 228, ISO 7, ASME B1.20.1 (cited) |
-| ACME, stub ACME, trapezoidal, buttress | MH31 | planned | ASME B1.5, ISO 2904, ASME B1.9 (cited) |
-| Thread forms overview and symbols | EBB | planned | own diagrams |
-| Single-point threading: infeed, passes | MH31 | planned | insert maker guides |
-| Thread milling | MH31 | planned | own derivation, maker guides |
-| Thread rolling blank diameter | MH31 | planned | maker data |
-| Helical coil inserts (tap sizes) | MH31 | planned | insert maker data |
+| BSW, BSF, BA, BSP (G and R), NPT, NPTF | EBB MH31 | partial: BSW, BSF, BA, BSP and NPT basic dimensions built; NPTF and tolerances missing | BS 84, BS 93, ISO 228, ISO 7, ASME B1.20.1 (cited) |
+| ACME, stub ACME, trapezoidal, buttress | MH31 | missing | ASME B1.5, ISO 2904, ASME B1.9 (cited) |
+| Thread forms overview and symbols | EBB | missing | own diagrams |
+| Single-point threading: infeed, passes | MH31 | missing | insert maker guides |
+| Thread milling | MH31 | missing | own derivation, maker guides |
+| Thread rolling blank diameter | MH31 | missing | maker data |
+| Helical coil inserts (tap sizes) | MH31 | missing | insert maker data |
 
 ## Dimensioning, fits and inspection
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
 | **GD&T: symbols, datums, modifiers, tolerance zones, bonus tolerance, virtual condition** | MH31 EDB | built (guide, frame builder, calculators; see docs/gdt.md) | see "GD&T" below |
-| ISO limits and fits (IT grades, all hole/shaft deviations) | MH31 EBB EDB | built: up to 500 mm, without j/J | ISO 286-1 formulas (cited), computed and checked |
-| ANSI preferred fits (RC, LC, LT, LN, FN) | MH31 | planned | ANSI B4.1 (cited) |
-| General tolerances (ISO 2768) | EDB | planned | ISO 2768 (cited) |
-| Surface texture: Ra/Rz, symbols, process ranges, N grades | MH31 EBB EDB | partial | ISO 21920 / ISO 1302, ASME B46.1 (cited) |
-| Measuring: micrometer, vernier, dial reading | MH31 | planned | own explanations |
-| Temperature compensation of measurements | MH31 | planned | thermal expansion data with sources |
+| ISO limits and fits (IT grades, all hole/shaft deviations) | MH31 EBB EDB | partial: up to 500 mm, without j/J | ISO 286-1 formulas (cited), computed and checked |
+| ANSI preferred fits (RC, LC, LT, LN, FN) | MH31 | missing | ANSI B4.1 (cited) |
+| General tolerances (ISO 2768) | EDB | missing | ISO 2768 (cited) |
+| Surface texture: Ra/Rz, symbols, process ranges, N grades | MH31 EBB EDB | partial (theoretical turning Ra/Rt only; conversions, symbols and process ranges in progress on `claude/ref-data-3`) | ISO 21920 / ISO 1302, ASME B46.1 (cited) |
+| Measuring: micrometer, vernier, dial reading | MH31 | missing | own explanations |
+| Temperature compensation of measurements | MH31 | built (`tempcomp`) | thermal expansion data with sources |
 | Statistics: Cpk, SPC, tolerance stack (worst case, RSS) | MH31 | partial (1D worst-case and RSS stack; Cp/Cpk/Pp/Ppk with histogram; control charts still to do) | stack: Accendo, Five Flute (docs/gdt.md); Cpk/SPC: NIST/SEMATECH e-Handbook (public domain) |
-| Hardness conversion | EBB MH31 | planned | ASTM E140 / ISO 18265 (cited); conversion values cross-checked |
-| Drawing standards and abbreviations | EBB EDB | planned | own wording, ISO 128 / ASME Y14 cited |
+| Hardness conversion | EBB MH31 | missing (in progress on `claude/ref-data-3`) | ASTM E140 / ISO 18265 (cited); conversion values cross-checked |
+| Drawing standards and abbreviations | EBB EDB | missing | own wording, ISO 128 / ASME Y14 cited |
 
 ## Mathematics and geometry
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
 | Bolt circle, hole coordinates | EBB | built | geometry |
-| Right and oblique triangles | MH31 EBB | built (branch `claude/geometry`) incl. the ambiguous SSA case | trigonometry |
-| Chords, segments, arcs, tangent points | MH31 EBB | built (branch `claude/geometry`): arc solver, 3-point circle, corner and line-arc fillets, dovetail and V-groove over pins | geometry |
-| Plane area and solid volume, weight | MH31 EBB | partial (stock sections and weight built; general solids still to do) | geometry, densities from supplier data |
-| Bar, tube and sheet weights | EBB | built (branch `claude/geometry`) | geometry × cited density |
-| Sheet gauges, bend allowance, K-factor | EBB MH31 | partial (bend allowance, setback, deduction, K from a test bend built; gauge tables still to do) | gauge tables from public standards; bend formula |
+| Right and oblique triangles | MH31 EBB | missing (in progress on `claude/geometry`) | trigonometry |
+| Chords, segments, arcs, tangent points | MH31 EBB | missing (in progress on `claude/geometry`) | geometry |
+| Plane area and solid volume, weight | MH31 EBB | missing (stock weight in progress on `claude/geometry`) | geometry, densities from supplier data |
+| Bar, tube and sheet weights | EBB | partial (round/hex/square bar in the bar stock planner with your density; full tool in progress on `claude/geometry`) | geometry × cited density |
+| Sheet gauges, bend allowance, K-factor | EBB MH31 | missing (bend allowance in progress on `claude/geometry`) | gauge tables from public standards; bend formula |
 | Fractions, decimals, unit conversions | EBB MH31 | partial (fraction / decimal / mm converter built) | NIST SP 811 (public domain) |
-| Engineering economics (payback, hourly rate) | MH31 | planned | standard formulas |
+| Engineering economics (payback, hourly rate) | MH31 | missing | standard formulas |
 
 ## Mechanics and machine elements
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
-| Beams, deflection, stress, torsion, columns | MH31 EDB | planned | [GERE] [ROARK]; public-domain MIL-HDBK-5 era formulas |
-| Bolt torque and preload, grade marks | EBB MH31 EDB | planned | VDI 2230 method (cited), ISO 898-1, SAE J429 |
-| Spanner and socket sizes | EBB | planned | ISO 272, ASME B18.2 (cited) |
-| Screw heads, drives, cap and set screws | EBB MH31 | planned | ISO 4762 etc. (cited), own drawings |
-| Keys and keyways | EBB MH31 | planned | DIN 6885 / BS 4235 / ASME B17.1 (cited) |
-| T-slots | EBB MH31 | planned | ISO 299 / DIN 650 (cited) |
-| Spur gears, gear trains, splines | EBB MH31 EDB | planned | ISO 53, ISO 54, AGMA public formulas; ANSI B92.1 (cited) |
-| Belt and pulley, chains | EBB MH31 EDB | planned | ISO 4183, maker data |
-| Bearings: life (L10), fits | MH31 EDB | planned | ISO 281 formula (cited), bearing maker data |
-| O-rings, seals | MH31 EDB | planned | AS568 / ISO 3601 (cited), maker groove guides |
-| Retaining rings, pins, rivets, inserts | MH31 | planned | cited standards, maker data |
-| Springs | MH31 | planned | standard spring formulas |
-| Adhesives and sealants | EBB MH31 | planned | maker guides |
-| Shaft alignment | MH31 | planned | own derivation |
-| Electric motors (power, torque, speed) | MH31 | planned | formulas |
-| Fluid power basics | MH31 | planned | formulas |
+| Beams, deflection, stress, torsion, columns | MH31 EDB | missing | [GERE] [ROARK]; public-domain MIL-HDBK-5 era formulas |
+| Bolt torque and preload, grade marks | EBB MH31 EDB | missing | VDI 2230 method (cited), ISO 898-1, SAE J429 |
+| Spanner and socket sizes | EBB | missing | ISO 272, ASME B18.2 (cited) |
+| Screw heads, drives, cap and set screws | EBB MH31 | missing | ISO 4762 etc. (cited), own drawings |
+| Keys and keyways | EBB MH31 | missing | DIN 6885 / BS 4235 / ASME B17.1 (cited) |
+| T-slots | EBB MH31 | missing | ISO 299 / DIN 650 (cited) |
+| Spur gears, gear trains, splines | EBB MH31 EDB | missing | ISO 53, ISO 54, AGMA public formulas; ANSI B92.1 (cited) |
+| Belt and pulley, chains | EBB MH31 EDB | missing | ISO 4183, maker data |
+| Bearings: life (L10), fits | MH31 EDB | missing | ISO 281 formula (cited), bearing maker data |
+| O-rings, seals | MH31 EDB | missing | AS568 / ISO 3601 (cited), maker groove guides |
+| Retaining rings, pins, rivets, inserts | MH31 | missing | cited standards, maker data |
+| Springs | MH31 | missing | standard spring formulas |
+| Adhesives and sealants | EBB MH31 | missing | maker guides |
+| Shaft alignment | MH31 | missing | own derivation |
+| Electric motors (power, torque, speed) | MH31 | missing | formulas |
+| Fluid power basics | MH31 | missing | formulas |
 
 ## Materials
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
 | Material equivalents | EBB EDB | built (v2) | evidence model, 100+ cited publishers |
-| Physical properties of metals | EBB MH31 | planned | supplier data sheets, NIST, public-domain MIL-HDBK-5J |
-| Heat treatment: terms, temper colours, hardening | EBB MH31 EDB | planned | steel supplier data |
-| Engineering plastics | EBB MH31 EDB | planned (materials round 2) | supplier data |
-| Corrosion and galvanic series | MH31 EDB | planned | public-domain MIL-STD-889 |
-| Elements, chemical symbols | EBB | planned | IUPAC / NIST public data |
+| Physical properties of metals | EBB MH31 | partial (127 grades, properties for some conditions; round 2 in progress on `claude/material-props-2`) | supplier data sheets, NIST, public-domain MIL-HDBK-5J |
+| Heat treatment: terms, temper colours, hardening | EBB MH31 EDB | missing | steel supplier data |
+| Engineering plastics | EBB MH31 EDB | partial (5 plastics in material equivalents) | supplier data |
+| Corrosion and galvanic series | MH31 EDB | missing | public-domain MIL-STD-889 |
+| Elements, chemical symbols | EBB | missing | IUPAC / NIST public data |
 
 ## GD&T section plan
 

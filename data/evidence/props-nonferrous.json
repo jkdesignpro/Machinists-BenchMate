@@ -827,6 +827,16 @@
        "verbatim": "Thermal Conductivity 121 W/m.K"
       },
       {
+       "prop": "density",
+       "value": 265,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Density | 265 g/cm³",
+       "note": "Printed exactly so on the page (re-checked 2026-11-10): no decimal point. Almost certainly a misprint for 2.65; kept as printed."
+      },
+      {
        "prop": "rp02",
        "value": 125,
        "unit": "MPa",
@@ -883,7 +893,7 @@
        "verbatim": "BS EN 485-2:2008 | Plate 6.3mm to 80mm | Proof Stress 115 Min MPa | Tensile Strength 270 - 345 MPa | Hardness 75 HB"
       }
      ],
-     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed. Density omitted: the extraction read '265 g/cm³' (decimal point lost or a misprint); not recorded until checked against the page."
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
     }
    ]
   },
