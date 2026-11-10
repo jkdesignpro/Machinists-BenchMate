@@ -453,6 +453,27 @@ const TOOLS = [
   source: 'ISO 68-1:2023, ISO 261:1998, ISO 262:2023, ISO 965-1:2013 (revised 2026), ASME B1.1-2024; series and published limits from the publishers listed under the tool.',
 },
 {
+  id: 'pipethreads', group: 'Threads', title: 'Pipe threads (BSP and NPT)',
+  desc: 'BSP parallel (G, ISO 228-1) and taper (R / Rc / Rp, ISO 7-1) and NPT (ASME B1.20.1): threads per inch, diameters, pitch diameters, gauge and engagement lengths.',
+  render: el => renderPipeThreads(el),
+  working: 'See the note under the tool.',
+  source: 'ISO 228-1:2000, ISO 7-1:1994 (with Cor 1:2007), ASME B1.20.1-2013 (reaffirmed 2018); series values from the publishers listed under the tool.',
+},
+{
+  id: 'whitworth', group: 'Threads', title: 'Whitworth and BA threads',
+  desc: 'BSW, BSF (BS 84) and BA (BS 93) threads: threads per inch, pitch, major, effective and minor diameters, thread depth and radius.',
+  render: el => renderWhitworth(el),
+  working: 'See the note under the tool.',
+  source: 'BS 84:2007, BS 93:2008; series values from the publishers listed under the tool.',
+},
+{
+  id: 'machinetapers', group: 'Setup', title: 'Machine tapers',
+  desc: 'Morse, Jacobs, 7:24 steep tapers (ISO 7388-1 / SK, BT, CAT), HSK-A and R8: gauge diameters, lengths, taper per foot and angle, with pull stud (retention knob) references.',
+  render: el => renderMachineTapers(el),
+  working: 'Included angle = 2 atan(taper per unit length / 2). Values come from published tables, each with its publisher count.',
+  source: 'ISO 296:1991 (Morse), ISO 7388-1:2007 and ISO 7388-2:2007 (7/24 shanks), ISO 7388-3:2016 (retention knobs), ISO 12164-1:2023 (HSK), ASME B5.50-2015 (R2025) (CAT), JIS B 6339 (BT, edition not confirmed); publishers listed under the tool.',
+},
+{
   id: 'fits', group: 'Limits and fits', title: 'ISO limits and fits',
   desc: 'IT grades, fundamental deviations and limits of any hole and shaft tolerance class up to 500 mm (hole basis or shaft basis), with the clearance or interference of the fit.',
   render: el => renderFits(el),

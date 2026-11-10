@@ -108,3 +108,9 @@ f1!(iso286_shaft_limit, c::iso286_shaft_limit_f, letter, grade, fd, it, which);
 f1!(iso286_hole_limit, c::iso286_hole_limit_f, letter, grade, shaft_fd, it_n, it_n1, lo, hi, which);
 f1!(iso286_fit, c::iso286_fit_f, hole_es, hole_ei, shaft_es, shaft_ei, which);
 f1!(iso286_shaft_fd_formula, c::iso286_shaft_fd_formula_f, letter, d, it6, it7, it8, it9, it10);
+
+// Other thread forms (core/src/thread_forms.rs)
+f1!(whitworth_value, c::whitworth_value_f, d, p, what);
+f1!(ba_value, c::ba_value_f, n, what);
+f1!(npt_value, c::npt_value_f, d, p, l1, what);
+f1!(round_sig, c::round_sig_f, x, sig);

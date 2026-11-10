@@ -89,7 +89,7 @@ current practice and says so in the tool's notes.
 | Insert designation (ISO 1832) and holder designation (ISO 5608) | EBB | planned | decoder built from the code structure, cited |
 | Tool coatings | EBB | planned | coating maker data (Oerlikon Balzers, Ionbond) |
 | Tool steels and cutting tool materials | MH31 EBB | planned | supplier data |
-| Tapers: Morse, Jacobs, ISO/SK, BT, CAT, HSK, R8 | EBB MH31 | planned | standards cited (ISO 296, DIN 238, ISO 7388, ISO 12164, JIS B 6339, ASME B5.50), dimensions cross-checked against maker data |
+| Tapers: Morse, Jacobs, ISO/SK, BT, CAT, HSK, R8 | EBB MH31 | built: Morse, Jacobs, CAT and BT checked against two publishers; ISO/SK, HSK-A and R8 one source so far | standards cited (ISO 296, DIN 238, ISO 7388, ISO 12164, JIS B 6339, ASME B5.50), dimensions cross-checked against maker data |
 | Pull studs and retention knobs | EBB | planned | maker data, cited standards |
 | Collets (ER sizes and ranges) | MH31 | planned | ISO 15488 (cited), maker data |
 | Burrs, mounted points, files | EBB MH31 | planned | maker data |
@@ -101,9 +101,9 @@ current practice and says so in the tool's notes.
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
 | Thread over wires | MH31 | built | [MH] wire formula, ISO 68-1 |
-| Unified (UNC/UNF/UNEF/UN), all classes | MH31 EBB | partial: UNC/UNF/UNEF basic dimensions, classes 2A/3A/2B/3B; not yet 1A/1B or internal minor-diameter limits | ASME B1.1 formulas (cited), values computed and cross-checked |
-| ISO metric coarse/fine, tolerance classes | MH31 EBB | partial: coarse/fine basic dimensions, 6g/6H | ISO 68-1, ISO 261, ISO 965 (cited), computed |
-| BSW, BSF, BA, BSP (G and R), NPT, NPTF | EBB MH31 | planned | BS 84, BS 93, ISO 228, ISO 7, ASME B1.20.1 (cited) |
+| Unified (UNC/UNF/UNEF/UN), all classes | MH31 EBB | partial: basic dimensions; 2A and 2B (including 2B minor) checked against published tables; 1A/3A/1B/3B computed, not checked; no 1B/3B minor limits | ASME B1.1 formulas (cited), values computed and cross-checked |
+| ISO metric coarse/fine, tolerance classes | MH31 EBB | partial: coarse/fine basic dimensions, 6g/6H checked; 4h, 6e, 6f, 6h, 8g, 5H, 6G, 7H computed, not checked | ISO 68-1, ISO 261, ISO 965 (cited), computed |
+| BSW, BSF, BA, BSP (G and R), NPT, NPTF | EBB MH31 | built for BSW, BSF, BA, BSP and NPT basic dimensions; NPTF and tolerances not yet | BS 84, BS 93, ISO 228, ISO 7, ASME B1.20.1 (cited) |
 | ACME, stub ACME, trapezoidal, buttress | MH31 | planned | ASME B1.5, ISO 2904, ASME B1.9 (cited) |
 | Thread forms overview and symbols | EBB | planned | own diagrams |
 | Single-point threading: infeed, passes | MH31 | planned | insert maker guides |

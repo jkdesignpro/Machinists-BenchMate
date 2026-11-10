@@ -3,6 +3,22 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (reference data, round 2: pipe and British threads, machine tapers)
+- Pipe threads (Threads): BSP G/R (ISO 228-1, ISO 7-1) and NPT (ASME B1.20.1).
+  - Shows TPI, diameters, pitch diameters, ISO 7-1 gauge length, and NPT L1, E0, E1 and L2.
+  - The NPT formulas are checked against the published E1 and L2 values.
+- Whitworth and BA threads (Threads): BSW and BSF (BS 84 profile) and BA (BS 93: P = 0.9^n, D = 6 P^1.2, two significant figures), with TPI checked against two publishers.
+- Machine tapers (Setup):
+  - Morse 0 to 7, Jacobs, 7:24 steep tapers (ISO 7388-1/SK, BT, CAT) with retention knob threads and pull stud standard references, HSK-A and R8.
+  - Each value shows its evidence status.
+- Thread data: Unified 2B minor diameter limits (ASME B1.1 rule, reproduces 71 of 74 rows of a published table); 1A and 1B rows, marked as not checked; other ISO metric classes (4h, 6e, 6f, 6h, 8g, 5H, 6G, 7H), computed from the formulas and marked as not checked.
+- Drill chart: a second publisher (MISUMI) for 40 metric sizes, now Confirmed.
+- `benchmate-core`:
+  - New `thread_forms` module: Whitworth profile, BA formulas, NPT E0/E1/L2, `round_sig`.
+  - `un_minor_tol_2b` and `un_minor_2b`.
+  - Tests against published NPT, BSW, BSF, BSP, BA and Unified 2B tables, and a comparison of the form-tap rule with a tap maker's (Balax) hole sizes.
+### Fixed
+- Unified internal pitch diameter tolerance: the class factor now applies to the unrounded 2A tolerance, which reproduces the published 2B table. Before, 20 of 74 rows were 0.0001 in off.
 ### Added (GD&T)
 - New **GD&T** group. All rules written in our own words; standards (ASME Y14.5-2018 (R2024), ISO 1101:2017, ISO 5459:2024, ISO 2692:2021, ISO 8015:2011, ISO 22081:2021) cited by name only, editions checked on the ASME and ISO catalogue pages. Every rule is confirmed in two independent public sources or marked "to be verified" (`docs/gdt.md`).
 - GD&T reference guide: purpose and datums (3-2-1, precedence, datum targets, MMB), Rule #1 versus ISO 8015 independency, all 14 characteristics (12 in Y14.5-2018 plus ISO concentricity/coaxiality and symmetry) with own SVG zone sketches, inspection notes and common mistakes, modifiers, ASME/ISO comparison, current editions and superseded practice (concentricity/symmetry removed in Y14.5-2018; ISO 2768-2 withdrawn). Source keys shown on every statement.
