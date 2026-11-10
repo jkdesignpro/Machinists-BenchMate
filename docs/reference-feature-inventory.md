@@ -20,3 +20,14 @@ Additional tools listed: shared machining data (community speeds/feeds with vali
 Screens inspected in detail: lathe cutting speed (material picker with AISI machinability rating, hardness slider, insert and strategy, outputs speed/RPM/feed/depth), drill cutting speed (point angle, tool material, coating, coolant; outputs speed, RPM, feed, point length, MRR, G-code), tap drill (tap type, thread select, % engagement 55-85 with suggested 65% roll form / 75% cut), true position (X/Y deviation with MMC/LMC toggle), surface finish (lathe, mill, conversions tabs), hole pattern (circular and rectangular, origin, start angle, count).
 
 Not yet inspected in detail: the sub-screens of most other items, settings, and any account or credits features (some outputs appear locked behind credits; BenchMate will have no locks).
+
+## Walkthrough 3: public product pages and store listing (2026-11-10)
+Additional tools not previously on this list (names only, as a checklist):
+- Chatter listener (microphone finds chatter tone; stable speed = 60 x f / (teeth x lobe); mill and lathe modes; on-device only) and a vibration check using the phone sensor.
+- Grinding: equivalent diameter, grit size conversion, plunge grind, grind RPM cylindricity error, wheel and workpiece speed, surface grind.
+- Threads: UNC/UNF/UNEF/UNJ/UNM/UNR/UNS, metric M, NPT, BSPP, STI and special threads, Whitworth BSF/BSW, ACME and Stub ACME, over-wire data, thread milling.
+- Measurement and geometry: sine bar, spur gear data, socket head cap screw hole dimensions, height over ball, countersink and tapered bore over-ball, scientific calculator, unit converter.
+- Milling and lathe extras: TrueFeed-style physics speeds and feeds, cutting speed with cycle time, adaptive feed control, CAD profile to canned cycles, taper programming, lathe cycle generator, tapping speeds, center drill dimensions.
+- Learning and help: machining formula library (172 formulas), 1,500+ tips of the day, quiz, virtual assistant, GD&T learning centre, community cut library, tool wear information.
+- Platform: web, iOS and Android, offline mode, 23 languages beyond English, favourites.
+BenchMate targets all of these. Language support and mobile are later phases; desktop first.

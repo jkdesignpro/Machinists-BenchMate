@@ -33,5 +33,13 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Tools | Unit conversions, grinding, bandsaw time | todo | standard |
 | Tools | G-code simulator | todo | reuse AMW simulator later |
 | Extras | 2D CAD/DXF generator, knowledge quiz, assistant | later | |
+| Shop | Chatter finder (mic, stable-speed lobes) and vibration check | todo | tooth-passing/lobe formula, FFT |
+| Grinding | Equivalent diameter, grit conversion, plunge, surface, wheel/workpiece speed | todo | MH grinding chapter |
+| Threads | UNJ/UNR/UNS/UNEF/UNM, BSPP, NPT, STI, Whitworth, ACME, Stub ACME, plating allowance | todo | ASME B1.1, B1.5, B1.8, B1.20.1, ISO 228, BS 84 |
+| Gears/splines | Spur gear data, involute splines (ISO 4156, ANSI B92.1), SAE J499a | todo | standards, MH |
+| Geometry | Sine bar, height over ball, countersink/tapered bore over ball, socket head cap screw holes | todo | trig, ASME B18.3 |
+| Cycles | G81/82/83/73, G84, G76, thread mill, keyway broach, lathe cycle generator, taper | todo | machine manuals |
+| Library | Formula library (172+ in Ultra), tips, quiz, tool wear info, indexable insert catalogue | todo | own writing, ISO 1832 |
+| Platform | Offline, favourites, many languages, mobile later | todo | |
 
 Beyond parity (ours): manufacturer speeds and feeds with PDF import, an adaptive per-machine learning profile (see `vendor-data-and-learning.md`), Swiss-lathe helpers, "show the working" steps for every result, AMW link-up.
