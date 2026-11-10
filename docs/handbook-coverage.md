@@ -23,8 +23,9 @@ Checklist books (names only, never quoted):
 - **[EBB]** Pat Rapp, Engineers Black Book, 2nd ed., 2004.
 - **[CNCH]** CNC Machining for Engineers and Makers (course handbook).
 
-Status: **built** = in the app; **planned** = to build; **out** = outside a
-machinist's calculator (left out unless Jacob asks).
+Status: **built** = in the app; **planned** = to build. Book topics outside
+machining (careers, thermodynamics, aerodynamics, pressure vessels and similar)
+are not part of BenchMate.
 
 ## Machining
 
@@ -148,14 +149,6 @@ machinist's calculator (left out unless Jacob asks).
 | Engineering plastics | EBB MH31 EDB | planned (materials round 2) | supplier data |
 | Corrosion and galvanic series | MH31 EDB | planned | public-domain MIL-STD-889 |
 | Elements, chemical symbols | EBB | planned | IUPAC / NIST public data |
-
-## Out of scope (unless Jacob asks)
-
-Careers and interview advice, design-process methodology, thermodynamic and
-steam cycles, aerodynamics, pressure vessel codes, turbines, refrigeration,
-diesel engines, human body dimensions, nails and wood screws, wire rope,
-metal casting and welding process detail. These appear in the books but are
-not machinist calculator subjects.
 
 ## GD&T section plan
 
