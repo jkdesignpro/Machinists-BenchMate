@@ -1,0 +1,235 @@
+name: Release
+
+# Builds the desktop installers and creates a DRAFT GitHub Release.
+# Run it from the Actions tab (Run workflow, enter e.g. v0.1.0) or push a tag v*.
+# Nothing is published until the owner presses "Publish release" on the draft.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. v0.1.0 (must match tauri.conf.json and the Cargo.toml files)"
+        required: true
+        type: string
+      macos_intel:
+        description: "Also build macOS Intel (x86_64)"
+        required: false
+        type: boolean
+        default: false
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  TAURI_CLI_VERSION: "2.12.4"
+
+jobs:
+  prep:
+    name: Check version and plan builds
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      tag: ${{ steps.v.outputs.tag }}
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        name: Work out the version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then TAG="${GITHUB_REF_NAME}"; else TAG="${INPUT_VERSION}"; fi
+          case "$TAG" in v*) ;; *) TAG="v$TAG" ;; esac
+          if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "::error::Version '$TAG' is not like v1.2.3"; exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+      - name: Versions in the code match the release
+        run: python3 scripts/check-versions.py "${{ steps.v.outputs.tag }}"
+      - id: m
+        name: Build matrix
+        env:
+          INTEL: ${{ inputs.macos_intel }}
+        run: |
+          M='[
+            {"name":"windows-x64","os":"windows-latest","target":"x86_64-pc-windows-msvc","bundles":"msi,nsis"},
+            {"name":"linux-x64","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","bundles":"appimage,deb"},
+            {"name":"macos-arm64","os":"macos-14","target":"aarch64-apple-darwin","bundles":"app,dmg"}'
+          if [ "$INTEL" = "true" ]; then
+            M="$M"',{"name":"macos-x64","os":"macos-14","target":"x86_64-apple-darwin","bundles":"app,dmg"}'
+          fi
+          echo "matrix=$(echo "$M]" | tr -d '\n ')" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.name }}
+    needs: prep
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.prep.outputs.matrix) }}
+    env:
+      VERSION: ${{ needs.prep.outputs.version }}
+      # SignPath (Windows code signing) is optional: the signing step only runs
+      # when this secret exists. See docs/release.md.
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown,${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+            desktop -> target
+          key: ${{ matrix.target }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Tauri Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev patchelf file
+
+      - name: Build WebAssembly and data into app/
+        run: bash scripts/build-web.sh
+
+      - name: Build desktop app (tauri build)
+        working-directory: desktop
+        run: npx --yes "@tauri-apps/cli@${TAURI_CLI_VERSION}" build --ci --target "${{ matrix.target }}" --bundles "${{ matrix.bundles }}"
+
+      - name: Collect installers (Windows / Linux)
+        if: runner.os != 'macOS'
+        run: |
+          B="desktop/target/${{ matrix.target }}/release/bundle"
+          mkdir -p dist
+          for f in "$B"/msi/*.msi;        do [ -e "$f" ] && cp "$f" "dist/Machinists-BenchMate_${VERSION}_windows_x64.msi"; done
+          for f in "$B"/nsis/*-setup.exe; do [ -e "$f" ] && cp "$f" "dist/Machinists-BenchMate_${VERSION}_windows_x64-setup.exe"; done
+          for f in "$B"/appimage/*.AppImage; do [ -e "$f" ] && cp "$f" "dist/Machinists-BenchMate_${VERSION}_linux_x86_64.AppImage"; done
+          for f in "$B"/deb/*.deb;        do [ -e "$f" ] && cp "$f" "dist/machinists-benchmate_${VERSION}_amd64.deb"; done
+          ls -l dist
+          [ -n "$(ls -A dist)" ] || { echo "::error::No installers were produced"; exit 1; }
+
+      - name: Ad hoc sign, verify and zip the macOS app
+        if: runner.os == 'macOS'
+        run: |
+          ARCH=$([ "${{ matrix.target }}" = "aarch64-apple-darwin" ] && echo apple-silicon || echo intel)
+          B="desktop/target/${{ matrix.target }}/release/bundle"
+          APP="$(ls -d "$B"/macos/*.app | head -n1)"
+          echo "App bundle: $APP"
+          # Ad hoc signature (no Apple Developer ID): free, but Gatekeeper still
+          # asks the user to allow the app once (System Settings > Open Anyway).
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          codesign -dv "$APP" 2>&1 | grep -E 'Signature|Identifier|Format'
+          mkdir -p dist
+          ditto -c -k --keepParent "$APP" "dist/Machinists-BenchMate_${VERSION}_macos_${ARCH}.app.zip"
+          DMG="$(ls "$B"/dmg/*.dmg | head -n1)"
+          # Check the app inside the disk image is signed too.
+          MNT="$(mktemp -d)"
+          hdiutil attach -nobrowse -readonly -mountpoint "$MNT" "$DMG"
+          codesign --verify --deep --strict --verbose=2 "$MNT"/*.app
+          hdiutil detach "$MNT"
+          cp "$DMG" "dist/Machinists-BenchMate_${VERSION}_macos_${ARCH}.dmg"
+          ls -l dist
+
+      - name: Upload unsigned Windows installers for SignPath
+        id: unsigned
+        if: runner.os == 'Windows' && env.SIGNPATH_API_TOKEN != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Sign Windows installers with SignPath
+        if: runner.os == 'Windows' && env.SIGNPATH_API_TOKEN != ''
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: dist-signed
+
+      - name: Use the signed Windows installers
+        if: runner.os == 'Windows' && env.SIGNPATH_API_TOKEN != ''
+        run: |
+          ls -l dist-signed
+          cp -f dist-signed/* dist/
+          echo "Windows installers are signed by SignPath."
+
+      - name: Note unsigned Windows build
+        if: runner.os == 'Windows' && env.SIGNPATH_API_TOKEN == ''
+        run: echo "::notice::SIGNPATH_API_TOKEN is not set, so the Windows installers are unsigned (SmartScreen will warn). See docs/release.md."
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    name: Create draft release
+    needs: [prep, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.prep.outputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          python3 scripts/changelog-section.py "$TAG" > notes.md
+          cat >> notes.md <<'EOF'
+
+          ---
+          **Installing:** see the README (Download and install). Windows may show a SmartScreen warning
+          (More info > Run anyway) while the installers are unsigned; on macOS, open the app once, then
+          System Settings > Privacy & Security > Open Anyway.
+          EOF
+          cat notes.md
+
+      - name: Create or update the draft release
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG exists; replacing its files."
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* --draft --target "$GITHUB_SHA" \
+              --title "Machinists BenchMate $TAG" --notes-file notes.md
+          fi

@@ -3,6 +3,13 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (desktop app and builds)
+- Native desktop app with Tauri 2 (`desktop/`): window "Machinists BenchMate", 1280 x 840 (minimum 480 x 400), identifier `com.jkdesignpro.benchmate`. Serves `app/` from the bundle, fully offline: a Content-Security-Policy allows only the app's own files plus WebAssembly (`'wasm-unsafe-eval'`), and the window cannot navigate to any other site.
+- Native save dialog for DXF, tool library, machine and setup sheet exports: `window.BenchMateSave` calls the app's own `save_file` command (dialog plugin, file written by the app to the path the user picks). The page gets no other native permission. Machine profile and setup sheet exports now go through `saveFile` too.
+- Saved settings, machines, tools, favourites and setup sheets (localStorage) persist across launches; checked on Linux by restarting the built app.
+- App icon: a flat two-colour vernier caliper (`desktop/icons/icon.svg`) and the generated icon set.
+- GitHub Actions: `ci.yml` (version check, `cargo test`, WebAssembly build, headless Chromium smoke test of every tool in inch and mm under the desktop CSP, desktop crate clippy and tests) and `release.yml` (Windows x64 MSI and NSIS installer, Linux AppImage and .deb, macOS Apple Silicon ad hoc signed and verified `.app.zip` and `.dmg`, optional macOS Intel, draft GitHub Release with these notes and SHA-256 sums; optional SignPath signing for Windows).
+- `scripts/check-versions.py` (version is the same in every Cargo.toml, Cargo.lock, tauri.conf.json and the UI label), `scripts/changelog-section.py` (release notes), `tests/smoke/`, `docs/release.md` (how to cut a release, SignPath Foundation, what users see on each OS).
 ### Added (CAD / DXF)
 - New **CAD / DXF** group with seven screens: bolt circle (optional outside diameter and centre bore), hole grid on an optional plate with corner radius, straight and arc slot, rectangle with corner radii and four corner holes, regular polygon (across flats or corners, rotation, bore; shows across corners, across flats, side and area), circle and ring, keyhole / D-flat / double-D.
 - Live SVG preview of the exact entities with overall width and height dimensions, hole callouts, a hole position table and the part extents; errors in plain words for impossible shapes (overlapping holes, corner radius too large, slot ends touching, holes breaking out).
