@@ -1,6 +1,6 @@
 # Machinists BenchMate
 
-A free, open-source (GPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. Designed first for a Citizen L20 Swiss-type lathe shop, useful for any turning and milling work.
+A free, open-source (AGPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. For all machinists and all machines: mills, lathes, Swiss-type and more.
 
 **Status:** early (v0.1.0). The Rust formula core, a first set of 9 tools and the app UI (AMW look) work in a browser. The native Tauri wrapper for Windows and Apple Silicon comes next.
 
@@ -30,4 +30,4 @@ Adding a calculator means adding one entry to `app/tools.js` and, if needed, a f
 Speeds and feeds, turning/finish, drilling and tapping, threads (UN, metric, NPT), taper and trig, bolt circles, drill/tap/fit charts, unit converter, materials table, Swiss-lathe helpers, second-opinion feeds from published manufacturer data, link-up with Alkart Mega Wizard.
 
 ## Licence
-GPL-3.0-or-later. See `LICENSE`.
+GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). See `LICENSE`. If you run a modified version for others over a network, you must offer them its source.

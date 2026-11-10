@@ -3,6 +3,9 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Changed
+- Licence changed from GPLv3 to AGPLv3 (AGPL-3.0-or-later) at the copyright holder's request; crate metadata updated.
+- README: scope is all machinists and machines, not one machine.
 ### Added (app)
 - First UI: tool list with search, inch/mm toggle, light/dark theme, results with the working and source shown. Tools: spindle speed, milling feed rate, MRR and power, surface finish from nose radius, cut time, taper, drill point length, thread measurement over wires, bolt circle.
 - `benchmate-wasm` crate: plain C-ABI WebAssembly wrapper so the UI uses the Rust formulas.
