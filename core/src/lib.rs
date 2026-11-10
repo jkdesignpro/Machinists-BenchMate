@@ -548,6 +548,11 @@ pub fn feed_per_tooth_f(vf: f64, rpm: f64, teeth: f64) -> f64 { feed_per_tooth(v
 
 pub const MM_PER_IN: f64 = 25.4; // exact by definition
 
+pub mod threads;
+pub mod fits;
+pub use threads::*;
+pub use fits::*;
+
 #[cfg(test)]
 mod tests {
     use super::*;

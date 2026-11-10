@@ -3,6 +3,27 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (reference data: drills, tap drills, threads, limits and fits)
+- Drill size chart (Drilling and tapping): fractional, letter, number (#1 to #97) and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Each size shows its evidence status: Exact, Confirmed, Confirmed with one outlier, or One source.
+- Tap drill size (Drilling and tapping):
+  - Cutting taps from the percent-of-thread formula, D - 1.299 P x %/100 (OSG, FM Carbide).
+  - Forming taps from D - 0.0068 x % x P (FM Carbide, Engineers Edge).
+  - Percent thread at the basic minor diameter and for the "D - P" rule of thumb, which is labelled as an approximation (about 77 %).
+  - The nearest standard drills, with their percent thread.
+- Thread data and limits (Threads):
+  - ISO metric coarse/fine series (ISO 261/262) and UNC/UNF/UNEF series, with basic dimensions from the ISO 68-1 / ASME B1.1 basic profile.
+  - ISO 965-1 6g/6H limits: the published value, with the formula value beside it.
+  - Unified classes 2A/3A/2B/3B from the ASME B1.1-2024 formulas.
+- ISO limits and fits (new group "Limits and fits"):
+  - IT01 to IT18 and all hole and shaft fundamental deviations up to 500 mm (a to zc and A to ZC, except j/J), from published tables checked against two or more publishers.
+  - Hole and shaft limits and presets for common fits.
+  - The fit type (clearance, transition or interference) with its maximum and minimum values.
+  - The formula value beside each table value, and notes on standard editions: ISO 286-1:2010 supersedes the 1988 rounding of js values.
+- `benchmate-core`, with tests against published tables (table/formula exceptions are listed in the tests) and matching WebAssembly exports:
+  - `threads` module: basic profile, tap drill formulas, ISO 965 tolerances with R40 rounding, ASME B1.1 class tolerances.
+  - `fits` module: ISO 286 tolerance factor, IT formula, delta rule, shaft and hole limits, fit type.
+- Evidence files in `data/refdata/`, and `scripts/build_refdata.py` (run by `scripts/build-web.sh`), which builds `data/refdata.json` with per-value publisher counts and disagreements.
+- `docs/sources.md`: reference data sources, current standard editions, disagreements and unverified items.
 ### Added (milling: deflection and cut optimiser)
 - Tool deflection (Milling): end mill as a two-section cantilever (solid shank + fluted length at an effective diameter), load at the tip. Force entered directly, or from net cutting power and speed (Ft = Pc x 60 000 / Vc) times a user-entered Fr/Ft ratio. Young's modulus presets: solid carbide 580 GPa (Ceratizit CTS20L), HSS M2 219 GPa (voestalpine data sheet), or enter E. Effective flute diameter / D is an editable input, blank by default (no verified source for a default).
 - Cut check and optimiser (Milling): RPM, feed, MRR, mean and max chip thickness, net and spindle power, spindle torque, tangential and radial force, deflection; share of each limit used and which binds first; largest ap for the given ae (or largest ae for the given ap) inside deflection, spindle power, spindle torque (below base speed), flute length and tool diameter limits. Machine power/torque come from the active machine profile unless entered. RPM, feed and power rows carry machine checks.

@@ -62,3 +62,26 @@ f1!(cut_optimise, c::cut_optimise_f, d, d_shank, stickout, flute_len, flute_fact
 /// Y of hole `i` (0-based) on a bolt circle.
 #[no_mangle] pub extern "C" fn bolt_y(n: f64, dia: f64, start: f64, cx: f64, cy: f64, i: f64) -> f64 {
     c::bolt_circle(n as u32, dia, start, cx, cy)[i as usize].1 }
+
+// Threads and tapping (core/src/threads.rs)
+f1!(thread_fundamental_h, c::thread_fundamental_h, p);
+f1!(thread_basic_pitch_dia, c::thread_basic_pitch_dia, d, p);
+f1!(thread_basic_minor_dia, c::thread_basic_minor_dia, d, p);
+f1!(thread_basic_height, c::thread_basic_height, p);
+f1!(thread_iso_d3, c::thread_iso_d3, d, p);
+f1!(un_number_major_in, c::un_number_major_in, n);
+f1!(tap_drill_cut, c::tap_drill_cut, d, p, pct);
+f1!(tap_pct_cut, c::tap_pct_cut, d, p, drill);
+f1!(tap_drill_form, c::tap_drill_form, d, p, pct);
+f1!(tap_pct_form, c::tap_pct_form, d, p, hole);
+f1!(iso965_limit, c::iso965_limit_f, d, p, grade, pos, which);
+f1!(iso965_value, c::iso965_value_f, d, p, grade, what);
+f1!(un_limit, c::un_limit_f, d, p, class, which);
+
+// ISO limits and fits (core/src/fits.rs)
+f1!(iso286_step_mean, c::iso286_step_mean, lo, hi);
+f1!(iso286_it_formula, c::iso286_it_formula_f, d_mean, grade);
+f1!(iso286_shaft_limit, c::iso286_shaft_limit_f, letter, grade, fd, it, which);
+f1!(iso286_hole_limit, c::iso286_hole_limit_f, letter, grade, shaft_fd, it_n, it_n1, lo, hi, which);
+f1!(iso286_fit, c::iso286_fit_f, hole_es, hole_ei, shaft_es, shaft_ei, which);
+f1!(iso286_shaft_fd_formula, c::iso286_shaft_fd_formula_f, letter, d, it6, it7, it8, it9, it10);
