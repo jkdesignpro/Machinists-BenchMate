@@ -483,6 +483,34 @@ const TOOLS = [
   source: "Machinery's Handbook (hole circles)",
 },
 {
+  id: 'triangle', group: 'Geometry', title: 'Triangle solver',
+  desc: 'Right or any triangle from three known sides and angles, including the two-solution case (two sides and an angle that is not between them).',
+  render: el => renderTriangle(el),
+  working: 'Angles add to 180°. Law of sines: a / sin A = b / sin B = c / sin C. Law of cosines: a² = b² + c² - 2bc cos A. Side-side-angle: sin B = b sin A / a gives no triangle (> 1), one, or two (B and 180° - B, when both leave room for C). Area = ½ ab sin C.',
+  source: 'OpenStax, Algebra and Trigonometry 2e, ch. 10 (non-right triangles: law of sines incl. the ambiguous case, law of cosines). See docs/geometry.md.',
+},
+{
+  id: 'arc', group: 'Geometry', title: 'Chord, arc, sagitta and 3-point circle',
+  desc: 'Solve an arc from any two of radius, angle, chord, sagitta and arc length; segment and sector areas; centre and radius of the circle through three points.',
+  render: el => renderArc(el),
+  working: 'Chord = 2R sin(θ/2); arc = Rθ (radians); sagitta = R(1 - cos(θ/2)); R from chord c and sagitta s = (c²/4 + s²) / 2s; segment area = R²/2 (θ - sin θ); sector = R²θ/2. Three points: centre where the perpendicular bisectors of two chords cross.',
+  source: 'Plane geometry (OpenStax Algebra and Trigonometry 2e; circle relations). Worked examples checked in core tests. See docs/geometry.md.',
+},
+{
+  id: 'fillet', group: 'Geometry', title: 'Fillet and tangent points',
+  desc: 'Tangent points and centre of a fillet in a corner between two lines, or blending a line into an arc, for programming.',
+  render: el => renderFillet(el),
+  working: 'Corner: tangent distance = r / tan(α/2), centre on the bisector at r / sin(α/2), α the angle between the legs. Line and arc: the fillet centre lies on the line offset by r and on the circle of radius R + r (outside) or R - r (inside) about the arc centre; tangent points are the foot of the perpendicular on the line and the point on the arc in line with both centres.',
+  source: 'Plane geometry (BenchMate derivation; tests check each tangent point lies at r from the fillet centre). See docs/geometry.md.',
+},
+{
+  id: 'dovetail', group: 'Geometry', title: 'Dovetail and V-groove over pins',
+  desc: 'Measurement over (or between) pins for male and female dovetails, and pin height in a V-groove.',
+  render: el => renderDovetail(el),
+  working: 'A pin in a corner of angle α touches base and flank; its centre is (d/2) cot(α/2) from the sharp corner along the base. Male: M = W + d (1 + cot(α/2)). Female: M = W - d (1 + cot(α/2)). W from the other face: W = top ∓ 2h cot α. V-groove: pin top above face = (d/2)/sin(β/2) + d/2 - (W/2)/tan(β/2).',
+  source: 'Plane geometry (BenchMate derivation, checked in tests by constructing the pin position). See docs/geometry.md.',
+},
+{
   id: 'gdtguide', group: 'GD&T', title: 'GD&T reference guide',
   desc: 'Datums, Rule #1 versus ISO independency, every geometric characteristic with its tolerance zone, inspection and common mistakes, modifiers, and an ASME Y14.5-2018 / ISO comparison.',
   render: el => renderGdtGuide(el),
@@ -658,6 +686,40 @@ const TOOLS = [
   source: 'Accendo Reliability (F. Schenkelberg) and Five Flute RSS tolerance analysis guides; BenchMate arithmetic with tests in core/src/gdt.rs.',
 },
 {
+  id: 'weight', group: 'Stock and sheet metal', title: 'Stock weight',
+  desc: 'Weight of round, hex, square, tube, flat bar, plate and sheet stock, per piece, per batch and per metre or foot.',
+  render: el => renderWeight(el),
+  working: 'Weight = section area x length x density. Round πd²/4; hex (√3/2)s² across flats s; square s²; tube π/4 (D² - (D - 2t)²); flat, plate or sheet width x thickness. Sharp corners assumed (no corner radii on hex, square or flat).',
+  source: 'Areas of plane figures; densities from the material data where Confirmed, else from your data sheet. See docs/geometry.md.',
+},
+{
+  id: 'bend', group: 'Stock and sheet metal', title: 'Sheet-metal bend allowance',
+  desc: 'Bend allowance, outside setback and bend deduction for a bend, flat length of a two-flange part, and the K-factor from a test bend.',
+  fields: s => [
+    { id: 't', label: 'Material thickness', unit: lenU(s), def: '' },
+    { id: 'r', label: 'Inside bend radius', unit: lenU(s), def: '' },
+    { id: 'a', label: 'Bend angle (angle bent through; 90 for a right angle)', unit: 'deg', def: 90 },
+    { id: 'k', label: 'K-factor (from your tooling or a test bend)', unit: '', def: '' },
+    { id: 'f1', label: 'Flange 1 length to the outside mould line (optional)', unit: lenU(s), def: '' },
+    { id: 'f2', label: 'Flange 2 length to the outside mould line (optional)', unit: lenU(s), def: '' },
+    { id: 'ba', label: 'Or: measured bend allowance from a test bend (for K)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3, rows = [];
+    if (!(v.t > 0) || !(v.r >= 0) || !(v.a > 0 && v.a < 180)) return [];
+    rows.push(R('Outside setback, tan(angle/2) x (R + t)', W.outside_setback(v.a, v.r, v.t), u, dp));
+    if (v.k >= 0 && v.k <= 1) {
+      const ba = W.bend_allowance(v.a, v.r, v.k, v.t), bd = W.bend_deduction(v.a, v.r, v.k, v.t);
+      rows.push(R('Bend allowance', ba, u, dp), R('Bend deduction', bd, u, dp));
+      if (v.f1 > 0 && v.f2 > 0) rows.push(R('Flat length = flange 1 + flange 2 - bend deduction', v.f1 + v.f2 - bd, u, dp));
+    } else rows.push(R('K-factor needed: from your press brake tooling chart or a test bend', 'not entered', '', 0));
+    if (v.ba > 0) rows.push(R('K-factor from the measured bend allowance', W.k_from_bend_allowance(v.a, v.r, v.t, v.ba), '', 3));
+    return rows;
+  },
+  working: 'Bend allowance BA = angle (radians) x (R + K t): the length of the neutral axis through the bend. Outside setback OSSB = tan(angle/2) x (R + t). Bend deduction BD = 2 OSSB - BA. Flat length = sum of flanges to the outside mould lines - BD per bend. K = (BA / angle - R) / t. K depends on material, thickness, radius and tooling; BenchMate has no default. Flanges are measured to the virtual sharp; for bends over 90° some CAD systems measure flanges differently, so check which convention your drawing uses.',
+  source: 'KETIV Technologies, Sheet metal unfold rule equations (BA, OSSB, BD, K); Aircraft Systems Tech, Making straight line bends (FAA-based: bend allowance, setback = K(R + T) with K = 1 at 90°, flat = mould line dimensions - setbacks + bend allowances). See docs/geometry.md.',
+},
+{
   id: 'capability', group: 'Inspection and quality', title: 'Process capability (Cp, Cpk, Pp, Ppk)',
   desc: 'Paste measurements (in production order) or enter a mean and sigma. Gives Cp, Cpk, Pp, Ppk, expected parts per million out of spec and a histogram with the fitted normal curve.',
   render: el => renderCapability(el),
@@ -745,6 +807,20 @@ const TOOLS = [
   render: el => renderSetupSheet(el),
   working: 'Nothing is calculated here. Sheets are kept in this browser (localStorage) and can be moved by exporting a JSON file. Print uses a print layout without the app frame.',
   source: 'BenchMate layout.',
+},
+{
+  id: 'sinebar', group: 'Setup', title: 'Sine bar and gauge-block stack',
+  desc: 'Gauge-block height for a sine bar angle (or the angle from a stack) and the stack with the fewest blocks from a standard or your own block set.',
+  render: el => renderSineBar(el),
+  working: 'H = L sin(angle); angle = asin(H / L), L the centre distance of the rolls. Stack: an exact search for the fewest blocks (each block used once) that add up to the size, in steps of the set\'s finest block (0.0005 mm or 0.00005 in).',
+  source: 'Set compositions as printed by Mitutoyo (via Cutwel and Transcat), Starrett and Insize; see docs/geometry.md. Sine relation: right-triangle trigonometry.',
+},
+{
+  id: 'indexing', group: 'Setup', title: 'Dividing head and rotary table indexing',
+  desc: 'Simple, angular and differential indexing with your own index plate hole circles and change gears.',
+  render: el => renderIndexing(el),
+  working: 'Simple: crank turns per division = ratio / N (ratio 40 on most dividing heads); the fraction must come out exactly on a hole circle. Angle: turns = ratio x angle / 360°. Differential: index as if for a nearby A\' that the plates can do, and gear the plate to the spindle with ratio x (A\' - N) / A\'; idlers: with A\' above N use 1 or 3 in a simple train, below N none or 2; a compound train reverses this.',
+  source: 'US Navy Machinery Repairman training manual, ch. 7 Indexing (differential indexing ratio and idlers; public domain). Plates and gears are never defaulted: enter your own. See docs/geometry.md.',
 },
 {
   id: 'materials', group: 'Materials', title: 'Material equivalents',

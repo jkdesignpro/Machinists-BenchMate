@@ -69,8 +69,8 @@ current practice and says so in the tool's notes.
 | EDM (wire and sinker) basics | MH31 | planned | public process guides |
 | Knurling: diameter for pitch | MH31 EBB | planned | ANSI B94.6 (cited), knurl maker data |
 | Broaching | MH31 | planned | geometry, maker data |
-| Indexing (dividing head, rotary table) | EBB | planned | own derivation (40:1 ratio arithmetic) |
-| Sine bar, sine plate, gauge block stack | MH31 EBB | planned | geometry; gauge sets from ISO 3650 / maker lists |
+| Indexing (dividing head, rotary table) | EBB | built (branch `claude/geometry`): simple, angular, differential with user plates and gears | US Navy Machinery Repairman ch. 7 (public domain); docs/geometry.md |
+| Sine bar, sine plate, gauge block stack | MH31 EBB | built (branch `claude/geometry`): sine bar height/angle, fewest-block stack; metric 112 and inch 81 sets confirmed by two makers | Mitutoyo, Insize, Starrett listings; docs/geometry.md |
 | CNC: coordinates, work offsets, G/M codes per control | MH31 CNCH EBB | planned | control makers' public manuals; generic profile from ISO 6983 (cited) |
 | CNC: 2D/3D toolpath concepts, setups | CNCH | planned | own explanations |
 | Shop safety notes | CNCH | planned | HSE / OSHA public guidance |
@@ -131,11 +131,11 @@ current practice and says so in the tool's notes.
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
 | Bolt circle, hole coordinates | EBB | built | geometry |
-| Right and oblique triangles | MH31 EBB | planned | trigonometry |
-| Chords, segments, arcs, tangent points | MH31 EBB | planned | geometry |
-| Plane area and solid volume, weight | MH31 EBB | planned | geometry, densities from supplier data |
-| Bar, tube and sheet weights | EBB | planned | geometry × cited density |
-| Sheet gauges, bend allowance, K-factor | EBB MH31 | planned | gauge tables from public standards; bend formula |
+| Right and oblique triangles | MH31 EBB | built (branch `claude/geometry`) incl. the ambiguous SSA case | trigonometry |
+| Chords, segments, arcs, tangent points | MH31 EBB | built (branch `claude/geometry`): arc solver, 3-point circle, corner and line-arc fillets, dovetail and V-groove over pins | geometry |
+| Plane area and solid volume, weight | MH31 EBB | partial (stock sections and weight built; general solids still to do) | geometry, densities from supplier data |
+| Bar, tube and sheet weights | EBB | built (branch `claude/geometry`) | geometry × cited density |
+| Sheet gauges, bend allowance, K-factor | EBB MH31 | partial (bend allowance, setback, deduction, K from a test bend built; gauge tables still to do) | gauge tables from public standards; bend formula |
 | Fractions, decimals, unit conversions | EBB MH31 | partial (fraction / decimal / mm converter built) | NIST SP 811 (public domain) |
 | Engineering economics (payback, hourly rate) | MH31 | planned | standard formulas |
 

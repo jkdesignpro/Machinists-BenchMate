@@ -558,6 +558,8 @@ pub use threads::*;
 pub use fits::*;
 pub mod shop;
 pub use shop::*;
+pub mod geometry;
+pub use geometry::*;
 
 #[cfg(test)]
 mod tests {

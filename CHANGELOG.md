@@ -3,6 +3,17 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (geometry)
+- Triangle solver: right or any triangle from any three values with at least one side; the ambiguous side-side-angle case shows both solutions with a picker; area and perimeter; own SVG drawing.
+- Chord, arc, sagitta: solve from radius and angle, radius and chord, radius and sagitta, chord and sagitta, or radius and arc length; segment and sector areas; diagram. Circle through three points.
+- Fillet and tangent points: corner fillet between two lines (tangent points, centre, tangent distance) and line-to-arc fillet (inside or outside the arc, either side of the line, up to two solutions), with drawings.
+- Dovetail and V-groove over pins: male and female dovetail measurement over/between pins from the corner width or the top width and depth, contact check; V-groove pin height.
+- Stock weight: round, hex, square, tube, flat/plate/sheet; per piece, batch and per metre or foot; density from Confirmed material data or entered.
+- Sheet-metal bend allowance, outside setback, bend deduction, flat length of a two-flange part, K-factor from a test bend (K never defaulted).
+- Sine bar and gauge-block stack: stack height for an angle and angle for a stack; fewest-block stack (exact search) from the metric 112 or inch 81-piece sets (confirmed by two makers), Mitutoyo 88/103/47/32 sets (one maker's listing, labelled) or your own list.
+- Dividing head and rotary table: simple and angular indexing on your own hole circles, differential indexing with your own change gears (simple or compound train, idler rule).
+- `benchmate-core` module `geometry` with tests (worked examples, brute-force and constructed-geometry checks); WebAssembly exports including list results through `list_out`.
+- `docs/geometry.md`: sources, check table, decisions.
 ### Added (shop helpers)
 - Process capability: paste measurements (production order) or enter mean and sigma. Cp, Cpk (within sigma: mean moving range / 1.128, or mean range / d2 for subgroups of 2-10), Pp, Ppk (overall sample standard deviation), one-sided limits, expected ppm below/above from the normal tails (within and overall), observed out-of-spec count, histogram SVG with normal fits and limit lines, warnings for fewer than about 50 values and for overall sigma well above within sigma.
 - Temperature compensation: reading corrected to 20 °C (68 °F) for part and gauge expansion, with the reading a to-size part gives, deviation from drawing size and the uncertainty from the part coefficient. Coefficients are entered by the user or picked from Confirmed material data (none confirmed yet, which the screen says).
