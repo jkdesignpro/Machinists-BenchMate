@@ -103,15 +103,18 @@ function renderTool() {
   const note = document.createElement('div'); note.className = 'note';
   note.innerHTML = '<b>Working:</b> <span id="w"></span><br><b>Source:</b> <span id="s"></span>';
   $('#w', note).textContent = t.working; $('#s', note).textContent = t.source;
-  main.append(card, res, note);
+  // Optional drawing under the results: t.diagram(v, sys) returns SVG markup or ''.
+  const dia = document.createElement('div'); dia.className = 'tdia';
+  main.append(card, res, dia, note);
   function update() {
     const v = {}; fields.forEach(f => { const e = grid.querySelector('[data-id="' + f.id + '"]'); v[f.id] = e.value === '' ? NaN : parseFloat(e.value); });
     let rows = [];
     try { rows = t.calc(v, state.W, state.sys); } catch (e) { rows = []; }
     rows = rows.filter(r => typeof r.value === 'string' || isFinite(r.value));
     res.innerHTML = '<div class="h">Results</div>' + (rows.length
-      ? '<table>' + rows.map(r => { const w = checkRow(r, state.sys, state.W); return '<tr' + (w ? ' class="over"' : '') + '><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v">' + fmt(r.value, r.dp) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>'
+      ? '<table>' + rows.map(r => { const w = checkRow(r, state.sys, state.W); return '<tr' + (w ? ' class="over"' : '') + '><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v' + (typeof r.value === 'string' && r.value.length > 24 ? ' txt' : '') + '">' + fmt(r.value, r.dp) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>'
       : '<table><tr><td class="warn">Enter the values above.</td></tr></table>');
+    if (t.diagram) { let h = ''; try { h = t.diagram(v, state.sys) || ''; } catch (e) { h = ''; } dia.innerHTML = h; }
   }
   const pick = $('#tpick', card);
   if (pick) pick.onchange = () => {

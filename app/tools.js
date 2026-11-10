@@ -15,6 +15,18 @@ const E_PRESETS = {
   1: { gpa: 580, name: 'Solid carbide', src: 'Ceratizit grade CTS20L, 10% Co' },
   2: { gpa: 219, name: 'HSS (M2, 1.3343)', src: 'voestalpine data sheet HSS M2 1.3343, at 20 C' },
 };
+// Boring bar E presets (see docs/sources.md) and published overhang guidance (L/D) per bar maker.
+const BAR_E = {
+  1: { gpa: 210, name: 'Steel', src: 'Ovako data for 4140 / 42CrMo4' },
+  2: { gpa: 580, name: 'Solid carbide', src: 'Ceratizit grade CTS20L, 10% Co' },
+  3: { gpa: 360, name: 'Tungsten heavy metal', src: 'Plansee Densimet D176' },
+};
+const BAR_LD = {
+  1: [['Seco Tools', '4'], ['Kennametal', '3'], ['Cutwel', '4']],
+  2: [['Seco Tools', '8'], ['Kennametal', '6'], ['Cutwel', '6-8']],
+  3: [['Seco Tools', '6'], ['Kennametal', '6']],
+  damped: [['Seco Tools (Steadyline)', '10'], ['Kennametal', '10 or more']],
+};
 const eField = s => s === 'inch' ? { u: 'Mpsi', k: MPSI_GPA, dp: 1 } : { u: 'GPa', k: 1, dp: 0 };
 // Effective (equivalent solid) diameter of the fluted part as a fraction of D.
 // Blank by default unless a verified source is recorded in docs/sources.md.
@@ -320,6 +332,154 @@ const TOOLS = [
   source: "Sandvik Coromant milling formulas (n, Vf, Q, Pc, hm); Machinery's Handbook; Altintas, Manufacturing Automation, Ch. 2 (chip thickness); Gere and Goodno / Roark (beam deflection); machine limits from the active machine profile or entered here.",
 },
 {
+  id: 'chipthin', group: 'Milling', title: 'Radial chip thinning feed',
+  pick: { map: { d: 'dia', z: 'flutes' } },
+  desc: 'With a radial width (stepover) below half the diameter the chip is thinner than the feed per tooth. Enter the chip thickness your tool maker recommends and get the feed per tooth that gives it at your stepover.',
+  fields: s => [
+    { id: 'd', label: 'Tool diameter D', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
+    { id: 'ae', label: 'Radial width ae (stepover)', unit: lenU(s), def: s === 'inch' ? 0.05 : 1.2 },
+    { id: 'hex', label: 'Target max chip thickness hex (tool maker\'s chip load)', unit: lenU(s), def: '' },
+    { id: 'z', label: 'Number of teeth (for table feed)', unit: '', def: '' },
+    { id: 'rpm', label: 'Spindle speed (for table feed)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0 && v.ae > 0)) return [];
+    const k = W.rctf(v.ae, v.d), dp = s === 'inch' ? 5 : 4;
+    const rows = [R('Engagement angle', W.mt_engagement_deg(v.ae, v.d), 'deg', 2), R('ae / D', 100 * v.ae / v.d, '%', 1), R('Chip thinning factor (RCTF)', k, 'x', 3)];
+    if (v.ae >= v.d / 2) rows.push(R('Chip thinning', 'None: at ae >= D/2 the chip reaches the feed per tooth', '', 0));
+    if (v.hex > 0) {
+      const fz = v.hex * k; rows.push(R('Feed per tooth for that chip', fz, lenU(s), dp));
+      if (v.z > 0 && v.rpm > 0) rows.push(R('Table feed', W.table_feed(v.rpm, fz, v.z), feedMinU(s), 2, 'feed'));
+    } else rows.push(R('Feed per tooth', 'Enter the target chip thickness', '', 0));
+    return rows;
+  },
+  diagram: (v, s) => typeof mtEngageSvg === 'function' ? mtEngageSvg(v.d, v.ae, 0, 0) : '',
+  working: 'Engagement phi = acos(1 - 2 ae / D). Max chip hex = fz sin(phi) for ae < D/2, so fz = hex x RCTF with RCTF = 1 / sin(phi) = 1 / sqrt(1 - (1 - 2 ae / D)^2). At ae >= D/2 the chip reaches fz and RCTF = 1. Vf = n x z x fz. Very large factors at tiny stepovers push the tool hard on entry and amplify any runout; check the result against the tool maker\'s maximum feed.',
+  source: 'Machining Doctor chip thinning calculator (RCTF); Altintas, Manufacturing Automation, Ch. 2 (h = c sin phi). See docs/sources.md.',
+},
+{
+  id: 'cornerfeed', group: 'Milling', title: 'Corner engagement and feed',
+  pick: { map: { d: 'dia', z: 'flutes' } },
+  desc: 'In an inside corner (or round a boss) the same stepover wraps more (or less) of the tool. Shows the engagement on the arc against the straight wall, and the feed per tooth that keeps the chip the same as on the straight wall.',
+  fields: s => [
+    { id: 'mode', label: 'Wall', unit: '', def: 1, options: [[1, 'Inside corner (pocket)'], [0, 'Outside (boss, convex arc)']] },
+    { id: 'd', label: 'Tool diameter D', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
+    { id: 'Rw', label: 'Corner (arc) radius of the finished wall', unit: lenU(s), def: s === 'inch' ? 0.375 : 10 },
+    { id: 'ae', label: 'Radial width ae on the straight wall', unit: lenU(s), def: s === 'inch' ? 0.05 : 1.2 },
+    { id: 'fz', label: 'Feed per tooth on the straight wall', unit: lenU(s), def: '' },
+    { id: 'z', label: 'Number of teeth (for table feed)', unit: '', def: '' },
+    { id: 'rpm', label: 'Spindle speed (for table feed)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0 && v.ae > 0 && v.Rw > 0)) return [];
+    const inside = v.mode === 1, dp = s === 'inch' ? 5 : 4;
+    const p0 = W.mt_engagement_deg(v.ae, v.d), p1 = W.engagement_arc_deg(v.ae, v.d, v.Rw, inside ? 1 : 0);
+    if (!isFinite(p1)) return [R('Corner', 'The tool radius must be smaller than the corner radius', '', 0)];
+    const rows = [R('Engagement on the straight wall', p0, 'deg', 2), R('Engagement on the arc', p1, 'deg', 2)];
+    const r = rad => rad * Math.PI / 180;
+    const h0 = Math.min(1, Math.sin(r(Math.min(p0, 90)))), h1 = Math.min(1, Math.sin(r(Math.min(p1, 90))));
+    rows.push(R('Chip on the arc / chip on the straight', h1 / h0, 'x', 3));
+    if (v.fz > 0) {
+      const hex = W.hex_for_engagement(v.fz, r(p0)), fz1 = hex / h1;
+      rows.push(R('Max chip on the straight wall', hex, lenU(s), dp));
+      rows.push(R('Feed per tooth on the arc for the same chip', fz1, lenU(s), dp));
+      if (v.z > 0 && v.rpm > 0) {
+        const fe = W.table_feed(v.rpm, fz1, v.z), rt = v.d / 2;
+        rows.push(R('Feed at the cutting edge on the arc', fe, feedMinU(s), 2));
+        rows.push(R('Programmed tool-centre feed on the arc', inside ? W.arc_feed_internal(fe, v.Rw, rt) : W.arc_feed_external(fe, v.Rw, rt), feedMinU(s), 2, 'feed'));
+      }
+    }
+    if (p1 > 120) rows.push(R('Note', 'Engagement over 120 deg: consider a smaller tool, a larger corner radius or a roll-in (trochoidal) path', '', 0));
+    return rows;
+  },
+  diagram: (v, s) => typeof mtEngageSvg === 'function' ? mtEngageSvg(v.d, v.ae, v.Rw, v.mode === 1 ? 1 : -1) : '',
+  working: 'Straight wall: phi = acos(1 - 2 ae / D). Arc of radius R at the finished wall, tool radius r: inside corner, tool centre at R - r and the previous wall at R - ae: cos phi = ((R - ae)^2 - (R - r)^2 - r^2) / (2 r (R - r)); outside, centre at R + r and previous wall at R + ae: cos phi = ((R + r)^2 + r^2 - (R + ae)^2) / (2 r (R + r)) (law of cosines in the triangle arc centre, tool centre, edge of the previous wall; both tend to the straight-wall angle as R grows). Max chip = fz sin(phi), fz once phi >= 90 deg, so the feed per tooth for the same chip is fz x sin(phi_straight) / sin(phi_arc). The tool-centre feed then uses the arc feed correction (R - r) / R inside, (R + r) / R outside. A sharp corner entered on a straight line is not an arc: there the engagement peaks briefly higher.',
+  source: 'Engagement and chip thickness: Altintas, Manufacturing Automation, Ch. 2; arc feed: Sandvik Coromant milling formulas (circular interpolation). The arc engagement is derived here by the law of cosines and checked in the core tests against a brute-force sample of the tool circle.',
+},
+{
+  id: 'ballcusp', group: 'Milling', title: 'Ball-nose cusp height and stepover',
+  pick: { map: { d: 'dia' }, types: ['Ball end mill', 'Other'] },
+  desc: 'Scallop (cusp) height left between passes of a ball-nose tool on a flat or gently curved surface, or the stepover for the cusp you want.',
+  fields: s => [
+    { id: 'd', label: 'Ball diameter D', unit: lenU(s), def: s === 'inch' ? 0.25 : 6 },
+    { id: 'st', label: 'Stepover', unit: lenU(s), def: s === 'inch' ? 0.01 : 0.25 },
+    { id: 'h', label: 'Or target cusp height', unit: s === 'inch' ? 'in' : 'mm', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0)) return [];
+    const r = v.d / 2, rows = [], k = s === 'inch' ? 1e6 : 1000, mu = s === 'inch' ? 'uin' : 'um';
+    if (v.st > 0) {
+      const h = W.cusp_height(r, v.st);
+      if (isFinite(h)) { rows.push(R('Cusp height', h, lenU(s), s === 'inch' ? 6 : 5)); rows.push(R('Cusp height', h * k, mu, 2)); rows.push(R('Stepover / D', 100 * v.st / v.d, '%', 1)); }
+      else rows.push(R('Cusp height', 'Stepover larger than the ball diameter', '', 0));
+    }
+    if (v.h > 0) {
+      const st = W.stepover_for_cusp(r, v.h);
+      if (isFinite(st)) { rows.push(R('Stepover for the target cusp', st, lenU(s), s === 'inch' ? 5 : 4)); rows.push(R('Stepover / D', 100 * st / v.d, '%', 1)); }
+      else rows.push(R('Stepover', 'Cusp height larger than the ball radius', '', 0));
+    }
+    return rows;
+  },
+  diagram: (v, s) => typeof mtCuspSvg === 'function' ? mtCuspSvg(v.d, v.st > 0 ? v.st : (v.h > 0 ? 2 * Math.sqrt(Math.max(0, v.d * v.h - v.h * v.h)) : 0)) : '',
+  working: 'Cusp h = R - sqrt(R^2 - (s/2)^2), R = D/2, s = stepover; stepover for a cusp h: s = 2 sqrt(2 R h - h^2). For small stepovers h is close to s^2 / (8 R). This is for passes side by side on a flat surface; on a slope across the stepover the cusp grows, on a slope along the feed it does not.',
+  source: 'Circle geometry; the small-stepover form s^2 / (8 R) as printed by IMCO Carbide Tool (Adjustments for ball nose endmills). See docs/sources.md.',
+},
+{
+  id: 'balleff', group: 'Milling', title: 'Ball-nose effective diameter, speed and feed',
+  pick: { map: { d: 'dia', z: 'flutes' }, types: ['Ball end mill', 'Other'] },
+  desc: 'At a shallow depth a ball-nose tool cuts on a smaller diameter than its size. Gives that effective diameter (with the tool tilted, if it is), the spindle speed for your cutting speed at it, and the feed per tooth that restores the chip.',
+  fields: s => [
+    { id: 'd', label: 'Ball diameter D', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
+    { id: 'ap', label: 'Depth of cut ap (normal to the surface)', unit: lenU(s), def: s === 'inch' ? 0.02 : 0.5 },
+    { id: 'tilt', label: 'Tool tilt from the surface normal (0 = axis square to the surface)', unit: 'deg', def: 0 },
+    { id: 'speed', label: s === 'inch' ? 'Surface speed wanted at the effective diameter' : 'Cutting speed Vc wanted at the effective diameter', unit: spdU(s), def: '' },
+    { id: 'fz', label: 'Chip load wanted (tool maker\'s fz)', unit: lenU(s), def: '' },
+    { id: 'z', label: 'Number of teeth', unit: '', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0 && v.ap > 0)) return [];
+    const t = v.tilt > 0 ? v.tilt : 0, de = W.ball_eff_dia(v.d, v.ap, t), dmin = W.ball_min_dia(v.d, v.ap, t), dp = s === 'inch' ? 4 : 3;
+    if (!isFinite(de)) return [R('Tilt', 'Enter a tilt from 0 to under 90 deg', '', 0)];
+    const rows = [R('Effective (largest) cutting diameter', de, lenU(s), dp), R('Smallest diameter in the cut', dmin, lenU(s), dp)];
+    if (dmin === 0) rows.push(R('Tool centre', 'In the cut: the centre point (zero speed) rubs; tilt the tool more than ' + (Math.acos(1 - 2 * Math.min(v.ap / v.d, 1)) * 180 / Math.PI).toFixed(1) + ' deg to lift it out', '', 0));
+    let rpm = NaN;
+    if (v.speed > 0) { rpm = s === 'inch' ? W.rpm_from_sfm(v.speed, de) : W.rpm_from_vc(v.speed, de); rows.push(R('Spindle speed for that speed at the effective diameter', rpm, 'RPM', 0, 'rpm')); rows.push(R('Spindle speed if the full diameter were used', s === 'inch' ? W.rpm_from_sfm(v.speed, v.d) : W.rpm_from_vc(v.speed, v.d), 'RPM', 0)); }
+    if (v.fz > 0) {
+      const fa = v.fz * v.d / de; rows.push(R('Feed per tooth to restore the chip (fz x D / De)', fa, lenU(s), s === 'inch' ? 5 : 4));
+      if (rpm > 0 && v.z > 0) rows.push(R('Table feed', W.table_feed(rpm, fa, v.z), feedMinU(s), 2, 'feed'));
+    }
+    return rows;
+  },
+  diagram: (v, s) => typeof mtBallSvg === 'function' ? mtBallSvg(v.d, v.ap, v.tilt > 0 ? v.tilt : 0) : '',
+  working: 'Band in the cut, measured from the tool axis: theta0 = acos(1 - 2 ap / D). A point at angle psi from the axis turns on diameter D sin(psi). With the axis tilted by beta from the surface normal the band spans beta - theta0 to beta + theta0, so the largest effective diameter is De = D sin(min(theta0 + beta, 90 deg)) and the smallest is D sin(beta - theta0), or 0 when beta <= theta0 (the centre cuts). With no tilt De = 2 sqrt(ap (D - ap)). n = 1000 Vc / (pi De) (inch: 12 SFM / (pi De)). The chip at the largest diameter is fz x De / D, so fz_adj = fz x D / De. The spindle speed is the one that gives your speed at the largest diameter; the rest of the edge runs slower.',
+  source: 'ISCAR, Machining Titanium guide (2019), Table 28 (de = 2 sqrt(d ap - ap^2)); IMCO Carbide Tool and Machining Doctor (feed factor D / De). The tilted form is derived from the sphere and reduces to ISCAR\'s at zero tilt (core tests).',
+},
+{
+  id: 'runout', group: 'Milling', title: 'Runout and chip load',
+  pick: { map: { z: 'flutes' } },
+  desc: 'Radial runout (TIR at the cutting edges) makes one tooth cut more than the rest. Shows each tooth\'s chip, how much the worst tooth is overloaded, and the feed per tooth that keeps the worst tooth at the chip you want.',
+  fields: s => [
+    { id: 'z', label: 'Number of teeth', unit: '', def: 4 },
+    { id: 'fz', label: 'Programmed feed per tooth', unit: lenU(s), def: s === 'inch' ? 0.002 : 0.05 },
+    { id: 'tir', label: 'Runout, total indicator reading at the edges', unit: lenU(s), def: '' },
+    { id: 'tgt', label: 'Largest chip allowed (blank = the programmed fz)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.z >= 1 && v.fz > 0 && v.tir >= 0)) return [];
+    const z = Math.round(v.z), n = W.runout_chips(v.fz, v.tir, z), dp = s === 'inch' ? 5 : 4, rows = [];
+    let mx = 0;
+    for (let i = 0; i < n; i++) { const c = W.list_out(i); mx = Math.max(mx, c); if (i < 12) rows.push(R('Tooth ' + (i + 1) + ' chip', c, lenU(s), dp)); }
+    if (n > 12) rows.push(R('Other teeth', 'not listed', '', 0));
+    rows.push(R('Worst tooth / programmed fz', 100 * mx / v.fz, '%', 1));
+    if (z > 1 && v.tir > 0 && v.fz < v.tir * Math.sin(Math.PI / z)) rows.push(R('Note', 'Runout is larger than the feed per tooth: some teeth do not cut at all', '', 0));
+    const tgt = v.tgt > 0 ? v.tgt : v.fz, f = W.runout_fz_for_max(tgt, v.tir, z);
+    rows.push(R('Feed per tooth so the worst tooth carries ' + fmt(tgt, dp), isFinite(f) ? f : 'Runout too large for that chip', isFinite(f) ? lenU(s) : '', dp));
+    return rows;
+  },
+  working: 'Tooth radii r_i = (TIR/2) cos(lambda - 2 pi i / z) for runout as an offset of the tool axis. Tooth i removes the least of (k fz + r_i - r_(i-k)) over k = 1..z, never less than zero: normally fz + r_i - r_(i-1), but a tooth that falls inside the surface left by an earlier tooth cuts nothing and the next tooth takes more. The phase lambda is set so the worst tooth is as large as it can be: fz + TIR sin(pi / z) (fz + TIR on two flutes). Feed per tooth for a largest chip c: fz = c - TIR sin(pi / z). Measure TIR on the cutting edges in the holder; tilt of the tool axis and holder runout at speed are not modelled.',
+  source: 'Kline and DeVor, Int. J. Mach. Tool Des. Res. 23 (1983) (runout model for end milling); Altintas, Manufacturing Automation, Ch. 2. Checked in the core tests against a brute-force scan of the runout phase.',
+},
+{
   id: 'finish', group: 'Turning', title: 'Surface finish from nose radius',
   pick: { map: { r: 'cr' }, types: ['Turning insert', 'Grooving', 'Threading', 'Boring bar', 'Other'] },
   desc: 'Theoretical roughness for a given feed and nose radius, or the feed for a target Ra. A geometric ideal: real finish is usually worse.',
@@ -437,6 +597,198 @@ const TOOLS = [
   source: "Machinery's Handbook (areas of plane figures, weights of bar stock)",
 },
 {
+  id: 'lathefeed', group: 'Turning', title: 'Lathe feed: per rev and per minute',
+  desc: 'Convert a turning feed between per revolution (G95 / G99) and per minute (G94 / G98) at a spindle speed, or at the speed set by a cutting speed and diameter.',
+  fields: s => [
+    { id: 'f', label: 'Feed per revolution', unit: feedRevU(s), def: s === 'inch' ? 0.006 : 0.15 },
+    { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: '' },
+    { id: 'speed', label: s === 'inch' ? 'Or surface speed' : 'Or cutting speed Vc', unit: spdU(s), def: '' },
+    { id: 'dia', label: 'with the diameter being cut', unit: lenU(s), def: '' },
+    { id: 'vf', label: 'Or known feed per minute', unit: feedMinU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    let n = v.rpm > 0 ? v.rpm : NaN;
+    const rows = [];
+    if (!(n > 0) && v.speed > 0 && v.dia > 0) { n = s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia); rows.push(R('Spindle speed at that diameter', n, 'RPM', 0, 'rpm')); }
+    if (!(n > 0)) return rows.concat([R('Spindle speed', 'Enter the spindle speed, or a cutting speed and diameter', '', 0)]);
+    if (v.f > 0) rows.push(R('Feed per minute', W.table_feed(n, v.f, 1), feedMinU(s), s === 'inch' ? 3 : 1, 'feed'));
+    if (v.vf > 0) rows.push(R('Feed per revolution for that feed per minute', W.feed_per_tooth(v.vf, n, 1), feedRevU(s), s === 'inch' ? 5 : 4));
+    return rows;
+  },
+  working: 'Vf = fn x n; fn = Vf / n. With constant surface speed (G96) the rpm, and so the feed per minute, change with the diameter: convert at the diameter you care about.',
+  source: "Sandvik Coromant turning formulas; Machinery's Handbook (feeds).",
+},
+{
+  id: 'roughtime', group: 'Turning', title: 'Multi-pass turning time',
+  desc: 'Number of roughing passes from the stock and the largest depth of cut, and the cutting time of each, at constant spindle speed or constant surface speed with an rpm limit. Approach and retract moves are not included; add them to the length if you want them counted.',
+  fields: s => [
+    { id: 'd0', label: 'Stock diameter', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'd1', label: 'Finished diameter (after roughing)', unit: lenU(s), def: s === 'inch' ? 1.5 : 38 },
+    { id: 'ap', label: 'Largest depth of cut per pass (radial)', unit: lenU(s), def: s === 'inch' ? 0.08 : 2 },
+    { id: 'len', label: 'Length of each pass', unit: lenU(s), def: s === 'inch' ? 3 : 75 },
+    { id: 'f', label: 'Feed per revolution', unit: feedRevU(s), def: s === 'inch' ? 0.01 : 0.25 },
+    { id: 'mode', label: 'Spindle', unit: '', def: 1, options: [[1, 'Constant surface speed (G96)'], [0, 'Constant rpm (G97)']] },
+    { id: 'speed', label: s === 'inch' ? 'Surface speed (CSS)' : 'Cutting speed Vc (CSS)', unit: spdU(s), def: s === 'inch' ? 600 : 180 },
+    { id: 'rpm', label: 'Spindle speed (constant rpm)', unit: 'RPM', def: '' },
+    { id: 'nmax', label: 'Max spindle speed (G50 / G92 clamp; blank = active machine)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    const k = s === 'inch' ? IN_MM : 1;
+    if (!(v.d0 > v.d1 && v.d1 >= 0 && v.ap > 0 && v.len > 0 && v.f > 0)) return [];
+    const m = typeof Profiles !== 'undefined' ? Profiles.active() : null;
+    const nmax = v.nmax > 0 ? v.nmax : (m && Number(m.rpm_max) > 0 ? Number(m.rpm_max) : 0);
+    const css = v.mode === 1;
+    const vc = css ? (s === 'inch' ? v.speed * FT_M : v.speed) : 0;
+    if (css && !(vc > 0)) return [R('Speed', 'Enter the cutting speed', '', 0)];
+    if (!css && !(v.rpm > 0)) return [R('Speed', 'Enter the spindle speed', '', 0)];
+    const n = W.turn_rough(v.d0 * k, v.d1 * k, v.ap * k, v.len * k, v.f * k, vc, css ? 0 : v.rpm, css ? nmax : 0);
+    if (!(n > 0)) return [];
+    const rows = [R('Passes', n, '', 0), R('Depth of cut per pass', (v.d0 - v.d1) / 2 / n, lenU(s), s === 'inch' ? 4 : 3)];
+    let tot = 0;
+    for (let i = 0; i < n; i++) {
+      const d = W.list_out(3 * i), rpm = W.list_out(3 * i + 1), t = W.list_out(3 * i + 2); tot += t;
+      if (i < 15) rows.push(R('Pass ' + (i + 1) + ' to ' + fmt(d / k, s === 'inch' ? 4 : 2) + ' ' + lenU(s) + ' at ' + fmt(rpm, 0) + ' RPM', t * 60, 's', 1));
+    }
+    if (n > 15) rows.push(R('Passes 16 and on', 'not listed', '', 0));
+    rows.push(R('Total cutting time', tot, 'min', 3), R('Total cutting time', tot * 60, 's', 1));
+    if (css && nmax > 0) rows.push(R('Speed limit used', nmax, 'RPM', 0));
+    if (css) rows.push(R('Highest spindle speed', W.list_out(3 * (n - 1) + 1), 'RPM', 0, 'rpm'));
+    return rows;
+  },
+  working: 'Passes N = ceil((D0 - D1) / 2 / ap_max), all at the same depth (D0 - D1) / (2N). Pass i finishes at Di = D0 - 2 i ap. Time per pass = L / (f x n). With constant surface speed n is taken at the finished diameter of the pass, n = 1000 Vc / (pi Di) (inch: 12 SFM / (pi Di)), limited to the rpm clamp; with constant rpm n is fixed. Finishing, approach, retract and rapid moves are not included.',
+  source: "Sandvik Coromant turning formulas (n, machining time); Machinery's Handbook.",
+},
+{
+  id: 'boringbar', group: 'Turning', title: 'Boring bar deflection',
+  pick: { map: { d: 'shank', L: 'stick' }, types: ['Boring bar'] },
+  desc: 'Tip deflection of a solid round boring bar under the cutting force, as a cantilever clamped at the holder, for steel, carbide or tungsten heavy metal bars, with the overhang (L/D) guidance published by bar makers.',
+  fields: s => [
+    { id: 'mat', label: 'Bar material (sets E)', unit: '', def: 1, options: [[1, 'Steel'], [2, 'Solid carbide'], [3, 'Tungsten heavy metal'], [0, 'Other: enter E below']] },
+    { id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
+    { id: 'd', label: 'Bar diameter', unit: lenU(s), def: s === 'inch' ? 0.75 : 20 },
+    { id: 'di', label: 'Coolant hole diameter (blank = none)', unit: lenU(s), def: '' },
+    { id: 'L', label: 'Overhang (holder face to cutting edge)', unit: lenU(s), def: s === 'inch' ? 2.25 : 60 },
+    { id: 'F', label: 'Tangential cutting force (if known)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { id: 'kc', label: 'Or specific cutting force kc', unit: 'N/mm2', def: '' },
+    { id: 'ap', label: 'with depth of cut ap', unit: lenU(s), def: '' },
+    { id: 'f', label: 'and feed per rev', unit: feedRevU(s), def: '' },
+    { id: 'Fr', label: 'Radial force (optional)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+  ],
+  calc: (v, W, s) => {
+    const k = s === 'inch' ? IN_MM : 1, fk = s === 'inch' ? LBF_N : 1, fU = s === 'inch' ? 'lbf' : 'N', ef = eField(s);
+    if (!(v.d > 0 && v.L > 0)) return [];
+    const p = BAR_E[v.mat], e = v.E > 0 ? v.E * ef.k : (p ? p.gpa : NaN);
+    if (!(e > 0)) return [R("Young's modulus", 'Enter E for your bar (from its maker)', '', 0)];
+    const di = v.di > 0 ? v.di * k : 0, d = v.d * k, L = v.L * k;
+    if (di >= d) return [R('Coolant hole', 'Must be smaller than the bar', '', 0)];
+    const rows = [R("Young's modulus used (" + (v.E > 0 ? 'as entered' : p.name + ' preset, ' + p.src) + ')', e / ef.k, ef.u, ef.dp), R('Overhang L/D', v.L / v.d, 'x D', 2)];
+    let F = v.F > 0 ? v.F * fk : NaN;
+    if (!(F > 0) && v.kc > 0 && v.ap > 0 && v.f > 0) { F = W.turning_force(v.kc, v.ap * k, v.f * k); rows.push(R('Tangential force Fc = kc ap fn', F / fk, fU, 1)); }
+    const dU = s === 'inch' ? 'thou' : 'um', dk = s === 'inch' ? 1000 / IN_MM : 1000;
+    if (F > 0) { const dt = W.boring_bar_deflection(F, L, d, di, e); rows.push(R('Tip deflection, tangential (edge drops below centre)', dt * dk, dU, s === 'inch' ? 2 : 1)); if (v.Fr > 0) { const dr = W.boring_bar_deflection(v.Fr * fk, L, d, di, e); rows.push(R('Tip deflection, radial (bore comes out small)', dr * dk, dU, s === 'inch' ? 2 : 1)); rows.push(R('Combined tip deflection', Math.hypot(dt, dr) * dk, dU, s === 'inch' ? 2 : 1)); } }
+    else rows.push(R('Deflection', 'Enter the force, or kc with ap and feed', '', 0));
+    const g = BAR_LD[p ? v.mat : 0] || [];
+    g.forEach(([who, ld]) => rows.push(R('Overhang guidance: ' + who, 'up to ' + ld + ' x D', '', 0)));
+    const lim = g.length ? Math.min(...g.map(x => parseFloat(x[1]))) : NaN;
+    if (v.L / v.d > lim) rows.push(R('Check', 'Overhang is past the smallest published guidance for this bar material (' + lim + ' x D); damped bars are made for ' + BAR_LD.damped.map(x => x[0] + ' ' + x[1] + ' x D').join(', '), '', 0));
+    return rows;
+  },
+  diagram: (v, s) => typeof mtBarSvg === 'function' ? mtBarSvg(v.d, v.L, v.di) : '',
+  working: 'I = pi (d^4 - di^4) / 64 (solid round bar, optional coolant hole; flats ground on the bar are ignored, so a real bar is a little softer). Tip deflection = F L^3 / (3 E I), clamped rigidly at the holder face: holder, clamping and spindle flex are not included, so the real bar deflects more. Fc = kc x ap x fn. E presets: steel 210 GPa (Ovako data for 4140 / 42CrMo4, in the BenchMate material data), solid carbide 580 GPa (Ceratizit grade CTS20L, 10% Co; use your bar maker\'s figure), tungsten heavy metal 360 GPa (Plansee Densimet D176). The guidance values are each maker\'s own rule of thumb for chatter-free boring, shown side by side because they differ.',
+  source: "Gere and Goodno, Mechanics of Materials (cantilever); Sandvik Coromant (Fc = kc ap fn); E: Ovako, Ceratizit, Plansee W-MMC brochure 09.2021; overhang guidance: Seco Tools (2019), Kennametal (The basics of boring), Cutwel (Expert guide to boring bars). See docs/sources.md.",
+},
+{
+  id: 'caxis', group: 'Turning', title: 'C-axis (polar) feed',
+  desc: 'Mill-turn and live tooling: angular feed of the C axis for a feed along the part surface at a diameter, and the inverse time feed number (G93) for a move that combines a linear axis and C.',
+  fields: s => [
+    { id: 'd', label: 'Diameter the tool cuts at', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'vf', label: 'Feed along the surface', unit: feedMinU(s), def: s === 'inch' ? 10 : 250 },
+    { id: 'deg', label: 'Or C-axis feed', unit: 'deg/min', def: '' },
+    { id: 'lin', label: 'G93 move: linear distance (X, Y or Z)', unit: lenU(s), def: '' },
+    { id: 'ang', label: 'G93 move: C rotation', unit: 'deg', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0)) return [];
+    const rows = [];
+    if (v.vf > 0) { const dm = W.c_axis_deg_min(v.vf, v.d); rows.push(R('C-axis feed', dm, 'deg/min', 1)); rows.push(R('C-axis speed', dm / 360, 'rev/min', 4)); }
+    if (v.deg > 0) rows.push(R('Feed along the surface for that C feed', W.c_axis_feed_from_deg(v.deg, v.d), feedMinU(s), 2));
+    if (v.vf > 0 && (v.lin > 0 || v.ang > 0)) {
+      const F = W.inverse_time_f(v.lin > 0 ? v.lin : 0, v.ang > 0 ? v.ang : 0, v.d, v.vf);
+      rows.push(R('G93 inverse time F (1 / minutes for the move)', F, '', 4));
+      rows.push(R('Move time', 60 / F, 's', 2));
+    }
+    return rows;
+  },
+  working: 'deg/min = Vf x 360 / (pi D); Vf = deg/min x pi D / 360. G93: the move should take 1/F minutes, so F = Vf / path length, path = sqrt(linear^2 + (pi D x angle / 360)^2) for the tool running at Vf over the part surface. How a control reads F on a move with a rotary axis in G94 differs between makers (degrees per minute, or a blend of linear and rotary): check your control manual. Polar coordinate interpolation (G12.1 / G112) converts the feed itself.',
+  source: 'Circle geometry; inverse time feed: NIST RS274NGC Interpreter, version 3 (Kramer, Proctor, Messina, NISTIR 6556, 2000). Check your control manual.',
+},
+{
+  id: 'slitsaw', group: 'Sawing', title: 'Slitting saw speeds and feeds',
+  pick: { map: { D: 'dia', z: 'flutes' } },
+  desc: 'Spindle speed, table feed, chip thickness and cut time for a slitting or slotting saw from the saw maker\'s cutting speed and feed per tooth. A slot shallower than half the saw diameter thins the chip; the screen shows how much.',
+  fields: s => [
+    { id: 'D', label: 'Saw diameter', unit: lenU(s), def: s === 'inch' ? 3 : 80 },
+    { id: 'z', label: 'Number of teeth', unit: '', def: '' },
+    { id: 'ae', label: 'Depth of slot (radial)', unit: lenU(s), def: s === 'inch' ? 0.25 : 6 },
+    { id: 'speed', label: s === 'inch' ? 'Surface speed (saw maker)' : 'Cutting speed Vc (saw maker)', unit: spdU(s), def: '' },
+    { id: 'fz', label: 'Feed per tooth (saw maker)', unit: lenU(s), def: '' },
+    { id: 'hex', label: 'Or target chip thickness hex', unit: lenU(s), def: '' },
+    { id: 'L', label: 'Length of slot (for time)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.D > 0 && v.ae > 0)) return [];
+    const rows = [], dp = s === 'inch' ? 5 : 4;
+    const n = v.speed > 0 ? (s === 'inch' ? W.rpm_from_sfm(v.speed, v.D) : W.rpm_from_vc(v.speed, v.D)) : NaN;
+    if (n > 0) rows.push(R('Spindle speed', n, 'RPM', 0, 'rpm'));
+    const k = W.rctf(v.ae, v.D);
+    rows.push(R('Chip thinning factor (RCTF)', k, 'x', 3));
+    if (v.z > 0) rows.push(R('Teeth in the cut at once', W.teeth_engaged(v.z, v.ae, v.D), '', 2));
+    const fz = v.hex > 0 ? v.hex * k : v.fz;
+    if (fz > 0) {
+      if (v.hex > 0) rows.push(R('Feed per tooth for that chip', fz, lenU(s), dp)); else rows.push(R('Max chip thickness hex', fz / k, lenU(s), dp));
+      if (n > 0 && v.z > 0) {
+        const vf = W.table_feed(n, fz, v.z); rows.push(R('Table feed', vf, feedMinU(s), 2, 'feed'));
+        const app = W.cutter_approach(v.D, v.ae); rows.push(R('Approach to full depth', app, lenU(s), s === 'inch' ? 3 : 2));
+        if (v.L > 0) rows.push(R('Cut time (slot plus approach)', (v.L + app) / vf, 'min', 3));
+      }
+    }
+    return rows;
+  },
+  working: 'n = 1000 Vc / (pi D) (inch 12 SFM / (pi D)). Vf = n x z x fz. Engagement phi = acos(1 - 2 ae / D), hex = fz sin(phi) for ae < D/2, so fz = hex / sin(phi) for a target chip. Teeth in the cut = z phi / 360 deg. Approach = sqrt(ae (D - ae)), the distance the saw centre travels from first touch to full depth. Speeds and chip loads come from the saw maker; BenchMate does not guess them.',
+  source: 'Sandvik Coromant milling formulas (n, Vf); Machining Doctor (RCTF); Altintas, Ch. 2 (chip thickness); approach by circle geometry.',
+},
+{
+  id: 'bandsaw', group: 'Sawing', title: 'Bandsaw cut time',
+  desc: 'Time to cut through a round, rectangular or tube section from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
+  fields: s => [
+    { id: 'shape', label: 'Section', unit: '', def: 1, options: [[1, 'Round bar'], [2, 'Rectangle (cut through the height)'], [3, 'Tube']] },
+    { id: 'a', label: 'Diameter, or width of the rectangle', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
+    { id: 'b', label: 'Rectangle height, or tube wall', unit: lenU(s), def: '' },
+    { id: 'vf', label: 'Down-feed rate', unit: feedMinU(s), def: '' },
+    { id: 'rate', label: 'Or cutting rate', unit: s === 'inch' ? 'in2/min' : 'cm2/min', def: '' },
+    { id: 'vb', label: 'Blade speed (for chip per tooth)', unit: s === 'inch' ? 'ft/min' : 'm/min', def: '' },
+    { id: 'tpi', label: 'Blade pitch', unit: 'TPI', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.a > 0)) return [];
+    let area, h;
+    if (v.shape === 2) { if (!(v.b > 0)) return [R('Section', 'Enter the height', '', 0)]; area = v.a * v.b; h = v.b; }
+    else if (v.shape === 3) { if (!(v.b > 0 && v.b < v.a / 2)) return [R('Section', 'Enter a wall thinner than half the diameter', '', 0)]; area = Math.PI / 4 * (v.a ** 2 - (v.a - 2 * v.b) ** 2); h = v.a; }
+    else { area = Math.PI / 4 * v.a ** 2; h = v.a; }
+    const au = s === 'inch' ? 'in2' : 'cm2', ak = s === 'inch' ? 1 : 0.01;
+    const rows = [R('Area cut', area * ak, au, 2), R('Height the blade feeds through', h, lenU(s), 2)];
+    if (v.vf > 0) rows.push(R('Cut time from the down-feed', h / v.vf, 'min', 2));
+    if (v.rate > 0) { const t = area * ak / v.rate; rows.push(R('Cut time from the cutting rate', t, 'min', 2)); rows.push(R('Average down-feed at that rate', h / t, feedMinU(s), 2)); }
+    if (v.vf > 0 && v.vb > 0 && v.tpi > 0) {
+      const c = s === 'inch' ? W.bandsaw_chip_per_tooth(v.vf * IN_MM, v.vb * FT_M, v.tpi) / IN_MM : W.bandsaw_chip_per_tooth(v.vf, v.vb, v.tpi);
+      rows.push(R('Feed per tooth (depth each tooth takes)', c, lenU(s), s === 'inch' ? 6 : 5));
+    }
+    return rows;
+  },
+  working: 'Time = height / down-feed rate, or area / cutting rate (the square inches or cm2 per minute figure saw makers quote). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle W x H. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker.',
+  source: 'Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut); KASCO (teeth per minute = teeth per foot x blade speed). See docs/sources.md.',
+},
+{
   id: 'drillpoint', group: 'Drilling and tapping', title: 'Drill point length',
   pick: { map: { dia: 'dia', ang: 'point' }, types: ['Drill', 'Spot', 'Other'] },
   desc: 'Axial length of the drill point.',
@@ -447,6 +799,37 @@ const TOOLS = [
   calc: (v, W, s) => (v.dia > 0 && v.ang > 0 && v.ang < 180) ? [R('Point length', W.drill_point_length(v.dia, v.ang), lenU(s), 4)] : [],
   working: 'h = (d / 2) / tan(point angle / 2).',
   source: "Machinery's Handbook (drills)",
+},
+{
+  id: 'spotdepth', group: 'Drilling and tapping', title: 'Spot and centre drill depth',
+  pick: { map: { ang: 'point' }, types: ['Spot', 'Drill', 'Chamfer', 'Other'] },
+  desc: 'Depth to program a spot drill, chamfer tool point or centre drill to for a given chamfer (countersink) diameter, or the diameter a depth gives. The centre drill\'s pilot length is yours to measure or take from its maker.',
+  fields: s => [
+    { id: 'mode', label: 'Tool', unit: '', def: 1, options: [[1, 'Spot drill or pointed chamfer tool'], [2, 'Centre drill (pilot and countersink)']] },
+    { id: 'dc', label: 'Chamfer / countersink diameter wanted', unit: lenU(s), def: s === 'inch' ? 0.3 : 8 },
+    { id: 'ang', label: 'Included angle of the point or countersink', unit: 'deg', def: 90 },
+    { id: 'dh', label: 'Hole diameter (optional, for the chamfer width)', unit: lenU(s), def: '' },
+    { id: 'dp', label: 'Centre drill pilot diameter', unit: lenU(s), def: '' },
+    { id: 'lp', label: 'Centre drill: tip to start of the countersink cone', unit: lenU(s), def: '' },
+    { id: 'z', label: 'Or a depth, to get the diameter', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.ang > 0 && v.ang < 180)) return [];
+    const rows = [], dp = s === 'inch' ? 4 : 3;
+    if (v.mode === 2) {
+      if (!(v.dp > 0 && v.lp >= 0)) return [R('Centre drill', 'Enter the pilot diameter and the length from the tip to the countersink', '', 0)];
+      if (v.dc > 0) { const z = W.centre_drill_depth(v.dc, v.dp, v.lp, v.ang); rows.push(R('Depth from the tip', isFinite(z) ? z : 'Countersink smaller than the pilot', isFinite(z) ? lenU(s) : '', dp)); }
+      if (v.z > 0) { const d = W.centre_drill_dia(v.z, v.dp, v.lp, v.ang); rows.push(R('Countersink diameter at that depth', isFinite(d) ? d : 'Depth does not reach the countersink', isFinite(d) ? lenU(s) : '', dp)); }
+    } else {
+      if (v.dc > 0) rows.push(R('Depth from the tip', W.spot_depth(v.dc, v.ang), lenU(s), dp));
+      if (v.z > 0) rows.push(R('Chamfer diameter at that depth', 2 * v.z * Math.tan(v.ang * Math.PI / 360), lenU(s), dp));
+    }
+    if (v.dh > 0 && v.dc > v.dh) rows.push(R('Chamfer width on the hole (each side)', (v.dc - v.dh) / 2, lenU(s), dp));
+    return rows;
+  },
+  diagram: (v, s) => typeof mtSpotSvg === 'function' ? mtSpotSvg(v.mode, v.dc, v.ang, v.dp, v.lp) : '',
+  working: 'Pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts (it includes the pilot\'s own point). Program the Z depth to the tool tip; a tip with a flat or radius cuts slightly larger at the same depth.',
+  source: 'Right-triangle geometry of a cone (as in the Drill point length tool).',
 },
 {
   id: 'drillchart', group: 'Drilling and tapping', title: 'Drill size chart',
@@ -461,6 +844,132 @@ const TOOLS = [
   render: el => renderTapDrill(el),
   working: 'See the note under the tool.',
   source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge. ISO 68-1:2023, ASME B1.1-2024.',
+},
+{
+  id: 'chatter', group: 'Chatter and vibration', title: 'Chatter finder (stable speeds)',
+  desc: 'Listen to a cut through the microphone, or type the chatter frequency, and get the tooth passing frequency and the spindle speeds where a whole number of chatter waves fit between teeth. A rule-of-thumb lobe estimate, not a full stability lobe diagram.',
+  render: el => renderChatter(el),
+  working: 'Tooth passing frequency f_t = n z / 60 (lathe: z = 1). Stable speed estimate for lobe N = 0, 1, 2 ...: n = 60 fc / (z (N + 1)): the tooth period then holds a whole number of chatter waves, so the wavy surface left by one tooth lines up with the next and does not feed the vibration. fc / f_t gives the lobe the cut is in now. Spectrum: Hann window, radix-2 FFT in the Rust core, averaged over a few frames; peaks within the tolerance of a spindle harmonic (runout, tooth passing and their multiples) are marked and skipped. The chatter frequency sits a little above the natural frequency it comes from, so after a change of speed listen again (Smith and Tlusty repeat the step until it settles). Use the running spindle speed, not the commanded one. Nothing is recorded or stored: the audio stays in this page while you listen and is dropped when you stop.',
+  source: 'S. Smith, Finding harmony in stable cutting, Cutting Tool Engineering, Dec. 2010; S. Smith and J. Tlusty, CIRP Annals 41(1), 1992; Y. Altintas, Manufacturing Automation, 2nd ed., Ch. 3; Cooley and Tukey (1965), FFT. See docs/sources.md.',
+},
+{
+  id: 'grindspeed', group: 'Grinding', title: 'Wheel and work speed, equivalent diameter',
+  desc: 'Wheel surface speed or rpm, work speed and the speed ratio, equivalent wheel diameter for external, internal and surface grinding, contact length, specific removal rate and equivalent chip thickness. Always obey the maximum operating speed marked on the wheel; BenchMate never assumes one.',
+  fields: s => [
+    { id: 'mode', label: 'Operation', unit: '', def: 0, options: [[0, 'External cylindrical'], [1, 'Internal'], [2, 'Surface']] },
+    { id: 'ds', label: 'Wheel diameter', unit: lenU(s), def: s === 'inch' ? 14 : 350 },
+    { id: 'ns', label: 'Wheel speed', unit: 'RPM', def: '' },
+    { id: 'vs', label: 'Or wheel surface speed wanted', unit: s === 'inch' ? 'SFPM' : 'm/s', def: '' },
+    { id: 'vmax', label: 'Max operating speed marked on the wheel', unit: s === 'inch' ? 'SFPM' : 'm/s', def: '' },
+    { id: 'nmax', label: 'Or max rpm marked on the wheel', unit: 'RPM', def: '' },
+    { id: 'dw', label: 'Work diameter (cylindrical, internal: bore)', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'nw', label: 'Work speed (cylindrical)', unit: 'RPM', def: '' },
+    { id: 'vt', label: 'Or table speed (surface)', unit: s === 'inch' ? 'ft/min' : 'm/min', def: '' },
+    { id: 'ae', label: 'Depth of cut per pass', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.ds > 0)) return [];
+    const k = s === 'inch' ? IN_MM : 1, inch = s === 'inch', rows = [];
+    const toMs = x => inch ? x * FT_M / 60 : x, fromMs = x => inch ? x * 60 / FT_M : x, vU = inch ? 'SFPM' : 'm/s';
+    let ns = v.ns > 0 ? v.ns : NaN;
+    if (!(ns > 0) && v.vs > 0) { ns = W.wheel_rpm_ms(toMs(v.vs), v.ds * k); rows.push(R('Wheel rpm for that surface speed', ns, 'RPM', 0, 'rpm')); }
+    let vs = NaN;
+    if (ns > 0) { vs = W.wheel_speed_ms(v.ds * k, ns); rows.push(R('Wheel surface speed', fromMs(vs), vU, inch ? 0 : 2)); if (inch) rows.push(R('Wheel surface speed', vs, 'm/s', 2)); }
+    if (v.vmax > 0 || v.nmax > 0) {
+      const over = (v.vmax > 0 && vs > toMs(v.vmax) * (1 + 1e-12)) || (v.nmax > 0 && ns > v.nmax);
+      rows.push(R('Marked maximum', !(ns > 0) ? 'Enter the wheel rpm or surface speed to compare' : over ? 'OVER the maximum marked on the wheel: do not run it' : 'Within the marked maximum', '', 0));
+      if (v.vmax > 0) rows.push(R('Highest rpm allowed by the marked speed at this diameter', W.wheel_rpm_ms(toMs(v.vmax), v.ds * k), 'RPM', 0));
+    } else rows.push(R('Marked maximum', 'Not entered: read the maximum operating speed on the wheel (or its label) and never exceed it', '', 0));
+    const de = W.equiv_dia(v.dw > 0 ? v.dw * k : 0, v.ds * k, v.mode);
+    if (isFinite(de)) rows.push(R('Equivalent wheel diameter de', de / k, lenU(s), inch ? 3 : 2));
+    else if (v.mode === 1) rows.push(R('Equivalent diameter', 'Internal: the wheel must be smaller than the bore', '', 0));
+    let vw = NaN; // m/min
+    if (v.mode !== 2 && v.dw > 0 && v.nw > 0) { vw = W.vc_from_rpm(v.nw, v.dw * k); rows.push(R('Work surface speed', inch ? vw / FT_M : vw, inch ? 'SFM' : 'm/min', 1)); }
+    if (v.mode === 2 && v.vt > 0) vw = inch ? v.vt * FT_M : v.vt;
+    if (vs > 0 && vw > 0) rows.push(R('Speed ratio q = vs / vw', W.speed_ratio(vs, vw), '', 1));
+    if (v.ae > 0 && isFinite(de)) {
+      rows.push(R('Contact length sqrt(ae de)', W.contact_length(v.ae * k, de) / k, lenU(s), inch ? 4 : 3));
+      if (vw > 0) { const q = W.specific_mrr(v.ae * k, vw); rows.push(R("Specific removal rate Q'w", inch ? q * 60 / 645.16 : q, inch ? 'in3/min per in' : 'mm3/mm/s', 3)); if (vs > 0) rows.push(R('Equivalent chip thickness heq', W.equiv_chip_um(v.ae * k, vw, vs) * (inch ? 1000 / IN_MM : 1), inch ? 'uin' : 'um', 4)); }
+    }
+    return rows;
+  },
+  diagram: (v, s) => typeof grindDeSvg === 'function' ? grindDeSvg(v.mode, v.ds, v.dw) : '',
+  working: 'Wheel speed vs = pi ds ns / 60 000 m/s (ds in mm), SFPM = pi ds(in) ns / 12. Work speed vw = pi dw nw / 1000 m/min. Speed ratio q = vs x 60 / vw. Equivalent diameter de = dw ds / (dw + ds) external, dw ds / (dw - ds) internal, ds surface. Contact length lg = sqrt(ae de). Specific removal rate Q\'w = ae vw (mm3/mm/s with vw in mm/s); equivalent chip thickness heq = ae vw / vs. The maximum operating speed is marked on every wheel larger than 80 mm (or on its label or a notice) and must not be exceeded; it depends on the wheel, not on anything BenchMate can work out.',
+  source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
+},
+{
+  id: 'grindtime', group: 'Grinding', title: 'Cylindrical traverse and plunge time',
+  desc: 'Traverse rate from the cross-feed per work revolution (a fraction of the wheel width that you choose), overlap ratio and traverse grinding time, and plunge grinding time with spark-out.',
+  fields: s => [
+    { id: 'bs', label: 'Wheel width', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
+    { id: 'fa', label: 'Traverse per work revolution', unit: lenU(s), def: '' },
+    { id: 'frac', label: 'Or traverse as a fraction of the wheel width', unit: 'x bs', def: '' },
+    { id: 'nw', label: 'Work speed', unit: 'RPM', def: '' },
+    { id: 'L', label: 'Traverse length (with overrun)', unit: lenU(s), def: '' },
+    { id: 'passes', label: 'Number of traverse passes (incl. spark-out)', unit: '', def: '' },
+    { id: 'stock', label: 'Plunge: radial stock', unit: lenU(s), def: '' },
+    { id: 'vfr', label: 'Plunge: radial infeed rate', unit: feedMinU(s), def: '' },
+    { id: 'dw', label: 'Plunge: work diameter (for removal rate)', unit: lenU(s), def: '' },
+    { id: 'spark', label: 'Plunge: spark-out time', unit: 's', def: '' },
+  ],
+  calc: (v, W, s) => {
+    const k = s === 'inch' ? IN_MM : 1, rows = [];
+    const fa = v.fa > 0 ? v.fa : (v.frac > 0 && v.bs > 0 ? v.frac * v.bs : NaN);
+    if (fa > 0) {
+      if (!(v.fa > 0)) rows.push(R('Traverse per work revolution', fa, lenU(s), s === 'inch' ? 4 : 3));
+      if (v.bs > 0) rows.push(R('Overlap ratio bs / fa', W.overlap_ratio(v.bs, fa), '', 2));
+      if (v.nw > 0) { rows.push(R('Traverse rate', W.traverse_speed(fa, v.nw), feedMinU(s), s === 'inch' ? 2 : 0, 'feed'));
+        if (v.L > 0 && v.passes > 0) rows.push(R('Traverse grinding time', W.traverse_time(v.L, fa, v.nw, v.passes), 'min', 3)); }
+    }
+    if (v.stock > 0 && v.vfr > 0) {
+      const t = W.plunge_time(v.stock, v.vfr, v.spark > 0 ? v.spark : 0);
+      rows.push(R('Plunge grinding time', t, 'min', 3), R('Plunge grinding time', t * 60, 's', 1));
+      if (v.dw > 0) { const q = W.plunge_specific_mrr(v.dw * k, v.vfr * k); rows.push(R("Specific removal rate Q'w", s === 'inch' ? q * 60 / 645.16 : q, s === 'inch' ? 'in3/min per in' : 'mm3/mm/s', 3)); }
+    }
+    return rows;
+  },
+  working: 'Traverse per work revolution fa (or a chosen fraction of the wheel width bs); traverse rate = fa x nw; overlap ratio = bs / fa (how many times each point is passed by the wheel width). Traverse time = L / (fa nw) x passes. Plunge: time = radial stock / radial infeed rate + spark-out; Q\'w = pi dw vfr / 60 (mm3/mm/s). The fraction of wheel width, infeed rates and spark-out are process choices: take them from your wheel maker or your own records.',
+  source: 'W. B. Rowe, Principles of Modern Grinding Technology (overlap ratio); S. Malkin and C. Guo, Grinding Technology (removal rate). Times are distance / rate.',
+},
+{
+  id: 'grindsurf', group: 'Grinding', title: 'Surface grinding time',
+  desc: 'Number of strokes and passes and the grinding time on a reciprocating surface grinder, from the table speed, cross-feed per stroke and down-feed per pass.',
+  fields: s => [
+    { id: 'L', label: 'Length of the part (along the table)', unit: lenU(s), def: s === 'inch' ? 8 : 200 },
+    { id: 'ot', label: 'Overtravel at each end', unit: lenU(s), def: s === 'inch' ? 0.75 : 20 },
+    { id: 'ct', label: 'Cross travel per layer (part width - wheel width + overrun)', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'cf', label: 'Cross-feed per stroke', unit: lenU(s), def: '' },
+    { id: 'vt', label: 'Table speed', unit: s === 'inch' ? 'ft/min' : 'm/min', def: '' },
+    { id: 'stock', label: 'Stock to remove (depth)', unit: lenU(s), def: '' },
+    { id: 'down', label: 'Down-feed per pass (layer)', unit: lenU(s), def: '' },
+    { id: 'spark', label: 'Spark-out passes', unit: '', def: '' },
+    { id: 'both', label: 'Grinding', unit: '', def: 1, options: [[1, 'Both directions (cross-feed at each end)'], [0, 'One direction only']] },
+  ],
+  calc: (v, W, s) => {
+    const k = s === 'inch' ? IN_MM : 1;
+    if (!(v.L > 0 && v.cf > 0 && v.vt > 0 && v.stock > 0 && v.down > 0)) return [];
+    const vt = s === 'inch' ? v.vt * FT_M : v.vt, a = [v.L * k, (v.ot > 0 ? v.ot : 0) * k, (v.ct > 0 ? v.ct : 0) * k, v.cf * k, vt, v.stock * k, v.down * k, v.spark > 0 ? v.spark : 0, v.both];
+    const t = W.surface_grind(...a, 0);
+    return [R('Strokes per layer', W.surface_grind(...a, 1), '', 0), R('Layers (passes, incl. spark-out)', W.surface_grind(...a, 2), '', 0),
+      R('Time per stroke', (v.L + 2 * (v.ot > 0 ? v.ot : 0)) * k / (vt * 1000) * 60, 's', 2), R('Grinding time', t, 'min', 2), R('Grinding time', t * 60, 's', 0)];
+  },
+  diagram: (v, s) => typeof grindSurfSvg === 'function' ? grindSurfSvg() : '',
+  working: 'Stroke length = L + 2 x overtravel; time per stroke = stroke / table speed (twice that when grinding one way only, as the table returns empty). Strokes per layer = ceil(cross travel / cross-feed) + 1. Layers = ceil(stock / down-feed) + spark-out passes. Time = strokes x layers x time per stroke. Table reversal, wheel dressing and loading are not included.',
+  source: 'Distance / rate arithmetic; surface grinding kinematics as in W. B. Rowe, Principles of Modern Grinding Technology.',
+},
+{
+  id: 'gritconv', group: 'Grinding', title: 'Grit size conversion',
+  desc: 'FEPA F (grinding wheels), ANSI / US mesh and FEPA P (coated) grit sizes in micrometres, as printed by two publishers each, with the nearest sizes in the other systems. Disagreements between publishers are shown.',
+  render: el => renderGritConv(el),
+  working: 'Sizes are what the publishers print (see the note under the tool for what each number means). Coarse grits are graded with sieves and fine grits by sedimentation, so a coarse grit size is a sieve opening, not a mean grain size. Nearest equivalents compare the first printed size of each grit and are only approximate.',
+  source: 'Noritake (JIS R6001 tables), Hapstone, Ted Pella (3M), Steel Data. Standards cited by name: ISO 8486-1:1996 and ISO 8486-2:2007 (F grits), ISO 6344-2/-3:2021 (P grits), FEPA 42 and 43, ANSI B74.12 / B74.10 / B74.18.',
+},
+{
+  id: 'wheelcode', group: 'Grinding', title: 'Grinding wheel marking decoder',
+  desc: 'Decode a conventional (aluminium oxide or silicon carbide) grinding wheel specification such as A46-K8V or WA 60 K 7 V: abrasive, grit size, grade, structure, bond and the maker\'s record, with how many publishers print each meaning.',
+  render: el => renderWheelCode(el),
+  working: 'Order: abrasive (letters, often with a maker\'s number in front), grit (number), grade (letter A soft to Z hard), structure (number, low dense, high open; optional), bond (letters), maker\'s record. Letter meanings come from wheel makers and training publishers; where they differ (E, O, AZ), all are shown. Diamond and CBN wheels use a different marking and are not decoded here.',
+  source: 'ISO 525:2020 (confirmed 2026) and ANSI B74.13-2016, cited by name; meanings as printed by United Abrasives, CGW, the US Navy Machinery Repairman manual and High Speed Training.',
 },
 {
   id: 'wires', group: 'Threads', title: 'Thread measurement over wires',

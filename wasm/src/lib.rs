@@ -322,3 +322,90 @@ f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
 f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
 f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
 f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);
+
+// Small milling and turning calculators (core/src/millturn.rs)
+f1!(mt_engagement_deg, c::engagement_deg_f, ae, d);
+f1!(rctf, c::rctf, ae, d);
+f1!(hex_for_engagement, c::hex_for_engagement, fz, phi_rad);
+f1!(engagement_arc_deg, c::engagement_arc_deg_f, ae, d, r_wall, inside);
+f1!(cusp_height, c::cusp_height, r, s);
+f1!(stepover_for_cusp, c::stepover_for_cusp, r, h);
+f1!(ball_eff_dia, c::ball_eff_dia, d, ap, tilt);
+f1!(ball_min_dia, c::ball_min_dia, d, ap, tilt);
+f1!(runout_chip_max, c::runout_chip_max, fz, tir, z);
+f1!(runout_fz_for_max, c::runout_fz_for_max, target, tir, z);
+f1!(cutter_approach, c::cutter_approach, d, ae);
+f1!(teeth_engaged, c::teeth_engaged, z, ae, d);
+f1!(turn_passes, c::turn_passes, d0, d1, ap_max);
+f1!(c_axis_deg_min, c::c_axis_deg_min, vf, d);
+f1!(c_axis_feed_from_deg, c::c_axis_feed_from_deg, deg_min, d);
+f1!(inverse_time_f, c::inverse_time_f, lin, deg, d, vf);
+f1!(second_moment_tube, c::second_moment_tube, d, di);
+f1!(boring_bar_deflection, c::boring_bar_deflection, f, l, d, di, e_gpa);
+f1!(turning_force, c::turning_force, kc, ap, f);
+f1!(bandsaw_chip_per_tooth, c::bandsaw_chip_per_tooth, vf, vb, tpi);
+f1!(spot_depth, c::spot_depth, dc, angle);
+f1!(centre_drill_depth, c::centre_drill_depth, dc, dp, l, angle);
+f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
+/// Per-tooth chip loads with runout into list_out; returns the tooth count.
+#[no_mangle] pub extern "C" fn runout_chips(fz: f64, tir: f64, z: f64) -> f64 { set_out(c::runout_chips(fz, tir, z.max(0.0) as usize)) }
+/// Multi-pass turning into list_out as (finished dia, rpm, minutes) per pass; returns the pass count.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn turn_rough(d0: f64, d1: f64, ap_max: f64, len: f64, f: f64, vc: f64, rpm: f64, n_max: f64) -> f64 {
+    let p = c::turn_rough(d0, d1, ap_max, len, f, vc, rpm, n_max);
+    let n = p.len(); set_out(p.into_iter().flat_map(|(a, b, t)| [a, b, t]).collect()); n as f64 }
+
+// Chatter (core/src/chatter.rs). Samples go in their own buffer (up to 65 536);
+// spectra are averaged over calls to chat_add until chat_reset.
+const CHAT_LEN: usize = 65536;
+static mut CHAT_BUF: [f64; CHAT_LEN] = [0.0; CHAT_LEN];
+static mut CHAT_AVG: Vec<f64> = Vec::new();
+static mut CHAT_FRAMES: f64 = 0.0;
+#[no_mangle] pub extern "C" fn chat_buf_ptr() -> *mut f64 { core::ptr::addr_of_mut!(CHAT_BUF) as *mut f64 }
+#[no_mangle] pub extern "C" fn chat_buf_len() -> f64 { CHAT_LEN as f64 }
+#[no_mangle] pub extern "C" fn chat_reset() { unsafe { *core::ptr::addr_of_mut!(CHAT_AVG) = Vec::new(); *core::ptr::addr_of_mut!(CHAT_FRAMES) = 0.0; } }
+/// Add the spectrum of the first `n` samples (largest power of two) to the average;
+/// returns the number of bins (n/2), restarting the average when the size changes.
+#[no_mangle] pub extern "C" fn chat_add(n: f64) -> f64 {
+    let n = (n.max(0.0) as usize).min(CHAT_LEN);
+    // SAFETY: single-threaded wasm; JS wrote the buffer before this call.
+    let x = unsafe { core::slice::from_raw_parts(core::ptr::addr_of!(CHAT_BUF) as *const f64, n) };
+    let m = c::amplitude_spectrum(x);
+    unsafe {
+        let avg = &mut *core::ptr::addr_of_mut!(CHAT_AVG); let fr = &mut *core::ptr::addr_of_mut!(CHAT_FRAMES);
+        if avg.len() != m.len() { *avg = vec![0.0; m.len()]; *fr = 0.0; }
+        for (a, v) in avg.iter_mut().zip(&m) { *a = (*a * *fr + v) / (*fr + 1.0); }
+        *fr += 1.0; avg.len() as f64 }
+}
+/// Averaged amplitude of bin i.
+#[no_mangle] pub extern "C" fn chat_bin(i: f64) -> f64 { unsafe { (&*core::ptr::addr_of!(CHAT_AVG)).get(i as usize).copied().unwrap_or(f64::NAN) } }
+/// Up to k peaks of the averaged spectrum (bin width df Hz, fmin..fmax) into list_out as
+/// (frequency, amplitude, spindle harmonic order or 0) using the spindle frequency
+/// rpm / 60 and tolerance tol Hz; returns the count.
+#[no_mangle] pub extern "C" fn chat_peaks(df: f64, fmin: f64, fmax: f64, rpm: f64, tol: f64, k: f64) -> f64 {
+    let avg = unsafe { &*core::ptr::addr_of!(CHAT_AVG) };
+    let p = c::spectrum_peaks(avg, df, fmin, fmax, k.max(0.0) as usize);
+    let n = p.len();
+    set_out(p.into_iter().flat_map(|(f, a)| [f, a, c::harmonic_order(f, rpm / 60.0, tol)]).collect()); n as f64 }
+f1!(tooth_pass_hz, c::tooth_pass_hz, rpm, z);
+f1!(stable_rpm, c::stable_rpm, fc, z, lobe);
+f1!(chatter_ratio, c::chatter_ratio, fc, rpm, z);
+f1!(harmonic_order, c::harmonic_order, f, base, tol);
+
+// Grinding (core/src/grinding.rs)
+f1!(wheel_speed_ms, c::wheel_speed_ms, d, rpm);
+f1!(wheel_rpm_ms, c::wheel_rpm_ms, vs, d);
+f1!(speed_ratio, c::speed_ratio, vs, vw);
+f1!(equiv_dia, c::equiv_dia_f, dw, ds, mode);
+f1!(contact_length, c::contact_length, ae, de);
+f1!(specific_mrr, c::specific_mrr, ae, vw);
+f1!(equiv_chip_um, c::equiv_chip_um, ae, vw, vs);
+f1!(traverse_speed, c::traverse_speed, fa, nw);
+f1!(overlap_ratio, c::overlap_ratio, bs, fa);
+f1!(traverse_time, c::traverse_time, len, fa, nw, passes);
+f1!(plunge_time, c::plunge_time, stock, vfr, spark);
+f1!(plunge_specific_mrr, c::plunge_specific_mrr, dw, vfr);
+f1!(over_marked_max, c::over_marked_max, vs, vmax);
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn surface_grind(len: f64, over: f64, cross_travel: f64, cross: f64, vt: f64, stock: f64, down: f64, spark: f64, both: f64, which: f64) -> f64 {
+    c::surface_grind(len, over, cross_travel, cross, vt, stock, down, spark, both, which as u32) }

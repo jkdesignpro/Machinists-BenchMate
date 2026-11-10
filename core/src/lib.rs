@@ -569,6 +569,12 @@ pub mod dxf;
 pub mod cad;
 pub mod tooling;
 pub use tooling::*;
+pub mod millturn;
+pub use millturn::*;
+pub mod chatter;
+pub use chatter::*;
+pub mod grinding;
+pub use grinding::*;
 
 #[cfg(test)]
 mod tests {

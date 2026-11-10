@@ -322,10 +322,24 @@ def build_knurl():
             'pitches_dp': [float(x) for x in ev['pitches_dp']['DORIAN']], 'din403_mm': [float(x) for x in ev['din403_mm']]}
 
 
+def build_grinding():
+    """Grit sizes (um) per system and wheel marking letters, each with publisher consensus."""
+    ev = load_ev('grinding-evidence.json')
+    if not ev: return None
+    return {'sources': sources_of(ev), 'note': ev.get('_note', ''),
+            'grit_um': {sysname: build_codes(sec) for sysname, sec in ev['grit_um'].items()},
+            'abrasive': build_codes(ev['abrasive']), 'bond': build_codes(ev['bond']),
+            'grit_group': build_codes(ev['grit_group']), 'grade_scale': any_consensus(ev['grade_scale']),
+            'grade_group': ev['grade_group'],
+            'structure_low': any_consensus({k: v['low'] for k, v in ev['structure'].items()}),
+            'structure': ev['structure'], 'order': ev['order']}
+
+
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
-           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl()}
+           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(),
+           'grinding': build_grinding()}
     for sec in ('other_threads', 'tapers'):
         if not out[sec]: continue
         for k, rows in out[sec].items():
@@ -361,6 +375,11 @@ def main():
                 print(' ', sec, k, dict(st), [(code, [(g['value'], g['publishers']) for g in c['groups']]) for code, c in codes.items() if c['status'] in ('differs', 'confirmed_with_outlier')])
     hs = collections.Counter(c['status'] for r in out['hardness']['rows'] for f, c in r.items() if f != 'hv')
     print('  hardness cells', dict(hs), [(r['hv']['value'], f, [(g['value'], g['publishers']) for g in c['groups']]) for r in out['hardness']['rows'] for f, c in r.items() if f != 'hv' and c['status'] not in ('confirmed', 'review')])
+    g = out['grinding']
+    for k in ('abrasive', 'bond', 'grit_group'):
+        print('  grinding', k, dict(collections.Counter(c['status'] for c in g[k].values())), [(code, [(x['value'], x['publishers']) for x in c['groups']]) for code, c in g[k].items() if c['status'] in ('differs', 'confirmed_with_outlier')])
+    for k, codes in g['grit_um'].items():
+        print('  grit', k, dict(collections.Counter(c['status'] for c in codes.values())))
     print('  knurl pitches', [(x['p'], x['status']) for x in out['knurl']['pitches_mm']])
 
 
