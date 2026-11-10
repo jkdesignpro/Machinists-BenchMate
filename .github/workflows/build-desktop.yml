@@ -27,6 +27,8 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   TAURI_CLI_VERSION: "2.12.4"
+  # Python reads the data files as UTF-8 on Windows too (default there is cp1252).
+  PYTHONUTF8: "1"
 
 jobs:
   plan:
@@ -42,9 +44,9 @@ jobs:
           M='[
             {"name":"windows-x64","os":"windows-latest","target":"x86_64-pc-windows-msvc","bundles":"msi,nsis"},
             {"name":"linux-x64","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","bundles":"appimage,deb"},
-            {"name":"macos-arm64","os":"macos-14","target":"aarch64-apple-darwin","bundles":"app,dmg"}'
+            {"name":"macos-arm64","os":"macos-latest","target":"aarch64-apple-darwin","bundles":"app,dmg"}'
           if [ "$INTEL" = "true" ]; then
-            M="$M"',{"name":"macos-x64","os":"macos-14","target":"x86_64-apple-darwin","bundles":"app,dmg"}'
+            M="$M"',{"name":"macos-x64","os":"macos-latest","target":"x86_64-apple-darwin","bundles":"app,dmg"}'
           fi
           echo "matrix=$(echo "$M]" | tr -d '\n ')" >> "$GITHUB_OUTPUT"
 

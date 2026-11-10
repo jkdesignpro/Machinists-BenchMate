@@ -79,7 +79,7 @@ Note: this signs the installers. The `.exe` installed by them is not signed sepa
 
 ## macOS: optional Intel build and notarisation
 
-- Intel: tick *Also build macOS Intel* when running the workflow (cross-compiled on the Apple Silicon runner).
+- Intel: tick *Also build macOS Intel* when running the workflow (cross-compiled on the Apple Silicon runner, `macos-latest`).
 - Notarisation would remove the Open Anyway step but needs an Apple Developer Program membership (paid). If that is ever added: set `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID` as secrets, pass them to the `tauri build` step, and remove `"signingIdentity": "-"` from `desktop/tauri.conf.json` and the ad hoc `codesign` lines.
 
 ## Building the desktop app locally
