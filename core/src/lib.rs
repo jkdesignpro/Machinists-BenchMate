@@ -552,6 +552,17 @@ pub fn feed_per_tooth_f(vf: f64, rpm: f64, teeth: f64) -> f64 { feed_per_tooth(v
 
 pub const MM_PER_IN: f64 = 25.4; // exact by definition
 
+pub mod threads;
+pub mod fits;
+pub use threads::*;
+pub use fits::*;
+pub mod shop;
+pub use shop::*;
+pub mod geometry;
+pub use geometry::*;
+pub mod thread_forms;
+pub use thread_forms::*;
+
 #[cfg(test)]
 mod tests {
     use super::*;

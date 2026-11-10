@@ -50,8 +50,10 @@ Superseded practice noted in the UI:
 - **ISO 2768-2:1989** (general geometrical tolerances) is withdrawn in the
   ISO catalogue; ISO 22081:2021 is the current ISO standard for general
   geometrical specifications. Whether ISO formally names 22081 as the
-  replacement could not be confirmed (the 22081 page does not mention
-  2768-2), so the UI only states both statuses.
+  replacement could not be confirmed on iso.org (the 22081 page does not
+  mention 2768-2). Round 2: the Genorma catalogue [GEN] gives the withdrawal
+  date 2021-02-04 and lists ISO 22081:2021 under "revised by". That is one
+  source, so the UI states it as such and keeps the flag.
 - **Circled S (RFS symbol)** appears on older drawings (UIUC notes, SKL);
   current ASME practice shows no symbol. KEY says it was removed in
   Y14.5-2009; other sources put it earlier. The edition is left
@@ -144,10 +146,35 @@ Independent public explanations (each counts as one source):
   MMC", Wevolver, 2026. https://www.wevolver.com/article/true-position-in-gdt-formula-tolerance-zones-and-mmc
 - **[ACC]** F. Schenkelberg, "Root sum squared tolerance analysis method",
   Accendo Reliability. https://accendoreliability.com/root-sum-squared-tolerance-analysis-method/
+- **[FARO]** O. Ekinci, "Understanding composite positional tolerances in
+  GD&T", FARO Technologies (cites ASME Y14.5-2018 section 10.5).
+  https://www.faro.com/en/Resource-Library/Article/understanding-composite-positional-tolerances-in-gd-t
+  Used for: PLTZF/FRTZF meaning; lower row datums orient only; lower row
+  zones move as a group.
+- **[DCS]** Dimensional Control Systems, 3DCS help manual, "Composite GD&T".
+  https://community.3dcs.com/help_manual/composite-gdt.htm
+  Used for: upper row locates the pattern, lower row relates the features to
+  each other; lower row repeats datums for orientation only.
+- **[GDTB]** (round 2 addition) "Composite position vs multiple single
+  segment" https://www.gdandtbasics.com/composite-position-vs-multiple-single-segment-tolerances/
+- **[OEP]** (round 2 additions):
+  unequal disposition, citing Y14.5-2009 8.3.1.2 (https://open-exam-prep.com/study-guides/asme-gdtp-technologist/ch10/disposition-unequally-disposed);
+  profile modifiers, citing Y14.5-2009 8.5 (https://open-exam-prep.com/study-guides/asme-gdtp-technologist/ch10/profile-combined-controls-modifiers);
+  LMC position (https://open-exam-prep.com/study-guides/asme-gdtp-technologist/ch9/lmc-position-applications);
+  material condition concepts (https://open-exam-prep.com/study-guides/asme-gdtp-technologist/ch2/material-condition-concepts).
+- **[KEY]** (round 2 addition) location tolerance page
+  https://www.keyence.com/ss/products/measure-sys/gd-and-t/type/location-tolerance.jsp
+  Used for: coaxiality zone (cylinder about the datum axis), symmetry zone
+  (two planes symmetric about the datum centre plane), RFS symbol history.
+- **[GEN]** Genorma standards catalogue, ISO 2768-2:1989 page
+  https://genorma.com/en/standards/iso-2768-2-1989
+  Used for: withdrawal date 2021-02-04 and "revised by ISO 22081:2021".
 - **[FF]** W. Burke, "Introduction to root sum squared (RSS) tolerance
   analysis", Five Flute. https://fiveflute.com/guide/introduction-to-root-sum-squared-rss-tolerance-analysis
 
-Read but not used to confirm anything (did not cover the points): Sigmetrix,
+Read but not used to confirm anything (did not cover the points): MMS
+(Modern Machine Shop), G. Schuetz, "Determining out-of-roundness at the point
+of manufacture", 2022 (excerpt only, nothing usable on lobing); Sigmetrix,
 "Comparing GD&T standards: ISO GPS vs. ASME Y14.5" (2025/2026); GrabCAD
 tutorial on Y14.5-2018 terms; ZEISS Quality Forum thread on ISO 8015
 (user forum, not ZEISS staff).
@@ -164,7 +191,7 @@ tutorial on Y14.5-2018 terms; ZEISS Quality Forum thread on ISO 8015
 | Virtual condition: MMC hole = MMC - t, MMC pin = MMC + t, LMC hole = LMC + t, LMC pin = LMC - t | GDTB, SKL, JLC, OEP |
 | Inner/outer boundary at RFS has the same arithmetic but is not a virtual condition | GDTB (one source; shown as RFS boundary only) |
 | Resultant condition at MMC: hole = LMC + t + size tol., pin = LMC - t - size tol. | OEP, OWN (follows from the confirmed bonus and VC rules) |
-| Resultant condition at LMC | OWN only: **to be verified** |
+| Resultant condition at LMC | OWN only (OEP's LMC page gives only the virtual condition): **to be verified** |
 | Functional gauge pin = hole MMC - position tolerance, at basic locations | GDTB, SKL (pin VC example) |
 | Floating fastener T = H - F each part | OEP, SKL |
 | Fixed fastener t1 + t2 = H - F; equal split (H - F)/2 | OEP, SKL |
@@ -176,7 +203,8 @@ tutorial on Y14.5-2018 terms; ZEISS Quality Forum thread on ISO 8015
 | Profile: datums optional; without datums controls form only; equal bilateral by default | GDTB, GLS ("usually"), KEY (profile listed with form) |
 | MMC/LMC only on features of size | GDTB, JLC, SKL |
 | No MMC on circularity, cylindricity, runout, concentricity, symmetry | GDTB, SKL, GLS |
-| MMC on profile | sources differ (GDTB: not applicable; SKL: noted 2018 use): **to be verified**, builder shows a warning |
+| MMC/LMC on the profile tolerance value: not allowed in Y14.5-2009 (profile is RFS) | GDTB, OEP (cites 2009 8.5). SKL notes a 2018 use: 2018 position **to be verified**, builder warns |
+| MMB/LMB on datum references of a profile frame is allowed when the datum feature is a feature of size | OEP, GLS |
 | Straightness/flatness on a feature of size: derived median line/plane, MMC allowed, overrides Rule #1 | GDTB, HZ |
 | Circularity zone: two concentric circles, radial; cylindricity: two coaxial cylinders | GDTB, UIUC |
 | No diameter symbol on runout, cylindricity | GDTB, UIUC (zones are radial) |
@@ -190,37 +218,65 @@ tutorial on Y14.5-2018 terms; ZEISS Quality Forum thread on ISO 8015
 | 3-2-1 contacts and six degrees of freedom (3, 2, 1 removed) | GDTB, CNCC |
 | Datum order = order in the frame, not alphabetical | UIUC, CNCC, GDTB |
 | Datum targets | KEY, CNCC |
-| MMB on a datum feature of size: simulator fixed at boundary; part may shift; shift is not bonus | GLS (MMB allowed), GDTB (shift): **to be verified** |
+| MMB on a datum feature of size: simulator fixed at boundary; part may shift; shift is not bonus | GLS, GDTB, OEP: confirmed (round 2) |
+| A plane datum feature has no size, so takes no MMB/LMB | OEP, GDTB |
 | Concentricity and symmetry removed in Y14.5-2018 | MIT, GLS |
+| ISO coaxiality zone: cylinder of the tolerance diameter about the datum axis; concentricity: circle about the datum point in a section | KEY, UIUC: confirmed (round 2) |
+| ISO symmetry zone: two parallel planes symmetric about the datum centre plane | KEY, UIUC: confirmed (round 2) |
+| Circled S (RFS) no longer used in ASME | OEP (dropped 1994), KEY (dropped 2009), GDTB: the fact agrees, the edition differs: edition **to be verified** |
+| Composite position: one symbol, two rows; upper row (PLTZF) locates the pattern to the datums | FARO, DCS, GDTB |
+| Lower row (FRTZF): tighter, controls the features relative to each other; its zones move as a group; its datums orient only | FARO, DCS, GDTB |
+| Multiple single-segment (two symbols) differs: the lower row's datums also locate | GDTB, DCS |
+| Each feature must lie in both its PLTZF and FRTZF zones | FARO, DCS |
 | Projected zone above the part for mating parts, threaded/press-fit holes | UIUC, KEY, GDTB |
 | Free state, tangent plane, CF | KEY, GDTB, GLS |
 | Unequal profile: U in ASME, UZ in ISO | KEY, GDTB |
-| Second value after U = part of the zone outside the material | GDTB only (it cites Y14.5-2018 6.3.22): **to be verified** |
-| Statistical tolerance (ST), ASME only, SPC | KEY only: **to be verified** |
+| Second value after U = part of the zone on the material-adding side (outside the material); 0 = all inside, equal to total = all outside | GDTB (cites 2018 6.3.22), OEP (cites 2009 8.3.1.2): confirmed (round 2) |
+| Statistical tolerance (ST), ASME only, SPC | KEY only: **to be verified** (fetch budget ran out before a second source could be read) |
 | Position applies to plane surfaces in ISO, not in ASME | HZ only (UI marked) |
 | Datum letters I, O, Q avoided | no source read: **to be verified** (builder note only) |
 
-## Items left "to be verified"
+## Items left "to be verified" (round 2 outcome)
 
-1. Resultant condition with the LMC modifier (BenchMate derives it; one
-   source covers only MMC).
-2. Exceptions to "position needs datums" (coaxial features).
-3. MMB datum feature shift details.
-4. MMC/LMC on profile tolerances under Y14.5-2018 (sources differ).
-5. Meaning of the second value after the U (unequal profile) modifier.
-6. Statistical tolerance (ST) details.
-7. ISO invocation principle wording, and ISO position on plane surfaces
-   (one academic source each).
-8. ISO 1101:2017 zone definitions for coaxiality/concentricity and symmetry.
-9. Which ASME edition dropped the circled-S RFS symbol (sources differ).
-10. Lobing effects on V-block and two-point roundness checks.
-11. Datum letters to avoid (I, O, Q).
-12. Use of tangent plane with non-orientation tolerances; projected zone
-    limited to position/orientation; spherical diameter only with position.
-13. ISO 5459:2024 edition details (the catalogue detail page could not be
-    loaded; the listing title confirms the 2024 edition exists).
-14. Fastener formula appendix letter in Y14.5-2018.
-15. Whether ISO names ISO 22081 as the formal replacement for ISO 2768-2.
+Round 1 left 15 items. Round 2 outcome, item by item:
+
+1. Resultant condition with the LMC modifier: **still flagged.** OEP's LMC
+   page covers only the virtual condition; BenchMate's value stays a
+   derivation.
+2. Position without datums for coaxial features: **still flagged** (GLS
+   only).
+3. MMB datum feature shift: **confirmed** (GLS, GDTB, OEP). Added: a plane
+   datum feature takes no MMB/LMB.
+4. MMC/LMC on profile: **corrected, still flagged.** Y14.5-2009 does not
+   allow it (GDTB, OEP); the 2018 position is unclear (SKL). The builder
+   warning now says this.
+5. Value after U: **confirmed** (GDTB citing 2018 6.3.22, OEP citing 2009
+   8.3.1.2). The Unequal profile (U) zone calculator is built on it.
+6. Statistical tolerance (ST): **still flagged** (KEY only).
+7. ISO invocation principle and ISO position on planes: **still flagged**
+   (HZ only).
+8. ISO coaxiality/concentricity and symmetry zones: **confirmed** (KEY,
+   UIUC). The guide text no longer carries the flag.
+9. Edition that dropped the circled S: **still flagged, conflict narrowed.**
+   All sources agree current ASME shows no RFS symbol; OEP says 1994, KEY
+   says 2009.
+10. Lobing on V-block and two-point roundness checks: **still flagged** (no
+    usable source read).
+11. Datum letters I, O, Q: **still flagged** (no source read).
+12. Tangent plane, projected zone and spherical diameter usage limits:
+    **still flagged** (builder shows these as warnings, not errors).
+13. ISO 5459:2024 edition details: **still flagged** (detail page not read).
+14. Fastener appendix letter in Y14.5-2018: **still flagged** (UI says
+    "nonmandatory appendix" without a letter).
+15. ISO 22081 as the replacement for ISO 2768-2: **partly confirmed.** GEN
+    gives the withdrawal date (2021-02-04) and lists 22081 as the revision;
+    ISO's own page does not say so. One source, so still flagged.
+
+The shared web fetch budget ran out during round 2, which is why items 6, 7,
+10-14 were not researched further. Candidate pages for the next round: PTC
+Creo help "Optional modifiers (ASME)" and an ETS (Montreal) paper on profile
+and ST for item 6; the OEP projected zone and fastener chapter for items 12
+and 14; the Mitutoyo RA-10 roundness brochure for item 10.
 
 ## Decisions
 
@@ -239,5 +295,21 @@ tutorial on Y14.5-2018 terms; ZEISS Quality Forum thread on ISO 8015
   circled letters U+24B6-U+24E9), because common shop PCs lack fonts with
   those glyphs. Strokes use `currentColor` and CSS tokens, so they follow the
   light and dark themes.
+- **Composite position solver.** The lower row (FRTZF) check finds the
+  shift (and, when only the primary datum is repeated in the lower row, the
+  small rotation about the pattern centroid) of the zone group that
+  minimises the worst hole's need, max over holes of (2 x distance to its
+  moved zone centre - bonus). The problem is convex, so nested golden-section
+  search finds the exact minimum; tests compare it with grid searches and
+  with a minimal enclosing circle. Rotation is linearised (small angles).
+- **Composite checker leaves out** perpendicularity to the primary datum
+  (also controlled by the lower row; measure it separately) and datum
+  feature shift.
+- **Unequal profile calculator** gives the two zone limits, the equivalent
+  offset (u - t/2 towards the outside) with +/- t/2 for CMM software that
+  only takes equal zones, and a pass/fail margin for a measured deviation.
+- **Degrees of freedom explainer** uses a three-plane frame: A (removes Tz, Rx, Ry),
+  B square to A (Tx, Rz), C square to both (Ty).
+  The axis names are BenchMate's choice; sources describe the 3-2-1 counts.
 - **ASME is the default** in the builder (US shop drawings); switching to
   ISO 1101:2017 allows concentricity and symmetry.

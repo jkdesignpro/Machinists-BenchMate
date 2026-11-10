@@ -58,6 +58,9 @@ const GDT_SOURCES = {
   WEV: 'Wevolver, True position in GD&T: formula, tolerance zones and MMC, 2026',
   ACC: 'F. Schenkelberg, Root sum squared tolerance analysis method, Accendo Reliability',
   FF: 'Five Flute, Introduction to root sum squared (RSS) tolerance analysis',
+  FARO: 'O. Ekinci, Understanding composite positional tolerances in GD&T, FARO Technologies (cites ASME Y14.5-2018 section 10.5)',
+  DCS: 'Dimensional Control Systems, 3DCS help manual: Composite GD&T',
+  GEN: 'Genorma standards catalogue, ISO 2768-2:1989 status page (withdrawn 2021-02-04, revised by ISO 22081:2021)',
   OWN: 'BenchMate derivation (geometry or arithmetic), with tests in core/src/gdt.rs',
 };
 // Render source keys; fewer than two independent keys (OWN counts for maths only) = to be verified.
@@ -143,13 +146,13 @@ const CHARS = [
     mistakes: 'Resetting the indicator at each position (that is circular runout). Applying MMC. Leaving out the datum.',
     src: ['GDTB', 'UIUC', 'GLS', 'SKL'] },
   { id: 'concentricity', name: 'Concentricity / coaxiality', cat: 'Location', datums: 'required', fos: true, mc: false, dia: true, asme: false, iso: true,
-    zone: 'ISO 1101:2017 keeps coaxiality (for an axis) and concentricity (for a centre point); the zone is a cylinder (or circle) about the datum axis (to be verified against the standard). Former ASME practice (Y14.5-2009) controlled the median points of opposed elements.',
+    zone: 'Coaxiality: the axis must lie in a cylinder of the tolerance diameter whose axis is the datum axis. Concentricity: the centre point in a section must lie in a circle of the tolerance diameter about the datum. Both are ISO 1101:2017 characteristics. Former ASME practice (Y14.5-2009) controlled the median points of opposed elements.',
     controls: 'Coaxiality of an axis to a datum axis (ISO).',
     inspect: 'CMM. The former ASME median-point check was costly to inspect.',
     mistakes: 'Using it on a drawing to ASME Y14.5-2018: removed from that edition. Use position (RMB/MMC), runout or profile instead.',
-    src: ['MIT', 'GLS', 'KEY'] },
+    src: ['MIT', 'GLS', 'KEY', 'UIUC'] },
   { id: 'symmetry', name: 'Symmetry', cat: 'Location', datums: 'required', fos: true, mc: false, dia: false, asme: false, iso: true,
-    zone: 'Two parallel planes the tolerance apart, centred on the datum centre plane (to be verified against ISO 1101:2017).',
+    zone: 'Two parallel planes the tolerance apart, placed symmetrically about the datum centre plane; the median plane of the feature must lie between them.',
     controls: 'Centring of a slot or tab on a datum centre plane.',
     inspect: 'CMM, or measure both walls to the datum and compare.',
     mistakes: 'Using it on a drawing to ASME Y14.5-2018: removed from that edition. Use position or profile instead.',
@@ -257,7 +260,7 @@ const MODS = [
   { k: 'T', show: () => circled('T'), name: 'Tangent plane', asmeIso: 'ASME (KEYENCE lists it as ASME only)',
     text: 'The tolerance applies to the plane touching the high points of the surface, not to every point of it. Useful on mounting faces where contact matters.', src: ['KEY', 'GDTB', 'GLS'] },
   { k: 'U', show: () => circled('U'), name: 'Unequally disposed profile', asmeIso: 'ASME (U); ISO 1101:2017 uses UZ',
-    text: 'Profile only. The zone is not split equally about the true profile. The frame gives the total width, then, after the U, the part of it that lies outside the material: equal values put the whole zone outside, zero puts it all inside (the reading of the second value is from one source).', src: ['GDTB', 'KEY', 'GLS'], tbv: true },
+    text: 'Profile only. The zone is not split equally about the true profile. The frame gives the total width, then, after the U, the part of it that lies on the material-adding side (outside the material): equal values put the whole zone outside, zero puts it all inside. See the Unequal profile (U) zone calculator.', src: ['GDTB', 'OEP', 'KEY'] },
   { k: 'ST', show: () => stBox(), name: 'Statistical tolerance', asmeIso: 'ASME (KEYENCE lists it as ASME only)',
     text: 'The tolerance relies on statistical tolerancing, so the feature is expected to be made under statistical process control (to be verified: only one source read).', src: ['KEY'], tbv: true },
   { k: 'CF', show: () => '<span class="gtx">CF</span>', name: 'Continuous feature', asmeIso: 'ASME (KEYENCE lists it as ASME only)',
@@ -277,7 +280,7 @@ function renderGdtGuide(el) {
     '<dt>Tolerance zone</dt><dd>' + gesc(c.zone) + '</dd><dt>What it controls</dt><dd>' + gesc(c.controls) + '</dd>' +
     '<dt>Typical inspection</dt><dd>' + gesc(c.inspect) + '</dd><dt>Common mistakes</dt><dd>' + gesc(c.mistakes) + '</dd></dl></div></section>';
   const cats = ['Form', 'Profile', 'Orientation', 'Location', 'Runout'];
-  const toc = [['g-purpose', 'Purpose'], ['g-rule1', 'Rule #1 vs ISO 8015'], ['g-datums', 'Datums'], ['g-chars', 'Characteristics'], ['g-mods', 'Modifiers'], ['g-cmp', 'ASME vs ISO'], ['g-eds', 'Editions'], ['g-srcs', 'Sources']];
+  const toc = [['g-purpose', 'Purpose'], ['g-rule1', 'Rule #1 vs ISO 8015'], ['g-datums', 'Datums'], ['g-chars', 'Characteristics'], ['g-comp', 'Composite position'], ['g-mods', 'Modifiers'], ['g-cmp', 'ASME vs ISO'], ['g-eds', 'Editions'], ['g-srcs', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Written for BenchMate in our own words, for ASME Y14.5-2018 and the current ISO GPS editions. Standards are cited by name, year and clause only. Each rule carries the keys of the public sources that confirm it (hover a key); anything not confirmed in two independent sources is marked <span class="gtbv">to be verified</span>. Always work to the standard and edition named on your drawing.</p>' +
@@ -296,12 +299,14 @@ function renderGdtGuide(el) {
     '<p><b>3-2-1 and degrees of freedom.</b> A free part has six degrees of freedom: three translations and three rotations. For a part with three plane datum features, the primary datum feature contacts its simulator at three or more points and removes three degrees of freedom, the secondary at two or more points and removes two, and the tertiary at one or more point and removes the last. ' + srcTags(['GDTB', 'CNCC']) + '</p>' +
     '<p><b>Order of precedence.</b> The first datum letter in the feature control frame is primary, the second secondary, the third tertiary. The order is the order of set-up, not alphabetical, and changing it can change the result. ' + srcTags(['UIUC', 'CNCC', 'GDTB']) + '</p>' +
     '<p><b>Datum targets.</b> On warped or irregular surfaces the drawing can name points, lines or small areas to contact instead of the whole surface, so set-up is repeatable. ' + srcTags(['KEY', 'CNCC']) + '</p>' +
-    '<p><b>Datum features of size at MMB/LMB.</b> When a hole or pin is a datum feature it can be referenced at its maximum or least material boundary (M or L after the datum letter). The simulator is then fixed at that boundary size, and if the actual datum feature departs from it the part may shift relative to the simulator. This shift is not a bonus on the feature tolerance and must not simply be added to it. ' + srcTags(['GLS', 'GDTB'], true) + mmbDiagram() + '</p>' +
+    '<p><b>Datum features of size at MMB/LMB.</b> When a hole or pin is a datum feature it can be referenced at its maximum or least material boundary (M or L after the datum letter). The simulator is then fixed at that boundary size, and if the actual datum feature departs from it the part may shift relative to the simulator. This datum feature shift is not a bonus on the feature tolerance and must not simply be added to it. A plane datum feature has no size, so it cannot take MMB or LMB. ' + srcTags(['GLS', 'GDTB', 'OEP']) + mmbDiagram() + '</p>' +
 
     '<h2 id="g-chars">The geometric characteristics</h2>' +
     '<p class="desc">ASME Y14.5-2018 has 12 characteristic symbols; concentricity and symmetry were removed from that edition but are still in ISO 1101:2017. ' + srcTags(['MIT', 'GLS', 'KEY']) + ' The zone and datum rules below are confirmed in the sources tagged on each; inspection notes are common shop practice from the same sources, not requirements of the standards. Sketch key: <span class="gkey gkp"></span> part, <span class="gkey gkz"></span> tolerance zone, <span class="gkey gkb"></span> true profile / datum.</p>' +
     cats.map(cat => '<h3 class="gcat">' + cat + '</h3>' + CHARS.filter(c => c.cat === cat).map(charRow).join('')).join('') +
 
+    '<h2 id="g-comp">Composite position</h2>' + compositeDiagram() +
+    '<p>One position symbol spanning two rows of a frame. The upper row (pattern-locating tolerance zone framework, PLTZF) locates the pattern of holes to the datums, like an ordinary position tolerance. The lower row (feature-relating tolerance zone framework, FRTZF) is tighter and controls the holes relative to each other: its zones form one rigid group that may shift (and, with only the primary datum repeated, rotate) as long as each hole stays in both of its zones. Datums in the lower row orient the group only. Two frames each with their own position symbol (multiple single-segment) are different: there the lower datums locate as well, so the result is tighter. Use the Composite position checker to test measured holes. ' + srcTags(['FARO', 'DCS', 'GDTB']) + '</p>' +
     '<h2 id="g-mods">Modifiers</h2><div class="res" style="max-width:none"><table class="gtab"><tr><th>Symbol</th><th>Name</th><th>Meaning</th><th>Standards</th></tr>' +
     MODS.map(m => '<tr><td class="gsc">' + m.show() + '</td><td><b>' + gesc(m.name) + '</b></td><td>' + gesc(m.text) + ' ' + srcTags(m.src, m.tbv) + '</td><td>' + gesc(m.asmeIso) + '</td></tr>').join('') +
     '<tr><td class="gsc">' + sym('dia') + '</td><td><b>Diameter, spherical diameter</b></td><td>The zone is a cylinder; S before the diameter symbol means a spherical zone. Not used with runout, circularity or cylindricity, whose zones are radial widths. ' + srcTags(['UIUC', 'GDTB']) + '</td><td>ASME and ISO</td></tr>' +
@@ -315,7 +320,7 @@ function renderGdtGuide(el) {
      ['ASME-only modifiers', 'Tangent plane, statistical, continuous feature, independency.', 'Not in ISO in the same form; ISO has CZ (common zone) and others.', ['KEY', 'GDTB'], false],
      ['Material condition', 'MMC/LMC modifiers; RFS by default.', 'MMR and LMR, ISO 2692:2021.', ['ISO', 'KEY'], false],
      ['Datums', 'Y14.5-2018 datum reference frames.', 'ISO 5459:2024. Common datum written A-A in ISO.', ['ISO', 'HZ'], true],
-     ['General geometric tolerances', 'No ASME general geometric tolerance table; by drawing note or company standard (to be verified).', 'ISO 22081:2021. ISO 2768-2:1989 is withdrawn in the ISO catalogue.', ['ISO'], true],
+     ['General geometric tolerances', 'No ASME general geometric tolerance table; by drawing note or company standard (to be verified).', 'ISO 22081:2021. ISO 2768-2:1989 was withdrawn on 2021-02-04; one catalogue lists ISO 22081:2021 as its revision (ISO\'s own page does not say so).', ['ISO', 'GEN'], true],
      ['Fastener formulas', 'Nonmandatory appendix (floating and fixed fastener formulas).', 'No ISO counterpart found (to be verified).', ['GDTB', 'OEP'], true],
     ].map(([a, b, c, s, t]) => '<tr><td><b>' + a + '</b></td><td>' + b + '</td><td>' + c + ' ' + srcTags(s, t) + '</td></tr>').join('') + '</table></div>' +
 
@@ -356,7 +361,7 @@ function fcfCheck(s) {
   ds.forEach(([l]) => { if (/^[IOQ]$/.test(l)) warn('Datum letters I, O and Q are commonly avoided because they look like 1 and 0.', [], true); });
   if (ds.some(x => x[1])) warn('MMB/LMB after a datum letter only means something if that datum feature is a feature of size (hole, pin, slot, tab).', ['GLS', 'GDTB']);
   if (s.mc && !s.fos) err('MMC and LMC apply only to features of size (axis or median plane), not to a plain surface.', ['GDTB', 'GLS', 'KEY']);
-  if (s.mc && s.ch.startsWith('profile')) warn('Material condition on profile: sources differ (GD&T Basics says not applicable; Skill-Lync notes a Y14.5-2018 use). Check the standard before using it.', ['GDTB', 'SKL'], true);
+  if (s.mc && s.ch.startsWith('profile')) warn('MMC/LMC on the profile tolerance value: not allowed under Y14.5-2009 (profile is a surface control, RFS only); one source mentions a Y14.5-2018 use. Avoid it unless your standard edition clearly allows it. MMB/LMB on the datum references is fine when the datum feature is a feature of size.', ['GDTB', 'OEP', 'SKL'], true);
   else if (s.mc && !c.mc) err(c.name + ' cannot take MMC or LMC' + (c.cat === 'Runout' ? ': runout is always regardless of feature size.' : '.'), ['GLS', 'GDTB']);
   if (s.fos && !c.fos) err(c.name + ' applies to surfaces, not to a derived axis or median plane.', ['GLS']);
   if (s.zone === 'dia' && !c.dia) err('A diameter zone does not apply to ' + c.name.toLowerCase() + '; its zone is a width between lines, planes, circles or cylinders.', ['UIUC', 'GDTB']);
@@ -497,6 +502,102 @@ function renderStack(el) {
     const o = k => W.gdt_stack(...a, k), dp = state.sys === 'inch' ? 4 : 3, f = x => fmt(x, dp);
     const rows = [['Gap at nominal', o(0)], ['Gap at mean (centre of each tolerance)', o(1)], ['Worst case: plus/minus', o(2)], ['Worst case: minimum gap', o(4)], ['Worst case: maximum gap', o(5)], ['RSS: plus/minus', o(3)], ['RSS: minimum gap', o(6)], ['RSS: maximum gap', o(7)]];
     el.querySelector('#sres').innerHTML = '<div class="h">Results (' + o(8) + ' dimensions)</div><table>' + rows.map(([l, v]) => '<tr' + ((l.includes('minimum') && v < 0) ? ' class="over"' : '') + '><td>' + l + (l.includes('minimum') && v < 0 ? '<div class="wmsg">Negative: interference is possible</div>' : '') + '</td><td class="v">' + f(v) + '</td><td class="u">' + u + '</td></tr>').join('') + '</table>';
+  };
+  draw();
+}
+
+// ---------- Composite position (PLTZF / FRTZF) ----------
+function compositeDiagram() {
+  // Four-hole pattern: big pattern-locating zones fixed at true position;
+  // small feature-relating zones move together as one rigid group.
+  const P = [[60, 40], [140, 40], [60, 110], [140, 110]], sh = [9, -6];
+  let s = '<path class="gb" d="M20 150H190M20 150V10"/>';
+  P.forEach(([x, y]) => { s += '<circle class="gz" cx="' + x + '" cy="' + y + '" r="22"/><path class="gm" d="M' + (x - 4) + ' ' + y + 'h8M' + x + ' ' + (y - 4) + 'v8"/>'; });
+  P.forEach(([x, y]) => { s += '<circle class="gzs" cx="' + (x + sh[0]) + '" cy="' + (y + sh[1]) + '" r="8"/>'; });
+  [[70, 33], [148, 37], [66, 106], [151, 102]].forEach(([x, y]) => { s += '<circle class="gdot" cx="' + x + '" cy="' + y + '" r="2.2"/>'; });
+  s += '<text class="gl" x="186" y="34">large dashed: PLTZF,</text><text class="gl" x="186" y="46">fixed at basic positions</text><text class="gl" x="186" y="90">small: FRTZF, one rigid</text><text class="gl" x="186" y="102">group that may shift</text><text class="gl" x="186" y="114">(and rotate)</text>';
+  return '<svg class="gdia big" viewBox="0 0 320 160" role="img" aria-label="Composite position zones">' + s + '</svg>';
+}
+
+const COMP_STATE = { t1: 0.5, t2: 0.12, mc: 0, rot: 1, int: 1, lo: '', hi: '', holes: [[0, 0, 0.05, 0.12, ''], [40, 0, 40.09, 0.08, ''], [40, 30, 40.07, 30.13, ''], [0, 30, -0.02, 30.11, '']] };
+function renderComposite(el) {
+  const s = COMP_STATE, W = state.W, u = lenU(state.sys), dp = state.sys === 'inch' ? 4 : 3;
+  const num = x => (x === '' || x === null || x === undefined) ? NaN : +x;
+  const opt = (arr, cur) => arr.map(([v, t]) => '<option value="' + v + '"' + (String(v) === String(cur) ? ' selected' : '') + '>' + t + '</option>').join('');
+  const draw = () => {
+    el.innerHTML = compositeDiagram() +
+      '<p class="desc" style="max-width:880px">A composite frame has one position symbol over two rows. The <b>upper row (PLTZF, pattern-locating tolerance zone framework)</b> locates the whole pattern to the datums: each hole must be inside its zone at the basic location. The <b>lower row (FRTZF, feature-relating tolerance zone framework)</b> is tighter and controls the holes relative to each other: its zones move together as one rigid group, and any datums in the lower row only orient that group, they do not locate it. With only the primary datum in the lower row the group may shift and rotate; with the primary and secondary it may shift but not rotate. Each hole must be inside both of its zones. Two separate frames, each with its own symbol (multiple single-segment), mean something else: there the lower datums also locate. ' + srcTags(['FARO', 'DCS', 'GDTB']) + '</p>' +
+      '<div class="grid">' +
+      '<label class="f"><span>Upper row tolerance (PLTZF, diameter)</span><div class="row"><input data-k="t1" type="number" step="any" value="' + s.t1 + '"><span class="u">' + u + '</span></div></label>' +
+      '<label class="f"><span>Lower row tolerance (FRTZF, diameter)</span><div class="row"><input data-k="t2" type="number" step="any" value="' + s.t2 + '"><span class="u">' + u + '</span></div></label>' +
+      '<label class="f"><span>Lower row datums</span><div class="row"><select data-k="rot">' + opt([[1, 'Primary only: shift and rotate'], [0, 'Primary and secondary: shift only']], s.rot) + '</select></div></label>' +
+      '<label class="f"><span>Material condition (both rows)</span><div class="row"><select data-k="mc">' + opt([[0, 'RFS'], [1, 'MMC'], [2, 'LMC']], s.mc) + '</select></div></label>' +
+      '<label class="f"><span>Feature</span><div class="row"><select data-k="int">' + opt([[1, 'Holes (internal)'], [0, 'Pins (external)']], s.int) + '</select></div></label>' +
+      '<label class="f"><span>Size lower limit (for bonus)</span><div class="row"><input data-k="lo" type="number" step="any" value="' + s.lo + '"><span class="u">' + u + '</span></div></label>' +
+      '<label class="f"><span>Size upper limit (for bonus)</span><div class="row"><input data-k="hi" type="number" step="any" value="' + s.hi + '"><span class="u">' + u + '</span></div></label>' +
+      '</div><div class="res" style="max-width:none;overflow:auto"><table class="gtab"><tr><th>Hole</th><th>Basic X</th><th>Basic Y</th><th>Measured X</th><th>Measured Y</th><th>Actual size</th><th></th></tr>' +
+      s.holes.map((h, i) => '<tr><td>' + (i + 1) + '</td>' + [0, 1, 2, 3, 4].map(j => '<td><input type="number" step="any" data-i="' + i + '" data-j="' + j + '" value="' + h[j] + '" style="width:100px;font-family:var(--mono)"></td>').join('') + '<td><button class="btn" data-del="' + i + '">Remove</button></td></tr>').join('') +
+      '</table></div><div class="mfilter" style="margin-top:8px"><button class="btn" id="cadd"' + (s.holes.length >= 8 ? ' disabled' : '') + '>Add hole</button><span class="desc" style="margin:0">Up to 8 holes. Coordinates in the datum reference frame of the upper row.</span></div>' +
+      '<div class="res" id="cres" style="margin-top:12px;max-width:none;overflow:auto"></div>';
+    el.querySelectorAll('[data-k]').forEach(i => i.oninput = i.onchange = () => { s[i.dataset.k] = i.value === '' ? '' : +i.value; calc(); });
+    el.querySelectorAll('[data-i]').forEach(i => i.oninput = i.onchange = () => { s.holes[+i.dataset.i][+i.dataset.j] = i.value === '' ? '' : +i.value; calc(); });
+    el.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { s.holes.splice(+b.dataset.del, 1); draw(); });
+    el.querySelector('#cadd').onclick = () => { s.holes.push(['', '', '', '', '']); draw(); };
+    calc();
+  };
+  const calc = () => {
+    const out = el.querySelector('#cres'), mc = +s.mc, lo = num(s.lo), hi = num(s.hi);
+    const useB = mc > 0 && lo > 0 && hi >= lo;
+    const rows = [], flat = [];
+    let msg = '';
+    if (mc > 0 && !useB) msg = '<tr><td colspan="8" class="warn">Enter the size limits to use bonus tolerance; until then the check uses no bonus.</td></tr>';
+    s.holes.forEach((h, i) => {
+      const [nx, ny, mx, my, act] = h.map(num);
+      if (!(isFinite(nx) && isFinite(ny) && isFinite(mx) && isFinite(my))) return;
+      let b = 0, bad = '';
+      if (useB) { if (isFinite(act)) { b = W.gdt_bonus(lo, hi, act, +s.int, mc); if (!isFinite(b)) { bad = 'size out of limits: reject'; b = 0; } } else bad = 'no actual size: no bonus'; }
+      rows.push({ i, tp: W.gdt_tp_coords(nx, ny, mx, my), b, bad });
+      flat.push(nx, ny, mx, my, b);
+    });
+    if (!rows.length) { out.innerHTML = '<div class="h">Results</div><table><tr><td class="warn">Enter at least one hole.</td></tr></table>'; return; }
+    while (flat.length < 40) flat.push(0, 0, NaN, NaN, 0);
+    const C = k => W.gdt_composite(...flat, +s.rot, k);
+    const need = C(0), t1 = num(s.t1), t2 = num(s.t2);
+    const f = x => fmt(x, dp);
+    let allOk = rows.every(r => !r.bad.startsWith('size'));
+    const body = rows.map((r, k) => {
+      const res = C(10 + k), up = r.tp <= t1 + r.b + 1e-12, lw = res <= t2 + r.b + 1e-12;
+      if (!(up && lw)) allOk = false;
+      return '<tr' + (up && lw && !r.bad.startsWith('size') ? '' : ' class="over"') + '><td>' + (r.i + 1) + (r.bad ? '<div class="wmsg">' + r.bad + '</div>' : '') + '</td><td class="v">' + f(r.tp) + '</td><td class="v">' + f(r.b) + '</td><td class="v">' + f(t1 + r.b) + '</td><td>' + (up ? 'pass' : '<b class="gerr">fail</b>') + '</td><td class="v">' + f(res) + '</td><td class="v">' + f(t2 + r.b) + '</td><td>' + (lw ? 'pass' : '<b class="gerr">fail</b>') + '</td></tr>';
+    }).join('');
+    out.innerHTML = '<div class="h">Results</div><table class="gtab"><tr><th>Hole</th><th>Position to datums (dia)</th><th>Bonus</th><th>Upper row allowed</th><th>Upper row</th><th>Lower row: dia to best-fit group</th><th>Lower row allowed</th><th>Lower row</th></tr>' + msg + body +
+      '</table><table><tr><td>Best-fit shift of the lower-row group (X, Y)</td><td class="v">' + f(C(1)) + ', ' + f(C(2)) + '</td><td class="u">' + u + '</td></tr>' +
+      '<tr><td>Best-fit rotation of the group (about the origin)</td><td class="v">' + fmt(C(3) * 180 / Math.PI, 5) + '</td><td class="u">deg</td></tr>' +
+      '<tr><td>Smallest lower-row tolerance this pattern would meet' + (useB ? ' (net of each hole\'s bonus)' : '') + '</td><td class="v">' + f(need) + '</td><td class="u">' + u + '</td></tr>' +
+      '<tr' + (allOk ? '' : ' class="over"') + '><td><b>Result</b></td><td class="v">' + (allOk ? 'PASS' : 'FAIL') + '</td><td class="u"></td></tr></table>';
+  };
+  draw();
+}
+
+// ---------- Datum reference frame and degrees of freedom ----------
+const DOF_STATE = { n: 3 };
+function renderDof(el) {
+  const s = DOF_STATE;
+  const D = [['Tz', 'translation along Z (square to A)'], ['Rx', 'rotation about X'], ['Ry', 'rotation about Y'], ['Tx', 'translation along X (square to B)'], ['Rz', 'rotation about Z'], ['Ty', 'translation along Y (square to C)']];
+  const by = [0, 0, 0, 1, 1, 2]; // datum that removes each: 0 A, 1 B, 2 C
+  const draw = () => {
+    const pts = { 0: [[110, 160], [200, 158], [170, 125]], 1: [[80, 90], [140, 70]], 2: [[240, 70]] };
+    let svg = '<svg class="gdia big" viewBox="0 -22 320 222" role="img" aria-label="Datum reference frame">';
+    [['M40 150L160 190L300 140L180 100Z', 1], ['M40 150L40 40L180 -10L180 100Z', 2], ['M180 100L180 -10L300 30L300 140Z', 3]].forEach(([d, k]) => { svg += '<path class="gplane' + (s.n >= k ? ' on' : '') + '" d="' + d + '"/>'; });
+    [0, 1, 2].forEach(k => { if (s.n > k) pts[k].forEach(([x, y]) => { svg += '<circle class="gdot" cx="' + x + '" cy="' + y + '" r="3.2"/>'; }); });
+    svg += '<text class="gl" x="120" y="196">A (primary)</text><text class="gl" x="8" y="30">B (secondary)</text><text class="gl" x="236" y="-8">C (tertiary)</text>' +
+      '<path class="gm" d="M20 186l24 8M20 186l24 -9M20 186l0 -24"/><text class="gl" x="46" y="198">X</text><text class="gl" x="46" y="178">Y</text><text class="gl" x="16" y="158">Z</text></svg>';
+    const free = D.filter((_, i) => by[i] >= s.n).length;
+    el.innerHTML = '<div class="mfilter"><span>Datums set up:</span><div class="seg" id="dofseg">' + ['None', 'A', 'A, B', 'A, B, C'].map((t, i) => '<button data-n="' + i + '"' + (i === s.n ? ' class="on"' : '') + '>' + t + '</button>').join('') + '</div></div>' + svg +
+      '<div class="res" style="max-width:560px"><div class="h">Degrees of freedom: ' + free + ' of 6 still free</div><table>' +
+      D.map(([k, t], i) => '<tr><td class="v" style="text-align:left;width:40px">' + k + '</td><td>' + t + '</td><td>' + (by[i] < s.n ? '<span class="gok">removed by ' + 'ABC'[by[i]] + '</span>' : '<span class="warn">free</span>') + '</td></tr>').join('') + '</table></div>' +
+      '<p class="desc" style="max-width:880px">For a part with three plane datum features at right angles, the primary datum feature A rests on at least three high points and removes three degrees of freedom (one translation, two rotations); the secondary B touches at least two points and removes two; the tertiary C touches at least one and removes the last. The order is the order in the feature control frame, left to right, not alphabetical. ' + srcTags(['GDTB', 'CNCC', 'UIUC']) + ' Which axes each plane locks follows from the geometry of the set-up drawn here (' + srcTags(['OWN']) + '). A bore or pin used as a datum feature removes a different set; that case is not covered here.</p>';
+    el.querySelectorAll('#dofseg button').forEach(b => b.onclick = () => { s.n = +b.dataset.n; draw(); });
   };
   draw();
 }

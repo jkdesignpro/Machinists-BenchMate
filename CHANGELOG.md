@@ -3,6 +3,47 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (geometry)
+- Triangle solver: right or any triangle from any three values with at least one side; the ambiguous side-side-angle case shows both solutions with a picker; area and perimeter; own SVG drawing.
+- Chord, arc, sagitta: solve from radius and angle, radius and chord, radius and sagitta, chord and sagitta, or radius and arc length; segment and sector areas; diagram. Circle through three points.
+- Fillet and tangent points: corner fillet between two lines (tangent points, centre, tangent distance) and line-to-arc fillet (inside or outside the arc, either side of the line, up to two solutions), with drawings.
+- Dovetail and V-groove over pins: male and female dovetail measurement over/between pins from the corner width or the top width and depth, contact check; V-groove pin height.
+- Stock weight: round, hex, square, tube, flat/plate/sheet; per piece, batch and per metre or foot; density from Confirmed material data or entered.
+- Sheet-metal bend allowance, outside setback, bend deduction, flat length of a two-flange part, K-factor from a test bend (K never defaulted).
+- Sine bar and gauge-block stack: stack height for an angle and angle for a stack; fewest-block stack (exact search) from the metric 112 or inch 81-piece sets (confirmed by two makers), Mitutoyo 88/103/47/32 sets (one maker's listing, labelled) or your own list.
+- Dividing head and rotary table: simple and angular indexing on your own hole circles, differential indexing with your own change gears (simple or compound train, idler rule).
+- `benchmate-core` module `geometry` with tests (worked examples, brute-force and constructed-geometry checks); WebAssembly exports including list results through `list_out`.
+- `docs/geometry.md`: sources, check table, decisions.
+### Added (shop helpers)
+- Process capability: paste measurements (production order) or enter mean and sigma. Cp, Cpk (within sigma: mean moving range / 1.128, or mean range / d2 for subgroups of 2-10), Pp, Ppk (overall sample standard deviation), one-sided limits, expected ppm below/above from the normal tails (within and overall), observed out-of-spec count, histogram SVG with normal fits and limit lines, warnings for fewer than about 50 values and for overall sigma well above within sigma.
+- Temperature compensation: reading corrected to 20 °C (68 °F) for part and gauge expansion, with the reading a to-size part gives, deviation from drawing size and the uncertainty from the part coefficient. Coefficients are entered by the user or picked from Confirmed material data (none confirmed yet, which the screen says).
+- Coolant concentration from refractometer reading x the fluid's factor (never defaulted), with an optional range check; coolant mix and top-up: concentrate or water to add, top-up mix strength to reach target when filling to full, fresh fill amounts.
+- Fraction, decimal and mm converter: reads 1 3/8, 1-3/8, 3/8, 0.375, 0.375", 9.525 mm; nearest fraction at a chosen denominator (default 1/64) with error in inch and mm, plus a table for 1/4 to 1/64.
+- Setup sheet: job, part, operation, machine from Machine profiles, tool list (T no., description, holder, stick-out, length and diameter offsets, notes), work offsets, notes; several sheets in the browser (localStorage), JSON export/import, print layout without the app frame.
+- `benchmate-core` module `shop`: `cap_mean`, `cap_sigma_overall`, `cap_sigma_within`, `d2`, `cap_indices`, `cap_ppm`, `erfc`, `normal_pdf`, `histogram`, `sturges_bins`, `capability_flat`, `length_at_20`, `reading_for_length`, `thermal_growth`, `alpha_uncertainty`, `coolant_*`, `frac_nearest_num`, `frac_reduce`, `mixed_to_decimal`, with tests (hand example, NIST ppm table, d2 against NIST's A2 table). WebAssembly: shared input buffer (`buf_ptr`, `buf_len`) for list data, `cap_from_buf`, `cap_from_stats` and scalar exports.
+- `docs/shop-helpers.md`: sources, statement check table, open items, decisions.
+### Added (GD&T round 2)
+- Composite position checker: up to 8 holes with basic and measured X/Y and actual size; upper row (PLTZF) checked per hole against its basic location with bonus; lower row (FRTZF) checked after the best shift of the zone group, plus a small rotation when only the primary datum is repeated in the lower row. Shows the tolerance the pattern needs, the best shift and rotation, and the residual per hole. Own diagram; guide section "Composite position" (composite vs multiple single-segment).
+- Unequal profile (U) zone calculator: zone limits on the outside and inside of the material, equivalent offset and +/- t/2 for CMM software, pass/fail margin for a measured deviation.
+- Datum reference frame and degrees of freedom explainer: step through A, A-B, A-B-C and see which of the six degrees of freedom each datum removes.
+- `benchmate-core`: `true_position_dia_from_coords`, `composite_frtzf` (`CompositeResult`, exact convex minimax by nested golden-section search, tested against grid searches and a minimal enclosing circle), `composite_frtzf_flat`, `profile_unequal_limits`, `profile_unequal_offset`, `profile_unequal_margin`; WebAssembly exports `gdt_tp_coords`, `gdt_composite`, `gdt_profile_u_*`.
+- Round 1 "to be verified" items reworked: confirmed MMB datum shift, meaning of the value after U, ISO coaxiality/concentricity and symmetry zones; corrected the MMC-on-profile warning (not allowed in Y14.5-2009) and narrowed the RFS-symbol conflict; ISO 2768-2 withdrawal date and ISO 22081 revision link from one catalogue. Outcome of all 15 items in `docs/gdt.md`. New sources: FARO, 3DCS, more GD&T Basics, Open Exam Prep and KEYENCE pages, Genorma.
+### Added (reference data, round 2: pipe and British threads, machine tapers)
+- Pipe threads (Threads): BSP G/R (ISO 228-1, ISO 7-1) and NPT (ASME B1.20.1).
+  - Shows TPI, diameters, pitch diameters, ISO 7-1 gauge length, and NPT L1, E0, E1 and L2.
+  - The NPT formulas are checked against the published E1 and L2 values.
+- Whitworth and BA threads (Threads): BSW and BSF (BS 84 profile) and BA (BS 93: P = 0.9^n, D = 6 P^1.2, two significant figures), with TPI checked against two publishers.
+- Machine tapers (Setup):
+  - Morse 0 to 7, Jacobs, 7:24 steep tapers (ISO 7388-1/SK, BT, CAT) with retention knob threads and pull stud standard references, HSK-A and R8.
+  - Each value shows its evidence status.
+- Thread data: Unified 2B minor diameter limits (ASME B1.1 rule, reproduces 71 of 74 rows of a published table); 1A and 1B rows, marked as not checked; other ISO metric classes (4h, 6e, 6f, 6h, 8g, 5H, 6G, 7H), computed from the formulas and marked as not checked.
+- Drill chart: a second publisher (MISUMI) for 40 metric sizes, now Confirmed.
+- `benchmate-core`:
+  - New `thread_forms` module: Whitworth profile, BA formulas, NPT E0/E1/L2, `round_sig`.
+  - `un_minor_tol_2b` and `un_minor_2b`.
+  - Tests against published NPT, BSW, BSF, BSP, BA and Unified 2B tables, and a comparison of the form-tap rule with a tap maker's (Balax) hole sizes.
+### Fixed
+- Unified internal pitch diameter tolerance: the class factor now applies to the unrounded 2A tolerance, which reproduces the published 2B table. Before, 20 of 74 rows were 0.0001 in off.
 ### Added (GD&T)
 - New **GD&T** group. All rules written in our own words; standards (ASME Y14.5-2018 (R2024), ISO 1101:2017, ISO 5459:2024, ISO 2692:2021, ISO 8015:2011, ISO 22081:2021) cited by name only, editions checked on the ASME and ISO catalogue pages. Every rule is confirmed in two independent public sources or marked "to be verified" (`docs/gdt.md`).
 - GD&T reference guide: purpose and datums (3-2-1, precedence, datum targets, MMB), Rule #1 versus ISO 8015 independency, all 14 characteristics (12 in Y14.5-2018 plus ISO concentricity/coaxiality and symmetry) with own SVG zone sketches, inspection notes and common mistakes, modifiers, ASME/ISO comparison, current editions and superseded practice (concentricity/symmetry removed in Y14.5-2018; ISO 2768-2 withdrawn). Source keys shown on every statement.
@@ -16,10 +57,31 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - `scripts/build_materials.py`: converts to SI, groups by property/condition/basis, clusters values (density within 1 %, others exact or within 0.5 % after unit conversion, ranges by both ends), counts independent publishers, statuses Confirmed / Sources differ / Needs 2nd source; refuses mechanical values without a condition; writes the coverage table into `docs/material-equivalents.md`. Materials JSON schema 3.
 - App: properties table in the grade detail (condition, value basis, publisher counts, alternatives and printed spread on disagreement, status), metric or inch units (lb/in³, Msi, ksi, µin/in·°F, BTU/h·ft·°F) following the inch/mm toggle; the open grade, search and filters survive a unit switch. Source panel shows each source's revision and printed property lines.
 - First coverage: 36 of 127 grades, 513 condition groups, from 42 documents by 15 publishers (Outokumpu, Atlas Steels, Lucefin, Ovako, Dörrenberg, Aalco, Smiths, Diehl, MakeItFrom, TIMET, Special Metals, Aerospace Metals, KIPP, W.S. Hampshire, Aircraft Materials). Disagreements recorded, e.g. 2205 ASTM min Rm 655 vs 620 MPa, austenitic density 7.9 vs 8.0 and E 200 vs 193 GPa, 6082 conductivity 180 vs 160 W/m·K.
-- Round 2 (`data/evidence/props-round2.json`): 54 of 128 grades, 765 condition groups, from 76 property documents by 22 publishers. New: Aalco stainless bar pages (416, 2205, 410, 420, 430, 440C, 304L, 316L), Aalco aluminium (6063, 5052, 5754, 1050A, 5251, 6262) and copper sheets, ColorMetal EN 755-2 bar minimums (2011, 2024, 6060, 6063, 6082, 7075), West Yorkshire Steel and Macsteel (EN24), Uddeholm (D2, H13, O1), VDM (Inconel 718), Special Metals (Inconel 625), Alumeco (CW617N, CW307G), Aerospace Metals (Ti-6Al-4V STA bar), MakeItFrom and Online Metals (1018).
+- Round 2 (`data/evidence/props-round2.json`): 54 of 128 grades, 764 condition groups, from 76 property documents by 22 publishers. New: Aalco stainless bar pages (416, 2205, 410, 420, 430, 440C, 304L, 316L), Aalco aluminium (6063, 5052, 5754, 1050A, 5251, 6262) and copper sheets, ColorMetal EN 755-2 bar minimums (2011, 2024, 6060, 6063, 6082, 7075), West Yorkshire Steel and Macsteel (EN24), Uddeholm (D2, H13, O1), VDM (Inconel 718), Special Metals (Inconel 625), Alumeco (CW617N, CW307G), Aerospace Metals (Ti-6Al-4V STA bar), MakeItFrom and Online Metals (1018).
 - New grade 1018 (`data/evidence/steels-3.json`): AISI 1018 / UNS G10180 from two publishers; no EN number found yet.
-- Recorded as printed, not corrected: Aalco 5083 density "265 g/cm³", Aalco 410 E 300 GPa, Special Metals 625 conductivity 776 Btu·in (inch column) vs 129 W/m·°C (metric column). New disagreements: EN24 condition U Rm 925-1075 vs 925-1000 MPa, D2 annealed hardness and conductivity, Inconel 718 E 204 vs 199.9 GPa. Smiths C101 counted as a copy of Aalco.
+- Recorded as printed, not corrected: Aalco 5083 density "265 g/cm³", Aalco 410 E 300 GPa. Inconel 625 conductivity left out (the extracted figures match its electrical resistivity). New disagreements: EN24 condition U Rm 925-1075 vs 925-1000 MPa, D2 annealed hardness and conductivity, Inconel 718 E 204 vs 199.9 GPa. Smiths C101 counted as a copy of Aalco.
 - Density units "sg" and "g/cc", and unit spellings with superscripts, "°C" and "/m/" are now accepted. Grade publisher counts use designation rows only.
+### Added (reference data: drills, tap drills, threads, limits and fits)
+- Drill size chart (Drilling and tapping): fractional, letter, number (#1 to #97) and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Each size shows its evidence status: Exact, Confirmed, Confirmed with one outlier, or One source.
+- Tap drill size (Drilling and tapping):
+  - Cutting taps from the percent-of-thread formula, D - 1.299 P x %/100 (OSG, FM Carbide).
+  - Forming taps from D - 0.0068 x % x P (FM Carbide, Engineers Edge).
+  - Percent thread at the basic minor diameter and for the "D - P" rule of thumb, which is labelled as an approximation (about 77 %).
+  - The nearest standard drills, with their percent thread.
+- Thread data and limits (Threads):
+  - ISO metric coarse/fine series (ISO 261/262) and UNC/UNF/UNEF series, with basic dimensions from the ISO 68-1 / ASME B1.1 basic profile.
+  - ISO 965-1 6g/6H limits: the published value, with the formula value beside it.
+  - Unified classes 2A/3A/2B/3B from the ASME B1.1-2024 formulas.
+- ISO limits and fits (new group "Limits and fits"):
+  - IT01 to IT18 and all hole and shaft fundamental deviations up to 500 mm (a to zc and A to ZC, except j/J), from published tables checked against two or more publishers.
+  - Hole and shaft limits and presets for common fits.
+  - The fit type (clearance, transition or interference) with its maximum and minimum values.
+  - The formula value beside each table value, and notes on standard editions: ISO 286-1:2010 supersedes the 1988 rounding of js values.
+- `benchmate-core`, with tests against published tables (table/formula exceptions are listed in the tests) and matching WebAssembly exports:
+  - `threads` module: basic profile, tap drill formulas, ISO 965 tolerances with R40 rounding, ASME B1.1 class tolerances.
+  - `fits` module: ISO 286 tolerance factor, IT formula, delta rule, shaft and hole limits, fit type.
+- Evidence files in `data/refdata/`, and `scripts/build_refdata.py` (run by `scripts/build-web.sh`), which builds `data/refdata.json` with per-value publisher counts and disagreements.
+- `docs/sources.md`: reference data sources, current standard editions, disagreements and unverified items.
 ### Added (milling: deflection and cut optimiser)
 - Tool deflection (Milling): end mill as a two-section cantilever (solid shank + fluted length at an effective diameter), load at the tip. Force entered directly, or from net cutting power and speed (Ft = Pc x 60 000 / Vc) times a user-entered Fr/Ft ratio. Young's modulus presets: solid carbide 580 GPa (Ceratizit CTS20L), HSS M2 219 GPa (voestalpine data sheet), or enter E. Effective flute diameter / D is an editable input, blank by default (no verified source for a default).
 - Cut check and optimiser (Milling): RPM, feed, MRR, mean and max chip thickness, net and spindle power, spindle torque, tangential and radial force, deflection; share of each limit used and which binds first; largest ap for the given ae (or largest ae for the given ap) inside deflection, spindle power, spindle torque (below base speed), flute length and tool diameter limits. Machine power/torque come from the active machine profile unless entered. RPM, feed and power rows carry machine checks.

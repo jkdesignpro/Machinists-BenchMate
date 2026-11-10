@@ -119,7 +119,7 @@
    "publisher": "Special Metals",
    "accessed": "2026-11-10",
    "revision": "Copyright 2013 (Aug 13)",
-   "notes": "Tensile table is labelled as composite ranges 'not suitable for specification purposes'; recorded as ranges with that note."
+   "notes": "Tensile table is labelled as composite ranges 'not suitable for specification purposes'; recorded as ranges with that note. Thermal conductivity not recorded: the text extraction paired the conductivity row with figures (776 / 129) that match the alloy's electrical resistivity (ohm·circ mil/ft, 1.29 µΩ·m); needs a check against the PDF."
   },
   "MIF_1018": {
    "title": "MakeItFrom: SAE-AISI 1018 (G10180) Carbon Steel",
@@ -1662,16 +1662,6 @@
        "condition": "Solution treated, 70 °F (21 °C)",
        "basis": "typical",
        "verbatim": "Modulus of elasticity, 70 °F, solution-treated 29.7 x10^3 ksi (204.8 GPa)"
-      },
-      {
-       "prop": "k",
-       "value": 776,
-       "unit": "Btu.in/h.ft2.F",
-       "cond": "RT",
-       "condition": "70 °F, annealed 2100 °F/1 h",
-       "basis": "typical",
-       "verbatim": "Thermal conductivity 70 °F 776 Btu·in/ft²·h·°F (metric column: 129 W/m·°C)",
-       "note": "The bulletin's metric column prints 129 W/m·°C, which does not equal 776 Btu·in/ft²·h·°F (about 112 W/m·K by conversion). Recorded as printed in the inch column; neither figure corrected."
       },
       {
        "prop": "cte",

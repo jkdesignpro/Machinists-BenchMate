@@ -108,6 +108,11 @@ pub fn true_position_dia(dx: f64, dy: f64) -> f64 {
     2.0 * dx.hypot(dy)
 }
 
+/// Same, from nominal and measured coordinates.
+pub fn true_position_dia_from_coords(nx: f64, ny: f64, mx: f64, my: f64) -> f64 {
+    true_position_dia(mx - nx, my - ny)
+}
+
 /// Same in three dimensions (spherical zone): `2 * sqrt(dx^2 + dy^2 + dz^2)`.
 pub fn true_position_dia_3d(dx: f64, dy: f64, dz: f64) -> f64 {
     2.0 * (dx * dx + dy * dy + dz * dz).sqrt()
@@ -218,7 +223,137 @@ pub fn stack_worst_case(tols: &[f64]) -> f64 { tols.iter().map(|t| t.abs()).sum(
 /// Root-sum-square of symmetric (plus/minus) tolerances.
 pub fn stack_rss(tols: &[f64]) -> f64 { tols.iter().map(|t| t * t).sum::<f64>().sqrt() }
 
+/// Result of a composite position (feature-relating) check for a hole pattern.
+#[derive(Clone, Debug, PartialEq)]
+pub struct CompositeResult {
+    /// Smallest feature-relating zone diameter (FRTZF, lower segment) that the
+    /// pattern can meet after the best allowed shift (and rotation), net of
+    /// each hole's bonus: max over holes of (2 |residual| - bonus).
+    pub frtzf_needed: f64,
+    /// Best-fit shift of the pattern of zones (same units as the deviations).
+    pub shift_x: f64,
+    pub shift_y: f64,
+    /// Best-fit rotation of the pattern of zones about the origin of the
+    /// nominal coordinates (radians, small-angle model). Zero if not allowed.
+    pub rot: f64,
+    /// Diametral residual of each hole to its shifted zone centre.
+    pub residual_dia: Vec<f64>,
+}
+
+/// Composite position, lower segment (FRTZF): can the pattern of
+/// feature-relating zones be moved, as one rigid group, so that every hole
+/// axis lies inside its own zone? The lower segment fixes orientation only
+/// (to the datums it references), not location, so the group may translate
+/// in the plane; if it references no secondary datum it may also rotate
+/// about the datum axis. [FARO][DCS]
+///
+/// `nominal`: basic (true) positions of the holes, used for the rotation
+/// lever arms. `dev`: measured deviation of each hole from its true position
+/// (dX, dY) in the datum reference frame. `bonus`: per-hole bonus (0 at RFS).
+/// The upper segment (PLTZF) is checked separately per hole with
+/// `true_position_dia` against its own tolerance, without any shift.
+///
+/// Method: minimise the convex function
+/// `g(tx, ty, a) = max_i (2 |dev_i - t - a k x p_i| - bonus_i)` by a
+/// nested golden-section search: g is jointly convex, so the partial
+/// minima are convex and unimodal and the search finds the global minimum.
+pub fn composite_frtzf(nominal: &[(f64, f64)], dev: &[(f64, f64)], bonus: &[f64], allow_rotation: bool) -> CompositeResult {
+    let n = nominal.len().min(dev.len());
+    if n == 0 {
+        return CompositeResult { frtzf_needed: f64::NAN, shift_x: 0.0, shift_y: 0.0, rot: 0.0, residual_dia: vec![] };
+    }
+    let b = |i: usize| bonus.get(i).copied().filter(|x| x.is_finite() && *x > 0.0).unwrap_or(0.0);
+    // Rotate about the centroid of the nominal positions (better conditioned),
+    // then express the result about the origin.
+    let (cx, cy) = (nominal[..n].iter().map(|p| p.0).sum::<f64>() / n as f64, nominal[..n].iter().map(|p| p.1).sum::<f64>() / n as f64);
+    let arm = nominal[..n].iter().map(|p| (p.0 - cx).hypot(p.1 - cy)).fold(0.0, f64::max).max(1e-12);
+    let resid = |x: &[f64; 3], i: usize| -> (f64, f64) {
+        let a = if allow_rotation { x[2] / arm } else { 0.0 };
+        let (px, py) = (nominal[i].0 - cx, nominal[i].1 - cy);
+        // small rotation a about the centroid moves a zone centre by (-a py, a px)
+        (dev[i].0 - x[0] + a * py, dev[i].1 - x[1] - a * px)
+    };
+    let g = |x: &[f64; 3]| (0..n).map(|i| { let (ex, ey) = resid(x, i); 2.0 * ex.hypot(ey) - b(i) }).fold(f64::NEG_INFINITY, f64::max);
+    // g is jointly convex in (tx, ty, a), so min over ty is convex in (tx, a)
+    // and min over (tx, ty) is convex in a: nested golden-section searches
+    // find the global minimum.
+    let scale = dev[..n].iter().map(|d| d.0.hypot(d.1)).fold(0.0, f64::max).max(1e-9);
+    let bmax = (0..n).map(b).fold(0.0, f64::max);
+    let span = 2.0 * scale + bmax + 1e-9;
+    fn golden<F: FnMut(f64) -> f64>(mut lo: f64, mut hi: f64, iters: usize, mut f: F) -> (f64, f64) {
+        let r = (5f64.sqrt() - 1.0) / 2.0;
+        let mut x1 = hi - r * (hi - lo); let mut x2 = lo + r * (hi - lo);
+        let mut f1 = f(x1); let mut f2 = f(x2);
+        for _ in 0..iters {
+            if f1 <= f2 { hi = x2; x2 = x1; f2 = f1; x1 = hi - r * (hi - lo); f1 = f(x1); }
+            else { lo = x1; x1 = x2; f1 = f2; x2 = lo + r * (hi - lo); f2 = f(x2); }
+        }
+        if f1 <= f2 { (x1, f1) } else { (x2, f2) }
+    }
+    let it = 90;
+    let best_t = |a: f64| -> ([f64; 3], f64) {
+        let (tx, _) = golden(-span, span, it, |tx| golden(-span, span, it, |ty| g(&[tx, ty, a])).1);
+        let (ty, f) = golden(-span, span, it, |ty| g(&[tx, ty, a]));
+        ([tx, ty, a], f)
+    };
+    let (x, fx) = if allow_rotation {
+        // a here is the tip displacement at the largest arm; bounded like t.
+        let (a, _) = golden(-4.0 * span, 4.0 * span, it, |a| best_t(a).1);
+        best_t(a)
+    } else { best_t(0.0) };
+    let a = if allow_rotation { x[2] / arm } else { 0.0 };
+    let residual_dia = (0..n).map(|i| { let (ex, ey) = resid(&x, i); 2.0 * ex.hypot(ey) }).collect();
+    // Shift about the origin: rotation about the centroid = rotation about the origin + extra shift.
+    CompositeResult { frtzf_needed: fx, shift_x: x[0] + a * cy, shift_y: x[1] - a * cx, rot: a, residual_dia }
+}
+
+/// Unequally disposed profile (U modifier): limits of the zone measured
+/// from the true profile, as (towards the outside of the material, into the
+/// material) = (u, total - u). `u` is the part of the total zone that lies
+/// outside the material (the material-adding side). [GDTB][OEP]
+pub fn profile_unequal_limits(total: f64, u: f64) -> (f64, f64) {
+    if !(total > 0.0) || !(u >= 0.0) || u > total { return (f64::NAN, f64::NAN); }
+    (u, total - u)
+}
+
+/// Equal-bilateral zone of the same width with its centre offset from the
+/// true profile, for CMM software that wants "+/- t/2 about an offset
+/// profile": offset = u - total / 2 (positive = outside the material).
+pub fn profile_unequal_offset(total: f64, u: f64) -> f64 {
+    let (o, i) = profile_unequal_limits(total, u);
+    (o - i) / 2.0
+}
+
+/// Check one measured profile deviation `e` (positive = outside the
+/// material, negative = into the material): returns the margin left
+/// (>= 0 passes, < 0 fails by that much).
+pub fn profile_unequal_margin(total: f64, u: f64, e: f64) -> f64 {
+    let (o, i) = profile_unequal_limits(total, u);
+    (o - e).min(e + i)
+}
 // ---- f64 wrappers for the WebAssembly layer ----
+
+/// Composite position lower segment from up to 8 holes passed flat as
+/// (nominal x, nominal y, measured x, measured y, bonus); a hole whose
+/// measured x or y is not finite is skipped. Deviations = measured - nominal. `rotate` > 0.5 allows rotation of the pattern. `out`: 0 FRTZF
+/// needed, 1 shift x, 2 shift y, 3 rotation (rad), 4 holes used,
+/// 10 + i diametral residual of the i-th used hole.
+pub fn composite_frtzf_flat(v: &[f64], rotate: f64, out: u32) -> f64 {
+    let mut nom = Vec::new(); let mut dev = Vec::new(); let mut bon = Vec::new();
+    for c in v.chunks(5) {
+        if c.len() < 5 || !(c[2].is_finite() && c[3].is_finite()) { continue; }
+        let z = |x: f64| if x.is_finite() { x } else { 0.0 };
+        nom.push((z(c[0]), z(c[1]))); dev.push((c[2] - z(c[0]), c[3] - z(c[1]))); bon.push(z(c[4]));
+    }
+    let r = composite_frtzf(&nom, &dev, &bon, rotate > 0.5);
+    match out {
+        0 => r.frtzf_needed, 1 => r.shift_x, 2 => r.shift_y, 3 => r.rot, 4 => nom.len() as f64,
+        k @ 10..=17 => r.residual_dia.get((k - 10) as usize).copied().unwrap_or(f64::NAN),
+        _ => f64::NAN,
+    }
+}
+pub fn profile_unequal_outside(total: f64, u: f64) -> f64 { profile_unequal_limits(total, u).0 }
+pub fn profile_unequal_inside(total: f64, u: f64) -> f64 { profile_unequal_limits(total, u).1 }
 
 /// `internal` > 0.5 means internal; `mc` 0 RFS, 1 MMC, 2 LMC.
 pub fn bonus_tolerance_f(lower: f64, upper: f64, actual: f64, internal: f64, mc: f64) -> f64 {
@@ -344,6 +479,96 @@ mod tests {
         let flat = [50.0, 0.1, 0.1, 1.0, 30.0, 0.05, 0.15, -1.0, 19.5, 0.05, 0.05, -1.0, f64::NAN, f64::NAN, f64::NAN, 1.0];
         close(tolerance_stack_flat(&flat, 3), 0.15, 1e-12);
         close(tolerance_stack_flat(&flat, 8), 3.0, 0.0);
+    }
+
+    // Composite position, lower segment (own worked examples; brute force cross-check).
+    #[test] fn composite_translation() {
+        let nom = [(0.0, 0.0), (50.0, 0.0)];
+        // opposite deviations: best shift 0, each residual 0.02 radius -> 0.04 dia
+        let r = composite_frtzf(&nom, &[(0.02, 0.0), (-0.02, 0.0)], &[0.0, 0.0], false);
+        close(r.frtzf_needed, 0.04, 1e-9); close(r.shift_x, 0.0, 1e-9);
+        // same deviation on every hole: the pattern shifts, nothing left
+        let r = composite_frtzf(&nom, &[(0.1, 0.05), (0.1, 0.05)], &[0.0, 0.0], false);
+        close(r.frtzf_needed, 0.0, 1e-9); close(r.shift_x, 0.1, 1e-9); close(r.shift_y, 0.05, 1e-9);
+        // bonus 0.01 on each hole lowers the need by 0.01
+        let r = composite_frtzf(&nom, &[(0.02, 0.0), (-0.02, 0.0)], &[0.01, 0.01], false);
+        close(r.frtzf_needed, 0.03, 1e-9);
+    }
+    // Rotation: holes at x = -50 and +50 moved -0.03 and +0.03 in y.
+    // With rotation a = 0.03 / 50 = 0.0006 rad everything fits (need 0);
+    // without rotation the best is no shift and 0.06.
+    #[test] fn composite_rotation() {
+        let nom = [(-50.0, 0.0), (50.0, 0.0)];
+        let dev = [(0.0, -0.03), (0.0, 0.03)];
+        let r = composite_frtzf(&nom, &dev, &[], true);
+        close(r.frtzf_needed, 0.0, 1e-8); close(r.rot, 0.0006, 1e-9);
+        let r = composite_frtzf(&nom, &dev, &[], false);
+        close(r.frtzf_needed, 0.06, 1e-9);
+        // Rotation about the origin when the pattern is off-centre: nominal (100,0),(200,0).
+        let r = composite_frtzf(&[(100.0, 0.0), (200.0, 0.0)], &[(0.0, 0.06), (0.0, 0.12)], &[], true);
+        close(r.frtzf_needed, 0.0, 1e-8); close(r.rot, 0.0006, 1e-9); close(r.shift_y, 0.0, 1e-8);
+    }
+    // Three holes, general deviations: compare with a fine brute-force grid search.
+    #[test] fn composite_brute_force() {
+        let nom = [(0.0, 0.0), (40.0, 0.0), (0.0, 30.0)];
+        let dev = [(0.01, 0.02), (-0.01, 0.0), (0.03, -0.01)];
+        let r = composite_frtzf(&nom, &dev, &[0.0; 3], false);
+        let mut best = f64::INFINITY;
+        for i in -400..=400 { for j in -400..=400 {
+            let (tx, ty) = (i as f64 * 1e-4, j as f64 * 1e-4);
+            let g = dev.iter().map(|d| 2.0 * (d.0 - tx).hypot(d.1 - ty)).fold(0.0, f64::max);
+            if g < best { best = g; }
+        } }
+        assert!(r.frtzf_needed <= best + 1e-12, "{} vs {}", r.frtzf_needed, best);
+        assert!(r.frtzf_needed >= best - 3e-4);
+        // with rotation it can only get better
+        let rr = composite_frtzf(&nom, &dev, &[0.0; 3], true);
+        assert!(rr.frtzf_needed <= r.frtzf_needed + 1e-12);
+        // flat wrapper
+        let flat = [0.0, 0.0, 0.01, 0.02, 0.0, 40.0, 0.0, 39.99, 0.0, 0.0, 0.0, 30.0, 0.03, 29.99, 0.0, 9.0, 9.0, f64::NAN, f64::NAN, 0.0];
+        close(composite_frtzf_flat(&flat, 0.0, 0), r.frtzf_needed, 1e-12);
+        close(composite_frtzf_flat(&flat, 0.0, 4), 3.0, 0.0);
+    }
+    // Unequal profile: total 0.6, U 0.2 -> 0.2 outside, 0.4 inside; offset -0.1.
+    #[test] fn profile_unequal() {
+        let (o, i) = profile_unequal_limits(0.6, 0.2);
+        close(o, 0.2, 1e-12); close(i, 0.4, 1e-12);
+        close(profile_unequal_offset(0.6, 0.2), -0.1, 1e-12);
+        close(profile_unequal_offset(0.6, 0.6), 0.3, 1e-12); // all outside
+        close(profile_unequal_margin(0.6, 0.2, 0.15), 0.05, 1e-12);
+        close(profile_unequal_margin(0.6, 0.2, -0.45), -0.05, 1e-12);
+        assert!(profile_unequal_limits(0.6, 0.7).0.is_nan());
+    }
+
+    // Random patterns (fixed LCG seed): the optimiser must not be worse than a
+    // two-stage grid search, with and without rotation.
+    #[test] fn composite_random_vs_grid() {
+        let mut seed: u64 = 12345;
+        let mut rnd = || { seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407); ((seed >> 11) as f64 / (1u64 << 53) as f64) * 2.0 - 1.0 };
+        for _case in 0..12 {
+            let n = 3 + (rnd().abs() * 4.0) as usize;
+            let nom: Vec<(f64, f64)> = (0..n).map(|_| (rnd() * 60.0, rnd() * 40.0)).collect();
+            let dev: Vec<(f64, f64)> = (0..n).map(|_| (rnd() * 0.04, rnd() * 0.04)).collect();
+            for &rot in &[false, true] {
+                let r = composite_frtzf(&nom, &dev, &[], rot);
+                let (cx, cy) = (nom.iter().map(|p| p.0).sum::<f64>() / n as f64, nom.iter().map(|p| p.1).sum::<f64>() / n as f64);
+                let g = |tx: f64, ty: f64, a: f64| dev.iter().zip(&nom).map(|(d, p)| 2.0 * (d.0 - tx + a * (p.1 - cy)).hypot(d.1 - ty - a * (p.0 - cx))).fold(0.0, f64::max);
+                let mut best = (f64::INFINITY, 0.0, 0.0, 0.0);
+                let arange: Vec<f64> = if rot { (-20..=20).map(|k| k as f64 * 5e-5).collect() } else { vec![0.0] };
+                for &a in &arange { for i in -40..=40 { for j in -40..=40 {
+                    let v = g(i as f64 * 1e-3, j as f64 * 1e-3, a); if v < best.0 { best = (v, i as f64 * 1e-3, j as f64 * 1e-3, a); }
+                } } }
+                // local refine
+                let (_, bx, by, ba) = best;
+                let arange2: Vec<f64> = if rot { (-10..=10).map(|k| ba + k as f64 * 5e-6).collect() } else { vec![0.0] };
+                for &a in &arange2 { for i in -25..=25 { for j in -25..=25 {
+                    let v = g(bx + i as f64 * 4e-5, by + j as f64 * 4e-5, a); if v < best.0 { best = (v, 0.0, 0.0, 0.0); }
+                } } }
+                assert!(r.frtzf_needed <= best.0 + 1e-9, "rot {rot}: {} vs grid {}", r.frtzf_needed, best.0);
+                // reported residuals are consistent with the reported need
+                close(r.residual_dia.iter().cloned().fold(0.0, f64::max), r.frtzf_needed, 1e-12);
+            }
+        }
     }
     #[test] fn wrappers() {
         close(bonus_tolerance_f(0.5, 0.51, 0.506, 1.0, 1.0), 0.006, 1e-12);

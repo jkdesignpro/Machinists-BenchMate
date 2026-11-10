@@ -409,6 +409,20 @@ const TOOLS = [
   source: "Machinery's Handbook (drills)",
 },
 {
+  id: 'drillchart', group: 'Drilling and tapping', title: 'Drill size chart',
+  desc: 'Fractional, number, letter and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Number and letter sizes show how many independent publishers print each value.',
+  render: el => renderDrillChart(el),
+  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them; they are not given by a formula), so each value is what the publishers listed under the table print. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder lists the drills closest to your size, smaller first.',
+  source: 'Wikipedia "Drill bit sizes"; Stoody Industrial & Welding Supply decimal equivalents chart; P. Lobben, Machinists\' and Draftsmen\'s Handbook (1910, public domain). Standards cited, not read: ASME B94.11M-1993 (twist drills, current per ASME catalogue), ISO 235:2016 (metric jobber drill sizes).',
+},
+{
+  id: 'tapdrill', group: 'Drilling and tapping', title: 'Tap drill size',
+  desc: 'Hole size for a chosen percent of thread with a cutting tap or a forming (roll) tap, for ISO metric and Unified threads or any size you enter, with the nearest standard drills and the percent of thread each one gives.',
+  render: el => renderTapDrill(el),
+  working: 'See the note under the tool.',
+  source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge. ISO 68-1:2023, ASME B1.1-2024.',
+},
+{
   id: 'wires', group: 'Threads', title: 'Thread measurement over wires',
   desc: 'Pitch diameter, best wire size and the measurement over three wires for 60 degree threads.',
   fields: s => [
@@ -432,6 +446,41 @@ const TOOLS = [
   source: "Machinery's Handbook (screw thread measurement)",
 },
 {
+  id: 'threaddata', group: 'Threads', title: 'Thread data and limits',
+  desc: 'Basic dimensions of ISO metric (coarse and fine) and Unified (UNC, UNF, UNEF) threads from the basic profile, with ISO 6g/6H and Unified 2A/3A/2B/3B limits computed from the standards\' formulas and checked against published tables.',
+  render: el => renderThreadData(el),
+  working: 'See the note under the tool.',
+  source: 'ISO 68-1:2023, ISO 261:1998, ISO 262:2023, ISO 965-1:2013 (revised 2026), ASME B1.1-2024; series and published limits from the publishers listed under the tool.',
+},
+{
+  id: 'pipethreads', group: 'Threads', title: 'Pipe threads (BSP and NPT)',
+  desc: 'BSP parallel (G, ISO 228-1) and taper (R / Rc / Rp, ISO 7-1) and NPT (ASME B1.20.1): threads per inch, diameters, pitch diameters, gauge and engagement lengths.',
+  render: el => renderPipeThreads(el),
+  working: 'See the note under the tool.',
+  source: 'ISO 228-1:2000, ISO 7-1:1994 (with Cor 1:2007), ASME B1.20.1-2013 (reaffirmed 2018); series values from the publishers listed under the tool.',
+},
+{
+  id: 'whitworth', group: 'Threads', title: 'Whitworth and BA threads',
+  desc: 'BSW, BSF (BS 84) and BA (BS 93) threads: threads per inch, pitch, major, effective and minor diameters, thread depth and radius.',
+  render: el => renderWhitworth(el),
+  working: 'See the note under the tool.',
+  source: 'BS 84:2007, BS 93:2008; series values from the publishers listed under the tool.',
+},
+{
+  id: 'machinetapers', group: 'Setup', title: 'Machine tapers',
+  desc: 'Morse, Jacobs, 7:24 steep tapers (ISO 7388-1 / SK, BT, CAT), HSK-A and R8: gauge diameters, lengths, taper per foot and angle, with pull stud (retention knob) references.',
+  render: el => renderMachineTapers(el),
+  working: 'Included angle = 2 atan(taper per unit length / 2). Values come from published tables, each with its publisher count.',
+  source: 'ISO 296:1991 (Morse), ISO 7388-1:2007 and ISO 7388-2:2007 (7/24 shanks), ISO 7388-3:2016 (retention knobs), ISO 12164-1:2023 (HSK), ASME B5.50-2015 (R2025) (CAT), JIS B 6339 (BT, edition not confirmed); publishers listed under the tool.',
+},
+{
+  id: 'fits', group: 'Limits and fits', title: 'ISO limits and fits',
+  desc: 'IT grades, fundamental deviations and limits of any hole and shaft tolerance class up to 500 mm (hole basis or shaft basis), with the clearance or interference of the fit.',
+  render: el => renderFits(el),
+  working: 'See the note under the tool.',
+  source: 'ISO 286-1:2010 (with Cor 1:2013) and ISO 286-2:2010; table values from Wikipedia, Ganter, GOST 25346-89, RoyMech, Simply Bearings and OSG (JIS B 0401).',
+},
+{
   id: 'bolt', group: 'Geometry', title: 'Bolt circle',
   desc: 'X and Y coordinates of equally spaced holes on a circle.',
   fields: s => [
@@ -453,6 +502,34 @@ const TOOLS = [
   },
   working: 'x = cx + (D/2) cos(a0 + 360 i / n), y = cy + (D/2) sin(a0 + 360 i / n). Angles measured counter-clockwise from +X.',
   source: "Machinery's Handbook (hole circles)",
+},
+{
+  id: 'triangle', group: 'Geometry', title: 'Triangle solver',
+  desc: 'Right or any triangle from three known sides and angles, including the two-solution case (two sides and an angle that is not between them).',
+  render: el => renderTriangle(el),
+  working: 'Angles add to 180°. Law of sines: a / sin A = b / sin B = c / sin C. Law of cosines: a² = b² + c² - 2bc cos A. Side-side-angle: sin B = b sin A / a gives no triangle (> 1), one, or two (B and 180° - B, when both leave room for C). Area = ½ ab sin C.',
+  source: 'OpenStax, Algebra and Trigonometry 2e, ch. 10 (non-right triangles: law of sines incl. the ambiguous case, law of cosines). See docs/geometry.md.',
+},
+{
+  id: 'arc', group: 'Geometry', title: 'Chord, arc, sagitta and 3-point circle',
+  desc: 'Solve an arc from any two of radius, angle, chord, sagitta and arc length; segment and sector areas; centre and radius of the circle through three points.',
+  render: el => renderArc(el),
+  working: 'Chord = 2R sin(θ/2); arc = Rθ (radians); sagitta = R(1 - cos(θ/2)); R from chord c and sagitta s = (c²/4 + s²) / 2s; segment area = R²/2 (θ - sin θ); sector = R²θ/2. Three points: centre where the perpendicular bisectors of two chords cross.',
+  source: 'Plane geometry (OpenStax Algebra and Trigonometry 2e; circle relations). Worked examples checked in core tests. See docs/geometry.md.',
+},
+{
+  id: 'fillet', group: 'Geometry', title: 'Fillet and tangent points',
+  desc: 'Tangent points and centre of a fillet in a corner between two lines, or blending a line into an arc, for programming.',
+  render: el => renderFillet(el),
+  working: 'Corner: tangent distance = r / tan(α/2), centre on the bisector at r / sin(α/2), α the angle between the legs. Line and arc: the fillet centre lies on the line offset by r and on the circle of radius R + r (outside) or R - r (inside) about the arc centre; tangent points are the foot of the perpendicular on the line and the point on the arc in line with both centres.',
+  source: 'Plane geometry (BenchMate derivation; tests check each tangent point lies at r from the fillet centre). See docs/geometry.md.',
+},
+{
+  id: 'dovetail', group: 'Geometry', title: 'Dovetail and V-groove over pins',
+  desc: 'Measurement over (or between) pins for male and female dovetails, and pin height in a V-groove.',
+  render: el => renderDovetail(el),
+  working: 'A pin in a corner of angle α touches base and flank; its centre is (d/2) cot(α/2) from the sharp corner along the base. Male: M = W + d (1 + cot(α/2)). Female: M = W - d (1 + cot(α/2)). W from the other face: W = top ∓ 2h cot α. V-groove: pin top above face = (d/2)/sin(β/2) + d/2 - (W/2)/tan(β/2).',
+  source: 'Plane geometry (BenchMate derivation, checked in tests by constructing the pin position). See docs/geometry.md.',
 },
 {
   id: 'gdtguide', group: 'GD&T', title: 'GD&T reference guide',
@@ -587,6 +664,42 @@ const TOOLS = [
   source: 'ASME Y14.5 nonmandatory appendix on fastener formulas (cited, not reproduced); Open Exam Prep GDTP study guide and Skill-Lync (formulas); GD&T Basics (appendix covers fixed and floating fasteners). See docs/gdt.md.',
 },
 {
+  id: 'gdtcomp', group: 'GD&T', title: 'Composite position checker',
+  desc: 'Check a hole pattern against a composite position frame: the upper row (PLTZF) locates each hole to the datums, the lower row (FRTZF) relates the holes to each other after the best allowed shift (and rotation) of the whole group.',
+  render: el => renderComposite(el),
+  working: 'Upper row: each hole, diameter = 2 x sqrt(dX^2 + dY^2) from its basic location, must be within the upper tolerance plus its bonus. Lower row: BenchMate finds the shift (and, with only the primary datum in the lower row, the small rotation) of the group of lower-row zones that minimises the worst hole, max over holes of (2 x distance to its moved zone centre - bonus), and compares it with the lower tolerance. The minimisation is exact for this convex problem (nested golden-section search, checked against grid searches in the tests). Perpendicularity to datum A (the orientation the lower row also controls) is not checked here: measure it separately. Datum feature shift is not included.',
+  source: 'FARO (O. Ekinci) and 3DCS help on composite position; GD&T Basics (composite vs multiple single-segment). Standard: ASME Y14.5-2018 (composite positional tolerancing, cited only). See docs/gdt.md.',
+},
+{
+  id: 'gdtprofu', group: 'GD&T', title: 'Unequal profile (U) zone',
+  desc: 'Zone limits for a profile tolerance with the unequally disposed (U) modifier, the equivalent offset for CMM software, and a check of a measured deviation.',
+  fields: s => [
+    { id: 't', label: 'Total profile tolerance (first value)', unit: lenU(s), def: s === 'inch' ? 0.024 : 0.6 },
+    { id: 'u', label: 'Value after U (outside the material)', unit: lenU(s), def: s === 'inch' ? 0.008 : 0.2 },
+    { id: 'e', label: 'Measured deviation (+ outside material, - into material)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.t > 0 && v.u >= 0)) return [];
+    if (v.u > v.t) return [R('U value', 'Must not be more than the total tolerance: invalid callout', '', 0)];
+    const dp = s === 'inch' ? 4 : 3, u = lenU(s);
+    const rows = [R('Zone limit on the material-adding side (outside)', W.gdt_profile_u_outside(v.t, v.u), u, dp),
+      R('Zone limit on the material-removing side (inside)', W.gdt_profile_u_inside(v.t, v.u), u, dp),
+      R('As an equal zone of +/- t/2 about an offset profile: offset', W.gdt_profile_u_offset(v.t, v.u), u, dp),
+      R('Half width of that equal zone', v.t / 2, u, dp)];
+    if (isFinite(v.e)) { const m = W.gdt_profile_u_margin(v.t, v.u, v.e); rows.push(R('Margin left', m, u, dp)); rows.push(R('Result', m >= -1e-12 ? 'PASS' : 'FAIL', '', 0)); }
+    return rows;
+  },
+  working: 'Frame: profile symbol, total tolerance t, U, value u. u is the part of the zone on the side that adds material (outside the material: away from the solid on an outside surface, towards the centre of a pocket or hole); t - u lies on the side that removes material. u = t: all outside; u = 0: all inside; u = t/2 is the ordinary equal zone. Equal-zone form for CMM software: offset the profile by (u - (t - u)) / 2 = u - t/2 towards the outside and apply +/- t/2. Example: t 0.6, u 0.2 on an outside surface at 50.0: limits 50.2 and 49.6.',
+  source: 'GD&T Basics (unequally disposed profile, citing Y14.5-2018 6.3.22); Open Exam Prep GDTP study guide (disposition, citing Y14.5-2009 8.3.1.2). ISO 1101:2017 writes the same idea as UZ with a signed offset (KEYENCE). See docs/gdt.md.',
+},
+{
+  id: 'gdtdof', group: 'GD&T', title: 'Datum reference frame and degrees of freedom',
+  desc: 'Step through a three-plane datum reference frame and see which of the six degrees of freedom each datum removes.',
+  render: el => renderDof(el),
+  working: 'Primary plane A: three or more contact points, removes Tz, Rx, Ry. Secondary plane B, square to A: two or more points, removes Tx, Rz. Tertiary plane C, square to both: one or more point, removes Ty.',
+  source: 'GD&T Basics (datums and degrees of freedom); CNCCookbook (3-2-1); University of Illinois ME 170 notes (datum order). Axis assignment: BenchMate geometry. See docs/gdt.md.',
+},
+{
   id: 'gdtstack', group: 'GD&T', title: 'Tolerance stack (worst case and RSS)',
   desc: 'One-dimensional stack of up to 10 dimensions: gap at nominal and mean, worst-case and root-sum-square (RSS) limits.',
   render: el => renderStack(el),
@@ -594,11 +707,141 @@ const TOOLS = [
   source: 'Accendo Reliability (F. Schenkelberg) and Five Flute RSS tolerance analysis guides; BenchMate arithmetic with tests in core/src/gdt.rs.',
 },
 {
+  id: 'weight', group: 'Stock and sheet metal', title: 'Stock weight',
+  desc: 'Weight of round, hex, square, tube, flat bar, plate and sheet stock, per piece, per batch and per metre or foot.',
+  render: el => renderWeight(el),
+  working: 'Weight = section area x length x density. Round πd²/4; hex (√3/2)s² across flats s; square s²; tube π/4 (D² - (D - 2t)²); flat, plate or sheet width x thickness. Sharp corners assumed (no corner radii on hex, square or flat).',
+  source: 'Areas of plane figures; densities from the material data where Confirmed, else from your data sheet. See docs/geometry.md.',
+},
+{
+  id: 'bend', group: 'Stock and sheet metal', title: 'Sheet-metal bend allowance',
+  desc: 'Bend allowance, outside setback and bend deduction for a bend, flat length of a two-flange part, and the K-factor from a test bend.',
+  fields: s => [
+    { id: 't', label: 'Material thickness', unit: lenU(s), def: '' },
+    { id: 'r', label: 'Inside bend radius', unit: lenU(s), def: '' },
+    { id: 'a', label: 'Bend angle (angle bent through; 90 for a right angle)', unit: 'deg', def: 90 },
+    { id: 'k', label: 'K-factor (from your tooling or a test bend)', unit: '', def: '' },
+    { id: 'f1', label: 'Flange 1 length to the outside mould line (optional)', unit: lenU(s), def: '' },
+    { id: 'f2', label: 'Flange 2 length to the outside mould line (optional)', unit: lenU(s), def: '' },
+    { id: 'ba', label: 'Or: measured bend allowance from a test bend (for K)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3, rows = [];
+    if (!(v.t > 0) || !(v.r >= 0) || !(v.a > 0 && v.a < 180)) return [];
+    rows.push(R('Outside setback, tan(angle/2) x (R + t)', W.outside_setback(v.a, v.r, v.t), u, dp));
+    if (v.k >= 0 && v.k <= 1) {
+      const ba = W.bend_allowance(v.a, v.r, v.k, v.t), bd = W.bend_deduction(v.a, v.r, v.k, v.t);
+      rows.push(R('Bend allowance', ba, u, dp), R('Bend deduction', bd, u, dp));
+      if (v.f1 > 0 && v.f2 > 0) rows.push(R('Flat length = flange 1 + flange 2 - bend deduction', v.f1 + v.f2 - bd, u, dp));
+    } else rows.push(R('K-factor needed: from your press brake tooling chart or a test bend', 'not entered', '', 0));
+    if (v.ba > 0) rows.push(R('K-factor from the measured bend allowance', W.k_from_bend_allowance(v.a, v.r, v.t, v.ba), '', 3));
+    return rows;
+  },
+  working: 'Bend allowance BA = angle (radians) x (R + K t): the length of the neutral axis through the bend. Outside setback OSSB = tan(angle/2) x (R + t). Bend deduction BD = 2 OSSB - BA. Flat length = sum of flanges to the outside mould lines - BD per bend. K = (BA / angle - R) / t. K depends on material, thickness, radius and tooling; BenchMate has no default. Flanges are measured to the virtual sharp; for bends over 90° some CAD systems measure flanges differently, so check which convention your drawing uses.',
+  source: 'KETIV Technologies, Sheet metal unfold rule equations (BA, OSSB, BD, K); Aircraft Systems Tech, Making straight line bends (FAA-based: bend allowance, setback = K(R + T) with K = 1 at 90°, flat = mould line dimensions - setbacks + bend allowances). See docs/geometry.md.',
+},
+{
+  id: 'capability', group: 'Inspection and quality', title: 'Process capability (Cp, Cpk, Pp, Ppk)',
+  desc: 'Paste measurements (in production order) or enter a mean and sigma. Gives Cp, Cpk, Pp, Ppk, expected parts per million out of spec and a histogram with the fitted normal curve.',
+  render: el => renderCapability(el),
+  working: 'Cp = (USL - LSL) / 6 sigma; Cpk = min((USL - mean) / 3 sigma, (mean - LSL) / 3 sigma); one-sided: only the index for the limit given. Cp and Cpk use the within (short-term) sigma: average moving range / d2 (d2 = 1.128 for ranges of two consecutive values), or for subgroups of k consecutive values the mean range / d2(k). Pp and Ppk use the same formulas with the overall sample standard deviation (divisor n - 1). Expected ppm: normal tail areas beyond each limit. Histogram bins: Sturges (ceil(log2 n) + 1).',
+  source: 'NIST/SEMATECH e-Handbook of Statistical Methods, 6.1.6 (capability indices, ppm table, ~50 values) and 6.3.2 (d2) (public domain); Minitab support, methods and formulas for normal capability analysis (within and overall sigma). Pp/Ppk as the same formulas on the overall sigma: one source read, to be verified. Normal tail: Numerical Recipes erfc. See docs/shop-helpers.md.',
+},
+{
+  id: 'tempcomp', group: 'Inspection and quality', title: 'Temperature compensation',
+  desc: 'Correct a measurement taken away from the 20 °C (68 °F) reference temperature to the length at 20 °C, allowing for both the part and the gauge expanding.',
+  render: el => renderTempComp(el),
+  working: 'L20 = reading x (1 + a_gauge x (T_gauge - 20)) / (1 + a_part x (T_part - 20)), temperatures in °C, a in 1/K. The gauge graduations grow with its temperature; the part grows with its own. Inverse for the reading a to-size part gives. Coefficient uncertainty: L x u(a) x |T_part - 20|.',
+  source: 'ISO 1:2022 (reference temperature 20 °C, cited only); T. Doiron, J. Res. NIST 112(1), 2007 (history and use of 20 °C); expansion formula dL = L a dT. See docs/shop-helpers.md.',
+},
+{
+  id: 'coolconc', group: 'Shop helpers', title: 'Coolant concentration (refractometer)',
+  desc: 'Concentration of a water-miscible coolant from the refractometer reading and the fluid\'s refractometer factor.',
+  fields: s => [
+    { id: 'brix', label: 'Refractometer reading', unit: '°Brix', def: '' },
+    { id: 'k', label: 'Refractometer factor (from the fluid data sheet)', unit: 'x', def: '' },
+    { id: 'lo', label: 'Recommended range, low (optional)', unit: '%', def: '' },
+    { id: 'hi', label: 'Recommended range, high (optional)', unit: '%', def: '' },
+  ],
+  calc: (v, W) => {
+    if (!(v.k > 0)) return [R('Refractometer factor needed: copy it from the fluid\'s data sheet (it differs between fluids)', 'not entered', '', 0)];
+    const c = W.coolant_conc(v.brix, v.k); if (!isFinite(c)) return [];
+    const rows = [R('Concentration', c, '%', 2)];
+    if (v.lo > 0 && c < v.lo) rows.push(R('Below the range: add concentrate (see Coolant mix and top-up)', 'low', '', 0));
+    else if (v.hi > 0 && c > v.hi) rows.push(R('Above the range: add water (see Coolant mix and top-up)', 'high', '', 0));
+    else if (v.lo > 0 || v.hi > 0) rows.push(R('Within the range', 'OK', '', 0));
+    return rows;
+  },
+  working: 'Concentration % = refractometer reading (°Brix) x refractometer factor. The factor depends on the fluid and is printed on its data sheet; BenchMate has no default. If the reading is off the scale, divide the concentration you need by the factor to see which refractometer range you need. A blurred line on the refractometer usually means the fluid is due for replacement.',
+  source: 'Fastenal, Tool Talk: Refractometers; Zebra Skimmers, refractometer product profile. See docs/shop-helpers.md.',
+},
+{
+  id: 'coolmix', group: 'Shop helpers', title: 'Coolant mix and top-up',
+  desc: 'How much concentrate or water to add to reach a target concentration, what mix to top up with, or what goes into a fresh fill.',
+  fields: s => [
+    { id: 'v', label: 'Volume in the sump now', unit: s === 'inch' ? 'US gal' : 'L', def: '' },
+    { id: 'c', label: 'Concentration now (blank for a fresh fill)', unit: '%', def: '' },
+    { id: 't', label: 'Target concentration', unit: '%', def: '' },
+    { id: 'full', label: 'Sump volume when full (optional, for top-up)', unit: s === 'inch' ? 'US gal' : 'L', def: '' },
+    { id: 'cc', label: 'Concentrate strength (100 unless pre-diluted)', unit: '%', def: 100 },
+  ],
+  calc: (v, W, s) => {
+    const u = s === 'inch' ? 'US gal' : 'L', cc = v.cc > 0 ? v.cc : 100, rows = [];
+    if (!(v.t > 0) || !(v.t < cc)) return v.t >= cc ? [R('Target must be below the concentrate strength', 'check', '', 0)] : [];
+    if (!isFinite(v.c)) {
+      if (!(v.v > 0)) return [];
+      const k = W.coolant_concentrate_in(v.v, v.t, cc);
+      return [R('Fresh fill: concentrate', k, u, 2), R('Fresh fill: water', v.v - k, u, 2)];
+    }
+    if (!(v.v > 0)) return [];
+    if (v.t > v.c) { const x = W.coolant_add_concentrate(v.v, v.c, v.t, cc); rows.push(R('Concentrate to add (no top-up limit)', x, u, 2), R('Volume after', v.v + x, u, 1)); if (v.full > 0 && v.v + x > v.full) rows.push(R('More than the sump holds: drain some first or use the top-up mix below', 'check', '', 0)); }
+    else if (v.t < v.c) { const w = W.coolant_add_water(v.v, v.c, v.t); rows.push(R('Water to add', w, u, 2), R('Volume after', v.v + w, u, 1)); if (v.full > 0 && v.v + w > v.full) rows.push(R('More than the sump holds: drain some first or use the top-up mix below', 'check', '', 0)); }
+    else rows.push(R('Already at target', 'no change', '', 0));
+    if (v.full > v.v) {
+      const m = W.coolant_topup_mix(v.v, v.c, v.full, v.t), add = v.full - v.v;
+      if (m < 0) rows.push(R('Top-up to full not possible: even plain water leaves it above target; drain some first', 'n/a', '', 0));
+      else if (m > cc) rows.push(R('Top-up to full not possible: even neat concentrate leaves it below target', 'n/a', '', 0));
+      else { const k = W.coolant_concentrate_in(add, m, cc); rows.push(R('Top-up to full: mix strength', m, '%', 2), R('Top-up: concentrate', k, u, 2), R('Top-up: water', add - k, u, 2)); }
+    }
+    return rows;
+  },
+  working: 'Mass balance of concentrate, by volume. Raise: x = V (c_target - c_now) / (c_conc - c_target). Lower: water = V (c_now - c_target) / c_target. Top-up to full: mix % = (c_target x V_full - c_now x V_now) / (V_full - V_now). Fresh fill: concentrate = V x c_target / c_conc. Always add concentrate to water, not water to concentrate, unless the supplier says otherwise.',
+  source: 'Volume mass balance (BenchMate derivation, checked in tests); add concentrate to water: Fastenal Tool Talk. See docs/shop-helpers.md.',
+},
+{
+  id: 'fraction', group: 'Shop helpers', title: 'Fraction, decimal and mm',
+  desc: 'Convert fractions, decimal inches and millimetres; nearest fraction (to 1/64 or another denominator) and the error.',
+  render: el => renderFraction(el),
+  working: '1 in = 25.4 mm exactly. Nearest fraction: numerator = round(value x denominator), then reduced by the greatest common divisor. Error = value - fraction.',
+  source: 'NIST SP 811, appendix B: inch = 0.0254 m exactly (1959 definition). See docs/shop-helpers.md.',
+},
+{
   id: 'machines', group: 'Setup', title: 'Machine profiles',
   desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
   render: el => renderMachines(el),
   working: 'Power available at speed n: P(n) = min(P_max, T_max x 2 pi n / 60 000). Constant torque below base speed, constant power above it.',
   source: 'Standard spindle power/torque characteristic [SAN]. Machine limits come from the builder\'s spec sheet or manual.',
+},
+{
+  id: 'setupsheet', group: 'Setup', title: 'Setup sheet',
+  desc: 'A printable setup sheet: job, machine, tool list with stick-out and offsets, work offsets and notes. Saved in this browser; export and import as JSON.',
+  render: el => renderSetupSheet(el),
+  working: 'Nothing is calculated here. Sheets are kept in this browser (localStorage) and can be moved by exporting a JSON file. Print uses a print layout without the app frame.',
+  source: 'BenchMate layout.',
+},
+{
+  id: 'sinebar', group: 'Setup', title: 'Sine bar and gauge-block stack',
+  desc: 'Gauge-block height for a sine bar angle (or the angle from a stack) and the stack with the fewest blocks from a standard or your own block set.',
+  render: el => renderSineBar(el),
+  working: 'H = L sin(angle); angle = asin(H / L), L the centre distance of the rolls. Stack: an exact search for the fewest blocks (each block used once) that add up to the size, in steps of the set\'s finest block (0.0005 mm or 0.00005 in).',
+  source: 'Set compositions as printed by Mitutoyo (via Cutwel and Transcat), Starrett and Insize; see docs/geometry.md. Sine relation: right-triangle trigonometry.',
+},
+{
+  id: 'indexing', group: 'Setup', title: 'Dividing head and rotary table indexing',
+  desc: 'Simple, angular and differential indexing with your own index plate hole circles and change gears.',
+  render: el => renderIndexing(el),
+  working: 'Simple: crank turns per division = ratio / N (ratio 40 on most dividing heads); the fraction must come out exactly on a hole circle. Angle: turns = ratio x angle / 360°. Differential: index as if for a nearby A\' that the plates can do, and gear the plate to the spindle with ratio x (A\' - N) / A\'; idlers: with A\' above N use 1 or 3 in a simple train, below N none or 2; a compound train reverses this.',
+  source: 'US Navy Machinery Repairman training manual, ch. 7 Indexing (differential indexing ratio and idlers; public domain). Plates and gears are never defaulted: enter your own. See docs/geometry.md.',
 },
 {
   id: 'materials', group: 'Materials', title: 'Material equivalents',

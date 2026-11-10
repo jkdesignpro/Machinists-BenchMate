@@ -110,7 +110,7 @@ Data stays SI. Inch mode shows lb/in³, Msi, ksi, µin/in·°F and BTU/h·ft·°
 | Steel | O1 | 3 | 0/0/1 | 0/0/1 |  |  |  | 0/0/6 | 0/0/2 | 0/1/0 |  |
 | Titanium | Ti-6Al-4V (Grade 5) | 3 | 1/0/0 | 0/1/0 | 0/0/4 | 0/0/4 | 0/0/4 | 0/0/2 | 0/0/4 | 0/1/1 |  |
 | Nickel alloy | Inconel 718 | 2 | 0/0/3 | 0/1/0 | 1/0/2 | 1/0/2 | 0/0/3 | 0/0/3 |  | 0/0/3 |  |
-| Nickel alloy | Inconel 625 | 1 | 0/0/1 | 0/0/2 | 0/0/2 | 0/0/2 | 0/0/2 | 0/0/2 | 0/0/1 | 0/0/1 |  |
+| Nickel alloy | Inconel 625 | 1 | 0/0/1 | 0/0/2 | 0/0/2 | 0/0/2 | 0/0/2 | 0/0/2 | 0/0/1 |  |  |
 | Steel | 1018 | 2 | 1/0/0 | 0/1/0 |  |  |  |  | 0/0/1 | 1/0/0 |  |
 | Steel | 304 | 3 | 1/0/0 | 1/0/0 | 1/0/3 | 1/0/3 | 1/0/3 | 0/0/3 | 0/0/5 | 0/0/3 |  |
 | Steel | 303 | 3 | 1/0/0 | 1/0/0 | 0/0/4 | 0/0/4 | 0/0/4 | 0/0/2 | 0/0/5 | 0/0/3 |  |
@@ -124,7 +124,7 @@ Data stays SI. Inch mode shows lb/in³, Msi, ksi, µin/in·°F and BTU/h·ft·°
 | Steel | 1045 | 2 | 1/0/0 | 0/0/1 | 1/0/4 | 1/0/4 | 0/0/5 | 0/0/6 | 0/0/2 | 0/0/1 |  |
 | Cast iron | Grey iron GG 25 | 1 | 0/0/1 | 0/0/1 | 0/0/1 |  | 0/0/1 | 0/0/1 |  |  |  |
 
-Totals (condition groups, confirmed/differ/single-source): Density 21/4/28; Young's modulus 10/8/27; Tensile strength Rm 14/1/116; Yield / proof Rp0.2 15/0/101; Elongation 12/0/108; Hardness 7/0/122; Thermal expansion 0/3/90; Thermal conductivity 2/8/58; Machinability rating 1/0/9.
+Totals (condition groups, confirmed/differ/single-source): Density 21/4/28; Young's modulus 10/8/27; Tensile strength Rm 14/1/116; Yield / proof Rp0.2 15/0/101; Elongation 12/0/108; Hardness 7/0/122; Thermal expansion 0/3/90; Thermal conductivity 2/8/57; Machinability rating 1/0/9.
 
 Grades with no property data yet: 1200, 2014 / 2014A, 7020, LM24 (AlSi8Cu3Fe), LM6 (AlSi12), LM25 (AlSi7Mg), LM9 (AlSi10Mg), LG2 leaded gunmetal (CC491K), Beryllium copper CW101C (CuBe2), CW008A Cu-OF (C103?), 301, 310S, 316Ti, 317L, 347, 904L, 405, 409, 410S, 420-highC, 15-5PH, 2304, 1015, 1020, 1040, 1055, 1213, 1215, 12L14, 4130, 8620, 52100, EN40B, EN41B, EN36, EN30B, O2, A2, D3, S1, P20, M2, M42, 420 (1.4028 X30Cr13 / 1.4021 X20Cr13), EN1A, EN3B, EN9, EN16, EN19, EN31, EN32, EN56 (A-D), EN57, EN58 (A-J, M), Ti CP Grade 1 (Ti 99.8), Ti CP Grade 2 (Ti 99.7), Ti CP Grade 4 (Ti 99.5), Ti CP Grade 3 (Ti 99.6), Inconel 600, Monel 400, Monel K-500, Hastelloy C-276, Grey iron GG 10, Grey iron GG 15, Grey iron GG 20, Grey iron GG 30, Grey iron GG 35, Grey iron GG 40, Ductile iron GGG 35.3, Ductile iron GGG 40, Ductile iron GGG 50, Ductile iron GGG 60, Ductile iron GGG 70, Ductile iron GGG 80.
 <!-- props-coverage:end -->
@@ -141,7 +141,7 @@ Grades with no property data yet: 1200, 2014 / 2014A, 7020, LM24 (AlSi8Cu3Fe), L
 - EN24 (817M40) condition U Rm: West Yorkshire Steel 925-1075 MPa, Smiths 925-1000 MPa.
 - D2 annealed hardness: Dörrenberg/Lucefin max 255 HB, Uddeholm Sverker 21 approx. 210 HB. D2 conductivity: Dörrenberg 16.7, Uddeholm 20.0 W/m·K. H13 conductivity: Dörrenberg 25.6, Uddeholm (Orvar Supreme, a premium H13) 25 W/m·K.
 - Inconel 718 Young's modulus: VDM 204 GPa, Special Metals 29.0 Msi (199.9 GPa). The AMS 5596 sheet minimums (1034 / 1241 MPa) are now confirmed by VDM and Special Metals.
-- Inconel 625 (Special Metals bulletin): thermal conductivity at 70 °F is printed as 776 Btu·in/ft²·h·°F with 129 W/m·°C in the metric column; 776 Btu·in converts to about 112 W/m·K. The inch figure is recorded as printed with a note; neither is corrected. Its tensile table is a composite range "not suitable for specification purposes" and is recorded as ranges with that note.
+- Inconel 625 (Special Metals bulletin): its tensile table is a composite range "not suitable for specification purposes" and is recorded as ranges with that note. Thermal conductivity is not recorded: the text extraction gave 776 / 129, which match the alloy's electrical resistivity (776 ohm·circ mil/ft, 1.29 µΩ·m), so the row pairing is unreliable until checked against the PDF.
 - Smiths CZ122 physical values match the Alumeco CW617N sheet figure for figure (a shared origin cannot be ruled out). Smiths C101, C106 and CZ112 sheets copy Aalco's text: C101 counts as Aalco (`COPIES`), C106 and CZ112 were not added.
 - Online Metals prints 1018 machinability "78%" without a basis; not recorded.
 
