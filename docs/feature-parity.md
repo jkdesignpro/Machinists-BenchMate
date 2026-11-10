@@ -15,6 +15,10 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Milling | Speeds and feeds with chip thinning, power check | core (partial) | MH, Sandvik public formulas |
 | Milling | Radial chip thinning | todo | standard formula |
 | Milling | Thread milling G-code | todo | helical interpolation |
+| Milling | Arc feed correction (internal/external) | done | `arc_feed_*`, Sandvik |
+| Milling | Helical interpolation / ramp angle and pitch | done | `helix_*`, Sandvik, MH |
+| Turning | Bar stock planner (parts per bar, weight, cost) | done | `bar_*`, MH |
+| Economics | Taylor tool life, cost per part, economic tool life | done | `taylor_*`, `cost_per_part`, `economic_tool_life`; Taylor 1907, Gilbert 1950, MH |
 | Milling | MRR and power | core | `mrr_*`, `power_kw` |
 | Milling | Ball endmill cusp height, effective diameter | todo | geometry |
 | Milling | Adaptive feed on rounded corners | todo | geometry |

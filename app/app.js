@@ -39,9 +39,14 @@ function renderTool() {
     const lab = document.createElement('label'); lab.className = 'f';
     const span = document.createElement('span'); span.textContent = f.label;
     const row = document.createElement('div'); row.className = 'row';
-    const inp = document.createElement('input'); inp.type = 'number'; inp.step = 'any'; inp.inputMode = 'decimal';
+    // A field with `options: [[value, label], ...]` renders as a drop-down; the value is still a number.
+    let inp;
+    if (f.options) {
+      inp = document.createElement('select');
+      f.options.forEach(([val, txt]) => { const o = document.createElement('option'); o.value = val; o.textContent = txt; inp.appendChild(o); });
+    } else { inp = document.createElement('input'); inp.type = 'number'; inp.step = 'any'; inp.inputMode = 'decimal'; }
     inp.value = saved[f.id] !== undefined ? saved[f.id] : f.def; inp.dataset.id = f.id;
-    inp.oninput = () => { saved[f.id] = inp.value; update(); };
+    inp.oninput = inp.onchange = () => { saved[f.id] = inp.value; update(); };
     const u = document.createElement('span'); u.className = 'u'; u.textContent = f.unit;
     row.append(inp, u); lab.append(span, row); grid.appendChild(lab);
   });
@@ -51,7 +56,7 @@ function renderTool() {
   $('#w', note).textContent = t.working; $('#s', note).textContent = t.source;
   main.append(card, res, note);
   function update() {
-    const v = {}; fields.forEach(f => { const e = $('input[data-id="' + f.id + '"]'); v[f.id] = e.value === '' ? NaN : parseFloat(e.value); });
+    const v = {}; fields.forEach(f => { const e = grid.querySelector('[data-id="' + f.id + '"]'); v[f.id] = e.value === '' ? NaN : parseFloat(e.value); });
     let rows = [];
     try { rows = t.calc(v, state.W, state.sys); } catch (e) { rows = []; }
     rows = rows.filter(r => typeof r.value === 'string' || isFinite(r.value));
