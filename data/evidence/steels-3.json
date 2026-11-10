@@ -1,0 +1,40 @@
+{
+ "sources": {
+  "MIF_1018": {
+   "title": "MakeItFrom: SAE-AISI 1018 (G10180) Carbon Steel",
+   "url": "https://www.makeitfrom.com/material-properties/SAE-AISI-1018-G10180-Carbon-Steel",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10"
+  },
+  "ONLINEMETALS_1018": {
+   "title": "Online Metals product guide: 1018",
+   "url": "https://www.onlinemetals.com/en/product-guide/alloy/1018",
+   "publisher": "Online Metals",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "1018",
+   "family": "Steel",
+   "subfamily": "Carbon steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "MIF_1018",
+     "values": {"aisi": "1018", "uns": "G10180"},
+     "verbatim_row": "G10180 is the UNS number. 1018 is the designation in both the SAE and AISI systems for this material.",
+     "transcription": "Quoted from a text extraction of the page."
+    },
+    {
+     "source": "ONLINEMETALS_1018",
+     "values": {"aisi": "1018", "uns": "G10180"},
+     "verbatim_row": "Common Trade Names: UNS G10180, AISI 1018, C1018, Marshallcrat | Specifications: ASTM A108",
+     "transcription": "Quoted from a text extraction of the page."
+    }
+   ],
+   "unsourced": {},
+   "disagreements": "No fetched source prints an EN / W.-Nr. equivalent for 1018 (West Yorkshire Steel's table has no 1018 row; Wikipedia's SAE grades page does not list it), so the status stays 'Needs 2nd source' on the EN number."
+  }
+ ]
+}

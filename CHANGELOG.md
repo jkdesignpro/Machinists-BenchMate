@@ -3,6 +3,17 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (geometry)
+- Triangle solver: right or any triangle from any three values with at least one side; the ambiguous side-side-angle case shows both solutions with a picker; area and perimeter; own SVG drawing.
+- Chord, arc, sagitta: solve from radius and angle, radius and chord, radius and sagitta, chord and sagitta, or radius and arc length; segment and sector areas; diagram. Circle through three points.
+- Fillet and tangent points: corner fillet between two lines (tangent points, centre, tangent distance) and line-to-arc fillet (inside or outside the arc, either side of the line, up to two solutions), with drawings.
+- Dovetail and V-groove over pins: male and female dovetail measurement over/between pins from the corner width or the top width and depth, contact check; V-groove pin height.
+- Stock weight: round, hex, square, tube, flat/plate/sheet; per piece, batch and per metre or foot; density from Confirmed material data or entered.
+- Sheet-metal bend allowance, outside setback, bend deduction, flat length of a two-flange part, K-factor from a test bend (K never defaulted).
+- Sine bar and gauge-block stack: stack height for an angle and angle for a stack; fewest-block stack (exact search) from the metric 112 or inch 81-piece sets (confirmed by two makers), Mitutoyo 88/103/47/32 sets (one maker's listing, labelled) or your own list.
+- Dividing head and rotary table: simple and angular indexing on your own hole circles, differential indexing with your own change gears (simple or compound train, idler rule).
+- `benchmate-core` module `geometry` with tests (worked examples, brute-force and constructed-geometry checks); WebAssembly exports including list results through `list_out`.
+- `docs/geometry.md`: sources, check table, decisions.
 ### Added (shop helpers)
 - Process capability: paste measurements (production order) or enter mean and sigma. Cp, Cpk (within sigma: mean moving range / 1.128, or mean range / d2 for subgroups of 2-10), Pp, Ppk (overall sample standard deviation), one-sided limits, expected ppm below/above from the normal tails (within and overall), observed out-of-spec count, histogram SVG with normal fits and limit lines, warnings for fewer than about 50 values and for overall sigma well above within sigma.
 - Temperature compensation: reading corrected to 20 °C (68 °F) for part and gauge expansion, with the reading a to-size part gives, deviation from drawing size and the uncertainty from the part coefficient. Coefficients are entered by the user or picked from Confirmed material data (none confirmed yet, which the screen says).
@@ -46,6 +57,10 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - `scripts/build_materials.py`: converts to SI, groups by property/condition/basis, clusters values (density within 1 %, others exact or within 0.5 % after unit conversion, ranges by both ends), counts independent publishers, statuses Confirmed / Sources differ / Needs 2nd source; refuses mechanical values without a condition; writes the coverage table into `docs/material-equivalents.md`. Materials JSON schema 3.
 - App: properties table in the grade detail (condition, value basis, publisher counts, alternatives and printed spread on disagreement, status), metric or inch units (lb/in³, Msi, ksi, µin/in·°F, BTU/h·ft·°F) following the inch/mm toggle; the open grade, search and filters survive a unit switch. Source panel shows each source's revision and printed property lines.
 - First coverage: 36 of 127 grades, 513 condition groups, from 42 documents by 15 publishers (Outokumpu, Atlas Steels, Lucefin, Ovako, Dörrenberg, Aalco, Smiths, Diehl, MakeItFrom, TIMET, Special Metals, Aerospace Metals, KIPP, W.S. Hampshire, Aircraft Materials). Disagreements recorded, e.g. 2205 ASTM min Rm 655 vs 620 MPa, austenitic density 7.9 vs 8.0 and E 200 vs 193 GPa, 6082 conductivity 180 vs 160 W/m·K.
+- Round 2 (`data/evidence/props-round2.json`): 54 of 128 grades, 764 condition groups, from 76 property documents by 22 publishers. New: Aalco stainless bar pages (416, 2205, 410, 420, 430, 440C, 304L, 316L), Aalco aluminium (6063, 5052, 5754, 1050A, 5251, 6262) and copper sheets, ColorMetal EN 755-2 bar minimums (2011, 2024, 6060, 6063, 6082, 7075), West Yorkshire Steel and Macsteel (EN24), Uddeholm (D2, H13, O1), VDM (Inconel 718), Special Metals (Inconel 625), Alumeco (CW617N, CW307G), Aerospace Metals (Ti-6Al-4V STA bar), MakeItFrom and Online Metals (1018).
+- New grade 1018 (`data/evidence/steels-3.json`): AISI 1018 / UNS G10180 from two publishers; no EN number found yet.
+- Recorded as printed, not corrected: Aalco 5083 density "265 g/cm³", Aalco 410 E 300 GPa. Inconel 625 conductivity left out (the extracted figures match its electrical resistivity). New disagreements: EN24 condition U Rm 925-1075 vs 925-1000 MPa, D2 annealed hardness and conductivity, Inconel 718 E 204 vs 199.9 GPa. Smiths C101 counted as a copy of Aalco.
+- Density units "sg" and "g/cc", and unit spellings with superscripts, "°C" and "/m/" are now accepted. Grade publisher counts use designation rows only.
 ### Added (reference data: drills, tap drills, threads, limits and fits)
 - Drill size chart (Drilling and tapping): fractional, letter, number (#1 to #97) and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Each size shows its evidence status: Exact, Confirmed, Confirmed with one outlier, or One source.
 - Tap drill size (Drilling and tapping):

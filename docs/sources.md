@@ -39,6 +39,13 @@ Full list with URLs, the statement check table and open items: **`docs/shop-help
 - **[SP811]** NIST SP 811, appendix B: 1 in = 25.4 mm exactly.
 - **[FAS]** Fastenal, Tool Talk: Refractometers; **[ZEB]** Zebra Skimmers, refractometer product profile (concentration = Brix x the fluid's factor).
 
+## Geometry (`core/src/geometry.rs`, `app/geometry.js`)
+Full list and the statement check table: **`docs/geometry.md`**. Summary:
+- Gauge-block sets: Mitutoyo (Cutwel PDF, Penn Tool and Transcat listings), Insize 112-piece, Starrett RS81.
+- Sheet metal: KETIV Technologies, sheet metal unfold rule equations; Aircraft Systems Tech, making straight line bends (FAA-based).
+- Indexing: US Navy Machinery Repairman training manual, ch. 7 (differential indexing).
+- Trigonometry: OpenStax Algebra and Trigonometry 2e, ch. 10 (cited).
+
 ## Tool material data (Young's modulus presets, `app/tools.js` `E_PRESETS`)
 - **Solid carbide, 580 GPa:** Ceratizit grade CTS20L (cemented carbide, 10% Co binder), elastic modulus 580 GPa at 23 C. Read from the grade's property listing as republished at https://www.mfgrobots.com/Article/material/composite/33306.html (accessed 2026-11-10); the Ceratizit primary data sheet (cdn.plansee-group.com) could not be fetched in this session and should be checked. Range check: Tungaloy catalogue grade table (page 38, https://allindustrial.com/content/catalogs/vendors/tungaloy/files/basic-html/page38.html, accessed 2026-11-10) lists cemented carbide grades from 490 GPa (UX30) to 660 GPa (G1F); the same listing site shows Ceratizit CTS22D 570, CTU16L 605, CTU06M 665 GPa. The preset is therefore one typical grade, not a universal value; users should enter their tool maker's figure.
 - **HSS (M2, 1.3343), 219 GPa:** voestalpine High Performance Metals Denmark, "Datablad HSS/M2/W 1.3343" (Uddeholm site), physical properties at 20 C, elasticitetsmodul 219 x 10^3 N/mm^2. https://www.uddeholm.com/app/uploads/sites/239/2025/08/Datablad-HSS_M2_W-1.3343.pdf (accessed 2026-11-10).

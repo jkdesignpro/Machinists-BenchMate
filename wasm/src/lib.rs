@@ -157,6 +157,67 @@ f1!(frac_nearest_num, c::frac_nearest_num, x, den);
 f1!(mixed_to_decimal, c::mixed_to_decimal, whole, num, den);
 #[no_mangle] pub extern "C" fn frac_reduce(num: f64, den: f64, which: f64) -> f64 {
     let (a, b) = c::frac_reduce(num, den); if which == 0.0 { a } else { b } }
+
+// Geometry (core/src/geometry.rs)
+f1!(tri_solve, c::solve_triangle_flat, a, b, cc, aa, bb, ccc, sol, which);
+f1!(arc_solve, c::arc_solve_flat, mode, x, y, which);
+f1!(circle_3pts, c::circle_3pts_flat, x1, y1, x2, y2, x3, y3, which);
+f1!(sine_bar_height, c::sine_bar_height, l, theta);
+f1!(sine_bar_angle, c::sine_bar_angle, l, h);
+f1!(bend_allowance, c::bend_allowance, angle, r, k, t);
+f1!(outside_setback, c::outside_setback, angle, r, t);
+f1!(bend_deduction, c::bend_deduction, angle, r, k, t);
+f1!(k_from_bend_allowance, c::k_from_bend_allowance, angle, r, t, ba);
+f1!(mass_metric_kg, c::mass_metric_kg, area, len, density);
+f1!(dovetail_male_over_pins, c::dovetail_male_over_pins, w, alpha, d);
+f1!(dovetail_female_between_pins, c::dovetail_female_between_pins, w, alpha, d);
+f1!(dovetail_contact_along_flank, c::dovetail_contact_along_flank, alpha, d);
+f1!(vgroove_pin_height, c::vgroove_pin_height, w, beta, d);
+f1!(vgroove_contact_margin, c::vgroove_contact_margin, w, beta, d);
+#[no_mangle] pub extern "C" fn stock_area(shape: f64, a: f64, b: f64) -> f64 { c::stock_area(shape as u32, a, b) }
+#[no_mangle] pub extern "C" fn dovetail_corner_width(top: f64, h: f64, alpha: f64, male: f64) -> f64 { c::dovetail_corner_width(top, h, alpha, male != 0.0) }
+/// Fillet in a corner: which 0..6 = t1x, t1y, t2x, t2y, cx, cy, tangent distance.
+#[no_mangle] pub extern "C" fn fillet_line_line(px: f64, py: f64, d1: f64, d2: f64, r: f64, which: f64) -> f64 {
+    c::fillet_line_line(px, py, d1, d2, r).get(which as usize).copied().unwrap_or(f64::NAN) }
+/// Line-circle fillet: which 9 = number of solutions, else solution `sol` value 0..5.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn fillet_line_circle(x1: f64, y1: f64, x2: f64, y2: f64, cx: f64, cy: f64, rr: f64, r: f64, outside: f64, side: f64, sol: f64, which: f64) -> f64 {
+    let v = c::fillet_line_circle(x1, y1, x2, y2, cx, cy, rr, r, outside != 0.0, side);
+    if which as i32 == 9 { return v.len() as f64; }
+    v.get(sol as usize).and_then(|s| s.get(which as usize)).copied().unwrap_or(f64::NAN) }
+
+// Lists passed through the shared buffer: results kept until the next call.
+static mut LIST_OUT: Vec<f64> = Vec::new();
+fn set_out(v: Vec<f64>) -> f64 { let n = v.len(); unsafe { *core::ptr::addr_of_mut!(LIST_OUT) = v; } n as f64 }
+/// Value `i` of the last list result.
+#[no_mangle] pub extern "C" fn list_out(i: f64) -> f64 {
+    // SAFETY: single-threaded wasm; LIST_OUT is only replaced by set_out.
+    let v: &Vec<f64> = unsafe { &*core::ptr::addr_of!(LIST_OUT) };
+    v.get(i as usize).copied().unwrap_or(f64::NAN) }
+/// Fewest-block gauge stack from the first `n` buffer values (block sizes).
+/// Returns the number of blocks (NaN if none); `list_out(i)` gives the sizes.
+#[no_mangle] pub extern "C" fn gauge_stack(n: f64, target: f64, unit: f64) -> f64 {
+    let blocks = buf(n).to_vec();
+    match c::gauge_stack(&blocks, target, unit) { Some(ix) => set_out(ix.iter().map(|i| blocks[*i]).collect()), None => { set_out(vec![]); f64::NAN } } }
+fn ints(v: &[f64]) -> Vec<u64> { v.iter().filter(|x| **x >= 1.0).map(|x| x.round() as u64).collect() }
+/// Indexing with hole circles in the buffer (first `n` values). mode 0: N
+/// divisions; mode 1: angle deg/min/sec. Returns the count of workable
+/// circles; `list_out(3i..3i+2)` = whole turns, holes, circle.
+#[no_mangle] pub extern "C" fn index_plates(n: f64, ratio: f64, mode: f64, a: f64, m: f64, s: f64) -> f64 {
+    let circles = ints(buf(n));
+    let r = ratio.round().max(0.0) as u64;
+    let v = if mode == 0.0 { c::index_simple(r, a.round().max(0.0) as u64, &circles) } else { c::index_angle(r, a.max(0.0) as u64, m.max(0.0) as u64, s.max(0.0) as u64, &circles) };
+    let k = v.len(); set_out(v.iter().flat_map(|t| [t.0 as f64, t.1 as f64, t.2 as f64]).collect()); k as f64 }
+/// Differential indexing: buffer holds `nc` circles then `ng` gears.
+/// Returns 1 if found: list_out = [A', turns, holes, circle, gear ratio, same direction (1/0), gear count, gears...].
+#[no_mangle] pub extern "C" fn index_differential(nc: f64, ng: f64, ratio: f64, divisions: f64, max_off: f64) -> f64 {
+    let all = buf(nc + ng);
+    let circles = ints(&all[..(nc as usize).min(all.len())]);
+    let gears = ints(&all[(nc as usize).min(all.len())..]);
+    match c::index_differential(ratio.round() as u64, divisions.round() as u64, &circles, &gears, max_off.max(1.0) as u64) {
+        Some(d) => { let mut v = vec![d.approx as f64, d.crank.0 as f64, d.crank.1 as f64, d.crank.2 as f64, d.gear_ratio, if d.same_direction { 1.0 } else { 0.0 }, d.gears.len() as f64];
+            v.extend(d.gears.iter().map(|g| *g as f64)); set_out(v); 1.0 }
+        None => { set_out(vec![]); 0.0 } } }
 // Other thread forms (core/src/thread_forms.rs)
 f1!(whitworth_value, c::whitworth_value_f, d, p, what);
 f1!(ba_value, c::ba_value_f, n, what);
