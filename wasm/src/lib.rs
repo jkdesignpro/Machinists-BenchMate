@@ -28,6 +28,24 @@ f1!(thread_pitch_dia_basic, c::thread_pitch_dia_basic, major, pitch);
 f1!(thread_best_wire, c::thread_best_wire, pitch);
 f1!(thread_three_wire_m, c::thread_three_wire_m, e, wire, pitch);
 
+f1!(arc_feed_internal, c::arc_feed_internal, fe, part_r, tool_r);
+f1!(arc_feed_external, c::arc_feed_external, fe, part_r, tool_r);
+f1!(helix_path_dia_internal, c::helix_path_dia_internal, hole, tool);
+f1!(helix_path_dia_external, c::helix_path_dia_external, boss, tool);
+f1!(helix_pitch, c::helix_pitch, path_dia, deg);
+f1!(helix_ramp_deg, c::helix_ramp_deg, path_dia, pitch);
+f1!(helix_axial_feed_plane, c::helix_axial_feed_plane, vf, deg);
+f1!(helix_axial_feed_path, c::helix_axial_feed_path, vf, deg);
+f1!(bar_section_area, c::bar_section_area_f, shape, size);
+f1!(bar_length_per_part, c::bar_length_per_part, part, cutoff, facing);
+f1!(bar_parts_per_bar, c::bar_parts_per_bar, bar, part, cutoff, facing, remnant, start);
+f1!(bar_scrap_len, c::bar_scrap_len, bar, parts, per_part);
+f1!(taylor_life, c::taylor_life, v, n, c);
+f1!(taylor_speed, c::taylor_speed, t, n, c);
+f1!(cost_per_part, c::cost_per_part, cycle, rate, tool, cut, life, material);
+f1!(economic_tool_life, c::economic_tool_life, n, tool, rate, change);
+f1!(max_production_tool_life, c::max_production_tool_life, n, change);
+
 /// X of hole `i` (0-based) on a bolt circle.
 #[no_mangle] pub extern "C" fn bolt_x(n: f64, dia: f64, start: f64, cx: f64, cy: f64, i: f64) -> f64 {
     c::bolt_circle(n as u32, dia, start, cx, cy)[i as usize].0 }
