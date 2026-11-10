@@ -98,7 +98,7 @@ async function renderWheelCode(el) {
     rows.push(['Grade ' + p.grade, 'letter ' + pos + ' of 26 on the A (soft) to Z (hard) scale ' + badge(G.grade_scale.status) + ' <span class="ms">(' + G.grade_scale.groups[0].publishers.map(q => rEsc(pubName(S, q))).join(', ') + ')</span>' +
       (inG ? '<div class="ms">' + rEsc(pubName(S, 'CGW')) + ' groups it as ' + inG[0] + ' (' + inG[1] + ')</div>' : '') + '<div class="ms">Grade is how firmly the bond holds the grain, not the hardness of the grain.</div>']);
     if (p.struct) rows.push(['Structure ' + p.struct, 'grain spacing: low numbers dense, high numbers open ' + badge(G.structure_low.status) + '<div class="ms">' + Object.entries(G.structure).map(([q, v]) => rEsc(pubName(S, q)) + ': ' + rEsc(v.range)).join('; ') + '</div>']);
-    else rows.push(['Structure', '<span class="ms">not given (United Abrasives' ANSI example, A 24 R BF, leaves it out too)</span>']);
+    else rows.push(['Structure', '<span class="ms">not given (United Abrasives\' ANSI example, A 24 R BF, leaves it out too)</span>']);
     if (p.bond) rows.push(['Bond ' + p.bond, grCons(S, G.bond[p.bond], grText) + (p.bond === 'E' || p.bond === 'O' ? '<div class="ms">The ANSI (US) source and the UK source (citing ISO 525) give different meanings for this letter; ask the maker.</div>' : '')]);
     else rows.push(['Bond', p.unknownBond ? '<span class="warn">' + rEsc(p.unknownBond) + ' is not a bond letter in the sources used here</span>' : '<span class="ms">missing</span>']);
     if (p.record) rows.push(["Maker's record " + rEsc(p.record), '<span class="ms">the maker\'s own code (bond variant, process); see the maker\'s catalogue</span>']);

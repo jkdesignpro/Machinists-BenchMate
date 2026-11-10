@@ -3,6 +3,8 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Fixed
+- Grinding wheel marking and grit conversion screens failed to load (unescaped quote in `app/grinding.js`); `scripts/build-web.sh` now syntax-checks every UI script.
 ### Added (calculators batch 3: small mill and lathe, chatter, grinding)
 - **Milling:** radial chip thinning (feed for a target chip, engagement angle, with a drawing), corner and boss engagement (law of cosines, feed reduction into an inside corner), ball-nose cusp height and step-over (exact circle form), ball-nose effective diameter with tool tilt (speed and feed corrected), runout and chip load (per-tooth chip with dial-indicator TIR, feed that keeps the worst tooth at the target).
 - **Turning:** lathe feed (mm/min and mm/rev), multi-pass roughing time with a per-pass table, boring bar deflection (steel, carbide, heavy metal or your own modulus; optional coolant bore; overhang guidance from Seco, Kennametal and Cutwel shown side by side), C-axis feed (degrees per minute, feed along the circumference, inverse time F for G93).
