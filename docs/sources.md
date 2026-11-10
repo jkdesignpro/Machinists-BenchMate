@@ -232,6 +232,94 @@ All were accessed 2026-11-10.
   - The ISO 7388-1 (SK) rows, HSK and R8 have one source so far; no free second publisher was found. Previews of the paid standards were not used.
 - **Pull studs.** Only the standard references and the thread sizes are given. Knob profiles differ between machine builders.
 
+## Inserts, holders, cutting material groups (`data/refdata/inserts-evidence.json`, `iso513-evidence.json`, `core/src/tooling.rs`)
+### Standards cited (current editions, iso.org listings checked 2026-11-10)
+- ISO 1832:2017 (indexable inserts for cutting tools: designation; iso.org/standard/69202).
+- ISO 5608:2012 (turning and copying tool holders and cartridges for indexable inserts: designation; iso.org/standard/60180).
+- ISO 513:2012 (classification and application of hard cutting materials).
+- Mentioned, not decoded: ANSI B212.4 (inch insert designation) and ISO 6261 (boring bars); editions not checked.
+
+### Publishers (all accessed 2026-11-10)
+- **[WALTER]** Walter AG, designation key Walter Turn cutting inserts. https://cdn2.walter-tools.com/files/a5ea48ae-5fa6-0161-3cb3-0ac22248a0fb/7f0801eb-595f-4dda-8f3c-cd3acbacc456/turning-designation-key-walter-turn-cutting-inserts-en-gb.pdf
+- **[MITSUBISHI]** Mitsubishi Materials, toolholder identification system. https://mitsubishicarbide.net/contents/mhg/de/html/product/product_guide/information/turning/bite_1.html
+- **[KORLOY]** Korloy turning insert code system (Cutwel PDF). https://www.cutwel.co.uk/media/product-pdfs/downloads/Korloy%20Turning%20Inserts.pdf
+- **[PRAMET]** Pramet catalogue (inch), holder key p. T179. https://powelltoolsupplyinc.assets-ascend-prod.roccommercecloud.com/assets%2FProduction%2F2c09719daaecbb19072d1c095c6d3a1e/Pramet_6753291_Catalog.pdf
+- **[KENNAMETAL]** Kennametal Turning Inserts Master Catalog, pp. B4-B7. https://www.productivity.com/wp-content/uploads/pdfs/Kennametal%20Turning%20Inserts%20-%20Master%20Catalog.pdf
+- **[YG1]** YG-1 YU-IT23 indexable insert catalogue, pp. 4 and 6-7. https://www.yg1usa.com/downloads/INDEXABLE-INSERT_YU-IT23.pdf
+- **[ZCC]** ZCC Cutting Tools turning holder catalogue 2022-2023. https://sakusakuec.com/download/zcc_catalog_2022-2023_TurningHolder.pdf
+- **[ISCAR]** ISCAR turning catalogue 2022, ISOTURN key (HTML view). https://iscar.com/Catalogs/flipview/flipview2022/english-1/TURNING-CATALOG-42_2022-p121-254/files/basic-html/page2.html
+- **[DORMER_PRAMET]** Dormer Pramet, workpiece material groups. https://dormerpramet.com/WMG
+- **[FMCARBIDE]** FM Carbide, ISO material group. https://fmcarbide.com/pages/iso-material-group
+- **[CTE]** Cutting Tool Engineering, "Inserts show their true colors" (1999). https://ctemag.com/articles/inserts-show-their-true-colors/
+- **[SECO]** Seco Tools, the ISO application standardization. https://www.secotools.com/article/120339
+
+### Findings
+- **Size codes follow from geometry.** Every ISO insert with tangent sides has edge l = (d/2)(cot(a1/2) + cot(a2/2)).
+  - The whole-mm code matches all 33 rows checked (Mitsubishi table, Korloy and Walter where they print the same sizes).
+  - One rounding rule is needed: the triangle with d = 25.4 mm has l = 43.994 mm and is coded 44, so lengths within 0.01 mm below a whole number round up.
+- **Inch catalogues.** Kennametal and YG-1 print tolerances, thickness and corner radius in inch. These are converted to mm and compared at the coarser precision; where makers agree, the metric printing is shown.
+- **Holder style G.** YG-1 prints kr 90 deg; ZCC's product tables print 91 deg. Shown as "Sources differ".
+- **ISO 513 colour for S.** Orange (Dormer Pramet) against brown (FM Carbide). Shown as printed.
+- **One maker only so far:**
+  - tolerance classes A, F, J, K, L, M, N, U (Walter);
+  - insert type letters (YG-1; A also ISCAR);
+  - edge F and insert hand (Kennametal);
+  - holder clamping C and D; styles D, E, H, P; several tool length letters.
+  - Edge letters other than F, and holder styles not listed, are not decoded.
+- **Not used.** Walter, ISCAR, Kyocera and Tungaloy keys show some columns only as drawings or extract scrambled; those columns were not used. Sandvik product pages need JavaScript and could not be read.
+
+## Surface texture (`data/refdata/surface-evidence.json`)
+### Standards cited
+- ISO 21920-1:2021 (indication of surface texture), ISO 21920-2:2021 (terms, definitions and parameters), ISO 21920-3:2021 (specification operators): current per iso.org.
+- ISO 1302:2002: withdrawn 2021-12-20, replaced by ISO 21920-1.
+- ASME Y14.36 for US drawings: mentioned, edition not checked.
+
+### Publishers (all accessed 2026-11-10)
+- **[CERATIZIT]** CERATIZIT, bar peeling hints and tips: surface quality. https://cuttingtools.ceratizit.com/bg/en/industries/bar-peeling/hints-and-tips/surface-quality.html
+- **[WERK24]** Werk24, N-grades. https://werk24.io/knowledge-base/n-grades
+- **[ENGINEERSEDGE]** Engineers Edge, surface roughness conversion chart. https://ns2.engineersedge.com/manufacturing/surface-roughness-conversion.htm
+- **[MECHENG]** Mechanical-Engineering.com, surface roughness chart (2018). https://mechanical-engineering.com/surface-roughness-chart/
+- **[AUTODESK]** Autodesk Inventor 2020 help, press fit surface quality. https://help.autodesk.com/cloudhelp/2020/ENU/Inventor-Help/files/GUID-AB89A817-38AB-4DC0-8594-54847FB0034B.htm
+
+### Findings
+- **N grades.** N1 to N12 agree across four publishers except N6: Engineers Edge prints 0.5 um, the other three 0.8 um. The series doubles at each step, so 0.8 fits.
+- **Rz and Rt beside the N grades.** CERATIZIT (Rz) and Mechanical-Engineering.com (Rt) print values about 3 to 13 times Ra. They are shown as evidence that Ra and Rz do not convert, not used as a conversion.
+- **Process ranges.** The two charts differ in grouping and limits for every process. Both are shown, with the range both include. Labelled approximate.
+
+## Hardness conversion (`data/refdata/hardness-evidence.json`)
+### Standards cited
+- ISO 18265:2013 (metallic materials, conversion of hardness values; iso.org/standard/53810), current.
+- ASTM E140-26 (hardness conversion tables for metals), current per the DIN Media listing; its tables were not used.
+- Older practice: DIN 50150 was replaced by DIN EN ISO 18265.
+
+### Publishers (all accessed 2026-11-10)
+- **[OPTIMAS]** Optimas Solutions, hardness conversion table (according to ISO 18265). https://optimas.com/technical-resources/hardness-conversion-table/
+- **[BOSSARD]** Bossard, technical information TG.006 (g-002-de), comparison table tensile strength and hardness (ISO 18265). https://www.bossard.com/ch-de/-/media/bossard-group/website/documents/technical-resources/de/g-002-de.pdf
+
+### Findings
+- **Agreement.** All 97 rows (HV 80 to 940) agree in every column both print.
+- **Bracketed HRB values above 100** (101, 102, 104, 105) sit one row lower in the Optimas printing (HV 255, 265, 275, 285) than in Bossard's (HV 260, 270, 280, 290). Each shows as one source and is not used for interpolation.
+- **Not used.**
+  - Righton Blackburns and a tube maker print the same BS 860 based table for stainless steel: not independent of each other, and for another material group.
+  - Kemet prints only a few points.
+
+## Knurling (`data/refdata/knurl-evidence.json`)
+### Standards cited
+- DIN 82:1973-01 (knurls), current per DIN Media.
+- DIN 403 (knurling wheels): pitches as quoted by Hommel+Keller; edition not confirmed.
+
+### Publishers (all accessed 2026-11-10)
+- **[DORIAN]** Dorian Tool, knurling catalogue. https://www.productivity.com/wp-content/uploads/2015/05/Dorian-Knurling.pdf
+- **[HOMMEL_KELLER]** Hommel+Keller Zeus catalogue 2021, pp. 35-46. https://cdn.shopify.com/s/files/1/0564/9065/5778/files/HOMMEL_KELLER_ZEUS_kataloog_2021.pdf
+
+### Findings
+- **Pitch relations.** Both makers give the same relations: CP pitch = 25.4 / TPI mm, DP pitch = pi / DP in. Dorian also gives the tooth count and the 30 deg diagonal correction (cos 30).
+- **Checks.** The core reproduces:
+  - Dorian's examples: 17.32 transverse TPI at 20 TPI; 83.14 teeth on 1 in at 96 DP and 30 deg; a 0.998 in blank for 83 teeth;
+  - Hommel+Keller's pitch examples: CP 20 = 1.27 mm, DP 64 = 1.25 mm.
+- **Dorian DP table.** It prints 23.6 TPI at 30 deg for 64 DP, where the formula gives 23.5; the other rows agree. Not used.
+- **Diameter growth** for form knurling is empirical and differs by maker: Dorian by TPI in inch, Hommel+Keller by material, diameter and pitch in mm. It is not tabulated; the tool tells the user to make a trial.
+
 ## Feature research
 - CNC Machinist Calculator Ultra: in-app menus viewed 2026-11-10 and public pages https://cncmachinistcalculatorultra.com/homePage , https://cncmachinistcalculatorultra.com/tools/machining-chatter , https://apps.apple.com/app/id6474093839 . Used only as a feature checklist.
 - CNCCookbook, "28 feeds and speeds features to try in G-Wizard Calculator". https://www.cnccookbook.com/28-feeds-and-speeds-features-to-try-in-g-wizard-calculator

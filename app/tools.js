@@ -340,6 +340,34 @@ const TOOLS = [
   source: "Machinery's Handbook; Sandvik Coromant formulas",
 },
 {
+  id: 'insertcode', group: 'Turning', title: 'Insert designation (ISO 1832)',
+  desc: 'Decode or build a metric turning insert code (shape, clearance, tolerance class, type, size, thickness, corner, edge, hand, maker chipbreaker), with the insert shape drawn and the size number computed from the inscribed circle.',
+  render: el => renderInsertCode(el),
+  working: 'See the note under the tool. Size = cutting edge length in whole mm, l = (d/2)(cot(a1/2) + cot(a2/2)).',
+  source: 'ISO 1832:2017; code meanings from the Walter, Mitsubishi Materials, Korloy, Kennametal, YG-1, ISCAR and Dormer Pramet code keys listed under the tool.',
+},
+{
+  id: 'holdercode', group: 'Turning', title: 'Toolholder designation (ISO 5608)',
+  desc: 'Decode an external turning toolholder code: clamping system, insert shape, style and approach angle, clearance, hand, shank size, length and insert size.',
+  render: el => renderHolderCode(el),
+  working: 'See the note under the tool.',
+  source: 'ISO 5608:2012; code meanings from the Mitsubishi Materials, YG-1, ZCC Cutting Tools and Dormer Pramet keys and catalogues listed under the tool.',
+},
+{
+  id: 'iso513', group: 'Turning', title: 'Cutting material groups (ISO 513)',
+  desc: 'The P, M, K, N, S and H application groups: colour, workpiece materials, and what the number after the letter means.',
+  render: el => renderIso513(el),
+  working: 'Reference only.',
+  source: 'ISO 513:2012; colours from Dormer Pramet, FM Carbide and Cutting Tool Engineering; numbering from Seco Tools.',
+},
+{
+  id: 'knurl', group: 'Turning', title: 'Knurling blank diameter',
+  desc: 'Blank diameter for a whole number of knurl teeth, straight or 30 degree diagonal and diamond, with pitch in mm, TPI or diametral pitch.',
+  render: el => renderKnurl(el),
+  working: 'D = n p / (pi cos h); p = 25.4 / TPI mm or pi / DP in. See the note under the tool.',
+  source: 'Dorian Tool and Hommel+Keller (Zeus) knurling catalogues; DIN 82:1973-01, DIN 403.',
+},
+{
   id: 'passtime', group: 'Turning', title: 'Cut time for a pass',
   desc: 'Time for one turning pass.',
   fields: s => [
@@ -491,6 +519,20 @@ const TOOLS = [
   render: el => renderFits(el),
   working: 'See the note under the tool.',
   source: 'ISO 286-1:2010 (with Cor 1:2013) and ISO 286-2:2010; table values from Wikipedia, Ganter, GOST 25346-89, RoyMech, Simply Bearings and OSG (JIS B 0401).',
+},
+{
+  id: 'surface', group: 'Limits and fits', title: 'Surface texture: Ra, N grades and symbols',
+  desc: 'Ra in micrometres and microinches with the N grade, why Ra and Rz do not convert, ISO 21920-1 and ISO 1302 drawing symbols in plain words, and typical Ra by process from two publishers.',
+  render: el => renderSurface(el),
+  working: 'See the notes under the tool. 1 um = 39.37 uin.',
+  source: 'ISO 21920-1:2021, ISO 21920-2:2021, ISO 21920-3:2021 (ISO 1302:2002 withdrawn); N grades from CERATIZIT, Werk24, Mechanical-Engineering.com and Engineers Edge; process ranges from Autodesk and Mechanical-Engineering.com.',
+},
+{
+  id: 'hardness', group: 'Limits and fits', title: 'Hardness conversion (steel, approximate)',
+  desc: 'Convert between HV, HB, HRC, HRB, HRA and tensile strength for unalloyed and low alloy steels, interpolated between published table rows, with the working shown.',
+  render: el => renderHardness(el),
+  working: 'Linear interpolation between adjacent rows of the ISO 18265 steel table. See the caveats under the tool.',
+  source: 'ISO 18265:2013, ASTM E140-26; table as printed by Optimas and Bossard.',
 },
 {
   id: 'bolt', group: 'Geometry', title: 'Bolt circle',

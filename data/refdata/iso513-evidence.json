@@ -1,0 +1,55 @@
+{
+ "sources": {
+  "DORMER_PRAMET": {
+   "publisher": "Dormer Pramet",
+   "title": "Workpiece material groups (WMG)",
+   "url": "https://dormerpramet.com/WMG",
+   "accessed": "2026-11-10",
+   "note": "Maker. Colour and material class for each ISO group."
+  },
+  "FMCARBIDE": {
+   "publisher": "FM Carbide (D&D Supply Inc.)",
+   "title": "ISO material group",
+   "url": "https://fmcarbide.com/pages/iso-material-group",
+   "accessed": "2026-11-10",
+   "note": "Tool supplier. Colour and material class for each ISO group."
+  },
+  "CTE": {
+   "publisher": "Cutting Tool Engineering",
+   "title": "M. Eastman, \"Inserts show their true colors\" (1 April 1999)",
+   "url": "https://ctemag.com/articles/inserts-show-their-true-colors/",
+   "accessed": "2026-11-10",
+   "note": "Trade magazine. Colours for P, M and K only."
+  },
+  "SECO": {
+   "publisher": "Seco Tools",
+   "title": "The ISO application standardization",
+   "url": "https://www.secotools.com/article/120339",
+   "accessed": "2026-11-10",
+   "note": "Maker. Meaning of the number after the letter (low numbers: finishing, high thermal load; high numbers: roughing, high mechanical load); not a colour source."
+  }
+ },
+ "colour": {
+  "DORMER_PRAMET": {
+   "P": "blue",
+   "M": "yellow",
+   "K": "red",
+   "N": "green",
+   "S": "orange",
+   "H": "grey"
+  },
+  "FMCARBIDE": {
+   "P": "blue",
+   "M": "yellow",
+   "K": "red",
+   "N": "green",
+   "S": "brown",
+   "H": "grey"
+  },
+  "CTE": {
+   "P": "blue",
+   "M": "yellow",
+   "K": "red"
+  }
+ }
+}

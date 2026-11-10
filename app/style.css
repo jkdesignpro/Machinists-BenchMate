@@ -212,3 +212,9 @@ svg.cadp circle.cp-h{fill:var(--panel)}
   .fam{white-space:normal}
   .gch>div{min-width:0}
 }
+/* code decoders (insert and holder designations) */
+.res table.codes { width: 100%; }
+.res table.codes td.v { text-align: left; white-space: normal; }
+.res table.codes td:first-child { white-space: nowrap; vertical-align: top; }
+.res table.codes td:last-child { width: 30%; }
+@media (max-width: 600px) { .res table.codes td:first-child { white-space: normal; } .res table.codes td:last-child { min-width: 0; } }
