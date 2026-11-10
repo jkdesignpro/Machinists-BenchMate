@@ -34,4 +34,4 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Tools | G-code simulator | todo | reuse AMW simulator later |
 | Extras | 2D CAD/DXF generator, knowledge quiz, assistant | later | |
 
-Beyond parity (ours): Swiss-lathe helpers, manufacturer second opinions, "show the working" steps for every result, AMW link-up.
+Beyond parity (ours): manufacturer speeds and feeds with PDF import, an adaptive per-machine learning profile (see `vendor-data-and-learning.md`), Swiss-lathe helpers, "show the working" steps for every result, AMW link-up.
