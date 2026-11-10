@@ -298,10 +298,7 @@ function renderSetupSheet(el) {
   el.querySelector('#sdel').onclick = () => { if (confirm('Delete this setup sheet from this browser?')) { S.remove(s.id); renderSetupSheet(el); } };
   el.querySelector('#sprint').onclick = () => { printView(); window.print(); };
   el.querySelector('#sexp').onclick = () => {
-    const blob = new Blob([S.exportJson(s)], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'setup-' + ((s.part || 'sheet') + (s.op ? '-' + s.op : '')).replace(/[^\w.-]+/g, '_') + '.json';
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    saveFile('setup-' + ((s.part || 'sheet') + (s.op ? '-' + s.op : '')).replace(/[^\w.-]+/g, '_') + '.json', S.exportJson(s), 'application/json');
   };
   el.querySelector('#simp').onchange = e => {
     const f = e.target.files[0]; if (!f) return;

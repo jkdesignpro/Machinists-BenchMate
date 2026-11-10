@@ -149,11 +149,8 @@ function cyPlot(res, lathe) {
     '<p class="ms"><span class="gkey gkp" style="border-color:var(--accent)"></span> feed &nbsp; <span class="gkey" style="border-top:1px dashed var(--muted)"></span> rapid &nbsp; dot = start. ' + (lathe ? 'Only the side above the centreline is drawn.' : 'Circles mark holes.') + '</p>';
 }
 
-function cyDownload(name, text, type) {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([text], { type: type || 'text/plain' }));
-  a.download = name; document.body.appendChild(a); a.click(); a.remove();
-}
+// Through saveFile (app.js) so the desktop app shows a native save dialog.
+function cyDownload(name, text, type) { saveFile(name, text, type || 'text/plain'); }
 
 function cyOutput(out, s, res, job) {
   if (!res.ok) { out.innerHTML = '<div class="res">' + stable('Program', [[sesc(res.err), '', '']]) + '</div>'; return; }
