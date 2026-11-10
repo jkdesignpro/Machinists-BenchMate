@@ -13,7 +13,7 @@ Computed quantities (thread dimensions, tolerances, fits) are not stored here:
 the app computes them with the Rust core.
 Run: python3 scripts/build_refdata.py
 """
-import json, pathlib, collections
+import json, pathlib, collections, re
 from fractions import Fraction
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -335,10 +335,58 @@ def build_grinding():
             'structure': ev['structure'], 'order': ev['order']}
 
 
+# ---------------------------------------------------------------- G and M codes
+# Kinds of source that count on their own for the control they describe: the
+# maker's manual, a machine builder's document for its own machines, the maker's
+# distribution network, or a public standard / report (generic base only).
+PRIMARY = {'maker', 'builder', 'distributor', 'standard'}
+
+
+def gm_status(srcs, row):
+    """'maker' when a primary source prints it, 'confirmed' when two independent
+    secondary sources (different families) agree. Anything else stops the build."""
+    kinds = {srcs[s['s']]['kind'] for s in row['src']}
+    if kinds & PRIMARY:
+        return 'maker'
+    fams = {srcs[s['s']].get('family', s['s']) for s in row['src']}
+    if len(fams) >= 2:
+        return 'confirmed'
+    raise SystemExit(f"{row.get('ctrl')} {row.get('code', row.get('topic'))}: needs the maker's document or two independent sources, has {sorted(fams)}")
+
+
+def build_gcodes():
+    """G-code, M-code and macro reference. Every row must name a known source."""
+    ev = load_ev('gcodes-evidence.json')
+    if not ev: return None
+    srcs = ev['sources']
+    for k, s in srcs.items():
+        for f in ('publisher', 'title', 'url', 'accessed', 'kind'):
+            if not s.get(f): raise SystemExit(f'gcodes source {k}: missing {f}')
+        if s['kind'] not in PRIMARY | {'secondary'}: raise SystemExit(f'gcodes source {k}: unknown kind {s["kind"]}')
+    ctrls = ev['controls']
+    seen = set()
+    for sec in ('codes', 'macro', 'disagreements'):
+        for r in ev[sec]:
+            if r['ctrl'] not in ctrls: raise SystemExit(f"{sec}: unknown control {r['ctrl']}")
+            if not r.get('src'): raise SystemExit(f"{sec} {r['ctrl']} {r.get('code', r.get('topic'))}: no source")
+            for s in r['src']:
+                if s['s'] not in srcs: raise SystemExit(f"{sec} {r['ctrl']}: unknown source {s['s']}")
+            if sec == 'codes':
+                if not r['meaning'] or not (r['mill'] or r['lathe']): raise SystemExit(f"{r['ctrl']} {r['code']}: meaning and mill/lathe needed")
+                if not re.fullmatch(r'[GM]\d+(\.\d+)?', r['code']): raise SystemExit(f"{r['ctrl']}: bad code {r['code']}")
+                key = (r['ctrl'], r['code'], r['mill'], r['lathe'])
+                if key in seen: raise SystemExit(f'duplicate row {key}')
+                seen.add(key)
+            if sec != 'disagreements':
+                r['status'] = gm_status(srcs, r)
+    return {'sources': srcs, 'controls': ctrls, 'codes': ev['codes'], 'macro': ev['macro'],
+            'disagreements': ev['disagreements'], 'gaps': ev['gaps']}
+
+
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
-           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(),
+           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes(),
            'grinding': build_grinding()}
     for sec in ('other_threads', 'tapers'):
         if not out[sec]: continue
@@ -380,6 +428,10 @@ def main():
         print('  grinding', k, dict(collections.Counter(c['status'] for c in g[k].values())), [(code, [(x['value'], x['publishers']) for x in c['groups']]) for code, c in g[k].items() if c['status'] in ('differs', 'confirmed_with_outlier')])
     for k, codes in g['grit_um'].items():
         print('  grit', k, dict(collections.Counter(c['status'] for c in codes.values())))
+    g = out['gcodes']
+    if g:
+        n = collections.Counter((r['ctrl'], r['status']) for r in g['codes'])
+        print('  gcodes', len(g['codes']), 'rows,', len(g['macro']), 'macro notes,', len(g['disagreements']), 'disagreements:', dict(n))
     print('  knurl pitches', [(x['p'], x['status']) for x in out['knurl']['pitches_mm']])
 
 

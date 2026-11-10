@@ -41,7 +41,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Reference | Thread measurement over wires | done (60 degree only) | `wires` | U51 |
 | Threads | UNJ, UNR, UNM, ACME, Stub ACME, STI, plating allowance | missing | | U40-U46, U49 |
 | Reference | ISO fits and tolerances | partial (no j/J, up to 500 mm) | `fits` | U61 |
-| Reference | G-code and M-code reference per control dialect, custom macros | missing | | U92-U94 |
+| Reference | G-code and M-code reference per control dialect, custom macros | done (G/M codes, ten controls with sources and compare) / partial (macros: Mitsubishi and Heidenhain thin) | `gmcodes`, `macroref` | U92-U94 |
 | Reference | Material properties | partial (properties, no SFM/machinability data; round 2 in progress) | `materials` | U82 |
 | Reference | Material weight | partial (bar only; full tool in progress on `claude/geometry`) | `bar` | U81 |
 | Reference | Hardness conversion | missing (in progress, `claude/ref-data-3`) | | U67 |

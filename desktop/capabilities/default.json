@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The page may only call the app's own save_file command. No plugin or core APIs are exposed to the page.",
+  "windows": ["main"],
+  "permissions": ["allow-save-file"]
+}

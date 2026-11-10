@@ -2,7 +2,16 @@
 
 A free, open-source (AGPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. For all machinists and all machines: mills, lathes, Swiss-type and more.
 
-**Status:** early (v0.1.0). The Rust formula core, a first set of 13 tools and the app UI (AMW look) work in a browser. The native Tauri wrapper for Windows and Apple Silicon comes next.
+**Status:** early (v0.1.0). The Rust formula core and the app UI (AMW look) work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
+
+## Download and install
+Get the files from the [Releases page](https://github.com/jkdesignpro/Machinists-BenchMate/releases). The app is fully offline and has no account or updater; everything you save stays on your computer.
+
+- **Windows 10/11 (x64):** run `Machinists-BenchMate_<version>_windows_x64-setup.exe` (installs for your user, no admin) or the `.msi`. Until the installers are code signed, **SmartScreen** says "Windows protected your PC": click **More info**, then **Run anyway**.
+- **macOS (Apple Silicon, macOS 11+):** open the `.dmg` and drag the app to Applications, or unzip the `.app.zip`. The app is ad hoc signed but not notarised by Apple, so the first launch is blocked: open it once, then go to **System Settings > Privacy & Security**, scroll down and click **Open Anyway** (then confirm). After that it opens normally.
+- **Linux (x86_64):** `chmod +x Machinists-BenchMate_<version>_linux_x86_64.AppImage` and run it, or on Debian/Ubuntu `sudo apt install ./machinists-benchmate_<version>_amd64.deb`.
+
+Check a download against `SHA256SUMS.txt` on the release page if you like (`sha256sum -c`, or `certutil -hashfile <file> SHA256` on Windows).
 
 ## Principles
 - **Accuracy first.** Every formula cites a standard reference (Machinery's Handbook, ISO, manufacturer-published formulas) in its doc comment, and has a unit test against a worked example.
@@ -13,10 +22,13 @@ A free, open-source (AGPLv3) machinist's calculator, built to sit beside the mac
 ## Layout
 - `core/` - `benchmate-core`, pure Rust formulas (no dependencies)
 - `wasm/` - plain C-ABI WebAssembly wrapper so the UI calls the same Rust formulas (no JS copies)
-- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `cad.js` (DXF generator screens), `toollib.js` (tool library), `cycles.js` (G-code cycle generators), `app.js` (shell, favourites), `tokens.css`
+- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `cad.js` (DXF generator screens), `toollib.js` (tool library), `cycles.js` (G-code cycle generators), `gmcodes.js` (G/M-code and macro reference), `app.js` (shell, favourites), `tokens.css`
+- `desktop/` - the Tauri 2 desktop wrapper: serves `app/` from the app bundle (no network), native save dialog for exports, icons in `desktop/icons/` (from `icon.svg`)
+- `tests/smoke/` - headless Chromium smoke test of `app/`; `scripts/check-versions.py` - checks the version is the same everywhere
+- `.github/workflows/` - CI (`ci.yml`) and release builds (`release.yml`); see `docs/release.md`
 - `scripts/build-web.sh` - builds the WebAssembly module; `scripts/check_dxf.py` - checks generated DXF files with the independent ezdxf reader
 - `data/` - reference data (material equivalents), generated from `scripts/materials_seed.py`
-- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions; `docs/shop-helpers.md` - shop helper sources and decisions; `docs/geometry.md` - geometry sources and decisions; `docs/cad-dxf.md` - DXF format, shapes, validation, tool library and favourites; `docs/cycles.md` - G-code cycle syntax sources, dialect support and decisions
+- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions; `docs/shop-helpers.md` - shop helper sources and decisions; `docs/geometry.md` - geometry sources and decisions; `docs/cad-dxf.md` - DXF format, shapes, validation, tool library and favourites; `docs/cycles.md` - G-code cycle syntax sources, dialect support and decisions; `docs/gm-codes.md` - G/M-code and macro reference sources, coverage and gaps
 - `CHANGELOG.md` - every change, per version
 
 ## Build, test and run
@@ -26,6 +38,14 @@ rustup target add wasm32-unknown-unknown
 scripts/build-web.sh            # builds app/benchmate.wasm
 cd app && python3 -m http.server 8765   # then open http://localhost:8765
 ```
+Desktop app (needs the Tauri prerequisites, see `docs/release.md`):
+```
+scripts/build-web.sh
+cargo install tauri-cli --version "^2" --locked
+cd desktop && cargo tauri build      # installers in desktop/target/release/bundle/
+```
+Smoke test of the UI: `cd tests/smoke && npm ci && npx playwright install chromium && cd ../.. && node tests/smoke/smoke.mjs`.
+
 Adding a calculator means adding one entry to `app/tools.js` and, if needed, a formula to `core/` with a cited source and a test.
 
 ## GD&T
@@ -39,6 +59,10 @@ Process capability (Cp, Cpk, Pp, Ppk, expected ppm, histogram with normal fit) f
 
 ## G-code cycles
 Program generators for drilling and tapping (G81, G82, G83, G73, G84 rigid or floating) on a bolt circle, grid or pasted holes with CSV export; thread milling (internal/external, climb/conventional, arc-in/out, optional G41/G42, several passes); lathe threading with G76 or G92 passes and an infeed table (constant volume, constant depth, custom, minimum cut, spring passes); taper turning and boring; groove and cut-off with CSS; keyway broaching; G71/G70 from a simple profile. Output for a generic ISO 6983 / Fanuc-style control and for Haas; other controls are shown as not yet supported until their syntax is confirmed. Each program has a backplot, an estimated cycle time and a check against the active machine. Always prove out a generated program in single block. See `docs/cycles.md`.
+
+## G and M code reference
+G and M codes for ten controls: a generic ISO 6983 / RS-274 base (NIST RS274NGC), Fanuc (machining centre, and lathe with G-code systems A, B and C), Haas mill and lathe, Mitsubishi M70/M80 and the legacy MELDAS 60, Siemens SINUMERIK 840D sl in native and ISO mode, Heidenhain TNC DIN/ISO, Okuma OSP lathe and Mazak EIA/ISO turning. The control defaults to the active machine profile; search by code (G1 finds G01) or word, filter mill or lathe, and compare two controls side by side. Each row shows its source with section or page; a code a control's sources do not list is shown as not confirmed for that control, never borrowed from another. A macro reference covers Fanuc Custom Macro B, Haas macros, Siemens R parameters and control structures, Heidenhain Q-parameter jumps and Okuma variables. Where sources disagree, both are shown. See `docs/gm-codes.md`.
+
 ## CAD / DXF
 Parametric 2D shapes exported as DXF for CAM: bolt circle (with outside diameter and centre bore), rectangular hole grid on an optional plate, straight and arc slots, rectangle with corner radii and corner holes, regular polygon from across flats or corners, circle and ring, keyhole, D-flat and double-D. Live SVG preview with overall dimensions, hole callouts and a hole position table. Inch or mm (`$INSUNITS` set), layers OUTLINE / HOLES / CENTRE, optional centre marks, origin at the centre or lower-left, DXF R2000 (LWPOLYLINE with bulges) or R12 (POLYLINE/VERTEX). The writer is in the Rust core, tested by reading its own output back, and the files load and audit cleanly in ezdxf. See `docs/cad-dxf.md`.
 

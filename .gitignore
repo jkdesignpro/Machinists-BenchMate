@@ -2,3 +2,4 @@ target/
 app/benchmate.wasm
 app/data/
 .claude/
+tests/smoke/node_modules/
