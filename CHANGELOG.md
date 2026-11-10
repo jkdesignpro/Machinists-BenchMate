@@ -3,6 +3,15 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (reference data, round 3: inserts, holders, cutting material groups, surface texture, hardness, knurling)
+- Insert designation (ISO 1832): decode a metric turning insert code or build one from pickers; shape, clearance, tolerance class (d, m, s), type (hole and chipbreaker), size, thickness, corner, edge, hand and the maker's chipbreaker suffix. Our own SVG of the shape with its inscribed circle. The size number is computed from the inscribed circle (tangential polygon edge length) and checked against the Mitsubishi, Korloy and Walter size tables.
+- Toolholder designation (ISO 5608): clamping system, insert shape, style with approach angle kr (with a sketch), clearance, hand, shank height and width, tool length letter, insert size; note on kr against the North American lead angle.
+- Cutting material groups (ISO 513): P, M, K, N, S, H with colour, materials in our words and the meaning of the 01-50 number. S is printed as orange by one source and brown by another; both are shown.
+- Surface texture: Ra in um and uin with the N grade (N6 printed as 0.5 um by one publisher against 0.8 um by three, shown), why Ra and Rz do not convert (ratio computed for ideal profiles), ISO 21920-1:2021 against ISO 1302:2002 in our words, typical Ra by process from two publishers side by side with the range both include.
+- Hardness conversion for unalloyed and low alloy steel (ISO 18265 table as printed by Optimas and Bossard): HV, HB, HRC, HRB, HRA and tensile strength (MPa or ksi), linear interpolation between rows with the working shown, only on values both publishers print; steel-only, approximate caveats.
+- Knurling blank diameter: whole tooth count for circular pitch (mm or TPI) or diametral pitch, straight or 30 degree diagonal and diamond; blanks for the tooth counts either side; maker pitches.
+- `benchmate-core` module `tooling`: `insert_edge_length`, `insert_size_code`, `insert_shape_angles`, `knurl_blank_dia`, `knurl_teeth_exact`, `knurl_dp_to_cp` and the CP/DP forms, `profile_rz_over_ra`, `lerp`, with tests against maker examples; WebAssembly exports.
+- Evidence files `data/refdata/inserts-evidence.json`, `iso513-evidence.json`, `surface-evidence.json`, `hardness-evidence.json`, `knurl-evidence.json`; `scripts/build_refdata.py` compares code meanings and ranges (a-b) per publisher.
 ### Added (geometry)
 - Triangle solver: right or any triangle from any three values with at least one side; the ambiguous side-side-angle case shows both solutions with a picker; area and perimeter; own SVG drawing.
 - Chord, arc, sagitta: solve from radius and angle, radius and chord, radius and sagitta, chord and sagitta, or radius and arc length; segment and sector areas; diagram. Circle through three points.

@@ -233,3 +233,7 @@ f1!(knurl_blank_dia_dp, c::knurl_blank_dia_dp, dp, n);
 f1!(knurl_teeth_cp, c::knurl_teeth_cp, d, p);
 f1!(knurl_teeth_dp, c::knurl_teeth_dp, d, dp);
 f1!(lerp, c::lerp, x, x0, y0, x1, y1);
+f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
+f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
+f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
+f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);

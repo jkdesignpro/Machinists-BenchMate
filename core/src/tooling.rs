@@ -72,6 +72,47 @@ pub fn knurl_teeth_dp(d: f64, dp: f64) -> f64 {
     (d * dp).round()
 }
 
+/// Circular pitch (along the circumference, inch) of a diametral pitch knurl:
+/// `p = pi / DP`. DP 96 gives 0.0327 in, about 30.6 teeth per inch.
+pub fn knurl_dp_to_cp(dp: f64) -> f64 {
+    std::f64::consts::PI / dp
+}
+
+/// Blank diameter for `n` teeth of a knurl whose pitch `p_normal` is measured
+/// square to the teeth, with the teeth at `helix_deg` to the work axis (0 for a
+/// straight knurl, 30 for the usual diagonal and diamond knurls). Around the
+/// circumference the pitch is `p / cos(helix)`, so `D = n p / (pi cos(helix))`.
+pub fn knurl_blank_dia(p_normal: f64, n: f64, helix_deg: f64) -> f64 {
+    n * p_normal / (std::f64::consts::PI * helix_deg.to_radians().cos())
+}
+
+/// Teeth (not rounded) around diameter `d` for a knurl of normal pitch `p` at
+/// `helix_deg`: `pi d cos(helix) / p`. Round to a whole number and feed it back
+/// to [`knurl_blank_dia`] to get a diameter that tracks.
+pub fn knurl_teeth_exact(d: f64, p_normal: f64, helix_deg: f64) -> f64 {
+    std::f64::consts::PI * d * helix_deg.to_radians().cos() / p_normal
+}
+
+// ---------------------------------------------------------------------------
+// Surface texture
+// ---------------------------------------------------------------------------
+
+/// Ratio of peak-to-valley height to Ra for an ideal periodic profile, to show
+/// why no fixed Ra to Rz factor exists: the ratio depends only on the shape of
+/// the profile. kind 0: sine wave (pi); 1: triangular, sawtooth (4);
+/// 2: turned feed marks, parabolic arcs (18 sqrt 3 / 8 = 3.897);
+/// 3: square wave (2). Real profiles with odd deep scratches or high peaks
+/// have much larger ratios, since Ra averages them away and Rz does not.
+pub fn profile_rz_over_ra(kind: f64) -> f64 {
+    match kind as i32 {
+        0 => std::f64::consts::PI,
+        1 => 4.0,
+        2 => 18.0 * 3f64.sqrt() / 8.0,
+        3 => 2.0,
+        _ => f64::NAN,
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Tables
 // ---------------------------------------------------------------------------
@@ -128,6 +169,39 @@ mod tests {
         close(knurl_teeth_cp(d, 1.0), 40.0, 0.0);
         close(knurl_blank_dia_dp(96.0, 48.0), 0.5, 1e-12);
         close(knurl_teeth_dp(0.5, 96.0), 48.0, 0.0);
+    }
+
+    /// Dorian Tool knurling catalogue: 20 TPI at 30 deg is 17.32 TPI around the
+    /// work; 1.000 in at 96 DP and 30 deg gives 83.14 teeth and 83 teeth track
+    /// on about 0.998 in. Hommel+Keller: CP 20 is a 1.27 mm pitch, DP 64 a
+    /// 1.25 mm pitch (both accessed 2026-11-10).
+    #[test] fn knurl_vs_makers() {
+        close(1.0 / (knurl_blank_dia(1.0 / 20.0, 1.0, 30.0) * std::f64::consts::PI), 17.32, 0.005);
+        let p = knurl_dp_to_cp(96.0);
+        close(knurl_teeth_exact(1.0, p, 30.0), 83.14, 0.005);
+        close(knurl_blank_dia(p, 83.0, 30.0), 0.998, 0.0005);
+        close(25.4 / 20.0, 1.27, 1e-12);
+        close(knurl_dp_to_cp(64.0) * 25.4, 1.25, 0.005);
+        close(1.0 / knurl_dp_to_cp(96.0), 30.6, 0.05);
+        // straight knurl: the general form reduces to the CP and DP forms
+        close(knurl_blank_dia(1.0, 40.0, 0.0), knurl_blank_dia_cp(1.0, 40.0), 1e-12);
+        close(knurl_blank_dia(knurl_dp_to_cp(96.0), 48.0, 0.0), knurl_blank_dia_dp(96.0, 48.0), 1e-12);
+    }
+
+    /// Check the profile ratios by sampling one period of each profile.
+    #[test] fn rz_over_ra_profiles() {
+        let n = 200_000;
+        let ratio = |f: &dyn Fn(f64) -> f64| {
+            let ys: Vec<f64> = (0..n).map(|i| f((i as f64 + 0.5) / n as f64)).collect();
+            let mean = ys.iter().sum::<f64>() / n as f64;
+            let ra = ys.iter().map(|y| (y - mean).abs()).sum::<f64>() / n as f64;
+            let (lo, hi) = ys.iter().fold((f64::MAX, f64::MIN), |(a, b), &y| (a.min(y), b.max(y)));
+            (hi - lo) / ra
+        };
+        close(ratio(&|x| (2.0 * std::f64::consts::PI * x).sin()), profile_rz_over_ra(0.0), 1e-3);
+        close(ratio(&|x| x), profile_rz_over_ra(1.0), 1e-3);
+        close(ratio(&|x| (x - 0.5) * (x - 0.5)), profile_rz_over_ra(2.0), 1e-3);
+        close(ratio(&|x| if x < 0.5 { 1.0 } else { 0.0 }), profile_rz_over_ra(3.0), 1e-3);
     }
 
     #[test] fn interpolation() {
