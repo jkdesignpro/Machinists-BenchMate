@@ -79,8 +79,8 @@ current practice and says so in the tool's notes.
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
-| Drill sizes: fractional, letter, number, metric, decimal chart | EBB MH31 | planned | ASME B94.11M / ISO 235 (cited); number/letter sizes are public facts, cross-checked against several maker charts |
-| Tap drill sizes (cut and form taps), percent thread | EBB MH31 | planned | formulas from thread standards; form-tap formula from tap makers |
+| Drill sizes: fractional, letter, number, metric, decimal chart | EBB MH31 | built | ASME B94.11M / ISO 235 (cited); number/letter sizes are public facts, cross-checked against several maker charts |
+| Tap drill sizes (cut and form taps), percent thread | EBB MH31 | built | formulas from thread standards; form-tap formula from tap makers |
 | Broken tap removal, screw extractor drill sizes | EBB | planned | maker data |
 | Thread chasers | EBB | planned | maker data |
 | Drill point geometry by material, grinding faults | EBB MH31 | planned | own diagrams, maker data |
@@ -101,8 +101,8 @@ current practice and says so in the tool's notes.
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
 | Thread over wires | MH31 | built | [MH] wire formula, ISO 68-1 |
-| Unified (UNC/UNF/UNEF/UN), all classes | MH31 EBB | planned | ASME B1.1 formulas (cited), values computed and cross-checked |
-| ISO metric coarse/fine, tolerance classes | MH31 EBB | planned | ISO 68-1, ISO 261, ISO 965 (cited), computed |
+| Unified (UNC/UNF/UNEF/UN), all classes | MH31 EBB | partial: UNC/UNF/UNEF basic dimensions, classes 2A/3A/2B/3B; not yet 1A/1B or internal minor-diameter limits | ASME B1.1 formulas (cited), values computed and cross-checked |
+| ISO metric coarse/fine, tolerance classes | MH31 EBB | partial: coarse/fine basic dimensions, 6g/6H | ISO 68-1, ISO 261, ISO 965 (cited), computed |
 | BSW, BSF, BA, BSP (G and R), NPT, NPTF | EBB MH31 | planned | BS 84, BS 93, ISO 228, ISO 7, ASME B1.20.1 (cited) |
 | ACME, stub ACME, trapezoidal, buttress | MH31 | planned | ASME B1.5, ISO 2904, ASME B1.9 (cited) |
 | Thread forms overview and symbols | EBB | planned | own diagrams |
@@ -116,7 +116,7 @@ current practice and says so in the tool's notes.
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
 | **GD&T: symbols, datums, modifiers, tolerance zones, bonus tolerance, virtual condition** | MH31 EDB | built (guide, frame builder, calculators; see docs/gdt.md) | see "GD&T" below |
-| ISO limits and fits (IT grades, all hole/shaft deviations) | MH31 EBB EDB | planned | ISO 286-1 formulas (cited), computed and checked |
+| ISO limits and fits (IT grades, all hole/shaft deviations) | MH31 EBB EDB | built: up to 500 mm, without j/J | ISO 286-1 formulas (cited), computed and checked |
 | ANSI preferred fits (RC, LC, LT, LN, FN) | MH31 | planned | ANSI B4.1 (cited) |
 | General tolerances (ISO 2768) | EDB | planned | ISO 2768 (cited) |
 | Surface texture: Ra/Rz, symbols, process ranges, N grades | MH31 EBB EDB | partial | ISO 21920 / ISO 1302, ASME B46.1 (cited) |
