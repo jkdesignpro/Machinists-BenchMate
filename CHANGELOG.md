@@ -1,0 +1,7 @@
+# Changelog
+
+All notable changes to Machinists BenchMate. Versions follow semver.
+
+## [Unreleased]
+### Added
+- `benchmate-core` 0.1.0: first formula set (RPM/SFM, Vc, feed per tooth, table feed, turning/milling MRR, spindle power, theoretical Rt/Ra, pass time, taper, drill point length, 60 deg thread pitch diameter, best wire and three-wire measurement, bolt circle) with unit tests. Each function cites its source in its doc comment.
