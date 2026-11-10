@@ -220,3 +220,13 @@ svg.cadp circle.cp-h{fill:var(--panel)}
 .res table.codes td:first-child { white-space: nowrap; vertical-align: top; }
 .res table.codes td:last-child { width: 30%; }
 @media (max-width: 600px) { .res table.codes td:first-child { white-space: normal; } .res table.codes td:last-child { min-width: 0; } }
+/* G and M code reference */
+.gmf{flex-wrap:wrap;align-items:flex-end;gap:8px 12px}
+.gml{display:flex;flex-direction:column;gap:2px;min-width:0;max-width:100%}
+.gml input{width:220px;max-width:100%}
+.gml select{max-width:100%}
+.gmbox{margin-top:12px}
+.gmhr{border:0;border-top:1px solid var(--soft);margin:5px 0}
+.gmcmp td{width:44%}
+.gmcmp td:first-child{width:12%}
+.gmnc{font-weight:600}

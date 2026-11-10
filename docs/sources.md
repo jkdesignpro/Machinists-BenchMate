@@ -320,6 +320,19 @@ All were accessed 2026-11-10.
 - **Dorian DP table.** It prints 23.6 TPI at 30 deg for 64 DP, where the formula gives 23.5; the other rows agree. Not used.
 - **Diameter growth** for form knurling is empirical and differs by maker: Dorian by TPI in inch, Hommel+Keller by material, diameter and pitch in mm. It is not tabulated; the tool tells the user to make a trial.
 
+## G and M codes, macros (`data/refdata/gcodes-evidence.json`, `app/gmcodes.js`)
+Full list with editions, sections, coverage counts, gaps and disagreements: **`docs/gm-codes.md`**. All accessed 2026-11-10. Summary:
+- **Standards cited:** ISO 6983-1:2009 (program format and address words), by name only. **[NIST]** T. R. Kramer, F. M. Proctor, E. Messina, *The NIST RS274NGC Interpreter - Version 3*, NISTIR 6556, 2000 (public domain), Tables 4 and 5, section 3.6.
+- **[LCNC_OV] [LCNC_M]** LinuxCNC G-code overview (modal groups) and M-code pages.
+- **Fanuc:** [FAN_M] 0i-F Plus Operator's Manual (Machining Center), B-64694EN-2/01; [FAN_T] 0i-F lathe manual, B-64604EN-1/01 (public copies on manualmachine.com); [MFG_FT] [MFG_F31] mfgrobots.com lists; [TIE] TIE / fanucworld list; [IMD_SYS] Industrial Monitor Direct A/B/C article.
+- **Haas:** [HAAS_MG] Mill Operator's Manual ch. 17 (2025); [HAAS_MWB] Mill Programming Workbook (2015); [HAAS_LC] lathe G&M code card (2002); [HFO_L] Haas Factory Outlet lathe programming manual (12/2024); [HAAS_MAC] Macro Programming Information (2017).
+- **Mitsubishi:** [MIT_EL] [MIT_EM] e-learning BNP-C8027-688/689 (2020); [MIT_70L] M700L/M70L Programming Manual; [MIT_M60] MELDAS 60/60S programming manual BNP-B2181.
+- **Siemens:** [SIE_C101] SINUMERIK Handbook G codes & M codes; [SIE_ISOM] 840D sl ISO Milling 06/2009 (6FC5398-7BP10-1BA0); [SIE_PGA] Job Planning 03/2013 (6FC5398-2BP40-3BA1).
+- **Heidenhain:** [HEI_320] TNC 320 DIN/ISO user's manual 77185x-01 (7/2014, French), p. 553; [HEI_426] TNC 426 B ISO manual, p. 275; [ICAM_H] ICAM Heidenhain ISO syntax.
+- **Okuma:** [OKU_P200L] OSP-P200L/P20L Programming Manual 3rd ed. (2007); [OKU_BLOG] Okuma America blog; [OKU_MTH] Machine Tool Help list; [ICAM_O] ICAM Okuma syntax.
+- **Mazak:** [MAZ_T] Programming EIA/ISO for MAZATROL turning, C734PBT018E (2002).
+- **Macros:** [TORNOS] Tornos Tips & Tricks B Macro (2017); [CNCC] CNCCookbook parameterized programming.
+
 ## Feature research
 - CNC Machinist Calculator Ultra: in-app menus viewed 2026-11-10 and public pages https://cncmachinistcalculatorultra.com/homePage , https://cncmachinistcalculatorultra.com/tools/machining-chatter , https://apps.apple.com/app/id6474093839 . Used only as a feature checklist.
 - CNCCookbook, "28 feeds and speeds features to try in G-Wizard Calculator". https://www.cnccookbook.com/28-feeds-and-speeds-features-to-try-in-g-wizard-calculator

@@ -30,14 +30,16 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 35 | 18 | 58 (8) | 2 | 0 | 32 % |
+| CNC Machinist Calculator Ultra | 113 | 37 | 19 | 55 (8) | 2 | 0 | 33 % |
 | Machinery's Handbook 31 | 306 | 15 | 45 | 212 (14) | 6 | 28 | 6 % |
 | Engineers' Data Book | 94 | 3 | 20 | 33 (1) | 12 | 26 | 5 % |
-| Engineers Black Book | 80 | 9 | 14 | 56 (10) | 1 | 0 | 11 % |
-| CNC Machining handbook | 83 | 1 | 9 | 69 (0) | 0 | 4 | 1 % |
-| **All** | **676** | **63** | **106** | **428 (32)** | **21** | **58** | **11 %** |
+| Engineers Black Book | 80 | 9 | 15 | 55 (10) | 1 | 0 | 11 % |
+| CNC Machining handbook | 83 | 4 | 9 | 66 (0) | 0 | 4 | 5 % |
+| **All** | **676** | **68** | **108** | **421 (32)** | **21** | **58** | **11 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
+
+**Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -220,9 +222,9 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U92 | G-code reference | missing | | |
-| U93 | M-code reference | missing | | |
-| U94 | Custom macro information | missing | | |
+| U92 | G-code reference | done | `gmcodes` | Ten controls (generic RS274NGC, Fanuc mill and lathe A/B/C, Haas mill and lathe, Mitsubishi M70/M80, MELDAS 60, Siemens native and ISO, Heidenhain ISO, Okuma OSP lathe, Mazak EIA turning), search, mill/lathe filter, side-by-side compare, source per row (`claude/gmcodes`) |
+| U93 | M-code reference | done | `gmcodes` | Program-control and builder M codes where the maker prints them; builder-specific codes are flagged; Heidenhain, Mazak and Siemens ISO M codes are gaps (`claude/gmcodes`) |
+| U94 | Custom macro information | partial | `macroref` | Fanuc Macro B, Haas, Siemens R parameters and control structures, Okuma VC/IF, Heidenhain Q jumps; Mitsubishi variable ranges and IF/WHILE not yet confirmed (`claude/gmcodes`) |
 | U95 | G-code simulator (2D/3D, cycle time) | missing | | |
 | U96 | 2D CAD and DXF generator (snapping, angle measure) | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | Parametric shapes with DXF export (branch `claude/dxf-toollib`); no free sketching, snapping or angle measure |
 
@@ -798,7 +800,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB70 | Abbreviations used in drawings | missing | | |
 | BB71 | Standards for engineering drawings | missing | | |
 | BB72 | Human physical dimensions | out of scope | | |
-| BB73 | G-codes, letter addresses, miscellaneous function words | missing | | |
+| BB73 | G-codes, letter addresses, miscellaneous function words | partial | `gmcodes` | G and M words per control; no letter-address table yet |
 | BB74 | Surface roughness tables | partial | `finish` | Conversions in progress (`claude/ref-data-3`) |
 | BB75 | Surface finish expected from manufacturing processes | missing | | In progress (`claude/ref-data-3`) |
 | BB76 | Terms used in heat treatment of steel | missing | | |
@@ -833,8 +835,8 @@ One row per learning objective.
 | CN18 | L4 Fixture offset Z with 1-2-3 block and indicator | missing | | |
 | CN19 | L4 Inch and metric programming units | partial | `app.js` (unit toggle) | No G20/G21 explanation |
 | CN20 | L5 What a CNC program is; sequence of operations | missing | | |
-| CN21 | L5 Common G-codes | missing | | |
-| CN22 | L5 Common M-codes | missing | | |
+| CN21 | L5 Common G-codes | done | `gmcodes` | |
+| CN22 | L5 Common M-codes | done | `gmcodes` | |
 | CN23 | L5 Special characters in a program | missing | | |
 | CN24 | L5 Organisation of a simple program | missing | | |
 | CN25 | L6 Steps to set up and run a CNC mill | missing | | |
@@ -893,7 +895,7 @@ One row per learning objective.
 | CN78 | App B: tool length offset with a 1-2-3 block from a finished face | missing | | |
 | CN79 | App B: tool length offset with a tool probe | missing | | |
 | CN80 | App C: CNC process planning form | partial | `setupsheet` | Setup sheet, no operation-sequence plan |
-| CN81 | App D: G and M code reference | missing | | |
+| CN81 | App D: G and M code reference | done | `gmcodes` | |
 | CN82 | App E: glossary | missing | | |
 | CN83 | App F: drill chart and decimal equivalents | done | `drillchart` | |
 
