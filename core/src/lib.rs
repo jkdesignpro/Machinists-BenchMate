@@ -139,6 +139,10 @@ pub fn bolt_circle(n: u32, dia: f64, start_deg: f64, cx: f64, cy: f64) -> Vec<(f
         .collect()
 }
 
+/// f64-argument helpers used by the WebAssembly layer (teeth as a number).
+pub fn table_feed_f(rpm: f64, fz: f64, teeth: f64) -> f64 { table_feed(rpm, fz, teeth as u32) }
+pub fn feed_per_tooth_f(vf: f64, rpm: f64, teeth: f64) -> f64 { feed_per_tooth(vf, rpm, teeth as u32) }
+
 pub const MM_PER_IN: f64 = 25.4; // exact by definition
 
 #[cfg(test)]

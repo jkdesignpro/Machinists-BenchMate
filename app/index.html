@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Machinists BenchMate</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="titlebar">
+  <div class="brand"><span class="mark">BM</span>Machinists BenchMate <small id="ver"></small></div>
+  <div class="sp"></div>
+  <div class="seg" id="units"><button data-u="inch" class="on">inch</button><button data-u="mm">mm</button></div>
+  <button class="btn" id="theme">Theme</button>
+</div>
+<div id="shell">
+  <nav id="side"><input id="search" type="search" placeholder="Search tools" aria-label="Search tools"><div id="list"></div></nav>
+  <main id="main"></main>
+</div>
+<div id="status">Formulas run in Rust (WebAssembly). Results are for guidance; verify before cutting.</div>
+<script src="tools.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
