@@ -29,7 +29,7 @@ cd app && python3 -m http.server 8765   # then open http://localhost:8765
 Adding a calculator means adding one entry to `app/tools.js` and, if needed, a formula to `core/` with a cited source and a test.
 
 ## GD&T
-A GD&T reference guide (datums, Rule #1 vs ISO independency, every characteristic, modifiers, ASME/ISO comparison), a feature control frame builder with plain-English explanation and validity checks, and calculators for true position, bonus/virtual/resultant condition, position/plus-minus conversion, fastener tolerances and worst-case/RSS stacks. Written for ASME Y14.5-2018 and current ISO GPS editions; see `docs/gdt.md`.
+A GD&T reference guide (datums, Rule #1 vs ISO independency, every characteristic, modifiers, ASME/ISO comparison), a feature control frame builder with plain-English explanation and validity checks, and calculators for true position, bonus/virtual/resultant condition, position/plus-minus conversion, fastener tolerances, worst-case/RSS stacks, a composite position (PLTZF/FRTZF) checker, an unequal profile (U) zone calculator, and a datum reference frame / degrees-of-freedom explainer. Written for ASME Y14.5-2018 and current ISO GPS editions; see `docs/gdt.md`.
 
 ## Planned
 Speeds and feeds, turning/finish, drilling and tapping, threads (UN, metric, NPT), taper and trig, bolt circles, drill/tap/fit charts, unit converter, materials table, Swiss-lathe helpers, second-opinion feeds from published manufacturer data, link-up with Alkart Mega Wizard.
