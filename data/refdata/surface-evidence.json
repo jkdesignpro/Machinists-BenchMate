@@ -1,0 +1,186 @@
+{
+ "sources": {
+  "CERATIZIT": {
+   "publisher": "CERATIZIT",
+   "title": "Bar peeling hints and tips: surface quality",
+   "url": "https://cuttingtools.ceratizit.com/bg/en/industries/bar-peeling/hints-and-tips/surface-quality.html",
+   "accessed": "2026-11-10",
+   "note": "Maker. N grade with Ra, and an Rz value printed beside each grade (cites DIN 4768, now withdrawn)."
+  },
+  "WERK24": {
+   "publisher": "Werk24",
+   "title": "N-grades: identify surface roughness better",
+   "url": "https://werk24.io/knowledge-base/n-grades",
+   "accessed": "2026-11-10",
+   "note": "Drawing-reading software publisher. N grade with Ra in micrometres and microinches."
+  },
+  "ENGINEERSEDGE": {
+   "publisher": "Engineers Edge",
+   "title": "Surface roughness conversion chart tables",
+   "url": "https://ns2.engineersedge.com/manufacturing/surface-roughness-conversion.htm",
+   "accessed": "2026-11-10",
+   "note": "Engineering reference site. N grade with Ra."
+  },
+  "MECHENG": {
+   "publisher": "Mechanical-Engineering.com",
+   "title": "B. Toulas, Surface roughness chart (17 Dec 2018)",
+   "url": "https://mechanical-engineering.com/surface-roughness-chart/",
+   "accessed": "2026-11-10",
+   "note": "Engineering site. N grade with Ra and an Rt value; Ra range by process."
+  },
+  "AUTODESK": {
+   "publisher": "Autodesk",
+   "title": "Inventor 2020 help: press fit surface quality (Ra by process)",
+   "url": "https://help.autodesk.com/cloudhelp/2020/ENU/Inventor-Help/files/GUID-AB89A817-38AB-4DC0-8594-54847FB0034B.htm",
+   "accessed": "2026-11-10",
+   "note": "Software maker. Ra values marked as average application for each process; the range here runs from the smallest to the largest value so marked."
+  }
+ },
+ "n_ra": {
+  "CERATIZIT": {
+   "N1": "0.025",
+   "N2": "0.05",
+   "N3": "0.1",
+   "N4": "0.2",
+   "N5": "0.4",
+   "N6": "0.8",
+   "N7": "1.6",
+   "N8": "3.2",
+   "N9": "6.3",
+   "N10": "12.5",
+   "N11": "25",
+   "N12": "50"
+  },
+  "WERK24": {
+   "N1": "0.025",
+   "N2": "0.05",
+   "N3": "0.1",
+   "N4": "0.2",
+   "N5": "0.4",
+   "N6": "0.8",
+   "N7": "1.6",
+   "N8": "3.2",
+   "N9": "6.3",
+   "N10": "12.5",
+   "N11": "25",
+   "N12": "50"
+  },
+  "MECHENG": {
+   "N1": "0.025",
+   "N2": "0.05",
+   "N3": "0.1",
+   "N4": "0.2",
+   "N5": "0.4",
+   "N6": "0.8",
+   "N7": "1.6",
+   "N8": "3.2",
+   "N9": "6.3",
+   "N10": "12.5",
+   "N11": "25",
+   "N12": "50"
+  },
+  "ENGINEERSEDGE": {
+   "N1": "0.025",
+   "N2": "0.05",
+   "N3": "0.1",
+   "N4": "0.2",
+   "N5": "0.4",
+   "N6": "0.5",
+   "N7": "1.6",
+   "N8": "3.2",
+   "N9": "6.3",
+   "N10": "12.5",
+   "N11": "25",
+   "N12": "50"
+  }
+ },
+ "n_beside": {
+  "CERATIZIT": {
+   "param": "Rz",
+   "values": {
+    "N1": "0.25",
+    "N2": "0.63",
+    "N3": "1",
+    "N4": "1.6",
+    "N5": "2.5",
+    "N6": "4-6.3",
+    "N7": "10",
+    "N8": "16-25",
+    "N9": "40",
+    "N10": "63",
+    "N11": "100",
+    "N12": "160"
+   }
+  },
+  "MECHENG": {
+   "param": "Rt",
+   "values": {
+    "N1": "0.3",
+    "N2": "0.5",
+    "N3": "0.8",
+    "N4": "1.2",
+    "N5": "2",
+    "N6": "4",
+    "N7": "8",
+    "N8": "13",
+    "N9": "25",
+    "N10": "50",
+    "N11": "100",
+    "N12": "200"
+   }
+  }
+ },
+ "process_ra": {
+  "AUTODESK": {
+   "turning": "0.8-6.3",
+   "boring": "0.8-6.3",
+   "milling": "1.6-6.3",
+   "drilling": "3.2-6.3",
+   "reaming": "1.6-3.2",
+   "broaching": "1.6-3.2",
+   "planing": "3.2-12.5",
+   "sawing": "3.2-25",
+   "edm": "3.2-3.2",
+   "grinding": "0.2-1.6",
+   "honing": "0.2-0.8",
+   "polishing": "0.2-0.4",
+   "lapping": "0.2-0.4",
+   "superfinishing": "0.05-0.2",
+   "burnishing": "0.4-0.4",
+   "flame": "25-25",
+   "sand_casting": "25-25",
+   "die_casting": "1.6-1.6",
+   "investment_casting": "3.2-3.2",
+   "forging": "6.3-12.5",
+   "extruding": "1.6-3.2",
+   "cold_drawing": "0.8-1.6",
+   "laser": "1.6-6.3",
+   "electropolish": "0.2-0.8"
+  },
+  "MECHENG": {
+   "turning": "0.4-6.3",
+   "boring": "0.4-6.3",
+   "milling": "0.8-6.3",
+   "reaming": "0.8-6.3",
+   "broaching": "0.8-6.3",
+   "planing": "1.6-25",
+   "sawing": "1.6-25",
+   "edm": "1.6-25",
+   "grinding": "0.1-1.6",
+   "honing": "0.1-1.6",
+   "polishing": "0.1-1.6",
+   "lapping": "0.05-0.4",
+   "superfinishing": "0.025-0.2",
+   "burnishing": "0.2-0.8",
+   "flame": "12.5-25",
+   "sand_casting": "12.5-25",
+   "die_casting": "0.8-6.3",
+   "investment_casting": "1.6-25",
+   "forging": "3.2-12.5",
+   "extruding": "0.8-6.3",
+   "cold_drawing": "0.8-6.3",
+   "laser": "0.8-6.3",
+   "electropolish": "0.1-1.6"
+  }
+ }
+}

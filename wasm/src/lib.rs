@@ -248,3 +248,16 @@ fn set_text(s: String) -> f64 { let n = s.len(); unsafe { *core::ptr::addr_of_mu
         Err(e) => { set_out(vec![]); -set_text(e) }
     } }
 f1!(polygon_dims, c::cad::polygon_dims, n, size, corners, which);
+// Tooling (core/src/tooling.rs)
+f1!(insert_edge_length, c::insert_edge_length, d, a1, a2);
+f1!(insert_edge_length_shape, c::insert_edge_length_f, d, letter_code);
+f1!(insert_size_code, c::insert_size_code, edge_len);
+f1!(knurl_blank_dia_cp, c::knurl_blank_dia_cp, p, n);
+f1!(knurl_blank_dia_dp, c::knurl_blank_dia_dp, dp, n);
+f1!(knurl_teeth_cp, c::knurl_teeth_cp, d, p);
+f1!(knurl_teeth_dp, c::knurl_teeth_dp, d, dp);
+f1!(lerp, c::lerp, x, x0, y0, x1, y1);
+f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
+f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
+f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
+f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);

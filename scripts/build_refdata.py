@@ -232,9 +232,100 @@ def build_tapers():
     return out
 
 
+# ---------------------------------------------------------------- round 3: codes, groups, tables
+def is_rng(v):
+    """'0.05-0.152' or '12.5' (all parts numeric)."""
+    return all(is_num(x) for x in str(v).split('-')) if str(v) else False
+
+
+def agree_rng(a, b):
+    pa, pb = str(a).split('-'), str(b).split('-')
+    return len(pa) == len(pb) and all(agree(x, y) for x, y in zip(pa, pb))
+
+
+def any_consensus(printed):
+    """Numbers and ranges (a-b) are equal at the coarser printed precision; text by id."""
+    if not all(is_rng(v) for v in printed.values()): return text_consensus(printed)
+    groups = []
+    for pub, v in printed.items():
+        for g in groups:
+            if agree_rng(g['printed'][0], v): g['publishers'].append(pub); g['printed'].append(str(v)); break
+        else: groups.append({'value': str(v), 'publishers': [pub], 'printed': [str(v)]})
+    for g in groups:
+        # show the plainest printing: inch prints converted to mm carry extra decimals
+        g['value'] = sorted(g['printed'], key=lambda x: (sum(decimals(y) for y in x.split('-')), -g['printed'].count(x)))[0]
+    groups.sort(key=lambda g: -len(g['publishers']))
+    strong = [g for g in groups if len(g['publishers']) >= 2]
+    status = ('confirmed' if len(groups[0]['publishers']) >= 2 else 'review') if len(groups) == 1 else 'confirmed_with_outlier' if len(strong) == 1 else 'differs'
+    return {'value': groups[0]['value'], 'status': status, 'groups': groups}
+
+
+def build_codes(sec):
+    """sec: {publisher: {code: printed}} -> {code: consensus}."""
+    codes = []
+    for rows in sec.values():
+        for c in rows:
+            if c not in codes: codes.append(c)
+    return {c: any_consensus({pub: rows[c] for pub, rows in sec.items() if c in rows}) for c in codes}
+
+
+def load_ev(name):
+    p = EV / name
+    return json.loads(p.read_text()) if p.exists() else None
+
+
+def build_inserts():
+    ev = load_ev('inserts-evidence.json')
+    if not ev: return None
+    return {'sources': sources_of(ev), 'insert': {k: build_codes(v) for k, v in ev['insert'].items()},
+            'holder': {k: build_codes(v) for k, v in ev['holder'].items()}}
+
+
+def build_iso513():
+    ev = load_ev('iso513-evidence.json')
+    return ev and {'sources': sources_of(ev), 'colour': build_codes(ev['colour'])}
+
+
+def build_surface():
+    ev = load_ev('surface-evidence.json')
+    if not ev: return None
+    return {'sources': sources_of(ev), 'n_ra': build_codes(ev['n_ra']), 'n_beside': ev['n_beside'], 'process_ra': build_codes(ev['process_ra'])}
+
+
+def build_hardness():
+    ev = load_ev('hardness-evidence.json')
+    if not ev: return None
+    hvs = sorted({float(h) for t in ev['tables'].values() for h in t})
+    rows = []
+    for hv in hvs:
+        key = f"{hv:g}"
+        hvc = any_consensus({pub: key for pub, t in ev['tables'].items() if key in t})
+        row = {'hv': dict(hvc, value=hv, approx=False)}
+        for f in ('uts', 'hb', 'hrb', 'hrc', 'hra'):
+            printed = {pub: t[key][f] for pub, t in ev['tables'].items() if key in t and f in t[key]}
+            if not printed: continue
+            c = any_consensus({p: v.rstrip('*') for p, v in printed.items()})
+            c['approx'] = any(v.endswith('*') for v in printed.values())
+            c['value'] = float(c['value'])
+            row[f] = c
+        rows.append(row)
+    return {'sources': sources_of(ev), 'rows': rows}
+
+
+def build_knurl():
+    ev = load_ev('knurl-evidence.json')
+    if not ev: return None
+    pubs = collections.defaultdict(list)
+    for pub, lst in ev['pitches_mm'].items():
+        for v in lst: pubs[float(v)].append(pub)
+    return {'sources': sources_of(ev), 'pitches_mm': [{'p': p, 'publishers': pubs[p], 'status': 'confirmed' if len(pubs[p]) >= 2 else 'review'} for p in sorted(pubs)],
+            'pitches_dp': [float(x) for x in ev['pitches_dp']['DORIAN']], 'din403_mm': [float(x) for x in ev['din403_mm']]}
+
+
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
-           'other_threads': build_other_threads(), 'tapers': build_tapers()}
+           'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
+           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl()}
     for sec in ('other_threads', 'tapers'):
         if not out[sec]: continue
         for k, rows in out[sec].items():
@@ -262,6 +353,15 @@ def main():
             if c['status'] != 'confirmed': print('  IT', g, r, c['status'], c['groups'])
     n = collections.Counter(c['status'] for l in iso['shaft'].values() for c in l.values())
     print('shaft deviations', dict(n))
+    for sec, parts in (('inserts', ('insert', 'holder')), ('iso513', ('colour',)), ('surface', ('n_ra', 'process_ra'))):
+        for part in parts:
+            sub = out[sec][part]
+            for k, codes in (sub.items() if part in ('insert', 'holder') else [(part, sub)]):
+                st = collections.Counter(c['status'] for c in codes.values())
+                print(' ', sec, k, dict(st), [(code, [(g['value'], g['publishers']) for g in c['groups']]) for code, c in codes.items() if c['status'] in ('differs', 'confirmed_with_outlier')])
+    hs = collections.Counter(c['status'] for r in out['hardness']['rows'] for f, c in r.items() if f != 'hv')
+    print('  hardness cells', dict(hs), [(r['hv']['value'], f, [(g['value'], g['publishers']) for g in c['groups']]) for r in out['hardness']['rows'] for f, c in r.items() if f != 'hv' and c['status'] not in ('confirmed', 'review')])
+    print('  knurl pitches', [(x['p'], x['status']) for x in out['knurl']['pitches_mm']])
 
 
 if __name__ == '__main__':

@@ -1,0 +1,414 @@
+{
+ "sources": {
+  "WALTER": {
+   "publisher": "Walter AG",
+   "title": "Designation key, Walter Turn cutting inserts (en-gb)",
+   "url": "https://cdn2.walter-tools.com/files/a5ea48ae-5fa6-0161-3cb3-0ac22248a0fb/7f0801eb-595f-4dda-8f3c-cd3acbacc456/turning-designation-key-walter-turn-cutting-inserts-en-gb.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker. Shape letters with corner angles, clearance letters, tolerance classes with d/m/s values in mm, thickness and corner codes. Insert type (position 4), edge and hand letters are shown only as drawings and were not read."
+  },
+  "MITSUBISHI": {
+   "publisher": "Mitsubishi Materials",
+   "title": "Toolholder identification system (external turning), product guide",
+   "url": "https://mitsubishicarbide.net/contents/mhg/de/html/product/product_guide/information/turning/bite_1.html",
+   "accessed": "2026-11-10",
+   "note": "Maker. Clamping system, insert shape, clearance, hand and tool length letters, insert size codes by inscribed circle. Holder style angles are drawings only."
+  },
+  "KORLOY": {
+   "publisher": "Korloy",
+   "title": "Turning insert code system (ISO), catalogue pp. B24-B25 (distributed by Cutwel)",
+   "url": "https://www.cutwel.co.uk/media/product-pdfs/downloads/Korloy%20Turning%20Inserts.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker. Shape angles for C, D, K, R, S, T and size codes; other columns did not extract legibly."
+  },
+  "PRAMET": {
+   "publisher": "Dormer Pramet",
+   "title": "Pramet catalogue (inch edition), toolholder designation key p. T179",
+   "url": "https://powelltoolsupplyinc.assets-ascend-prod.roccommercecloud.com/assets%2FProduction%2F2c09719daaecbb19072d1c095c6d3a1e/Pramet_6753291_Catalog.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker. Clearance letters N, B, C, P; hand R, L; tool length letters K, M, S, Y. Its holder angle legend uses the ANSI lead-angle convention and is not compared."
+  },
+  "KENNAMETAL": {
+   "publisher": "Kennametal",
+   "title": "Turning Inserts Master Catalog, catalog numbering system pp. B4-B7",
+   "url": "https://www.productivity.com/wp-content/uploads/pdfs/Kennametal%20Turning%20Inserts%20-%20Master%20Catalog.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker (inch edition; tolerances printed in inch, converted here to mm). Used: tolerance classes C, E, G, H; shape letters whose name and angle were legible together (A, B, H, K, L, O, P, R, S, T, W); insert hand R, L, N; edge F = sharp. The rhombic shape rows and the other edge letters did not extract with a clear pairing and are not used."
+  },
+  "YG1": {
+   "publisher": "YG-1",
+   "title": "Indexable insert catalogue YU-IT23, insert ISO code system pp. 6-7 and external holder code system p. 4",
+   "url": "https://www.yg1usa.com/downloads/INDEXABLE-INSERT_YU-IT23.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker (inch edition; thickness and corner radius printed as inch fractions, converted here to mm). Used: clearance letters, tolerance classes C, E, G, H, insert type (clamping hole and chipbreaker columns), thickness and corner codes, holder clamping letters C, M, P, S, holder styles with approach angle (KAPR), holder hand. Its K, M and U tolerance columns did not extract with a clear column order and are not used."
+  },
+  "ZCC": {
+   "publisher": "ZCC Cutting Tools",
+   "title": "Turning toolholder catalogue 2022-2023",
+   "url": "https://sakusakuec.com/download/zcc_catalog_2022-2023_TurningHolder.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker. Approach angle Kr printed for each external holder in the product tables; the style letter is the third character of each designation (for example DCLNR: style L, 95 deg). The page has no letter key of its own. CKNNR is printed as 63 deg in one table and 62.5 deg in the overview."
+  },
+  "ISCAR": {
+   "publisher": "ISCAR",
+   "title": "Turning catalogue 2022, ISOTURN designation key (catalogue p. 122, HTML view)",
+   "url": "https://iscar.com/Catalogs/flipview/flipview2022/english-1/TURNING-CATALOG-42_2022-p121-254/files/basic-html/page2.html",
+   "accessed": "2026-11-10",
+   "note": "Maker. The HTML view is scrambled; used only for insert type A (hole, no chipbreaker), where letter and text were together."
+  }
+ },
+ "insert": {
+  "shape": {
+   "WALTER": {
+    "A": "85",
+    "B": "82",
+    "C": "80",
+    "D": "55",
+    "E": "75",
+    "K": "55",
+    "M": "86",
+    "R": "round",
+    "S": "90",
+    "T": "60",
+    "V": "35",
+    "W": "80"
+   },
+   "MITSUBISHI": {
+    "C": "80",
+    "D": "55",
+    "R": "round",
+    "S": "90",
+    "T": "60",
+    "V": "35",
+    "W": "80"
+   },
+   "KORLOY": {
+    "C": "80",
+    "D": "55",
+    "K": "55",
+    "R": "round",
+    "S": "90",
+    "T": "60"
+   },
+   "KENNAMETAL": {
+    "A": "85",
+    "B": "82",
+    "H": "120",
+    "K": "55",
+    "L": "90",
+    "O": "135",
+    "P": "108",
+    "R": "round",
+    "S": "90",
+    "T": "60",
+    "W": "80"
+   }
+  },
+  "clearance": {
+   "WALTER": {
+    "A": "3",
+    "B": "5",
+    "C": "7",
+    "D": "15",
+    "E": "20",
+    "F": "25",
+    "G": "30",
+    "N": "0",
+    "P": "11"
+   },
+   "MITSUBISHI": {
+    "C": "7",
+    "D": "15",
+    "E": "20",
+    "N": "0"
+   },
+   "PRAMET": {
+    "N": "0",
+    "B": "5",
+    "C": "7",
+    "P": "11"
+   },
+   "YG1": {
+    "N": "0",
+    "B": "5",
+    "C": "7",
+    "P": "11",
+    "D": "15",
+    "E": "20",
+    "F": "25"
+   }
+  },
+  "tol_d": {
+   "WALTER": {
+    "A": "0.025",
+    "C": "0.025",
+    "E": "0.025",
+    "F": "0.013",
+    "G": "0.025",
+    "H": "0.013",
+    "J": "0.05-0.152",
+    "K": "0.05-0.152",
+    "L": "0.05-0.152",
+    "M": "0.05-0.152",
+    "N": "0.05-0.152",
+    "U": "0.08-0.252"
+   },
+   "KENNAMETAL": {
+    "C": "0.0254",
+    "H": "0.0127",
+    "E": "0.0254",
+    "G": "0.0254"
+   },
+   "YG1": {
+    "C": "0.0254",
+    "H": "0.0127",
+    "E": "0.0254",
+    "G": "0.0254"
+   }
+  },
+  "tol_m": {
+   "WALTER": {
+    "A": "0.005",
+    "C": "0.013",
+    "E": "0.025",
+    "F": "0.005",
+    "G": "0.025",
+    "H": "0.013",
+    "J": "0.005",
+    "K": "0.013",
+    "L": "0.025",
+    "M": "0.08-0.202",
+    "N": "0.08-0.202",
+    "U": "0.13-0.382"
+   },
+   "KENNAMETAL": {
+    "C": "0.0127",
+    "H": "0.0127",
+    "E": "0.0254",
+    "G": "0.0254"
+   },
+   "YG1": {
+    "C": "0.0127",
+    "H": "0.0127",
+    "E": "0.0254",
+    "G": "0.0254"
+   }
+  },
+  "tol_s": {
+   "WALTER": {
+    "A": "0.025",
+    "C": "0.025",
+    "E": "0.025",
+    "F": "0.025",
+    "G": "0.13",
+    "H": "0.025",
+    "J": "0.025",
+    "K": "0.025",
+    "L": "0.025",
+    "M": "0.13",
+    "N": "0.025",
+    "U": "0.13"
+   },
+   "KENNAMETAL": {
+    "C": "0.0254",
+    "H": "0.0254",
+    "E": "0.0254",
+    "G": "0.127"
+   },
+   "YG1": {
+    "C": "0.0254",
+    "H": "0.0254",
+    "E": "0.0254",
+    "G": "0.127"
+   }
+  },
+  "type_hole": {
+   "YG1": {
+    "N": "none",
+    "R": "none",
+    "A": "cyl",
+    "M": "cyl",
+    "W": "screw",
+    "T": "screw",
+    "X": "special"
+   },
+   "ISCAR": {
+    "A": "cyl"
+   }
+  },
+  "type_cb": {
+   "YG1": {
+    "R": "one",
+    "M": "one",
+    "T": "one",
+    "G": "both",
+    "U": "both"
+   },
+   "ISCAR": {
+    "A": "none"
+   }
+  },
+  "thickness": {
+   "WALTER": {
+    "01": "1.59",
+    "T1": "1.98",
+    "02": "2.38",
+    "T2": "2.78",
+    "03": "3.18",
+    "T3": "3.97",
+    "04": "4.76",
+    "05": "5.56",
+    "06": "6.35",
+    "07": "7.94",
+    "09": "9.52"
+   },
+   "KORLOY": {
+    "04": "4.76"
+   },
+   "YG1": {
+    "T1": "1.984",
+    "02": "2.381",
+    "03": "3.175",
+    "T3": "3.969",
+    "04": "4.762",
+    "05": "5.556",
+    "06": "6.35",
+    "07": "7.938",
+    "09": "9.525"
+   }
+  },
+  "corner": {
+   "WALTER": {
+    "01": "0.1",
+    "02": "0.2",
+    "04": "0.4",
+    "08": "0.8",
+    "12": "1.2",
+    "16": "1.6",
+    "24": "2.4"
+   },
+   "YG1": {
+    "01": "0.102",
+    "02": "0.203",
+    "04": "0.397",
+    "08": "0.794",
+    "12": "1.191",
+    "16": "1.587",
+    "20": "1.984",
+    "24": "2.381"
+   }
+  },
+  "edge": {
+   "KENNAMETAL": {
+    "F": "sharp"
+   }
+  },
+  "hand": {
+   "KENNAMETAL": {
+    "R": "right",
+    "L": "left",
+    "N": "neutral"
+   }
+  }
+ },
+ "holder": {
+  "clamping": {
+   "MITSUBISHI": {
+    "D": "double",
+    "M": "tophole",
+    "P": "lever",
+    "S": "screw"
+   },
+   "YG1": {
+    "C": "top",
+    "M": "tophole",
+    "P": "lever",
+    "S": "screw"
+   }
+  },
+  "style": {
+   "YG1": {
+    "A": "90",
+    "B": "75",
+    "F": "90",
+    "G": "90",
+    "H": "107.5",
+    "J": "93",
+    "K": "75",
+    "L": "95",
+    "N": "62.5",
+    "S": "45",
+    "T": "60",
+    "V": "72.5"
+   },
+   "ZCC": {
+    "A": "90",
+    "B": "75",
+    "D": "45",
+    "E": "60",
+    "F": "90",
+    "G": "91",
+    "J": "93",
+    "K": "75",
+    "L": "95",
+    "N": "62.5",
+    "P": "62.5",
+    "S": "45",
+    "T": "60",
+    "V": "72.5"
+   }
+  },
+  "clearance": {
+   "MITSUBISHI": {
+    "C": "7",
+    "D": "15",
+    "E": "20",
+    "N": "0"
+   },
+   "PRAMET": {
+    "N": "0",
+    "B": "5",
+    "C": "7",
+    "P": "11"
+   }
+  },
+  "hand": {
+   "MITSUBISHI": {
+    "R": "right",
+    "L": "left",
+    "N": "neutral"
+   },
+   "PRAMET": {
+    "R": "right",
+    "L": "left"
+   },
+   "YG1": {
+    "R": "right",
+    "L": "left",
+    "N": "neutral"
+   }
+  },
+  "length": {
+   "MITSUBISHI": {
+    "D": "60",
+    "E": "70",
+    "F": "80",
+    "H": "100",
+    "K": "125",
+    "M": "150",
+    "N": "160",
+    "P": "170",
+    "R": "200",
+    "S": "250",
+    "T": "300",
+    "U": "350"
+   },
+   "PRAMET": {
+    "K": "125",
+    "M": "150",
+    "S": "250",
+    "Y": "500"
+   }
+  }
+ }
+}
