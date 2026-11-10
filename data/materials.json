@@ -1,0 +1,2405 @@
+{
+ "schema": 1,
+ "systems": [
+  "aisi",
+  "uns",
+  "en_number",
+  "en_name",
+  "bs970",
+  "uk_en",
+  "jis",
+  "gb"
+ ],
+ "sources": {
+  "TWI": "TWI Ltd, FAQ 'equivalent European and American standards for common stainless steels' (BS EN 10088-1). twi-global.com",
+  "WYS": "West Yorkshire Steel, international standards cross-reference tables (stainless, carbon and alloy, tool steel). westyorkssteel.com",
+  "MMC": "Mitsubishi Materials, cutting tools catalogue: material cross reference (pages N028-N031). mitsubishicarbide.net",
+  "WIKI": "Wikipedia, 'SAE steel grades' (SAE to UNS table for stainless). en.wikipedia.org/wiki/SAE_steel_grades"
+ },
+ "materials": [
+  {
+   "id": "301",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "301",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "uns": {
+     "value": "S30100",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4310",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X10CrNi18-8",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {
+    "jis": "SUS301",
+    "bs970": "301S21"
+   },
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "303",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "303",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S30300",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4305",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "303S31",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS303",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "en_name": "X8CrNiS18-9",
+    "uk_en": "EN58M"
+   },
+   "pair_sources": [
+    "TWI",
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": "Free-machining 18/8. Names printed by sources: X8CrNi18-9 (TWI), X10CrNiS18-9 (WYS), X12CrNiS18-8 (MMC, old DIN)."
+  },
+  {
+   "id": "304",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "304",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S30400",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4301",
+     "sources": [
+      "TWI",
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "X5CrNi18-10",
+     "sources": [
+      "TWI",
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "304S15",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS304",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "bs970": "304S31",
+    "uk_en": "EN58E"
+   },
+   "pair_sources": [
+    "TWI",
+    "WYS"
+   ],
+   "status": "confirmed",
+   "notes": "MMC prints 1.4350 for 304; TWI and WYS give 1.4301, the standard 304 grade. WYS gives BS 304S15 (also a sheet designation); 304S31 is commonly quoted for bar but not yet sourced."
+  },
+  {
+   "id": "304L",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "304L",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S30403",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4306 / 1.4307",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X2CrNi19-11 (1.4306)",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "bs970": {
+     "value": "304S11",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS304L",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {},
+   "pair_sources": [
+    "TWI",
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": "1.4306 is printed by all three sources; WYS also lists 1.4307 (X2CrNi18-9), the common bar grade."
+  },
+  {
+   "id": "310S",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "310 / 310S",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "uns": {
+     "value": "S31008",
+     "sources": [
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4845",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "X12CrNi25-21",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS310S",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {},
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "TWI pairs 310 with 1.4951 (a pressure-vessel grade) and its own footnote disagrees on that grade's name."
+  },
+  {
+   "id": "316",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "316",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S31600",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4401",
+     "sources": [
+      "TWI",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X5CrNiMo17-12-2",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "bs970": {
+     "value": "316S31",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS316",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN58J"
+   },
+   "pair_sources": [
+    "TWI",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "316L",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "316L",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S31603",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4404",
+     "sources": [
+      "TWI",
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "X2CrNiMo17-12-2",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "bs970": {
+     "value": "316S11",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS316L",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {},
+   "pair_sources": [
+    "TWI",
+    "WYS"
+   ],
+   "status": "confirmed",
+   "notes": "MMC pairs 316L with 1.4435 (higher Ni/Mo variant)."
+  },
+  {
+   "id": "316Ti",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "316Ti",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "uns": {
+     "value": "S31635",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4571",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X6CrNiMoTi17-12-2",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {
+    "bs970": "320S31",
+    "jis": "SUS316Ti"
+   },
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "317L",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "uns": {
+     "value": "S31703",
+     "sources": [
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4438",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X2CrNiMo18-15-4",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {
+    "aisi": "317L"
+   },
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": "TWI pairs 1.4438 with 317 (S31700); the X2 name means low carbon, i.e. 317L-type. Needs a second source."
+  },
+  {
+   "id": "321",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "321",
+     "sources": [
+      "TWI",
+      "WYS"
+     ]
+    },
+    "uns": {
+     "value": "S32100",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4541",
+     "sources": [
+      "TWI",
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "X6CrNiTi18-10",
+     "sources": [
+      "TWI",
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "321S31",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS321",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN58B"
+   },
+   "pair_sources": [
+    "TWI",
+    "WYS"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "347",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "347",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "uns": {
+     "value": "S34700",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4550",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X6CrNiNb18-10",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {
+    "bs970": "347S31",
+    "jis": "SUS347"
+   },
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "904L",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {},
+   "unsourced": {
+    "aisi": "904L",
+    "uns": "N08904",
+    "en_number": "1.4539",
+    "en_name": "X1NiCrMoCu25-20-5"
+   },
+   "pair_sources": [],
+   "status": "review",
+   "notes": "Not yet sourced."
+  },
+  {
+   "id": "405",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "405",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "uns": {
+     "value": "S40500",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4002",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X6CrAl13",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {},
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "409",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "409",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "uns": {
+     "value": "S40900",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4512",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X2CrTi12",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {},
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "410",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "410",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S41000",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4006",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X12Cr13",
+     "sources": [
+      "TWI",
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "410S21",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS410",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN56A"
+   },
+   "pair_sources": [
+    "TWI",
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "410S",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "410S",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "uns": {
+     "value": "S41008",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4000",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X6Cr13",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {},
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "416",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "416",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S41600",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4005",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X12CrS13",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "416S21",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS416",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {},
+   "pair_sources": [
+    "TWI",
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "420",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "420",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S42000",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4021",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X20Cr13",
+     "sources": [
+      "TWI",
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "420S37",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS420J1",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN56C"
+   },
+   "pair_sources": [
+    "TWI",
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "420-highC",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "en_number": {
+     "value": "1.4028",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "X30Cr13",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "420S45",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS420J2",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "aisi": "420 (higher carbon)"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "WYS labels this 420F; 420F is a free-machining variant (UNS S42020), so treat as higher-carbon 420."
+  },
+  {
+   "id": "430",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "430",
+     "sources": [
+      "TWI",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S43000",
+     "sources": [
+      "TWI",
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4016",
+     "sources": [
+      "TWI",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X6Cr17",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "jis": {
+     "value": "SUS430",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "bs970": "430S17",
+    "uk_en": "EN60"
+   },
+   "pair_sources": [
+    "TWI",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "431",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "431",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "uns": {
+     "value": "S43100",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4057",
+     "sources": [
+      "TWI",
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X17CrNi16-2",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "bs970": {
+     "value": "431S29",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SUS431",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN57"
+   },
+   "pair_sources": [
+    "TWI",
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": "Wikipedia prints S41623 for 431 (the 416Se number), a typo there; TWI gives S43100."
+  },
+  {
+   "id": "440C",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "440C",
+     "sources": [
+      "WIKI"
+     ]
+    },
+    "uns": {
+     "value": "S44004",
+     "sources": [
+      "WIKI"
+     ]
+    }
+   },
+   "unsourced": {
+    "en_number": "1.4125",
+    "en_name": "X105CrMo17",
+    "jis": "SUS440C"
+   },
+   "pair_sources": [],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "17-4PH",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "630 (17-4PH)",
+     "sources": [
+      "WYS",
+      "MMC",
+      "WIKI"
+     ]
+    },
+    "uns": {
+     "value": "S17400",
+     "sources": [
+      "WIKI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4542",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "en_name": "X5CrNiCuNb16-4",
+    "jis": "SUS630"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "15-5PH",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {},
+   "unsourced": {
+    "aisi": "15-5PH",
+    "uns": "S15500",
+    "en_number": "1.4545",
+    "en_name": "X5CrNiCu15-5"
+   },
+   "pair_sources": [],
+   "status": "review",
+   "notes": "Not yet sourced."
+  },
+  {
+   "id": "2205",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "2205 (common name)",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "uns": {
+     "value": "S31803",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4462",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X2CrNiMoN22-5-3",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "S32205"
+   },
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": "'2205' is a common name, not a true AISI number (TWI)."
+  },
+  {
+   "id": "2304",
+   "family": "Stainless steel",
+   "iso_group": "M",
+   "fields": {
+    "aisi": {
+     "value": "2304 (common name)",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "uns": {
+     "value": "S32304",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_number": {
+     "value": "1.4362",
+     "sources": [
+      "TWI"
+     ]
+    },
+    "en_name": {
+     "value": "X2CrNiN23-4",
+     "sources": [
+      "TWI"
+     ]
+    }
+   },
+   "unsourced": {},
+   "pair_sources": [
+    "TWI"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "1015",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "1015",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.0401",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "C15",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "080A15 / 080M13",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "S15C",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "gb": {
+     "value": "15",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G10150",
+    "uk_en": "EN32"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "1020",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "1020",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.0402",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "C22",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "070M20",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "S20C / S22C",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "gb": {
+     "value": "20",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G10200",
+    "uk_en": "EN3B"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "1040",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "1040",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_number": {
+     "value": "1.0511",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "C40",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "080M40",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G10400",
+    "uk_en": "EN8",
+    "jis": "S40C"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "1045",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "1045",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.0503 (C45) / 1.1191 (C45E, Ck45)",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "080M46",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "jis": {
+     "value": "S45C",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "gb": {
+     "value": "45",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G10450"
+   },
+   "pair_sources": [
+    "MMC"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "1055",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "1055",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.0535",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "C55",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "070M55",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "jis": {
+     "value": "S55C",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "gb": {
+     "value": "55",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G10550",
+    "uk_en": "EN9"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "1213",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "1213",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.0715",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "9SMn28 (old DIN)",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "230M07",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "jis": {
+     "value": "SUM22",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "gb": {
+     "value": "Y15",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "en_name": "11SMn30 (EN 10087)",
+    "uk_en": "EN1A"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": "WYS prints the number as 1.07159 (typo)."
+  },
+  {
+   "id": "1215",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "1215",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.0736",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "9SMn36 (old DIN)",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "gb": {
+     "value": "Y13",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "en_name": "11SMn37 (EN 10087)",
+    "jis": "SUM25"
+   },
+   "pair_sources": [
+    "MMC"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "12L14",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "12L14",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.0737",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "9SMnPb36 (old DIN)",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "en_number": "1.0718 (11SMnPb30) is also widely quoted",
+    "jis": "SUM24L"
+   },
+   "pair_sources": [
+    "MMC"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "4130",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "4130",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.7218",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "25CrMo4",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "jis": {
+     "value": "SCM420 / SCM430",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G41300"
+   },
+   "pair_sources": [
+    "MMC"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "4140",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "4140 / 4142",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.7225",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "42CrMo4",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "708M40 / 709M40",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "jis": {
+     "value": "SCM440",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "gb": {
+     "value": "40CrMoA",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G41400",
+    "uk_en": "EN19"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "MMC pairs 4140 with 1.7223 41CrMo4 (a close sister grade). WYS prints JIS 'SCN440' (typo for SCM440)."
+  },
+  {
+   "id": "4340",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "4340",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.6582",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "34CrNiMo6",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "817M40",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "gb": {
+     "value": "40CrNiMoA",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G43400",
+    "uk_en": "EN24",
+    "jis": "SNCM439"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": "WYS prints JIS 'SNcM447'; MMC gives none. SNCM439 is commonly quoted but not yet sourced."
+  },
+  {
+   "id": "8620",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "8620",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.6523",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "21NiCrMo2",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "805M20",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "jis": {
+     "value": "SNCM220",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "G86200",
+    "uk_en": "EN362"
+   },
+   "pair_sources": [
+    "MMC"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "52100",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "52100",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.3505",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "100Cr6",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "534A99",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "jis": {
+     "value": "SUJ2",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN31",
+    "bs970": "535A99 also quoted"
+   },
+   "pair_sources": [
+    "MMC"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "EN40B",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "en_number": {
+     "value": "1.7361",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "32CrMo12",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "722M24",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN40B"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "Nitriding steel."
+  },
+  {
+   "id": "EN41B",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "en_number": {
+     "value": "1.8509",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "41CrAlMo7",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "905M31 / 905M39",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SACM645",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN41B"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "Nitriding steel."
+  },
+  {
+   "id": "EN36",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "3310 / 9314",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_number": {
+     "value": "1.5752",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "14NiCr14",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "655M13 / 655H13",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SNC815",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN36"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "Case-hardening steel."
+  },
+  {
+   "id": "EN30B",
+   "family": "Carbon and alloy steel",
+   "iso_group": "P",
+   "fields": {
+    "en_number": {
+     "value": "1.6747",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "30NiCrMo16-6",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "835M30",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uk_en": "EN30B"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "O1",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "O1",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_number": {
+     "value": "1.2510",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "100MnCrW4",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "BO1 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SKS3 (approx.)",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T31501"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "O2",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "O2",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_number": {
+     "value": "1.2842",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "90MnCrV8",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "BO2 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T31502"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "A2",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "A2",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.2363",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X100CrMoV5",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "BA2 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SKD12",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "gb": {
+     "value": "Cr5Mo1V",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T30102"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "D2",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "D2",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.2379",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "BD2 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SKD11",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "gb": {
+     "value": "Cr12MoV",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T30402",
+    "en_name": "X153CrMoV12"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "MMC pairs D2 with 1.2601 (a close sister grade); WYS with 1.2379, the usual D2 equivalent. Names printed: X155CrVMo12-1 (WYS), X153CrMoV12 (MMC, for 1.2601)."
+  },
+  {
+   "id": "D3",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "D3",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.2080",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X210Cr12",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "BD3 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SKD1",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T30403"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "H13",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "H13",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.2344",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "X40CrMoV5-1",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "BH13 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SKD61",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "gb": {
+     "value": "40CrMoV5",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T20813"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "S1",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "S1",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.2550",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "60WCrV7 / 60WCrV8",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "BS1 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T41901"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "MMC pairs S1 with 1.2542 45WCrV7 (lower carbon sister grade)."
+  },
+  {
+   "id": "P20",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "P20",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_number": {
+     "value": "1.2311",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_name": {
+     "value": "40CrMnMo7",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "BP20 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T51620"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": ""
+  },
+  {
+   "id": "M2",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "M2",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_number": {
+     "value": "1.3343",
+     "sources": [
+      "WYS",
+      "MMC"
+     ]
+    },
+    "en_name": {
+     "value": "S6-5-2 (old DIN)",
+     "sources": [
+      "MMC"
+     ]
+    },
+    "bs970": {
+     "value": "BM2 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SKH51",
+     "sources": [
+      "MMC"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T11302",
+    "en_name": "HS6-5-2C (EN ISO 4957)"
+   },
+   "pair_sources": [
+    "WYS",
+    "MMC"
+   ],
+   "status": "confirmed",
+   "notes": ""
+  },
+  {
+   "id": "M42",
+   "family": "Tool steel",
+   "iso_group": "P",
+   "fields": {
+    "aisi": {
+     "value": "M42",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "en_number": {
+     "value": "1.3247",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "bs970": {
+     "value": "BM42 (BS 4659)",
+     "sources": [
+      "WYS"
+     ]
+    },
+    "jis": {
+     "value": "SKH59",
+     "sources": [
+      "WYS"
+     ]
+    }
+   },
+   "unsourced": {
+    "uns": "T11342",
+    "en_name": "HS2-10-1-8"
+   },
+   "pair_sources": [
+    "WYS"
+   ],
+   "status": "review",
+   "notes": "WYS prints the name as S2-1-1-8 (typo)."
+  }
+ ]
+}

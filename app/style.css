@@ -41,3 +41,19 @@ label.f .u{color:var(--muted);min-width:34px;font-size:11.5px}
 #status{height:24px;display:flex;align-items:center;padding:0 10px;border-top:1px solid var(--line);background:var(--head);color:var(--muted);font-size:11.5px}
 .tbl{font-family:var(--mono)}
 @media (max-width:760px){#side{display:none}}
+
+.card.wide{max-width:none}
+.mtab{max-width:none;overflow:auto}
+.mtab th{text-align:left;padding:5px 8px;background:var(--raise);border-bottom:1px solid var(--line);font-weight:600;white-space:nowrap;font-size:11.5px}
+.mtab td{padding:5px 8px;vertical-align:top;border-bottom:1px solid var(--soft)}
+.mv{font-family:var(--mono);white-space:nowrap}
+.ms{color:var(--muted);font-size:10.5px}
+.mu{color:var(--muted);font-family:var(--mono);font-size:11.5px;opacity:.75}
+.mu i{font-family:var(--sans);font-style:normal;font-size:10px;border:1px solid var(--line);border-radius:3px;padding:0 3px}
+.mn td{color:var(--muted);font-size:11.5px;padding-top:0}
+.badge{font-size:10.5px;border-radius:3px;padding:1px 5px;border:1px solid}
+.badge.confirmed{color:var(--ok);border-color:var(--ok)}
+.badge.review{color:var(--warn);border-color:var(--warn)}
+.fam{color:var(--muted);font-size:10.5px;margin-top:3px;white-space:nowrap}
+.mfilter{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.chk{display:flex;gap:5px;align-items:center}

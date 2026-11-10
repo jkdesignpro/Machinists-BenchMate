@@ -1,2 +1,3 @@
 target/
 app/benchmate.wasm
+app/data/

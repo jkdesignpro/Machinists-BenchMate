@@ -15,6 +15,8 @@ A free, open-source (AGPLv3) machinist's calculator, built to sit beside the mac
 - `wasm/` - plain C-ABI WebAssembly wrapper so the UI calls the same Rust formulas (no JS copies)
 - `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `app.js`, `tokens.css`
 - `scripts/build-web.sh` - builds the WebAssembly module
+- `data/` - reference data (material equivalents), generated from `scripts/materials_seed.py`
+- `docs/sources.md` - every source referenced
 - `CHANGELOG.md` - every change, per version
 
 ## Build, test and run

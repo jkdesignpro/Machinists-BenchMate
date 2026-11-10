@@ -25,6 +25,7 @@ function renderList(filter = '') {
 
 function renderTool() {
   const t = TOOLS.find(x => x.id === state.tool) || TOOLS[0];
+  if (t.render) { renderCustom(t); return; }
   const fields = t.fields(state.sys);
   const key = t.id + ':' + state.sys;
   const saved = state.vals[key] || (state.vals[key] = {});
@@ -59,6 +60,44 @@ function renderTool() {
       : '<table><tr><td class="warn">Enter the values above.</td></tr></table>');
   }
   update();
+}
+
+function renderCustom(t) {
+  const main = $('#main'); main.innerHTML = '';
+  const card = document.createElement('div'); card.className = 'card wide';
+  card.innerHTML = '<h1></h1><p class="desc"></p><div class="body"></div>';
+  $('h1', card).textContent = t.title; $('.desc', card).textContent = t.desc;
+  const note = document.createElement('div'); note.className = 'note';
+  note.innerHTML = '<b>Note:</b> <span id="w"></span><br><b>Sources:</b> <span id="s"></span>';
+  $('#w', note).textContent = t.working; $('#s', note).textContent = t.source;
+  main.append(card, note);
+  t.render($('.body', card));
+}
+
+const MAT_COLS = [['aisi','AISI / SAE'],['uns','UNS'],['en_number','EN / W.-Nr.'],['en_name','EN name'],['bs970','BS 970 / BS 4659'],['uk_en','UK old EN'],['jis','JIS'],['gb','GB (China)']];
+let MAT = null;
+async function renderMaterials(el) {
+  el.innerHTML = '<input id="msearch" type="search" placeholder="Type any grade: 304, 1.4404, EN24, SKD11, 42CrMo4..." style="width:100%;max-width:520px;margin-bottom:10px"><div class="mfilter"></div><div id="mres"></div><div id="msrc" class="note"></div>';
+  if (!MAT) { try { MAT = await (await fetch('data/materials.json')).json(); } catch (e) { el.textContent = 'Material data not found (run scripts/build-web.sh).'; return; } }
+  const fams = [...new Set(MAT.materials.map(m => m.family))];
+  const ff = $('.mfilter', el);
+  ff.innerHTML = '<select id="mfam"><option value="">All families</option>' + fams.map(f => '<option>' + f + '</option>').join('') + '</select> <label class="chk"><input type="checkbox" id="mconf"> Confirmed only</label>';
+  const esc = x => String(x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const norm = x => String(x).toLowerCase().replace(/[\s.\-\/]/g, '');
+  function draw() {
+    const q = norm($('#msearch').value), fam = $('#mfam').value, conf = $('#mconf').checked;
+    const rows = MAT.materials.filter(m => (!fam || m.family === fam) && (!conf || m.status === 'confirmed') && (!q ||
+      [m.id, ...Object.values(m.fields).map(f => f.value), ...Object.values(m.unsourced)].some(v => norm(v).includes(q))));
+    $('#mres').innerHTML = '<div class="res mtab"><table><tr><th>Status</th>' + MAT_COLS.map(c => '<th>' + c[1] + '</th>').join('') + '</tr>' +
+      rows.map(m => '<tr><td><span class="badge ' + m.status + '">' + (m.status === 'confirmed' ? 'Confirmed' : 'Review') + '</span><div class="fam">' + esc(m.family) + ' · ISO ' + m.iso_group + '</div></td>' +
+        MAT_COLS.map(([k]) => { const f = m.fields[k]; const u = m.unsourced[k];
+          return '<td>' + (f ? '<div class="mv">' + esc(f.value) + '</div><div class="ms">' + f.sources.join(', ') + '</div>' : '') +
+            (u ? '<div class="mu" title="Not yet sourced">' + esc(u) + ' <i>unsourced</i></div>' : '') + '</td>'; }).join('') + '</tr>' +
+        (m.notes ? '<tr class="mn"><td></td><td colspan="' + MAT_COLS.length + '">' + esc(m.notes) + '</td></tr>' : '')).join('') +
+      '</table></div><p class="desc">' + rows.length + ' of ' + MAT.materials.length + ' grades shown.</p>';
+  }
+  $('#msrc').innerHTML = '<b>Source key</b><br>' + Object.entries(MAT.sources).map(([k, v]) => '<b>' + k + '</b>: ' + esc(v)).join('<br>');
+  $('#msearch').oninput = draw; $('#mfam').onchange = draw; $('#mconf').onchange = draw; draw();
 }
 
 function setUnits(u) {

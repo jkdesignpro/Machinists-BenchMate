@@ -176,4 +176,11 @@ const TOOLS = [
   working: 'x = cx + (D/2) cos(a0 + 360 i / n), y = cy + (D/2) sin(a0 + 360 i / n). Angles measured counter-clockwise from +X.',
   source: "Machinery's Handbook (hole circles)",
 },
+{
+  id: 'materials', group: 'Materials', title: 'Material equivalents',
+  desc: 'Find comparable grades across US (AISI/SAE, UNS), European (EN/W.-Nr.), UK (BS 970, old EN), Japanese (JIS) and Chinese (GB) systems. Every value shows which source prints it.',
+  render: el => renderMaterials(el),
+  working: 'Equivalents are comparable grades, not identical: chemistry and properties differ between standards. Check the actual standard or mill certificate before substituting.',
+  source: 'See the source list under the table. Grades are marked Confirmed only when two independent sources agree on the main pairing.',
+},
 ];
