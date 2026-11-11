@@ -227,6 +227,27 @@ def build_other_threads():
     return out
 
 
+def build_power_threads():
+    """Threads round 3: ACME / Stub ACME series, trapezoidal rows, STI tapped holes, UN constant-pitch lists."""
+    ev = load_ev('threads-power-evidence.json')
+    if not ev: return None
+    out = {'sources': sources_of(ev)}
+    out['acme'] = build_series(ev['acme'], ['tpi'])
+    out['stub_acme'] = build_series(ev['stub_acme'], ['tpi'])
+    out['trap'] = build_series(ev['trap'], ['p', 'd2', 'd3', 'D1', 'D4'], order=lambda s: tuple(float(x) for x in s.split('x')))
+    def unc_key(s):
+        d = s.split('-')[0]
+        return (0.060 + 0.013 * int(d)) if '/' not in d and '.' not in d and float(d) < 13 else frac_in(d)
+    out['sti_unc'] = build_series(ev['sti_unc'], ['major_min', 'pd_min', 'pd_max_3b', 'pd_max_2b', 'minor_min', 'minor_max'], order=unc_key)
+    out['sti_metric'] = build_series(ev['sti_metric'], ['pd_min', 'minor_min', 'minor_max'], order=lambda s: tuple(float(x) for x in s[1:].split('x')))
+    if ev.get('unm'):
+        out['unm'] = build_series(ev['unm'], ['p', 'd2', 'ext_major_min', 'ext_pd_min', 'ext_minor', 'ext_minor_min', 'int_minor', 'int_minor_max', 'int_pd_min', 'int_pd_max', 'int_major', 'int_major_max'], order=float)
+    for k in ('un_const', 'uns'):
+        if ev.get(k): out[k] = build_codes(ev[k])
+    out['notes'] = ev.get('notes', {})
+    return out
+
+
 def build_tapers():
     p = EV / 'tapers-evidence.json'
     if not p.exists(): return None
@@ -482,9 +503,10 @@ def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
            'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes(),
-           'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev()}
+           'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
+           'power_threads': build_power_threads()}
     out['fasteners'] = build_fasteners(out['drills']['drills'])
-    for sec in ('other_threads', 'tapers'):
+    for sec in ('other_threads', 'tapers', 'power_threads'):
         if not out[sec]: continue
         for k, rows in out[sec].items():
             if k in ('sources', 'notes'): continue

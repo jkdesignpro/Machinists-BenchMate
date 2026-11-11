@@ -37,10 +37,15 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Reference | Drill chart (fraction, number, letter, metric) | done | `drillchart` | U30 |
 | Reference | Tap drill sizes (cut and form) | done | `tapdrill` | U31 |
 | Reference | Thread data and limits: UNC/UNF/UNEF, metric M | done | `threaddata` | U38, U43, U52 |
-| Reference | Thread data: UN constant pitch / UNS | partial (custom size only) | `threaddata` | U39 |
-| Reference | NPT, BSPP, BSW, BSF, BA | done (basic dimensions; no tolerances, no NPTF) | `pipethreads`, `whitworth` | U47, U48, U50 |
-| Reference | Thread measurement over wires | done (60 degree only) | `wires` | U51 |
-| Threads | UNJ, UNR, UNM, ACME, Stub ACME, STI, plating allowance | missing | | U40-U46, U49 |
+| Reference | Thread data: UN constant pitch / UNS | done (8, 12, 16-UN lists to 2 in; any UNS size through the custom size) | `unseries`, `threaddata` | U39 |
+| Reference | NPT, BSPP, BSW, BSF, BA | done (basic dimensions, NPTF notes; no tolerances) | `pipethreads`, `whitworth` | U47, U48, U50 |
+| Reference | Thread measurement over wires | done (60, 55, 30, 29 degree; lead angle neglected) | `wires` | U51 |
+| Threads | UNJ, UNR | done (UNJ radius and minor limits; UNR rule, no UNR minor limits) / partial | `unjunr` | U40, U41 |
+| Threads | UNM | done | `unm` | U42 |
+| Threads | ACME, Stub ACME | done (2G-4G, 2C-4C, Stub; single start) | `acme` | U45, U46 |
+| Threads | STI | done (tapped-hole sizes, three makers) | `sti` | U49 |
+| Threads | Plating and anodize allowance | partial (allowance and before-coating limits; no special-size tables) | `coating` | U44 |
+| Threads | Trapezoidal, buttress, multi-start | done (basic dimensions; no tolerances) | `trapezoidal`, `buttress`, `multistart` | |
 | Reference | ISO fits and tolerances | partial (no j/J, up to 500 mm) | `fits` | U61 |
 | Reference | G-code and M-code reference per control dialect, custom macros | done (G/M codes, ten controls with sources and compare) / partial (macros: Mitsubishi and Heidenhain thin) | `gmcodes`, `macroref` | U92-U94 |
 | Reference | Material properties | partial (properties, no SFM/machinability data; round 2 in progress) | `materials` | U82 |

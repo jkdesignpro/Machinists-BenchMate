@@ -223,6 +223,16 @@ f1!(whitworth_value, c::whitworth_value_f, d, p, what);
 f1!(ba_value, c::ba_value_f, n, what);
 f1!(npt_value, c::npt_value_f, d, p, l1, what);
 f1!(round_sig, c::round_sig_f, x, sig);
+// Threads round 3 (core/src/power_threads.rs)
+f1!(acme_limit, c::acme_limit_f, d, p, class, internal, which);
+f1!(stub_acme_limit, c::stub_acme_limit_f, d, p, internal, which);
+f1!(trap_value, c::trap_value_f, d, p, what);
+f1!(sti_value, c::sti_value_f, d, p, what);
+f1!(unj_value, c::unj_value_f, d, p, class, what);
+f1!(buttress_value, c::buttress_value_f, d, p, what);
+f1!(unm_value, c::unm_value_f, d, p, what);
+f1!(thread_misc, c::thread_misc_f, a, b, what);
+f1!(wire_measurement, c::wire_measurement_f, x, w, p, angle, inverse);
 
 // Cycle generators (core/src/cycles.rs, core/src/gcode.rs)
 f1!(css_rpm, c::css_rpm_f, v, dia, max_rpm, metric);

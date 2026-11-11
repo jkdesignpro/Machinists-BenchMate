@@ -980,26 +980,29 @@ const TOOLS = [
 },
 {
   id: 'wires', group: 'Threads', title: 'Thread measurement over wires',
-  desc: 'Pitch diameter, best wire size and the measurement over three wires for 60 degree threads.',
+  desc: 'Pitch diameter, best wire size and the measurement over three wires for 60 degree (UN, metric), 55 degree (Whitworth), 29 degree (ACME) and 30 degree (trapezoidal) threads.',
   fields: s => [
+    { id: 'form', label: 'Thread form', unit: '', def: 60, options: [[60, '60 deg: UN, ISO metric'], [55, '55 deg: Whitworth, BSP'], [29, '29 deg: ACME'], [30, '30 deg: trapezoidal'], [291, '29 deg: Stub ACME']] },
     { id: 'major', label: 'Major diameter', unit: lenU(s), def: s === 'inch' ? 0.5 : 10 },
     { id: 'pitch', label: s === 'inch' ? 'Threads per inch (TPI)' : 'Pitch', unit: s === 'inch' ? 'TPI' : 'mm', def: s === 'inch' ? 13 : 1.5 },
     { id: 'wire', label: 'Wire diameter (blank = best size)', unit: lenU(s), def: '' },
+    { id: 'pd', label: 'Or known pitch diameter (wins over the basic)', unit: lenU(s), def: '' },
   ],
   calc: (v, W, s) => {
     if (!(v.major > 0 && v.pitch > 0)) return [];
-    const p = s === 'inch' ? 1 / v.pitch : v.pitch;
-    const e = W.thread_pitch_dia_basic(v.major, p);
-    const best = W.thread_best_wire(p);
+    const p = s === 'inch' ? 1 / v.pitch : v.pitch, f = v.form || 60, a = f === 291 ? 29 : f;
+    // Basic pitch diameter of each form: D - 0.649519 P (60), D - 0.640327 P (55), D - 0.5 P (ACME, Tr), D - 0.3 P (Stub ACME).
+    const e = v.pd > 0 ? v.pd : f === 60 ? W.thread_pitch_dia_basic(v.major, p) : f === 55 ? W.whitworth_value(v.major, p, 0) : f === 291 ? v.major - 0.3 * p : v.major - 0.5 * p;
+    const best = W.thread_misc(p, a, 1);
     const w = v.wire > 0 ? v.wire : best;
     return [
-      R('Basic pitch diameter', e, lenU(s), 5),
+      R(v.pd > 0 ? 'Pitch diameter (entered)' : 'Basic pitch diameter', e, lenU(s), 5),
       R('Best wire size', best, lenU(s), 5),
-      R('Measurement over three wires', W.thread_three_wire_m(e, w, p), lenU(s), 5),
+      R('Measurement over three wires', W.wire_measurement(e, w, p, a, 0), lenU(s), 5),
     ];
   },
-  working: 'E = D - 0.649519 P. Best wire w = 0.57735 P. M = E + 3w - 0.866025 P. Lead-angle correction neglected.',
-  source: "Machinery's Handbook (screw thread measurement)",
+  working: 'Best wire w = P / (2 cos(a/2)): 0.57735 P (60 deg), 0.56368 P (55), 0.51645 P (29), 0.51764 P (30). M = E + w (1 + 1 / sin(a/2)) - (P/2) cot(a/2): for 60 deg M = E + 3w - 0.866025 P; 55 deg E + 3.1657 w - 0.9605 P; 29 deg E + 4.9939 w - 1.9334 P. Basic E = D - 0.649519 P (60), D - 0.640327 P (55), D - 0.5 P (ACME, trapezoidal), D - 0.3 P (Stub ACME). Lead-angle correction neglected: on ACME and other coarse or multi-start threads it is not small, and the measurement should be corrected as the standard (or the wire maker) describes.',
+  source: "Machinery's Handbook (screw thread measurement), NBS Handbook H28 (wire method); the general angle form is geometry (docs/sources.md, Threads round 3).",
 },
 {
   id: 'threaddata', group: 'Threads', title: 'Thread data and limits',
@@ -1021,6 +1024,85 @@ const TOOLS = [
   render: el => renderWhitworth(el),
   working: 'See the note under the tool.',
   source: 'BS 84:2007, BS 93:2008; series values from the publishers listed under the tool.',
+},
+{
+  id: 'acme', group: 'Threads', title: 'ACME and Stub ACME threads',
+  desc: 'ACME general purpose (2G, 3G, 4G) and centralizing (2C, 3C, 4C) threads to ASME B1.5, and Stub ACME to ASME B1.8: basic dimensions, limits of size for screw and nut, lead angle and best wire.',
+  render: el => renderAcme(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.5-1997 (R2024), ASME B1.8-1988 (R2021); formulas confirmed in NBS Handbook H28 (1957) and the publishers listed under the tool.',
+},
+{
+  id: 'trapezoidal', group: 'Threads', title: 'Metric trapezoidal threads (Tr)',
+  desc: 'ISO metric trapezoidal threads: clearance, pitch, minor and major diameters of screw and nut from the ISO 2904 basic profile, with lead for multi-start threads and best wire.',
+  render: el => renderTrapezoidal(el),
+  working: 'See the note under the tool.',
+  source: 'ISO 2904:2020 (confirmed 2025), ISO 2901:2016, ISO 2903 (tolerances; BS ISO 2903:2016) (cited by name); published rows from the publishers listed under the tool.',
+},
+{
+  id: 'buttress', group: 'Threads', title: 'Buttress threads (7/45)',
+  desc: 'ASME B1.9 inch buttress threads, 7 degree load flank and 45 degree clearance flank: basic thread heights, crest and root, pitch, minor and major diameters at maximum material.',
+  render: el => renderButtress(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.9-1973 (R2025), cited by name; constants as printed by AMESweb and derived from the geometry.',
+},
+{
+  id: 'unseries', group: 'Threads', title: 'Constant-pitch UN series and UNS',
+  desc: '8-UN, 12-UN and 16-UN constant-pitch series up to 2 in, with basic pitch and minor diameters, and how UNS (special) threads are designated.',
+  render: el => renderUnSeries(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.1-2024 (cited by name); series lists from AMESweb and Torqbolt.',
+},
+{
+  id: 'unm', group: 'Threads', title: 'Unified miniature threads (UNM)',
+  desc: 'UNM threads 0.30 to 1.40 mm (ASME B1.10M): pitch, basic and design diameters, root radii and published limits of size.',
+  render: el => renderUnm(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.10M-2004 (cited by name); Thread Check Inc. and AMESweb.',
+},
+{
+  id: 'unjunr', group: 'Threads', title: 'UNJ and UNR threads',
+  desc: 'UNJ controlled root radius and increased internal minor diameter (ASME B1.15), and the UNR rounded-root rule for external Unified threads (ASME B1.1).',
+  render: el => renderUnjUnr(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.15-1995, ASME B1.1-2024 (cited by name); publishers listed under the tool.',
+},
+{
+  id: 'sti', group: 'Threads', title: 'Helical insert (STI) tapped holes',
+  desc: 'Tapped-hole thread for helical coil (wire) inserts: STI major, pitch and minor diameters from the nominal thread, with the insert makers\' published limits side by side.',
+  render: el => renderSti(el),
+  working: 'See the note under the tool.',
+  source: 'Recoil (Alcoa Fastening Systems), Kato Fastening Systems and Heli-Coil data as reprinted by Vargus; NASM33537 and MA1567 cited by name.',
+},
+{
+  id: 'coating', group: 'Threads', title: 'Plating and coating allowance on threads',
+  desc: 'Pitch diameter change from a coating on the flanks (4 x thickness for 60 degree threads) and the before-coating pitch diameter limits, for screws, nuts and helical inserts.',
+  render: el => renderCoating(el),
+  working: 'See the note under the tool.',
+  source: 'Thread Check Inc. and Kato Fastening Systems (4 x thickness rule); geometry for other thread angles.',
+},
+{
+  id: 'multistart', group: 'Threads', title: 'Multi-start thread lead and pitch',
+  desc: 'Lead from pitch and number of starts (or pitch from lead), lead angle at the pitch diameter, and how far to index or shift the tool between starts.',
+  fields: s => [
+    { id: 'pitch', label: s === 'inch' ? 'Pitch (distance between adjacent threads)' : 'Pitch P', unit: lenU(s), def: s === 'inch' ? 0.1 : 2 },
+    { id: 'n', label: 'Number of starts', unit: '', def: 2 },
+    { id: 'lead', label: 'Or known lead (wins over pitch)', unit: lenU(s), def: '' },
+    { id: 'e', label: 'Pitch diameter (for the lead angle)', unit: lenU(s), def: s === 'inch' ? 0.9 : 18 },
+  ],
+  calc: (v, W, s) => {
+    const n = Math.round(v.n);
+    if (!(n >= 1)) return [];
+    const lead = v.lead > 0 ? v.lead : v.pitch * n, p = lead / n;
+    if (!(lead > 0)) return [];
+    const r = [R('Lead L (axial advance per turn)', lead, lenU(s), 4), R('Pitch P = L / starts', p, lenU(s), 4),
+      R(s === 'inch' ? 'Threads per inch (1 / P)' : 'Leads per 25.4 mm', s === 'inch' ? 1 / p : 25.4 / lead, s === 'inch' ? 'TPI' : '', 3),
+      R('Index between starts (rotate the work)', 360 / n, 'deg', 2), R('Or shift the tool axially between starts', p, lenU(s), 4)];
+    if (v.e > 0) r.push(R('Lead angle at the pitch diameter', W.thread_misc(lead, v.e, 2), 'deg', 3));
+    return r;
+  },
+  working: 'L = n x P (n starts). Lead angle = atan(L / (pi E)). To cut the next start, either rotate the work 360 / n degrees with the tool where it is, or move the tool one pitch P along the axis (a G76 or G92 cycle started one pitch later in Z). Feed per revolution on the lathe is the lead, not the pitch.',
+  source: 'Thread geometry (lead, pitch and helix angle); see docs/sources.md, Threads round 3.',
 },
 {
   id: 'machinetapers', group: 'Setup', title: 'Machine tapers',

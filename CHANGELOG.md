@@ -3,6 +3,18 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (threads round 3)
+- **ACME and Stub ACME threads**: ASME B1.5 general purpose 2G, 3G, 4G and centralizing 2C, 3C, 4C, and ASME B1.8 Stub ACME; basic dimensions, screw and nut limits of size, lead angle, best wire and measurement over wires, starts. The limits reproduce a published 2-4 ACME table for all six classes.
+- **Metric trapezoidal threads (Tr)**: ISO 2904 basic profile (clearance ac, d2, d3, D1, D4, h3, root radii, crest flat), multi-start lead, best wire; checked against eight published rows. Tolerances not included.
+- **Buttress threads (7/45, ASME B1.9)**: basic heights, crest and root, pitch, minor and major diameters at maximum material; every constant derived again from the geometry.
+- **UNJ and UNR**: UNJ root radius range, screw minor limits and nut minor minimum for any Unified size and class 2 or 3 (reproduces published UNJC 3A/3B rows); the UNR rounded-root rule.
+- **Unified miniature (UNM)** 0.30 to 1.40 mm (ASME B1.10M): basic and design diameters checked against two publishers, published limits of size, two publisher misprints shown.
+- **Constant-pitch UN series and UNS**: 8-UN, 12-UN and 16-UN lists up to 2 in with publisher counts and basic diameters; designation rules.
+- **Helical insert (STI) tapped holes**: STI major, pitch and minor diameters (nominal + 1.299038 P) with the Recoil, Kato and Heli-Coil (via Vargus) limits side by side and their disagreements.
+- **Plating and coating allowance**: pitch diameter change 2 t / sin(a/2) (4 t at 60 degrees, doubled for coated inserts) and before-coating limits for screws and nuts.
+- **Multi-start lead and pitch** helper: lead, pitch, lead angle, index angle or axial shift between starts.
+- **Thread measurement over wires** now covers 55 degree (Whitworth), 29 degree (ACME, Stub ACME) and 30 degree (trapezoidal) threads and takes a known pitch diameter. **Pipe threads** screen gains NPTF (Dryseal, ASME B1.20.3) notes.
+- `benchmate-core` module `power_threads` with tests against MachiningDoctor, Torqbolt, RoyMech, The Engineering ToolBox, AMESweb, Thread Check, Recoil, Kato and Vargus rows; WebAssembly exports; evidence file `data/refdata/threads-power-evidence.json` (20 sources); screens in `app/threads3.js`.
 ### Added (measurement round 2 and shop maths)
 - **Ball in a countersink or tapered bore**: height of a gauge ball over the face, the face diameter from a ball reading, and the included angle and face diameter from two balls, with a drawing. **Taper over rolls**: measurement over two rolls on gauge blocks for a known external taper, or the angle and small-end diameter from two readings.
 - **Shrink and press fits**: growth for a temperature change; temperature to heat the hub, cool the shaft, or both, for an interference plus an assembly clearance; Lame press-fit pressure, hub hoop stress, holding torque and push-off force. Expansion coefficient, E, Poisson's ratio and friction are always your entries; a picker offers only CTE values two publishers agree on.
