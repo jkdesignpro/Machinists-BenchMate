@@ -1,0 +1,863 @@
+{
+ "sources": {
+  "TORQ_ACME": {
+   "publisher": "Torqbolt",
+   "title": "Unified ACME threads dimensions specifications (general purpose, basic dimensions table)",
+   "url": "https://torqbolt.com/unified-acme-threads-dimensions-specifications",
+   "accessed": "2026-11-11",
+   "note": "Fastener maker. Cites ASME/ANSI B1.5-1997. Prints size, TPI, basic pitch and minor diameters, flat 0.3707P and lead angle for 1/4 to 5 in, and the major/minor tolerance and clearance rules in prose."
+  },
+  "TORQ_STUB": {
+   "publisher": "Torqbolt",
+   "title": "Stub ACME dimensions specifications",
+   "url": "https://torqbolt.com/stub-acme-dimensions-specifications",
+   "accessed": "2026-11-11",
+   "note": "Cites ASME/ANSI B1.8-1988 (R2001). Prints h = 0.3P, flat 0.4224P, the major/minor rules and a size table 1/4 to 5 in."
+  },
+  "MD_ACME": {
+   "publisher": "MachiningDoctor",
+   "title": "ACME threads: dimensions, charts and formulas; 2-4 ACME thread data page (threadinfo-acme, tid 5014)",
+   "url": "https://machiningdoctor.com/charts/acme",
+   "accessed": "2026-11-11",
+   "note": "States the pitch diameter tolerance as K1 sqrt P + K2 sqrt D with 0.030/0.006 (2G), 0.014/0.0028 (3G), 0.010/0.002 (4G); its class labels and two constants carry typos (0.002 for 0.020, TPI/20 for P/20). Its 2-4 page prints limits for 2G, 3G, 4G, 2C, 3C and 4C (https://www.machiningdoctor.com/threadinfo-acme?tid=5014), used in the tests."
+  },
+  "NBS_H28": {
+   "publisher": "National Bureau of Standards (US government)",
+   "title": "Handbook H28 (1957), Screw-thread standards for federal services, Part III (Acme and Stub Acme sections)",
+   "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/hb/nbshandbook28supp1957pt3.pdf",
+   "accessed": "2026-11-11",
+   "note": "Public domain. Used for the formulas only: pitch diameter allowances 0.008, 0.006, 0.004 sqrt D; tolerance 0.030 sqrt(1/n) + 0.006 sqrt D (2), 0.014 + 0.0028 (3), 0.010 + 0.002 (4); clearance 0.020 / 0.010 in; screw minor tolerance 1.5 x PD tolerance; centralizing nut minor 0.1 P above basic; Stub ACME h = 0.3P, flat 0.4224P. The scan is OCR and some tables are unreadable."
+  },
+  "RM_TR": {
+   "publisher": "RoyMech",
+   "title": "Metric trapezoidal screw threads (ISO 2904 table and profile formulas)",
+   "url": "https://roymech.org/Useful_Tables/Screws/Trapezoidal.html",
+   "accessed": "2026-11-11",
+   "note": "Engineering reference site. Prints the ISO 2904 profile formulas and d, P, d2, D4, d3, D1. Cites the 1977 editions of ISO 2901 to 2904. The Tr 32 x 6 row was read as D4 32.500, which does not fit its own d3 25.000 (formula 33.000); not used."
+  },
+  "ETB_TR": {
+   "publisher": "The Engineering ToolBox",
+   "title": "Trapezoidal metric screw threads (ISO 2901)",
+   "url": "https://www.engineeringtoolbox.com/trapezoidal-metric-screw-threads-d_2042.html",
+   "accessed": "2026-11-11",
+   "note": "Prints screw diameter x pitch, nut inside diameter D1, nut crest (0.366P) and the clearances ac for Tr 8 x 1.5 to Tr 24 x 5."
+  },
+  "RECOIL": {
+   "publisher": "Alcoa Fastening Systems (Recoil)",
+   "title": "Recoil threaded inserts, taps, tooling and kits catalog, tapped hole data p. 25",
+   "url": "https://www.newmantools.com/sti/Recoil2007ntCatalog.pdf",
+   "accessed": "2026-11-11",
+   "note": "Insert maker. UNC tapped-hole (STI) minor diameter, major diameter minimum and pitch diameter limits for classes 2B and 3B. Copy hosted by a distributor; no year printed on the pages read."
+  },
+  "KATO": {
+   "publisher": "Kato Fastening Systems",
+   "title": "KATO Tangless and Tanged CoilThread inserts and tools catalog (2003), drilled hole dimensions pp. 10 and 12",
+   "url": "https://www.hardwarespecialty.com/products/pdf/vendor_kato_tang_tangless_catalog.pdf",
+   "accessed": "2026-11-11",
+   "note": "Insert maker. Tapped hole minor diameters, inch (NASM33537) and metric (MA1567). Copy hosted by a distributor. Only the first two of the three minor diameter columns are used (minimum, maximum for the tighter class)."
+  },
+  "VARGUS_HC": {
+   "publisher": "Vargus",
+   "title": "Heli-Coil drilling data, inch, and Heli-Coil thread data, metric (help file of the Vargus thread milling software)",
+   "url": "https://vargen.vargus.com/VargusGenWeb/help/helicoil.pdf",
+   "accessed": "2026-11-11",
+   "note": "Thread tool maker reprinting Heli-Coil STI data. 1/4-20 and M10 x 1.5 rows read; the 1/4-20 major diameter column (.3187) is not labelled clearly enough to use."
+  },
+  "TC_PLATE": {
+   "publisher": "Thread Check Inc.",
+   "title": "Calculating pre-plate screw threads gages",
+   "url": "https://www.threadcheck.com/calculating-pre-plate-screw-threads-gages/technicalinfo/",
+   "accessed": "2026-11-11",
+   "note": "Gauge maker. States the 4:1 pitch diameter build-up for 60 degree threads and the half-and-half rule for major and minor diameters, with a 1/2-20 UNF 2A/2B worked example (used in the tests)."
+  },
+  "KATO_PLATE": {
+   "publisher": "Kato Fastening Systems",
+   "title": "The effects of plating",
+   "url": "https://katofastening.com/article/effectsplating.html",
+   "accessed": "2026-11-11",
+   "note": "Insert maker. States that a 60 degree thread's pitch diameter changes by four times the coating thickness, and that a plated helical insert counts twice (8 x thickness) because it carries both threads."
+  },
+  "AMES_UN": {
+   "publisher": "AMESweb",
+   "title": "Thread pitch chart (UNC / UNF / UNEF / UN), constant-pitch columns 4-UN to 32-UN",
+   "url": "https://amesweb.info/Screws/Tables/Thread-Pitch-Chart-UNC-UNF-UNEF-UN.aspx",
+   "accessed": "2026-11-11",
+   "note": "Engineering calculator site; cites ASME B1.1. Sizes up to 2 in. Prints the pitch in the constant-pitch column even where it equals the UNC or UNF pitch."
+  },
+  "TORQ_UN": {
+   "publisher": "Torqbolt",
+   "title": "Diameter-pitch combinations for UN and UNR thread series",
+   "url": "https://mail.torqbolt.com/pitch-diameter-combinations-un-unr-thread-series",
+   "accessed": "2026-11-11",
+   "note": "Table runs to 4 in; only the 1 to 2 in rows were read. Prints UNC or UNF in the constant-pitch column where the pitch belongs to the graded series."
+  },
+  "AMES_BUTT": {
+   "publisher": "AMESweb",
+   "title": "Buttress thread chart and calculator (7/45 form)",
+   "url": "https://amesweb.info/Screws/buttress-thread-chart-calculator.aspx",
+   "accessed": "2026-11-11",
+   "note": "Cites ANSI B1.9-1973. Prints the basic constants H 0.89064P, h 0.6P, r 0.07141P, s 0.0826P, S 0.0928P, f 0.14532P, F 0.16316P, hs = hn 0.66271P and the diameter formulas; no allowance or tolerance values."
+  },
+  "TORQ_UNJ": {
+   "publisher": "Torqbolt",
+   "title": "UNJC unified coarse threads for aerospace fasteners (controlled root radius and increased minor diameter)",
+   "url": "https://torqbolt.com/unjc-unified-coarse-threads-aerospace-fasteners",
+   "accessed": "2026-11-11",
+   "note": "Cites ASME B1.15 (1995) and MIL-S-8879C. Root radius 0.15011P to 0.18042P; UNJC 3A/3B limits printed in mm to 0.01 (used in the tests)."
+  },
+  "RPG_UNJ": {
+   "publisher": "Gage Crib Worldwide (Ring and Plug Thread Gages)",
+   "title": "UNJ vs UN",
+   "url": "https://ring-plug-thread-gages.com/ti-UNJ-vs-UN.htm",
+   "accessed": "2026-11-11",
+   "note": "Gauge maker. Root radius minimum 0.15011p, maximum 0.18042p; names SAE AS8879 (formerly MIL-S-8879) and ASME B1.15."
+  },
+  "TC_UNR": {
+   "publisher": "Thread Check Inc.",
+   "title": "UNR screw thread form",
+   "url": "https://www.threadcheck.com/unr-screw-thread-form/technicalinfo/",
+   "accessed": "2026-11-11",
+   "note": "Gauge maker. Quotes ASME B1.1 para. 2.3.1: root radius of curvature not less than 0.10825318P, tangency point not less than 0.625H below the basic major diameter; external threads only; UN ring gauges check UNR."
+  },
+  "TC_WIRE": {
+   "publisher": "Thread Check Inc.",
+   "title": "Approximate formulas for measured pitch diameter",
+   "url": "https://www.threadcheck.com/approximate-formulas-for-measured-pitch-diameter/technicalinfo/",
+   "accessed": "2026-11-11",
+   "note": "Gauge maker. Best wire 0.57735P (60), 0.56369P (55), 0.51645P (29); E = M - (3G - .86603P) (60), M - (3.16568G - .96049P) (55), M - (4.9939G - 1.933357P) (29, ACME); for lead angles up to 5 degrees."
+  },
+  "TC_UNM": {
+   "publisher": "Thread Check Inc.",
+   "title": "Unified miniature screw threads per ASME B1.10M-2004",
+   "url": "https://www.threadcheck.com/unified-miniature-screw-threads-per-asme-b1-10m-2004/technicalinfo/",
+   "accessed": "2026-11-11",
+   "note": "Gauge maker. Basic and design dimensions 0.30 to 1.40 UNM and the profile constants (basic height 0.48P, external design height 0.5725907P, root radii 0.1851815P external, 0.0721688P internal). The two minor diameter columns were read with their headers swapped; they are assigned here by the profile formulas."
+  },
+  "AMES_UNM": {
+   "publisher": "AMESweb",
+   "title": "Unified miniature screw threads dimensions (external and internal limits of size)",
+   "url": "https://amesweb.info/Screws/unified-miniature-screw-threads.aspx",
+   "accessed": "2026-11-11",
+   "note": "Cites ASME B1.10M-1997. Limits of size 0.30 to 1.40 UNM in mm. Two values do not fit the rest of its own rows: 1.00 UNM external pitch diameter max 0.839 (basic 0.838), 0.50 UNM internal minor min 0.390 (its max 0.432 less its tolerance 0.052 is 0.380)."
+  }
+ },
+ "acme": {
+  "TORQ_ACME": {
+   "1/4": {
+    "tpi": "16"
+   },
+   "5/16": {
+    "tpi": "14"
+   },
+   "3/8": {
+    "tpi": "12"
+   },
+   "7/16": {
+    "tpi": "12"
+   },
+   "1/2": {
+    "tpi": "10"
+   },
+   "5/8": {
+    "tpi": "8"
+   },
+   "3/4": {
+    "tpi": "6"
+   },
+   "7/8": {
+    "tpi": "6"
+   },
+   "1": {
+    "tpi": "5"
+   },
+   "1 1/8": {
+    "tpi": "5"
+   },
+   "1 1/4": {
+    "tpi": "5"
+   },
+   "1 3/8": {
+    "tpi": "4"
+   },
+   "1 1/2": {
+    "tpi": "4"
+   },
+   "1 3/4": {
+    "tpi": "4"
+   },
+   "2": {
+    "tpi": "4"
+   },
+   "2 1/4": {
+    "tpi": "3"
+   },
+   "2 1/2": {
+    "tpi": "3"
+   },
+   "2 3/4": {
+    "tpi": "3"
+   },
+   "3": {
+    "tpi": "2"
+   },
+   "3 1/2": {
+    "tpi": "2"
+   },
+   "4": {
+    "tpi": "2"
+   },
+   "4 1/2": {
+    "tpi": "2"
+   },
+   "5": {
+    "tpi": "2"
+   }
+  },
+  "MD_ACME": {
+   "2": {
+    "tpi": "4"
+   }
+  }
+ },
+ "stub_acme": {
+  "TORQ_STUB": {
+   "1/4": {
+    "tpi": "16"
+   },
+   "1/2": {
+    "tpi": "10"
+   },
+   "1": {
+    "tpi": "5"
+   },
+   "2": {
+    "tpi": "4"
+   },
+   "5": {
+    "tpi": "2"
+   }
+  }
+ },
+ "trap": {
+  "RM_TR": {
+   "8x1.5": {
+    "p": "1.5",
+    "d2": "7.250",
+    "D4": "8.300",
+    "d3": "6.200",
+    "D1": "6.500"
+   },
+   "10x2": {
+    "p": "2",
+    "d2": "9.000",
+    "D4": "10.500",
+    "d3": "7.500",
+    "D1": "8.000"
+   },
+   "12x3": {
+    "p": "3",
+    "d2": "10.500",
+    "D4": "12.500",
+    "d3": "8.500",
+    "D1": "9.000"
+   },
+   "20x4": {
+    "p": "4",
+    "d2": "18.000",
+    "D4": "20.500",
+    "d3": "15.500",
+    "D1": "16.000"
+   },
+   "24x5": {
+    "p": "5",
+    "d2": "21.500",
+    "D4": "24.500",
+    "d3": "18.500",
+    "D1": "19.000"
+   },
+   "40x7": {
+    "p": "7",
+    "d2": "36.500",
+    "D4": "41.000",
+    "d3": "32.000",
+    "D1": "33.000"
+   },
+   "60x9": {
+    "p": "9",
+    "d2": "55.500",
+    "D4": "61.000",
+    "d3": "50.000",
+    "D1": "51.000"
+   },
+   "100x12": {
+    "p": "12",
+    "d2": "94.000",
+    "D4": "101.000",
+    "d3": "87.000",
+    "D1": "88.000"
+   }
+  },
+  "ETB_TR": {
+   "8x1.5": {
+    "p": "1.5",
+    "D1": "6.5"
+   },
+   "10x2": {
+    "p": "2",
+    "D1": "8.0"
+   },
+   "12x3": {
+    "p": "3",
+    "D1": "9.0"
+   },
+   "16x4": {
+    "p": "4",
+    "D1": "12.0"
+   },
+   "20x4": {
+    "p": "4",
+    "D1": "16.0"
+   },
+   "24x5": {
+    "p": "5",
+    "D1": "19.0"
+   }
+  }
+ },
+ "sti_unc": {
+  "RECOIL": {
+   "4-40": {
+    "minor_min": "0.118",
+    "minor_max": "0.122",
+    "major_min": "0.1445",
+    "pd_min": "0.1282",
+    "pd_max_2b": "0.1307",
+    "pd_max_3b": "0.1298"
+   },
+   "6-32": {
+    "minor_min": "0.145",
+    "minor_max": "0.150",
+    "major_min": "0.1786",
+    "pd_min": "0.1583",
+    "pd_max_2b": "0.1611",
+    "pd_max_3b": "0.1601"
+   },
+   "8-32": {
+    "minor_min": "0.171",
+    "minor_max": "0.175",
+    "major_min": "0.2046",
+    "pd_min": "0.1843",
+    "pd_max_2b": "0.1872",
+    "pd_max_3b": "0.1862"
+   },
+   "10-24": {
+    "minor_min": "0.199",
+    "minor_max": "0.205",
+    "major_min": "0.2441",
+    "pd_min": "0.2171",
+    "pd_max_2b": "0.2204",
+    "pd_max_3b": "0.2193"
+   },
+   "1/4-20": {
+    "minor_min": "0.261",
+    "minor_max": "0.270",
+    "major_min": "0.3150",
+    "pd_min": "0.2825",
+    "pd_max_2b": "0.2863",
+    "pd_max_3b": "0.2851"
+   },
+   "3/8-16": {
+    "minor_min": "0.389",
+    "minor_max": "0.398",
+    "major_min": "0.4562",
+    "pd_min": "0.4156",
+    "pd_max_2b": "0.4203",
+    "pd_max_3b": "0.4189"
+   },
+   "1/2-13": {
+    "minor_min": "0.517",
+    "minor_max": "0.527",
+    "major_min": "0.5999",
+    "pd_min": "0.5499",
+    "pd_max_2b": "0.5554",
+    "pd_max_3b": "0.5537"
+   }
+  },
+  "KATO": {
+   "4-40": {
+    "minor_min": ".1175",
+    "minor_max": ".1252"
+   },
+   "10-24": {
+    "minor_min": ".1990",
+    "minor_max": ".2080"
+   },
+   "1/4-20": {
+    "minor_min": ".2608",
+    "minor_max": ".2704"
+   },
+   "1/2-13": {
+    "minor_min": ".5166",
+    "minor_max": ".5273"
+   }
+  },
+  "VARGUS_HC": {
+   "1/4-20": {
+    "minor_min": ".2608",
+    "minor_max": ".2704",
+    "pd_min": ".2825",
+    "pd_max_3b": ".2851",
+    "pd_max_2b": ".2864"
+   }
+  }
+ },
+ "sti_metric": {
+  "KATO": {
+   "M3x0.5": {
+    "minor_min": "3.108",
+    "minor_max": "3.220"
+   },
+   "M6x1": {
+    "minor_min": "6.217",
+    "minor_max": "6.407"
+   },
+   "M10x1.5": {
+    "minor_min": "10.324",
+    "minor_max": "10.560"
+   },
+   "M12x1.75": {
+    "minor_min": "12.379",
+    "minor_max": "12.644"
+   }
+  },
+  "VARGUS_HC": {
+   "M10x1.5": {
+    "minor_min": "10.324",
+    "minor_max": "10.560",
+    "pd_min": "10.974"
+   }
+  }
+ },
+ "un_const": {
+  "AMES_UN": {
+   "12UN 9/16": "listed",
+   "12UN 5/8": "listed",
+   "12UN 11/16": "listed",
+   "12UN 3/4": "listed",
+   "12UN 13/16": "listed",
+   "12UN 7/8": "listed",
+   "12UN 15/16": "listed",
+   "16UN 5/16": "listed",
+   "16UN 3/8": "listed",
+   "16UN 7/16": "listed",
+   "16UN 1/2": "listed",
+   "16UN 9/16": "listed",
+   "16UN 5/8": "listed",
+   "16UN 11/16": "listed",
+   "16UN 3/4": "listed",
+   "16UN 13/16": "listed",
+   "16UN 7/8": "listed",
+   "16UN 15/16": "listed",
+   "8UN 1": "listed",
+   "8UN 1 1/16": "listed",
+   "8UN 1 1/8": "listed",
+   "8UN 1 3/16": "listed",
+   "8UN 1 1/4": "listed",
+   "8UN 1 5/16": "listed",
+   "8UN 1 3/8": "listed",
+   "8UN 1 7/16": "listed",
+   "8UN 1 1/2": "listed",
+   "8UN 1 9/16": "listed",
+   "8UN 1 5/8": "listed",
+   "8UN 1 11/16": "listed",
+   "8UN 1 3/4": "listed",
+   "8UN 1 13/16": "listed",
+   "8UN 1 7/8": "listed",
+   "8UN 1 15/16": "listed",
+   "8UN 2": "listed",
+   "12UN 1": "listed",
+   "12UN 1 1/16": "listed",
+   "12UN 1 1/8": "listed",
+   "12UN 1 3/16": "listed",
+   "12UN 1 1/4": "listed",
+   "12UN 1 5/16": "listed",
+   "12UN 1 3/8": "listed",
+   "12UN 1 7/16": "listed",
+   "12UN 1 1/2": "listed",
+   "12UN 1 9/16": "listed",
+   "12UN 1 5/8": "listed",
+   "12UN 1 11/16": "listed",
+   "12UN 1 3/4": "listed",
+   "12UN 1 13/16": "listed",
+   "12UN 1 7/8": "listed",
+   "12UN 1 15/16": "listed",
+   "12UN 2": "listed",
+   "16UN 1": "listed",
+   "16UN 1 1/16": "listed",
+   "16UN 1 1/8": "listed",
+   "16UN 1 3/16": "listed",
+   "16UN 1 1/4": "listed",
+   "16UN 1 5/16": "listed",
+   "16UN 1 3/8": "listed",
+   "16UN 1 7/16": "listed",
+   "16UN 1 1/2": "listed",
+   "16UN 1 9/16": "listed",
+   "16UN 1 5/8": "listed",
+   "16UN 1 11/16": "listed",
+   "16UN 1 3/4": "listed",
+   "16UN 1 13/16": "listed",
+   "16UN 1 7/8": "listed",
+   "16UN 1 15/16": "listed",
+   "16UN 2": "listed"
+  },
+  "TORQ_UN": {
+   "8UN 1": "listed",
+   "8UN 1 1/16": "listed",
+   "8UN 1 1/8": "listed",
+   "8UN 1 3/16": "listed",
+   "8UN 1 1/4": "listed",
+   "8UN 1 5/16": "listed",
+   "8UN 1 3/8": "listed",
+   "8UN 1 7/16": "listed",
+   "8UN 1 1/2": "listed",
+   "8UN 1 9/16": "listed",
+   "8UN 1 5/8": "listed",
+   "8UN 1 11/16": "listed",
+   "8UN 1 3/4": "listed",
+   "8UN 1 13/16": "listed",
+   "8UN 1 7/8": "listed",
+   "8UN 1 15/16": "listed",
+   "8UN 2": "listed",
+   "12UN 1": "listed",
+   "12UN 1 1/16": "listed",
+   "12UN 1 1/8": "listed",
+   "12UN 1 3/16": "listed",
+   "12UN 1 1/4": "listed",
+   "12UN 1 5/16": "listed",
+   "12UN 1 3/8": "listed",
+   "12UN 1 7/16": "listed",
+   "12UN 1 1/2": "listed",
+   "12UN 1 9/16": "listed",
+   "12UN 1 5/8": "listed",
+   "12UN 1 11/16": "listed",
+   "12UN 1 3/4": "listed",
+   "12UN 1 13/16": "listed",
+   "12UN 1 7/8": "listed",
+   "12UN 1 15/16": "listed",
+   "12UN 2": "listed",
+   "16UN 1": "listed",
+   "16UN 1 1/16": "listed",
+   "16UN 1 1/8": "listed",
+   "16UN 1 3/16": "listed",
+   "16UN 1 1/4": "listed",
+   "16UN 1 5/16": "listed",
+   "16UN 1 3/8": "listed",
+   "16UN 1 7/16": "listed",
+   "16UN 1 1/2": "listed",
+   "16UN 1 9/16": "listed",
+   "16UN 1 5/8": "listed",
+   "16UN 1 11/16": "listed",
+   "16UN 1 3/4": "listed",
+   "16UN 1 13/16": "listed",
+   "16UN 1 7/8": "listed",
+   "16UN 1 15/16": "listed",
+   "16UN 2": "listed"
+  }
+ },
+ "notes": {
+  "un_const_same": {
+   "8UN 1": "UNC",
+   "12UN 1": "UNF",
+   "12UN 1 1/8": "UNF",
+   "12UN 1 1/4": "UNF",
+   "12UN 1 3/8": "UNF",
+   "12UN 1 1/2": "UNF"
+  }
+ },
+ "unm": {
+  "TC_UNM": {
+   "0.30": {
+    "p": "0.080",
+    "d2": "0.248",
+    "ext_minor": "0.208",
+    "int_minor": "0.223",
+    "int_major": "0.306"
+   },
+   "0.35": {
+    "p": "0.090",
+    "d2": "0.292",
+    "ext_minor": "0.247",
+    "int_minor": "0.264",
+    "int_major": "0.356"
+   },
+   "0.40": {
+    "p": "0.100",
+    "d2": "0.335",
+    "ext_minor": "0.285",
+    "int_minor": "0.304",
+    "int_major": "0.407"
+   },
+   "0.45": {
+    "p": "0.100",
+    "d2": "0.385",
+    "ext_minor": "0.335",
+    "int_minor": "0.354",
+    "int_major": "0.457"
+   },
+   "0.50": {
+    "p": "0.125",
+    "d2": "0.419",
+    "ext_minor": "0.357",
+    "int_minor": "0.380",
+    "int_major": "0.509"
+   },
+   "0.55": {
+    "p": "0.125",
+    "d2": "0.469",
+    "ext_minor": "0.407",
+    "int_minor": "0.430",
+    "int_major": "0.559"
+   },
+   "0.60": {
+    "p": "0.150",
+    "d2": "0.503",
+    "ext_minor": "0.428",
+    "int_minor": "0.456",
+    "int_major": "0.611"
+   },
+   "0.70": {
+    "p": "0.175",
+    "d2": "0.586",
+    "ext_minor": "0.500",
+    "int_minor": "0.532",
+    "int_major": "0.713"
+   },
+   "0.80": {
+    "p": "0.200",
+    "d2": "0.670",
+    "ext_minor": "0.571",
+    "int_minor": "0.608",
+    "int_major": "0.814"
+   },
+   "0.90": {
+    "p": "0.225",
+    "d2": "0.754",
+    "ext_minor": "0.642",
+    "int_minor": "0.684",
+    "int_major": "0.916"
+   },
+   "1.00": {
+    "p": "0.250",
+    "d2": "0.838",
+    "ext_minor": "0.714",
+    "int_minor": "0.760",
+    "int_major": "1.018"
+   },
+   "1.10": {
+    "p": "0.250",
+    "d2": "0.938",
+    "ext_minor": "0.814",
+    "int_minor": "0.860",
+    "int_major": "1.118"
+   },
+   "1.20": {
+    "p": "0.250",
+    "d2": "1.038",
+    "ext_minor": "0.914",
+    "int_minor": "0.960",
+    "int_major": "1.218"
+   },
+   "1.40": {
+    "p": "0.300",
+    "d2": "1.205",
+    "ext_minor": "1.056",
+    "int_minor": "1.112",
+    "int_major": "1.422"
+   }
+  },
+  "AMES_UNM": {
+   "0.30": {
+    "p": "0.080",
+    "ext_major_min": "0.284",
+    "d2": "0.248",
+    "ext_pd_min": "0.234",
+    "ext_minor": "0.208",
+    "ext_minor_min": "0.187",
+    "int_minor": "0.223",
+    "int_minor_max": "0.260",
+    "int_pd_min": "0.248",
+    "int_pd_max": "0.262",
+    "int_major_max": "0.321"
+   },
+   "0.35": {
+    "p": "0.090",
+    "ext_major_min": "0.333",
+    "d2": "0.292",
+    "ext_pd_min": "0.277",
+    "ext_minor": "0.247",
+    "ext_minor_min": "0.225",
+    "int_minor": "0.264",
+    "int_minor_max": "0.305",
+    "int_pd_min": "0.292",
+    "int_pd_max": "0.307",
+    "int_major_max": "0.373"
+   },
+   "0.40": {
+    "p": "0.100",
+    "ext_major_min": "0.382",
+    "d2": "0.335",
+    "ext_pd_min": "0.319",
+    "ext_minor": "0.285",
+    "ext_minor_min": "0.261",
+    "int_minor": "0.304",
+    "int_minor_max": "0.348",
+    "int_pd_min": "0.335",
+    "int_pd_max": "0.351",
+    "int_major_max": "0.425"
+   },
+   "0.45": {
+    "p": "0.100",
+    "ext_major_min": "0.432",
+    "d2": "0.385",
+    "ext_pd_min": "0.369",
+    "ext_minor": "0.335",
+    "ext_minor_min": "0.311",
+    "int_minor": "0.354",
+    "int_minor_max": "0.398",
+    "int_pd_min": "0.385",
+    "int_pd_max": "0.401",
+    "int_major_max": "0.475"
+   },
+   "0.50": {
+    "p": "0.125",
+    "ext_major_min": "0.479",
+    "d2": "0.419",
+    "ext_pd_min": "0.401",
+    "ext_minor": "0.357",
+    "ext_minor_min": "0.329",
+    "int_minor": "0.390",
+    "int_minor_max": "0.432",
+    "int_pd_min": "0.419",
+    "int_pd_max": "0.437",
+    "int_major_max": "0.529"
+   },
+   "0.55": {
+    "p": "0.125",
+    "ext_major_min": "0.529",
+    "d2": "0.469",
+    "ext_pd_min": "0.451",
+    "ext_minor": "0.407",
+    "ext_minor_min": "0.379",
+    "int_minor": "0.430",
+    "int_minor_max": "0.482",
+    "int_pd_min": "0.469",
+    "int_pd_max": "0.487",
+    "int_major_max": "0.579"
+   },
+   "0.60": {
+    "p": "0.150",
+    "ext_major_min": "0.576",
+    "d2": "0.503",
+    "ext_pd_min": "0.483",
+    "ext_minor": "0.428",
+    "ext_minor_min": "0.396",
+    "int_minor": "0.456",
+    "int_minor_max": "0.516",
+    "int_pd_min": "0.503",
+    "int_pd_max": "0.523",
+    "int_major_max": "0.633"
+   },
+   "0.70": {
+    "p": "0.175",
+    "ext_major_min": "0.673",
+    "d2": "0.586",
+    "ext_pd_min": "0.564",
+    "ext_minor": "0.500",
+    "ext_minor_min": "0.464",
+    "int_minor": "0.532",
+    "int_minor_max": "0.600",
+    "int_pd_min": "0.586",
+    "int_pd_max": "0.608",
+    "int_major_max": "0.737"
+   },
+   "0.80": {
+    "p": "0.200",
+    "ext_major_min": "0.770",
+    "d2": "0.670",
+    "ext_pd_min": "0.646",
+    "ext_minor": "0.571",
+    "ext_minor_min": "0.531",
+    "int_minor": "0.608",
+    "int_minor_max": "0.684",
+    "int_pd_min": "0.670",
+    "int_pd_max": "0.694",
+    "int_major_max": "0.842"
+   },
+   "0.90": {
+    "p": "0.225",
+    "ext_major_min": "0.867",
+    "d2": "0.754",
+    "ext_pd_min": "0.728",
+    "ext_minor": "0.642",
+    "ext_minor_min": "0.598",
+    "int_minor": "0.684",
+    "int_minor_max": "0.768",
+    "int_pd_min": "0.754",
+    "int_pd_max": "0.780",
+    "int_major_max": "0.946"
+   },
+   "1.00": {
+    "p": "0.250",
+    "ext_major_min": "0.964",
+    "d2": "0.839",
+    "ext_pd_min": "0.810",
+    "ext_minor": "0.714",
+    "ext_minor_min": "0.666",
+    "int_minor": "0.760",
+    "int_minor_max": "0.852",
+    "int_pd_min": "0.838",
+    "int_pd_max": "0.866",
+    "int_major_max": "1.050"
+   },
+   "1.10": {
+    "p": "0.250",
+    "ext_major_min": "1.064",
+    "d2": "0.938",
+    "ext_pd_min": "0.910",
+    "ext_minor": "0.814",
+    "ext_minor_min": "0.766",
+    "int_minor": "0.860",
+    "int_minor_max": "0.952",
+    "int_pd_min": "0.938",
+    "int_pd_max": "0.966",
+    "int_major_max": "1.150"
+   },
+   "1.20": {
+    "p": "0.250",
+    "ext_major_min": "1.164",
+    "d2": "1.038",
+    "ext_pd_min": "1.010",
+    "ext_minor": "0.914",
+    "ext_minor_min": "0.866",
+    "int_minor": "0.960",
+    "int_minor_max": "1.052",
+    "int_pd_min": "1.038",
+    "int_pd_max": "1.066",
+    "int_major_max": "1.250"
+   },
+   "1.40": {
+    "p": "0.300",
+    "ext_major_min": "1.358",
+    "d2": "1.205",
+    "ext_pd_min": "1.173",
+    "ext_minor": "1.056",
+    "ext_minor_min": "1.000",
+    "int_minor": "1.112",
+    "int_minor_max": "1.220",
+    "int_pd_min": "1.205",
+    "int_pd_max": "1.237",
+    "int_major_max": "1.458"
+   }
+  }
+ }
+}

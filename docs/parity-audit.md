@@ -30,12 +30,12 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 61 | 13 | 37 (8) | 2 | 0 | 55 % |
-| Machinery's Handbook 31 | 306 | 36 | 69 | 167 (12) | 6 | 28 | 13 % |
+| CNC Machinist Calculator Ultra | 113 | 67 | 14 | 30 (8) | 2 | 0 | 60 % |
+| Machinery's Handbook 31 | 306 | 40 | 77 | 155 (12) | 6 | 28 | 15 % |
 | Engineers' Data Book | 94 | 5 | 24 | 27 (0) | 12 | 26 | 9 % |
 | Engineers Black Book | 80 | 20 | 18 | 41 (9) | 1 | 0 | 25 % |
 | CNC Machining handbook | 83 | 13 | 16 | 50 (0) | 0 | 4 | 16 % |
-| **All** | **676** | **135** | **140** | **322 (29)** | **21** | **58** | **23 %** |
+| **All** | **676** | **145** | **149** | **303 (29)** | **21** | **58** | **24 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -50,6 +50,8 @@ features are names only.
 **Update (branch `claude/gdt-3`, 2026-11-11):** BB73 done (letter-address table added to the G and M codes screen). GD&T round 3 (composite profile added to the guide) changes no row status. Summary counts updated for BB73.
 
 **Update (branch `claude/cnc-guide`, 2026-11-11):** batch B6 (first part) and the rest of A15 except tips: tool nose radius compensation calculator (`tnrc`), CNC knowledge guide (`cncguide`: axes, coordinate systems, offsets, program structure, climb/conventional, chip formation, tool wear, troubleshooting, workholding, safety) and the formula library (`formulas`). U91, U97, MH131, MH176, MH178, MH183, CN8, CN10, CN12, CN13, CN15, CN16, CN20, CN24, CN48 done; MH100, MH137, MH174, CN4, CN5, CN23, CN41, CN49, CN62, CN63, CN64 partial. Not built: tip of the day (U98), toolpath strategies, CSS explainer, operator procedures (CN25-CN34), 3D toolpaths, glossary. Summary counts recounted from all rows.
+
+**Update (branch `claude/threads-3`, 2026-11-11):** batch A12 (threads round 3) is built except Whitworth tolerances, taper and buttress wire measurement and the trapezoidal tolerances. U39, U40, U42, U45, U46, U49, MH222, MH224, MH225, MH232 done; U41, U44, MH207, MH220, MH221, MH228, MH230, MH233, MH234, MH238, MH247 partial (U47, U51, MH246, BB7 notes updated). Summary counts recounted from all rows by script after merging `claude/cnc-guide` (the in-progress column kept as it was).
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -159,19 +161,19 @@ Store list is the fuller of the two store lists.
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | U38 | UNC, UNF, UNEF data and class limits | done | `threaddata` | 2A/2B checked against published tables; 1A/3A/1B/3B computed, not checked; no 1B/3B minor limits |
-| U39 | UN constant-pitch and UNS (special) threads | partial | `threaddata` (custom size) | A custom diameter and pitch works; no 4-UN...32-UN series tables, no UNS designation |
-| U40 | UNJ threads | missing | | |
-| U41 | UNR threads | missing | | UNR shares the UN 2A/3A limits, but the app never mentions UNR or its mandatory root radius |
-| U42 | UNM (miniature) threads | missing | | |
+| U39 | UN constant-pitch and UNS (special) threads | done | `unseries`, `threaddata` (custom size) | 8-UN, 12-UN, 16-UN lists to 2 in with publisher counts; UNS designation explained, limits through the custom size; no 4, 6, 20, 28, 32-UN lists (`claude/threads-3`) |
+| U40 | UNJ threads | done | `unjunr` | Root radius range, screw minor limits, nut minor minimum for any UN size, classes 2 and 3; checked against published UNJC rows (`claude/threads-3`) |
+| U41 | UNR threads | partial | `unjunr` | UNR rule (root radius at least 0.108 P, external only) stated; UNR minor diameter limits not computed (`claude/threads-3`) |
+| U42 | UNM (miniature) threads | done | `unm` | 0.30 to 1.40 UNM basic and design sizes from two publishers, limits of size from one (`claude/threads-3`) |
 | U43 | Metric M profile threads | done | `threaddata` | 6g/6H checked; other classes computed only |
-| U44 | Special UN and metric sizes with anodize and plating allowance | missing | | No coated-thread allowance |
-| U45 | ACME threads | missing | | |
-| U46 | Stub ACME threads | missing | | |
-| U47 | NPT threads | done | `pipethreads` | Basic dimensions; no NPTF, no tolerances |
+| U44 | Special UN and metric sizes with anodize and plating allowance | partial | `coating` | Pitch diameter change and before-coating limits for any thread angle; no tables of special coated sizes (`claude/threads-3`) |
+| U45 | ACME threads | done | `acme` | General purpose 2G-4G and centralizing 2C-4C limits, single start; no 5G/5C/6C or multi-start allowance (`claude/threads-3`) |
+| U46 | Stub ACME threads | done | `acme` | Stub ACME (2G fit); no modified forms 1 and 2 (`claude/threads-3`) |
+| U47 | NPT threads | done | `pipethreads` | Basic dimensions; NPTF notes; no tolerances (`claude/threads-3`) |
 | U48 | BSPP threads | done | `pipethreads` | |
-| U49 | STI (helical insert) threads | missing | | |
+| U49 | STI (helical insert) threads | done | `sti` | Tapped-hole major, pitch, minor from the nominal thread, three makers' limits side by side (`claude/threads-3`) |
 | U50 | Whitworth BSW and BSF | done | `whitworth` | Basic dimensions; no tolerances |
-| U51 | Thread data and over-wire measurement | done | `wires` | 60-degree threads only, lead angle neglected; no ACME/Whitworth wires |
+| U51 | Thread data and over-wire measurement | done | `wires` | 60, 55, 30 and 29 degree threads; lead angle neglected (`claude/threads-3`) |
 | U52 | Thread size tolerance data (menu item) | done | `threaddata` | |
 | U53 | G76 lathe thread program generator | done | `cycthread` | G76 (Fanuc-style two-block, Haas one-block) or G92 per pass, with infeed table (`claude/cycles`) |
 | U54 | Thread programming (menu item) | done | `cycthread` | (`claude/cycles`) |
@@ -514,7 +516,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH204 | Metric hex screws, bolts, nuts and washers | partial | `spanner` | Widths across flats (ISO 272, old DIN, JIS) only; no head heights, nuts or washers |
 | MH205 | Socket head cap screws (inch and metric) | done | `shcs` | ISO 4762 and ASME B18.3 head diameter, height and key (`claude/fasteners`) |
 | MH206 | Clearance holes for bolts, screws and studs (inch and metric) | done | `clearance` | ISO 273 fine/medium/coarse and inch close/normal/free, with disagreements (`claude/fasteners`) |
-| MH207 | Helical coil screw thread inserts (STI) | missing | | |
+| MH207 | Helical coil screw thread inserts (STI) | partial | `sti` | Tapped-hole sizes; no insert lengths or installation data (`claude/threads-3`) |
 | MH208 | British fasteners | missing | | |
 | MH209 | Machine screws and nuts (inch, metric, British) | missing | | |
 | MH210 | Cap screws and set screws; drill and counterbore sizes; hex keys | partial | `shcs`, `clearance`, `spanner` | Cap screws, clearance and counterbore holes and hex keys; no set screws |
@@ -532,25 +534,25 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | MH218 | Screw thread forms and definitions | partial | `threaddata` | Data, no forms overview |
 | MH219 | Unified threads: form, series (coarse, fine, extra-fine), classes, designation | done | `threaddata` | |
-| MH220 | Unified constant-pitch series (4 to 28 threads) and UNS | partial | `threaddata` (custom) | See U39 |
-| MH221 | Coated 60-degree threads | missing | | See U44 |
-| MH222 | Multiple-start threads | missing | | |
+| MH220 | Unified constant-pitch series (4 to 28 threads) and UNS | partial | `unseries`, `threaddata` (custom) | 8, 12 and 16-UN lists only (`claude/threads-3`) |
+| MH221 | Coated 60-degree threads | partial | `coating` | Allowance and before-coating pitch diameter limits; no coated-thread tables (`claude/threads-3`) |
+| MH222 | Multiple-start threads | done | `multistart`, `acme`, `trapezoidal` | Lead, pitch, lead angle, indexing between starts (`claude/threads-3`) |
 | MH223 | Hole sizes for tapping, internal thread minor diameter tolerances | done | `tapdrill`, `threaddata` | |
-| MH224 | Unified miniature threads | missing | | |
-| MH225 | UNJ threads | missing | | |
+| MH224 | Unified miniature threads | done | `unm` | (`claude/threads-3`) |
+| MH225 | UNJ threads | done | `unjunr` | (`claude/threads-3`) |
 | MH226 | Calculating and rounding thread dimensions | done | `threaddata` | |
 | MH227 | Metric M profile: limits and fits, formulas, tolerance grades | done | `threaddata` | 6g/6H checked, others computed |
-| MH228 | Metric limits for coated threads | missing | | |
+| MH228 | Metric limits for coated threads | partial | `coating` | General allowance only; no ISO 965 coated-thread limits (`claude/threads-3`) |
 | MH229 | Metric MJ profile | missing | | |
-| MH230 | Trapezoidal metric threads | missing | | |
+| MH230 | Trapezoidal metric threads | partial | `trapezoidal` | ISO 2904 basic dimensions; no ISO 2903 tolerances (`claude/threads-3`) |
 | MH231 | ISO miniature threads | missing | | |
-| MH232 | ACME general purpose and centralizing threads | missing | | |
-| MH233 | Stub ACME, alternate stub, 60-degree stub, square thread | missing | | |
-| MH234 | Buttress threads (British and 7/45 inch) | missing | | |
+| MH232 | ACME general purpose and centralizing threads | done | `acme` | Single-start limits; no 5G/5C/6C (`claude/threads-3`) |
+| MH233 | Stub ACME, alternate stub, 60-degree stub, square thread | partial | `acme` | Stub ACME only; no modified stub, 60-degree stub or square thread (`claude/threads-3`) |
+| MH234 | Buttress threads (British and 7/45 inch) | partial | `buttress` | 7/45 inch basic dimensions only; no tolerances, no British form (`claude/threads-3`) |
 | MH235 | Whitworth BSW and BSF: form, tolerances, basic dimensions | partial | `whitworth` | No tolerances |
 | MH236 | Taper pipe threads (NPT): dimensions, engagement, tolerances | partial | `pipethreads` | No tolerances |
 | MH237 | Straight pipe threads (NPSM, NPSL etc.) | missing | | |
-| MH238 | Dryseal pipe threads (NPTF) | missing | | |
+| MH238 | Dryseal pipe threads (NPTF) | partial | `pipethreads` | Notes only (form, sealing, related Dryseal types); no truncation limits (`claude/threads-3`) |
 | MH239 | British pipe threads (BSP) | done | `pipethreads` | |
 | MH240 | Hose coupling and fire hose threads | missing | | Low priority |
 | MH241 | Interference-fit threads | missing | | |
@@ -558,8 +560,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH243 | Instrument threads; British Association (BA) | partial | `whitworth` | BA done; instrument and microscope threads missing |
 | MH244 | Historical and miscellaneous threads | out of scope? | | |
 | MH245 | Measuring threads: pitch, lead, thread and ball micrometers | missing | | |
-| MH246 | Three-wire method, best wire sizes, formulas | partial | `wires` | 60-degree only, no lead-angle correction |
-| MH247 | Wire measurement of Whitworth, ACME, stub ACME, taper and buttress threads | missing | | |
+| MH246 | Three-wire method, best wire sizes, formulas | partial | `wires` | 60, 55, 30, 29 degree; no lead-angle correction (`claude/threads-3`) |
+| MH247 | Wire measurement of Whitworth, ACME, stub ACME, taper and buttress threads | partial | `wires`, `acme`, `trapezoidal` | Whitworth, ACME, Stub ACME and trapezoidal; no taper or buttress wires (`claude/threads-3`) |
 | MH248 | Thread gauges, gauge tolerances | missing | | |
 | MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | missing | | |
 | MH250 | Tap drill diameter, percentage of thread, cold form tapping | done | `tapdrill` | |
@@ -744,7 +746,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB4 | Torque conversion chart | missing | | |
 | BB5 | Socket size cross-reference inch/metric | partial | `spanner` | Lookup of a spanner size against metric and inch heads; no socket cross-reference chart |
 | BB6 | Abbreviations for standard threads | partial | `threaddata` | Series names only |
-| BB7 | Thread forms used in engineering | partial | `threaddata`, `pipethreads`, `whitworth` | No ACME, trapezoidal, buttress or forms overview |
+| BB7 | Thread forms used in engineering | partial | `threaddata`, `pipethreads`, `whitworth`, `acme`, `trapezoidal`, `buttress` | ACME, trapezoidal and buttress added; no forms overview drawing (`claude/threads-3`) |
 | BB8 | Types of ground thread taps | missing | | |
 | BB9 | Colour-coded high-performance taps and applications | missing | | Maker-specific; low priority |
 | BB10 | Tapping drill formulae | done | `tapdrill` | |

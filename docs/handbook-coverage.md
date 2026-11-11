@@ -104,16 +104,17 @@ current practice and says so in the tool's notes.
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
-| Thread over wires | MH31 | partial (60-degree threads, lead angle neglected; no ACME or Whitworth wires) | [MH] wire formula, ISO 68-1 |
+| Thread over wires | MH31 | partial: 60, 55, 30 and 29 degree threads (UN, metric, Whitworth, trapezoidal, ACME, Stub ACME); lead angle neglected; no buttress or taper wires | geometry; Thread Check constants |
 | Unified (UNC/UNF/UNEF/UN), all classes | MH31 EBB | partial: basic dimensions; 2A and 2B (including 2B minor) checked against published tables; 1A/3A/1B/3B computed, not checked; no 1B/3B minor limits | ASME B1.1 formulas (cited), values computed and cross-checked |
 | ISO metric coarse/fine, tolerance classes | MH31 EBB | partial: coarse/fine basic dimensions, 6g/6H checked; 4h, 6e, 6f, 6h, 8g, 5H, 6G, 7H computed, not checked | ISO 68-1, ISO 261, ISO 965 (cited), computed |
-| BSW, BSF, BA, BSP (G and R), NPT, NPTF | EBB MH31 | partial: BSW, BSF, BA, BSP and NPT basic dimensions built; NPTF and tolerances missing | BS 84, BS 93, ISO 228, ISO 7, ASME B1.20.1 (cited) |
-| ACME, stub ACME, trapezoidal, buttress | MH31 | missing | ASME B1.5, ISO 2904, ASME B1.9 (cited) |
+| BSW, BSF, BA, BSP (G and R), NPT, NPTF | EBB MH31 | partial: BSW, BSF, BA, BSP and NPT basic dimensions built; NPTF notes only; tolerances missing | BS 84, BS 93, ISO 228, ISO 7, ASME B1.20.1, B1.20.3 (cited) |
+| ACME, stub ACME, trapezoidal, buttress | MH31 | partial: ACME 2G-4G and 2C-4C and Stub ACME limits built and checked; trapezoidal and 7/45 buttress basic dimensions only (no tolerances, no British or metric buttress) | ASME B1.5, B1.8, B1.9, ISO 2904 (cited); publishers in `docs/sources.md` |
+| UNJ, UNR, UNM, constant-pitch UN, coated threads, multi-start | MH31 | built: UNJ minor limits, UNR rule, UNM basic and design sizes, 8/12/16-UN lists, coating allowance, multi-start lead | ASME B1.15, B1.1, B1.10M (cited); publishers |
 | Thread forms overview and symbols | EBB | missing | own diagrams |
 | Single-point threading: infeed, passes | MH31 | missing | insert maker guides |
 | Thread milling | MH31 | missing | own derivation, maker guides |
 | Thread rolling blank diameter | MH31 | missing | maker data |
-| Helical coil inserts (tap sizes) | MH31 | missing | insert maker data |
+| Helical coil inserts (tap sizes) | MH31 | built: STI tapped-hole major, pitch and minor (nominal + 1.299038 P) with Recoil, Kato and Heli-Coil limits | insert maker data |
 
 ## Dimensioning, fits and inspection
 
