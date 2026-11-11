@@ -3,6 +3,11 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (gears and splines)
+- New **Gears and splines** group. **Spur gear data**: reference, base, tip and root diameters, addendum, dedendum, pitches, tooth thickness on the reference circle and at the tip, undercut limit, and for a pair the working pressure angle, centre distance with profile shift, tips for standard clearance and contact ratio, from the module or diametral pitch, with a drawing of the true involute teeth. **Helical gears**: normal and transverse module and pressure angle, base helix angle, lead, axial pitch, virtual teeth, shifted centre distance, transverse, overlap and total contact ratio.
+- **Gear measurement**: span over k teeth with the suggested k, over pins or balls and between pins (internal) with the ideal pin size and contact diameter, chordal tooth thickness and height. **Gear train ratio** (simple and compound, direction, and a change-gear finder for a wanted ratio from a gear set), **planetary gear set** (Willis), **worm and wheel** basics.
+- **Involute splines** (ANSI B92.1 and ISO 4156, 30 degree flat root side fit): pitch and base diameters, basic tooth thickness and space width, major and minor diameters, measurement over and between pins. Basic values only; single-source factors are marked on the screen.
+- `benchmate-core` module `gears` with 14 tests against the KHK Gear Technical Reference (Tables 4.3 and 4.9) and MESYS AG span and over-ball values; WebAssembly exports `gear_*`; `docs/gears.md` lists every source and what is still single-source.
 ### Added (threads round 3)
 - **ACME and Stub ACME threads**: ASME B1.5 general purpose 2G, 3G, 4G and centralizing 2C, 3C, 4C, and ASME B1.8 Stub ACME; basic dimensions, screw and nut limits of size, lead angle, best wire and measurement over wires, starts. The limits reproduce a published 2-4 ACME table for all six classes.
 - **Metric trapezoidal threads (Tr)**: ISO 2904 basic profile (clearance ac, d2, d3, D1, D4, h3, root radii, crest flat), multi-start lead, best wire; checked against eight published rows. Tolerances not included.

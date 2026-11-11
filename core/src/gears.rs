@@ -455,7 +455,8 @@ pub fn spline_basic(m: f64, z: f64, alpha_deg: f64, c_ee: f64, c_ii: f64, c_ei: 
 /// Diameter factors c (d = m (z + c)) for 30 deg flat root side fit splines,
 /// in the order (major external, minor internal, major internal, minor external).
 /// `std` 1 = ANSI B92.1 (m = 1 / P): Do = (N + 1)/P, Di = (N - 1)/P,
-/// Dri = (N + 1.35)/P, Dre = (N - 1.35)/P (Engineers Edge, table of basic formulas).
+/// Dri = (N + 1.35)/P, Dre = (N - 1.35)/P (Engineers Edge, table of basic formulas;
+/// the Dre factor is stated for 2.5/5 through 12/24 pitch, finer pitches differ).
 /// `std` 2 = ISO 4156: Dee max = m (z + 1), Dei min = m (z + 1.5), Die max = m (z - 1.5)
 /// (ISO 4156:1981 table 2, read in the publisher's free preview); the
 /// internal minor diameter Dii is not given as a plain factor there (NaN).
@@ -471,6 +472,7 @@ pub fn spline_factors(std: u32) -> [f64; 4] {
 /// Spline basic dimensions for a standard (see `spline_factors`), pressure angle 30 deg.
 /// which 0 D, 1 Db, 2 p, 3 s = e, 4 major ext, 5 minor int, 6 major int, 7 minor ext.
 pub fn spline_flat(std: u32, m: f64, z: f64, which: u32) -> f64 {
+    if !(std == 1 || std == 2) { return f64::NAN; }
     let c = spline_factors(std);
     spline_basic(m, z, 30.0, c[0], c[1], c[2], c[3]).get(which as usize).copied().unwrap_or(f64::NAN)
 }
@@ -563,5 +565,225 @@ mod tests {
         close(involute(20.0), 0.014_904_4, 1e-7);
         close(involute(14.5), 0.005_544_8, 1e-7);
         for a in [1.0, 14.5, 20.0, 26.0886, 45.0, 70.0, 85.0] { close(inv_angle_deg(involute(a)), a, 1e-9); }
+        // KHK Table 4.3 / 4.9: inv 26.0886 deg = 0.034316, inv 23.1126 deg = 0.023405.
+        close(involute(26.0886), 0.034316, 2e-6);
+        close(involute(23.1126), 0.023405, 2e-6);
+    }
+
+    /// KHK Gear Technical Reference, Table 4.3 (profile shifted spur gears):
+    /// m 3, alpha 20, z 12 / 24, x 0.6 / 0.36. Published: inv aw 0.034316,
+    /// aw 26.0886, y 0.83329, a 56.4999, db 33.8289 / 67.6579, dw 37.667 / 75.333,
+    /// ha 4.420 / 3.700, h 6.370, da 44.840 / 79.400, df 32.100 / 66.660.
+    #[test]
+    fn khk_profile_shifted_spur_pair() {
+        let p = spur_pair(3.0, 12.0, 24.0, 20.0, 0.6, 0.36, 1.0, 1.25);
+        close(p.inv_w, 0.034316, 1e-6);
+        close(p.alpha_w, 26.0886, 1e-4);
+        close(p.y, 0.83329, 1e-5);
+        close(p.a, 56.4999, 1e-4);
+        close(p.dw1, 37.667, 1e-3); close(p.dw2, 75.333, 1e-3);
+        close(p.ha1, 4.420, 1e-3); close(p.ha2, 3.700, 1e-3); close(p.h, 6.370, 1e-3);
+        close(p.da1, 44.840, 1e-3); close(p.da2, 79.400, 1e-3);
+        close(p.df1, 32.100, 1e-3); close(p.df2, 66.660, 1e-3);
+        let g1 = spur(3.0, 12.0, 20.0, 0.6, 1.0, 1.25);
+        let g2 = spur(3.0, 24.0, 20.0, 0.36, 1.0, 1.25);
+        close(g1.d, 36.0, 1e-12); close(g2.d, 72.0, 1e-12);
+        close(g1.db, 33.8289, 1e-4); close(g2.db, 67.6579, 1e-4);
+        // Inverse: the shift sum for that centre distance is x1 + x2 = 0.96.
+        close(shift_sum_for_centre(3.0, 12.0, 24.0, 20.0, p.a), 0.96, 1e-9);
+    }
+
+    /// Unshifted pair: a = m (z1 + z2) / 2, aw = alpha, y = 0, and the
+    /// textbook values z_min = 17.1 (20 deg) and 31.9 (14.5 deg) teeth
+    /// (KHK section 4.2, SDP/SI section 4: 2 / sin^2 alpha).
+    #[test]
+    fn standard_spur_and_undercut() {
+        let p = spur_pair(2.0, 20.0, 40.0, 20.0, 0.0, 0.0, 1.0, 1.25);
+        close(p.a, 60.0, 1e-9); close(p.alpha_w, 20.0, 1e-9); close(p.y, 0.0, 1e-12);
+        let g = spur(2.0, 20.0, 20.0, 0.0, 1.0, 1.25);
+        close(g.da, 44.0, 1e-12); close(g.df, 35.0, 1e-12); close(g.h, 4.5, 1e-12);
+        close(g.s, PI, 1e-12); close(g.e, PI, 1e-12); close(g.p, 2.0 * PI, 1e-12);
+        close(spur(1.0, 20.0, 20.0, 0.0, 1.0, 1.25).z_min, 17.097, 1e-3);
+        close(spur(1.0, 20.0, 14.5, 0.0, 1.0, 1.25).z_min, 31.903, 1e-3);
+        // x_min for z 10 at 20 deg: 1 - 10 sin^2 20 / 2 = 0.415 (KHK 4.2 form).
+        close(spur(1.0, 10.0, 20.0, 0.0, 1.0, 1.25).x_min, 0.41511, 1e-5);
+        // Thickness at the reference diameter is s; at the base circle it grows.
+        close(thickness_at(40.0, PI, 20.0, 40.0), PI, 1e-12);
+        assert!(thickness_at(40.0, PI, 20.0, 40.0 * rad(20.0).cos()) > PI);
+        assert!(thickness_at(40.0, PI, 20.0, 30.0).is_nan());
+        // Contact ratio of a standard pair is between 1 and 2.
+        assert!(p.eps > 1.4 && p.eps < 1.8, "{}", p.eps);
+    }
+
+    /// KHK Gear Technical Reference, Table 4.9 (helical gears, normal system):
+    /// mn 3, an 20, beta 30, z 12 / 60, xn 0.09809 / 0. Published: at 22.79588,
+    /// inv awt 0.023405, awt 23.1126, y 0.09744, d 41.569 / 207.846,
+    /// db 38.322 / 191.611, a 125.000, da 48.153 / 213.842, df 34.657 / 200.346.
+    #[test]
+    fn khk_helical_normal_system() {
+        let g1 = helical(3.0, 12.0, 20.0, 30.0, 0.09809, 1.0, 1.25);
+        let g2 = helical(3.0, 60.0, 20.0, 30.0, 0.0, 1.0, 1.25);
+        close(g1.alpha_t, 22.79588, 1e-5);
+        close(g1.d, 41.569, 1e-3); close(g2.d, 207.846, 1e-3);
+        close(g1.db, 38.322, 1e-3); close(g2.db, 191.611, 1e-3);
+        let (a, awt, y) = helical_centre(3.0, 12.0, 60.0, 20.0, 30.0, 0.09809, 0.0);
+        close(a, 125.000, 1e-3); close(awt, 23.1126, 1e-4); close(y, 0.09744, 1e-5);
+        let p = helical_pair(3.0, 12.0, 60.0, 20.0, 30.0, 0.09809, 0.0, 1.0, 1.25);
+        close(p[3], 48.153, 1e-3); close(p[4], 213.842, 1e-3);
+        close(p[5], 34.657, 1e-3); close(p[6], 200.346, 1e-3);
+        // Transverse module and conversions: mt = mn / cos b; pn = pt cos b.
+        close(g1.mt, 3.0 / rad(30.0).cos(), 1e-12);
+        close(g1.pn, g1.pt * rad(30.0).cos(), 1e-12);
+        // sin bb = sin b cos an (KHK span article, second form of the base helix angle).
+        close(rad(g1.beta_b).sin(), rad(30.0).sin() * rad(20.0).cos(), 1e-12);
+        // Spur limit: beta = 0 gives the spur values.
+        let s0 = helical(2.0, 20.0, 20.0, 0.0, 0.0, 1.0, 1.25);
+        close(s0.d, 40.0, 1e-12); close(s0.alpha_t, 20.0, 1e-12); assert!(s0.lead.is_infinite());
+        close(overlap_ratio(30.0, 3.0, 30.0), 30.0 * 0.5 / (PI * 3.0), 1e-12);
+    }
+
+    /// Span example of the KHK Gear Technical Reference (printed tooth
+    /// thickness section): m 3, a 20, z 24, x 0.4: k = 4, W = 32.8266. The KHK
+    /// web PDF we could open does not show that table, so this row is
+    /// single-source (see docs/gears.md). MESYS AG calculation for m 1, z 20,
+    /// x 0: W over 2 teeth 4.7083.
+    #[test]
+    fn span_measurement_examples() {
+        close(span_k(24.0, 20.0, 0.0, 0.4), 4.0, 0.0);
+        close(span_w(3.0, 24.0, 20.0, 0.0, 0.4, 4.0), 32.8266, 1e-4);
+        close(span_w(1.0, 20.0, 20.0, 0.0, 0.0, 2.0), 4.7083, 1e-4);
+        // Anvils on the circle used to pick k: contact diameter of W(k exact) is d + 2 x m.
+        let kx = span_k_exact(24.0, 20.0, 0.0, 0.4);
+        let w = span_w(3.0, 24.0, 20.0, 0.0, 0.4, kx);
+        close(span_contact_dia(72.0 * rad(20.0).cos(), w, 0.0), 72.0 + 2.4, 1e-9);
+        // For x = 0 the formula reduces to k = z alpha / 180 + 0.5 (z / 9 + 0.5 at 20 deg).
+        for z in [12.0, 20.0, 30.0, 44.0, 80.0] { close(span_k(z, 20.0, 0.0, 0.0), (z / 9.0 + 0.5).round(), 0.0); }
+    }
+
+    /// MESYS AG online calculation (calc.mesys.ch, gear m 1, z 30, a 20, ball 1.7,
+    /// with the generating profile shifts of its two tooth thickness limits):
+    /// xE -0.0412: Wk(3) 7.7723, MdK 32.2380; xE -0.0824: Wk(3) 7.7441, MdK 32.1641.
+    /// MESYS also gives MdK 22.2941 for m 1, z 20, x 0, dp 1.7.
+    #[test]
+    fn over_pins_and_span_against_mesys() {
+        close(span_w(1.0, 30.0, 20.0, 0.0, -0.0412, 3.0), 7.7723, 1e-4);
+        close(span_w(1.0, 30.0, 20.0, 0.0, -0.0824, 3.0), 7.7441, 1e-4);
+        close(mop_spur(1.0, 30.0, 20.0, -0.0412, 1.7), 32.2380, 1e-4);
+        close(mop_spur(1.0, 30.0, 20.0, -0.0824, 1.7), 32.1641, 1e-4);
+        close(mop_spur(1.0, 20.0, 20.0, 0.0, 1.7), 22.2941, 1e-4);
+        close(span_k(30.0, 20.0, 0.0, 0.0), 4.0, 0.0);
+    }
+
+    /// The ideal pin touches the flanks on the reference circle (x = 0) or on
+    /// d + 2 x m; checked with the independent contact-diameter formula.
+    #[test]
+    fn ideal_pins_touch_where_intended() {
+        for &(z, x) in &[(20.0, 0.0), (31.0, 0.0), (24.0, 0.4), (15.0, 0.3)] {
+            let r = gear_measure(1.0, z, 20.0, 0.0, x, 0.0, false);
+            close(r[4], z + 2.0 * x, 1e-9);
+        }
+        // m 1, z 20, 20 deg: ideal pin 1.72445 (own computation from the KHK formula).
+        close(ideal_pin_ext(1.0, 20.0, 20.0, 0.0), 1.72445, 1e-5);
+        for &(z, x) in &[(40.0, 0.0), (60.0, 0.0), (50.0, 0.2)] {
+            let r = gear_measure(1.0, z, 20.0, 0.0, x, 0.0, true);
+            close(r[4], z + 2.0 * x, 1e-9);
+            assert!(r[0] < z && r[0] > z - 4.0, "{:?}", r);
+        }
+        // Odd tooth count: the pin-centre diameter is reduced by cos(90/z).
+        let odd = gear_measure(1.0, 21.0, 20.0, 0.0, 0.0, 1.7, false);
+        close(odd[0], odd[3] * (PI / 42.0).cos() + 1.7, 1e-12);
+    }
+
+    /// Over balls of a helical gear by the transverse form agrees with the spur
+    /// form for beta = 0, and the KHK helical ball (spur formula on zv) is used.
+    #[test]
+    fn helical_over_balls_consistency() {
+        let s = gear_measure(1.0, 20.0, 20.0, 0.0, 0.0, 1.7, false);
+        close(s[0], 22.2941, 1e-4);
+        let h = gear_measure(3.0, 12.0, 20.0, 30.0, 0.09809, 0.0, false);
+        let zv = 12.0 / rad(30.0).cos().powi(3);
+        close(h[2], ideal_pin_ext(3.0, zv, 20.0, 0.09809), 1e-12);
+        assert!(h[0] > 48.153 && h[0] < 52.0, "{:?}", h);
+    }
+
+    /// Chordal tooth thickness, m 10, a 20, z 12, x 0.3, ha 13.000, worked by
+    /// hand from the KHK formulas psi = 90/z + 360 x tan a / (pi z):
+    /// psi = 8.5427 deg, s = 17.8256, h = 13.6657. Hand check only, no printed
+    /// result row read (flagged in docs/gears.md).
+    #[test]
+    fn chordal_thickness() {
+        let (sc, hc) = chordal(10.0, 12.0, 20.0, 0.3, 13.0);
+        close(sc, 17.8256, 1e-4); close(hc, 13.6657, 1e-4);
+        // Large z: chordal thickness tends to the arc thickness, height to ha.
+        let (s2, h2) = chordal(1.0, 2000.0, 20.0, 0.0, 1.0);
+        close(s2, PI / 2.0, 1e-6); close(h2, 1.0, 1e-3);
+        let (s3, _) = chordal_at(20.0, PI / 2.0, 22.0);
+        close(s3, 20.0 * (PI / 40.0).sin(), 1e-12);
+    }
+
+    /// Involute splines, 30 deg flat root side fit. ANSI B92.1 8/16 pitch,
+    /// 24 teeth (basic formulas as printed by Engineers Edge; Dre factor 1.35 is
+    /// stated there for 2.5/5 to 12/24 pitch only): D 3, Do 3.125, Di 2.875,
+    /// Dri 3.16875, Dre 2.83125, space width pi / (2P) = 0.19635. Then the
+    /// 16/32 pins check below uses only D and the space width.
+    /// ISO 4156 m 2, z 20: D 40, Dee 42, Dei 43, Die 37 (ISO 4156:1981 table 2).
+    #[test]
+    fn spline_basic_dimensions() {
+        let a: Vec<f64> = (0..8).map(|i| spline_flat(1, 1.0 / 8.0, 24.0, i)).collect();
+        close(a[0], 3.0, 1e-12); close(a[1], 3.0 * 0.75f64.sqrt(), 1e-12);
+        close(a[3], 0.19635, 1e-5); close(a[4], 3.125, 1e-12); close(a[5], 2.875, 1e-12);
+        close(a[6], 3.16875, 1e-12); close(a[7], 2.83125, 1e-12);
+        let i: Vec<f64> = (0..8).map(|k| spline_flat(2, 2.0, 20.0, k)).collect();
+        close(i[0], 40.0, 1e-12); close(i[4], 42.0, 1e-12); close(i[6], 43.0, 1e-12); close(i[7], 37.0, 1e-12);
+        assert!(i[5].is_nan());
+        assert!(spline_flat(3, 2.0, 20.0, 0).is_nan());
+        // Over pins with the ideal pin: pins touch at the pitch diameter.
+        let m = 1.0 / 16.0;
+        let dp = ideal_pin_ext(m, 24.0, 30.0, 0.0);
+        let mm = over_pins_ext(24.0, 1.5, 30.0, PI * m / 2.0, dp);
+        close(pin_contact_dia(1.5 * rad(30.0).cos(), mm - dp, dp, false), 1.5, 1e-9);
+        // Between pins of the mating internal spline, same basic space width.
+        let di = ideal_pin_int(m, 24.0, 30.0, 0.0);
+        let mi = between_pins_int(24.0, 1.5, 30.0, PI * m / 2.0, di);
+        close(pin_contact_dia(1.5 * rad(30.0).cos(), mi + di, di, true), 1.5, 1e-9);
+    }
+
+    /// Gear trains: compound 20/60 x 18/54 is 9 : 1; Willis for a 24 / 72 set
+    /// with the ring held gives 1 + 72/24 = 4 : 1 (SDP/SI section 13 form).
+    #[test]
+    fn trains_and_planetary() {
+        close(train_ratio(&[20.0, 60.0, 18.0, 54.0]), 9.0, 1e-12);
+        assert!(train_ratio(&[20.0]).is_nan());
+        close(train_sign(2.0), 1.0, 0.0); close(train_sign(3.0), -1.0, 0.0);
+        close(willis(24.0, 72.0, 1000.0, 0.0, f64::NAN), 250.0, 1e-9);
+        close(willis(24.0, 72.0, f64::NAN, 0.0, 250.0), 1000.0, 1e-9);
+        close(willis(24.0, 72.0, 1000.0, f64::NAN, 0.0), -1000.0 / 3.0, 1e-9);
+        close(planet_teeth(24.0, 72.0), 24.0, 0.0);
+        assert!(planets_assemble(24.0, 72.0, 3.0));
+        assert!(!planets_assemble(24.0, 72.0, 5.0));
+        // Change-gear finder (benchmate_core::change_gear_trains) finds 1 : 9 exactly
+        // from a 20..80 by 5 set as a compound train.
+        let set: Vec<u32> = (20..=80).step_by(5).collect();
+        let t = crate::change_gear_trains(&set, 1.0 / 9.0, true, 3);
+        close(t[0].ratio, 1.0 / 9.0, 1e-12); assert!(t[0].c > 0);
+    }
+
+    /// Worm: mx 3, one start, 30 teeth, d1 44: lead 3 pi, tan g = 3 / 44,
+    /// a = (44 + 90) / 2 = 67 (KHK section on cylindrical worm gear pairs, form only).
+    #[test]
+    fn worm_basics() {
+        let w = worm(3.0, 1.0, 30.0, 44.0);
+        close(w[0], 3.0 * PI, 1e-12); close(w[1], deg((3.0f64 / 44.0).atan()), 1e-12);
+        close(w[2], 30.0, 0.0); close(w[3], 67.0, 1e-12); close(w[4], 90.0, 1e-12);
+    }
+
+    #[test]
+    fn tooth_outline_is_symmetric_and_bounded() {
+        let g = spur(2.0, 20.0, 20.0, 0.0, 1.0, 1.25);
+        let p = tooth_outline(g.d, g.db, g.da, g.df, g.s, 20);
+        assert!(p.len() > 40 && p.len() % 2 == 0);
+        let n = p.len();
+        close(p[0], -p[n - 2], 1e-12); close(p[1], p[n - 1], 1e-12);
+        for c in p.chunks(2) { let r = c[0].hypot(c[1]); assert!(r <= g.da / 2.0 + 1e-9 && r >= g.df / 2.0 - 1e-9); }
     }
 }

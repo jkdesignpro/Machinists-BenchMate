@@ -23,7 +23,7 @@ function gearToothSvg(m, z, alpha, x, haK, hfK, label) {
   const span = 1.6 * step, ra = da / 2, rf = df / 2;
   const arcPts = r => { const o = []; for (let i = 0; i <= 40; i++) { const t = -span + 2 * span * i / 40; o.push([r * Math.sin(t), r * Math.cos(t)]); } return o; };
   const all = teeth.flat().concat(arcPts(ra), arcPts(rf));
-  const w = 420, h = 250, mp = gfit(all, w, h, 22);
+  const w = 420, h = 250, mp = gfit(all, w - 90, h, 22); // 90 px on the right for the circle labels
   const path = pts => pts.map((p, i) => (i ? 'L' : 'M') + gpt(mp.P(p))).join('');
   // Root arcs between the teeth.
   let body = '';

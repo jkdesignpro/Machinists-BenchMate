@@ -246,6 +246,7 @@ const FORMULAS = [
   F('helicalgear', 'Helical centre distance with shift', 'inv αwt = 2 tan αn (xn1 + xn2)/(z1 + z2) + inv αt;  a = ((z1 + z2)/(2 cos β) + y) mn', '', ['KHK']),
   F('helicalgear', 'Overlap ratio', 'εβ = b sin β / (π mn)', 'b: face width', ['KHK', 'SDPSI']),
   F('geartrain', 'Train ratio', 'i = Π (driven teeth / driver teeth);  n_out = n_in / i', 'one factor per meshing pair', ['SDPSI', 'KHK']),
+  F('geartrain', 'Change-gear train finder', 'try every a/b and (a/b)(c/d) from the set; error = i_found / i_wanted − 1', 'a, c: drivers; b, d: driven; one gear of each size', ['OWN']),
   F('planetary', 'Willis formula', '(ns − nc) / (nr − nc) = −zr / zs', 'n: speeds of sun, ring, carrier; z: teeth', ['WILLIS', 'SDPSI']),
   F('planetary', 'Planet teeth and spacing', 'zp = (zr − zs)/2;  (zs + zr)/n whole for n equally spaced planets', '', ['SDPSI', 'KHK']),
   F('spline', 'Spline basic dimensions', 'D = m z (m = 1/P);  Db = D cos 30°;  p = π m;  s = e = p/2', '', ['B92', 'ISO4156']),

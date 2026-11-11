@@ -1032,6 +1032,85 @@ const TOOLS = [
   working: 'See the note under the tool.',
   source: 'BS 84:2007, BS 93:2008; series values from the publishers listed under the tool.',
 },
+{
+  id: 'acme', group: 'Threads', title: 'ACME and Stub ACME threads',
+  desc: 'ACME general purpose (2G, 3G, 4G) and centralizing (2C, 3C, 4C) threads to ASME B1.5, and Stub ACME to ASME B1.8: basic dimensions, limits of size for screw and nut, lead angle and best wire.',
+  render: el => renderAcme(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.5-1997 (R2024), ASME B1.8-1988 (R2021); formulas confirmed in NBS Handbook H28 (1957) and the publishers listed under the tool.',
+},
+{
+  id: 'trapezoidal', group: 'Threads', title: 'Metric trapezoidal threads (Tr)',
+  desc: 'ISO metric trapezoidal threads: clearance, pitch, minor and major diameters of screw and nut from the ISO 2904 basic profile, with lead for multi-start threads and best wire.',
+  render: el => renderTrapezoidal(el),
+  working: 'See the note under the tool.',
+  source: 'ISO 2904:2020 (confirmed 2025), ISO 2901:2016, ISO 2903 (tolerances; BS ISO 2903:2016) (cited by name); published rows from the publishers listed under the tool.',
+},
+{
+  id: 'buttress', group: 'Threads', title: 'Buttress threads (7/45)',
+  desc: 'ASME B1.9 inch buttress threads, 7 degree load flank and 45 degree clearance flank: basic thread heights, crest and root, pitch, minor and major diameters at maximum material.',
+  render: el => renderButtress(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.9-1973 (R2025), cited by name; constants as printed by AMESweb and derived from the geometry.',
+},
+{
+  id: 'unseries', group: 'Threads', title: 'Constant-pitch UN series and UNS',
+  desc: '8-UN, 12-UN and 16-UN constant-pitch series up to 2 in, with basic pitch and minor diameters, and how UNS (special) threads are designated.',
+  render: el => renderUnSeries(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.1-2024 (cited by name); series lists from AMESweb and Torqbolt.',
+},
+{
+  id: 'unm', group: 'Threads', title: 'Unified miniature threads (UNM)',
+  desc: 'UNM threads 0.30 to 1.40 mm (ASME B1.10M): pitch, basic and design diameters, root radii and published limits of size.',
+  render: el => renderUnm(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.10M-2004 (cited by name); Thread Check Inc. and AMESweb.',
+},
+{
+  id: 'unjunr', group: 'Threads', title: 'UNJ and UNR threads',
+  desc: 'UNJ controlled root radius and increased internal minor diameter (ASME B1.15), and the UNR rounded-root rule for external Unified threads (ASME B1.1).',
+  render: el => renderUnjUnr(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.15-1995, ASME B1.1-2024 (cited by name); publishers listed under the tool.',
+},
+{
+  id: 'sti', group: 'Threads', title: 'Helical insert (STI) tapped holes',
+  desc: 'Tapped-hole thread for helical coil (wire) inserts: STI major, pitch and minor diameters from the nominal thread, with the insert makers\' published limits side by side.',
+  render: el => renderSti(el),
+  working: 'See the note under the tool.',
+  source: 'Recoil (Alcoa Fastening Systems), Kato Fastening Systems and Heli-Coil data as reprinted by Vargus; NASM33537 and MA1567 cited by name.',
+},
+{
+  id: 'coating', group: 'Threads', title: 'Plating and coating allowance on threads',
+  desc: 'Pitch diameter change from a coating on the flanks (4 x thickness for 60 degree threads) and the before-coating pitch diameter limits, for screws, nuts and helical inserts.',
+  render: el => renderCoating(el),
+  working: 'See the note under the tool.',
+  source: 'Thread Check Inc. and Kato Fastening Systems (4 x thickness rule); geometry for other thread angles.',
+},
+{
+  id: 'multistart', group: 'Threads', title: 'Multi-start thread lead and pitch',
+  desc: 'Lead from pitch and number of starts (or pitch from lead), lead angle at the pitch diameter, and how far to index or shift the tool between starts.',
+  fields: s => [
+    { id: 'pitch', label: s === 'inch' ? 'Pitch (distance between adjacent threads)' : 'Pitch P', unit: lenU(s), def: s === 'inch' ? 0.1 : 2 },
+    { id: 'n', label: 'Number of starts', unit: '', def: 2 },
+    { id: 'lead', label: 'Or known lead (wins over pitch)', unit: lenU(s), def: '' },
+    { id: 'e', label: 'Pitch diameter (for the lead angle)', unit: lenU(s), def: s === 'inch' ? 0.9 : 18 },
+  ],
+  calc: (v, W, s) => {
+    const n = Math.round(v.n);
+    if (!(n >= 1)) return [];
+    const lead = v.lead > 0 ? v.lead : v.pitch * n, p = lead / n;
+    if (!(lead > 0)) return [];
+    const r = [R('Lead L (axial advance per turn)', lead, lenU(s), 4), R('Pitch P = L / starts', p, lenU(s), 4),
+      R(s === 'inch' ? 'Threads per inch (1 / P)' : 'Leads per 25.4 mm', s === 'inch' ? 1 / p : 25.4 / lead, s === 'inch' ? 'TPI' : '', 3),
+      R('Index between starts (rotate the work)', 360 / n, 'deg', 2), R('Or shift the tool axially between starts', p, lenU(s), 4)];
+    if (v.e > 0) r.push(R('Lead angle at the pitch diameter', W.thread_misc(lead, v.e, 2), 'deg', 3));
+    return r;
+  },
+  working: 'L = n x P (n starts). Lead angle = atan(L / (pi E)). To cut the next start, either rotate the work 360 / n degrees with the tool where it is, or move the tool one pitch P along the axis (a G76 or G92 cycle started one pitch later in Z). Feed per revolution on the lathe is the lead, not the pitch.',
+  source: 'Thread geometry (lead, pitch and helix angle); see docs/sources.md, Threads round 3.',
+},
 // ---------- Gears and splines (core/src/gears.rs, drawings in app/gears.js) ----------
 {
   id: 'spurgear', group: 'Gears and splines', title: 'Spur gear data',
@@ -1172,7 +1251,7 @@ const TOOLS = [
 },
 {
   id: 'geartrain', group: 'Gears and splines', title: 'Gear train ratio',
-  desc: 'Simple and compound trains: give each driver and driven gear that mesh, up to four pairs (two gears on one shaft make the next pair). An idler only changes the direction; count it below. Output speed = input speed / ratio.',
+  desc: 'Simple and compound trains: give each driver and driven gear that mesh, up to four pairs (two gears on one shaft make the next pair). An idler only changes the direction; count it below. Output speed = input speed / ratio. To find a train for a wanted ratio from a gear set, give the ratio (input / output speed) and the set.',
   fields: s => [
     { id: 'n', label: 'Input speed', unit: 'RPM', def: 1500 },
     { id: 'a1', label: 'Pair 1: driver teeth', unit: '', def: 20 }, { id: 'b1', label: 'Pair 1: driven teeth', unit: '', def: 60 },
@@ -1180,6 +1259,11 @@ const TOOLS = [
     { id: 'a3', label: 'Pair 3: driver teeth', unit: '', def: '' }, { id: 'b3', label: 'Pair 3: driven teeth', unit: '', def: '' },
     { id: 'a4', label: 'Pair 4: driver teeth', unit: '', def: '' }, { id: 'b4', label: 'Pair 4: driven teeth', unit: '', def: '' },
     { id: 'idl', label: 'Idlers (external gears between)', unit: '', def: 0 },
+    { id: 'tr', label: 'Find trains for ratio (blank = off)', unit: ': 1', def: '' },
+    { id: 'g0', label: 'Gear set: smallest', unit: 'teeth', def: 20 },
+    { id: 'g1', label: 'Gear set: largest', unit: 'teeth', def: 80 },
+    { id: 'gs', label: 'Gear set: step', unit: 'teeth', def: 5 },
+    { id: 'gc', label: 'Trains to try', unit: '', def: 1, options: [[1, 'Simple and compound'], [0, 'Simple only']] },
   ],
   calc: (v, W, s) => {
     const p = [];
@@ -1189,9 +1273,24 @@ const TOOLS = [
     const rows = [R('Train ratio (input / output speed)', r, ': 1', 5), R('Output turns per input turn', 1 / r, '', 6)];
     if (v.n > 0) rows.push(R('Output speed', v.n / r, 'RPM', 2));
     rows.push(R('Output direction (external gears only)', W.gear_train_sign(ext) > 0 ? 'same as the input' : 'opposite to the input', '', 0));
+    if (v.tr > 0) {
+      // Change-gear finder: the user's gear set from smallest to largest by step; the
+      // search (core change_gear_trains) works with driver/driven, so ask for 1 / ratio.
+      const set = [], st = v.gs >= 1 ? Math.round(v.gs) : 1;
+      for (let t = Math.round(v.g0); t <= Math.round(v.g1) && set.length < 60; t += st) if (t >= 8) set.push(t);
+      if (set.length < 2) rows.push(R('Train finder', 'give a gear set of at least two sizes', '', 0));
+      else {
+        const n = W.change_gears(toBuf(W, set), 1 / v.tr, v.gc === 0 ? 0 : 1, 6), L = listOut(W, n * 5);
+        for (let i = 0; i < n; i++) {
+          const [a, b, c, d, q] = L.slice(5 * i, 5 * i + 5), e = (1 / q) / v.tr - 1;
+          rows.push(R('Train ' + (i + 1) + (c ? ' (compound, driver/driven)' : ' (driver/driven)'),
+            (c ? a + '/' + b + ' × ' + c + '/' + d : a + '/' + b) + ' = ' + fmt(1 / q, 6) + ' : 1, error ' + (Math.abs(e) < 1e-12 ? 'exact' : fmt(e * 100, 4) + ' %'), '', 0));
+        }
+      }
+    }
     return rows;
   },
-  working: 'Ratio = (driven1 / driver1) × (driven2 / driver2) × ... ; n_out = n_in / ratio. Each external mesh reverses the direction, so the output turns the same way as the input when the number of external meshes (pairs plus idlers) is even. An internal (ring) gear mesh does not reverse; allow for it yourself.',
+  working: 'Ratio = (driven1 / driver1) × (driven2 / driver2) × ... ; n_out = n_in / ratio. Each external mesh reverses the direction, so the output turns the same way as the input when the number of external meshes (pairs plus idlers) is even. An internal (ring) gear mesh does not reverse; allow for it yourself. Train finder: every simple pair a/b and compound train (a/b)(c/d) of different gears from the set (one of each size) is tried and the closest ratios are listed, error = found / wanted − 1. Check that the gears fit the centre distances.',
   source: 'Gear-train ratio arithmetic; KHK Gear Technical Reference and SDP/SI Elements of Metric Gear Technology, section 13 (gear trains). See docs/gears.md.',
 },
 {
@@ -1227,7 +1326,7 @@ const TOOLS = [
   desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal). Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
   fields: s => [
     { id: 'std', label: 'Standard', unit: '', def: s === 'inch' ? 1 : 2, options: [[1, 'ANSI B92.1 (inch, P/2P pitch)'], [2, 'ISO 4156 (metric module)']] },
-    { id: 'mp', label: 'Pitch P (ANSI, e.g. 16 for 16/32) or module m (ISO, mm)', unit: '', def: s === 'inch' ? 16 : 2 },
+    { id: 'mp', label: 'Pitch P (ANSI, e.g. 8 for 8/16) or module m (ISO, mm)', unit: '', def: s === 'inch' ? 8 : 2 },
     { id: 'z', label: 'Number of teeth', unit: '', def: s === 'inch' ? 24 : 20 },
     { id: 'dpe', label: 'Pin diameter, external (blank = ideal)', unit: lenU(s), def: '' },
     { id: 'dpi', label: 'Pin diameter, internal (blank = ideal)', unit: lenU(s), def: '' },
@@ -1243,7 +1342,8 @@ const TOOLS = [
     if (v.std === 1) rows.push(R('Pitch', v.mp + '/' + 2 * v.mp + ' (stub pitch 2P sets the depth)', '', 0));
     rows.push(R('Pitch diameter D', g(0), u, dp), R('Base diameter Db = D cos 30°', g(1), u, dp), R('Circular pitch p', g(2), u, dp + 1),
       R('Basic tooth thickness = basic space width (p / 2)', g(3), u, dp + 1),
-      R('Major diameter, external (basic)', g(4), u, dp), R('Minor diameter, external (flat root, basic)', g(7), u, dp),
+      R('Major diameter, external (basic)', g(4), u, dp),
+      v.std === 1 && v.mp > 12 ? R('Minor diameter, external (flat root)', 'the (N − 1.35)/P rule is for 2.5/5 to 12/24 pitch; finer pitches use another factor (see ANSI B92.1)', '', 0) : R('Minor diameter, external (flat root, basic)', g(7), u, dp),
       R('Major diameter, internal (flat root, basic)', g(6), u, dp));
     if (isFinite(g(5))) rows.push(R('Minor diameter, internal (basic)', g(5), u, dp));
     else rows.push(R('Minor diameter, internal', 'from the external form diameter and form clearance in ISO 4156 (not given here)', '', 0));
@@ -1252,9 +1352,10 @@ const TOOLS = [
     rows.push(R('Pin diameter, external', pe, u, dp + 1), R('Measurement over pins, external', W.gear_over_pins_ext(v.z, d, 30, st, pe), u, dp + 1),
       R('Pin diameter, internal', pi, u, dp + 1), R('Measurement between pins, internal', W.gear_between_pins_int(v.z, d, 30, et, pi), u, dp + 1));
     rows.push(R('Major and minor diameter factors', v.std === 1 ? 'one free source so far (Engineers Edge)' : 'one free source so far (ISO 4156:1981 preview)', '', 0));
+    rows.push(R('Pin size', 'the pins shown touch at the pitch diameter; the standards list their own measuring pin sizes: enter the size on your inspection sheet', '', 0));
     return rows;
   },
-  working: 'm = 1/P (ANSI) or the module (ISO). D = m z; Db = D cos 30°; p = π m; basic s = e = p/2. ANSI B92.1 30° flat root side fit: Do = (N + 1)/P, Di = (N − 1)/P, Dri = (N + 1.35)/P, Dre = (N − 1.35)/P. ISO 4156 30° flat root: Dee = m (z + 1), Dei = m (z + 1.5), Die = m (z − 1.5) (basic, before deviations). Pins: external inv φ = s/D + inv 30° + dp/Db − π/z, M = Db / cos φ + dp (even z; odd z × cos(90°/z) before + dp); internal inv φ = e/D + inv 30° − dp/Db, M = Db / cos φ − dp. Ideal pins touch at the pitch diameter (as for a gear with x = 0).',
+  working: 'm = 1/P (ANSI) or the module (ISO). D = m z; Db = D cos 30°; p = π m; basic s = e = p/2. ANSI B92.1 30° flat root side fit: Do = (N + 1)/P, Di = (N − 1)/P, Dri = (N + 1.35)/P, Dre = (N − 1.35)/P (Dre rule for 2.5/5 to 12/24 pitch). ISO 4156 30° flat root: Dee = m (z + 1), Dei = m (z + 1.5), Die = m (z − 1.5) (basic, before deviations). Pins: external inv φ = s/D + inv 30° + dp/Db − π/z, M = Db / cos φ + dp (even z; odd z × cos(90°/z) before + dp); internal inv φ = e/D + inv 30° − dp/Db, M = Db / cos φ − dp. Ideal pins touch at the pitch diameter (as for a gear with x = 0).',
   source: 'ANSI B92.1-1996 and ISO 4156-1:2021 (second edition, replaces ISO 4156-1:2005), cited by name. Factors: Engineers Edge, involute spline basic formulas (ANSI); ISO 4156:1981 table 2 in the iTeh free preview (ISO). Pin formulas as for gears (KHK). Each status is in docs/gears.md.',
 },
 {
@@ -1280,85 +1381,6 @@ const TOOLS = [
   },
   working: 'm = 1 / P in inch mode. px = π mx; lead L = z1 px; tan γ = z1 mx / d1; ratio = z2 / z1; d2 = z2 mx; a = (d1 + d2)/2; mn = mx cos γ.',
   source: 'KHK Gear Technical Reference, cylindrical worm gear pair; SDP/SI Elements of Metric Gear Technology, section 9 (worm mesh). See docs/gears.md.',
-},
-{
-  id: 'acme', group: 'Threads', title: 'ACME and Stub ACME threads',
-  desc: 'ACME general purpose (2G, 3G, 4G) and centralizing (2C, 3C, 4C) threads to ASME B1.5, and Stub ACME to ASME B1.8: basic dimensions, limits of size for screw and nut, lead angle and best wire.',
-  render: el => renderAcme(el),
-  working: 'See the note under the tool.',
-  source: 'ASME B1.5-1997 (R2024), ASME B1.8-1988 (R2021); formulas confirmed in NBS Handbook H28 (1957) and the publishers listed under the tool.',
-},
-{
-  id: 'trapezoidal', group: 'Threads', title: 'Metric trapezoidal threads (Tr)',
-  desc: 'ISO metric trapezoidal threads: clearance, pitch, minor and major diameters of screw and nut from the ISO 2904 basic profile, with lead for multi-start threads and best wire.',
-  render: el => renderTrapezoidal(el),
-  working: 'See the note under the tool.',
-  source: 'ISO 2904:2020 (confirmed 2025), ISO 2901:2016, ISO 2903 (tolerances; BS ISO 2903:2016) (cited by name); published rows from the publishers listed under the tool.',
-},
-{
-  id: 'buttress', group: 'Threads', title: 'Buttress threads (7/45)',
-  desc: 'ASME B1.9 inch buttress threads, 7 degree load flank and 45 degree clearance flank: basic thread heights, crest and root, pitch, minor and major diameters at maximum material.',
-  render: el => renderButtress(el),
-  working: 'See the note under the tool.',
-  source: 'ASME B1.9-1973 (R2025), cited by name; constants as printed by AMESweb and derived from the geometry.',
-},
-{
-  id: 'unseries', group: 'Threads', title: 'Constant-pitch UN series and UNS',
-  desc: '8-UN, 12-UN and 16-UN constant-pitch series up to 2 in, with basic pitch and minor diameters, and how UNS (special) threads are designated.',
-  render: el => renderUnSeries(el),
-  working: 'See the note under the tool.',
-  source: 'ASME B1.1-2024 (cited by name); series lists from AMESweb and Torqbolt.',
-},
-{
-  id: 'unm', group: 'Threads', title: 'Unified miniature threads (UNM)',
-  desc: 'UNM threads 0.30 to 1.40 mm (ASME B1.10M): pitch, basic and design diameters, root radii and published limits of size.',
-  render: el => renderUnm(el),
-  working: 'See the note under the tool.',
-  source: 'ASME B1.10M-2004 (cited by name); Thread Check Inc. and AMESweb.',
-},
-{
-  id: 'unjunr', group: 'Threads', title: 'UNJ and UNR threads',
-  desc: 'UNJ controlled root radius and increased internal minor diameter (ASME B1.15), and the UNR rounded-root rule for external Unified threads (ASME B1.1).',
-  render: el => renderUnjUnr(el),
-  working: 'See the note under the tool.',
-  source: 'ASME B1.15-1995, ASME B1.1-2024 (cited by name); publishers listed under the tool.',
-},
-{
-  id: 'sti', group: 'Threads', title: 'Helical insert (STI) tapped holes',
-  desc: 'Tapped-hole thread for helical coil (wire) inserts: STI major, pitch and minor diameters from the nominal thread, with the insert makers\' published limits side by side.',
-  render: el => renderSti(el),
-  working: 'See the note under the tool.',
-  source: 'Recoil (Alcoa Fastening Systems), Kato Fastening Systems and Heli-Coil data as reprinted by Vargus; NASM33537 and MA1567 cited by name.',
-},
-{
-  id: 'coating', group: 'Threads', title: 'Plating and coating allowance on threads',
-  desc: 'Pitch diameter change from a coating on the flanks (4 x thickness for 60 degree threads) and the before-coating pitch diameter limits, for screws, nuts and helical inserts.',
-  render: el => renderCoating(el),
-  working: 'See the note under the tool.',
-  source: 'Thread Check Inc. and Kato Fastening Systems (4 x thickness rule); geometry for other thread angles.',
-},
-{
-  id: 'multistart', group: 'Threads', title: 'Multi-start thread lead and pitch',
-  desc: 'Lead from pitch and number of starts (or pitch from lead), lead angle at the pitch diameter, and how far to index or shift the tool between starts.',
-  fields: s => [
-    { id: 'pitch', label: s === 'inch' ? 'Pitch (distance between adjacent threads)' : 'Pitch P', unit: lenU(s), def: s === 'inch' ? 0.1 : 2 },
-    { id: 'n', label: 'Number of starts', unit: '', def: 2 },
-    { id: 'lead', label: 'Or known lead (wins over pitch)', unit: lenU(s), def: '' },
-    { id: 'e', label: 'Pitch diameter (for the lead angle)', unit: lenU(s), def: s === 'inch' ? 0.9 : 18 },
-  ],
-  calc: (v, W, s) => {
-    const n = Math.round(v.n);
-    if (!(n >= 1)) return [];
-    const lead = v.lead > 0 ? v.lead : v.pitch * n, p = lead / n;
-    if (!(lead > 0)) return [];
-    const r = [R('Lead L (axial advance per turn)', lead, lenU(s), 4), R('Pitch P = L / starts', p, lenU(s), 4),
-      R(s === 'inch' ? 'Threads per inch (1 / P)' : 'Leads per 25.4 mm', s === 'inch' ? 1 / p : 25.4 / lead, s === 'inch' ? 'TPI' : '', 3),
-      R('Index between starts (rotate the work)', 360 / n, 'deg', 2), R('Or shift the tool axially between starts', p, lenU(s), 4)];
-    if (v.e > 0) r.push(R('Lead angle at the pitch diameter', W.thread_misc(lead, v.e, 2), 'deg', 3));
-    return r;
-  },
-  working: 'L = n x P (n starts). Lead angle = atan(L / (pi E)). To cut the next start, either rotate the work 360 / n degrees with the tool where it is, or move the tool one pitch P along the axis (a G76 or G92 cycle started one pitch later in Z). Feed per revolution on the lathe is the lead, not the pitch.',
-  source: 'Thread geometry (lead, pitch and helix angle); see docs/sources.md, Threads round 3.',
 },
 {
   id: 'machinetapers', group: 'Setup', title: 'Machine tapers',

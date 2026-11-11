@@ -540,3 +540,11 @@ Web sources accessed 2026-11-11 unless stated. Book titles are cited by name onl
 - Standards (by name only): ASME Y14.38-2019, *Abbreviations and Acronyms for Use in Product Definition and Related Documents* (asme.org lists 2019 as the edition in effect, stabilized maintenance), https://www.asme.org/codes-standards/find-codes-standards/y14-38-abbreviations-acronyms-use-drawings-related-documents ; ISO 128-1:2020, *Technical product documentation (TPD) - General principles of representation - Part 1* (edition 2, published, confirmed 2026), https://www.iso.org/standard/65296.html .
 - Publishers: Wikipedia, "Engineering drawing abbreviations and symbols", https://en.wikipedia.org/wiki/Engineering_drawing_abbreviations_and_symbols ; Bureau of Indian Standards, IS 11670:1993 *Technical drawings - Abbreviations and symbols for use in technical drawings*, Table 1, via Public.Resource.Org, https://law.resource.org/pub/in/bis/S01/is.11670.1993.pdf .
 - BenchMate's list (65 entries) and wording are our own; 34 are listed by both publishers with the same meaning, 31 by one (shown as "One source"). Wikipedia prints DRG (not DWG) and EQS; IS 11670 prints EQUI SP and SFACE. Weld symbols are not covered.
+
+## Gears and splines (`core/src/gears.rs`, `app/gears.js`)
+
+Full list of formulas, sources, worked examples and single-source warnings in `docs/gears.md`.
+Main sources: KHK Gear Technical Reference (khkgears.us, Tables 4.3 and 4.9, and the span,
+over-pin and chordal articles from Gear Solutions 2020); SDP/SI Elements of Metric Gear
+Technology; MESYS AG online gear calculation (calc.mesys.ch); ISO 53, ISO 21771-1, DIN 3960,
+ANSI B92.1 and ISO 4156-1 (cited by name); Engineers Edge involute spline formulas.
