@@ -352,3 +352,80 @@ svg.geo.cnw{width:150px;max-width:150px;flex:none;margin:0}
 }
 @media (max-width:720px){.bcalc .bc-keys button{height:40px}}
 /* ===== end Calculator ===== */
+
+/* ===== Cycle input sections (thread milling) ===== */
+details.cysec{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);margin:0 0 8px;max-width:980px}
+details.cysec>summary{cursor:pointer;padding:7px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;list-style:none}
+details.cysec>summary::-webkit-details-marker{display:none}
+details.cysec>summary::before{content:'';width:0;height:0;border-left:5px solid var(--muted);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .12s}
+details.cysec[open]>summary::before{transform:rotate(90deg)}
+details.cysec .cysh{font-weight:600}
+details.cysec .cyst{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0}
+details.cysec .cymiss{overflow-wrap:anywhere}
+details.cysec .cysb{border-top:1px solid var(--line);padding:10px 12px 4px}
+.cystd{margin:0 0 8px}
+.cystd .f{max-width:360px}
+.cystd select{max-width:100%}
+.cystd p{margin:4px 0 0;min-height:1em}
+.cywait{border:1px dashed var(--line);border-radius:var(--r);max-width:980px}
+
+/* ===== Thread data: recent threads, copy buttons, hand-off to the programs ===== */
+.thhist{max-width:980px;margin:0 0 6px}
+.thhist>.ms{display:block;margin:0 0 4px}
+.thhist .fchips{align-items:center}
+.thhist .thclr{height:24px}
+.thgo{max-width:980px;margin:12px 0 4px}
+.thgor{flex-wrap:wrap;gap:8px}
+.thgor .seg{flex:none}
+#hres td.v .cpy{margin-left:2px}
+#hres td .cpy{white-space:nowrap}
+
+/* ===== G and M codes: operation chips and the info drawer ===== */
+.gmtags{margin:2px 0 6px}
+.gmtags .fchip:disabled{opacity:.45;cursor:default}
+.gmtags .gmtn{font-family:var(--mono);font-size:10.5px;opacity:.75}
+.gmtab tr.gmrow{cursor:pointer}
+.gmtab tr.gmrow:hover>td{background:var(--soft)}
+.gmtab tr.gmrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.gmtab tr.gmrow.open>td{background:var(--soft);border-bottom-color:transparent}
+.gmtab tr.gmdrw>td{background:var(--soft);padding:0 8px 10px}
+.gmdrawer{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);background:var(--panel);padding:10px 12px;max-width:900px;white-space:normal}
+.gmdh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.gmdh .btn{flex:none}
+.gmdl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0 0 8px}
+.gmdl dt{color:var(--muted);font-size:11.5px}
+.gmdl dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.gmdsec{margin-top:8px}
+.gmdsec>.h{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.gmdsec table{width:100%;border-collapse:collapse}
+.gmdsec td{padding:3px 6px 3px 0;vertical-align:top;border-bottom:1px solid var(--soft)}
+.gmdsec td:first-child{white-space:nowrap;width:1%}
+.gmdsec p{margin:4px 0}
+.gmdsrc{margin:0;padding-left:18px;overflow-wrap:anywhere}
+.gmdsrc li{margin:2px 0}
+@media (max-width:600px){.gmdl{grid-template-columns:1fr}.gmdl dt{margin-top:4px}}
+
+/* ===== Keyway broaching: the user's own presets ===== */
+.cypre{border:1px solid var(--line);border-radius:var(--r);background:var(--raise);padding:8px 10px;margin:0 0 12px;max-width:980px}
+.cypreh{margin-bottom:6px}
+.cyprer{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.cyprer select{max-width:320px;min-width:0;flex:1 1 200px}
+.cyprer input{flex:1 1 180px;min-width:0;max-width:280px}
+.cyprer .btn{flex:none}
+.cypre p{margin:4px 0 0;min-height:1em}
+
+/* ===== Formula library: category chips, favourites, open calculator ===== */
+.flib-chips{max-width:980px}
+.flib-chips .fchip{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.flib-chips .fchip svg.ic{width:13px;height:13px}
+.flib-chips .gmtn,.fchip .gmtn{font-family:var(--mono);font-size:10.5px;opacity:.75}
+.fht{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.fstar{width:24px;height:24px;flex:none;border-radius:var(--r)}
+.fstar:hover{background:var(--soft)}
+.fstar .ic{width:15px;height:15px}
+.fgo{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-left:auto}
+.fh .fgo .btn{color:var(--ink)}
+@media (max-width:600px){
+  .fgo{margin-left:30px}
+}
+.gmdh .gmdc{display:block;margin-top:2px}

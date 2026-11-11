@@ -239,6 +239,103 @@ if (over > 0) problems.push(`[${where}] panel wider than the screen by ${over}px
 await page.evaluate(() => window.BenchCalc.close());
 await page.setViewportSize({ width: 1280, height: 900 });
 
+// Thread data: a looked-up thread goes to the top of Recent threads, each value row has a copy button,
+// and "Thread mill this" / "Lathe G76 for this" fill the program generators.
+where = 'threaddata history';
+await mode('advanced');
+await units('mm');
+await page.evaluate(() => localStorage.removeItem('bm.thrhist'));
+await open('threaddata', 300);
+await page.waitForSelector('#hk');
+await page.selectOption('#hk', 'M12x1.75');
+await page.waitForTimeout(60);
+const th0 = await page.evaluate(() => [(JSON.parse(localStorage.getItem('bm.thrhist') || '[]')[0] || {}).key, (document.querySelector('#hhist .fchip') || {}).textContent || '']);
+if (th0[0] !== 'M12x1.75' || !/M12 x 1\.75/.test(th0[1])) problems.push(`[${where}] last thread not first in Recent threads: ${JSON.stringify(th0)}`);
+const thCopy = await page.$$eval('#hres button.cpy', bs => bs.map(b => b.dataset.copy));
+if (thCopy.length < 15 || thCopy[0] !== '12.000') problems.push(`[${where}] copy buttons: expected 15 or more, the first copying "12.000", got ${thCopy.length}, first "${thCopy[0]}"`);
+where = 'threaddata to thread mill';
+await page.click('#hint button[data-v="1"]');
+await page.click('#hgomill');
+await page.waitForSelector('#main [data-k="major"]');
+await page.waitForTimeout(150);
+const tm = await page.evaluate(() => ({ hash: location.hash, major: document.querySelector('#main [data-k="major"]').value, pitch: document.querySelector('#main [data-k="pitch"]').value, internal: document.querySelector('#main [data-k="internal"]').value,
+  from: (document.querySelector('#cystdmsg') || {}).textContent || '', prog: (document.querySelector('#cytext') || {}).textContent || '' }));
+if (!/cyctmill/.test(tm.hash) || tm.major !== '12' || tm.pitch !== '1.75' || tm.internal !== '1' || !/M12 x 1\.75/.test(tm.from) || !/G0?3/.test(tm.prog)) problems.push(`[${where}] hand-off did not fill the thread mill: ${JSON.stringify(tm).slice(0, 300)}`);
+where = 'thread mill sections';
+await page.fill('#main [data-k="major"]', '');
+await page.dispatchEvent('#main [data-k="major"]', 'input');
+const tmNeed = await page.evaluate(() => [document.querySelector('details[data-sec="thread"] .rdy.no') ? 1 : 0, document.querySelectorAll('details.cysec .rdy:not(.no)').length, document.querySelector('#cytext') ? 1 : 0]);
+if (tmNeed[0] !== 1 || tmNeed[1] !== 4 || tmNeed[2] !== 0) problems.push(`[${where}] blank major diameter: expected Thread "Needs input", 4 sections Ready and no program, got ${JSON.stringify(tmNeed)}`);
+await page.waitForSelector('#cystd option[value="M16x2"]', { state: 'attached' });
+await page.selectOption('#cystd', 'M16x2');
+await page.waitForTimeout(60);
+const tmStd = await page.evaluate(() => [document.querySelector('#main [data-k="major"]').value, document.querySelector('#main [data-k="pitch"]').value, document.querySelectorAll('details.cysec .rdy.no').length, document.querySelector('#cytext') ? 1 : 0]);
+if (tmStd.join(' ') !== '16 2 0 1') problems.push(`[${where}] Fill from a standard thread M16 x 2: got ${JSON.stringify(tmStd)}`);
+where = 'threaddata to lathe G76 (inch)';
+await units('inch');
+await open('threaddata', 200);
+await page.waitForSelector('#hk');
+await page.selectOption('#hk', '1/2-13 UNC');
+await page.click('#hgolathe');
+await page.waitForSelector('#main [data-k="major"]');
+const lt = await page.evaluate(() => [location.hash, document.querySelector('#main [data-k="major"]').value, document.querySelector('#main [data-k="pitch"]').value]);
+if (!/cycthread/.test(lt[0]) || lt[1] !== '0.5' || lt[2] !== '13') problems.push(`[${where}] hand-off did not fill G76: ${JSON.stringify(lt)}`);
+
+// G and M codes: an operation chip narrows the list, and a row opens its info drawer.
+where = 'gmcodes tags';
+await open('gmcodes', 300);
+await page.waitForSelector('#gmt .fchip');
+await page.selectOption('#gmc', 'haas');
+const gmAll = await page.$$eval('#gmres tr.gmrow', rs => rs.length);
+await page.click('#gmt .fchip[data-t="coolant"]');
+const gmCool = await page.$$eval('#gmres tr.gmrow', rs => rs.map(r => r.cells[1].textContent));
+if (!(gmCool.length > 0 && gmCool.length < gmAll) || !gmCool.every(t => /coolant|air/i.test(t))) problems.push(`[${where}] Coolant chip: ${gmCool.length} of ${gmAll} rows: ${gmCool.slice(0, 4).join(' | ')}`);
+await page.click('#gmres tr.gmrow td:first-child');
+const gmDr = await page.evaluate(() => { const d = document.querySelector('#gmres .gmdrawer'); return d ? d.innerText : ''; });
+if (!/Meaning/i.test(gmDr) || !/Sources/i.test(gmDr) || !/Other controls/i.test(gmDr)) problems.push(`[${where}] info drawer did not open with meaning, other controls and sources`);
+await page.click('#gmt .fchip[data-t=""]');
+await page.click('#gmres .gmdx');
+
+// Keyway broaching: a saved preset survives a reload and fills the form; it can be deleted.
+where = 'broach preset';
+await units('mm');
+await page.evaluate(() => localStorage.removeItem('bm.broachpresets'));
+await open('cycbroach', 200);
+await page.fill('#main [data-k="bore"]', '31.5');
+await page.dispatchEvent('#main [data-k="bore"]', 'input');
+await page.fill('#bpname', 'Smoke 8 mm key');
+await page.click('#bpsave');
+await page.reload({ waitUntil: 'load' });
+await page.waitForFunction(() => state && state.W);
+await open('cycbroach', 200);
+await page.fill('#main [data-k="bore"]', '40');
+await page.dispatchEvent('#main [data-k="bore"]', 'input');
+const bpOpt = await page.$$eval('#bpsel option', os => os.filter(o => /Smoke 8 mm key/.test(o.textContent)).map(o => o.value));
+if (bpOpt.length !== 1) problems.push(`[${where}] saved preset not listed after a reload`);
+else {
+  await page.selectOption('#bpsel', bpOpt[0]);
+  const bore = await page.inputValue('#main [data-k="bore"]');
+  if (bore !== '31.5') problems.push(`[${where}] preset did not fill the bore: "${bore}"`);
+  await page.click('#bpdel');
+  if (await page.evaluate(() => JSON.parse(localStorage.getItem('bm.broachpresets') || '[]').length)) problems.push(`[${where}] preset not deleted`);
+}
+
+// Formula library: a starred formula shows under the Favourites chip.
+where = 'formula favourite';
+await page.evaluate(() => localStorage.removeItem('bm.formfav'));
+await open('formulas', 200);
+await page.click('#fg .fchip[data-g=""]');
+const fName = await page.$eval('#flist .frow b', b => b.textContent);
+await page.click('#flist .frow .fstar');
+await page.click('#fg .fchip:nth-child(2)');
+const favRows = await page.$$eval('#flist .frow b', bs => bs.map(b => b.textContent));
+if (favRows.length !== 1 || favRows[0] !== fName) problems.push(`[${where}] Favourites shows ${JSON.stringify(favRows)}, expected only "${fName}"`);
+const openBtns = await page.$$eval('#flist .frow .flink', bs => bs.map(b => b.textContent));
+if (openBtns[0] !== 'Open calculator') problems.push(`[${where}] no "Open calculator" button`);
+await page.click('#flist .frow .fstar');
+await page.click('#fg .fchip[data-g=""]');
+await units('inch');
+
 // Material data: a designation a publisher prints must not also be listed as "unsourced".
 where = 'materials data';
 const mat = JSON.parse(await readFile(path.join(appDir, 'data/materials.json'), 'utf8'));

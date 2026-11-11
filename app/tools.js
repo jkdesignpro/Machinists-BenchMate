@@ -2572,7 +2572,7 @@ const TOOLS = [
 },
 {
   id: 'formulas', level: 'advanced', group: 'Guides', title: 'Formula library',
-  desc: 'Every formula BenchMate uses, searchable: the formula, its variables and units, the tool that uses it and its source. Click a tool name to open it.',
+  desc: 'Every formula BenchMate uses, searchable: the formula, its variables and units, the tool that uses it and its source. Star the ones you use; Open calculator goes to the tool.',
   render: el => renderFormulaLibrary(el),
   working: 'Built from the formula registry in app/formulas.js. The Rust core does the arithmetic in every tool; this list is for reading.',
   source: 'Source keys as listed under the library and in docs/sources.md.',

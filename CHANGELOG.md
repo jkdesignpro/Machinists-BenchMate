@@ -36,9 +36,18 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - **Part-off and groove time** (`partofftime`, Turning): time to part off, face or plunge from a start to an end diameter with feed per rev, at constant surface speed with a G50 / G92 spindle limit (taken from the active machine when left blank) or at constant rpm. Shows the diameter where the limit is reached, the time above and below it, the rpm at both ends, and the time at constant start rpm for comparison.
 - `benchmate-core`: `partoff_time` (closed form in two regions, checked against numerical integration and Isakov's "about half the constant-rpm time") and `partoff_time_rpm`, with tests. The multi-pass turning time tool already had the spindle limit, so it is unchanged.
 - **Bolt circle**: a table of every hole (number, angle, X, Y) with **Copy table** (for a spreadsheet) and **Copy as X Y lines** (to paste into a program), plus the angle between holes and the centre-to-centre distance of neighbouring holes. The decimals buttons apply to the table.
+- **Thread data and limits**: Recent threads (the last 10 looked up, newest first, kept in this browser, with Clear); a copy button on every value (the class tables copy a whole row, tab separated); "Thread mill this" and "Lathe G76 for this" open the program generators with the thread's diameter and pitch, internal or external.
+- **Thread milling program**: "Fill from a standard thread" (ISO metric coarse and fine, Unified) from the same thread list as Thread data; the tool also takes a thread passed from another tool.
+- **Lathe threading (G76 / G92)**: takes a thread passed from Thread data and fills the major diameter, pitch and internal or external.
+- **G and M codes**: operation tags (Motion, Path control, Hole cycles, Turning cycles, Milling cycles, Threading, Compensation, Coordinates and offsets, Units and modes, Spindle and feed, Coolant and air, Program control, Probing and measuring, Machine functions) as filter chips that combine with the search and the other filters; a code can have several tags. The tags are BenchMate's own grouping of the meanings already in the data.
+- **G and M codes**: click a row for an info drawer with everything the data holds on that code: meaning, note, modal group, mill or lathe, evidence, the same code on the other controls, any disagreement that names it, and its full sources. Nothing is added to the data.
+- **Keyway broaching program**: save your own presets (a name and every input, in the units you saved them in), pick one to fill the form, delete one. Kept in this browser only; BenchMate ships no maker's presets or data.
+- **Formula library**: a star on each formula and a Favourites chip that shows only the starred ones (kept in this browser).
 ### Changed (improved tools)
 - **Drill size chart**: the nearest-drill finder now takes a diameter in inch or mm (its own unit choice) and shows, for each of the number, letter, fractional and metric series, the nearest drill at or below and above, with the difference in inch and mm and an "exact" mark.
 - The spot and centre drill tool is now its own screen (it was a plain form) so each table value can show its sources.
+- **Thread milling program**: the inputs are grouped into folding sections (Thread, Tool, Position, Cutting, Program output), each marked Ready or Needs input with what is missing; the program appears when every section is ready.
+- **Formula library**: category chips replace the group drop-down, and the link to the tool is now an "Open calculator" button on each formula.
 
 ## [0.1.0] - 2026-11-11
 ### Added (tooling reference)
