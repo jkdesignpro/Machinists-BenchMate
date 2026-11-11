@@ -38,21 +38,30 @@ function drillLabel(d) { return d.kind === 'number' ? 'Number ' + d.name : d.kin
 
 async function renderDrillChart(el) {
   const R = await loadRef(el); if (!R) return;
-  const D = R.drills, m = RMEM.drill || (RMEM.drill = { q: '', kind: '', target: '' });
+  const D = R.drills, m = RMEM.drill || (RMEM.drill = { q: '', kind: '', target: '', tu: '' });
+  if (!m.tu) m.tu = inMode() ? 'in' : 'mm';
   el.innerHTML = '<div class="mfilter"><input id="dq" type="search" placeholder="Search: #7, F, 13/64, 6.8 ..." style="width:260px">' +
     '<select id="dk"><option value="">All series</option><option value="fraction">Fractional</option><option value="number">Number</option><option value="letter">Letter</option><option value="metric">Metric</option></select></div>' +
-    '<div class="grid" style="max-width:760px"><label class="f"><span>Nearest drill to a target size</span><div class="row"><input id="dt" type="number" step="any" inputmode="decimal"><span class="u">' + uLen() + '</span></div></label></div>' +
+    '<div class="grid" style="max-width:760px"><label class="f"><span>Find the nearest drills to a diameter</span><div class="row"><input id="dt" type="number" step="any" inputmode="decimal"><select id="dtu" style="width:auto"><option value="in">in</option><option value="mm">mm</option></select></div></label></div>' +
     '<div id="dn"></div><div id="dres"></div><div class="note" id="dsrc"></div>';
-  const q = $('#dq', el), k = $('#dk', el), t = $('#dt', el);
-  q.value = m.q; k.value = m.kind; const t0 = m.target === '' ? '' : String(+toUser(m.target).toFixed(inMode() ? 4 : 3)); t.value = t0;
+  const q = $('#dq', el), k = $('#dk', el), t = $('#dt', el), tu = $('#dtu', el);
+  q.value = m.q; k.value = m.kind; tu.value = m.tu;
+  const showT = () => { t.value = m.target === '' ? '' : String(+(m.tu === 'in' ? m.target / IN_MM : m.target).toFixed(m.tu === 'in' ? 4 : 3)); };
+  showT();
+  // Nearest size at or below and above the diameter in each series; the difference is drill minus target.
   function nearest() {
-    const v = parseFloat(t.value), out = $('#dn', el);
-    if (!(v > 0)) { out.innerHTML = ''; m.target = ''; return; }
-    const mm = t.value === t0 ? m.target : fromUser(v); m.target = mm;
-    const list = D.drills.filter(d => !k.value || d.kind === k.value).map(d => ({ d, diff: d.inch * IN_MM - mm })).sort((a, b) => Math.abs(a.diff) - Math.abs(b.diff)).slice(0, 8).sort((a, b) => a.diff - b.diff);
-    out.innerHTML = '<div class="res" style="margin-bottom:12px"><div class="h">Nearest drills to ' + fBoth(mm) + '</div><table>' + list.map(({ d, diff }) =>
-      '<tr><td>' + rEsc(drillLabel(d)) + ' ' + badge(d.status) + '</td><td class="v">' + fBoth(d.inch * IN_MM) + '</td><td class="v">' + (diff >= 0 ? '+' : '') + (inMode() ? fx(diff / IN_MM, 4) : fx(diff, 3)) + '</td><td class="u">' + uLen() + '</td></tr>').join('') + '</table></div>';
+    const out = $('#dn', el), mm = m.target;
+    if (!(mm > 0)) { out.innerHTML = ''; return; }
+    const dIn = x => (x >= 0 ? '+' : '') + fx(x / IN_MM, 4) + ' in', dMm = x => (x >= 0 ? '+' : '') + fx(x, 3) + ' mm';
+    const rows = nearestBySeries(D.drills, mm).filter(s => !k.value || s.kind === k.value).map(s => {
+      const cell = (x, side) => x ? '<td>' + rEsc(x.d.name) + ' ' + badge(x.d.status) + '<div class="ms">' + side + '</div></td><td class="v">' + fBoth(x.mm) + '</td><td class="v">' + (Math.abs(x.mm - mm) < 1e-9 ? '<b>exact</b>' : dIn(x.mm - mm) + '<div class="ms">' + dMm(x.mm - mm) + '</div>') + '</td>'
+        : '<td colspan="3" class="ms">' + (side === 'below' ? 'none this small (smallest ' + rEsc(s.first.d.name) + ')' : 'none this large (largest ' + rEsc(s.last.d.name) + ')') + '</td>';
+      return '<tr><td rowspan="2"><b>' + s.name + '</b></td>' + cell(s.below, 'at or below') + '</tr><tr>' + cell(s.above, 'above') + '</tr>';
+    });
+    out.innerHTML = '<div class="res mtab" style="margin-bottom:12px"><div class="h">Nearest drills to ' + fBoth(mm) + '</div><table><tr><th>Series</th><th>Drill</th><th style="text-align:right">Size</th><th style="text-align:right">Difference</th></tr>' + rows.join('') + '</table></div>';
   }
+  t.oninput = () => { const v = parseFloat(t.value); m.target = v > 0 ? (m.tu === 'in' ? v * IN_MM : v) : ''; nearest(); };
+  tu.onchange = () => { m.tu = tu.value; showT(); nearest(); };
   function draw() {
     m.q = q.value; m.kind = k.value;
     const s = q.value.trim().toLowerCase().replace(/^#/, '').replace(/"/g, '');
@@ -66,7 +75,7 @@ async function renderDrillChart(el) {
       (d.kind === 'number' || d.kind === 'letter' ? '<div class="ms">' + d.groups[0].publishers.length + ' publisher' + (d.groups[0].publishers.length > 1 ? 's' : '') + '</div>' : '') + '</td></tr>').join('') + '</table></div>' +
       '<p class="desc">' + rows.length + ' of ' + D.drills.length + ' sizes. Number and letter sizes are not given by a formula; their decimal sizes are what the publishers below print (Confirmed = two or more agree). Fractional sizes are exact (n/64 in). Metric sizes are exact by name; the list is the sizes one supplier stocks (a second list is still to be added). mm values are inch x 25.4.</p>';
   }
-  q.oninput = () => { draw(); }; k.onchange = () => { draw(); nearest(); }; t.oninput = nearest;
+  q.oninput = () => { draw(); }; k.onchange = () => { draw(); nearest(); };
   $('#dsrc', el).innerHTML = '<b>Sources</b><br>' + sourceList(D.sources);
   draw(); nearest();
 }

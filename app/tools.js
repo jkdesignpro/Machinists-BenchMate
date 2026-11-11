@@ -863,7 +863,7 @@ const TOOLS = [
   id: 'drillchart', level: 'simple', group: 'Drilling and tapping', title: 'Drill size chart',
   desc: 'Fractional, number, letter and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Number and letter sizes show how many independent publishers print each value.',
   render: el => renderDrillChart(el),
-  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them; they are not given by a formula), so each value is what the publishers listed under the table print. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder lists the drills closest to your size, smaller first.',
+  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them; they are not given by a formula), so each value is what the publishers listed under the table print. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder takes a diameter in inch or mm (whatever the unit setting) and lists, for each series (number, letter, fractional, metric), the nearest drill at or below and the nearest above, with the difference (drill minus your size) in inch and mm.',
   source: 'Wikipedia "Drill bit sizes"; Stoody Industrial & Welding Supply decimal equivalents chart; P. Lobben, Machinists\' and Draftsmen\'s Handbook (1910, public domain). Standards cited, not read: ASME B94.11M-1993 (twist drills, current per ASME catalogue), ISO 235:2016 (metric jobber drill sizes).',
 },
 {

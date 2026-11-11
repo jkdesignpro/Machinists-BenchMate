@@ -14,6 +14,7 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - **Bandsaw cut time**: single piece or bundle (pieces across and layers high) for round bar, rectangle and tube: metal area, feed height, effective width, cut time from the down-feed and from the cutting rate, and time per piece. Cut time = metal area / cutting rate (Starrett Bulletin 193; Machinery's Handbook example 5.5 in² at 4 in²/min = 1.375 min as a test).
 - `benchmate-core`: `saw_section` and `saw_cut_time` with tests (the section area was worked out in the screen before).
 ### Changed
+- **Drill size chart**: the nearest-drill finder now takes a diameter in inch or mm (its own unit choice) and shows, for each of the number, letter, fractional and metric series, the nearest drill at or below and above, with the difference in inch and mm and an "exact" mark.
 - The spot and centre drill tool is now its own screen (it was a plain form) so each table value can show its sources.
 
 ## [0.1.0] - 2026-11-11
