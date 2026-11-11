@@ -412,9 +412,9 @@ function renderCompound(el) {
     const st = [0, 1, 2, 3].map(i => W.compound_settings(C, dir, i));
     if (!isFinite(C) || !st.every(isFinite)) { out.innerHTML = mMsg('Results', 'Enter two angles below 90°'); return; }
     const L = snum(s.sb), h = x => L > 0 ? gf(L * Math.sin(Math.abs(x) * Math.PI / 180), gdp()) + ' ' + u : '';
-    out.innerHTML = mRes('The face', [['True angle (steepest slope)', mangle(C), 'deg'], ['', mdms(W, C), ''], ['Direction of the slope in plan, from X', mangle(dir), 'deg'], ['Angle of the face normal to the base normal', mangle(C), 'deg']]) +
+    out.innerHTML = mRes('The face', [['True angle (steepest slope)', mangle(C), 'deg'], ['', mdms(W, C), ''], ['Direction of the slope in plan, from X', mangle(dir), 'deg']]) +
       mRes('Ways to set it up', [
-        ['Swivel the vise (or rotary table) to ' + mangle(dir) + '° in plan, then tilt by the true angle', mangle(C), 'deg', ''],
+        ['Swivel ' + gf(dir, 2) + '° in plan, then tilt', mangle(C), 'deg', ''],
         ['Compound sine plate: lower plate (about X)', mangle(st[2]), 'deg' + (L > 0 ? ', blocks ' + h(st[2]) : '')],
         ['Compound sine plate: upper plate (about its own Y)', mangle(st[3]), 'deg' + (L > 0 ? ', blocks ' + h(st[3]) : '')],
         ['Apparent angle in the front view (XZ)', mangle(st[0]), 'deg'], ['Apparent angle in the side view (YZ)', mangle(st[1]), 'deg']]) +
@@ -556,7 +556,7 @@ function scaleSvg(W, kind, val, show) {
     }
     if (ver > 0) {
       // Vernier on the sleeve: 10 lines spaced 9/10 of a thimble division; line r[4] coincides.
-      const vx = 20, vy = 160, vp = 14;
+      const vx = 20, vy = 160, vp = 30;
       s += gtxt([vx, vy - 6], 'Thimble lines (top), sleeve vernier 0 to 9 (below)', 'gs');
       const off = (frac - Math.floor(frac));
       for (let k = 0; k <= 10; k++) { s += ln(vx + k * vp * 0.9 + 40, vy + 20, vx + k * vp * 0.9 + 40, vy + 36, show && k === r[4] ? 'gw' : 'gp'); if (k < 10) s += gtxt([vx + k * vp * 0.9 + 40, vy + 48], String(k), 'gs', 'middle'); }
