@@ -86,7 +86,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Library | Tool wear information | done (seven wear types, causes and remedies from two makers) | `cncguide` | U91 |
 | Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
 | Library | Tips, assistant, community cut data | missing | | U98, U101, U102 |
-| Library | Indexable insert catalogue | missing (in progress, `claude/ref-data-3`) | | U103 |
+| Library | Indexable insert catalogue | done (decode or tap a code together; insert drawn to scale from above and in section; nose radius to the turning advisor, outline to the sketcher) | `insertcode`, `holdercode`, `iso513` | U103 |
 | Shop | Tool library and favourites | done | `toollib` (fill into rpm, feed, arcfeed, helix, deflection, cutopt, drillpoint, tapdrill, finish); star in the side list or by the title | U106, U109 |
 | Shop | Decimal precision, home dashboard, reorderable menu | missing | | U105, U107, U108 |
 | Platform | Inch/metric toggle | done | `app.js` | U104 |

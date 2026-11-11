@@ -606,6 +606,7 @@ pub mod sketch;
 pub mod dxf;
 pub mod cad;
 pub mod tooling;
+pub mod insert;
 pub use tooling::*;
 pub mod fasteners;
 pub use fasteners::*;

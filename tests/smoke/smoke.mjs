@@ -694,6 +694,61 @@ await open('sketch', 120);
   await page.click('#skclr');
 }
 
+// Insert designation: the keys build the code, the drawing is the core's outline to scale, and the
+// buttons hand the nose radius to the advisor and the outline to the sketcher.
+where = 'insertcode';
+{
+  await units('mm');
+  await open('insertcode', 80);
+  await page.waitForSelector('#ires table');
+  const q = sel => page.$eval(sel, e => e.textContent);
+  const on = i => page.$eval(`#b${i} button.on`, b => b.dataset.v).catch(() => '');
+  await page.fill('#ic', 'CNMG120408');
+  let dims = await q('#idims'), top = await q('#itop');
+  for (const want of ['12.896', '11.271', '0.953', '0.445', '9.434', '3.084', '18.869 x 16.090', 'Fixing hole d15.160']) if (!dims.includes(want)) problems.push(`[${where}] CNMG 12 04 08 should show ${want}: "${dims.slice(0, 300)}"`);
+  if (!top.includes('l 12.896') || !top.includes('80°, r 0.800') || !top.includes('d 12.700')) problems.push(`[${where}] the top view should be labelled with l, the corner and d: "${top}"`);
+  const arcs = await page.$eval('#iout', e => (e.getAttribute('d').match(/A/g) || []).length);
+  if (arcs !== 4) problems.push(`[${where}] a rhombic insert with a corner radius has 4 arcs, drawn ${arcs}`);
+  if ((await on(1)) !== 'C' || (await on(2)) !== 'N' || (await on(5)) !== '12.7' || (await on(7)) !== '08') problems.push(`[${where}] the keys should show the typed code: ${await on(1)} ${await on(2)} ${await on(5)} ${await on(7)}`);
+  // the hole of a CNMG is drawn to its ISO 3364 size: 5.16 across against 12.7 for the dashed circle
+  const holeRatio = await page.$eval('#itop', e => e.querySelector('#ihole').r.baseVal.value / e.querySelector('circle[stroke-dasharray="4 3"]').r.baseVal.value);
+  if (Math.abs(holeRatio - 5.16 / 12.7) > 0.005 || (await page.$('#ihole[stroke-dasharray]'))) problems.push(`[${where}] the fixing hole of a CNMG should be drawn to size, solid: ratio ${holeRatio}`);
+  // the picture has the proportions the core gives: width over height of the outline
+  const box = await page.$eval('#iout', e => { const b = e.getBBox(); return b.width / b.height; });
+  if (Math.abs(box - 18.869 / 16.090) > 0.01) problems.push(`[${where}] the outline is not drawn to scale: width / height ${box}`);
+  // tap a code together: T C (M) T, inscribed circle 9.525, thickness T3, corner 04
+  for (const [i, v] of [[1, 'T'], [2, 'C'], [4, 'T'], [5, '9.525'], [6, 'T3'], [7, '04']]) await page.click(`#b${i} button[data-v="${v}"]`);
+  dims = await q('#idims');
+  const side = await q('#iside');
+  if ((await page.inputValue('#ic')) !== 'TCMT16T304' || !dims.includes('16.498') || !dims.includes('8.550') || !side.includes('flanks 7°') || !(await page.$('#ihole[stroke-dasharray]')) || dims.includes('Fixing hole')) problems.push(`[${where}] the keys should build TCMT16T304 with edge 16.498 and bottom face 8.550: "${await page.inputValue('#ic')}" "${dims.slice(0, 200)}" "${side}"`);
+  // a round insert, a shape the circle does not fix, and a radius that does not fit
+  await page.fill('#ic', 'RCMT10T3M0');
+  if (!(await q('#itop')).includes('Ø 9.525') || (await page.$('#iadv:not([disabled])'))) problems.push(`[${where}] a round insert is drawn as its circle and has no nose radius to send`);
+  await page.fill('#ic', 'KNUX160405');
+  if ((await page.$('#itop')) || !/schematic/.test(await q('#ires'))) problems.push(`[${where}] shape K should stay a sketch without dimensions`);
+  await page.fill('#ic', 'CNMG040224');
+  if ((await page.$('#itop')) || !/must be smaller than half the inscribed circle/.test(await q('#ires'))) problems.push(`[${where}] a 2.4 radius on a 3.97 circle should be refused with the reason: "${(await q('#ires')).slice(0, 200)}"`);
+  // the outline in the sketcher: one closed polyline and the inscribed circle
+  await page.fill('#ic', 'DCMT11T304');
+  await page.click('#isk'); await page.waitForTimeout(200);
+  const sum = await page.$eval('#sksum', e => e.innerText);
+  if (!/2D sketcher/i.test(await page.textContent('#main')) || !/INSERT/.test(sum) || !/INSCRIBED/.test(sum) || (await page.evaluate(() => state.W.sk_count())) !== 2) problems.push(`[${where}] Open in the sketcher: "${sum.replace(/\s+/g, ' ').slice(0, 300)}"`);
+  await page.click('#skclr');
+  // the nose radius in the advisor and the finish calculator, in the units in use
+  await open('insertcode', 80);
+  await page.waitForSelector('#ires table');
+  await page.fill('#ic', 'CNMG120408');
+  await page.click('#iadv'); await page.waitForTimeout(80);
+  if (!/Turning advisor/i.test(await page.textContent('#main')) || (await page.inputValue('#main [data-id="re"]')) !== '0.8') problems.push(`[${where}] the advisor should open with nose radius 0.8: ${await page.inputValue('#main [data-id="re"]').catch(() => 'no field')}`);
+  await units('inch');
+  await open('insertcode', 80);
+  await page.waitForSelector('#ires table');
+  if (!(await q('#itop')).includes('r 0.0315')) problems.push(`[${where}] in inches the corner label should read r 0.0315: "${await q('#itop')}"`);
+  await page.click('#ifin'); await page.waitForTimeout(80);
+  if ((await page.inputValue('#main [data-id="r"]')) !== '0.0314961') problems.push(`[${where}] the finish calculator should open with radius 0.0314961 in: ${await page.inputValue('#main [data-id="r"]').catch(() => 'no field')}`);
+  await units('mm');
+}
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

@@ -263,7 +263,7 @@ Store list is the fuller of the two store lists.
 | U100 | Tolerance stack mini game | out of scope |  | Jacob dropped games (a stack calculator exists: `gdtstack`) |
 | U101 | Virtual machining assistant (AI) | missing |  |  |
 | U102 | Community cut library / shared machining data | missing |  |  |
-| U103 | Indexable insert catalogue (decode/build ISO designations) | done | `insertcode`, `holdercode`, `iso513` |  |
+| U103 | Indexable insert catalogue (decode/build ISO designations) | done | `insertcode`, `holdercode`, `iso513` | 0.4.0: tap-key builder, insert drawn to scale (top view and section), linked to the turning advisor, finish calculator, tool library and sketcher |
 
 ### Platform and UI
 

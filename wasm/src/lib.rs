@@ -338,6 +338,36 @@ f1!(polygon_dims, c::cad::polygon_dims, n, size, corners, which);
 f1!(insert_edge_length, c::insert_edge_length, d, a1, a2);
 f1!(insert_edge_length_shape, c::insert_edge_length_f, d, letter_code);
 f1!(insert_size_code, c::insert_size_code, edge_len);
+// Insert outline to scale (core/src/insert.rs)
+fn insert_letter(code: f64) -> char { char::from_u32(code as u32).unwrap_or('?') }
+/// Outline of an insert as a closed polyline. Returns the number of vertices
+/// and puts (x, y, bulge, arc radius) per vertex in `list_out`; on bad input
+/// returns minus the length of a message held at `text_ptr`.
+#[no_mangle] pub extern "C" fn insert_outline(letter_code: f64, d: f64, r: f64) -> f64 {
+    match c::insert::outline(insert_letter(letter_code), d, r) {
+        Ok(v) => {
+            let n = v.len();
+            let mut out = Vec::with_capacity(4 * n);
+            for i in 0..n {
+                let (p, q) = (v[i], v[(i + 1) % n]);
+                let rad = if p.2 != 0.0 { c::dxf::bulge_arc((p.0, p.1), (q.0, q.1), p.2).1 } else { 0.0 };
+                out.extend([p.0, p.1, p.2, rad]);
+            }
+            set_out(out);
+            n as f64
+        }
+        Err(e) => { set_out(vec![]); -set_text(e) }
+    } }
+/// One dimension of the insert outline (see `insert::dim` for `which`).
+#[no_mangle] pub extern "C" fn insert_dim(letter_code: f64, d: f64, r: f64, which: f64) -> f64 { c::insert::dim(insert_letter(letter_code), d, r, which as u32) }
+f1!(insert_base_ic, c::insert::base_ic, d, s, clearance_deg);
+/// The insert outline and its inscribed circle as a DXF file in millimetres
+/// (text at `text_ptr`); minus the length of a message on bad input.
+#[no_mangle] pub extern "C" fn insert_dxf(letter_code: f64, d: f64, r: f64, r12: f64) -> f64 {
+    match c::insert::doc(insert_letter(letter_code), d, r) {
+        Ok(doc) => set_text(c::dxf::write_doc(&doc, c::dxf::Units::Mm, if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 })),
+        Err(e) => -set_text(e),
+    } }
 f1!(knurl_blank_dia_cp, c::knurl_blank_dia_cp, p, n);
 f1!(knurl_blank_dia_dp, c::knurl_blank_dia_dp, dp, n);
 f1!(knurl_teeth_cp, c::knurl_teeth_cp, d, p);

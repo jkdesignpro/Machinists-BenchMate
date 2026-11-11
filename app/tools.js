@@ -574,10 +574,10 @@ const TOOLS = [
 },
 {
   id: 'insertcode', level: 'advanced', group: 'Turning', title: 'Insert designation (ISO 1832)',
-  desc: 'Decode or build a metric turning insert code (shape, clearance, tolerance class, type, size, thickness, corner, edge, hand, maker chipbreaker), with the insert shape drawn and the size number computed from the inscribed circle.',
+  desc: 'Decode a metric turning insert code or tap one together key by key (shape, clearance, tolerance class, type, size, thickness, corner, hand, maker chipbreaker). The insert is drawn to scale from above and in section, with its edge length, nose radius and corner height, and the nose radius goes to the turning advisor or the outline to the sketcher with one key.',
   render: el => renderInsertCode(el),
-  working: 'See the note under the tool. Size = cutting edge length in whole mm, l = (d/2)(cot(a1/2) + cot(a2/2)).',
-  source: 'ISO 1832:2017; code meanings from the Walter, Mitsubishi Materials, Korloy, Kennametal, YG-1, ISCAR and Dormer Pramet code keys listed under the tool.',
+  working: 'See the note under the tool. Size = cutting edge length in whole mm, l = (d/2)(cot(a1/2) + cot(a2/2)). Outline: corner at (d/2) / sin(a/2) from the centre, radius meeting each side r / tan(a/2) from the sharp corner.',
+  source: 'ISO 1832:2017; code meanings from the Walter, Mitsubishi Materials, Korloy, Kennametal, YG-1, ISCAR and Dormer Pramet code keys listed under the tool. Outline checked against the corner heights printed in ISO 3364:1997; fixing hole sizes from ISO 3364:1997 and Tungaloy.',
 },
 {
   id: 'holdercode', level: 'advanced', group: 'Turning', title: 'Toolholder designation (ISO 5608)',

@@ -90,7 +90,7 @@ current practice and says so in the tool's notes.
 | Drill point geometry by material, grinding faults | EBB MH31 | missing | own diagrams, maker data |
 | End mill types, cutter geometry | EBB MH31 | missing | own explanations |
 | Carbide grades, ISO P/M/K/N/S/H groups | EBB MH31 | partial (ISO 513 groups, colours and numbering built; no maker grade chart) | ISO 513:2012 (cited), maker pages |
-| Insert designation (ISO 1832) and holder designation (ISO 5608) | EBB | built (metric insert decoder and builder, external holder decoder; inch ANSI B212.4 inserts and ISO 6261 boring bars not decoded; some letters one maker only) | ISO 1832:2017, ISO 5608:2012 (cited); eight maker code keys |
+| Insert designation (ISO 1832) and holder designation (ISO 5608) | EBB | built (metric insert decoder and tap-key builder with the insert drawn to scale, external holder decoder; inch ANSI B212.4 inserts and ISO 6261 boring bars not decoded; some letters one maker only) | ISO 1832:2017, ISO 5608:2012 (cited); eight maker code keys; ISO 3364:1997 preview (corner heights, hole sizes) |
 | Tool coatings | EBB | missing | coating maker data (Oerlikon Balzers, Ionbond) |
 | Tool steels and cutting tool materials | MH31 EBB | partial (10 tool-steel grades in material equivalents; no selection or heat-treatment data) | supplier data |
 | Tapers: Morse, Jacobs, ISO/SK, BT, CAT, HSK, R8 | EBB MH31 | partial: Morse, Jacobs, CAT and BT checked against two publishers; ISO/SK, HSK-A and R8 one source so far; Brown & Sharpe, Jarno, British and DIN metric tapers missing | standards cited (ISO 296, DIN 238, ISO 7388, ISO 12164, JIS B 6339, ASME B5.50), dimensions cross-checked against maker data |
