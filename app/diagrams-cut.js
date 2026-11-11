@@ -43,7 +43,7 @@ function dcCutter(cx, cy, r, z, rot) {
   // Screen angles grow clockwise (y down), so the cutter turns towards +angle.
   // Going round: land on the rim behind each tip, the tip, the cutting face down
   // into the flute, then the flute curving back up to the next land.
-  const step = 2 * Math.PI / z, land = step * (z > 12 ? 0.45 : 0.42), core = z > 12 ? 0.84 : (z > 2 ? 0.7 : 0.6), pts = [];
+  const step = 2 * Math.PI / z, land = step * (z > 12 ? 0.45 : 0.42), core = z > 12 ? 1 - Math.min(0.16, 0.45 * step) : (z > 2 ? 0.7 : 0.6), pts = [];
   const P = (rr, t) => [cx + r * rr * Math.cos(t), cy + r * rr * Math.sin(t)];
   for (let i = 0; i < z; i++) {
     const a = (rot || 0) + i * step;
@@ -700,5 +700,300 @@ Object.assign(DIAGRAMS, {
     h += DK.text(14, H - 24, isFinite(q.value) ? 'Q ' + dcN(q.value) + ' ' + dcUnit(q.unit) : 'Q = Vc × ap × f', { cls: 'hott', anchor: 'start' });
     h += DK.text(14, H - 8, dcOk(kw) ? 'power at the spindle ' + dcN(kw) + ' kW' + (dcOk(hp) ? ' (' + dcN(hp) + ' hp)' : '') : 'Enter kc for the power.', { cls: dcOk(kw) ? 'hott' : 'mut', anchor: 'start' });
     return DK.svg(W, H, h, 'Material removal rate in turning');
+  },
+});
+
+// Saw teeth along a straight edge from x0 to x1 at y, points down (dir 1) or up (-1), pitch p px.
+function dcTeeth(x0, x1, y, p, dir, cls) {
+  const pts = [[x0, y]]; let x = x0;
+  const dd = Math.min(p * 0.5, 14);
+  while (x + p <= x1 + 0.01) { pts.push([x + p * 0.3, y + dir * dd * 0.25], [x + p * 0.8, y + dir * dd], [x + p, y]); x += p; }
+  pts.push([x1, y]);
+  return dcPl(pts, cls || 'ln');
+}
+
+Object.assign(DIAGRAMS, {
+  // ---------------- Sawing ----------------
+  // Slitting saw: the saw to scale in the slot, the edge in the cut, approach to full depth, rotation and feed.
+  slitsaw(v, sys, rows) {
+    const W = 520, H = 290, u = dcU(sys), ok = dcOk(v.D) && dcOk(v.ae), k = ok ? dcClamp(v.ae / v.D, 0.015, 0.9) : 0.08;
+    const Rs = 104, cx = 150, cy = 142, ys = cy + Rs - 2 * Rs * k, yb = cy + Rs, yp = 278, z = dcOk(v.z) ? v.z : 36;
+    const t0 = Math.asin(dcClamp((ys - cy) / Rs, -1, 1)), xi = cx + Rs * Math.cos(t0);
+    const arc = []; for (let i = 0; i <= 40; i++) { const t = Math.PI / 2 - (Math.PI / 2 - t0) * i / 40; arc.push([cx + Rs * Math.cos(t), cy + Rs * Math.sin(t)]); }
+    let h = DK.poly([[14, yp], [14, yb], [cx, yb]].concat(arc, [[318, ys], [318, yp]]), 'hatch');
+    h += dcCutter(cx, cy, Rs, Math.min(z, 72), 0) + DK.circle(cx, cy, Rs * 0.32, 'thin') + DK.cl(cx - Rs - 10, cy, cx + Rs + 10, cy) + DK.cl(cx, cy - Rs - 10, cx, cy + Rs + 6);
+    h += dcPl(arc, 'hot') + dcSpin(cx, cy, Rs * 0.5, Rs * 0.5, 150, 30, 'dim');
+    h += DK.dimH(cx - Rs, cx + Rs, cy - Rs - 16, 'Ø ' + dcL(v.D, u, 'D'), { from: cy });
+    h += dcDimV(ys, yb, 334, '', { from: 318 }) + DK.text(340, (ys + yb) / 2 + 4, 'ae ' + dcL(v.ae, u, ''), { cls: 'dimt', anchor: 'start' });
+    const app = dcRow(rows, 'Approach to full depth');
+    if (xi - cx > 10) h += DK.dimH(cx, xi, ys - 18, '', { from: ys - 2 }) + DK.text(xi + 6, ys - 22, 'approach' + (dcOk(app) ? ' ' + dcN(app) : ''), { cls: 'dimt', anchor: 'start' });
+    const n = dcRow(rows, 'Spindle speed'), vf = dcRow(rows, 'Table feed'), hex = dcRow(rows, 'Max chip thickness hex'), fz = dcRow(rows, 'Feed per tooth for that chip');
+    const rc = dcRow(rows, 'Chip thinning factor'), te = dcRow(rows, 'Teeth in the cut'), tc = dcRow(rows, 'Cut time');
+    h += DK.arrow(266, 40, 310, 40, 'hot') + DK.text(262, 44, 'feed', { cls: 'mut', anchor: 'end' });
+    const x = 376;
+    h += DK.text(x, 40, dcOk(vf) ? 'Vf ' + dcN(vf) + ' ' + dcFU(sys) : 'Vf: enter speed, z, fz', { cls: 'hott', anchor: 'start' });
+    h += dcLines(x, 62, [dcOk(n) ? dcN(n, 0) + ' RPM' : '', dcOk(hex) ? 'chip hex ' + dcN(hex) : '', dcOk(fz) ? 'fz ' + dcN(fz) + ' for that chip' : '', dcOk(rc) ? 'RCTF ' + dcN(rc) + ' ×' : '', dcOk(te) ? dcN(te, 2) + ' teeth in the cut' : ''], { cls: 'txt' });
+    if (dcOk(tc)) h += DK.text(x, 160, 'cut time ' + dcN(tc) + ' min', { cls: 'hott', anchor: 'start' });
+    h += DK.text(W - 6, H - 6, 'to scale; ' + (z > 72 ? '72 of ' + z + ' teeth drawn' : z + ' teeth'), { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Slitting saw in the slot: depth, approach, speed and feed');
+  },
+
+  // Bandsaw: the section being cut (to scale), the blade part way through, the down-feed and the time.
+  bandsaw(v, sys, rows) {
+    const W = 520, H = 280, u = dcU(sys), shape = v.shape === 2 ? 2 : v.shape === 3 ? 3 : 1, a = v.a, b = v.b;
+    const ok = dcOk(a) && (shape === 1 || dcOk(b)), cx = 150, cy = 150;
+    const ww = shape === 2 ? a : a, hh = shape === 2 ? b : a, s = ok ? Math.min(220 / ww, 170 / hh) : 1, Wp = ok ? ww * s : 160, Hp = ok ? hh * s : 160;
+    let h = '';
+    const sec = cls => shape === 2 ? DK.rect(cx - Wp / 2, cy - Hp / 2, Wp, Hp, cls) : shape === 3 ? dcRing(cx, cy, Math.max(1, Wp / 2 - (ok ? b * s : 18)), Wp / 2, cls) : DK.circle(cx, cy, Wp / 2, cls);
+    const yb = cy - Hp / 2 + Hp * 0.36;
+    h += sec('hatch') + '<clipPath id="dcbsc"><rect x="0" y="0" width="' + W + '" height="' + yb.toFixed(1) + '"/></clipPath><g clip-path="url(#dcbsc)">' + sec('part') + '</g>';
+    h += DK.cl(cx - Wp / 2 - 12, cy, cx + Wp / 2 + 12, cy) + DK.cl(cx, cy - Hp / 2 - 12, cx, cy + Hp / 2 + 12);
+    // Blade a third of the way down, cutting downwards; kerf above it.
+    h += DK.rect(14, yb - 14, 300, 14, 'tool') + dcTeeth(14, 314, yb, 9, 1, 'hot');
+    h += DK.arrow(232, yb - 30, 300, yb - 30, 'dim') + DK.text(228, yb - 26, 'blade', { cls: 'mut', anchor: 'end' });
+    const t1 = dcRow(rows, 'Cut time from the down-feed'), t2 = dcRow(rows, 'Cut time from the cutting rate'), area = (rows.find(r => r.label === 'Area cut') || {});
+    h += DK.arrow(34, yb + 4, 34, yb + 50, 'hot') + DK.text(40, yb + 64, 'down-feed', { cls: 'mut', anchor: 'middle' });
+    h += DK.text(cx, cy - Hp / 2 - 8, 'cut', { cls: 'mut' });
+    h += dcDimV(cy - Hp / 2, cy + Hp / 2, cx + Wp / 2 + 74, 'h ' + dcL(shape === 2 ? b : a, u, 'h'), { from: cx + (shape === 2 ? Wp / 2 : 0) + 2 });
+    if (shape !== 2) h += DK.dimH(cx - Wp / 2, cx + Wp / 2, cy + Hp / 2 + 22, 'Ø ' + dcL(a, u, 'D'), { from: cy, below: true });
+    else h += DK.dimH(cx - Wp / 2, cx + Wp / 2, cy + Hp / 2 + 22, 'width ' + dcL(a, u, 'W'), { from: cy + Hp / 2 + 2, below: true });
+    const x = 360, cpt = dcRow(rows, 'Feed per tooth');
+    h += DK.text(x, 40, dcOk(t1) ? 'time ' + dcN(t1) + ' min' : dcOk(t2) ? 'time ' + dcN(t2) + ' min' : 'time: enter a rate', { cls: 'hott', anchor: 'start' });
+    h += dcLines(x, 58, [shape === 3 && dcOk(b) ? 'tube wall ' + dcN(b) + ' ' + u : '', dcOk(t1) && dcOk(t2) ? '(' + dcN(t2) + ' min from the rate)' : '', isFinite(area.value) ? 'area ' + dcN(area.value) + ' ' + dcUnit(area.unit) : '', dcOk(v.vf) ? 'down-feed ' + dcN(v.vf) + ' ' + dcFU(sys) : '', dcOk(cpt) ? 'chip per tooth ' + dcN(cpt) : '']);
+    return DK.svg(W, H, h, 'Bandsaw cut through a section');
+  },
+
+  // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
+  sawtpi(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys);
+    if (!dcOk(v.thin)) return '';
+    const tpi = dcOk(v.tpi) ? v.tpi : dcRow(rows, 'Fewest teeth per inch');
+    const nThin = dcOk(v.tpi) ? dcRow(rows, 'Teeth in the thinnest section') : 3, nThick = dcRow(rows, 'Teeth in the longest cut');
+    const panel = (x0, w, n, label, val, title) => {
+      const y = 120, p = dcOk(n) && n > 0 ? w / n : w / 3;
+      let g = DK.text(x0 + w / 2, 30, title, { cls: 'txt' });
+      g += DK.rect(x0, y, w, 64, 'hatch');
+      const xL = x0 - Math.min(2.5 * p, 40), xR = x0 + w + Math.min(2.5 * p, 40);
+      const dd = Math.min(p * 0.5, 14), yT = y - dd;
+      if (p >= 3) {
+        g += DK.rect(xL, yT - 22, xR - xL, 22, 'tool') + dcTeeth(xL, xR, yT, p, 1, 'hot');
+        for (let x = xL + 0.8 * p; x <= xR && p >= 6; x += p) if (x >= x0 - 0.01 && x <= x0 + w + 0.01) g += DK.circle(x, y, 2.2, 'hotf');
+      } else g += DK.rect(xL, y - 24, xR - xL, 22, 'tool') + DK.text((xL + xR) / 2, y - 8, 'fine teeth', { cls: 'mut' });
+      g += DK.dimH(x0, x0 + w, y + 86, label + ' ' + dcL(val, u, ''), { from: y + 66, below: true });
+      g += DK.text(x0 + w / 2, y + 38, dcOk(n) ? dcN(n, 1) + ' teeth' : '', { cls: 'hott' });
+      return g;
+    };
+    let h = panel(40, 150, nThin, 'wall', v.thin, 'thinnest wall');
+    if (dcOk(v.thick) && dcOk(nThick)) h += panel(270, 220, nThick, 'cut', v.thick, 'longest cut');
+    else if (dcOk(v.thick)) h += dcLines(270, 90, ['Enter a pitch to check to see', 'the teeth in the longest cut.']);
+    h += DK.text(14, H - 6, (dcOk(v.tpi) ? 'pitch ' : 'coarsest pitch ') + (dcOk(tpi) ? dcN(tpi, 1) + ' TPI' : '?') + '; at least 3 teeth in the thinnest wall', { cls: dcOk(v.tpi) && nThin < 3 ? 'hott' : 'mut', anchor: 'start' });
+    return DK.svg(W, H, h, 'Saw blade pitch: teeth in the wall and in the cut');
+  },
+
+  // ---------------- Drilling ----------------
+  // Drill point: the drill to scale with its diameter, point angle and the point length.
+  drillpoint(v, sys, rows) {
+    const W = 520, H = 280, u = dcU(sys), ang = dcOk(v.ang) && v.ang < 180 ? v.ang : 118, r = 56, cx = 190, y0 = 18, ys = 140;
+    const lp = Math.min(r / Math.tan(dcRad(ang / 2)), 122), pl = dcRow(rows, 'Point length'), tip = ys + lp;
+    let h = DK.poly([[cx - r, y0], [cx + r, y0], [cx + r, ys], [cx, tip], [cx - r, ys]], 'tool');
+    for (let y = y0 + 8; y + 22 < ys - 4; y += 26) h += DK.line(cx - r + 1, y, cx + r - 1, y + 22, 'thin');
+    h += DK.cl(cx, y0 - 6, cx, tip + 22) + DK.line(cx - r, ys, cx + r, ys, 'thin');
+    h += dcDimV(ys, tip, cx + r + 40, '', { hot: true, from: cx + 4 }) + DK.line(cx + r + 2, ys, cx + r + 44, ys, 'hot ext');
+    h += DK.text(cx + r + 48, (ys + tip) / 2 + 4, 'point ' + dcL(pl, u, '?'), { cls: 'hott', anchor: 'start' });
+    h += DK.dimH(cx - r, cx + r, y0 + 40, 'Ø ' + dcL(v.dia, u, 'D'), {});
+    const ex = (tip - ys + 34) * Math.tan(dcRad(ang / 2));
+    h += DK.line(cx, tip, cx - ex, ys - 34, 'thin') + DK.line(cx, tip, cx + ex, ys - 34, 'thin');
+    h += DK.angle(cx, tip, Math.min(lp + 22, tip - y0 - 60), 90 - ang / 2, 90 + ang / 2, dcN(ang, 2) + '°', {});
+    h += dcLines(350, 210, ['Add the point length to the', 'full-diameter depth for the', 'Z depth of a blind hole.']);
+    if (lp >= 122) h += DK.text(cx, H - 6, 'point shortened to fit', { cls: 'mut' });
+    return DK.svg(W, H, h, 'Drill point length');
+  },
+
+  // Spot and centre drill: section through the countersink with the tool in it, the diameter wanted and the depth to program.
+  spotdepth(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), ang = dcOk(v.ang) && v.ang < 180 ? v.ang : 90, ht = Math.tan(dcRad(ang / 2));
+    const centre = v.mode === 2 && dcOk(v.dp) && v.lp >= 0 && dcOk(v.dc) && v.dc > v.dp;
+    const dc = dcOk(v.dc) ? v.dc : 1, zc = centre ? v.lp + (v.dc - v.dp) / 2 / ht : dc / 2 / ht;
+    const k = Math.min(170 / dc, 150 / Math.max(zc, 1e-9)), cx = 190, top = 70, P = (x, z) => [cx + x * k, top + z * k];
+    const depth = dcRow(rows, 'Depth from the tip'), dAt = dcRow(rows, 'Chamfer diameter at that depth') || dcRow(rows, 'Countersink diameter at that depth');
+    // Part with the recess.
+    let rec;
+    if (centre) { const zt = Math.min(v.lp, v.dp / 2 / Math.tan(dcRad(59))); rec = [P(-dc / 2, 0), P(-v.dp / 2, zc - v.lp), P(-v.dp / 2, zc - zt), P(0, zc), P(v.dp / 2, zc - zt), P(v.dp / 2, zc - v.lp), P(dc / 2, 0)]; }
+    else rec = [P(-dc / 2, 0), P(0, zc), P(dc / 2, 0)];
+    let h = DK.poly([[14, top]].concat(rec, [[360, top], [360, 250], [14, 250]]), 'hatch');
+    if (dcOk(v.dh) && v.dh < dc) { const hx = v.dh / 2 * k; h += DK.line(cx - hx, P(0, (dc - v.dh) / 2 / ht)[1], cx - hx, 250, 'hid') + DK.line(cx + hx, P(0, (dc - v.dh) / 2 / ht)[1], cx + hx, 250, 'hid'); }
+    // Tool above, following the recess.
+    const tw = dc / 2 * 1.25, tz = -(tw - dc / 2) / ht, tl = rec.slice(), y1 = 14;
+    h += DK.poly([[cx - tw * k, y1], [cx - tw * k, P(0, tz)[1]]].concat(tl, [[cx + tw * k, P(0, tz)[1]], [cx + tw * k, y1]]), 'tool');
+    h += DK.line(14, top, 360, top, 'ln') + DK.cl(cx, y1 - 4, cx, P(0, zc)[1] + 22);
+    h += DK.dimH(cx - dc / 2 * k, cx + dc / 2 * k, top + 0, '', {}) + DK.text(cx, top - 8, 'Ø ' + dcL(v.dc, u, 'Dc'), { cls: 'dimt' });
+    h += dcDimV(top, P(0, zc)[1], 392, '', { hot: true, from: 362 }) + DK.line(cx + 4, P(0, zc)[1], 392, P(0, zc)[1], 'hot ext');
+    h += DK.text(400, (top + P(0, zc)[1]) / 2 + 4, 'z ' + dcL(depth, u, '?'), { cls: 'hott', anchor: 'start' });
+    h += DK.text(400, (top + P(0, zc)[1]) / 2 + 20, 'from the tip', { cls: 'mut', anchor: 'start' });
+    if (!centre) h += DK.angle(P(0, zc)[0], P(0, zc)[1], 34, 90 - ang / 2, 90 + ang / 2, dcN(ang, 2) + '°', {});
+    else { h += DK.text(cx - v.dp / 2 * k - 6, P(0, zc - v.lp / 2)[1], 'pilot Ø ' + dcN(v.dp), { cls: 'dimt', anchor: 'end' }); }
+    const cw = dcRow(rows, 'Chamfer width on the hole');
+    h += dcLines(380, 196, [dcOk(cw) ? 'chamfer ' + dcN(cw) + ' each side' : '', dcOk(v.z) && dcOk(dAt) ? 'at z ' + dcN(v.z) + ': Ø ' + dcN(dAt) : '', dcStr(rows, 'Centre drill') ? 'Enter the pilot Ø and length.' : '']);
+    return DK.svg(W, H, h, 'Spot or centre drill depth');
+  },
+
+  // ---------------- Grinding ----------------
+  // Wheel and work: external, internal or surface, to scale (clamped), with the equivalent diameter as a dashed circle on the contact.
+  grindspeed(v, sys, rows) {
+    const W = 520, H = 290, u = dcU(sys), mode = v.mode === 1 ? 1 : v.mode === 2 ? 2 : 0, ds = v.ds, dw = v.dw;
+    const de = dcRow(rows, 'Equivalent wheel diameter de'), vs = rows.find(r => r.label === 'Wheel surface speed') || {}, vw = rows.find(r => r.label === 'Work surface speed') || {};
+    const q = dcRow(rows, 'Speed ratio'), mark = dcStr(rows, 'Marked maximum');
+    const cy = 150;
+    let h = '', cxW, rW, cxS, rS, contact, k;
+    if (mode === 2) {
+      rS = 92; cxS = 170; k = dcOk(ds) ? 2 * rS / ds : 1; contact = [cxS, cy - 40 + rS];
+      h += DK.rect(30, contact[1], 300, 40, 'hatch') + DK.circle(cxS, cy - 40, rS, 'tool') + DK.circle(cxS, cy - 40, rS * 0.3, 'thin');
+      h += DK.arrow(250, contact[1] + 56, 310, contact[1] + 56, 'dim') + DK.text(246, contact[1] + 60, 'table', { cls: 'mut', anchor: 'end' });
+      cxW = null;
+    } else if (mode === 1) {
+      const ok = dcOk(ds) && dcOk(dw) && ds < dw; rW = 110; k = ok ? 2 * rW / dw : 1; rS = ok ? Math.max(6, ds * k / 2) : 50; cxW = 170; cxS = cxW + rW - rS; contact = [cxW + rW, cy];
+      h += dcRing(cxW, cy, rW, rW + 14) + DK.circle(cxS, cy, rS, 'tool') + DK.cl(cxW - rW - 20, cy, cxW + rW + 20, cy) + DK.cl(cxW, cy - rW - 20, cxW, cy + rW + 20);
+    } else {
+      const ok = dcOk(ds) && dcOk(dw), tot = ok ? ds + dw : 3; k = 300 / tot; rW = ok ? Math.max(8, dw * k / 2) : 50; rS = ok ? Math.max(8, ds * k / 2) : 100;
+      const sc = Math.min(1, 125 / Math.max(rW, rS)); rW *= sc; rS *= sc; k *= sc;
+      cxW = 30 + rW; cxS = cxW + rW + rS; contact = [cxW + rW, cy];
+      h += DK.circle(cxW, cy, rW, 'part') + DK.circle(cxS, cy, rS, 'tool') + DK.circle(cxS, cy, rS * 0.3, 'thin') + DK.cl(cxW - rW - 10, cy, cxS + rS + 10, cy) + DK.cl(cxW, cy - rW - 10, cxW, cy + rW + 10);
+    }
+    if (mode !== 2) h += dcSpin(cxS, cy, rS * 0.55, rS * 0.55, 140, 40, 'dim');
+    if (mode === 0 && cxW !== null) h += dcSpin(cxW, cy, rW * 0.55, rW * 0.55, 220, 320, 'dim');
+    // Equivalent diameter: a dashed circle of diameter de touching the flat at the contact.
+    if (dcOk(de) && dcOk(ds)) {
+      const rde = de * k / 2;
+      if (mode !== 2 && rde > 2) {
+        const c = mode === 1 ? [contact[0] - rde, contact[1]] : [contact[0] + rde, contact[1]];
+        h += '<path class="hot" stroke-dasharray="6 4" d="M' + (c[0] + rde * Math.cos(2.2)).toFixed(1) + ' ' + (c[1] - rde * Math.sin(2.2)).toFixed(1) + 'A' + rde.toFixed(1) + ' ' + rde.toFixed(1) + ' 0 ' + (rde > 150 ? 0 : 1) + ' 1 ' + (c[0] + rde * Math.cos(-2.2 + (mode === 1 ? 0 : 0))).toFixed(1) + ' ' + (c[1] - rde * Math.sin(-2.2)).toFixed(1) + '"/>';
+      }
+    }
+    if (mode !== 2) h += DK.line(contact[0], contact[1] - 46, contact[0], contact[1] + 46, 'thin');
+    h += DK.circle(contact[0], contact[1], 3, 'hotf');
+    const sLab = 'wheel Ø ' + dcL(ds, u, 'ds'), wLab = mode === 2 ? 'flat work' : (mode === 1 ? 'bore Ø ' : 'work Ø ') + dcL(dw, u, 'dw');
+    h += DK.text(cxS, mode === 2 ? cy - 40 - rS - 10 : cy - rS - 10, sLab, { cls: 'dimt' });
+    h += DK.text(mode === 2 ? 180 : cxW, mode === 2 ? contact[1] + 26 : (mode === 1 ? cy + rW + 32 : cy + rW + 22), wLab, { cls: 'dimt' });
+    const x = 372, mU = vs.unit || '';
+    h += DK.text(x, 40, dcOk(de) ? 'de ' + dcN(de) + ' ' + u : 'de', { cls: 'hott', anchor: 'start' });
+    h += dcLines(x, 58, [mode === 0 ? 'de = dw ds / (dw + ds)' : mode === 1 ? 'de = dw ds / (dw − ds)' : 'surface: de = ds', 'dashed: equivalent wheel'], {});
+    h += dcLines(x, 100, [isFinite(vs.value) ? 'wheel ' + dcN(vs.value) + ' ' + mU : '', isFinite(vw.value) ? 'work ' + dcN(vw.value) + ' ' + vw.unit : '', dcOk(q) ? 'speed ratio q ' + dcN(q, 1) : ''], { cls: 'txt' });
+    if (mark) h += dcLines(x, 160, dcWrap(mark, /OVER/.test(mark) ? 18 : 24), { cls: /OVER/.test(mark) ? 'hott' : 'mut' });
+    return DK.svg(W, H, h, 'Grinding wheel and work, equivalent diameter');
+  },
+
+  // Cylindrical grinding: the work between centres, the wheel of width bs traversing fa per work turn; or plunging.
+  grindtime(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), cy = 150, R = 40, x0 = 40, x1 = 400;
+    const fa = dcOk(v.fa) ? v.fa : dcRow(rows, 'Traverse per work revolution'), ov = dcRow(rows, 'Overlap ratio'), tr = dcRow(rows, 'Traverse rate');
+    const tt = dcRow(rows, 'Traverse grinding time'), tp = dcRow(rows, 'Plunge grinding time', 'min'), tps = dcRow(rows, 'Plunge grinding time', 's');
+    const plunge = !dcOk(fa) && dcOk(tp);
+    let h = DK.rect(x0, cy - R, x1 - x0, 2 * R, 'part') + DK.cl(x0 - 26, cy, x1 + 26, cy);
+    h += DK.poly([[x0 - 22, cy - 8], [x0, cy], [x0 - 22, cy + 8]], 'hatch') + DK.poly([[x1 + 22, cy - 8], [x1, cy], [x1 + 22, cy + 8]], 'hatch');
+    const L = dcOk(v.L) ? v.L : NaN, kx = dcOk(L) ? (x1 - x0 - 20) / L : 1, bw = dcOk(v.bs) ? dcClamp(v.bs * kx, 16, 160) : 60;
+    const xw = plunge ? (x0 + x1) / 2 - bw / 2 : Math.min(x0 + 210, x1 - bw - 40);
+    h += DK.rect(xw, cy - R - 70, bw, 70, 'tool') + DK.line(xw, cy - R - 35, xw + bw, cy - R - 35, 'thin');
+    if (!plunge) {
+      const fp = dcOk(fa) && dcOk(v.bs) ? dcClamp(bw * fa / v.bs, 4, bw) : bw / 3;
+      for (let x = xw - fp; x > x0 + 4; x -= fp) h += DK.line(x + fp * 0.25, cy - R + 2, x - fp * 0.25, cy + R - 2, 'thin');
+      h += DK.dimH(xw - 2 * fp, xw - fp, cy - R - 10, '', { from: cy - R - 2 }) + DK.text(xw - 2 * fp - 22, cy - R - 6, 'fa ' + dcL(fa, u, ''), { cls: 'dimt', anchor: 'end' });
+      h += DK.arrow(xw + bw / 2 - 40, cy + R + 22, xw + bw / 2 + 40, cy + R + 22, 'hot') + DK.text(xw + bw / 2 - 46, cy + R + 26, dcOk(tr) ? dcN(tr) + ' ' + dcFU(sys) : 'traverse', { cls: 'hott', anchor: 'end' });
+      if (dcOk(L)) h += DK.dimH(x0 + 10, x1 - 10, cy + R + 56, 'traverse L ' + dcN(L) + ' ' + u, { from: cy + R + 2, below: true });
+    } else {
+      h += DK.arrow(xw + bw + 20, cy - R - 60, xw + bw + 20, cy - R - 4, 'hot') + DK.text(xw + bw + 26, cy - R - 30, 'plunge ' + dcL(v.vfr, dcFU(sys), ''), { cls: 'hott', anchor: 'start' });
+      h += DK.rect(xw, cy - R, bw, 6, 'hatch');
+    }
+    h += DK.dimH(xw, xw + bw, cy - R - 82, 'bs ' + dcL(v.bs, u, ''), { from: cy - R - 72 });
+    h += dcSpin(x1 - 24, cy, 8, R + 8, 115, 245, 'dim') + DK.text(x1, cy - R - 16, dcOk(v.nw) ? dcN(v.nw, 0) + ' RPM' : '', { cls: 'dimt', anchor: 'end' });
+    const x = 420;
+    h += dcLines(x, 40, [dcOk(ov) ? 'overlap ' + dcN(ov, 2) : '', dcOk(tt) ? 'traverse time' : '', ''], { cls: 'txt' });
+    if (dcOk(tt)) h += DK.text(x, 72, dcN(tt) + ' min', { cls: 'hott', anchor: 'start' });
+    if (dcOk(tp)) h += DK.text(x, plunge ? 40 : 100, 'plunge ' + dcN(tp) + ' min', { cls: 'hott', anchor: 'start' }) + DK.text(x, plunge ? 56 : 116, dcOk(tps) ? '= ' + dcN(tps, 1) + ' s' : '', { cls: 'mut', anchor: 'start' });
+    if (!dcOk(fa) && !dcOk(tp)) h += dcLines(x - 10, 40, ['Enter fa (or the', 'fraction) and the', 'work speed.']);
+    return DK.svg(W, H, h, 'Cylindrical traverse and plunge grinding');
+  },
+
+  // Surface grinding: top view of the part, the wheel centre zig-zagging with overtravel and cross-feed per stroke.
+  grindsurf(v, sys, rows) {
+    const W = 520, H = 280, u = dcU(sys), ot = dcOk(v.ot) ? v.ot : 0, L = v.L, ct = dcOk(v.ct) ? v.ct : 0;
+    if (!dcOk(L)) return '';
+    const strokes = dcRow(rows, 'Strokes per layer'), layers = dcRow(rows, 'Layers'), tps = dcRow(rows, 'Time per stroke'), t = dcRow(rows, 'Grinding time', 'min');
+    const k = 330 / (L + 2 * ot), x0 = 40 + ot * k, x1 = x0 + L * k, ya = 70, ch = ct > 0 ? dcClamp(ct / (L + 2 * ot) * 330, 50, 130) : 110;
+    let h = DK.rect(x0, ya, L * k, ch, 'hatch');
+    const n = dcOk(strokes) ? Math.min(Math.round(strokes), 14) : 7, step = ch / Math.max(n - 1, 1), pts = [];
+    for (let i = 0; i < n; i++) { const y = ya + i * step, a = i % 2 ? 40 + (L + 2 * ot) * k : 40, b = i % 2 ? 40 : 40 + (L + 2 * ot) * k; pts.push([a, y], [b, y]); }
+    h += dcPl(pts, 'hot') + DK.rect(36, ya - 9, 10, 18, 'tool');
+    h += DK.arrow(40 + (L + 2 * ot) * k - 46, ya - 22, 40 + (L + 2 * ot) * k - 6, ya - 22, 'dim') + DK.text(40 + (L + 2 * ot) * k - 50, ya - 18, 'table', { cls: 'mut', anchor: 'end' });
+    h += DK.dimH(x0, x1, ya + ch + 26, 'L ' + dcN(L) + ' ' + u, { from: ya + ch + 2, below: true });
+    if (ot > 0) h += DK.dimH(40, x0, ya + ch + 26, '', { from: ya + ch }) + DK.text(40, ya + ch + 48, 'overtravel ' + dcN(ot), { cls: 'dimt', anchor: 'start' });
+    h += dcDimV(ya, ya + ch, 400, ct > 0 ? 'cross ' + dcN(ct) : '', { from: 380 });
+    if (n > 1 && step > 6) h += dcDimV(ya + ch - step, ya + ch, 388, '', {}) ;
+    const x = 420;
+    h += DK.text(x, 40, dcOk(t) ? dcN(t) + ' min' : 'time', { cls: 'hott', anchor: 'start' });
+    h += dcLines(x, 58, [dcOk(strokes) ? dcN(strokes, 0) + ' strokes' : '', dcOk(layers) ? '× ' + dcN(layers, 0) + ' layers' : '', dcOk(tps) ? '× ' + dcN(tps) + ' s each' : '', dcOk(v.cf) ? 'cross-feed ' + dcN(v.cf) : ''], { cls: 'txt' });
+    if (dcOk(layers)) {
+      const nl = Math.min(Math.round(layers), 12), bx = 410, by = 226, bwid = 96, sh = 36;
+      h += DK.text(bx + bwid / 2, by - sh - 8, 'side view: layers', { cls: 'mut' }) + DK.rect(bx, by, bwid, 30, 'hatch') + DK.rect(bx, by - sh, bwid, sh, 'part');
+      for (let i = 1; i < nl; i++) h += DK.line(bx, by - sh + i * sh / nl, bx + bwid, by - sh + i * sh / nl, 'thin');
+      h += DK.rect(bx, by - sh, bwid, sh / nl, 'hot');
+    }
+    h += DK.text(14, H - 6, 'Wheel centre path' + (dcOk(strokes) && strokes > 14 ? ' (14 of ' + dcN(strokes, 0) + ' strokes drawn)' : '') + '; ' + (v.both === 0 ? 'grinding one way, return stroke idle' : 'grinding both ways'), { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, h, 'Surface grinding strokes');
+  },
+
+  // ---------------- Tool life ----------------
+  // Taylor line on log axes with this speed, lowest cost and fastest production marked; or, with a known life, the edge's parts.
+  toollife(v, sys, rows) {
+    const W = 520, H = 290, su = dcSU(sys), taylor = v.n > 0 && v.n < 1 && dcOk(v.c);
+    const life = taylor ? dcRow(rows, 'Tool life at this speed') : v.t, ppe = dcRow(rows, 'Parts per edge'), cost = dcRow(rows, 'Cost per part');
+    let h = '';
+    if (taylor) {
+      const pts = [];
+      if (dcOk(v.v) && dcOk(life)) pts.push({ T: life, V: v.v, lab: 'this speed', cls: 'hot' });
+      const te = dcRow(rows, 'Tool life for lowest cost'), ve = dcRow(rows, 'Speed for lowest cost'), tp = dcRow(rows, 'Tool life for fastest production'), vp = dcRow(rows, 'Speed for fastest production');
+      if (dcOk(te) && dcOk(ve)) pts.push({ T: te, V: ve, lab: 'lowest cost', cls: 'dim' });
+      if (dcOk(tp) && dcOk(vp)) pts.push({ T: tp, V: vp, lab: 'fastest', cls: 'dim' });
+      const vt = dcRow(rows, 'Speed for target tool life');
+      if (dcOk(v.tt) && dcOk(vt)) pts.push({ T: v.tt, V: vt, lab: 'target', cls: 'dim' });
+      const Ts = pts.map(p => p.T).concat([1]);
+      let lo = Math.log10(Math.min.apply(null, Ts)) - 0.3, hi = Math.log10(Math.max.apply(null, Ts)) + 0.3;
+      if (hi - lo < 1) { const m = (hi + lo) / 2; lo = m - 0.5; hi = m + 0.5; }
+      const Vat = T => v.c / Math.pow(T, v.n);
+      const vlo = Math.log10(Vat(Math.pow(10, hi))), vhi = Math.log10(Vat(Math.pow(10, lo)));
+      const pad = (vhi - vlo) * 0.08 + 0.02, a0 = vlo - pad, a1 = vhi + pad;
+      const X0 = 70, X1 = 340, Y0 = 236, Y1 = 30, X = T => X0 + (Math.log10(T) - lo) / (hi - lo) * (X1 - X0), Y = V => Y0 - (Math.log10(V) - a0) / (a1 - a0) * (Y0 - Y1);
+      h += DK.line(X0, Y0, X1, Y0, 'ln') + DK.line(X0, Y0, X0, Y1, 'ln');
+      const ticks = (a, b) => { const out = []; for (let e = Math.floor(a); e <= Math.ceil(b); e++) [1, 2, 5].forEach(m => { const x = Math.log10(m) + e; if (x >= a - 1e-9 && x <= b + 1e-9) out.push(m * Math.pow(10, e)); }); return out; };
+      const tx = ticks(lo, hi), ty = ticks(a0, a1);
+      tx.forEach(T => { h += DK.line(X(T), Y0, X(T), Y0 + 4, 'thin') + (Math.abs(Math.log10(T) % 1) < 1e-9 ? DK.line(X(T), Y0, X(T), Y1, 'cl') : '') + DK.text(X(T), Y0 + 16, dcN(T), { cls: 'mut' }); });
+      ty.forEach(V => { h += DK.line(X0 - 4, Y(V), X0, Y(V), 'thin') + DK.text(X0 - 7, Y(V) + 4, dcN(V), { cls: 'mut', anchor: 'end' }); });
+      h += DK.text((X0 + X1) / 2, Y0 + 34, 'tool life T (min, log scale)', { cls: 'mut' }) + DK.text(14, Y1 - 12, su + ' (log)', { cls: 'mut', anchor: 'start' });
+      h += '<path class="ln" d="M' + X(Math.pow(10, lo)).toFixed(1) + ' ' + Y(Vat(Math.pow(10, lo))).toFixed(1) + 'L' + X(Math.pow(10, hi)).toFixed(1) + ' ' + Y(Vat(Math.pow(10, hi))).toFixed(1) + '"/>';
+      pts.slice().sort((a, b) => a.T - b.T).forEach((p, i) => {
+        const x = X(p.T), y = Y(p.V), up = i % 2 === 0, wide = x + 8 + p.lab.length * 7.3 > X1 + 16;
+        h += DK.circle(x, y, p.cls === 'hot' ? 4.5 : 3.5, p.cls + 'f') + DK.text(up && !wide ? x + 8 : x - 8, up ? y - 10 : y + 18, p.lab, { cls: p.cls === 'hot' ? 'hott' : 'dimt', anchor: up && !wide ? 'start' : 'end' });
+      });
+      h += DK.text(X0 + 8, Y0 - 10, 'V × T^' + dcN(v.n) + ' = ' + dcN(v.c), { cls: 'mut', anchor: 'start' });
+      const xr = 376;
+      let y = 36;
+      pts.forEach(p => { h += DK.text(xr, y, p.lab, { cls: p.cls === 'hot' ? 'hott' : 'dimt', anchor: 'start' }) + DK.text(xr, y + 15, dcN(p.V) + ' ' + su + ', ' + dcN(p.T) + ' min', { cls: 'txt', anchor: 'start' }); y += 36; });
+      y += 4;
+      if (dcOk(cost)) h += DK.text(xr, y, 'cost ' + dcN(cost, 2) + ' per part', { cls: 'hott', anchor: 'start' });
+      if (dcOk(ppe)) h += DK.text(xr, y + 16, dcN(ppe, 0) + ' parts per edge', { cls: 'mut', anchor: 'start' });
+      return DK.svg(W, H, h, 'Taylor tool life: speed against tool life');
+    }
+    // No Taylor constants: the edge's life as a bar, divided into the cutting time of each part.
+    if (!dcOk(life)) return DK.svg(W, 120, dcLines(20, 40, ['Enter the Taylor exponent n and constant C, or a known tool life,', 'to see the tool life and the parts per edge.']), 'Tool life');
+    const X0 = 30, X1 = 490, y = 90, kx = (X1 - X0) / life, pw = dcOk(v.cut) ? v.cut * kx : 0, np = dcOk(ppe) ? ppe : 0;
+    h += DK.text(X0, 40, 'one edge: ' + dcN(life) + ' min of cutting', { cls: 'txt', anchor: 'start' });
+    h += DK.rect(X0, y, X1 - X0, 34, 'part');
+    for (let i = 0; i < np && pw >= 2.5; i++) h += DK.rect(X0 + i * pw, y, pw, 34, i === 0 ? 'tool' : 'part');
+    if (pw > 0 && np * pw < X1 - X0 - 0.5) h += DK.rect(X0 + np * pw, y, X1 - X0 - np * pw, 34, 'hatch');
+    h += DK.dimH(X0, X1, y + 58, 'tool life ' + dcN(life) + ' min', { from: y + 36, below: true });
+    if (pw >= 18) h += DK.dimH(X0, X0 + pw, y - 14, '', { from: y }) + DK.text(X0 + pw + 6, y - 10, 'cut ' + dcN(v.cut) + ' min per part', { cls: 'dimt', anchor: 'start' });
+    h += DK.text(X0, 200, dcOk(np) ? dcN(np, 0) + ' parts per edge' : '', { cls: 'hott', anchor: 'start' });
+    if (dcOk(cost)) h += DK.text(X0, 218, 'cost ' + dcN(cost, 2) + ' per part', { cls: 'hott', anchor: 'start' });
+    h += DK.text(X0, 236, 'hatched: life left over, not enough for another part', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, 250, h, 'Tool life: parts per edge');
   },
 });
