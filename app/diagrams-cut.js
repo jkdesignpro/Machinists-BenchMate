@@ -239,7 +239,7 @@ Object.assign(DIAGRAMS, {
       isFinite(E.value) ? 'E ' + dcN(E.value) + ' ' + E.unit : '',
       dcOk(sec) ? 'flute section Ø ' + dcN(sec) + ' ' + u : dcOk(sol) ? 'solid section Ø ' + dcN(sol) + ' ' + u : '',
     ]);
-    h += dcLines(334, 236, ['Bent shape exaggerated;', 'holder and spindle flex', 'are not included.']);
+    h += dcLines(334, 236, dcRow(rows, 'Holder and spindle stiffness used') > 0 ? ['Bent shape exaggerated;', 'the holder giving way', 'is included.'] : ['Bent shape exaggerated;', 'holder and spindle flex', 'are not included.']);
     return DK.svg(W, H, h, 'Tool deflection: stick-out, side force and tip deflection');
   },
 

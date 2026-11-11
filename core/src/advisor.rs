@@ -88,6 +88,8 @@ pub struct MillJob {
     /// Bending force as a share of the tangential force.
     pub radial_ratio: f64,
     pub defl_limit: f64,
+    /// Holder and spindle stiffness at the holder face, N/um (not given = rigid).
+    pub holder_k: f64,
 }
 
 /// Result of [`advise_mill`].
@@ -132,7 +134,7 @@ fn eval(j: &MillJob, rpm: f64, vc: f64, ae: f64, ap: f64, feed_scale: f64) -> Ev
         d: j.d, d_shank: j.d_shank, stickout: j.stickout,
         flute_len: if solid { 0.0 } else { j.flute_len }, flute_factor: j.flute_factor, e_gpa: j.e_gpa,
         z: j.z, ae, ap, fz, vc, kc: if kc.is_finite() { kc } else { 0.0 }, eta: j.eta,
-        radial_ratio: j.radial_ratio, f_direct: 0.0, defl_limit: j.defl_limit, p_max: j.p_max, t_max: j.t_max,
+        radial_ratio: j.radial_ratio, f_direct: 0.0, defl_limit: j.defl_limit, p_max: j.p_max, t_max: j.t_max, holder_k: j.holder_k,
     };
     let r = cut_check(&c);
     let mut worst = 0.0; let mut code = 0u8;
@@ -197,10 +199,10 @@ pub fn advise_mill(j: &MillJob) -> MillAdvice {
 #[allow(clippy::too_many_arguments)]
 pub fn advise_mill_f(d: f64, z: f64, d_shank: f64, stickout: f64, flute_len: f64, flute_factor: f64, e_gpa: f64,
                      vc: f64, chip: f64, kc11: f64, mc: f64, ae: f64, ap: f64, lock: f64,
-                     n_max: f64, vf_max: f64, p_max: f64, t_max: f64, eta: f64, radial_ratio: f64, defl_limit: f64, out: f64) -> f64 {
+                     n_max: f64, vf_max: f64, p_max: f64, t_max: f64, eta: f64, radial_ratio: f64, defl_limit: f64, holder_k: f64, out: f64) -> f64 {
     let lk = lock as i32;
     let j = MillJob { d, z, d_shank, stickout, flute_len, flute_factor, e_gpa, vc, chip, kc11, mc, ae, ap,
-        ap_locked: lk == 1 || lk == 3, ae_locked: lk == 2 || lk == 3, n_max, vf_max, p_max, t_max, eta, radial_ratio, defl_limit };
+        ap_locked: lk == 1 || lk == 3, ae_locked: lk == 2 || lk == 3, n_max, vf_max, p_max, t_max, eta, radial_ratio, defl_limit, holder_k };
     let a = advise_mill(&j);
     let b = |x: bool| if x { 1.0 } else { 0.0 };
     match out as i32 {
@@ -567,7 +569,7 @@ mod tests {
         // 12 mm 4-flute carbide end mill, 40 mm stick-out, steel group 2
         MillJob { d: 12.0, z: 4.0, d_shank: 12.0, stickout: 40.0, flute_len: 26.0, flute_factor: 0.0, e_gpa: 580.0,
             vc: 120.0, chip: 0.05, kc11: 1500.0, mc: 0.22, ae: 6.0, ap: 12.0, ae_locked: false, ap_locked: false,
-            n_max: 0.0, vf_max: 0.0, p_max: 0.0, t_max: 0.0, eta: 0.8, radial_ratio: 1.0, defl_limit: 0.0 }
+            n_max: 0.0, vf_max: 0.0, p_max: 0.0, t_max: 0.0, eta: 0.8, radial_ratio: 1.0, defl_limit: 0.0, holder_k: 0.0 }
     }
 
     /// Published worked example: University of Florida, EML2322L "Drilling and
@@ -666,7 +668,7 @@ mod tests {
         assert!(a.ae == 6.0 && a.ap == 12.0 && a.reduced == CUT_FEED && a.fz < 0.05 && a.use_power <= 1.0 + 1e-9 && a.use_power > 0.999);
         // through the wrapper too, for every limit
         for (p, t, dl, st) in [(1.0, 0.0, 0.0, 40.0), (10.0, 2.0, 0.0, 40.0), (0.0, 0.0, 0.01, 90.0)] {
-            let f = |lock: f64, out: f64| advise_mill_f(12.0, 4.0, 12.0, st, 26.0, 0.0, 580.0, 120.0, 0.05, 1500.0, 0.22, 6.0, 12.0, lock, 0.0, 0.0, p, t, 0.8, 1.0, dl, out);
+            let f = |lock: f64, out: f64| advise_mill_f(12.0, 4.0, 12.0, st, 26.0, 0.0, 580.0, 120.0, 0.05, 1500.0, 0.22, 6.0, 12.0, lock, 0.0, 0.0, p, t, 0.8, 1.0, dl, 0.0, out);
             assert_eq!(f(3.0, 4.0), 6.0); assert_eq!(f(3.0, 5.0), 12.0);
             assert_eq!(f(1.0, 5.0), 12.0); assert_eq!(f(2.0, 4.0), 6.0);
             assert!(f(0.0, 14.0) > 0.0);

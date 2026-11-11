@@ -232,7 +232,7 @@ function advMillRun(v, W, s) {
   const g = kcGroup(m.kc), mach = advMachine(v, v.spn === 1), pE = E_PRESETS[tm], eGpa = v.E > 0 ? v.E * eField(s).k : pE.gpa;
   const lim = v.lim > 0 ? v.lim * k : advDeflDefault(op), ratio = v.ratio > 0 ? v.ratio : 1;
   const args = [dmm, v.z, v.dsh > 0 ? v.dsh * k : 0, v.L > 0 ? v.L * k : 0, lf, v.kf > 0 ? v.kf : 0, eGpa, vc, chip, g ? g[5] : 0, g && g[6] != null ? g[6] : 0, ae, ap,
-    (apL ? 1 : 0) + (aeL ? 2 : 0), mach.n, mach.vf, mach.p, mach.t, v.eta > 0 ? v.eta : 0, ratio, v.L > 0 ? lim : 0];
+    (apL ? 1 : 0) + (aeL ? 2 : 0), mach.n, mach.vf, mach.p, mach.t, v.eta > 0 ? v.eta : 0, ratio, v.L > 0 ? lim : 0, v.kh > 0 ? v.kh : 0];
   const A = i => W.advise_mill(...args, i);
   return { m, tm, entries, e, fell, g, mach, op, k, inch, vTab, chipTab, cool, vc, chip, sAe, sAp, aeL, apL, ae0: ae, ap0: ap, lim, limOwn: v.lim > 0, ratio, eGpa, eSrc: v.E > 0 ? 'as entered' : pE.name + ' preset', A,
     srcAe: W.mill_engagement(op, dmm, lf, tH, 2), srcAp: W.mill_engagement(op, dmm, lf, tH, 3), dmm,
@@ -266,6 +266,7 @@ TOOLS.push(
     { level: 'advanced', id: 'fzown', label: 'Your own chip load (wins over the table)', unit: lenU(s), def: '' },
     { level: 'advanced', id: 'spn', label: 'Spindle', unit: '', def: 0, options: [[0, 'Main spindle'], [1, 'Driven (live) tool']] },
     { level: 'advanced', id: 'lim', label: 'Deflection allowed at the tip (blank = 0.05 mm rough, 0.01 mm finish)', unit: lenU(s), def: '' },
+    { level: 'advanced', id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = rigid)', unit: 'N/µm', def: '' },
     { level: 'advanced', id: 'dsh', label: 'Shank diameter (blank = D)', unit: lenU(s), def: '' },
     { level: 'advanced', id: 'kf', label: 'Effective flute diameter / D (blank = solid rod)', unit: 'x D', def: '' },
     { level: 'advanced', id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
@@ -298,7 +299,7 @@ TOOLS.push(
       if (inch) rows.push(R('Spindle power needed', r.pSp * KW_HP, 'hp', 2));
       rows.push(R('Spindle torque needed', inch ? r.tq * NM_LBFIN : r.tq, inch ? 'lbf in' : 'N m', inch ? 1 : 2));
     } else rows.push(R('Power and torque', 'No specific cutting force is published for this material group, so power, torque and deflection are not worked out', '', 0));
-    if (isFinite(r.defl)) rows.push(R('Tool tip deflection', r.defl / k, lu, inch ? 5 : 4));
+    if (isFinite(r.defl)) rows.push(R(v.kh > 0 ? 'Tool tip deflection (tool bending and a holder of ' + fmt(v.kh, 1) + ' N/µm giving way)' : 'Tool tip deflection (holder and spindle taken as rigid)', r.defl / k, lu, inch ? 5 : 4));
     rows.push(R('Chip thickness: mean hm', r.hm / k, lu, dpF), R('Chip thickness: largest hex', r.hex / k, lu, dpF));
     if (isFinite(r.kc)) rows.push(R('Specific cutting force kc at hm (Iscar group ' + r.g[0] + ')', r.kc, 'N/mm2', 0));
     // The table value beside the corrected one.

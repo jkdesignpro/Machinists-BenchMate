@@ -128,6 +128,7 @@ const FORMULAS = [
   F('helix', 'Axial feed of a helix', 'Vz = F · tan(α) (F in the plane)  or  F · sin(α) (F along the helix)', 'F: programmed feed; α: ramp angle', ['SAN']),
   F('deflection', 'Second moment of a round section', 'I = π · d⁴ / 64', 'I: [mm⁴ or in⁴]; d: diameter', ['GERE']),
   F('deflection', 'Two-section cantilever deflection', 'δ = F / (3E) · [ (L³ − a³) / I_shank + a³ / I_flute ]', 'δ: tip deflection; F: radial force [N or lbf]; E: Young\'s modulus; L: stick-out; a: flute length', ['GERE', 'ROARK']),
+  F('deflection', 'Holder and spindle giving way', 'δ_total = δ_tool + F / k;  k = F_push / reading', 'k: stiffness of holder and spindle at the holder face [N/µm], from a push test; springs in series add their deflections. The tilt of the holder is not included', ['GERE', 'OWN']),
   F('deflection', 'Tangential force from power', 'Ft = Pc · 60 000 / Vc', 'Ft: [N]; Pc: power at the cut [kW]; Vc: [m/min]', ['SAN']),
   F('cutopt', 'Milling removal rate', 'Q = ae · ap · Vf', 'Q: removal rate; ae: radial width; ap: axial depth; Vf: table feed', ['SAN', 'MH']),
   F('cutopt', 'Spindle torque', 'T = P · 60 000 / (2π · n)', 'T: [N·m]; P: [kW]; n: [rpm]', ['SAN']),

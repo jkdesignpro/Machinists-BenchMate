@@ -55,8 +55,11 @@ f1!(tangential_force_n, c::tangential_force_n, pc, vc);
 f1!(engagement_angle_deg, c::engagement_angle_deg, ae, d);
 f1!(chip_thickness_max, c::chip_thickness_max, fz, ae, d);
 f1!(chip_thickness_mean, c::chip_thickness_mean, fz, ae, d);
-f1!(cut_check, c::cut_check_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, out);
-f1!(cut_optimise, c::cut_optimise_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, vary_ae, out);
+f1!(cut_check, c::cut_check_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, holder_k, out);
+f1!(holder_deflection_mm, c::holder_deflection_mm, f, k);
+f1!(stiffness_n_um, c::stiffness_n_um, f, defl);
+f1!(tool_and_holder_deflection_mm, c::tool_and_holder_deflection_mm, f, stickout, flute, d_shank, d_flute, e_gpa, k);
+f1!(cut_optimise, c::cut_optimise_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, holder_k, vary_ae, out);
 
 // GD&T: internal 1 = hole/slot, 0 = pin/boss; mc 0 RFS, 1 MMC, 2 LMC.
 f1!(gdt_mmc_size, c::mmc_size_f, lower, upper, internal);
@@ -754,7 +757,7 @@ f1!(drill_time_min, c::drill_time_min, depth, point, fnr, rpm);
 f1!(mrr_drilling_cm3_min, c::mrr_drilling_cm3_min, d, vf);
 /// Starting width and depth for an end mill: which 0 ae, 1 ap, 2 source of ae, 3 source of ap.
 #[no_mangle] pub extern "C" fn mill_engagement(op: f64, d: f64, flute_len: f64, boldness: f64, which: f64) -> f64 { pick(c::mill_engagement(op, d, flute_len, boldness), which) }
-f1!(advise_mill, c::advise_mill_f, d, z, d_shank, stickout, flute_len, flute_factor, e_gpa, vc, chip, kc11, mc, ae, ap, lock, n_max, vf_max, p_max, t_max, eta, radial_ratio, defl_limit, out);
+f1!(advise_mill, c::advise_mill_f, d, z, d_shank, stickout, flute_len, flute_factor, e_gpa, vc, chip, kc11, mc, ae, ap, lock, n_max, vf_max, p_max, t_max, eta, radial_ratio, defl_limit, holder_k, out);
 f1!(advise_turn, c::advise_turn_f, d, vc, f, ap, kappa, kc11, mc, lock, n_max, p_max, t_max, eta, out);
 /// Twist drill feed per revolution by diameter (inches): which 0 low, 1 high.
 #[no_mangle] pub extern "C" fn drill_feed_range_in(d_in: f64, which: f64) -> f64 { pick(c::drill_feed_range_in(d_in), which) }

@@ -456,6 +456,22 @@ aT = await advTxt();
 if (!/Spindle speed 1,000 RPM/i.test(aT) || !/Feed rate straight down 98\.8 mm\/min/.test(aT) || !/Top spindle speed/i.test(aT)) problems.push(`[${where}] speed limit: "${aT.slice(0, 500)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Holder and spindle stiffness in the tool deflection page. Solid 12 mm carbide rod, 40 mm out, 100 N: I = pi 12^4 / 64 = 1017.88 mm4,
+// bending 100 x 64000 / (3 x 580000 x 1017.88) = 0.0036 mm. A holder of 20 N/um gives 100 / 20 = 5 um more: 0.0086 mm.
+// A push test of 200 N moving the holder 0.01 mm is the same 20 N/um.
+where = 'deflection holder';
+await open('deflection');
+await advSet('lf', ''); await advSet('F', '100');
+aT = await advTxt();
+if (!/Tip deflection 0\.0036 mm/.test(aT) || !/Taken as rigid/.test(aT)) problems.push(`[${where}] rigid: "${aT.slice(0, 500)}"`);
+await advSet('kh', '20');
+aT = await advTxt();
+if (!/Tip deflection \(tool and holder\) 0\.0086 mm/.test(aT) || !/Of which the holder and spindle giving way 0\.0050 mm/.test(aT)) problems.push(`[${where}] stiffness: "${aT.slice(0, 500)}"`);
+await advSet('kh', ''); await advSet('pf', '200'); await advSet('pd', '0.01');
+aT = await advTxt();
+if (!/Tip deflection \(tool and holder\) 0\.0086 mm/.test(aT) || !/from the push test\) 20\.0 N\/µm/.test(aT)) problems.push(`[${where}] push test: "${aT.slice(0, 600)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');
