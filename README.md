@@ -2,12 +2,13 @@
 
 A free, open-source (AGPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. For all machinists and all machines: mills, lathes, Swiss-type and more.
 
-**Status:** v0.2.0 (in progress). 151 tools on 123 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
+**Status:** v0.2.0. 153 tools on 123 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
 
 ## How the app is organised
 - **Modes** (top bar): **Simple** shows 16 everyday tools with only their main inputs; **Advanced** shows every tool; **Expert** also opens every working, constant and evidence table. A mode never changes a calculation.
 - **Workspaces** (left rail): Turning, Milling, Holes and threads, Grinding, sawing and gears, Measure and inspect, Shop maths, Programming, Reference. Each opens on a page of cards. Related tools share a page with tabs.
 - **Home**: a dashboard of widgets you choose: small calculators, favourites, recent tools, pinned results, the calculator, a tip of the day.
+- **Drawings**: every calculator has a drawing in one engineering-drawing style, live and to scale where it helps, labelled with your own numbers.
 - **Calculator**: opens over any page (Alt+C) and from any number box.
 - **Every calculator**: a large main result, a drawing, linked boxes where either value can be typed, decimals, reset, copy, pin, and "Formula and sources".
 - **Compact view** for a narrow window; light and dark themes; search with Ctrl+K.

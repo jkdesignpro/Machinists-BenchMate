@@ -33,7 +33,7 @@ One kit, one style: `DK.svg`, `fit`, `line`, `path`, `poly`, `rect`, `circle`, `
 - Draw the real situation, to scale where that helps, with ratios clamped so odd inputs never break the picture.
 - Label with the user's numbers and units; put the answer on the drawing in the hot colour.
 - Numbers on a drawing come from the inputs or the Rust results, never from a second calculation in JavaScript.
-- Nothing may reach outside the viewBox. Check each drawing in both themes and both unit systems with `node tests/smoke/shot.mjs`.
+- Nothing may reach outside the viewBox. Check each drawing in both themes and both unit systems with `node tests/smoke/shot.mjs`, or all of them at once with `node tests/smoke/sheet.mjs out.png all` (it fails if anything is outside a frame).
 - All art is BenchMate's own, drawn from the geometry.
 
 ## Home (`app/dashboard.js`)

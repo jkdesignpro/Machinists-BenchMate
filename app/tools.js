@@ -51,7 +51,7 @@ function toolGeom(v, s) {
   return { d: v.d * k, dsh: v.dsh > 0 ? v.dsh * k : 0, L: v.L * k, lf: v.lf > 0 ? v.lf * k : 0, kf: v.kf > 0 ? v.kf : 0, e,
     eSrc: v.E > 0 ? 'as entered' : (p ? p.name + ' preset, ' + p.src : ''), eShow: e / ef.k, eU: ef.u, eDp: ef.dp };
 }
-const LIMIT_NAMES = { 1: 'Tool deflection', 2: 'Spindle power', 3: 'Spindle torque (below base speed)', 4: 'Flute length', 5: 'Tool diameter (ae = D)' };
+const LIMIT_NAMES = { 1: 'Tool deflection', 2: 'Spindle power', 3: 'Spindle torque (below base speed)', 4: 'Flute length', 5: 'Tool diameter (ae = D)', 6: 'Stick-out (no flute length entered)' };
 
 // Shared note for the DXF screens (see docs/cad-dxf.md).
 const DXF_NOTE = 'Geometry and the DXF text are made in the Rust core. Layers: OUTLINE (outer profile), HOLES (round holes), CENTRE (centre marks, pitch circle, slot centreline). Outer profiles are closed polylines, counter-clockwise; arcs inside a polyline are stored as bulges, bulge = tan(included angle / 4). R2000 files store the units in $INSUNITS (1 = inches, 4 = millimetres); R12 files cannot, so set the units when you import them. All values are in the units chosen in the title bar.';
@@ -1942,6 +1942,8 @@ const TOOLS = [
       const ba = W.bend_allowance(v.a, v.r, v.k, v.t), bd = W.bend_deduction(v.a, v.r, v.k, v.t);
       rows.push(R('Bend allowance', ba, u, dp), R('Bend deduction', bd, u, dp));
       if (v.f1 > 0 && v.f2 > 0) rows.push(R('Flat length = flange 1 + flange 2 - bend deduction', v.f1 + v.f2 - bd, u, dp));
+      const os = W.outside_setback(v.a, v.r, v.t);
+      if ((v.f1 > 0 && v.f1 < os) || (v.f2 > 0 && v.f2 < os)) rows.push(R('Check', 'A flange is shorter than the outside setback: the bend does not fit inside it, so the flat length is not usable', '', 0));
     } else rows.push(R('K-factor needed: from your press brake tooling chart or a test bend', 'not entered', '', 0));
     if (v.ba > 0) rows.push(R('K-factor from the measured bend allowance', W.k_from_bend_allowance(v.a, v.r, v.t, v.ba), '', 3));
     return rows;

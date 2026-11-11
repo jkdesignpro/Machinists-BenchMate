@@ -3,9 +3,11 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-11-11
 ### Added (the 0.2.0 overhaul: shell and look)
 - **Modes**: a Simple / Advanced / Expert selector in the top bar, remembered between runs. Simple lists 16 everyday tools with only their main inputs; Advanced lists every tool; Expert also opens every working, constant and evidence table. A mode never changes a calculation.
-- **Workspaces**: the tools are regrouped by the job into Turning, Milling, Holes and threads, Grinding, sawing and gears, Measure and inspect, Shop maths, Programming and Reference, each with a landing page of cards. Related tools share one page with tabs (for example Feed conversions, Hole patterns, Limits and fits, True position, DXF shapes), so 151 tools sit on 123 pages.
+- **Workspaces**: the tools are regrouped by the job into Turning, Milling, Holes and threads, Grinding, sawing and gears, Measure and inspect, Shop maths, Programming and Reference, each with a landing page of cards. Related tools share one page with tabs (for example Feed conversions, Hole patterns, Limits and fits, True position, DXF shapes), so 153 tools sit on 123 pages.
 - **Home dashboard**: a page of widgets you add, remove, resize and reorder (drag, or the arrow buttons). Widgets: any calculator in small form, favourites, recent tools, pinned results, the calculator, tip of the day, tool library and what's new. The first run asks what you mostly do and builds a starter layout.
 - **Calculator panel**: the calculator opens over any page from the top bar or with Alt+C, and from the small calculator button in any number box, which puts the answer back into that box.
 - **Calculator: lengths with units.** Type `12.7mm + 1/2 in`, `3 7/16"`, `5' 3 1/2"`, `5 thou` or `25 um` and the answer comes back in the app's unit, with the other unit beside it. Units: in, ft, thou, mm, cm, m, um. All conversions use the exact definitions (1 in = 25.4 mm, 1 ft = 12 in).
@@ -18,7 +20,11 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - **Compact view**: one column, the tool list as a drawer and a bottom bar, for a narrow window. Auto (below 820 px), On or Off in the view menu.
 - **What's new** page built from this changelog, and a **tip of the day** (BenchMate's own tips).
 - **Drawing kit** (`app/dk.js`): one engineering-drawing style for all drawings (part outlines, centre lines, dimension lines, angle arcs, leaders, hatching) that follows the light and dark themes; first drawings for Spindle speed and Bolt circle.
+- **A drawing on every calculator.** 93 drawings in the drawing-kit style, live and to scale where it helps and labelled with your own numbers: 28 for cutting (speeds and feeds, milling, turning, sawing, drilling, grinding), 15 for threads (one thread-form generator draws ISO, Unified, UNJ, Whitworth, ACME, trapezoidal, buttress and pipe forms from their real proportions), 26 for gears, GD&T and mechanics, 20 for fits, measuring and shop tools, plus spindle speed, bolt circle and hole grid. Every number written on a drawing is an input or a result from the Rust core; the JavaScript only places things. Tools with nothing typed yet show the same picture with letters in place of numbers.
+- **Drawing panel**: screens that are not plain forms (thread tables, limits and fits, gauge blocks and others) get a folding "Drawing" panel at the top with their reference drawing; open or closed is remembered.
 - `tests/smoke/shot.mjs`: takes a screenshot of any screen for checking layouts and drawings.
+- `tests/smoke/sheet.mjs`: lays any set of drawings (or all) out on one contact sheet, in either unit system and theme, and fails if any part of a drawing falls outside its frame.
+- The smoke test now checks that every calculator shows a drawing with its default inputs (reference tables, converters and managers are listed in the test as having nothing to draw).
 ### Changed (the 0.2.0 overhaul: shell and look)
 - New look of BenchMate's own: drafting blue and marking-out orange on cool paper, a blueprint dark theme, larger type and controls, cards and a faint drafting grid. Same bones as before: top bar, left rail, content area, token CSS.
 - The address now follows the screen (`#/home`, `#/w/turning`, `#/t/rpm`), so Back and Forward work and the app reopens where you left it. Input values are kept between runs.
@@ -47,7 +53,14 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - **G and M codes**: click a row for an info drawer with everything the data holds on that code: meaning, note, modal group, mill or lathe, evidence, the same code on the other controls, any disagreement that names it, and its full sources. Nothing is added to the data.
 - **Keyway broaching program**: save your own presets (a name and every input, in the units you saved them in), pick one to fill the form, delete one. Kept in this browser only; BenchMate ships no maker's presets or data.
 - **Formula library**: a star on each formula and a Favourites chip that shows only the starred ones (kept in this browser).
+- **Part-off and groove time**: a drawing of the blade travel with the diameters to scale, and the spindle speed against the diameter with the speed limit and the diameter where it is reached.
+- **Keys and keyways**: the shaft, key and hub section is now drawn to scale with every dimension of the table marked (b, h, t1, t2 and the two check dimensions; W, H and the ASME check dimensions in inch), and is shown before a diameter is typed.
+- **Fraction, decimal and mm**: a ruler with the value and the nearest fraction marked.
+- **Shop economics**: a break-even chart (income and cost against the number of parts, with the loss and profit areas).
 ### Changed (improved tools)
+- **Cut check and optimiser** (fix): with no flute length entered, the largest depth of cut is now capped at the stick-out (a cutter cannot cut deeper than it sticks out of the holder) and says so under "Set by". Before, it could report a depth longer than the tool. New core limit code `LIMIT_STICKOUT`, with a test.
+- **Sheet-metal bend allowance**: warns when a flange is shorter than the outside setback (the flat length was shown without comment, and could be negative).
+- **Spot and centre drill depth**: its live picture is now drawn by the drawing kit, in the chosen unit.
 - **Drill size chart**: the nearest-drill finder now takes a diameter in inch or mm (its own unit choice) and shows, for each of the number, letter, fractional and metric series, the nearest drill at or below and above, with the difference in inch and mm and an "exact" mark.
 - The spot and centre drill tool is now its own screen (it was a plain form) so each table value can show its sources.
 - **Thread milling program**: the inputs are grouped into folding sections (Thread, Tool, Position, Cutting, Program output), each marked Ready or Needs input with what is missing; the program appears when every section is ready.
