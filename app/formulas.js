@@ -69,6 +69,8 @@ const FORMULA_SOURCES = {
   B92: 'ANSI B92.1-1996 (cited by name); Engineers Edge, involute spline basic formulas',
   ISO4156: 'ISO 4156-1:2021 (cited by name); ISO 4156:1981 table 2 (iTeh free preview)',
   OWN: 'BenchMate derivation, with tests in benchmate-core',
+  GERR: 'D. Gerr, Controlling Galvanic Corrosion (galvanic series in seawater, V vs Ag/AgCl; 0.20 V rule)',
+  EEGALV: 'Engineers Edge, galvanic compatibility (anodic index; 0.15 / 0.25 / 0.50 V); Carr Lane, anodic index guideline',
 };
 
 // F(tool id, name, formula, variables 'sym: meaning [unit]; ...', source keys)
@@ -200,6 +202,7 @@ const FORMULAS = [
   F('oring', 'O-ring squeeze', 'squeeze = (CS − depth) / CS', 'CS: cross-section; depth: gland depth', ['ORING']),
   F('oring', 'O-ring stretch', 'stretch = (seat diameter − ID) / ID', '', ['ORING']),
   F('bearinglife', 'Basic rating life', 'L10 = (C / P)^p,  p = 3 ball, 10/3 roller', 'C: dynamic load rating; P: equivalent load', ['ISO281']),
+  F('galvanic', 'Galvanic potential difference', 'ΔE = |E_A − E_B|;  anode: more negative E (seawater series) or larger anodic index;  acceptable if ΔE ≤ limit', 'E: potential of each metal in the same table [V]; limit: 0.20 V seawater (Gerr) or 0.15 / 0.25 / 0.50 V harsh / normal / controlled (anodic index)', ['GERR', 'EEGALV']),
   F('bearinglife', 'Life in hours', 'L10h = 10⁶ · L10 / (60 · n)', 'n: [rpm]', ['ISO281']),
   F('keys', 'Inch keyseat chordal height', 'Y = (D − √(D² − W²)) / 2', 'D: shaft diameter; W: key width', ['KEYS']),
   F('tnrc', 'Z shift where a chamfer meets a diameter', 'dz = r · (1 − tan(θ / 2))', 'r: nose radius; θ: chamfer angle to the Z axis', ['KENTECH', 'IA']),
@@ -260,7 +263,8 @@ const FORMULAS = [
 
 // Tools that only show reference data (no formula of their own).
 const FORMULA_EXEMPT = ['holdercode', 'iso513', 'drillchart', 'tapdrill', 'gritconv', 'wheelcode', 'threaddata', 'pipethreads', 'whitworth', 'fits', 'surface', 'hardness',
-  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'formulas'];
+  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'formulas',
+  'tempercolours', 'heattreat', 'plastics', 'metalid'];
 
 const FLIB = { q: '', g: '' };
 function renderFormulaLibrary(el) {

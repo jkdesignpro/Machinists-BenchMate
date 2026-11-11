@@ -614,3 +614,10 @@ pub extern "C" fn gsim_run(len: f64, lathe: f64, ctrl: f64, metric_out: f64, def
 #[no_mangle] pub extern "C" fn gsim_stat(i: f64) -> f64 { unsafe { (&*core::ptr::addr_of!(GSIM_STATS)).get(i as usize).copied().unwrap_or(f64::NAN) } }
 /// Messages ("line TAB level TAB text" per line) into the text buffer; returns the length (text at `text_ptr`).
 #[no_mangle] pub extern "C" fn gsim_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GSIM_MSGS)).clone() }) }
+
+// Materials reference (B4): two-metal galvanic check.
+f1!(galv_diff, c::matref::galvanic_difference, a, b);
+/// 0 = first metal is the anode, 1 = second, -1 = equal; index_scale 1 for an anodic index table.
+#[no_mangle] pub extern "C" fn galv_anode(a: f64, b: f64, index_scale: f64) -> f64 { c::matref::galvanic_anode(a, b, index_scale != 0.0) as f64 }
+/// 1 when the difference is within the limit, else 0.
+#[no_mangle] pub extern "C" fn galv_within(diff: f64, limit: f64) -> f64 { if c::matref::galvanic_within(diff, limit) { 1.0 } else { 0.0 } }

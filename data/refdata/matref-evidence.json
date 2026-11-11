@@ -1,0 +1,395 @@
+{
+  "_about": "Materials reference round (parity batch B4): temper and heat-tint colours, heat treatment, galvanic series, machining plastics, metal identification. Every value records what one free publisher prints (verbatim or close transcription in 'v'), with the source key. Temperatures are stored in degC as printed or as converted from the printed degF (the printed text is kept in 'v'). Copies of one source share a 'family' and count once. Explanatory text (terms, notes, tips) is BenchMate's own wording; the sources listed against it use the term or say the same thing. No handbook table (Machinery's Handbook or similar) was used.",
+  "sources": {
+    "NAVY_AM": {"publisher": "US Navy (via Integrated Publishing, tpub.com)", "title": "Aviation Structural Mechanic (AM) training manual, Table 6-2, Color chart for various tempering temperatures of carbon steel (page 6-41)", "url": "https://navyaviation.tpub.com/14315/Table-6-2-Color-Chart-For-Various-Tempering-Temperatures-Of-Carbon-Steel-251.html", "accessed": "2026-11-11", "note": "US government training manual (public domain). No edition date shown on the page."},
+    "WYS": {"publisher": "West Yorkshire Steel", "title": "Steel tempering temperatures, colour chart", "url": "https://www.westyorkssteel.com/technical-information/steel-heat-treatment/tempering-temperatures/", "accessed": "2026-11-11", "note": "Steel stockholder. No date printed (page metadata modified 2026-03-07)."},
+    "WIKI_HC": {"publisher": "Wikipedia", "title": "Heat coloring of metals (steel row citing Kraemer 1983, p. 82; stainless row citing the British Stainless Steel Association)", "url": "https://en.wikipedia.org/wiki/Heat_coloring_of_metals", "accessed": "2026-11-11", "note": "The steel row is attributed to O. P. Kraemer (1983) and counted as that book's family; the stainless row is the BSSA chart and is counted as BSSA.", "family": "KRAEMER_1983"},
+    "BSSA": {"publisher": "British Stainless Steel Association (as reproduced by Wikipedia)", "title": "Heat tint (temper) colours on stainless steel surfaces heated in air", "url": "https://en.wikipedia.org/wiki/Heat_coloring_of_metals", "accessed": "2026-11-11", "family": "BSSA", "note": "Read from the Wikipedia table that cites the BSSA chart; the BSSA page itself was not fetched. Copies of the same chart on other sites are not counted again."},
+    "HTT": {"publisher": "Heat Treat Today (D. Herring, The Herring Group)", "title": "Ask the Heat Treat Doctor: What are the heat tint colors for stainless steel and when do they form?", "url": "https://www.heattreattoday.com/?p=69814", "accessed": "2026-11-11", "note": "Published 2026-07-21. The temperature chart is an image and was not read; used only for the order of colours with oxide thickness and for what changes the colour (time, atmosphere, chromium, surface finish)."},
+    "UDD_ARNE": {"publisher": "Uddeholm (voestalpine)", "title": "Uddeholm Arne technical data sheet (AISI O1, W.-Nr 1.2510), Edition 11, 04.2019", "url": "https://uddeholm.com/app/uploads/sites/240/2024/05/Tech-Uddeholm-Arne-EN.pdf", "accessed": "2026-11-11", "family": "VOESTALPINE"},
+    "UDD_SVERKER21": {"publisher": "Uddeholm (voestalpine)", "title": "Uddeholm Sverker 21 technical data sheet (AISI D2, W.-Nr 1.2379), Edition 13, 04.2019", "url": "https://uddeholm.com/app/uploads/sites/247/2024/09/Tech-Uddeholm-Sverker-21-EN.pdf", "accessed": "2026-11-11", "family": "VOESTALPINE"},
+    "UDD_ORVAR": {"publisher": "Uddeholm (voestalpine)", "title": "Uddeholm Orvar Supreme technical data sheet (ESR AISI H13), Edition 13, 06.2021", "url": "https://uddeholm.com/app/uploads/sites/230/2024/05/Tech-Uddeholm-Orvar-Supreme-EN-1.pdf", "accessed": "2026-11-11", "family": "VOESTALPINE"},
+    "UDD_M2": {"publisher": "voestalpine High Performance Metals Denmark (Uddeholm site)", "title": "Datablad HSS/M2/W 1.3343 (Danish), S13 2025-08-05", "url": "https://www.uddeholm.com/app/uploads/sites/239/2025/08/Datablad-HSS_M2_W-1.3343.pdf", "accessed": "2026-11-11", "family": "VOESTALPINE", "note": "Danish text, translated by us."},
+    "DOER_12510": {"publisher": "Doerrenberg Edelstahl", "title": "1.2510 (100MnCrW4) data sheet, 02/24 ('similar to AISI O1')", "url": "https://doerrenberg.com/fileadmin/special_steel/files/pdf_en_products_neues_Design/1.2510_en.pdf", "accessed": "2026-11-11", "family": "DOERRENBERG"},
+    "DOER_12363": {"publisher": "Doerrenberg Edelstahl", "title": "1.2363 (X100CrMoV5) data sheet, 02/24", "url": "https://doerrenberg.com/fileadmin/special_steel/files/pdf_en_products_neues_Design/1.2363_en.pdf", "accessed": "2026-11-11", "family": "DOERRENBERG", "note": "The page names no AISI grade; 1.2363 is listed as the A2 equivalent in BenchMate's material equivalents."},
+    "DOER_12344": {"publisher": "Doerrenberg Edelstahl", "title": "1.2344 (X40CrMoV5-1) data sheet, 02/24 ('similar to AISI H13')", "url": "https://doerrenberg.com/fileadmin/special_steel/files/pdf_en_products_neues_Design/1.2344_en.pdf", "accessed": "2026-11-11", "family": "DOERRENBERG"},
+    "LUCEFIN_C45E": {"publisher": "Lucefin Group", "title": "C45E (1.1191) data sheet, rev. 2024, ISO 683-1:2018 (equivalence row lists AISI/SAE 1045)", "url": "https://lucefin.com/wp-content/uploads/2025/01/C45E.pdf", "accessed": "2026-11-11", "family": "LUCEFIN", "note": "Italian/English table; the hardening line prints 820 (water) and 860 (oil or polymer)."},
+    "LUCEFIN_42CRMO4": {"publisher": "Lucefin Group", "title": "42CrMo4 (1.7225) data sheet, rev. 2024, ISO 683-2:2018 (equivalence row lists AISI/SAE 4140)", "url": "https://lucefin.com/wp-content/uploads/2025/01/42CrMo4.pdf", "accessed": "2026-11-11", "family": "LUCEFIN"},
+    "LUCEFIN_12379": {"publisher": "Lucefin Group", "title": "1.2379 X153CrMoV12 technical card, rev. 2018, UNI EN ISO 4957:2002 (AISI D 2)", "url": "https://www.lucefin.com/wp-content/files_mf/15236079321.2379X153CrMoV12.pdf", "accessed": "2026-11-11", "family": "LUCEFIN", "note": "Older edition (2018); the current standard is EN ISO 4957:2018."},
+    "HUDSON_A2": {"publisher": "Hudson Tool Steel", "title": "A2 air-hardening tool steel, technical data", "url": "https://hudsontoolsteel.com/technical-data/steelA2", "accessed": "2026-11-11", "family": "HUDSON", "note": "Prints degF with degC in brackets; degC as printed."},
+    "HUDSON_S7": {"publisher": "Hudson Tool Steel", "title": "S7 shock-resisting tool steel, technical data", "url": "https://hudsontoolsteel.com/technical-data/steelS7", "accessed": "2026-11-11", "family": "HUDSON"},
+    "GMH_S7": {"publisher": "GMH Gruppe (Schmiedewerke Gröditz)", "title": "SWG 2357 (AISI S7) data sheet, 09/2020", "url": "https://gmh-gruppe.de/wp-content/uploads/2024/05/SWG_2357__AISI_S7__09_2020.pdf", "accessed": "2026-11-11", "family": "GMH", "note": "The table's text layer is out of order; values were matched to row labels by position."},
+    "ATLAS_4340": {"publisher": "Atlas Steels", "title": "Through hardening low alloy steel bar 4340 grade data sheet, print date 10 September 2021", "url": "https://atlassteels.com.au/wp-content/uploads/2021/09/Through-Hardening-Low-Alloy-Steel-Bar-4340-Grade-Data-Sheet-10-09-21-1.pdf", "accessed": "2026-11-11", "family": "ATLAS"},
+    "ATLAS_416": {"publisher": "Atlas Steels", "title": "Stainless steel 416 grade data sheet, print date 8 June 2021", "url": "https://atlassteels.com.au/stainless-steel-416-grade-data-sheet-28-04-21", "accessed": "2026-11-11", "family": "ATLAS"},
+    "ATLAS_420": {"publisher": "Atlas Steels", "title": "Stainless steel 420 grade data sheet, print date 8 June 2021", "url": "https://atlassteels.com.au/stainless-steel-420-grade-data-sheet-28-04-21", "accessed": "2026-11-11", "family": "ATLAS"},
+    "ATLAS_630": {"publisher": "Atlas Steels", "title": "Stainless steel 630 (17-4PH) grade data sheet, print date 8 June 2021", "url": "https://atlassteels.com.au/wp-content/uploads/2021/07/Stainless-Steel-630-17-4PH-Grade-Data-Sheet-28-04-21.pdf", "accessed": "2026-11-11", "family": "ATLAS"},
+    "AALCO_416": {"publisher": "Aalco", "title": "Stainless steel 1.4005 (416) bar datasheet", "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14005-416-Bar_108.ashx", "accessed": "2026-11-11", "family": "ATLAS", "note": "The heat treatment text is word for word the Atlas Steels 416 text, so it is counted with Atlas, not as a second publisher."},
+    "AALCO_440C": {"publisher": "Aalco", "title": "Stainless steel 1.4125 (440C) bar datasheet", "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14125-440C-Bar_312.ashx", "accessed": "2026-11-11", "family": "AALCO"},
+    "AALCO_174": {"publisher": "Aalco", "title": "Stainless steel 1.4542 17/4 (630) bar datasheet", "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14542-174--630-Bar_100.ashx", "accessed": "2026-11-11", "family": "AALCO", "note": "States the H-condition naming rule; its condition table was not in the page text."},
+    "ATI_4XX": {"publisher": "ATI", "title": "ATI 410/420/425 Mod/440A/440C technical data sheet, version 1 (2/18/2014)", "url": "https://atimaterials.com/Products/Documents/datasheets/stainless-specialty-steel/martensitic/ati_410_420_425_mod_440a_440c_tds_en4_v2.pdf", "accessed": "2026-11-11", "family": "ATI", "note": "Gives heat treatment for 410 and 420 (and 425 Mod, 440A) but none for 440C. Prints degF with degC in brackets."},
+    "GERR": {"publisher": "Dave Gerr, naval architect", "title": "Controlling Galvanic Corrosion, part 1 (galvanic series in seawater, mV vs Ag/AgCl at 77 degF)", "url": "https://www.gerrmarine.com/Articles/controllingcorrosionpt1.pdf", "accessed": "2026-11-11", "note": "(c) Dave Gerr 1991 and 2010."},
+    "WIKI_GS": {"publisher": "Wikipedia", "title": "Galvanic series (order in stagnant seawater, citing MIL-STD-889C, Corrosion Doctors and Atlas Steels Tech Note 7)", "url": "https://en.wikipedia.org/wiki/Galvanic_series", "accessed": "2026-11-11", "note": "Order only, no potentials."},
+    "EE_GALV": {"publisher": "Engineers Edge", "title": "Galvanic compatibility, dissimilar metal corrosion guide (anodic index table)", "url": "https://www.engineersedge.com/galvanic_capatability.htm", "accessed": "2026-11-11", "note": "Cites no standard on the page; the anodic index table has the layout of the MIL-STD-889 / MIL-F-14072 groups."},
+    "CARRLANE": {"publisher": "Carr Lane Manufacturing", "title": "Practical guideline for the anodic index of materials in different environments", "url": "https://www.carrlane.com/engineering-resources/technical-information/galvanic-corrosion/practical-guideline-for-the-anodic-index-of-materials-in-different-environments", "accessed": "2026-11-11", "note": "Guidance values only, no table; says not to use them for critical parts such as aerospace flying parts."},
+    "MISUMI_GALV": {"publisher": "MISUMI USA", "title": "Galvanic compatibility and corrosion table (S. Bredemann, updated 4/8/2025)", "url": "https://us.misumi-ec.com/blog/galvanic-compatiblity-and-corrosion-table/", "accessed": "2026-11-11", "note": "Prints signed potentials headed 'Anodic Index (V)' without an environment or reference electrode; a different scale from Engineers Edge, so not compared with it."},
+    "MCAM_TK": {"publisher": "Mitsubishi Chemical Advanced Materials", "title": "Guide to machining plastic parts (Machinist Toolkit, A4 EU metric)", "url": "https://www.mcam.com/mam/41701/MCG-Machinist-Toolkit-A4-EU-metric.pdf", "accessed": "2026-11-11", "note": "No version printed (copyright 2026). Rows are by MCAM trade names; matched to generic plastics by us."},
+    "ENSINGER_MG": {"publisher": "Ensinger (hosted by Curbell Plastics)", "title": "Machining Engineering Plastics (Ensinger guidelines, footer 09/12 E9911075A004US)", "url": "https://www.curbellplastics.com/wp-content/uploads/2022/11/Machining-Engineering-Plastics.pdf", "accessed": "2026-11-11", "family": "ENSINGER", "note": "Probably a 2012 edition. The imperial table's text layer is out of order: turning values were read as clearance, rake, side angle, speed (ft/min), feed (in/rev) from the column order; check against the original PDF."},
+    "BOEDEKER_T": {"publisher": "Boedeker Plastics", "title": "Plastic turning machining guidelines", "url": "https://www.boedeker.com/Technical-Resources/Plastic-Machining-Guidelines/Plastic-Turning-Machining-Guidelines", "accessed": "2026-11-11", "note": "Prints roughing (0.150 in depth) and finishing (0.025 in) speeds and feeds; we record the span. Its clearance and rake angles match Ensinger's for most plastics, so its angles are counted with Ensinger, not as a second publisher."},
+    "WSH": {"publisher": "W.S. Hampshire", "title": "Thermoplastic properties chart (Plastic-Properties.pdf)", "url": "https://catalog.wshampshire.com/Asset/Plastic-Properties.pdf", "accessed": "2026-11-11", "note": "No date printed. Max. operating temperature in degF; thermal expansion in in/in/degF x 10^-5 (converted by us: x 18 gives 10^-6/K)."},
+    "PROPLAS_T": {"publisher": "Professional Plastics", "title": "Thermal properties of plastic materials (table)", "url": "https://www.professionalplastics.com/professionalplastics/content/downloads/ThermalPropertiesofPlasticMaterials.pdf", "accessed": "2026-11-11", "note": "No date; 'given as a guide only'. 'Upper working temperature' (degC) is used as the maximum service temperature."},
+    "NAVY_SW": {"publisher": "US Navy (via Integrated Publishing, tpub.com)", "title": "Steelworker training manual, chapter 1, spark test, chip test and magnetic test", "url": "https://tpub.com/steelworker1/6.htm", "accessed": "2026-11-11", "note": "US government training manual (public domain); no NAVEDTRA number shown on the page."}
+  },
+
+  "temper_carbon": {
+    "_note": "Colour keys are ours; each publisher's own colour name is kept. Matched by name: 'golden yellow' and 'dark yellow' as dark yellow, 'brown dappled with purple' and 'red brown' as brown-purple, 'bright blue' and 'Wedgewood blue' as bright blue, 'pale blue' and 'light blue' as light blue.",
+    "order": ["pale_yellow", "straw", "yellow", "dark_yellow", "brown", "brown_purple", "purple", "violet", "dark_blue", "bright_blue", "light_blue", "grey_blue", "grey_green"],
+    "own": {
+      "pale_yellow": ["Pale yellow", "#efe2a2"], "straw": ["Straw", "#e5cb78"], "yellow": ["Yellow", "#dcb955"], "dark_yellow": ["Dark (golden) yellow", "#c99a3c"],
+      "brown": ["Brown", "#9a6a3c"], "brown_purple": ["Brown to purple", "#8a4f58"], "purple": ["Purple", "#76407e"], "violet": ["Violet", "#5b4190"],
+      "dark_blue": ["Dark blue", "#2d3f8e"], "bright_blue": ["Bright blue", "#3d6dbd"], "light_blue": ["Light (pale) blue", "#7ea5d4"], "grey_blue": ["Grey blue", "#8b9bb1"], "grey_green": ["Grey green", "#8ea398"]
+    },
+    "printed": {
+      "NAVY_AM": {"pale_yellow": {"name": "Pale yellow", "c": "220", "v": "Pale yellow 428 220", "fp": "428"}, "straw": {"name": "Straw", "c": "230", "v": "Straw 446 230", "fp": "446"}, "dark_yellow": {"name": "Golden yellow", "c": "243", "v": "Golden yellow 469 243", "fp": "469"}, "brown": {"name": "Brown", "c": "254", "v": "Brown 491 254", "fp": "491"}, "brown_purple": {"name": "Brown dappled with purple", "c": "266", "v": "Brown dappled with purple 509 266", "fp": "509"}, "purple": {"name": "Purple", "c": "277", "v": "Purple 531 277", "fp": "531"}, "dark_blue": {"name": "Dark blue", "c": "288", "v": "Dark blue 550 288", "fp": "550"}, "bright_blue": {"name": "Bright blue", "c": "297", "v": "Bright blue 567 297", "fp": "567"}, "light_blue": {"name": "Pale blue", "c": "321", "v": "Pale blue 610 321", "fp": "610"}},
+      "WYS": {"pale_yellow": {"name": "Light Yellow", "c": "210", "v": "Light Yellow 210 410", "fp": "410"}, "straw": {"name": "Straw", "c": "220", "v": "Straw 220 430", "fp": "430"}, "yellow": {"name": "Yellow", "c": "230", "v": "Yellow 230 450", "fp": "450"}, "dark_yellow": {"name": "Dark Yellow", "c": "240", "v": "Dark Yellow 240 460", "fp": "460"}, "brown": {"name": "Yellow Brown", "c": "250", "v": "Yellow Brown 250 480", "fp": "480"}, "brown_purple": {"name": "Red Brown", "c": "260", "v": "Red Brown 260 500", "fp": "500"}, "purple": {"name": "Purple", "c": "270", "v": "Purple 270 520", "fp": "520"}, "violet": {"name": "Violet", "c": "280", "v": "Violet 280 530", "fp": "530"}, "dark_blue": {"name": "Dark Blue", "c": "290", "v": "Dark Blue 290 550", "fp": "550"}, "bright_blue": {"name": "Wedgewood Blue", "c": "300", "v": "Wedgewood Blue 300 570", "fp": "570"}, "light_blue": {"name": "Light Blue", "c": "310", "v": "Light Blue 310 590", "fp": "590"}, "grey_blue": {"name": "Grey Blue", "c": "320", "v": "Grey Blue 320 610", "fp": "610"}, "grey_green": {"name": "Grey Green", "c": "330", "v": "Grey Green 330 630", "fp": "630"}},
+      "WIKI_HC": {"straw": {"name": "straw yellow", "c": "232", "v": "straw yellow/232 C"}, "brown": {"name": "brown", "c": "265", "v": "brown/265 C"}, "purple": {"name": "purple red", "c": "277", "v": "purple red/277 C"}, "light_blue": {"name": "light blue", "c": "288", "v": "light blue/288 C"}, "dark_blue": {"name": "dark blue", "c": "293", "v": "dark blue/293 C"}}
+    }
+  },
+  "tint_stainless": {
+    "_note": "Heated in air. The British Stainless Steel Association chart as reproduced by Wikipedia; Heat Treat Today gives the same order of colours by oxide thickness but its temperature chart is an image.",
+    "order": ["light_yellow", "brown", "magenta", "blue", "dark_blue"],
+    "own": {"light_yellow": ["Light yellow (straw)", "#ebdc9c"], "brown": ["Brown", "#9a6a3c"], "magenta": ["Magenta (purple)", "#a2477e"], "blue": ["Blue", "#3e5ead"], "dark_blue": ["Dark blue", "#2b3979"]},
+    "printed": {
+      "BSSA": {"light_yellow": {"name": "light yellow", "c": "290", "v": "light yellow/290 C"}, "brown": {"name": "brown", "c": "390", "v": "brown/390 C"}, "magenta": {"name": "magenta", "c": "450", "v": "magenta/450 C"}, "blue": {"name": "blue", "c": "540", "v": "blue/540 C"}, "dark_blue": {"name": "dark blue", "c": "600", "v": "dark blue/600 C"}}
+    },
+    "via": {"BSSA": "WIKI_HC"}
+  },
+  "colour_factors": [
+    ["Time at temperature", "A longer soak gives a deeper colour at the same temperature, so a colour reached slowly shows a lower temperature than the chart.", ["HTT"]],
+    ["Atmosphere", "Colours form by oxidation; oxygen and water vapour in the furnace gas (air or a leak) colour the surface, a clean inert or vacuum atmosphere does not.", ["HTT"]],
+    ["Alloy", "Charts differ by alloy: stainless steels colour at higher temperatures than plain carbon steel, and higher chromium slows the tint.", ["HTT", "WIKI_HC"]],
+    ["Surface finish", "A rougher or dirty surface oxidises faster and shows deeper colours; clean, bright metal is needed to read a colour at all.", ["HTT"]]
+  ],
+  "titanium_note": "Titanium heat-tint colours are not given: the sources read give titanium weld colour only as a sign of contamination (judged against the weld specification, for example AWS D17.1), not as a temperature, and no two free publishers print a titanium temperature chart.",
+
+  "terms": [
+    {"id": "anneal", "term": "Annealing (full / soft annealing)", "own": "Heating steel to a set temperature, holding it and cooling it very slowly (often in the furnace) so it is as soft and machinable as it gets. Tool steels are supplied 'soft annealed'.", "used_by": ["UDD_ARNE", "DOER_12510", "LUCEFIN_C45E", "ATLAS_4340", "ATLAS_420"]},
+    {"id": "spheroidise", "term": "Spheroidise (globular) annealing", "own": "A long soak just below or around the lower critical temperature that turns the carbides into small balls; the softest condition for cold forming and machining high-carbon steels.", "used_by": ["LUCEFIN_42CRMO4"]},
+    {"id": "normalise", "term": "Normalising", "own": "Heating above the hardening range and cooling in still air. Refines the grain and evens out the structure after forging or rolling; harder than annealed, softer than hardened.", "used_by": ["LUCEFIN_C45E", "LUCEFIN_42CRMO4", "ATLAS_4340"]},
+    {"id": "stress", "term": "Stress relieving", "own": "Heating well below the hardening range (for hardened steel, below the last tempering temperature) and cooling slowly, to release stresses from rough machining, welding or straightening without changing hardness much. Tool makers advise it between roughing and finishing.", "used_by": ["UDD_ARNE", "UDD_ORVAR", "DOER_12344", "LUCEFIN_C45E", "ATLAS_4340"]},
+    {"id": "harden", "term": "Hardening (austenitising and quenching)", "own": "Heating the steel into its hardening range (austenitising), soaking it until it is heated through, then cooling it fast enough (the quench) to form hard martensite. The quench medium (water, oil, polymer, air, gas) is set by the grade.", "used_by": ["UDD_ARNE", "UDD_SVERKER21", "DOER_12510", "HUDSON_A2", "ATLAS_4340"]},
+    {"id": "quench", "term": "Quench media", "own": "Water is the most severe quench, then polymer solutions and oil; air-hardening steels (A2, D2, H13, S7) harden in still or forced air or gas, which distorts less. A martempering (hot bath) quench stops just above the martensite start temperature to even out the part before it cools.", "used_by": ["UDD_ARNE", "UDD_SVERKER21", "UDD_ORVAR", "HUDSON_S7", "LUCEFIN_42CRMO4"]},
+    {"id": "temper", "term": "Tempering", "own": "Reheating hardened steel to a temperature below the hardening range, holding it and cooling it. It trades some hardness for toughness and must follow the quench at once (tool makers say when the part reaches about 50-70 °C). Tool steels are usually tempered twice or more.", "used_by": ["UDD_ARNE", "UDD_ORVAR", "UDD_M2", "HUDSON_S7", "DOER_12344"]},
+    {"id": "martemper", "term": "Martempering (marquenching)", "own": "Quenching into a hot salt bath or fluidised bed held just above the martensite start, equalising, then cooling in air. Less distortion and cracking than a direct quench.", "used_by": ["UDD_ARNE", "UDD_SVERKER21", "UDD_ORVAR"]},
+    {"id": "case", "term": "Case hardening (carburising)", "own": "Adding carbon to the surface of a low-carbon steel at high temperature, then hardening, so a hard skin sits on a tough core. Used for gears, pins and wear parts made of grades such as 8620.", "used_by": []},
+    {"id": "nitride", "term": "Nitriding", "own": "Diffusing nitrogen into the surface at a relatively low temperature (around 500 °C) for many hours. No quench, so very little distortion; gives a thin, very hard case on nitriding steels, 4140, 4340, H13 and similar.", "used_by": ["ATLAS_4340"]},
+    {"id": "induction", "term": "Induction and flame hardening", "own": "Heating only the surface quickly (with an induction coil or a flame) and quenching it, leaving the core as it was. Needs a steel with enough carbon (medium-carbon and alloy steels such as 1045, 4140, 4340), usually followed by a low temper.", "used_by": ["ATLAS_4340"]},
+    {"id": "ph", "term": "Solution treating and ageing (precipitation hardening)", "own": "For precipitation-hardening stainless steels such as 17-4PH: the bar is supplied solution treated (condition A); a single ageing at a lower temperature then raises strength. The condition name is the ageing temperature in °F (H900 = 900 °F). Ageing shrinks the part slightly.", "used_by": ["ATLAS_630", "AALCO_174"]}
+  ],
+
+  "grades": {
+    "_fields": {"anneal": "Annealing (soft or full)", "normalise": "Normalising", "stress": "Stress relieving", "harden": "Hardening (austenitising)", "quench": "Quench", "temper": "Tempering range", "temper_min": "Lowest tempering temperature", "avoid": "Tempering range to avoid", "nitride": "Nitriding"},
+    "order": ["1045", "4140", "4340", "O1", "A2", "D2", "S7", "H13", "M2", "416", "420", "440C"],
+    "rows": {
+      "1045": {"label": "1045 (C45E, 1.1191)", "kind": "Carbon steel", "fields": {
+        "anneal": {"LUCEFIN_C45E": {"c": "690", "v": "690 raffr. 10 °C/h fino a 600 poi aria (soft annealing +A)"}},
+        "normalise": {"LUCEFIN_C45E": {"c": "840-880", "v": "+N 840-880 aria"}},
+        "harden": {"LUCEFIN_C45E": {"c": "820-860", "v": "+Q 820 acqua / 860 olio o polimero", "note": "820 °C for a water quench, 860 °C for oil or polymer (as laid out in the table)."}},
+        "quench": {"LUCEFIN_C45E": {"t": "water or oil/polymer", "v": "acqua; olio o polimero"}},
+        "temper": {"LUCEFIN_C45E": {"c": "550-660", "v": "+T 550-660 aria"}},
+        "stress": {"LUCEFIN_C45E": {"t": "50 °C below the tempering temperature", "v": "+SR 50 sotto la temperatura di rinv."}}
+      }},
+      "4140": {"label": "4140 (42CrMo4, 1.7225)", "kind": "Alloy steel", "fields": {
+        "anneal": {"LUCEFIN_42CRMO4": {"c": "720", "v": "+A 720 raffredd. 15 °C/h fino a 600 poi aria (HB max 241)"}},
+        "normalise": {"LUCEFIN_42CRMO4": {"c": "870", "v": "+N 870 aria (HB ~ 190)"}},
+        "harden": {"LUCEFIN_42CRMO4": {"c": "820-860", "v": "+Q 860 olio polimero / 820 acqua", "note": "860 °C for oil or polymer, 820 °C for water."}},
+        "quench": {"LUCEFIN_42CRMO4": {"t": "oil/polymer or water", "v": "olio polimero; acqua"}},
+        "temper": {"LUCEFIN_42CRMO4": {"c": "540-680", "v": "+T 540-680 aria"}},
+        "stress": {"LUCEFIN_42CRMO4": {"t": "50 °C below the tempering temperature", "v": "+SR 50 sotto la temperatura di rinv."}}
+      }},
+      "4340": {"label": "4340", "kind": "Alloy steel", "fields": {
+        "anneal": {"ATLAS_4340": {"c": "850", "v": "Annealing 850°C"}},
+        "normalise": {"ATLAS_4340": {"c": "850-920", "v": "Normalising 850 - 920°C"}},
+        "harden": {"ATLAS_4340": {"c": "850-860", "v": "Hardening 850 - 860°C ... quench vigorously in oil (or polymer with an equivalent quench rate) to between 80 and 110°C"}},
+        "quench": {"ATLAS_4340": {"t": "oil (or polymer)", "v": "Quenching Medium Oil"}},
+        "temper": {"ATLAS_4340": {"c": "450-650", "v": "re-heat to 450 to 650°C, hold one hour per 25mm of section (2 hours minimum)"}},
+        "stress": {"ATLAS_4340": {"c": "500-550", "v": "For pre-hardened steel stress relieving is achieved by heating to between 500 to 550°C", "note": "Annealed parts 600-650 °C; hardened and tempered bars 25 °C below the tempering temperature."}},
+        "nitride": {"ATLAS_4340": {"c": "510", "v": "Nitride at approximately 510°C for 10 to 60 hours"}}
+      }},
+      "O1": {"label": "O1 (1.2510)", "kind": "Tool steel, oil hardening", "fields": {
+        "anneal": {"UDD_ARNE": {"fp": "1435", "c": "780", "v": "heat through to 780°C (1435°F) ... cool in the furnace at 15°C (27°F) per hour to 650°C"}, "DOER_12510": {"c": "740-770", "v": "Soft annealing 740 - 770°C furnace max. 230 HB"}},
+        "stress": {"UDD_ARNE": {"fp": "1200", "c": "650", "v": "heated through to 650°C (1200°F), holding time 2 hours"}, "DOER_12510": {"c": "600-650", "v": "Stress relief annealing 600 - 650°C furnace"}},
+        "harden": {"UDD_ARNE": {"fp": "1450-1560", "c": "790-850", "v": "Austenitizing temperature: 790–850°C (1450–1560°F)"}, "DOER_12510": {"c": "790-820", "v": "Hardening 790 - 820°C oil or hot bath"}},
+        "quench": {"UDD_ARNE": {"t": "oil or martempering bath", "v": "Oil; Martempering bath. Temperature 180–225°C"}, "DOER_12510": {"t": "oil or hot bath", "v": "oil or hot bath"}},
+        "temper": {"DOER_12510": {"c": "180-220", "v": "Tempering 180 - 220°C see tempering diagram"}},
+        "temper_min": {"UDD_ARNE": {"fp": "360", "c": "180", "v": "Lowest tempering temperature 180°C (360°F). Holding time at temperature minimum 2 hours."}}
+      }},
+      "A2": {"label": "A2 (1.2363)", "kind": "Tool steel, air hardening", "fields": {
+        "anneal": {"HUDSON_A2": {"fp": "1550", "c": "843", "v": "to 1550°F (843°C)"}, "DOER_12363": {"c": "800-840", "v": "Soft annealing 800 - 840°C furnace max. 241 HB"}},
+        "stress": {"DOER_12363": {"c": "600-650", "v": "Stress relief annealing 600 - 650°C furnace"}},
+        "harden": {"HUDSON_A2": {"fp": "1725-1750", "c": "941-954", "v": "Furnace or Salt: 1725-1750°F (941-954°C)"}, "DOER_12363": {"c": "950-980", "v": "Hardening 950 - 980°C"}},
+        "quench": {"HUDSON_A2": {"t": "air, pressurised gas or interrupted oil", "v": "Air, pressurized gas, or interrupted oil to 150-125°F(66-51°C)"}, "DOER_12363": {"t": "oil, pressure gas (N2), air or hot bath", "v": "oil, pressure gas (N2), air or hot bath"}},
+        "temper": {"HUDSON_A2": {"fp": "350-500", "c": "177-260", "v": "The typical tempering range is 350 to 500°F (177 to 260°C)"}, "DOER_12363": {"c": "500-550", "v": "Tempering 500 - 550°C see tempering diagram"}}
+      }},
+      "D2": {"label": "D2 (1.2379)", "kind": "Tool steel, high-carbon high-chromium", "fields": {
+        "anneal": {"UDD_SVERKER21": {"fp": "1560", "c": "850", "v": "heat through to 850°C (1560°F) ... cool in the furnace at 10°C (20°F) per hour to 650°C"}, "LUCEFIN_12379": {"c": "790-840", "v": "ricottura di lavorabilità +A 790-840 aria calma (HB max 255)"}},
+        "stress": {"UDD_SVERKER21": {"fp": "1200", "c": "650", "v": "heated through to 650°C (1200°F), holding time 2 hours"}, "LUCEFIN_12379": {"c": "650-700", "v": "distensione 650-700 raffreddamento in forno fino a 320 poi aria"}},
+        "harden": {"UDD_SVERKER21": {"fp": "1830-1905", "c": "1000-1040", "v": "Austenitizing temperature: 990–1080°C (1810–1980°F) but usually 1000–1040°C (1830–1905°F)", "note": "Usual range recorded; full range 990-1080 °C."}, "LUCEFIN_12379": {"c": "1000-1040", "v": "Tempra 1: 1000-1040 olio, polimero o aria", "note": "Also prints a second, higher hardening 1060-1090 °C in oil or polymer."}},
+        "quench": {"UDD_SVERKER21": {"t": "vacuum or forced gas; oil only for very simple shapes; martempering bath", "v": "Oil (Only very simple geometries); Vacuum (high speed gas); Forced air/gas; Martempering bath"}, "LUCEFIN_12379": {"t": "oil, polymer or air", "v": "olio, polimero o aria"}},
+        "temper": {"LUCEFIN_12379": {"c": "180-250", "v": "rinvenimento 180-250 aria calma minimo 2 cicli", "note": "Also lists 520 °C (after the higher hardening)."}},
+        "temper_min": {"UDD_SVERKER21": {"fp": "360", "c": "180", "v": "Lowest tempering temperature 180°C (360°F). Holding time at temperature minimum 2 hours."}}
+      }},
+      "S7": {"label": "S7", "kind": "Tool steel, shock resisting", "fields": {
+        "anneal": {"HUDSON_S7": {"fp": "1550", "c": "843", "v": "to 1550°F (843°C), hold at temperature for 1 hour per inch"}, "GMH_S7": {"c": "800-840", "v": "Soft annealing 800-840 °C furnace until min. 600 °C, air"}},
+        "stress": {"GMH_S7": {"c": "600-650", "v": "Stress relieving 600-650 °C before hardening"}},
+        "harden": {"HUDSON_S7": {"fp": "1725", "c": "941", "v": "Furnace or Salt: 1725°F (941°C)"}, "GMH_S7": {"c": "950-1010", "v": "Hardening 950-1010 °C oil, vacuum"}},
+        "quench": {"HUDSON_S7": {"t": "air, pressurised gas or warm oil (over 63 mm section: gas or interrupted oil)", "v": "Air, pressurized gas, or warm oil to 150-125°F (66-51°C)"}, "GMH_S7": {"t": "oil or vacuum", "v": "oil, vacuum"}},
+        "temper": {"HUDSON_S7": {"fp": "400-500", "c": "204-260", "v": "The typical tempering range for cold work tools is 400 to 500°F (204 to 260°C)", "note": "Hot work tools: above 900 °F (482 °C), double temper."}, "GMH_S7": {"c": "200-600", "v": "Tempering 200-600 °C air"}}
+      }},
+      "H13": {"label": "H13 (1.2344)", "kind": "Tool steel, hot work", "fields": {
+        "anneal": {"UDD_ORVAR": {"fp": "1560", "c": "850", "v": "heat through to 850°C (1560°F) ... cool in the furnace at 10°C (20°F) per hour to 650°C"}, "DOER_12344": {"c": "750-800", "v": "Soft annealing 750 - 800°C furnace max. 229 HB"}},
+        "stress": {"UDD_ORVAR": {"fp": "1200", "c": "650", "v": "heated through to 650°C (1200°F), holding time 2 hours"}, "DOER_12344": {"c": "600-650", "v": "Stress relief annealing 600 - 650°C furnace"}},
+        "harden": {"UDD_ORVAR": {"fp": "1870-1920", "c": "1020-1050", "v": "Austenitizing temperature: 1020–1050°C (1870–1920°F), normally 1020–1030°C (1870–1885°F)"}, "DOER_12344": {"c": "1020-1060", "v": "Hardening 1020 - 1060°C"}},
+        "quench": {"UDD_ORVAR": {"t": "high-speed gas or vacuum, martempering bath or warm oil", "v": "High speed gas/circulating atmosphere; Vacuum; Martempering bath or fluidized bed; Warm oil"}, "DOER_12344": {"t": "oil, pressure gas (N2), air or hot bath", "v": "oil, pressure gas (N2), air or hot bath"}},
+        "temper": {"DOER_12344": {"c": "500-550", "v": "Tempering 500 - 550°C see tempering diagram"}},
+        "temper_min": {"UDD_ORVAR": {"fp": "480", "c": "250", "v": "Lowest tempering temperature 250°C (480°F). Holding time at temperature minimum 2 h."}},
+        "avoid": {"UDD_ORVAR": {"fp": "800-1020", "c": "425-550", "v": "To avoid \"temper brittleness\", do not temper in the range 425–550°C (800–1020°F)"}}
+      }},
+      "M2": {"label": "M2 (1.3343)", "kind": "High-speed steel", "fields": {
+        "anneal": {"UDD_M2": {"c": "770-840", "v": "Blødglødning: Opvarmning til 770-840°C. Kontrolleret afkøling i ovn med 10-20°C pr. time til 600°C"}},
+        "stress": {"UDD_M2": {"c": "600-650", "v": "Afspændingsglødning: Efter grovbearbejdning opvarmes emnet til 600-650°C. Holdetid 2 timer."}},
+        "harden": {"UDD_M2": {"c": "1050-1240", "v": "Austenitiseringstemperatur: 1050 – 1240°C", "note": "Chosen by the tool and its size; preheat in steps 500, 850, 1050 °C."}},
+        "quench": {"UDD_M2": {"t": "fast quench in vacuum to 50-70 °C", "v": "Bratkøling i vakuum til 50-70°C."}},
+        "temper": {"UDD_M2": {"c": "550-570", "v": "Anløbning udføres 3 gange ved 550-570°C.", "note": "Three tempers, 1 h per 20 mm, minimum 1 h."}}
+      }},
+      "416": {"label": "416 (1.4005)", "kind": "Stainless, martensitic free-machining", "fields": {
+        "anneal": {"ATLAS_416": {"c": "815-900", "v": "Full annealing: Heat to 815-900°C for ½ hour per 25mm of thickness. Cool at 30°C per hour maximum to 600°C"}, "AALCO_416": {"c": "815-900", "v": "Heat to 815-900°C for ½ hour per 25mm of thickness. Cool at 30°C per hour maximum to 600°C and air cool."}},
+        "stress": {"ATLAS_416": {"c": "650-760", "v": "Sub-critical annealing: Heat to 650-760°C and air cool.", "note": "Sub-critical anneal."}, "AALCO_416": {"c": "650-760", "v": "Sub-Critical Annealing - Heat to 650-760°C and air cool."}},
+        "harden": {"ATLAS_416": {"c": "925-1010", "v": "Hardened by heating to 925-1010°C, quenching in oil"}, "AALCO_416": {"c": "925-1010", "v": "Hardened by heating to 925-1010°C, quenching in oil"}},
+        "quench": {"ATLAS_416": {"t": "oil", "v": "quenching in oil"}},
+        "avoid": {"ATLAS_416": {"c": "400-580", "v": "The tempering range 400-580°C should be avoided, due to poor ductility."}}
+      }},
+      "420": {"label": "420 (1.4021)", "kind": "Stainless, martensitic", "fields": {
+        "anneal": {"ATI_4XX": {"fp": "1550-1650", "c": "843-899", "v": "heat to 1550°F-1650°F (843-899°C) for ATI 420"}, "ATLAS_420": {"c": "840-900", "v": "Full anneal - 840-900°C, slow furnace cool to 600°C and then air cool."}},
+        "stress": {"ATLAS_420": {"c": "735-785", "v": "Process Anneal - 735-785°C and air cool.", "note": "Process (sub-critical) anneal."}},
+        "harden": {"ATI_4XX": {"fp": "1850-1950", "c": "1010-1066", "v": "slowly heat the alloy to 1850°F-1950°F (1010-1066°C)"}, "ATLAS_420": {"c": "980-1035", "v": "Heat to 980-1035°C, followed by quenching in oil or air."}},
+        "quench": {"ATI_4XX": {"t": "oil (thin sections air)", "v": "quench in oil; air cooling may be substituted for thin sections"}, "ATLAS_420": {"t": "oil or air (oil for heavy sections)", "v": "quenching in oil or air. Oil quenching is necessary for heavy sections."}},
+        "temper": {"ATI_4XX": {"fp": "400-500", "c": "204-260", "v": "approximately 400°F to 500°F (204-260°C)"}, "ATLAS_420": {"c": "150-370", "v": "Temper at 150-370°C to obtain a wide variety of hardness values"}},
+        "avoid": {"ATLAS_420": {"c": "425-600", "v": "The tempering range 425-600°C should be avoided."}}
+      }},
+      "440C": {"label": "440C (1.4125)", "kind": "Stainless, martensitic high-carbon", "fields": {
+        "anneal": {"AALCO_440C": {"c": "850-900", "v": "Full anneal - 850-900°C, slow furnace cool to about 600°C and then air cool."}},
+        "stress": {"AALCO_440C": {"c": "735-785", "v": "Sub-critical Annealing - 735-785°C and slow furnace cool.", "note": "Sub-critical anneal."}},
+        "harden": {"AALCO_440C": {"c": "1010-1065", "v": "Heat to 1010-1065°C, followed by quenching in warm oil or air."}},
+        "quench": {"AALCO_440C": {"t": "warm oil or air (oil for heavy sections)", "v": "quenching in warm oil or air. Oil quenching is necessary for heavy sections."}},
+        "temper": {"AALCO_440C": {"c": "150-370", "v": "Immediately temper at 150-370°C"}},
+        "avoid": {"AALCO_440C": {"c": "425-565", "v": "Tempering in the range 425-565°C is to be avoided because of reduced impact resistance and corrosion resistance."}}
+      }}
+    }
+  },
+  "ph174": {
+    "solution": {"ATLAS_630": {"c": "1040", "v": "Heat at 1040°C for ½ hour and cool to 30°C maximum in air."}},
+    "naming": {"ATLAS_630": "the condition is designated by the age temperature in °F", "AALCO_174": "Condition designations are given by the age hardening temperature in °F."},
+    "conditions": [
+      {"cond": "H900", "f": 900, "ATLAS_630": {"c": "480", "h": "1", "rm": "1310", "rp": "1170", "hrc": "40"}},
+      {"cond": "H925", "f": 925, "ATLAS_630": {"c": "495", "h": "4", "rm": "1170", "rp": "1070", "hrc": "38"}},
+      {"cond": "H1025", "f": 1025, "ATLAS_630": {"c": "550", "h": "4", "rm": "1070", "rp": "1000", "hrc": "35"}},
+      {"cond": "H1075", "f": 1075, "ATLAS_630": {"c": "580", "h": "4", "rm": "1000", "rp": "860", "hrc": "32"}},
+      {"cond": "H1100", "f": 1100, "ATLAS_630": {"c": "595", "h": "4", "rm": "965", "rp": "795", "hrc": "31"}},
+      {"cond": "H1150", "f": 1150, "ATLAS_630": {"c": "620", "h": "4", "rm": "930", "rp": "725", "hrc": "28"}}
+    ],
+    "shrink": {"AALCO_174": "This shrinking is approximately 0.05% for condition H900 and 0.10% for H1150."},
+    "double": {"ATLAS_630": "Specialist double-aging treatments H1150M and H1150D are also possible - refer to ASTM A564M."}
+  },
+  "temper_hardness_note": "Hardness after tempering is printed by single publishers only (Lucefin for C45E in HRC and 42CrMo4 in HB, Lucefin for 1.2379, ATI for 420 in HRC, Atlas for 416 and 420 in HB) and the tool makers print it as graphs. No two independent publishers print the same steel, hardening and scale, so no tempering-hardness table is shown. Use the steel maker's tempering graph for your grade.",
+
+  "galv_sea": {
+    "_note": "Seawater at 77 °F (25 °C), potential in volts against a silver/silver-chloride reference, as printed in millivolts by Gerr. Most negative = most anodic (corrodes first).",
+    "rows": [
+      ["magnesium", "Magnesium", "-1.73"], ["mg_mn", "Magnesium (2 % manganese)", "-1.67"], ["mg_az", "Magnesium alloy (9 % Al, 1 % Mn, 1.5 % Zn)", "-1.58"],
+      ["galvanized", "Galvanised iron (hot dipped)", "-1.14"], ["zinc_plate", "Zinc electroplating", "-1.13"], ["cd_zn_solder", "Cadmium-zinc solder (71/29)", "-1.12"], ["zinc", "Zinc", "-1.05"],
+      ["cadmium", "Cadmium", "-0.86"], ["cd_plate", "Cadmium-plated steel", "-0.86"], ["al_marine", "Aluminium, marine alloys (5086, 5083, 6061)", "-0.82"],
+      ["mild_steel", "Mild or structural steel (A36)", "-0.79"], ["alloy_steel", "Alloy steel", "-0.74"], ["al_forged", "Aluminium (forged alloy)", "-0.73"],
+      ["ss_active", "Stainless steel 302/304/316/321/347, active (oxygen starved)", "-0.55"], ["tin", "Tin", "-0.50"],
+      ["naval_brass", "Manganese bronze, CA-464 naval brass", "-0.45"], ["naval_brass_60", "Naval brass (60 Cu 39 Zn)", "-0.45"], ["yellow_brass", "Yellow brass", "-0.45"], ["admiralty", "Admiralty brass (70 Cu 29 Zn)", "-0.36"],
+      ["copper", "Copper (CA-110)", "-0.34"], ["brass_6040", "Brass (60 Cu 40 Zn)", "-0.33"], ["gunmetal", "Gunmetal (88 Cu + Sn)", "-0.31"], ["si_bronze", "Silicon bronze", "-0.26"],
+      ["tin_bronze", "Tin bronze", "-0.26"], ["lead", "Lead", "-0.24"], ["cuni", "Copper-nickel 70/30 (CA-715)", "-0.20"], ["al_bronze", "Aluminium bronze (90 Cu 10 Al)", "-0.15"],
+      ["ss_passive", "Stainless steel 302/304/316/321/347, passive (oxygenated)", "-0.15"], ["monel", "Monel 400 and 500", "-0.11"], ["titanium", "Titanium", "-0.10"],
+      ["silver", "Silver", "-0.08"], ["graphite", "Graphite and carbon fibre", "+0.25"], ["platinum", "Platinum", "+0.26"]
+    ],
+    "src": "GERR",
+    "rule": {"GERR": {"v": "0.20", "text": "keep the voltage difference between two metals in direct contact in seawater below 0.20 V; above that, insulate them from each other or protect them with anodes"}}
+  },
+  "galv_order": {
+    "_note": "Wikipedia's order, most noble first, for stagnant (low-oxygen) seawater. 'k' links an entry to a row of the Gerr table where the metal is the same; entries without k have no counterpart.",
+    "src": "WIKI_GS",
+    "rows": [
+      ["Graphite", "graphite"], ["Palladium", ""], ["Platinum", "platinum"], ["Gold", ""], ["Silver", "silver"], ["Titanium", "titanium"],
+      ["Stainless steel 316 (passivated)", "ss_passive"], ["Stainless steel 304 (passivated)", "ss_passive"], ["Silicon bronze", "si_bronze"], ["Stainless steel 316 (active)", ""],
+      ["Monel 400", "monel"], ["Phosphor bronze", ""], ["Admiralty brass", "admiralty"], ["Cupronickel", "cuni"], ["Molybdenum", ""], ["Red brass", ""], ["Brass plating", ""],
+      ["Yellow brass", "yellow_brass"], ["Naval brass 464", "naval_brass"], ["Uranium 8% Mo", ""], ["Niobium 1% Zr", ""], ["Tungsten", ""], ["Tin", "tin"], ["Lead", "lead"],
+      ["Stainless steel 304 (active)", "ss_active"], ["Tantalum", ""], ["Chromium plating", ""], ["Nickel (passive)", ""], ["Copper", "copper"], ["Nickel (active)", ""],
+      ["Cast iron", ""], ["Steel", "mild_steel"], ["Indium", ""], ["Aluminum", "al_marine"], ["Uranium (pure)", ""], ["Cadmium", "cadmium"], ["Beryllium", ""], ["Zinc plating", "zinc_plate"], ["Magnesium", "magnesium"]
+    ]
+  },
+  "anodic_index": {
+    "_note": "Anodic index in volts (gold = 0). A higher index is more anodic. Not a seawater measurement: a design table for choosing compatible metals and finishes.",
+    "src": "EE_GALV",
+    "rows": [
+      ["gold", "Gold, solid and plated; gold-platinum alloy", "0.00"], ["rhodium", "Rhodium plated on silver-plated copper", "0.05"], ["silver", "Silver, solid or plated; monel; high nickel-copper alloys", "0.15"],
+      ["nickel", "Nickel, solid or plated; titanium and its alloys; Monel", "0.30"], ["copper", "Copper, solid or plated; low brasses or bronzes; silver solder; nickel silver; nickel-chromium alloys", "0.35"],
+      ["brass", "Brass and bronzes", "0.40"], ["high_brass", "High brasses and bronzes", "0.45"], ["ss18", "18 % chromium corrosion-resistant steels (300 series)", "0.50"],
+      ["chrome_plate", "Chromium plated; tin plated; 12 % chromium corrosion-resistant steels (400 series)", "0.60"], ["tinplate", "Tin-plate; tin-lead solder", "0.65"], ["lead", "Lead, solid or plated; high lead alloys", "0.70"],
+      ["al2000", "Aluminium, wrought 2000 series", "0.75"], ["steel", "Iron (wrought, grey or malleable), plain carbon and low alloy steels", "0.85"],
+      ["al_other", "Aluminium, wrought alloys other than 2000 series; silicon-type cast alloys", "0.90"], ["al_cast", "Aluminium cast alloys (other than silicon type); cadmium plated and chromate", "0.95"],
+      ["galvanized", "Hot-dip zinc plate; galvanised steel", "1.20"], ["zinc", "Zinc, wrought; zinc die-casting alloys; zinc plated", "1.25"], ["magnesium", "Magnesium and its alloys, cast or wrought", "1.75"], ["beryllium", "Beryllium", "1.85"]
+    ],
+    "limits": [
+      {"env": "harsh", "label": "Harsh (outdoors, high humidity, salt)", "EE_GALV": {"v": "0.15", "text": "Typically there should be not more than 0.15 V difference in the Anodic Index"}, "CARRLANE": {"v": "0.15", "text": "Harsh environments: a difference of up to 0.15V is considered generally acceptable"}},
+      {"env": "normal", "label": "Normal (indoors, not climate controlled)", "EE_GALV": {"v": "0.25", "text": "Typically there should not be more than 0.25 V difference in the Anodic Index"}, "CARRLANE": {"v": "0.25", "text": "Indoor, non-climate-controlled (moderate humidity): up to 0.25V is considered generally acceptable"}},
+      {"env": "controlled", "label": "Controlled (temperature and humidity controlled)", "EE_GALV": {"v": "0.50", "text": "For controlled environments ... 0.50 V can be tolerated"}, "CARRLANE": {"v": "0.50", "text": "Climate-controlled indoor: up to 0.50V is considered generally acceptable"}}
+    ]
+  },
+
+  "plastics": {
+    "_fields": {"max_temp": "Max. service temperature (°C)", "cte": "Thermal expansion (10^-6/K)", "density": "Density (kg/m³)", "anneal_hold": "Annealing hold temperature (°C)", "turn_speed": "Turning cutting speed (m/min)", "turn_feed": "Turning feed (mm/rev)", "clearance": "Clearance (relief) angle (°)", "rake": "Rake angle (°)"},
+    "_units": "WSH max_temp is printed in degF and converted; WSH cte printed in in/in/degF x 10^-5 and converted (x 18); WSH density from specific gravity (x 1000). Ensinger and Boedeker speeds in ft/min and feeds in in/rev, converted. Converted values keep the printed text in 'v'.",
+    "order": ["POM", "PA6", "PA66", "PEEK", "UHMWPE", "PTFE", "PC", "PMMA", "PVC", "PP", "ABS", "PEI"],
+    "rows": {
+      "POM": {"name": "Acetal (POM)", "material": "Acetal (POM)", "fields": {
+        "max_temp": {"WSH": {"f": "200", "v": "Acetal ... 200˚"}, "PROPLAS_T": {"c": "80-120", "v": "Acetal - Copolymer POMC ... upper working temperature 80-120"}},
+        "anneal_hold": {"ENSINGER_MG": {"f": "310", "v": "TECAFORM AH POM-C 3 h to 194°F 3 h to 310°F"}},
+        "turn_speed": {"MCAM_TK": {"m": "200-500", "v": "Ertacetal POM ... v 200-500 m/min"}, "ENSINGER_MG": {"ft": "985-1700", "v": "Acetal (TECAFORM AD, AH) turning 985- 1700"}, "BOEDEKER_T": {"ft": "500-700", "v": "Acetal (POM) 500-600 / 600-700 ft/min"}},
+        "turn_feed": {"MCAM_TK": {"mm": "0.05-0.5", "v": "s 0.05-0.5 mm/rev"}, "ENSINGER_MG": {"in": "0.004-0.016", "v": "0.004–0.016"}, "BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007 in/rev"}},
+        "clearance": {"MCAM_TK": {"d": "5-15", "v": "α 5-15"}, "ENSINGER_MG": {"d": "6-8", "v": "6–8"}, "BOEDEKER_T": {"d": "6-8", "v": "Clearance 6-8°", "family": "ENSINGER"}},
+        "rake": {"MCAM_TK": {"d": "0-10", "v": "γ 0-10"}, "ENSINGER_MG": {"d": "0-5", "v": "0–5"}, "BOEDEKER_T": {"d": "0-5", "v": "Rake 0-5°", "family": "ENSINGER"}}
+      }, "notes": [["Easy to machine with short chips and very dimensionally stable.", ["ENSINGER_MG"]], ["Keep heat low: local overheating gives post-shrinkage and warping (Ensinger: up to about 2.5 %).", ["ENSINGER_MG"]]]},
+      "PA6": {"name": "Nylon 6 (PA6, cast or extruded)", "material": "Nylon (PA)", "fields": {
+        "max_temp": {"WSH": {"f": "210", "v": "Nylon 6 Cast ... 210˚"}, "PROPLAS_T": {"c": "80-160", "v": "Polyamide - Nylon 6 PA 6 ... 80-160"}},
+        "anneal_hold": {"MCAM_TK": {"c": "160", "v": "PA 160°C"}, "ENSINGER_MG": {"f": "320", "v": "TECAMID 6 PA6 3 h to 194°F 3 h to 320°F"}},
+        "turn_speed": {"MCAM_TK": {"m": "200-500", "v": "Ertalon PA / Nylatron PA ... 200-500"}, "ENSINGER_MG": {"ft": "820-1640", "v": "Nylon (TECAMID, TECARIM, TECAST) 820– 1640"}, "BOEDEKER_T": {"ft": "500-700", "v": "Nylon (PA) 500-600 / 600-700"}},
+        "turn_feed": {"MCAM_TK": {"mm": "0.05-0.5", "v": "0.05-0.5"}, "ENSINGER_MG": {"in": "0.004-0.018", "v": "0.004–0.018"}, "BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007"}},
+        "clearance": {"MCAM_TK": {"d": "5-15", "v": "5-15"}, "ENSINGER_MG": {"d": "6-10", "v": "6– 10"}, "BOEDEKER_T": {"d": "6-10", "v": "6-10°", "family": "ENSINGER"}},
+        "rake": {"MCAM_TK": {"d": "0-10", "v": "0-10"}, "ENSINGER_MG": {"d": "0-5", "v": "0–5"}, "BOEDEKER_T": {"d": "0-5", "v": "0-5°", "family": "ENSINGER"}}
+      }, "notes": [["Takes up water and swells (Ensinger: about 0.5 % in size per 3 % moisture): leave allowance on close fits and store stock dry.", ["ENSINGER_MG"]], ["Extruded PA6 and PA66 form continuous chips; clear chips often. Large stock can have a dry, brittle core: Ensinger advises preheating large rods and plates to avoid cracking.", ["ENSINGER_MG"]]]},
+      "PA66": {"name": "Nylon 66 (PA66)", "material": null, "fields": {
+        "max_temp": {"WSH": {"f": "230", "v": "Nylon 6/6 Extruded ... 230˚"}, "PROPLAS_T": {"c": "80-180", "v": "Polyamide - Nylon 6, 6 PA 6,6 ... 80-180"}},
+        "cte": {"WSH": {"x5f": "4.50", "v": "Nylon 6/6 Extruded ... 4.50"}, "PROPLAS_T": {"k": "90", "v": "PA 6,6 90"}},
+        "density": {"WSH": {"sg": "1.140", "v": "Nylon 6/6 Extruded ... 1.140"}},
+        "anneal_hold": {"ENSINGER_MG": {"f": "355", "v": "TECAMID 66 PA66 3 h to 212°F 4 h to 355°F"}},
+        "turn_speed": {"MCAM_TK": {"m": "200-500", "v": "Ertalon PA ... 200-500"}, "ENSINGER_MG": {"ft": "820-1640", "v": "Nylon (TECAMID) 820– 1640"}, "BOEDEKER_T": {"ft": "500-700", "v": "Nylon (PA) 500-600 / 600-700"}},
+        "clearance": {"MCAM_TK": {"d": "5-15", "v": "5-15"}, "ENSINGER_MG": {"d": "6-10", "v": "6– 10"}, "BOEDEKER_T": {"d": "6-10", "v": "6-10°", "family": "ENSINGER"}},
+        "rake": {"MCAM_TK": {"d": "0-10", "v": "0-10"}, "ENSINGER_MG": {"d": "0-5", "v": "0–5"}, "BOEDEKER_T": {"d": "0-5", "v": "0-5°", "family": "ENSINGER"}}
+      }, "notes": [["Like PA6: absorbs moisture and grows; long chips. MCAM and Boedeker give one row for all unfilled nylons.", ["ENSINGER_MG", "MCAM_TK", "BOEDEKER_T"]]]},
+      "PEEK": {"name": "PEEK (unfilled)", "material": "PEEK", "fields": {
+        "max_temp": {"WSH": {"f": "480", "v": "PEEK ... 480˚"}, "PROPLAS_T": {"c": "250", "v": "Polyetheretherketone PEEK ... 250"}},
+        "anneal_hold": {"MCAM_TK": {"c": "250", "v": "PEEK 250°C"}, "ENSINGER_MG": {"f": "430", "v": "TECAPEEK PEEK 3 h to 250°F 4 h to 430°F"}},
+        "turn_speed": {"MCAM_TK": {"m": "200-400", "v": "Ketron 1000 PEEK ... 200-400 (carbide)"}, "ENSINGER_MG": {"ft": "820-1640", "v": "PEEK (TECAPEEK) 820– 1640"}, "BOEDEKER_T": {"ft": "350-600", "v": "PEEK (unfilled) 350-500 / 500-600"}},
+        "turn_feed": {"MCAM_TK": {"mm": "0.05-0.5", "v": "0.05-0.5"}, "ENSINGER_MG": {"in": "0.004-0.018", "v": "0.004–0.018"}, "BOEDEKER_T": {"in": "0.003-0.015", "v": ".010-.015 / .003-.008"}},
+        "clearance": {"MCAM_TK": {"d": "5-15", "v": "5-15"}, "ENSINGER_MG": {"d": "6-8", "v": "6–8"}, "BOEDEKER_T": {"d": "5-10", "v": "5-10°"}},
+        "rake": {"MCAM_TK": {"d": "0-10", "v": "0-10"}, "ENSINGER_MG": {"d": "0-5", "v": "0–5"}, "BOEDEKER_T": {"d": "3-8", "v": "3-8°"}}
+      }, "notes": [["Machines well with short chips; carbide tools (MCAM lists carbide only). Filled grades (glass, carbon) are abrasive: carbide or diamond tools and lower speeds.", ["ENSINGER_MG", "MCAM_TK"]], ["Keep heat input low to limit post-shrinkage; anneal between roughing and finishing for tight tolerances.", ["ENSINGER_MG", "MCAM_TK"]]]},
+      "UHMWPE": {"name": "UHMW-PE", "material": "UHMW-PE", "fields": {
+        "max_temp": {"WSH": {"f": "176", "v": "Polyethylene 819 UHMW ... 176˚"}, "PROPLAS_T": {"c": "55-95", "v": "Polyethylene - U.H.M.W. UHMW PE ... 55-95"}},
+        "anneal_hold": {"MCAM_TK": {"c": "130", "v": "PE-(U)HMW 130°C"}},
+        "turn_speed": {"MCAM_TK": {"m": "200-500", "v": "TIVAR UHMW-PE ... 200-500"}, "BOEDEKER_T": {"ft": "500-700", "v": "PE, incl. UHMW-PE 500-600 / 600-700"}},
+        "turn_feed": {"MCAM_TK": {"mm": "0.05-0.5", "v": "0.05-0.5"}, "BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007"}},
+        "clearance": {"MCAM_TK": {"d": "5-15", "v": "5-15"}, "BOEDEKER_T": {"d": "6-10", "v": "6-10°"}},
+        "rake": {"MCAM_TK": {"d": "0-10", "v": "0-10"}, "BOEDEKER_T": {"d": "0-5", "v": "0-5°"}}
+      }, "notes": [["Very soft and tough: needs sharp tools and burrs readily (Ensinger says this of soft, tough plastics such as PE and PTFE). Large thermal expansion: measure parts at room temperature.", ["ENSINGER_MG"]]]},
+      "PTFE": {"name": "PTFE (virgin)", "material": "PTFE", "fields": {
+        "max_temp": {"WSH": {"f": "500", "v": "Teflon Virgin Grade ... 500˚"}, "PROPLAS_T": {"c": "180-260", "v": "Polytetrafluoroethylene PTFE ... 180-260"}},
+        "turn_speed": {"ENSINGER_MG": {"ft": "490-1640", "v": "PTFE/PVDF (TECAFLON) 490– 1640"}, "BOEDEKER_T": {"ft": "600-1000", "v": "PTFE (unfilled, glass, or mica) 600-1000 / 600-700"}},
+        "turn_feed": {"ENSINGER_MG": {"in": "0.004-0.012", "v": "0.004–0.012"}, "BOEDEKER_T": {"in": "0.004-0.016", "v": ".010-.016 / .004-.007"}},
+        "clearance": {"ENSINGER_MG": {"d": "5-10", "v": "5– 10"}, "BOEDEKER_T": {"d": "5-10", "v": "5-10°", "family": "ENSINGER"}},
+        "rake": {"ENSINGER_MG": {"d": "5-8", "v": "5–8"}, "BOEDEKER_T": {"d": "5-8", "v": "5-8°", "family": "ENSINGER"}}
+      }, "notes": [["Soft, creeps under clamping force and smears: very sharp tools, light clamping, and expect fuzz and burrs that need deburring.", ["ENSINGER_MG"]], ["MCAM's PTFE rows are for its filled Fluorosint grades and are not used for virgin PTFE.", ["MCAM_TK"]]]},
+      "PC": {"name": "Polycarbonate (PC)", "material": null, "fields": {
+        "max_temp": {"WSH": {"f": "290", "v": "Polycarbonate ... 290˚"}, "PROPLAS_T": {"c": "115-130", "v": "Polycarbonate PC ... 115-130"}},
+        "cte": {"WSH": {"x5f": "3.75", "v": "Polycarbonate ... 3.75"}, "PROPLAS_T": {"k": "66-70", "v": "Polycarbonate PC 66-70"}},
+        "density": {"WSH": {"sg": "1.240", "v": "Polycarbonate ... 1.240"}},
+        "anneal_hold": {"ENSINGER_MG": {"f": "265", "v": "TECANAT PC 3 h to 175°F 3 h to 265°F"}},
+        "turn_speed": {"MCAM_TK": {"m": "200-400", "v": "Altron PC ... 200-400"}, "ENSINGER_MG": {"ft": "985", "v": "Polycarbonate (TECANAT) 985"}, "BOEDEKER_T": {"ft": "500-700", "v": "Polycarbonate (PC) 500-600 / 600-700"}},
+        "turn_feed": {"MCAM_TK": {"mm": "0.05-0.4", "v": "0.05-0.4"}, "ENSINGER_MG": {"in": "0.004-0.018", "v": "0.004–0.018"}, "BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007"}},
+        "clearance": {"MCAM_TK": {"d": "5-15", "v": "5-15"}, "ENSINGER_MG": {"d": "5-10", "v": "5– 10"}, "BOEDEKER_T": {"d": "5-12", "v": "5-12°"}},
+        "rake": {"MCAM_TK": {"d": "0-10", "v": "0-10"}, "ENSINGER_MG": {"d": "6-8", "v": "6–8"}, "BOEDEKER_T": {"d": "6-8", "v": "6-8°", "family": "ENSINGER"}}
+      }, "notes": [["Amorphous: stress-cracks with oils, greases and many cutting fluids. Machine dry or with a water-based fluid and wash parts afterwards (MCAM: isopropyl alcohol, then water).", ["ENSINGER_MG", "MCAM_TK"]], ["Sharp tools, light feeds, round inside corners.", ["ENSINGER_MG"]]]},
+      "PMMA": {"name": "Acrylic (PMMA, cast)", "material": null, "fields": {
+        "max_temp": {"WSH": {"f": "180", "v": "Acrylic Cast ... 180˚"}, "PROPLAS_T": {"c": "50-90", "v": "Polymethylmethacrylate PMMA, Acrylic ... 50 to 90"}},
+        "cte": {"WSH": {"x5f": "3.50", "v": "Acrylic Cast ... 3.50"}, "PROPLAS_T": {"k": "70-77", "v": "PMMA, Acrylic 70-77"}},
+        "density": {"WSH": {"sg": "1.190", "v": "Acrylic Cast ... 1.190"}},
+        "turn_speed": {"BOEDEKER_T": {"ft": "500-700", "v": "PMMA (Acrylic) 500-600 / 600-700"}},
+        "turn_feed": {"BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007"}},
+        "clearance": {"BOEDEKER_T": {"d": "5-10", "v": "5-10°"}},
+        "rake": {"BOEDEKER_T": {"d": "0-4", "v": "0-4°"}}
+      }, "notes": [["Brittle and notch sensitive: Boedeker prints a small rake (0-4°); support thin parts. Amorphous like PC, so avoid mineral-oil coolants.", ["BOEDEKER_T", "MCAM_TK"]]]},
+      "PVC": {"name": "PVC (rigid, type I)", "material": null, "fields": {
+        "max_temp": {"WSH": {"f": "150", "v": "PVC Type I ... 150˚"}, "PROPLAS_T": {"c": "50-75", "v": "Polyvinylchloride - Unplasticized UPVC ... 50-75"}},
+        "cte": {"WSH": {"x5f": "5.50", "v": "PVC Type I ... 5.50"}, "PROPLAS_T": {"k": "75-100", "v": "UPVC 75-100"}},
+        "density": {"WSH": {"sg": "1.400", "v": "PVC Type I ... 1.400"}},
+        "turn_speed": {"BOEDEKER_T": {"ft": "500-700", "v": "PVC (Type 1 & 2), CPVC 500-600 / 600-700"}},
+        "turn_feed": {"BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007"}},
+        "clearance": {"BOEDEKER_T": {"d": "8-10", "v": "8-10°"}},
+        "rake": {"BOEDEKER_T": {"d": "0-5", "v": "0-5°"}}
+      }, "notes": [["Softens at a low temperature: keep the cut cool with air. Overheated PVC gives off corrosive fumes, so never let it burn; keep chips off machine slides.", []]]},
+      "PP": {"name": "Polypropylene (PP)", "material": null, "fields": {
+        "max_temp": {"WSH": {"f": "140", "v": "Polypropylene ... 140˚"}, "PROPLAS_T": {"c": "90-120", "v": "Polypropylene PP ... 90-120"}},
+        "cte": {"WSH": {"x5f": "10.20", "v": "Polypropylene ... 10.20"}, "PROPLAS_T": {"k": "100-180", "v": "Polypropylene PP 100-180"}},
+        "density": {"WSH": {"sg": "0.905", "v": "Polypropylene ... 0.905"}},
+        "turn_speed": {"ENSINGER_MG": {"ft": "820-1640", "v": "PP (TECAFINE PE, PP) 820– 1640"}, "BOEDEKER_T": {"ft": "500-700", "v": "PP 500-600 / 600-700"}},
+        "turn_feed": {"ENSINGER_MG": {"in": "0.004-0.018", "v": "0.004–0.018"}, "BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007"}},
+        "clearance": {"ENSINGER_MG": {"d": "6-10", "v": "6– 10"}, "BOEDEKER_T": {"d": "6-10", "v": "6-10°", "family": "ENSINGER"}},
+        "rake": {"ENSINGER_MG": {"d": "0-5", "v": "0–5"}, "BOEDEKER_T": {"d": "0-5", "v": "0-5°", "family": "ENSINGER"}}
+      }, "notes": [["Soft and tough like PE: sharp tools, burrs readily, and large thermal expansion.", ["ENSINGER_MG"]]]},
+      "ABS": {"name": "ABS", "material": null, "fields": {
+        "max_temp": {"WSH": {"f": "200", "v": "ABS ... 200˚"}, "PROPLAS_T": {"c": "70-100", "v": "Polyacrylonitrile-butadienestyrene ABS ... 70-100"}},
+        "cte": {"WSH": {"x5f": "5.30", "v": "ABS ... 5.30"}, "PROPLAS_T": {"k": "80", "v": "ABS 80"}},
+        "density": {"WSH": {"sg": "1.040", "v": "ABS ... 1.040"}},
+        "turn_speed": {"ENSINGER_MG": {"ft": "655-1640", "v": "ABS (TECARAN ABS) 655– 1640"}, "BOEDEKER_T": {"ft": "500-700", "v": "ABS 500-600 / 600-700"}},
+        "turn_feed": {"ENSINGER_MG": {"in": "0.008-0.018", "v": "0.008–0.018"}, "BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007"}},
+        "clearance": {"ENSINGER_MG": {"d": "5-15", "v": "5– 15"}, "BOEDEKER_T": {"d": "5-15", "v": "5-15°", "family": "ENSINGER"}},
+        "rake": {"ENSINGER_MG": {"d": "25-30", "v": "25–30"}, "BOEDEKER_T": {"d": "25-30", "v": "25-30°", "family": "ENSINGER"}}
+      }, "notes": [["Amorphous and tough; a large positive rake is printed for it. Avoid oily coolants, as with other amorphous plastics.", ["ENSINGER_MG", "MCAM_TK"]]]},
+      "PEI": {"name": "PEI (Ultem 1000 type, unfilled)", "material": null, "fields": {
+        "max_temp": {"WSH": {"f": "392", "v": "Ultem (Unfilled) ... 392˚"}, "PROPLAS_T": {"c": "170-200", "v": "Polyetherimide PEI ... 170-200"}},
+        "cte": {"WSH": {"x5f": "3.10", "v": "Ultem (Unfilled) ... 3.10"}, "PROPLAS_T": {"k": "56", "v": "Polyetherimide PEI 56"}},
+        "density": {"WSH": {"sg": "1.270", "v": "Ultem (Unfilled) ... 1.270"}},
+        "turn_speed": {"MCAM_TK": {"m": "200-400", "v": "Duratron U1000 PEI ... 200-400"}, "BOEDEKER_T": {"ft": "500-700", "v": "PEI (incl. Ultem 1000) 500-600 / 600-700"}},
+        "turn_feed": {"MCAM_TK": {"mm": "0.05-0.4", "v": "0.05-0.4"}, "BOEDEKER_T": {"in": "0.004-0.015", "v": ".010-.015 / .004-.007"}},
+        "clearance": {"MCAM_TK": {"d": "5-15", "v": "5-15"}, "BOEDEKER_T": {"d": "5-10", "v": "5-10°"}},
+        "rake": {"MCAM_TK": {"d": "0-10", "v": "0-10"}, "BOEDEKER_T": {"d": "0-10", "v": "0-10°"}}
+      }, "notes": [["Amorphous and stiff; stress-cracks with some fluids like PC, so machine dry or with a water-based fluid. Carbide tools.", ["MCAM_TK"]]]}
+    },
+    "general": [
+      ["Plastics conduct heat poorly and expand up to about ten times as much as metals: keep heat out of the part with sharp, positive tools and enough feed to cut chips rather than rub.", ["MCAM_TK", "BOEDEKER_T", "ENSINGER_MG"]],
+      ["Coolant is mostly not needed: air blast or a water-based fluid. Mineral-oil fluids can stress-crack amorphous plastics (PC, PMMA, PEI, PSU, ABS).", ["MCAM_TK", "ENSINGER_MG", "BOEDEKER_T"]],
+      ["For tight tolerances, rough, let the part rest (MCAM: 24 hours) or anneal it, then finish. Diameters tend to grow after machining, so aim low in the tolerance (MCAM).", ["MCAM_TK", "ENSINGER_MG"]],
+      ["Measure at room temperature: a part measured warm from the machine is oversize by its expansion.", []],
+      ["Drilling generates the most heat: peck, clear chips, and use a lower speed than turning (MCAM: 25-100 m/min, 90-120° point).", ["MCAM_TK"]],
+      ["Test on scrap first; grades and fillers change the right numbers.", ["BOEDEKER_T"]]
+    ]
+  },
+
+  "metalid": {
+    "spark": {
+      "src": "NAVY_SW",
+      "_note": "Stream lengths are for the same wheel and pressure in the Navy manual and only compare metals with each other.",
+      "rows": [
+        ["Wrought iron", "65", "large", "straw near the wheel, brighter red at the end", "few forked sparklers near the end"],
+        ["Low-carbon steel", "70", "moderately large", "white", "few forked sparklers"],
+        ["High-carbon steel", "55", "larger", "white", "small repeating sparklers"],
+        ["Grey cast iron", "25", "rather small", "red near the wheel, straw further out", "small repeating sparklers"],
+        ["Stainless steel", "50", "moderate", "straw near the wheel, white at the end", "few forked sparklers"],
+        ["Nickel and Monel", "", "small", "orange, in wavy streaks", "no sparklers (the two cannot be told apart this way)"]
+      ]
+    },
+    "tests": [
+      ["Spark test", "Touch the metal lightly to a grinding wheel and compare the stream with known samples on the same wheel: more carbon gives more, smaller bursts (sparklers). Wear eye protection and keep clear of others.", ["NAVY_SW"]],
+      ["Magnet", "Iron-based (ferrous) metals are normally attracted by a magnet and nonferrous metals are not; some stainless steels are not magnetic, so the test is not fully reliable.", ["NAVY_SW"]],
+      ["Magnet and stainless", "Ferritic and martensitic stainless (400 series) are attracted by a magnet, annealed austenitic stainless (300 series) is not, and cold-worked 300 series can be slightly magnetic: a magnet alone never proves a grade.", []],
+      ["Chip test", "Cut a small chip with a sharp cold chisel and compare with known samples: the size and edges of the chip, its grain, and how easily it cuts all help to tell metals apart (the Navy manual tabulates them).", ["NAVY_SW"]],
+      ["File test", "A file bites easily into soft (annealed) steel, harder into tool steel, and skates over hardened steel; it gives a rough idea of hardness only. Use a proper hardness tester for numbers.", []],
+      ["Appearance and weight", "Colour, surface (mill scale, cast skin, machined), and weight for size separate aluminium, titanium, copper alloys and steel quickly.", []],
+      ["When it matters", "For a grade that matters, trust the mill certificate, a positive material identification (XRF or OES) analysis, or a lab: the tests above only sort metals into families.", []]
+    ]
+  }
+}

@@ -586,6 +586,7 @@ pub use measure::*;
 pub mod units;
 pub mod expr;
 pub mod gears;
+pub mod matref;
 
 #[cfg(test)]
 mod tests {
