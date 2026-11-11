@@ -161,7 +161,7 @@ Object.assign(DIAGRAMS, {
     const L = deV(rows, /^Lead L/), P = deV(rows, /^Pitch P/), ga = deV(rows, 'Lead angle');
     if (!(n >= 1 && L > 0 && P > 0)) return '';
     const nd = Math.min(n, 12), s = deClamp(250 / (2 * L), 6 / P, 1e9), x0 = 40, x1 = 330;
-    const Dpx = deClamp(v.e > 0 ? v.e * s : 110, 70, 130), cy = 132, yt = cy - Dpx / 2, yb = cy + Dpx / 2, dep = deClamp(0.3 * P * s, 3, 12);
+    const Dpx = deClamp(v.e > 0 ? v.e * s : 110, 70, 130), cy = 132, yt = cy - Dpx / 2, yb = cy + Dpx / 2, dep = deClamp(0.3 * P * s, 3, 22);
     let h = '';
     // Crest lines on the visible face: each crest advances L/2 over the visible half turn.
     let lines = '', hotl = '';

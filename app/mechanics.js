@@ -1,8 +1,8 @@
 'use strict';
 // Mechanics for the shop (parity B8): unit helpers, the shared section fields
-// and the drawings for the mechanics tools in tools.js. Every formula runs in
+// for the mechanics tools in tools.js (drawings: diagrams-eng.js). Every formula runs in
 // the Rust core (core/src/mechanics.rs); this file only converts units and
-// draws. Sources: docs/mechanics.md.
+// feeds the core. Sources: docs/mechanics.md.
 
 // Exact unit factors (NIST SP 811 appendix B).
 const MK_LBF_N = 4.4482216152605, MK_LB_KG = 0.45359237, MK_HP_W = 745.69987158227022, MK_LBFIN_NM = 4.4482216152605 * 0.0254;

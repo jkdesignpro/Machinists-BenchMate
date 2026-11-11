@@ -1149,7 +1149,7 @@ const TOOLS = [
   working: 'L = n x P (n starts). Lead angle = atan(L / (pi E)). To cut the next start, either rotate the work 360 / n degrees with the tool where it is, or move the tool one pitch P along the axis (a G76 or G92 cycle started one pitch later in Z). Feed per revolution on the lathe is the lead, not the pitch.',
   source: 'Thread geometry (lead, pitch and helix angle); see docs/sources.md, Threads round 3.',
 },
-// ---------- Gears and splines (core/src/gears.rs, drawings in app/gears.js) ----------
+// ---------- Gears and splines (core/src/gears.rs, drawings in app/diagrams-eng.js) ----------
 {
   id: 'spurgear', level: 'advanced', group: 'Gears and splines', title: 'Spur gear data',
   desc: 'Involute spur gear dimensions from the module (mm) or diametral pitch (inch): reference, base, tip and root diameters, addendum and dedendum, circular and base pitch, tooth thickness, undercut limit; give a second tooth count for the centre distance and contact ratio of the pair, with profile shift if used. Standard full-depth proportions (addendum 1, dedendum 1.25 times the module) are filled in; change them if your gear uses another basic rack.',
