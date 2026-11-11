@@ -719,3 +719,21 @@ f1!(galv_diff, c::matref::galvanic_difference, a, b);
 #[no_mangle] pub extern "C" fn galv_anode(a: f64, b: f64, index_scale: f64) -> f64 { c::matref::galvanic_anode(a, b, index_scale != 0.0) as f64 }
 /// 1 when the difference is within the limit, else 0.
 #[no_mangle] pub extern "C" fn galv_within(diff: f64, limit: f64) -> f64 { if c::matref::galvanic_within(diff, limit) { 1.0 } else { 0.0 } }
+
+// Cutting forces (core/src/cutforce.rs)
+f1!(kienzle_kc, c::kienzle_kc, kc11, mc, h);
+f1!(lead_chip_thickness, c::lead_chip_thickness, f, kappa);
+f1!(lead_feed_for_chip, c::lead_feed_for_chip, h, kappa);
+f1!(round_insert_kappa_deg, c::round_insert_kappa_deg, ic, ap);
+f1!(round_insert_hex, c::round_insert_hex, fz, ic, ap);
+f1!(round_insert_fz_for_hex, c::round_insert_fz_for_hex, hex, ic, ap);
+f1!(drill_chip_thickness, c::drill_chip_thickness, fnr, point);
+f1!(drill_power_kw, c::drill_power_kw, vc, d, fnr, kc);
+f1!(drill_torque_nm, c::drill_torque_nm, d, fnr, kc);
+f1!(drill_thrust_n, c::drill_thrust_n, kc, d, fnr, point);
+f1!(tap_torque_nm, c::tap_torque_nm, kc, pitch, d);
+f1!(form_tap_torque_nm, c::form_tap_torque_nm, kf, pitch, d);
+f1!(power_from_torque_kw, c::power_from_torque_kw, torque, rpm);
+f1!(turn_work_deflection, c::turn_work_deflection, support, f, a, l, d, di, e_gpa);
+/// Worst deflection of a part in the lathe: which 0 deflection (mm), 1 distance from the chuck (mm).
+#[no_mangle] pub extern "C" fn turn_work_deflection_max(support: f64, f: f64, l: f64, d: f64, di: f64, e_gpa: f64, which: f64) -> f64 { pick(c::turn_work_deflection_max(support, f, l, d, di, e_gpa), which) }

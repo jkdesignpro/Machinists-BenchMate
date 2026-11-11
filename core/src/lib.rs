@@ -596,6 +596,8 @@ pub mod mechanics;
 pub mod inspect;
 pub use inspect::*;
 pub mod matref;
+pub mod cutforce;
+pub use cutforce::*;
 
 #[cfg(test)]
 mod tests {

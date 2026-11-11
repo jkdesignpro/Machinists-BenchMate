@@ -601,7 +601,7 @@ async function boot() {
   const resp = await fetch('benchmate.wasm');
   const { instance } = await WebAssembly.instantiate(await resp.arrayBuffer(), {});
   state.W = instance.exports;
-  $('#ver').textContent = 'v0.2.0';
+  $('#ver').textContent = 'v0.3.0';
   refreshMachineSelect();
   $('#machine').onchange = e => { Profiles.setActive(e.target.value); renderMain(); };
   $$('#mode button').forEach(b => b.onclick = () => setMode(b.dataset.m));

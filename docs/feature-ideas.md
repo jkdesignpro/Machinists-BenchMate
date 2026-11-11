@@ -41,10 +41,10 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 6 | G-code tidy tools (renumber, strip, convert) | 2 (0.4.0) | to do |
 | 7 | Text engraving with the Hershey fonts | 2 (0.4.0) | to do |
 | 8 | Collet and pull stud torque | 3 (0.5.0) | to do |
-| 9 | Slender part deflection | 1 (0.3.0) | to do |
-| 10 | High-feed chip thinning | 1 (0.3.0) | to do |
-| 11 | Drill thrust and torque | 1 (0.3.0) | to do |
-| 12 | Tap torque | 1 (0.3.0) | to do |
+| 9 | Slender part deflection (`slender`) | 1 (0.3.0) | built |
+| 10 | High-feed chip thinning (`leadthin`) | 1 (0.3.0) | built |
+| 11 | Drill thrust and torque (`drillforce`) | 1 (0.3.0) | built |
+| 12 | Tap torque (`taptorque`) | 1 (0.3.0) | built |
 | 13 | Gauge R&R | 3 (0.5.0) | to do |
 | 14 | Thread gauge limits | 3 (0.5.0) | to do |
 | 15 | Rotary axis helper | 2 (0.4.0) | to do |

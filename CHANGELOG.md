@@ -4,6 +4,20 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-11
+Stage 1 of the plan: the physics behind speeds and feeds. In progress; built on top of 0.2.0.
+
+### Added (cutting forces)
+- **Specific cutting force (kc)** (Turning and Milling, Speeds and feeds): pick a work material group (39 groups after VDI 3323: steels, stainless, cast irons, aluminium, copper alloys, high temperature alloys, titanium, hardened materials) and get kc at the chip thickness of your cut by Kienzle's formula, kc = kc1.1 x h^(-mc), for turning (feed and entering angle), drilling (feed and point angle) or a chip thickness you type. The table is Iscar's; what Sandvik Coromant and Mitsubishi Materials print for a similar material is shown beside it and never mixed in, because they differ (by half as much again for stainless steel). A graph shows kc against chip thickness with your cut marked.
+- **Drill thrust, torque and power** (Holes and threads, Drilling): torque, feed force and net power from the drill diameter, feed, speed and point angle, with kc from the material group at the chip thickness of each lip or typed, and the share of the active machine's power at that speed.
+- **Tap torque and power** (same page, second tab): torque for a cutting tap from the thread size and material (Md = kc x P^2 x d / 8000), or the range for a forming tap, and the power at your tapping speed. Metric pitch or threads per inch.
+- **Chip thinning: entering angle and round inserts** (Milling, Engagement; second tab of the new Chip thinning page): the feed per tooth that gives the chip thickness you want on a 45 degree face mill, a high-feed cutter or a round insert at a given depth, or the chip a feed gives. Swap pair, table feed, drawing of the chip between two passes.
+- **Slender part deflection** (Turning, Stock and workholding): how far a long thin part is pushed away from the tool and the oversize that leaves on the diameter, held in the chuck only, with a tailstock centre or between centres, with the other two set-ups shown for comparison and a drawing of the shape as turned.
+- `benchmate-core`: new module `cutforce` (`kienzle_kc`, `lead_chip_thickness`, `lead_feed_for_chip`, `round_insert_kappa_deg`, `round_insert_hex`, `round_insert_fz_for_hex`, `drill_chip_thickness`, `drill_power_kw`, `drill_torque_nm`, `drill_thrust_n`, `tap_torque_nm`, `form_tap_torque_nm`, `power_from_torque_kw`, `turn_work_deflection`, `turn_work_deflection_max`), with tests; five drawings; smoke checks.
+
+### Changed
+- Radial chip thinning is now the first tab of a Chip thinning page.
+
 ## [0.2.0] - 2026-11-11
 ### Added (the 0.2.0 overhaul: shell and look)
 - **Modes**: a Simple / Advanced / Expert selector in the top bar, remembered between runs. Simple lists 16 everyday tools with only their main inputs; Advanced lists every tool; Expert also opens every working, constant and evidence table. A mode never changes a calculation.

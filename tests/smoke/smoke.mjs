@@ -307,6 +307,27 @@ await page.fill('#sr', '1.6'); await page.dispatchEvent('#sr', 'input');
 const rmsTxt = ((await page.textContent('#sres')) || '').replace(/\s+/g, ' ');
 if (!/RMS \(Rq\), if the profile were a pure sine wave\s*1\.78 um/.test(rmsTxt)) problems.push(`[${where}] got "${rmsTxt.slice(0, 200)}"`);
 
+// Cutting forces (0.3.0). Hand values are in core/src/cutforce.rs and docs/sources.md.
+await units('mm');
+for (const [id, re] of [
+  ['kcforce', /Specific cutting force kc at this chip thickness 2,139 N\/mm2/i],   // group 2, 0.2 mm/rev at 95 deg: 1500 x 0.19924^-0.22
+  ['drillforce', /Torque 5\.04 N m ; Feed force \(thrust\) 947 N/i],               // 10 mm, 0.15 mm/rev, 140 deg point, group 2
+  ['taptorque', /Torque, cutting tap 7\.03 N m/i],                                 // M10 x 1.5, kc 2500: 2500 x 2.25 x 10 / 8000
+  ['leadthin', /Feed per tooth for that chip 0\.1414 mm/i],                        // 0.1 mm chip at 45 deg
+  ['slender', /oversize by, at the worst place 311\.9 um/i],                       // 12 mm steel, 100 mm, 100 N, chuck only
+]) {
+  where = id;
+  await open(id);
+  const t = await page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(x => x.innerText.replace(/\s+/g, ' ')).join(' ; '));
+  if (!re.test(t)) problems.push(`[${where}] got "${t.slice(0, 300)}"`);
+}
+// A tailstock centre cuts the oversize of the same part to about a thirty-fourth: 311.9 / 33.97 = 9.2 um.
+where = 'slender centre';
+await page.selectOption('#main [data-id="sup"]', '1');
+const slT = await page.$eval('#res', e => e.innerText.replace(/\s+/g, ' '));
+if (!/worst place 9\.2 um/i.test(slT) || !/In the chuck only it would be 311\.9/i.test(slT)) problems.push(`[${where}] got "${slT.slice(0, 300)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');
