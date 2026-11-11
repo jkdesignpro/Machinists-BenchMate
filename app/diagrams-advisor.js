@@ -51,6 +51,29 @@ Object.assign(DIAGRAMS, {
     if (!r) return '';
     return daHole(v, sys, r, true);
   },
+  // Plunge roughing seen from above: the cutter at the end of a row of plunges, the scalloped wall they leave, the stepover and the spacing.
+  // Cutter, stepover and spacing are to one scale (held inside the picture); every number is an input or a core result.
+  advplunge(v, sys, rows) {
+    const r = advPlungeRun(v, state.W, sys);
+    if (!r || r.none) return '';
+    const W = 520, H = 292, u = dcU(sys), k = r.k, Rp = 40, sc = 2 * Rp / r.dmm, x0 = 30, x1 = 372, yTop = 100, yBot = 224, xc = 236;
+    const ae = r.ae > 0 ? dcClamp(r.ae * sc, 5, 2 * Rp) : Rp / 2, st = r.step > 0 ? dcClamp(r.step * sc, 8, 2.6 * Rp) : Rp / 2, cy = yTop + ae - Rp;
+    const cs = []; for (let x = xc; x > x0 - Rp; x -= st) cs.push(x);
+    const wall = x => { let y = yTop; cs.forEach(c => { const dx = x - c; if (Math.abs(dx) < Rp) y = Math.max(y, cy + Math.sqrt(Rp * Rp - dx * dx)); }); return y; };
+    const pts = [[x0, yBot]]; for (let x = x0; x <= xc + Rp + 2; x += 2) pts.push([x, wall(x)]); pts.push([x1, yTop], [x1, yBot]);
+    let s = DK.poly(pts, 'hatch') + DK.line(x0, yTop, xc, yTop, 'ghost');
+    if (cs.length > 1) s += DK.circle(cs[1], cy, Rp, 'ghost');
+    s += DK.circle(xc, cy, Rp, 'tool') + DK.cl(xc - Rp - 8, cy, xc + Rp + 8, cy) + DK.cl(xc, cy - Rp - 8, xc, cy + Rp + 8);
+    if (r.step > 0) s += DK.dimH(xc - st, xc, cy - Rp - 16, 'spacing ' + dcN(r.step / k) + ' ' + u, { from: cy });
+    if (r.ae > 0) s += dcDimV(yTop, yTop + ae, x1 + 18, 'stepover ' + dcN(r.ae / k) + ' ' + u, { from: x1 + 2 });
+    const cusp = r.step > 0 ? state.W.plunge_cusp(r.dmm, r.step) : NaN;
+    if (dcOk(cusp) && cs.length > 1) s += DK.leader(xc - st / 2, wall(xc - st / 2) + 2, 122, yBot + 26, 'cusp ' + dcN(cusp / k) + ' ' + u, { anchor: 'end' });
+    s += DK.arrow(xc + Rp + 14, yTop - 14, xc + Rp + 14 + dcClamp(st, 18, 70), yTop - 14, 'hot') + DK.text(xc + Rp + 14, yTop - 22, 'next plunge', { cls: 'hott', anchor: 'start' });
+    const lim = ADV_LIMITS[r.limit];
+    s += DK.text(150, yBot + 30, dcN(r.rpm, 0) + ' RPM', { cls: 'hott', anchor: 'start' }) + DK.text(250, yBot + 30, 'feed down ' + dcN(r.vf / k) + ' ' + dcFU(sys), { cls: 'hott', anchor: 'start' });
+    s += dcLines(150, yBot + 48, ['Ø ' + dcN(r.dmm / k) + ' ' + u + ' cutter seen from above' + (lim ? ', limited by ' + lim.toLowerCase() : '')]);
+    return DK.svg(W, H, s, 'Plunge roughing from above: the cutter at the end of a row of plunges with the stepover, the spacing and the cusp left on the wall');
+  },
   // Tapping advisor: the tap in its hole with the thread depth, the spindle speed and the feed that goes with it.
   advtap(v, sys, rows) {
     const r = advTapRun(v, state.W, sys);

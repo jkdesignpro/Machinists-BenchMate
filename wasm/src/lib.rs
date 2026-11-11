@@ -760,6 +760,12 @@ f1!(advise_turn, c::advise_turn_f, d, vc, f, ap, kappa, kc11, mc, lock, n_max, p
 #[no_mangle] pub extern "C" fn drill_feed_range_in(d_in: f64, which: f64) -> f64 { pick(c::drill_feed_range_in(d_in), which) }
 /// Reaming (or any hole tool without a force model): which as in `advise_hole`.
 #[no_mangle] pub extern "C" fn advise_hole(vc: f64, d: f64, fnr: f64, n_max: f64, vf_max: f64, which: f64) -> f64 { pick(c::advise_hole(vc, d, fnr, n_max, vf_max), which) }
+/// Plunge roughing advice: which 0 rpm, 1 cutting speed reached, 2 feed per tooth, 3 feed rate down, 4 rpm before the cap, 5 limit, 6 kc, 7 removal rate, 8 spindle power, 9 power available, 10 share of it, 11 reduced.
+#[no_mangle] pub extern "C" fn advise_plunge(vc: f64, d: f64, z: f64, fz: f64, ae: f64, step: f64, kc11: f64, mc: f64, fz_locked: f64, n_max: f64, vf_max: f64, p_max: f64, t_max: f64, eta: f64, which: f64) -> f64 { pick(c::advise_plunge(vc, d, z, fz, ae, step, kc11, mc, fz_locked, n_max, vf_max, p_max, t_max, eta), which) }
+f1!(plunge_cusp, c::plunge_cusp, d, step);
+f1!(plunge_max_step, c::plunge_max_step, d, ae);
+f1!(plunge_count, c::plunge_count, len, step);
+f1!(plunge_rough_time_min, c::plunge_rough_time_min, depth, vf, count);
 /// Tapping advice: which 0 rpm, 1 cutting speed reached, 2 feed rate, 3 rpm the table asks for, 4 limit.
 #[no_mangle] pub extern "C" fn advise_tap(vc: f64, d: f64, pitch: f64, n_max: f64, vf_max: f64, which: f64) -> f64 { pick(c::advise_tap(vc, d, pitch, n_max, vf_max), which) }
 f1!(tap_time_min, c::tap_time_min, depth, pitch, rpm);

@@ -5,7 +5,7 @@ Ideas from looking at other machinist tools (G-Wizard, HSMAdvisor, FSWizard, ope
 ## Tier 1: high value
 1. **Machine profiles.** (built: v0.1 profiles and checks; cut optimiser built) Spindle RPM range, power and torque curve, max feed, rigidity, control type. Every result is checked against the machine and flagged if it can't be reached (e.g. RPM capped, torque short at low RPM). Multiple machines, L20 first.
 2. **Cut optimiser with deflection and torque checks.** *(Done: Tool deflection, Cut check and optimiser. Holder/spindle compliance and chatter not included.)* Tool stick-out and diameter give tool deflection (cantilever beam); spindle torque/power curve gives a limit; solve for the best width/depth/feed inside those limits. Shows *why* a limit binds.
-3. **Arc and helix feed correction.** *(Done: Arc feed correction, Helical interpolation and ramping. Plunge roughing still to do.)* Feed compensation for internal/external arcs (tool centre vs cutting edge), helical interpolation and ramp angles, plunge roughing. Common cause of broken tools and rarely done by hand.
+3. **Arc and helix feed correction.** *(Done: Arc feed correction, Helical interpolation and ramping, Plunge roughing.)* Feed compensation for internal/external arcs (tool centre vs cutting edge), helical interpolation and ramp angles, plunge roughing. Common cause of broken tools and rarely done by hand.
 4. **Cost per part and tool life.** *(Done: Tool life and cost per part.)* Taylor tool-life equation, economic cutting speed, cycle time x machine rate + tool cost per edge + material cost. Answers "is running faster actually cheaper?".
 5. **Bar stock planner (Swiss and bar-fed lathes).** *(Done. Guide-bushing loss can be entered as part of the remnant.)* Parts per bar from part length, cutoff width, facing allowance, remnant and guide-bushing loss; bar weight and material cost per part.
 6. **Shop knowledge base.** Log what worked for a tool + material + machine, searchable; feeds the adaptive learning profile already planned.
@@ -52,7 +52,7 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 17 | Vendor data import and cut log | 5 (0.9.0) | to do |
 | 18 | Wire EDM | 3 (0.5.0) | to do |
 
-Built in 0.3.0 so far (branch `claude/advisor`): the cutting-force tools and the milling, turning, drilling and reaming advisors with locks and limit cards. The boring bar and slitting saw pages now take their material data from the advisor. The stability chart with a draggable speed marker is in the milling advisor. The tapping advisor gives a speed and the feed that goes with it. Still to build in stage 1: tool life in the advisor, plunge roughing, holder and spindle compliance, the chip-breaking window.
+Built in 0.3.0 so far (branch `claude/advisor`): the cutting-force tools and the milling, turning, drilling and reaming advisors with locks and limit cards. The boring bar and slitting saw pages now take their material data from the advisor. The stability chart with a draggable speed marker is in the milling advisor. The tapping advisor gives a speed and the feed that goes with it. Plunge roughing is its own page with three publishers' rules side by side. The milling and turning advisors open the tool life page with their speed (Taylor exponents stay the user's own figures: no open table was found). Still to build in stage 1: holder and spindle compliance, the chip-breaking window.
 
 Missing Ultra rows (docs/parity-audit.md) keep the stage the spec gives them: cutting-data advisors for turning, milling and drilling, reaming and tapping speeds in stage 1; gun drill, RPM cylindricity, SAE J499a and milling surface finish with RMS in stage 3; the vibration check in stage 5.
 
@@ -67,7 +67,7 @@ State of the tier list above, with the stage for what is still to build.
 |---|---|---|---|
 | 1 Machine profiles | built | | |
 | 2 Cut optimiser with deflection and torque checks | built | Holder and spindle compliance in the deflection check | 1 (0.3.0) |
-| 3 Arc and helix feed correction | built | Plunge roughing | 1 (0.3.0) |
+| 3 Arc and helix feed correction | built | | |
 | 4 Cost per part and tool life | built | | |
 | 5 Bar stock planner | built | | |
 | 6 Shop knowledge base | to do | Log what worked for a tool, material and machine, searchable; with the cut log (idea 17) | 5 (0.9.0) |

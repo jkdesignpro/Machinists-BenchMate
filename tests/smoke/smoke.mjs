@@ -440,6 +440,22 @@ aT = await advTxt();
 if (!/Spindle speed 200 RPM/i.test(aT) || !/Feed rate \(pitch x spindle speed\) 300\.00 mm\/min/.test(aT) || !/Top feed rate/i.test(aT) || !/Feed per revolution \(the pitch\) 1\.500 mm\/rev/.test(aT)) problems.push(`[${where}] feed limit: "${aT.slice(0, 600)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Plunge roughing: 12 mm carbide end mill, 4 flutes, low carbon steel. Harvey Tool: 100 to 300 ft/min, middle 200 = 60.96 m/min; chip load at
+// 0.4724 in between 0.002 (3/8) and 0.003 (1/2) = 0.0027795 in = 0.0706 mm. University of Florida rule: 75 % speed = 45.72 m/min,
+// n = 45720 / (pi x 12) = 1213 rpm; 25 % feed = 0.01765 mm; Vf = 1212.76 x 4 x 0.01765 = 85.6 mm/min. Plunges 3 mm apart: cusp 0.191 mm;
+// a 50 mm row: 18 plunges. CGS rule: table speed 1617 rpm, 35 % feed = 0.02471 mm, Vf = 159.8 mm/min. Held to 1000 rpm: Vf = 98.8 mm/min.
+where = 'advplunge';
+await open('advplunge');
+aT = await advTxt();
+if (!/Spindle speed 1,213 RPM/i.test(aT) || !/Feed rate straight down 85\.6 mm\/min/.test(aT) || !/Cusp left on the wall between plunges 0\.191 mm/.test(aT) || !/Plunges in the row \(one at each end\) 18/.test(aT)) problems.push(`[${where}] defaults: "${aT.slice(0, 700)}"`);
+await page.selectOption('#main [data-id="rule"]', '2');
+aT = await advTxt();
+if (!/Spindle speed 1,617 RPM/i.test(aT) || !/Feed rate straight down 159\.8 mm\/min/.test(aT)) problems.push(`[${where}] CGS rule: "${aT.slice(0, 500)}"`);
+await advSet('nmax', '1000');
+aT = await advTxt();
+if (!/Spindle speed 1,000 RPM/i.test(aT) || !/Feed rate straight down 98\.8 mm\/min/.test(aT) || !/Top spindle speed/i.test(aT)) problems.push(`[${where}] speed limit: "${aT.slice(0, 500)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

@@ -362,7 +362,9 @@ TOOLS.push(
     const k = r.k;
     return [['Check this cut in detail', 'cutopt', { d: v.d, dsh: v.dsh > 0 ? v.dsh : '', L: v.L, lf: v.lf > 0 ? v.lf : '', kf: v.kf > 0 ? v.kf : '', mat: r.tm, z: v.z, ae: r.ae / k, ap: r.ap / k, fz: r.fz / k,
       speed: r.inch ? r.vcA / FT_M : r.vcA, rpm: '', kc: isFinite(r.kc) ? Math.round(r.kc) : '', ratio: r.ratio, lim: r.lim / k }],
-      ['Feed rate calculator', 'feed', { rpm: Math.round(r.rpm), z: v.z, fz: r.fz / k }]];
+      ['Feed rate calculator', 'feed', { rpm: Math.round(r.rpm), z: v.z, fz: r.fz / k }],
+      ['Plunge roughing with this tool', 'advplunge', { mat: v.mat, tm: r.tm, d: v.d, z: v.z }],
+      ['Tool life and cost per part', 'toollife', { v: Math.round(r.inch ? r.vcA / FT_M : r.vcA) }]];
   },
   working: 'Order of work. 1: starting cutting speed and chip load from the chosen publisher\'s table for the material, tool material and cutter diameter; the sliders pick a place inside the printed range. Between two printed diameters the chip load is read along the straight line; below the smallest it is scaled down with the diameter. 2: coolant factor. 3: spindle speed n = 1000 Vc / (pi D), held to the machine\'s top speed. 4: width ae and depth ap suggested for the kind of cut (slot: full width, depth 0.2 D to 1 D; shoulder roughing: half the diameter wide, one diameter deep; high-speed path: 7 to 30 % of D wide, up to 2 D deep; finishing: 2 to 5 % of D wide, 1.5 D deep), depth held to the flute length. 5: feed per tooth fz = chip load x chip thinning factor for the width (1 at half the diameter or more), so the chip keeps its thickness in a light cut. 6: table feed Vf = n x z x fz, held to the machine\'s top feed. 7: specific cutting force kc = kc1.1 x hm^(-mc) at the mean chip thickness. 8: power Pc = ae x ap x Vf x kc / 60 000 000 kW, spindle power = Pc / efficiency, torque = P x 60 000 / (2 pi n), checked against P(n) = min(P_max, T_max x 2 pi n / 60 000). 9: tool tip deflection as a cantilever under the tangential force (x the bending ratio). If a limit is passed the depth is reduced; if you locked the depth, the width; if you locked both, the feed. A locked value is never changed. The chip loads are used as the chip thickness for a cut half the diameter wide or wider. BenchMate\'s own starting figures, which no publisher prints: 1 D depth for shoulder roughing, 1.5 D for finishing, bending force equal to the tangential force, 0.05 mm (rough) and 0.01 mm (finish) allowed deflection, and tile colours at 80 % and 100 % of a limit.',
   source: 'Speeds and chip loads: Harvey Tool, "General Machining Guidelines"; RedLine Tools catalogue p. 216 (general purpose carbide end mills); University of Pennsylvania MEAM, "Feeds and Speeds" guide; University of Florida MAE design lab, "Speeds and Feeds" (HSS speeds, chip loads, carbide factor 2.5, 60 % for oil by hand); LittleMachineShop, "Cutting Speeds". Width and depth: Mitsubishi Materials course "Depth of cut"; Helical Solutions, Machining Guidebook (2016) pp. 11, 31-32. kc: Iscar material groups. Formulas: Sandvik Coromant milling formulas; beam deflection: Gere and Goodno. See docs/sources.md, "Advisor".',
@@ -482,6 +484,43 @@ function advTurnRun(v, W, s) {
   r.redText = r.reduced === 1 ? 'The depth of cut was reduced from ' + fmt(ap0 / k, inch ? 4 : 3) + ' to ' + fmt(r.ap / k, inch ? 4 : 3) + ' ' + lenU(s) + '.' : r.reduced === 3 ? 'Your depth is locked, so the feed was reduced from ' + fmt(f0 / k, inch ? 4 : 3) + ' to ' + fmt(r.f / k, inch ? 4 : 3) + ' ' + feedRevU(s) + '.' : '';
   r.fixText = r.limit === 3 ? 'Take the depth in more passes. Below its base speed the spindle gives torque, not full power; on a geared head a lower gear gives more torque at this speed.' : 'Nothing more to do: the reduced cut fits. More passes at this depth remove the same metal.';
   r.fixRpm = 'Nothing more to do: a small diameter at the top speed of the lathe simply cuts below the table speed.';
+  return r;
+}
+
+// What three publishers print about plunging an end mill straight down. They do not agree: each is shown and the most cautious is the default.
+// sp: factor on the peripheral speed; fd: factor on the peripheral feed per tooth.
+const ADV_PLUNGE = [
+  { id: 1, pub: 'University of Florida design lab', row: 'Plunging (end mills and annular cutters): 75 % of the peripheral speed and 25 % of the peripheral feed', sp: 0.75, fd: 0.25, how: '75 % of the speed, 25 % of the feed per tooth' },
+  { id: 2, pub: 'CGS Tool', row: 'Plunge operations: reduce feed per tooth 50 to 65 %', sp: 1, fd: 0.35, how: 'table speed, 35 % of the feed per tooth (the cautious end of 35 to 50 %)' },
+  { id: 3, pub: 'MIT Center for Bits and Atoms', row: 'A plunge rate should be less than 50 % of the feed rate', sp: 1, fd: 0.5, how: 'table speed, 50 % of the feed per tooth (the most the page allows)' },
+];
+
+function advPlungeRun(v, W, s) {
+  const inch = s === 'inch', k = inch ? IN_MM : 1, m = advMat(v.mat);
+  if (!m || !(v.d > 0 && v.z > 0)) return null;
+  const tm = v.tm === 2 ? 2 : 1, dmm = v.d * k, entries = advMillEntries(W, m, tm, dmm / IN_MM), rule = ADV_PLUNGE.find(x => x.id === v.rule) || ADV_PLUNGE[0];
+  let e = null, fell = '';
+  if (v.src !== 9) {
+    e = entries.find(x => x.key === ADV_MILL_KEYS[v.src]) || null;
+    if (!e && entries.length) { e = entries[0]; if (v.src > 0) fell = (ADV_MILL_SRC.find(o => o[0] === v.src) || ['', ''])[1] + ' prints nothing for this material and tool material.'; }
+  }
+  const tS = (isFinite(v.sp) ? v.sp : 50) / 100, tA = (isFinite(v.ag) ? v.ag : 50) / 100, cool = v.cool === 2 ? 0.6 : 1;
+  let vTab = NaN, chipTab = NaN;
+  if (e) { vTab = W.range_pick(e.v[0], e.v[1], tS) * FT_M; chipTab = W.range_pick(e.fz[0], e.fz[1], tA) * IN_MM; }
+  if (v.vown > 0) vTab = inch ? v.vown * FT_M : v.vown;
+  if (v.fzown > 0) chipTab = v.fzown * k;
+  if (!(vTab > 0 && chipTab > 0)) return { m, tm, entries, e, none: true, fell, rule };
+  const vc = W.apply_factor(W.apply_factor(vTab, rule.sp), cool), fSug = W.apply_factor(W.apply_factor(chipTab, rule.fd), cool);
+  const fL = v.fz > 0, f0 = fL ? v.fz * k : fSug, ae = v.ae > 0 ? Math.min(v.ae * k, dmm) : 0, step = v.step > 0 ? v.step * k : 0;
+  const g = kcGroup(m.kc), mach = advMachine(v, v.spn === 1);
+  const args = [vc, dmm, v.z, f0, ae, step, g ? g[5] : 0, g && g[6] != null ? g[6] : 0, fL ? 1 : 0, mach.n, mach.vf, mach.p, mach.t, v.eta > 0 ? v.eta : 0];
+  const P = i => W.advise_plunge(...args, i), dpF = inch ? 5 : 4;
+  const r = { m, tm, entries, e, fell, rule, g, mach, k, inch, vTab, chipTab, cool, vc, fSug, fL, f0, ae, step, dmm, hasForce: !!g && ae > 0 && step > 0,
+    rpm: P(0), vcA: P(1), fz: P(2), vf: P(3), rpmTab: P(4), limit: P(5), kc: P(6), q: P(7), pSp: P(8), pAv: P(9), useP: P(10), reduced: P(11) > 0 };
+  r.over = (r.limit === 2 || r.limit === 3) && fL;
+  r.redText = 'The feed per tooth was reduced from ' + fmt(f0 / k, dpF) + ' to ' + fmt(r.fz / k, dpF) + ' ' + lenU(s) + '.';
+  r.fixText = 'Nothing more to do: the reduced feed fits. A smaller stepover or spacing lets the feed go back up.';
+  r.fixRpm = 'Nothing more to do: the cutter simply runs below its table speed.';
   return r;
 }
 
@@ -699,6 +738,81 @@ TOOLS.push(
   source: 'RedLine Tools, "Taps tech": speed table for general purpose taps (surface feet per minute by material). One publisher; see docs/sources.md, "Advisor". Feed rate = pitch x spindle speed: Haas Automation, G84 tapping guide (see Drilling cycles). n = 1000 Vc / (pi d): the cutting speed formula used throughout.',
 },
 {
+  id: 'advplunge', level: 'advanced', group: 'Speeds and feeds', title: 'Plunge roughing',
+  pick: { map: { d: 'dia', z: 'flutes' } },
+  desc: 'Roughing by feeding an end mill straight down, stepping along and going down again. The push is along the spindle, its stiffest direction, so it suits long tools and light machines. Speed and feed down from the milling tables and a published plunging rule, with the cusp the plunges leave and the removal rate.',
+  fields: s => [
+    { id: 'mat', label: 'Work material', unit: '', def: 3, options: ADV_MAT_OPTIONS, wide: true },
+    { id: 'tm', label: 'Tool material', unit: '', def: 1, options: [[1, 'Solid carbide'], [2, 'High speed steel (HSS)']] },
+    { id: 'rule', label: 'Plunging rule from', unit: '', def: 1, options: ADV_PLUNGE.map(x => [x.id, x.pub + ': ' + x.how]), wide: true },
+    { id: 'd', label: 'End mill diameter D', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
+    { id: 'z', label: 'Number of flutes', unit: '', def: 4 },
+    { id: 'ae', label: 'Stepover into the stock', unit: lenU(s), def: s === 'inch' ? 0.125 : 3 },
+    { id: 'step', label: 'Spacing between plunges along the wall', unit: lenU(s), def: s === 'inch' ? 0.125 : 3 },
+    { id: 'depth', label: 'Depth of each plunge (optional)', unit: lenU(s), def: s === 'inch' ? 0.75 : 20 },
+    { id: 'len', label: 'Length of the row (optional)', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'fz', label: 'Feed per tooth down (blank = suggested)', unit: lenU(s), def: '', lock: true },
+    { id: 'ag', label: 'Aggressiveness (chip load in the printed range)', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Gentle', 'Middle', 'Aggressive'] } },
+    { id: 'sp', label: 'Speed in the printed range (hard stock: low)', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Low', 'Middle', 'High'] } },
+    { id: 'cool', label: 'Coolant', unit: '', def: 1, options: ADV_COOL, wide: true },
+    { level: 'advanced', id: 'src', label: 'Starting figures from', unit: '', def: 0, options: ADV_MILL_SRC, wide: true },
+    { level: 'advanced', id: 'vown', label: 'Your own cutting speed for side milling (wins over the table)', unit: spdU(s), def: '' },
+    { level: 'advanced', id: 'fzown', label: 'Your own chip load for side milling (wins over the table)', unit: lenU(s), def: '' },
+    { level: 'advanced', id: 'spn', label: 'Spindle', unit: '', def: 0, options: [[0, 'Main spindle'], [1, 'Driven (live) tool']] },
+  ].concat(ADV_MACHINE_FIELDS),
+  suggest: (v, W, s) => { const r = advPlungeRun(v, W, s); return r && !r.none ? { fz: r.fSug / r.k } : {}; },
+  calc: (v, W, s) => {
+    const r = advPlungeRun(v, W, s);
+    if (!r) return [];
+    if (r.none) return [R('Starting figures', 'No publisher in the table lists this material for this tool material: type your own cutting speed and chip load (Advanced)', '', 0)];
+    const inch = r.inch, k = r.k, lu = lenU(s), dpF = inch ? 5 : 4, dpL = inch ? 4 : 3;
+    const fHow = r.fL ? (r.fz < r.f0 * (1 - 1e-9) ? 'yours, reduced to the top feed of the machine' : 'yours, locked') : r.fz < r.f0 * (1 - 1e-9) ? 'reduced from ' + fmt(r.f0 / k, dpF) + ' to fit ' + (ADV_LIMITS[r.limit] || 'the machine').toLowerCase() : 'suggested: ' + r.rule.pub;
+    const rows = [
+      R('Spindle speed', r.rpm, 'RPM', 0),
+      R('Feed rate straight down', r.vf / k, feedMinU(s), inch ? 2 : 1),
+      R('Feed per tooth down (' + fHow + ')', r.fz / k, lu, dpF),
+      R('Cutting speed at the rim', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0),
+    ];
+    if (r.step > 0) {
+      const cusp = W.plunge_cusp(r.dmm, r.step);
+      rows.push(isFinite(cusp) ? R('Cusp left on the wall between plunges', cusp / k, lu, dpL) : R('Cusp left on the wall', 'The spacing is more than the cutter diameter: the plunges do not meet', '', 0));
+      if (r.ae > 0) {
+        const mx = W.plunge_max_step(r.dmm, r.ae);
+        rows.push(R('Largest spacing at which the plunges still meet inside this stepover', mx / k, lu, dpL));
+        if (r.step > mx * (1 + 1e-9)) rows.push(cfNote('The plunges are too far apart for this stepover: stock is left standing between them. Keep the spacing under ' + fmt(mx / k, dpL) + ' ' + lu + '.'));
+        rows.push(R('Removal rate while going down', inch ? r.q / IN3_CM3 : r.q, inch ? 'in3/min' : 'cm3/min', 2));
+      }
+    }
+    if (v.depth > 0) rows.push(R('Time for one plunge to depth', W.plunge_rough_time_min(v.depth * k, r.vf, 1) * 60, 's', 1));
+    if (v.len > 0 && r.step > 0) {
+      const n = W.plunge_count(v.len * k, r.step);
+      rows.push(R('Plunges in the row (one at each end)', n, '', 0));
+      if (v.depth > 0) rows.push(R('Time going down for the row (retracts and moves not counted)', W.plunge_rough_time_min(v.depth * k, r.vf, n), 'min', 2));
+    }
+    if (isFinite(r.pSp)) rows.push(R('Spindle power needed (estimate: removal rate x kc)', r.pSp, 'kW', 2), R('Specific cutting force kc at the feed per tooth (Iscar group ' + r.g[0] + ')', r.kc, 'N/mm2', 0));
+    rows.push(R('Plunging rule (' + r.rule.pub + ')', r.rule.how, '', 0));
+    rows.push(R('From the table: cutting speed for side milling (' + (v.vown > 0 ? 'your own figure' : r.e.pub) + ')', inch ? r.vTab / FT_M : r.vTab, spdU(s), 0));
+    rows.push(R('From the table: chip load for side milling (' + (v.fzown > 0 ? 'your own figure' : r.e.pub) + ')', r.chipTab / k, lu, dpF));
+    if (r.cool < 1) rows.push(R('Coolant factor on speed and feed (University of Florida, oil by hand)', r.cool, 'x', 2));
+    if (r.fell) rows.push(R('Publisher', r.fell + ' Using ' + r.e.pub + '.', '', 0));
+    rows.push(cfNote('The publishers do not agree on how far to cut the feed for plunging (25 %, 35 to 50 %, under 50 %), and only one of them also cuts the speed. The table below shows each as printed. The University of Florida "feed" is read here as the feed per tooth; read as the feed rate it would be a third higher.'));
+    if (r.ae > 0 && W.plunge_max_step(r.dmm, r.ae) >= r.dmm * (1 - 1e-12)) rows.push(cfNote('The stepover is half the diameter or more, so the centre of the cutter is in the cut, where the cutting speed falls to zero: the end mill must cut over centre.'));
+    rows.push(R('Note', ADV_START_NOTE, '', 0));
+    return rows;
+  },
+  panel: (v, W, s) => { const r = advPlungeRun(v, W, s); return !r || r.none ? '' : '<div class="tiles">' + advHoleTiles(r, s) + '</div>' + advHoleCard(r, s, 'feed per tooth'); },
+  table: (v, W, s) => {
+    const r = advPlungeRun(v, W, s);
+    return r ? { title: 'What each publisher prints about plunging an end mill', head: ['Publisher', 'As printed', 'Used here as', ''], rows: ADV_PLUNGE.map(x => [x.pub, x.row, x.how, x === r.rule ? 'used' : '']), text: true } : null;
+  },
+  sends: (v, W, s) => {
+    const r = advPlungeRun(v, W, s);
+    return !r || r.none ? [] : [['Milling advisor for the same tool', 'advmill', { mat: v.mat, tm: v.tm, d: v.d, z: v.z }]];
+  },
+  working: 'Order of work. 1: cutting speed and chip load for side milling from the chosen publisher\'s table for the material, tool material and cutter diameter. 2: the plunging rule: a factor on the speed and a factor on the feed per tooth. 3: coolant factor. 4: n = 1000 Vc / (pi D), held to the machine\'s top speed; feed rate down Vf = n x z x fz, held to its top feed. 5: removal rate while going down Q = stepover x spacing x Vf (each plunge clears a strip one stepover wide and one spacing long; the cusps a row leaves are taken by the next row). 6: power Pc = Q x kc / 60 000 with kc = kc1.1 x fz^(-mc) (the end teeth cut a chip as thick as the feed per tooth), spindle power = Pc / efficiency, against P(n) = min(P_max, T_max x 2 pi n / 60 000); if the spindle is short the feed per tooth is reduced, unless it is locked. Cusp between plunges = R - sqrt(R^2 - (spacing / 2)^2). Largest spacing that still meets inside the stepover = 2 sqrt(ae (D - ae)), or D from a stepover of half the diameter up. Time = plunges x depth / Vf.',
+  source: 'Plunging rules: University of Florida MAE design lab, "Speeds and Feeds" (75 % speed, 25 % feed); CGS Tool, general purpose end mill speeds and feeds sheet (reduce feed per tooth 50 to 65 %); MIT Center for Bits and Atoms, feeds and speeds calculator notes, "Plunge rate" (less than 50 % of the feed rate). Speeds and chip loads: the milling advisor tables. Power: Sandvik Coromant formula with kc from the Iscar material groups. Cusp, spacing and removal rate: own geometry with core tests. See docs/sources.md, "Advisor".',
+},
+{
   id: 'advturn', level: 'advanced', group: 'Speeds and feeds', title: 'Turning advisor',
   pick: { map: { re: 'cr' }, types: ['Turning insert', 'Boring bar', 'Other'] },
   desc: 'Speed, feed and depth of cut for turning or boring from a published speed table and the nose radius of the insert, checked against the lathe for top speed, power and torque, with the finish the feed will leave. Type your own feed or depth and it is locked.',
@@ -762,7 +876,8 @@ TOOLS.push(
     const r = advTurnRun(v, W, s);
     if (!r || r.none) return [];
     const k = r.k;
-    return [['Cut time for a pass', 'passtime', { f: r.f / k, rpm: Math.round(r.rpm) }], ['Finish from nose radius and feed', 'finish', { f: r.f / k, r: v.re }]];
+    return [['Cut time for a pass', 'passtime', { f: r.f / k, rpm: Math.round(r.rpm) }], ['Finish from nose radius and feed', 'finish', { f: r.f / k, r: v.re }],
+      ['Tool life and cost per part', 'toollife', { v: Math.round(r.inch ? r.vcA / FT_M : r.vcA) }]];
   },
   working: 'Order of work. 1: starting cutting speed from the table for the material and tool material; the slider picks a place inside the printed range. 2: feed per revolution from the nose radius: the publisher recommends a corner radius of 2 to 3 times the feed, so the feed is between a third and a half of the radius. 3: depth of cut: the 0.040 in (1.0 mm) the speed table is based on, unless you type your own. 4: coolant factor. 5: n = 1000 Vc / (pi D) at the diameter being cut, held to the lathe\'s top speed. 6: chip thickness h = fn sin(entering angle); kc = kc1.1 x h^(-mc). 7: cutting force Fc = kc x ap x fn; power Pc = Fc x Vc / 60 000 kW; spindle power = Pc / efficiency; torque = P x 60 000 / (2 pi n), against P(n) = min(P_max, T_max x 2 pi n / 60 000). If the spindle is short the depth is reduced; if you locked the depth, the feed; if you locked both, nothing is changed and the card says the cut is over the limit. Theoretical finish Ra = fn^2 / (32 r) x 1000 um, a lower bound.',
   source: 'Speeds: LittleMachineShop, "Cutting Speeds" (turning table: HSS and carbide, for 0.004 in/rev, 0.040 in depth, 180 min tool life). For comparison: Open Oregon, "Manufacturing Processes 4-5", Table 1. Feed from nose radius: Mitsubishi Materials, technical information for turning, "Corner radius" (a corner radius of 2 to 3 times the feed). Forces: Kienzle with kc from the Iscar material groups; power and torque: Sandvik Coromant turning formulas. See docs/sources.md, "Advisor".',

@@ -407,6 +407,81 @@ pub fn advise_drill(vc: f64, d: f64, fnr: f64, point_deg: f64, kc11: f64, mc: f6
     [rpm, vca, f, rpm * f, table, limit, e.0, drill_torque_nm(d, f, e.0), drill_thrust_n(e.0, d, f, point_deg), e.1, e.2, e.3]
 }
 
+// ---------------- Plunge roughing ----------------
+/// Height of the cusp left on the wall between two neighbouring plunges of a cutter of
+/// diameter `d` spaced `step` apart along the wall. The two circles cross midway, so
+/// `h = R - sqrt(R^2 - (step / 2)^2)` (own geometry). NaN when the plunges do not overlap.
+pub fn plunge_cusp(d: f64, step: f64) -> f64 {
+    if !(pos(d) && pos(step)) || step > d { return f64::NAN; }
+    let r = d / 2.0;
+    r - (r * r - step * step / 4.0).sqrt()
+}
+
+/// Largest spacing along the wall at which neighbouring plunges still meet inside a
+/// stepover `ae`: there the cusp is as high as the stepover, `2 sqrt(ae (d - ae))`; from a
+/// stepover of half the diameter up it is the diameter itself (own geometry).
+pub fn plunge_max_step(d: f64, ae: f64) -> f64 {
+    if !(pos(d) && pos(ae)) { return f64::NAN; }
+    if ae >= d / 2.0 { d } else { 2.0 * (ae * (d - ae)).sqrt() }
+}
+
+/// Removal rate (cm^3/min) while the cutter is going down. Each plunge clears a strip one
+/// stepover wide and one spacing long (the cusps a row leaves are taken by the next row),
+/// so `Q = ae x step x Vf / 1000`.
+pub fn plunge_mrr_cm3_min(ae: f64, step: f64, vf: f64) -> f64 {
+    if !(pos(ae) && pos(step) && pos(vf)) { return f64::NAN; }
+    ae * step * vf / 1000.0
+}
+
+/// Plunges in a row of length `len` at a spacing `step`, with a plunge at each end.
+pub fn plunge_count(len: f64, step: f64) -> f64 {
+    if !(pos(len) && pos(step)) { return f64::NAN; }
+    (len / step - 1e-9).ceil().max(0.0) + 1.0
+}
+
+/// Time going down (min) for `count` plunges to `depth` (mm) at a feed rate `vf` (mm/min):
+/// `count x depth / Vf`. Retracts and moves between plunges are not counted.
+pub fn plunge_rough_time_min(depth: f64, vf: f64, count: f64) -> f64 {
+    if !(pos(depth) && pos(vf) && pos(count)) { return f64::NAN; }
+    count * depth / vf
+}
+
+/// Plunge roughing with an end mill: the cutter feeds straight down, steps along the wall and
+/// goes down again. `vc` and `fz` are the speed and the feed per tooth DOWN, after the
+/// publisher's plunging rule has been applied. Returns
+/// `[rpm, vc reached, feed per tooth, feed rate down, rpm before the cap, limit, kc, removal rate
+///   (cm^3/min), spindle power (kW), power available (kW), share of the power available, reduced]`.
+/// Speed and feed are held to the machine as in [`advise_hole`] with a feed per revolution of
+/// `z x fz`. Power: `Pc = Q kc / 60 000` [SAN] with kc at a chip thickness equal to the feed per
+/// tooth (the end teeth cut square to the feed). If the spindle is short the feed per tooth is
+/// reduced, unless it is locked (`fz_locked` > 0), in which case the share comes back above 1.
+#[allow(clippy::too_many_arguments)]
+pub fn advise_plunge(vc: f64, d: f64, z: f64, fz: f64, ae: f64, step: f64, kc11: f64, mc: f64, fz_locked: f64,
+                     n_max: f64, vf_max: f64, p_max: f64, t_max: f64, eta: f64) -> [f64; 12] {
+    if !(pos(z) && pos(fz)) { return [f64::NAN; 12]; }
+    let h0 = advise_hole(vc, d, z * fz, n_max, vf_max);
+    if !h0[0].is_finite() { return [f64::NAN; 12]; }
+    let (rpm, vca, table) = (h0[0], h0[1], h0[4]);
+    let mut f = h0[2] / z; let mut limit = h0[5]; let mut reduced = if h0[2] < z * fz * (1.0 - 1e-12) { 1.0 } else { 0.0 };
+    let eval = |f: f64| {
+        let kc = if pos(kc11) { kienzle_kc(kc11, mc.max(0.0), f) } else { f64::NAN };
+        let q = plunge_mrr_cm3_min(ae, step, rpm * z * f);
+        let p_sp = if pos(eta) { power_kw(q, kc, eta) } else { f64::NAN };
+        let p_av = if pos(p_max) { spindle_power_available_kw(rpm, p_max, t_max.max(0.0)) } else { f64::NAN };
+        (kc, q, p_sp, p_av, if p_sp.is_finite() && p_av.is_finite() { p_sp / p_av } else { f64::NAN })
+    };
+    let mut e = eval(f);
+    if e.4.is_finite() && e.4 > 1.0 {
+        limit = if pos(t_max) && e.3 < p_max { LIMIT_TORQUE as f64 } else { LIMIT_POWER as f64 };
+        if !(fz_locked > 0.0) {
+            let (mut lo, mut hi) = (0.0, f);
+            for _ in 0..60 { let mid = (lo + hi) / 2.0; if eval(mid).4 > 1.0 { hi = mid; } else { lo = mid; } }
+            f = lo; e = eval(f); reduced = 1.0;
+        }
+    }
+    [rpm, vca, f, rpm * z * f, table, limit, e.0, e.1, e.2, e.3, e.4, reduced]
+}
+
 // ---------------- Tapping ----------------
 /// Tapping speed and feed. A tap must feed one pitch per revolution, so the feed rate is
 /// `pitch x rpm` and a machine limit can only be met by slowing the spindle:
@@ -774,6 +849,36 @@ mod tests {
         let t = advise_bore(60.0, 20.0, 6.0, 210.0, 0.0, 0.0, 0.0, 0.0, 200.0, 0.0, 0.0);
         assert!(t[6].is_nan() && t[7].is_nan() && t[2].is_nan() && t[5] == 0.0 && close(t[1] / a[1], 160000.0 / (160000.0 - 1296.0), 1e-9));
         assert!(advise_bore(60.0, 20.0, 20.0, 210.0, 2000.0, 0.1, 1.0, 0.0, 0.0, 0.05, 4.0)[0].is_nan());
+    }
+
+    #[test]
+    fn plunge_roughing() {
+        // 12 mm cutter, plunges 3 mm apart: cusp 6 - sqrt(36 - 2.25) = 0.1905 mm; at a 3 mm stepover they meet up to 2 sqrt(3 x 9) = 10.39 mm apart
+        assert!(close(plunge_cusp(12.0, 3.0), 0.19052, 1e-4) && close(plunge_max_step(12.0, 3.0), 10.3923, 1e-3));
+        assert!(plunge_cusp(12.0, 12.0) == 6.0 && plunge_cusp(12.0, 13.0).is_nan() && plunge_max_step(12.0, 6.0) == 12.0 && plunge_max_step(12.0, 8.0) == 12.0);
+        // at the largest spacing the cusp is as high as the stepover
+        assert!(close(plunge_cusp(12.0, plunge_max_step(12.0, 3.0)), 3.0, 1e-9));
+        // a 50 mm row at 3 mm: 17 steps, 18 plunges; an exact multiple does not gain one
+        assert!(plunge_count(50.0, 3.0) == 18.0 && plunge_count(30.0, 3.0) == 11.0);
+        // 18 plunges 20 mm deep at 80 mm/min: 18 x 20 / 80 = 4.5 min in the cut
+        assert!(close(plunge_rough_time_min(20.0, 80.0, 18.0), 4.5, 1e-12) && plunge_rough_time_min(0.0, 80.0, 1.0).is_nan());
+        // 4 teeth, 60 m/min, 0.0125 mm per tooth down: n = 60000 / (pi x 12) = 1591.5 rpm, Vf = 1591.5 x 4 x 0.0125 = 79.58 mm/min,
+        // Q = 3 x 3 x 79.58 / 1000 = 0.7162 cm3/min; kc = 1500 x 0.0125^-0.25 = 4486 N/mm2; P = 0.7162 x 4486 / 60000 / 0.8 = 0.0669 kW
+        let a = advise_plunge(60.0, 12.0, 4.0, 0.0125, 3.0, 3.0, 1500.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.8);
+        assert!(close(a[0], 1591.55, 0.01) && close(a[3], 79.58, 0.01) && close(a[7], 0.7162, 1e-3) && close(a[6], 4486.0, 1.0) && close(a[8], 0.0669, 1e-3));
+        assert!(a[5] == 0.0 && a[11] == 0.0 && a[9].is_nan() && close(a[2], 0.0125, 1e-12));
+        // a 1000 rpm machine: the speed is held, the feed per tooth is not touched
+        let b = advise_plunge(60.0, 12.0, 4.0, 0.0125, 3.0, 3.0, 1500.0, 0.25, 0.0, 1000.0, 0.0, 0.0, 0.0, 0.8);
+        assert!(b[0] == 1000.0 && b[5] == ADV_RPM as f64 && close(b[3], 50.0, 1e-9) && close(b[2], 0.0125, 1e-12));
+        // a 0.05 kW spindle is short of power: the feed per tooth comes down until the cut fits
+        let c = advise_plunge(60.0, 12.0, 4.0, 0.0125, 3.0, 3.0, 1500.0, 0.25, 0.0, 0.0, 0.0, 0.05, 0.0, 0.8);
+        assert!(c[5] == LIMIT_POWER as f64 && c[11] == 1.0 && c[2] < 0.0125 && close(c[10], 1.0, 1e-6) && close(c[8], 0.05, 1e-6));
+        // locked: nothing is changed and the share is over 1
+        let l = advise_plunge(60.0, 12.0, 4.0, 0.0125, 3.0, 3.0, 1500.0, 0.25, 1.0, 0.0, 0.0, 0.05, 0.0, 0.8);
+        assert!(l[5] == LIMIT_POWER as f64 && l[11] == 0.0 && close(l[2], 0.0125, 1e-12) && close(l[10], 0.0669 / 0.05, 2e-3));
+        // no stepover given: speed and feed still come back, power does not
+        let n = advise_plunge(60.0, 12.0, 4.0, 0.0125, 0.0, 0.0, 1500.0, 0.25, 0.0, 0.0, 0.0, 5.0, 0.0, 0.8);
+        assert!(close(n[3], 79.58, 0.01) && n[7].is_nan() && n[10].is_nan() && n[5] == 0.0);
     }
 
     #[test]
