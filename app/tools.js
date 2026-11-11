@@ -357,7 +357,6 @@ const TOOLS = [
     } else rows.push(R('Feed per tooth', 'Enter the target chip thickness', '', 0));
     return rows;
   },
-  diagram: (v, s) => typeof mtEngageSvg === 'function' ? mtEngageSvg(v.d, v.ae, 0, 0) : '',
   working: 'Engagement phi = acos(1 - 2 ae / D). Max chip hex = fz sin(phi) for ae < D/2, so fz = hex x RCTF with RCTF = 1 / sin(phi) = 1 / sqrt(1 - (1 - 2 ae / D)^2). At ae >= D/2 the chip reaches fz and RCTF = 1. Vf = n x z x fz. Very large factors at tiny stepovers push the tool hard on entry and amplify any runout; check the result against the tool maker\'s maximum feed.',
   source: 'Machining Doctor chip thinning calculator (RCTF); Altintas, Manufacturing Automation, Ch. 2 (h = c sin phi). See docs/sources.md.',
 },
@@ -396,7 +395,6 @@ const TOOLS = [
     if (p1 > 120) rows.push(R('Note', 'Engagement over 120 deg: consider a smaller tool, a larger corner radius or a roll-in (trochoidal) path', '', 0));
     return rows;
   },
-  diagram: (v, s) => typeof mtEngageSvg === 'function' ? mtEngageSvg(v.d, v.ae, v.Rw, v.mode === 1 ? 1 : -1) : '',
   working: 'Straight wall: phi = acos(1 - 2 ae / D). Arc of radius R at the finished wall, tool radius r: inside corner, tool centre at R - r and the previous wall at R - ae: cos phi = ((R - ae)^2 - (R - r)^2 - r^2) / (2 r (R - r)); outside, centre at R + r and previous wall at R + ae: cos phi = ((R + r)^2 + r^2 - (R + ae)^2) / (2 r (R + r)) (law of cosines in the triangle arc centre, tool centre, edge of the previous wall; both tend to the straight-wall angle as R grows). Max chip = fz sin(phi), fz once phi >= 90 deg, so the feed per tooth for the same chip is fz x sin(phi_straight) / sin(phi_arc). The tool-centre feed then uses the arc feed correction (R - r) / R inside, (R + r) / R outside. A sharp corner entered on a straight line is not an arc: there the engagement peaks briefly higher.',
   source: 'Engagement and chip thickness: Altintas, Manufacturing Automation, Ch. 2; arc feed: Sandvik Coromant milling formulas (circular interpolation). The arc engagement is derived here by the law of cosines and checked in the core tests against a brute-force sample of the tool circle.',
 },
@@ -425,7 +423,6 @@ const TOOLS = [
     }
     return rows;
   },
-  diagram: (v, s) => typeof mtCuspSvg === 'function' ? mtCuspSvg(v.d, v.st > 0 ? v.st : (v.h > 0 ? 2 * Math.sqrt(Math.max(0, v.d * v.h - v.h * v.h)) : 0)) : '',
   working: 'Cusp h = R - sqrt(R^2 - (s/2)^2), R = D/2, s = stepover; stepover for a cusp h: s = 2 sqrt(2 R h - h^2). For small stepovers h is close to s^2 / (8 R). This is for passes side by side on a flat surface; on a slope across the stepover the cusp grows, on a slope along the feed it does not.',
   source: 'Circle geometry; the small-stepover form s^2 / (8 R) as printed by IMCO Carbide Tool (Adjustments for ball nose endmills). See docs/sources.md.',
 },
@@ -455,7 +452,6 @@ const TOOLS = [
     }
     return rows;
   },
-  diagram: (v, s) => typeof mtBallSvg === 'function' ? mtBallSvg(v.d, v.ap, v.tilt > 0 ? v.tilt : 0) : '',
   working: 'Band in the cut, measured from the tool axis: theta0 = acos(1 - 2 ap / D). A point at angle psi from the axis turns on diameter D sin(psi). With the axis tilted by beta from the surface normal the band spans beta - theta0 to beta + theta0, so the largest effective diameter is De = D sin(min(theta0 + beta, 90 deg)) and the smallest is D sin(beta - theta0), or 0 when beta <= theta0 (the centre cuts). With no tilt De = 2 sqrt(ap (D - ap)). n = 1000 Vc / (pi De) (inch: 12 SFM / (pi De)). The chip at the largest diameter is fz x De / D, so fz_adj = fz x D / De. The spindle speed is the one that gives your speed at the largest diameter; the rest of the edge runs slower.',
   source: 'ISCAR, Machining Titanium guide (2019), Table 28 (de = 2 sqrt(d ap - ap^2)); IMCO Carbide Tool and Machining Doctor (feed factor D / De). The tilted form is derived from the sphere and reduces to ISCAR\'s at zero tilt (core tests).',
 },
@@ -745,7 +741,6 @@ const TOOLS = [
     if (v.L / v.d > lim) rows.push(R('Check', 'Overhang is past the smallest published guidance for this bar material (' + lim + ' x D); damped bars are made for ' + BAR_LD.damped.map(x => x[0] + ' ' + x[1] + ' x D').join(', '), '', 0));
     return rows;
   },
-  diagram: (v, s) => typeof mtBarSvg === 'function' ? mtBarSvg(v.d, v.L, v.di) : '',
   working: 'I = pi (d^4 - di^4) / 64 (solid round bar, optional coolant hole; flats ground on the bar are ignored, so a real bar is a little softer). Tip deflection = F L^3 / (3 E I), clamped rigidly at the holder face: holder, clamping and spindle flex are not included, so the real bar deflects more. Fc = kc x ap x fn. E presets: steel 210 GPa (Ovako data for 4140 / 42CrMo4, in the BenchMate material data), solid carbide 580 GPa (Ceratizit grade CTS20L, 10% Co; use your bar maker\'s figure), tungsten heavy metal 360 GPa (Plansee Densimet D176). The guidance values are each maker\'s own rule of thumb for chatter-free boring, shown side by side because they differ.',
   source: "Gere and Goodno, Mechanics of Materials (cantilever); Sandvik Coromant (Fc = kc ap fn); E: Ovako, Ceratizit, Plansee W-MMC brochure 09.2021; overhang guidance: Seco Tools (2019), Kennametal (The basics of boring), Cutwel (Expert guide to boring bars). See docs/sources.md.",
 },
@@ -907,6 +902,7 @@ const TOOLS = [
   id: 'spotdepth', level: 'simple', group: 'Drilling and tapping', title: 'Spot and centre drill depth',
   desc: 'Depth to program a spot drill, chamfer tool point or centre drill to for a given chamfer (countersink) diameter, or the diameter a depth gives. Standard centre drills (inch plain and bell type #000 to #20, metric ISO 866 type A, ISO 2540 type B, ISO 2541 type R) can be picked by size, with every dimension\'s sources.',
   render: el => renderSpotDepth(el),
+  ownDrawing: true, // the screen draws the live picture itself
   working: 'Pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts. Standard sizes: see the note under the tool.',
   source: 'Right-triangle geometry of a cone (as in the Drill point length tool). Centre drill sizes: ICS Cutting Tools, Greenfield (Cleveland), Michigan Drill, Exact Tooling, Linear Tools, ZPS-FN, TECWERK; ISO 2540:2016 and ISO 2541:2016 (public previews); ISO 866, DIN 333 cited by name. See docs/sources.md.',
 },
@@ -979,7 +975,6 @@ const TOOLS = [
     }
     return rows;
   },
-  diagram: (v, s) => typeof grindDeSvg === 'function' ? grindDeSvg(v.mode, v.ds, v.dw) : '',
   working: 'Wheel speed vs = pi ds ns / 60 000 m/s (ds in mm), SFPM = pi ds(in) ns / 12. Work speed vw = pi dw nw / 1000 m/min. Speed ratio q = vs x 60 / vw. Equivalent diameter de = dw ds / (dw + ds) external, dw ds / (dw - ds) internal, ds surface. Contact length lg = sqrt(ae de). Specific removal rate Q\'w = ae vw (mm3/mm/s with vw in mm/s); equivalent chip thickness heq = ae vw / vs. The maximum operating speed is marked on every wheel larger than 80 mm (or on its label or a notice) and must not be exceeded; it depends on the wheel, not on anything BenchMate can work out.',
   source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
 },
@@ -1039,7 +1034,6 @@ const TOOLS = [
     return [R('Strokes per layer', W.surface_grind(...a, 1), '', 0), R('Layers (passes, incl. spark-out)', W.surface_grind(...a, 2), '', 0),
       R('Time per stroke', (v.L + 2 * (v.ot > 0 ? v.ot : 0)) * k / (vt * 1000) * 60, 's', 2), R('Grinding time', t, 'min', 2), R('Grinding time', t * 60, 's', 0)];
   },
-  diagram: (v, s) => typeof grindSurfSvg === 'function' ? grindSurfSvg() : '',
   working: 'Stroke length = L + 2 x overtravel; time per stroke = stroke / table speed (twice that when grinding one way only, as the table returns empty). Strokes per layer = ceil(cross travel / cross-feed) + 1. Layers = ceil(stock / down-feed) + spark-out passes. Time = strokes x layers x time per stroke. Table reversal, wheel dressing and loading are not included.',
   source: 'Distance / rate arithmetic; surface grinding kinematics as in W. B. Rowe, Principles of Modern Grinding Technology.',
 },

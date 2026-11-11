@@ -270,7 +270,7 @@ function renderPage(main, page, tabId) {
   if (t.render) {
     // Reference drawing for a tool that draws its own screen: a key to the names its tables use.
     // Folded state is the user's choice (one setting for all tools); folded by default in Compact view.
-    const ref = typeof DIAGRAMS !== 'undefined' && DIAGRAMS[t.id];
+    const ref = !t.ownDrawing && typeof DIAGRAMS !== 'undefined' && DIAGRAMS[t.id];
     let rh = ''; if (ref) { try { rh = ref({}, state.sys, []) || ''; } catch (e) { rh = ''; } }
     if (rh) {
       const d = document.createElement('details'); d.className = 'dref'; d.dataset.kept = '1';

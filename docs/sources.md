@@ -461,7 +461,7 @@ Cited by the edition the publishers name; not checked on a catalogue page:
 - **AS568.** Greene Tweed and eFunda differ on the ID tolerance of -102 and -113. Greene Tweed prints -391 ID 21.995, which looks like a typo against the size steps around it; shown as printed.
 - **Single-source values, labelled.** ASTM A574 yield and tensile (MSC; hardness confirmed by AFT), T-slot depth h (ISO 299 preview only), inch counterbores (MSC only).
 - **Left out:** Woodruff keys (no second free source for seat dimensions), ISO 3601-1 G series and AS568 -9xx, bearing shaft and housing fits (no two makers compared), DIN 471/472 retaining rings and dowel pins.
-## Small milling and turning (`core/src/millturn.rs`, `app/millturn.js`, tools in `app/tools.js`)
+## Small milling and turning (`core/src/millturn.rs`, tools in `app/tools.js`, drawings in `app/diagrams-cut.js`)
 All web sources accessed 2026-11-10. Drawings are our own SVG. Worked-example tests in `core/src/millturn.rs` were computed independently (hand examples and brute-force scans).
 - **[MD]** Machining Doctor, chip thinning calculator. https://www.machiningdoctor.com/calculators/chip-thinning-calculator/ . Radial chip thinning factor RCTF = 1 / sqrt(1 - (1 - 2 ae / D)^2) for ae < D/2; ball nose axial factor D / sqrt(D^2 - (D - 2 ap)^2).
 - **[ALT]** Altintas (above), Ch. 2: h(phi) = c sin(phi). Engagement angle on a straight wall; on an inside corner or a convex boss it is derived here with the law of cosines and tested against a numerical scan.
