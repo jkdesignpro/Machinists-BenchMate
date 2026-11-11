@@ -135,6 +135,93 @@ pub fn arc_solve(mode: u32, x: f64, y: f64) -> (f64, f64) {
     }
 }
 
+/// Root of `f` on [lo, hi] by bisection. `f(lo)` and `f(hi)` must differ in
+/// sign (or one be zero); NaN otherwise. Bisection halves the bracket every
+/// step, so it always converges, to the last bit of the bracket (at most 200 steps).
+pub fn bisect<F: Fn(f64) -> f64>(f: F, mut lo: f64, mut hi: f64) -> f64 {
+    let (mut flo, fhi) = (f(lo), f(hi));
+    if flo == 0.0 { return lo; }
+    if fhi == 0.0 { return hi; }
+    if !(flo.is_finite() && fhi.is_finite()) || flo.signum() == fhi.signum() { return f64::NAN; }
+    for _ in 0..200 {
+        let mid = 0.5 * (lo + hi);
+        if mid <= lo || mid >= hi { break; }
+        let fm = f(mid);
+        if fm == 0.0 { return mid; }
+        if fm.signum() == flo.signum() { lo = mid; flo = fm; } else { hi = mid; }
+    }
+    0.5 * (lo + hi)
+}
+
+/// Half angle u* (radians, between pi/2 and pi) where sagitta / arc length is
+/// largest: d/du [(1 - cos u) / (2u)] = 0, i.e. u sin u = 1 - cos u (about 2.3311,
+/// an included angle of about 267.1 deg). Below it the ratio rises with the angle,
+/// above it the ratio falls, so a sagitta and an arc length can fit two arcs.
+pub fn arc_sl_peak() -> f64 { bisect(|u| u * u.sin() - (1.0 - u.cos()), PI / 2.0, PI) }
+
+/// Every arc (R, included angle in degrees, 0 < angle <= 360) with the two known
+/// values `a` of kind `ka` and `b` of kind `kb`. Kinds: 0 radius, 1 included angle
+/// (degrees), 2 chord, 3 arc length, 4 sagitta (height of the arc above the chord).
+/// Closed forms where they exist; chord + arc length and sagitta + arc length are
+/// solved for the half angle u by bisection on a bracket where the function is
+/// monotonic. Several solutions are returned in order of angle:
+/// radius + chord gives the minor and the major arc; sagitta + arc length gives
+/// two arcs when s/L lies between 1/pi and the peak at u*.
+pub fn arc_from_two(ka: u32, a: f64, kb: u32, b: f64) -> Vec<(f64, f64)> {
+    if ka == kb || !(a > 0.0 && b > 0.0) || ka > 4 || kb > 4 { return vec![]; }
+    let (k1, x, k2, y) = if ka < kb { (ka, a, kb, b) } else { (kb, b, ka, a) };
+    let mut cand: Vec<(f64, f64)> = Vec::new();
+    let mut push = |r: f64, t: f64| cand.push((r, t));
+    match (k1, k2) {
+        (0, 1) => push(x, y),
+        (0, 2) => { let t = angle_from_chord(y, x); push(x, t); if y < 2.0 * x * (1.0 - 1e-12) { push(x, 360.0 - t); } }
+        (0, 3) => push(x, deg(y / x)),
+        (0, 4) => push(x, angle_from_sagitta(y, x)),
+        (1, 2) => if x < 360.0 { push(y / (2.0 * rad(x / 2.0).sin()), x) },
+        (1, 3) => push(y / rad(x), x),
+        (1, 4) => push(y / (1.0 - rad(x / 2.0).cos()), x),
+        (2, 3) => {
+            // c = 2 R sin u, L = 2 R u: sin(u)/u = c/L, falling from 1 to 0 on (0, pi].
+            if y > x {
+                let k = x / y;
+                let u = bisect(|u| (if u == 0.0 { 1.0 } else { u.sin() / u }) - k, 0.0, PI);
+                if u > 0.0 { push(x / (2.0 * u.sin()), 2.0 * deg(u)); }
+            }
+        }
+        (2, 4) => { let r = radius_from_chord_sagitta(x, y); push(r, angle_from_sagitta(y, r)); }
+        (3, 4) => {
+            // L = 2 R u, s = R (1 - cos u): q(u) = s/L = (1 - cos u)/(2u), rising on (0, u*], falling on [u*, pi].
+            let k = y / x;
+            let q = |u: f64| if u == 0.0 { 0.0 } else { (1.0 - u.cos()) / (2.0 * u) };
+            let us = arc_sl_peak();
+            for (lo, hi) in [(0.0, us), (us, PI)] {
+                let u = bisect(|u| q(u) - k, lo, hi);
+                if u > 0.0 { push(x / (2.0 * u), 2.0 * deg(u)); }
+            }
+        }
+        _ => {}
+    }
+    let mut out: Vec<(f64, f64)> = cand.into_iter()
+        .filter(|&(r, t)| r.is_finite() && r > 0.0 && t.is_finite() && t > 0.0 && t <= 360.0 + 1e-9)
+        .map(|(r, t)| (r, t.min(360.0))).collect();
+    out.sort_by(|p, q| p.1.partial_cmp(&q.1).unwrap());
+    out.dedup_by(|p, q| (p.1 - q.1).abs() < 1e-7 * q.1.max(1.0));
+    out
+}
+
+/// Flat form for WebAssembly: solution `sol` of `arc_from_two`; `which` as in
+/// `arc_solve_flat` (0 R, 1 angle, 2 chord, 3 arc length, 4 sagitta, 5 segment
+/// area, 6 sector area, 7 diameter); 9 = number of solutions.
+pub fn arc_two_flat(ka: f64, a: f64, kb: f64, b: f64, sol: f64, which: f64) -> f64 {
+    let v = arc_from_two(ka as u32, a, kb as u32, b);
+    if which as i32 == 9 { return v.len() as f64; }
+    let Some(&(r, t)) = v.get(sol as usize) else { return f64::NAN };
+    match which as i32 {
+        0 => r, 1 => t, 2 => chord_length(r, t), 3 => arc_length(r, t), 4 => sagitta(r, t),
+        5 => segment_area(r, t), 6 => sector_area(r, t), 7 => 2.0 * r, _ => f64::NAN,
+    }
+}
+
 /// `which`: 0 R, 1 angle, 2 chord, 3 arc length, 4 sagitta, 5 segment area,
 /// 6 sector area, 7 diameter.
 pub fn arc_solve_flat(mode: f64, x: f64, y: f64, which: f64) -> f64 {
@@ -521,6 +608,50 @@ mod tests {
         let (cx, cy, r) = circle_3pts(a.0, a.1, b.0, b.1, c.0, c.1);
         close(cx, 3.0, 1e-9); close(cy, -2.0, 1e-9); close(r, 7.0, 1e-9);
         assert!(circle_3pts(0.0, 0.0, 1.0, 1.0, 2.0, 2.0).0.is_nan());
+    }
+
+    #[test]
+    fn arc_from_any_two() {
+        // Every pair rebuilds the arc it came from, for a minor and a major arc.
+        for &(r, t) in &[(50.0, 60.0), (12.5, 135.0), (8.0, 300.0), (3.0, 1.0)] {
+            let v = [r, t, chord_length(r, t), arc_length(r, t), sagitta(r, t)];
+            for ka in 0..5u32 { for kb in (ka + 1)..5u32 {
+                if ka == 1 && kb == 2 && t >= 360.0 { continue; }
+                let sols = arc_from_two(ka, v[ka as usize], kb, v[kb as usize]);
+                assert!(!sols.is_empty(), "pair {ka},{kb} for R {r} angle {t}");
+                assert!(sols.iter().any(|&(rr, tt)| (rr - r).abs() < 1e-9 * r && (tt - t).abs() < 1e-8 * t.max(1.0)),
+                    "pair {ka},{kb} for R {r} angle {t}: {sols:?}");
+                // order of the two knowns does not matter
+                assert_eq!(arc_from_two(kb, v[kb as usize], ka, v[ka as usize]).len(), sols.len());
+            } }
+        }
+        // Radius and chord: minor and major arc. R 50, chord 50: 60 and 300 deg.
+        let s = arc_from_two(0, 50.0, 2, 50.0);
+        assert_eq!(s.len(), 2); close(s[0].1, 60.0, 1e-9); close(s[1].1, 300.0, 1e-9);
+        // Chord 80, sagitta 20 -> R 50 (worked example already used for radius_from_chord_sagitta).
+        let s = arc_from_two(2, 80.0, 4, 20.0); close(s[0].0, 50.0, 1e-12);
+        // Chord and arc length: a semicircle of R 10 has c 20, L 10 pi.
+        let s = arc_from_two(2, 20.0, 3, 10.0 * PI); assert_eq!(s.len(), 1); close(s[0].0, 10.0, 1e-9); close(s[0].1, 180.0, 1e-8);
+        // Arc no longer than its chord: no arc.
+        assert!(arc_from_two(2, 20.0, 3, 20.0).is_empty());
+        // Sagitta and arc length: the peak of s/L is at u sin u = 1 - cos u, u = 2.33112 rad.
+        let us = arc_sl_peak(); close(us * us.sin(), 1.0 - us.cos(), 1e-12); close(us, 2.331122, 1e-6);
+        // s/L between 1/pi and the peak: two arcs. R 10, 250 deg gives one; the other has the same s/L.
+        let (l, sg) = (arc_length(10.0, 250.0), sagitta(10.0, 250.0));
+        let s = arc_from_two(3, l, 4, sg);
+        assert_eq!(s.len(), 2);
+        for &(rr, tt) in &s { close(arc_length(rr, tt), l, 1e-9); close(sagitta(rr, tt), sg, 1e-9); }
+        assert!(s[0].1 < 267.1 && s[1].1 > 267.1);
+        // Small s/L (shallow arc): one arc.
+        assert_eq!(arc_from_two(3, arc_length(10.0, 30.0), 4, sagitta(10.0, 30.0)).len(), 1);
+        // s/L above the peak: none.
+        assert!(arc_from_two(3, 10.0, 4, 4.0).is_empty());
+        // Flat form
+        close(arc_two_flat(0.0, 50.0, 1.0, 60.0, 0.0, 2.0), 50.0, 1e-12);
+        close(arc_two_flat(0.0, 50.0, 2.0, 50.0, 0.0, 9.0), 2.0, 0.0);
+        // bisect: root of x^2 - 2 on [0, 2]
+        close(bisect(|x| x * x - 2.0, 0.0, 2.0), 2f64.sqrt(), 1e-15);
+        assert!(bisect(|x| x * x + 1.0, 0.0, 2.0).is_nan());
     }
 
     #[test]

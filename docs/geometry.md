@@ -61,7 +61,8 @@ Indexing:
 | Statement | Sources | Status |
 |---|---|---|
 | Law of sines, law of cosines, SSA gives 0, 1 or 2 triangles | OpenStax (cited); tests check each solution against the law of cosines | standard maths |
-| Chord, arc, sagitta, segment, sector, R from chord and sagitta, three-point circle | plane geometry; tests use known circles | standard maths |
+| Chord, arc, sagitta, segment, sector, R from chord and sagitta, three-point circle | plane geometry (OpenStax; Wikipedia "Circular segment", https://en.wikipedia.org/wiki/Circular_segment, accessed 2026-11-11); tests use known circles | standard maths |
+| Arc from any two of R, θ, c, L, s (all ten pairs): closed forms, and bisection for c + L (sin u / u = c / L, monotonic) and s + L ((1 - cos u) / 2u = s / L, peak at u sin u = 1 - cos u, u ≈ 2.3311) | own derivation; test `arc_from_any_two` rebuilds four arcs (minor and major) from every pair and checks both s + L roots | derivation |
 | Sine bar H = L sin θ | right-triangle trigonometry; tests | standard maths |
 | Metric 112-piece set: 1.0005; 1.001-1.009 by 0.001; 1.01-1.49 by 0.01; 0.5-24.5 by 0.5; 25-100 by 25 | MIT-P, INS | confirmed (two makers) |
 | Inch 81-piece set: .1001-.1009 by .0001; .101-.149 by .001; .050-.950 by .050; 1-4 by 1 | STR, MIT-T | confirmed (two makers; Transcat prints the last group unclearly as "1-4-100 Step=1") |
@@ -100,3 +101,8 @@ Indexing:
   convention.
 - **Line-arc fillet** returns up to two solutions for the chosen side and
   inside/outside; the user picks the one that matches the drawing.
+- **Arc from two values** returns every arc that fits: radius + chord gives
+  the minor and the major arc; sagitta + arc length gives two arcs when s/L
+  is between 1/π and the peak (about 0.3623). The user picks one. The
+  numerical solves use plain bisection on a bracket where the function is
+  monotonic, so they cannot fail to converge or jump to the wrong root.

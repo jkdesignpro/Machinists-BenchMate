@@ -1,0 +1,199 @@
+{
+ "_note": "Centre drill (combined drill and countersink) dimensions as printed by each publisher. Inch fractions are written as their exact decimals (3/64 = 0.046875); decimals are as printed. Field meanings: body = body (shank) diameter; pilot = pilot (drill) diameter; pilot_len = pilot (drill) length as printed; bell = bell (protecting chamfer) diameter; cone = largest diameter of the 60 degree countersink of type B, where the 120 degree protecting chamfer starts; l_min / l_max = pilot length range; r_max / r_min = radius of the type R profile. Built by scripts/build_refdata.py into refdata.json (section centredrills).",
+ "sources": {
+  "ICS": {"publisher": "ICS Cutting Tools", "title": "Catalogue page 114, combined drills and countersinks (plain type 60 deg; plain type 82 and 90 deg)", "url": "https://www.icscuttingtools.com/catalog/page_114.pdf", "accessed": "2026-11-11", "note": "Maker. Size 00 drill diameter is printed 0.25 (a misprint for .025: the drill length column prints .025 and the body is 1/8); transcribed here as .025."},
+  "GREENFIELD": {"publisher": "Greenfield Industries (Cleveland), catalogue page via ME Campbell", "title": "Style 217 plain type and style 217B bell type combined drill and countersink", "url": "https://www.mecampbell.com/media/pdf/GREENFE00009_131.pdf", "accessed": "2026-11-11", "note": "Maker. Decimal inch to 4 places. Sizes 00 and 0 print a drill length longer than the drill diameter (.0300, .0380)."},
+  "MICHIGAN": {"publisher": "Michigan Drill", "title": "Catalogue list 582/585/590 combined drills and countersinks, plain type (60, 82 and 90 deg), and list 587 bell type", "url": "https://default.assets-generalfactory-prod.roccommercecloud.com/assets%2F85ee570bdd31d33d0baea72969a996c8/Michigan_Drill_582_1_Catalog.pdf", "accessed": "2026-11-11", "note": "Maker. Plain type: body and drill diameter only (no drill length column). Bell type (list 587, https://default.assets-generalfactory-prod.roccommercecloud.com/assets%2F9e19334a7c7881853e50173b60b4f741/Michigan_Drill_587_11_Catalog.pdf): body, 'drill dia. and length' in one column, bell diameter; no size 19."},
+  "EXACT": {"publisher": "Exact Tooling", "title": "Combined drill and countersinks, bell type (60 deg with 120 deg chamfer)", "url": "https://exacttooling.com/pages/cuttingtools-solidround-combineddrills-countersinks-belltype", "accessed": "2026-11-11", "note": "Distributor (Magafor and own brand). Sizes 11 to 20."},
+  "LINEAR": {"publisher": "Linear Tools (data sheet LDS 1082, via Farnell)", "title": "Centre drills: metric DIN 333 / ISO 866, inch short series, bell type, radius type", "url": "https://www.farnell.com/datasheets/2804844.pdf", "accessed": "2026-11-11", "note": "UK maker/distributor. Metric table: d, D, l, L; the single l printed equals the minimum of the ZPS range and of ISO 2540, so it is recorded as l_min. Inch short series and bell type print a pilot length l longer than the US makers' drill length (British BS 328 practice); shown as printed, a different measure or a different design."},
+  "ZPS": {"publisher": "ZPS-FN (Czech Republic)", "title": "Centre drills 60 deg form A, DIN 333A, HSS (VS92010) and form R, DIN 333R (VS93010)", "url": "https://zps-fn.cz/en/drills/detail/centre-drills-60-form-a,-din-333a,-high-speed-steel-hss", "accessed": "2026-11-11", "note": "Maker. Table D, d, l1, l2 (l2 printed as a range). Form R page: https://zps-fn.cz/en/drills/detail/centre-drills-60-form-r,-din-333r,-high-speed-steel-hss . Symbols are not defined on the page; D is read as the body diameter and d as the pilot diameter (they match ISO 866 and ISO 2541)."},
+  "ISO2540": {"publisher": "ISO (public preview of ISO 2540:2016 on standards.iteh.ai)", "title": "ISO 2540:2016 Centre drills for centre holes with protecting chamfer - Type B, Table 1", "url": "https://cdn.standards.iteh.ai/samples/64194/2a14d980bea94904bca92bcfb2a6daf7/ISO-2540-2016.pdf", "accessed": "2026-11-11", "note": "The standard's own table (pilot d, shank d1, countersink d2, l max and min, L). The 1973 edition preview prints the same numbers; it is the same standard, so it is not counted as a second source."},
+  "ISO2541": {"publisher": "ISO (public preview of ISO 2541:2016 on standards.iteh.ai)", "title": "ISO 2541:2016 Centre drills for centre holes with radius form - Type R, Table 1", "url": "https://cdn.standards.iteh.ai/samples/64195/e9e87d5aa48d4bd58e7ea8018989f847/ISO-2541-2016.pdf", "accessed": "2026-11-11", "note": "Read from a text extract whose column headings did not line up with the numbers: pilot and shank diameters are clear; the radius columns are taken as the last two numbers of each row (max, min) and should be checked against the printed table."},
+  "TECWERK": {"publisher": "Nordwest Handel (TECWERK brand)", "title": "Centre drill bit DIN 333 shape B, nominal 3.15 mm, HSS", "url": "https://www.nordwest-tecwerk.com/en/products/machining/drill-bits/centre-drill-bits/centre-drill-bit-din-333-shape-b-hss-w-protection-lowering-right-cutting-tecwerk", "accessed": "2026-11-11", "note": "Distributor. Only the 3.15 mm size has dimensions: shank 11.2 mm, overall length 60 mm."}
+ },
+ "families": {
+  "inch_plain": {
+   "ICS": {
+    "#000": {"body": "0.125", "pilot": ".020", "pilot_len": ".020"},
+    "#00": {"body": "0.125", "pilot": ".025", "pilot_len": ".025"},
+    "#0": {"body": "0.125", "pilot": "0.03125", "pilot_len": "0.03125"},
+    "#1": {"body": "0.125", "pilot": "0.046875", "pilot_len": "0.046875"},
+    "#2": {"body": "0.1875", "pilot": "0.078125", "pilot_len": "0.078125"},
+    "#3": {"body": "0.25", "pilot": "0.109375", "pilot_len": "0.109375"},
+    "#4": {"body": "0.3125", "pilot": "0.125", "pilot_len": "0.125"},
+    "#4-1/2": {"body": "0.375", "pilot": "0.140625", "pilot_len": "0.140625"},
+    "#5": {"body": "0.4375", "pilot": "0.1875", "pilot_len": "0.1875"},
+    "#6": {"body": "0.5", "pilot": "0.21875", "pilot_len": "0.21875"},
+    "#7": {"body": "0.625", "pilot": "0.25", "pilot_len": "0.25"},
+    "#8": {"body": "0.75", "pilot": "0.3125", "pilot_len": "0.3125"},
+    "#9": {"body": "0.875", "pilot": "0.34375", "pilot_len": "0.34375"},
+    "#10": {"body": "1.0", "pilot": "0.375", "pilot_len": "0.375"}
+   },
+   "GREENFIELD": {
+    "#00": {"body": ".1250", "pilot": ".0250", "pilot_len": ".0300"},
+    "#0": {"body": ".1250", "pilot": ".0312", "pilot_len": ".0380"},
+    "#1": {"body": ".1250", "pilot": ".0469", "pilot_len": ".0469"},
+    "#2": {"body": ".1875", "pilot": ".0781", "pilot_len": ".0781"},
+    "#3": {"body": ".2500", "pilot": ".1094", "pilot_len": ".1094"},
+    "#4": {"body": ".3125", "pilot": ".1250", "pilot_len": ".1250"},
+    "#5": {"body": ".4375", "pilot": ".1875", "pilot_len": ".1875"},
+    "#6": {"body": ".5000", "pilot": ".2188", "pilot_len": ".2188"},
+    "#7": {"body": ".6250", "pilot": ".2500", "pilot_len": ".2500"},
+    "#8": {"body": ".7500", "pilot": ".3125", "pilot_len": ".3125"}
+   },
+   "MICHIGAN": {
+    "#000": {"body": "0.125", "pilot": ".020"},
+    "#00": {"body": "0.125", "pilot": ".025"},
+    "#0": {"body": "0.125", "pilot": "0.03125"},
+    "#1": {"body": "0.125", "pilot": "0.046875"},
+    "#2": {"body": "0.1875", "pilot": "0.078125"},
+    "#3": {"body": "0.25", "pilot": "0.109375"},
+    "#4": {"body": "0.3125", "pilot": "0.125"},
+    "#4-1/2": {"body": "0.375", "pilot": "0.140625"},
+    "#5": {"body": "0.4375", "pilot": "0.1875"},
+    "#6": {"body": "0.5", "pilot": "0.21875"},
+    "#7": {"body": "0.625", "pilot": "0.25"},
+    "#8": {"body": "0.75", "pilot": "0.3125"},
+    "#9": {"body": "0.875", "pilot": "0.34375"},
+    "#10": {"body": "1.0", "pilot": "0.375"}
+   },
+   "LINEAR": {
+    "#0": {"body": "0.125", "pilot": "0.03125", "pilot_len": "0.09375"},
+    "#1": {"body": "0.125", "pilot": "0.046875", "pilot_len": "0.125"},
+    "#2": {"body": "0.1875", "pilot": "0.078125", "pilot_len": "0.15625"},
+    "#3": {"body": "0.25", "pilot": "0.109375", "pilot_len": "0.15625"},
+    "#4": {"body": "0.3125", "pilot": "0.125", "pilot_len": "0.1875"},
+    "#5": {"body": "0.4375", "pilot": "0.1875", "pilot_len": "0.25"},
+    "#6": {"body": "0.5", "pilot": "0.21875", "pilot_len": "0.3125"},
+    "#7": {"body": "0.625", "pilot": "0.25", "pilot_len": "0.34375"}
+   }
+  },
+  "inch_bell": {
+   "GREENFIELD": {
+    "#11": {"body": ".1250", "bell": ".1000", "pilot": ".0469", "pilot_len": ".0469"},
+    "#12": {"body": ".1875", "bell": ".1500", "pilot": ".0625", "pilot_len": ".0625"},
+    "#13": {"body": ".2500", "bell": ".2000", "pilot": ".0938", "pilot_len": ".0938"},
+    "#14": {"body": ".3125", "bell": ".2500", "pilot": ".1094", "pilot_len": ".1094"},
+    "#15": {"body": ".4375", "bell": ".3500", "pilot": ".1562", "pilot_len": ".1562"},
+    "#16": {"body": ".5000", "bell": ".4000", "pilot": ".1875", "pilot_len": ".1875"},
+    "#17": {"body": ".6250", "bell": ".5000", "pilot": ".2188", "pilot_len": ".2188"},
+    "#18": {"body": ".7500", "bell": ".6000", "pilot": ".2500", "pilot_len": ".2500"}
+   },
+   "EXACT": {
+    "#11": {"body": "0.125", "bell": "0.100", "pilot": "0.046875", "pilot_len": "0.046875"},
+    "#12": {"body": "0.1875", "bell": "0.150", "pilot": "0.0625", "pilot_len": "0.0625"},
+    "#13": {"body": "0.25", "bell": "0.200", "pilot": "0.09375", "pilot_len": "0.09375"},
+    "#14": {"body": "0.3125", "bell": "0.250", "pilot": "0.109375", "pilot_len": "0.109375"},
+    "#15": {"body": "0.4375", "bell": "0.350", "pilot": "0.15625", "pilot_len": "0.15625"},
+    "#16": {"body": "0.5", "bell": "0.400", "pilot": "0.1875", "pilot_len": "0.1875"},
+    "#17": {"body": "0.625", "bell": "0.500", "pilot": "0.21875", "pilot_len": "0.21875"},
+    "#18": {"body": "0.75", "bell": "0.600", "pilot": "0.25", "pilot_len": "0.25"},
+    "#19": {"body": "0.875", "bell": "0.700", "pilot": "0.3125", "pilot_len": "0.3125"},
+    "#20": {"body": "1.0", "bell": "0.800", "pilot": "0.375", "pilot_len": "0.375"}
+   },
+   "MICHIGAN": {
+    "#11": {"body": "0.125", "bell": ".1000", "pilot": "0.046875", "pilot_len": "0.046875"},
+    "#12": {"body": "0.1875", "bell": ".1500", "pilot": "0.0625", "pilot_len": "0.0625"},
+    "#13": {"body": "0.25", "bell": ".2000", "pilot": "0.09375", "pilot_len": "0.09375"},
+    "#14": {"body": "0.3125", "bell": ".2500", "pilot": "0.109375", "pilot_len": "0.109375"},
+    "#15": {"body": "0.4375", "bell": ".3500", "pilot": "0.15625", "pilot_len": "0.15625"},
+    "#16": {"body": "0.5", "bell": ".4000", "pilot": "0.1875", "pilot_len": "0.1875"},
+    "#17": {"body": "0.625", "bell": ".5000", "pilot": "0.21875", "pilot_len": "0.21875"},
+    "#18": {"body": "0.75", "bell": ".6000", "pilot": "0.25", "pilot_len": "0.25"},
+    "#20": {"body": "1.0", "bell": ".8000", "pilot": "0.375", "pilot_len": "0.375"}
+   },
+   "LINEAR": {
+    "#11": {"body": "0.125", "bell": "0.100", "pilot": "0.046875", "pilot_len": "0.09375"},
+    "#12": {"body": "0.1875", "bell": "0.150", "pilot": "0.0625", "pilot_len": "0.09375"},
+    "#13": {"body": "0.25", "bell": "0.200", "pilot": "0.09375", "pilot_len": "0.125"},
+    "#14": {"body": "0.3125", "bell": "0.250", "pilot": "0.125", "pilot_len": "0.15625"},
+    "#15": {"body": "0.4375", "bell": "0.350", "pilot": "0.15625", "pilot_len": "0.21875"}
+   }
+  },
+  "iso866_a": {
+   "ZPS": {
+    "1": {"pilot": "1", "body": "3.15", "l_min": "1.3", "l_max": "1.7"},
+    "1.25": {"pilot": "1.25", "body": "3.15", "l_min": "1.6", "l_max": "2"},
+    "1.6": {"pilot": "1.6", "body": "4", "l_min": "2", "l_max": "2.6"},
+    "2": {"pilot": "2", "body": "5", "l_min": "2.5", "l_max": "3.1"},
+    "2.5": {"pilot": "2.5", "body": "6.3", "l_min": "3.1", "l_max": "3.8"},
+    "3.15": {"pilot": "3.15", "body": "8", "l_min": "3.9", "l_max": "4.6"},
+    "4": {"pilot": "4", "body": "10", "l_min": "5", "l_max": "5.9"},
+    "5": {"pilot": "5", "body": "12.5", "l_min": "6.3", "l_max": "7.2"},
+    "6.3": {"pilot": "6.3", "body": "16", "l_min": "8", "l_max": "8.9"},
+    "8": {"pilot": "8", "body": "20", "l_min": "10.1", "l_max": "11.1"},
+    "10": {"pilot": "10", "body": "25", "l_min": "12.8", "l_max": "13.8"}
+   },
+   "LINEAR": {
+    "1": {"pilot": "1.00", "body": "3.15", "l_min": "1.3"},
+    "1.25": {"pilot": "1.25", "body": "3.15", "l_min": "1.6"},
+    "1.6": {"pilot": "1.60", "body": "4.00", "l_min": "2.0"},
+    "2": {"pilot": "2.00", "body": "5.00", "l_min": "2.5"},
+    "2.5": {"pilot": "2.50", "body": "6.30", "l_min": "3.1"},
+    "3.15": {"pilot": "3.15", "body": "8.00", "l_min": "3.9"},
+    "4": {"pilot": "4.00", "body": "10.00", "l_min": "5.0"},
+    "5": {"pilot": "5.00", "body": "12.50", "l_min": "6.3"},
+    "6.3": {"pilot": "6.30", "body": "16.00", "l_min": "8.0"},
+    "10": {"pilot": "10.0", "body": "25.00", "l_min": "12.8"}
+   }
+  },
+  "iso2540_b": {
+   "ISO2540": {
+    "1": {"pilot": "1.0", "body": "4.0", "cone": "2.12", "l_max": "1.9", "l_min": "1.3"},
+    "1.25": {"pilot": "1.25", "body": "5.0", "cone": "2.65", "l_max": "2.2", "l_min": "1.6"},
+    "1.6": {"pilot": "1.6", "body": "6.3", "cone": "3.35", "l_max": "2.8", "l_min": "2.0"},
+    "2": {"pilot": "2.0", "body": "8.0", "cone": "4.25", "l_max": "3.3", "l_min": "2.5"},
+    "2.5": {"pilot": "2.5", "body": "10.0", "cone": "5.30", "l_max": "4.1", "l_min": "3.1"},
+    "3.15": {"pilot": "3.15", "body": "11.2", "cone": "6.70", "l_max": "4.9", "l_min": "3.9"},
+    "4": {"pilot": "4.0", "body": "14.0", "cone": "8.50", "l_max": "6.2", "l_min": "5.0"},
+    "5": {"pilot": "5.0", "body": "18.0", "cone": "10.60", "l_max": "7.5", "l_min": "6.3"},
+    "6.3": {"pilot": "6.3", "body": "20.0", "cone": "13.20", "l_max": "9.2", "l_min": "8.0"},
+    "8": {"pilot": "8.0", "body": "25.0", "cone": "17.00", "l_max": "11.5", "l_min": "10.1"},
+    "10": {"pilot": "10.0", "body": "31.5", "cone": "21.20", "l_max": "14.2", "l_min": "12.8"}
+   },
+   "TECWERK": {
+    "3.15": {"pilot": "3.15", "body": "11.2"}
+   }
+  },
+  "iso2541_r": {
+   "ISO2541": {
+    "1": {"pilot": "1.0", "body": "3.15", "r_max": "3.15", "r_min": "2.5"},
+    "1.25": {"pilot": "1.25", "body": "3.15", "r_max": "4.0", "r_min": "3.15"},
+    "1.6": {"pilot": "1.6", "body": "4.0", "r_max": "5.0", "r_min": "4.0"},
+    "2": {"pilot": "2.0", "body": "5.0", "r_max": "6.3", "r_min": "5.0"},
+    "2.5": {"pilot": "2.5", "body": "6.3", "r_max": "8.0", "r_min": "6.3"},
+    "3.15": {"pilot": "3.15", "body": "8.0", "r_max": "10.0", "r_min": "8.0"},
+    "4": {"pilot": "4.0", "body": "10.0", "r_max": "12.5", "r_min": "10.0"},
+    "5": {"pilot": "5.0", "body": "12.5", "r_max": "16.0", "r_min": "12.5"},
+    "6.3": {"pilot": "6.3", "body": "16.0", "r_max": "20.0", "r_min": "16.0"},
+    "8": {"pilot": "8.0", "body": "20.0", "r_max": "25.0", "r_min": "20.0"},
+    "10": {"pilot": "10.0", "body": "25.0", "r_max": "31.5", "r_min": "25.0"}
+   },
+   "ZPS": {
+    "1": {"pilot": "1", "body": "3.15"},
+    "1.6": {"pilot": "1.6", "body": "4"},
+    "2": {"pilot": "2", "body": "5"},
+    "2.5": {"pilot": "2.5", "body": "6.3"},
+    "3.15": {"pilot": "3.15", "body": "8"},
+    "4": {"pilot": "4", "body": "10"},
+    "5": {"pilot": "5", "body": "12.5"},
+    "6.3": {"pilot": "6.3", "body": "16"}
+   }
+  }
+ },
+ "angles": {
+  "_note": "Included countersink angle. Plain inch: 60 deg standard; 82 and 90 deg also made in sizes 1 to 8 (ICS, Michigan). Bell inch: 60 deg countersink with a 120 deg protecting chamfer (Exact Tooling; Michigan list 587 states 60 deg). Metric types A, B, R: 60 deg (DIN 333 title '60 deg centre drills; types R, A and B'; Linear Tools, ZPS). Type B adds a 120 deg protecting chamfer. Pilot point: 118 deg on the US inch tools (Michigan, KEO listings), 120 deg on Linear Tools' tools.",
+  "inch_plain": [60, 82, 90],
+  "inch_bell": [60],
+  "iso866_a": [60],
+  "iso2540_b": [60],
+  "iso2541_r": [60]
+ },
+ "order": {
+  "inch_plain": ["#000", "#00", "#0", "#1", "#2", "#3", "#4", "#4-1/2", "#5", "#6", "#7", "#8", "#9", "#10"],
+  "inch_bell": ["#11", "#12", "#13", "#14", "#15", "#16", "#17", "#18", "#19", "#20"],
+  "iso866_a": ["1", "1.25", "1.6", "2", "2.5", "3.15", "4", "5", "6.3", "8", "10"],
+  "iso2540_b": ["1", "1.25", "1.6", "2", "2.5", "3.15", "4", "5", "6.3", "8", "10"],
+  "iso2541_r": ["1", "1.25", "1.6", "2", "2.5", "3.15", "4", "5", "6.3", "8", "10"]
+ }
+}

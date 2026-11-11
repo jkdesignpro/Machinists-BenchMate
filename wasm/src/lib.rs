@@ -164,6 +164,7 @@ f1!(mixed_to_decimal, c::mixed_to_decimal, whole, num, den);
 // Geometry (core/src/geometry.rs)
 f1!(tri_solve, c::solve_triangle_flat, a, b, cc, aa, bb, ccc, sol, which);
 f1!(arc_solve, c::arc_solve_flat, mode, x, y, which);
+f1!(arc_two, c::arc_two_flat, ka, a, kb, b, sol, which);
 f1!(circle_3pts, c::circle_3pts_flat, x1, y1, x2, y2, x3, y3, which);
 f1!(sine_bar_height, c::sine_bar_height, l, theta);
 f1!(sine_bar_angle, c::sine_bar_angle, l, h);
@@ -390,6 +391,11 @@ f1!(bandsaw_chip_per_tooth, c::bandsaw_chip_per_tooth, vf, vb, tpi);
 f1!(spot_depth, c::spot_depth, dc, angle);
 f1!(centre_drill_depth, c::centre_drill_depth, dc, dp, l, angle);
 f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
+f1!(spot_chamfer_dia, c::spot_chamfer_dia, z, angle);
+f1!(saw_section, c::saw_section, shape, a, b, nx, ny, which);
+f1!(saw_cut_time, c::saw_cut_time, area, rate);
+f1!(partoff_time, c::partoff_time, d0, d1, f, vc, n_max, k, which);
+f1!(partoff_time_rpm, c::partoff_time_rpm, d0, d1, f, n);
 /// Per-tooth chip loads with runout into list_out; returns the tooth count.
 #[no_mangle] pub extern "C" fn runout_chips(fz: f64, tir: f64, z: f64) -> f64 { set_out(c::runout_chips(fz, tir, z.max(0.0) as usize)) }
 /// Multi-pass turning into list_out as (finished dia, rpm, minutes) per pass; returns the pass count.
@@ -521,6 +527,9 @@ f1!(npv, c::npv, investment, saving, n, i, resale);
 /// Units of quantity `q` as text (`symbol|name|exact|factor` lines) into the string buffer.
 #[no_mangle] pub extern "C" fn unit_list(q: f64) -> f64 { set_str(&c::units::units_text(q as u32)) }
 #[no_mangle] pub extern "C" fn unit_convert(q: f64, from: f64, to: f64, x: f64) -> f64 { c::units::convert(q as u32, from as u32, to as u32, x) }
+f1!(dms_to_deg, c::units::dms_to_deg, d, m, s);
+#[no_mangle] pub extern "C" fn angle_form_from_deg(kind: f64, a: f64) -> f64 { c::units::angle_form_from_deg(kind as u32, a) }
+#[no_mangle] pub extern "C" fn angle_form_to_deg(kind: f64, x: f64) -> f64 { c::units::angle_form_to_deg(kind as u32, x) }
 
 // Expression calculator (core/src/expr.rs)
 static mut EXPR_POS: f64 = 0.0;

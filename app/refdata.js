@@ -38,21 +38,30 @@ function drillLabel(d) { return d.kind === 'number' ? 'Number ' + d.name : d.kin
 
 async function renderDrillChart(el) {
   const R = await loadRef(el); if (!R) return;
-  const D = R.drills, m = RMEM.drill || (RMEM.drill = { q: '', kind: '', target: '' });
+  const D = R.drills, m = RMEM.drill || (RMEM.drill = { q: '', kind: '', target: '', tu: '' });
+  if (!m.tu) m.tu = inMode() ? 'in' : 'mm';
   el.innerHTML = '<div class="mfilter"><input id="dq" type="search" placeholder="Search: #7, F, 13/64, 6.8 ..." style="width:260px">' +
     '<select id="dk"><option value="">All series</option><option value="fraction">Fractional</option><option value="number">Number</option><option value="letter">Letter</option><option value="metric">Metric</option></select></div>' +
-    '<div class="grid" style="max-width:760px"><label class="f"><span>Nearest drill to a target size</span><div class="row"><input id="dt" type="number" step="any" inputmode="decimal"><span class="u">' + uLen() + '</span></div></label></div>' +
+    '<div class="grid" style="max-width:760px"><label class="f"><span>Find the nearest drills to a diameter</span><div class="row"><input id="dt" type="number" step="any" inputmode="decimal"><select id="dtu" style="width:auto"><option value="in">in</option><option value="mm">mm</option></select></div></label></div>' +
     '<div id="dn"></div><div id="dres"></div><div class="note" id="dsrc"></div>';
-  const q = $('#dq', el), k = $('#dk', el), t = $('#dt', el);
-  q.value = m.q; k.value = m.kind; const t0 = m.target === '' ? '' : String(+toUser(m.target).toFixed(inMode() ? 4 : 3)); t.value = t0;
+  const q = $('#dq', el), k = $('#dk', el), t = $('#dt', el), tu = $('#dtu', el);
+  q.value = m.q; k.value = m.kind; tu.value = m.tu;
+  const showT = () => { t.value = m.target === '' ? '' : String(+(m.tu === 'in' ? m.target / IN_MM : m.target).toFixed(m.tu === 'in' ? 4 : 3)); };
+  showT();
+  // Nearest size at or below and above the diameter in each series; the difference is drill minus target.
   function nearest() {
-    const v = parseFloat(t.value), out = $('#dn', el);
-    if (!(v > 0)) { out.innerHTML = ''; m.target = ''; return; }
-    const mm = t.value === t0 ? m.target : fromUser(v); m.target = mm;
-    const list = D.drills.filter(d => !k.value || d.kind === k.value).map(d => ({ d, diff: d.inch * IN_MM - mm })).sort((a, b) => Math.abs(a.diff) - Math.abs(b.diff)).slice(0, 8).sort((a, b) => a.diff - b.diff);
-    out.innerHTML = '<div class="res" style="margin-bottom:12px"><div class="h">Nearest drills to ' + fBoth(mm) + '</div><table>' + list.map(({ d, diff }) =>
-      '<tr><td>' + rEsc(drillLabel(d)) + ' ' + badge(d.status) + '</td><td class="v">' + fBoth(d.inch * IN_MM) + '</td><td class="v">' + (diff >= 0 ? '+' : '') + (inMode() ? fx(diff / IN_MM, 4) : fx(diff, 3)) + '</td><td class="u">' + uLen() + '</td></tr>').join('') + '</table></div>';
+    const out = $('#dn', el), mm = m.target;
+    if (!(mm > 0)) { out.innerHTML = ''; return; }
+    const dIn = x => (x >= 0 ? '+' : '') + fx(x / IN_MM, 4) + ' in', dMm = x => (x >= 0 ? '+' : '') + fx(x, 3) + ' mm';
+    const rows = nearestBySeries(D.drills, mm).filter(s => !k.value || s.kind === k.value).map(s => {
+      const cell = (x, side) => x ? '<td>' + rEsc(x.d.name) + ' ' + badge(x.d.status) + '<div class="ms">' + side + '</div></td><td class="v">' + fBoth(x.mm) + '</td><td class="v">' + (Math.abs(x.mm - mm) < 1e-9 ? '<b>exact</b>' : dIn(x.mm - mm) + '<div class="ms">' + dMm(x.mm - mm) + '</div>') + '</td>'
+        : '<td colspan="3" class="ms">' + (side === 'below' ? 'none this small (smallest ' + rEsc(s.first.d.name) + ')' : 'none this large (largest ' + rEsc(s.last.d.name) + ')') + '</td>';
+      return '<tr><td rowspan="2"><b>' + s.name + '</b></td>' + cell(s.below, 'at or below') + '</tr><tr>' + cell(s.above, 'above') + '</tr>';
+    });
+    out.innerHTML = '<div class="res mtab" style="margin-bottom:12px"><div class="h">Nearest drills to ' + fBoth(mm) + '</div><table><tr><th>Series</th><th>Drill</th><th style="text-align:right">Size</th><th style="text-align:right">Difference</th></tr>' + rows.join('') + '</table></div>';
   }
+  t.oninput = () => { const v = parseFloat(t.value); m.target = v > 0 ? (m.tu === 'in' ? v * IN_MM : v) : ''; nearest(); };
+  tu.onchange = () => { m.tu = tu.value; showT(); nearest(); };
   function draw() {
     m.q = q.value; m.kind = k.value;
     const s = q.value.trim().toLowerCase().replace(/^#/, '').replace(/"/g, '');
@@ -66,7 +75,7 @@ async function renderDrillChart(el) {
       (d.kind === 'number' || d.kind === 'letter' ? '<div class="ms">' + d.groups[0].publishers.length + ' publisher' + (d.groups[0].publishers.length > 1 ? 's' : '') + '</div>' : '') + '</td></tr>').join('') + '</table></div>' +
       '<p class="desc">' + rows.length + ' of ' + D.drills.length + ' sizes. Number and letter sizes are not given by a formula; their decimal sizes are what the publishers below print (Confirmed = two or more agree). Fractional sizes are exact (n/64 in). Metric sizes are exact by name; the list is the sizes one supplier stocks (a second list is still to be added). mm values are inch x 25.4.</p>';
   }
-  q.oninput = () => { draw(); }; k.onchange = () => { draw(); nearest(); }; t.oninput = nearest;
+  q.oninput = () => { draw(); }; k.onchange = () => { draw(); nearest(); };
   $('#dsrc', el).innerHTML = '<b>Sources</b><br>' + sourceList(D.sources);
   draw(); nearest();
 }
@@ -84,20 +93,39 @@ function threadSelect(opts, cur) {
 }
 
 // ------------------------------------------------------------------ tap drills
+const DRILL_SERIES = [['number', 'Number'], ['letter', 'Letter'], ['fraction', 'Fractional'], ['metric', 'Metric']];
+// Nearest drill at or below and above `mm` in each series (a lookup in the drill chart).
+function nearestBySeries(drills, mm) {
+  return DRILL_SERIES.map(([kind, name]) => {
+    const list = drills.filter(d => d.kind === kind).map(d => ({ d, mm: d.inch * IN_MM })).sort((a, b) => a.mm - b.mm);
+    let below = null, above = null;
+    for (const x of list) { if (x.mm <= mm + 1e-9) below = x; else if (!above) above = x; }
+    return { kind, name, below, above, first: list[0], last: list[list.length - 1] };
+  });
+}
+// Suggested starting engagement: 75 % cutting (USCTI tapping tip; FM Carbide 65-75 %, calculator default 75 %),
+// 65 % forming (Besly in CTE 1995: 65 to 75 %, worked at 65 %; FM Carbide 60-65 % in steel). See docs/sources.md.
+const TAP_SUGGEST = { cut: 75, form: 65 };
 async function renderTapDrill(el) {
   const R = await loadRef(el); if (!R) return;
   const W = state.W, opts = threadOptions(R);
-  const m = RMEM.tap || (RMEM.tap = { key: 'M10x1.5', type: 'cut', pct: '', d: 10, p: 1.5 });
+  const m = RMEM.tap || (RMEM.tap = { key: 'M10x1.5', type: 'cut', pctCut: TAP_SUGGEST.cut, pctForm: TAP_SUGGEST.form, d: 10, p: 1.5 });
   const TAP_PICK = { map: { d: 'dia', p: 'pitch' }, types: ['Tap'] };
   el.innerHTML = toolPickRow(TAP_PICK) + '<div class="grid" style="max-width:760px">' +
     '<label class="f"><span>Thread</span><div class="row"><select id="tk">' + threadSelect(opts, m.key) + '</select></div></label>' +
-    '<label class="f"><span>Tap type</span><div class="row"><select id="tt"><option value="cut">Cutting tap</option><option value="form">Forming (roll) tap</option></select></div></label>' +
-    '<label class="f"><span>Percent of thread (blank = 75 cut, 65 form)</span><div class="row"><input id="tp" type="number" step="any"><span class="u">%</span></div></label>' +
+    '<div class="f"><span>Tap type</span><div class="row"><div class="seg" id="tt"><button type="button" data-v="cut">Cut tap</button><button type="button" data-v="form">Form (roll) tap</button></div></div></div>' +
+    '<label class="f"><span>Thread engagement <b id="tpv" class="mv"></b> <span class="ms" id="tps"></span></span><div class="row"><input id="tp" type="range" min="55" max="85" step="1" style="flex:1 1 160px;min-width:120px;padding:0;border:0;background:transparent" aria-label="Thread engagement in percent"><span class="u">%</span></div></label>' +
     '<label class="f cust"><span>Major diameter</span><div class="row"><input id="td" type="number" step="any"><span class="u">' + uLen() + '</span></div></label>' +
     '<label class="f cust"><span>Pitch' + (inMode() ? ' (threads per inch)' : '') + '</span><div class="row"><input id="tpp" type="number" step="any"><span class="u">' + (inMode() ? 'TPI' : 'mm') + '</span></div></label>' +
-    '</div><div id="tres"></div><div class="note"><b>Working:</b> Cutting taps: drill = D - 1.299038 P x %/100, the convention behind the inch formula drill = D - 0.01299 x % / TPI (OSG USA tapping guide, 2024) and the metric form D - % x P / 76.98 (FM Carbide). In this convention 100 % is a thread depth of 2 x 0.75 H = 1.299 P on the diameter, deeper than the basic engagement of ISO 68-1 / ASME B1.1 (2 x 5/8 H = 1.0825 P), so a hole at the basic minor diameter is 83.3 %. Forming taps: hole = D - 0.0068 x % x P (inch: D - 0.0068 x % / TPI; metric form D - % x P / 147.06), as published by the forming tap makers North American Tool and Besly and by FM Carbide, Engineers Edge and MSC (compared under the result in forming mode); the formed metal flows inward, so the hole is larger than for a cutting tap. It is a rule of thumb: the forming-tap maker Balax prints hole sizes for 75, 65 and 55 % thread (miniature sizes, 0-80 to 3-48 and M1 to M1.4) that are 0 to 0.0016 in larger than it gives. Use the tap maker\'s recommended hole size for the tap you have. The shop rule of thumb "drill = major minus pitch" is an approximation: it gives 77 % thread with a cutting tap. Nearest drills come from the drill chart; check the hole against the internal thread minor diameter limits and your tap maker\'s chart, especially for forming taps.<br><b>Sources:</b> OSG USA, Tapping Guide vol. 3 (2024), formula and drill tables for 60 to 80 % thread; FM Carbide TechTips "Tapping formulas" (constants 1.299 / 0.68, 76.98 / 147.06); Engineers Edge "Theoretical tapping hole size, cold form threads" (0.0068). Thread geometry ISO 68-1:2023, ASME B1.1-2024.</div>';
+    '</div><div id="tres"></div><div class="note"><b>Working:</b> Cutting taps: drill = D - 1.299038 P x %/100, the convention behind the inch formula drill = D - 0.01299 x % / TPI (OSG USA tapping guide, 2024) and the metric form D - % x P / 76.98 (FM Carbide). In this convention 100 % is a thread depth of 2 x 0.75 H = 1.299 P on the diameter, deeper than the basic engagement of ISO 68-1 / ASME B1.1 (2 x 5/8 H = 1.0825 P), so a hole at the basic minor diameter is 83.3 %. Forming taps: hole = D - 0.0068 x % x P (inch: D - 0.0068 x % / TPI; metric form D - % x P / 147.06), as published by the forming tap makers North American Tool and Besly and by FM Carbide, Engineers Edge and MSC (compared under the result in forming mode); the formed metal flows inward, so the hole is larger than for a cutting tap. It is a rule of thumb: the forming-tap maker Balax prints hole sizes for 75, 65 and 55 % thread (miniature sizes, 0-80 to 3-48 and M1 to M1.4) that are 0 to 0.0016 in larger than it gives. Use the tap maker\'s recommended hole size for the tap you have. The shop rule of thumb "drill = major minus pitch" is an approximation: it gives 77 % thread with a cutting tap.<br>' +
+    '<b>Suggested engagement:</b> 75 % for cutting taps: USCTI calls 75 % the general rule for 2B and 3B threads (a little more in soft, a little less in hard material, and not under 65 % in holes shallower than 3 x D); FM Carbide gives 65 to 75 % for cutting taps and starts its calculator at 75 %. 65 % for forming taps: Besly (Cutting Tool Engineering, 1995) says 65 to 75 % is enough for general work and works its example at 65 %; FM Carbide gives 60 to 65 % for forming in steel, stainless and ductile alloys; North American Tool gives 55 to 75 %. Besly and FM Carbide both advise against forming above 75 %. The slider runs from 55 to 85 %; the suggestions are starting points, not limits.<br>' +
+    '<b>Nearest drills:</b> for each drill series, the nearest size at or below and the nearest above the theoretical hole for the tap type you chose, with the engagement each gives with a cutting tap and with a forming tap (the two use different formulas, so the same drill gives a different percent). Sizes come from the drill chart (number and letter sizes as printed by its publishers). Check the hole against the internal thread minor diameter limits and your tap maker\'s chart, especially for forming taps.<br><b>Sources:</b> OSG USA, Tapping Guide vol. 3 (2024), formula and drill tables for 60 to 80 % thread; FM Carbide TechTips "Tapping formulas" (constants 1.299 / 0.68, 76.98 / 147.06; engagement ranges); Engineers Edge "Theoretical tapping hole size, cold form threads" (0.0068); USCTI tapping tip "Don\'t let percent of thread derail your part"; Besly Products in Cutting Tool Engineering, "Threads will roll" (1995); North American Tool TRU-FLO engineering data. Thread geometry ISO 68-1:2023, ASME B1.1-2024.</div>';
   const k = $('#tk', el), tt = $('#tt', el), tp = $('#tp', el), td = $('#td', el), tpp = $('#tpp', el);
-  tt.value = m.type; tp.value = m.pct;
+  const type = () => m.type === 'form' ? 'form' : 'cut';
+  function setType() {
+    tt.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === type()));
+    tp.value = type() === 'form' ? m.pctForm : m.pctCut;
+  }
   function setCustomFields() {
     const cust = k.value === 'custom';
     el.querySelectorAll('.cust').forEach(x => x.style.display = cust ? '' : 'none');
@@ -105,29 +133,46 @@ async function renderTapDrill(el) {
     tpp.value = inMode() ? +(IN_MM / m.p).toFixed(3) : +m.p.toFixed(4);
   }
   function upd() {
-    m.key = k.value; m.type = tt.value; m.pct = tp.value;
+    m.key = k.value;
+    const pct = parseFloat(tp.value), form = type() === 'form';
+    if (form) m.pctForm = pct; else m.pctCut = pct;
+    $('#tpv', el).textContent = fx(pct, 0) + ' %';
+    $('#tps', el).textContent = pct === TAP_SUGGEST[type()] ? '(suggested for ' + (form ? 'forming' : 'cutting') + ' taps)' : '(suggested ' + TAP_SUGGEST[type()] + ' %)';
     let d, p, sel = opts.find(o => o.key === k.value);
     if (sel) { d = sel.d; p = sel.p; m.d = d; m.p = p; }
     else { d = fromUser(parseFloat(td.value)); const pv = parseFloat(tpp.value); p = inMode() ? IN_MM / pv : pv; if (d > 0 && p > 0) { m.d = d; m.p = p; } }
     const out = $('#tres', el);
     if (!(d > 0 && p > 0 && p < d)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter the thread size.</td></tr></table></div>'; return; }
-    const form = tt.value === 'form';
-    const pct = tp.value === '' ? (form ? 65 : 75) : parseFloat(tp.value);
-    const drill = form ? W.tap_drill_form(d, p, pct) : W.tap_drill_cut(d, p, pct);
-    const pctOf = h => form ? W.tap_pct_form(d, p, h) : W.tap_pct_cut(d, p, h);
-    const d1 = W.thread_basic_minor_dia(d, p);
-    const pctTxt = h => { const v = pctOf(h); return v > 100 ? 'too small for a forming tap (over 100 %)' : '= ' + fx(v, 1) + ' %'; };
-    const rows = [
-      ['Hole for ' + fx(pct, 0) + ' % thread', fBoth(drill)],
+    // Each tap type at its own engagement (the slider sets the one chosen; the other keeps its value).
+    const T = { cut: { pct: m.pctCut, hole: W.tap_drill_cut(d, p, m.pctCut), of: h => W.tap_pct_cut(d, p, h), name: 'Cutting tap' },
+      form: { pct: m.pctForm, hole: W.tap_drill_form(d, p, m.pctForm), of: h => W.tap_pct_form(d, p, h), name: 'Forming tap' } };
+    const cur = T[type()], d1 = W.thread_basic_minor_dia(d, p);
+    const pctTxt = h => { const v = cur.of(h); return v > 100 ? 'too small for a ' + (form ? 'forming' : 'cutting') + ' tap (over 100 %)' : '= ' + fx(v, 1) + ' % with a ' + (form ? 'forming' : 'cutting') + ' tap'; };
+    const pitchTxt = (sel ? sel.sys === 'unified' : inMode()) ? fx(IN_MM / p, 2) + ' TPI' : fx(p, 3) + ' mm pitch';
+    const order = form ? ['form', 'cut'] : ['cut', 'form'];
+    const rows = order.map(t => ['Theoretical hole, ' + T[t].name.toLowerCase() + ', ' + fx(T[t].pct, 0) + ' % engagement' + (t === type() ? '' : ' <span class="ms">(its own setting; choose ' + (t === 'form' ? 'Form' : 'Cut') + ' tap to change it)</span>'), t === type() ? '<b>' + fBoth(T[t].hole) + '</b>' : fBoth(T[t].hole)]).concat([
       ['Basic minor diameter of the internal thread (D1)', fBoth(d1) + ' <span class="ms">' + pctTxt(d1) + '</span>'],
       ['Rule of thumb D - P (approximation)', fBoth(d - p) + ' <span class="ms">' + pctTxt(d - p) + '</span>'],
-    ];
-    const near = R.drills.drills.map(x => ({ x, mm: x.inch * IN_MM })).sort((a, b) => Math.abs(a.mm - drill) - Math.abs(b.mm - drill)).slice(0, 8).sort((a, b) => a.mm - b.mm);
-    out.innerHTML = '<div class="res"><div class="h">Results' + (sel ? ' for ' + rEsc(sel.label) + ' ' + badge(sel.status) : '') + '</div><table>' + rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') + '</table></div>' +
-      '<div class="res" style="margin-top:12px"><div class="h">Nearest standard drills (' + (form ? 'forming' : 'cutting') + ' tap)</div><table><tr><td class="ms">Drill</td><td class="ms" style="text-align:right">Size</td><td class="ms" style="text-align:right">Thread</td></tr>' + near.map(({ x, mm }) => {
-        const pc = pctOf(mm), warn = pc > 100 || pc < 50;
-        return '<tr' + (warn ? ' class="over"' : '') + '><td>' + rEsc(drillLabel(x)) + ' ' + badge(x.status) + '</td><td class="v">' + fBoth(mm) + '</td><td class="v">' + fx(pc, 1) + ' %' + (warn ? '<div class="wmsg">' + (pc > 100 ? 'over 100 %: tap will bind or break' : 'under 50 %: weak thread') + '</div>' : '') + '</td></tr>';
-      }).join('') + '</table></div>' + (form && typeof formTapCompare === 'function' ? formTapCompare(R, d, p, pct) : '');
+    ]);
+    const nearTable = t => {
+      const X = T[t];
+      let near = '';
+      nearestBySeries(R.drills.drills, X.hole).forEach(s => {
+        const pick = [];
+        if (!s.above) { near += '<tr><td><b>' + s.name + '</b></td><td colspan="4" class="ms">None this large: the largest is ' + rEsc(s.last.d.name) + ' (' + fLen(s.last.mm) + ' ' + uLen() + ')</td></tr>'; return; }
+        if (s.below) pick.push(['at or below', s.below]);
+        pick.push(['above', s.above]);
+        pick.forEach(([side, x], i) => {
+          const diff = x.mm - X.hole, v = X.of(x.mm), warn = v > 100 ? 'over 100 %: tap will bind or break' : v < 50 ? 'under 50 %: weak thread' : '';
+          near += '<tr' + (warn ? ' class="over"' : '') + '>' + (i === 0 ? '<td rowspan="' + pick.length + '"><b>' + s.name + '</b>' + (!s.below ? '<div class="ms">none smaller in the chart</div>' : '') + '</td>' : '') +
+            '<td>' + rEsc(x.d.name) + ' ' + badge(x.d.status) + '</td><td class="v">' + fBoth(x.mm) + '</td><td class="v ms">' + side + ', ' + (diff >= 0 ? '+' : '') + (inMode() ? fx(diff / IN_MM, 4) : fx(diff, 3)) + '</td><td class="v"><b>' + fx(v, 1) + ' %</b>' + (warn ? '<div class="wmsg">' + warn + '</div>' : '') + '</td></tr>';
+        });
+      });
+      return '<div class="res mtab" style="margin-top:12px"><div class="h">' + X.name + ': nearest standard drills to ' + fLen(X.hole) + ' ' + uLen() + ' (' + fx(X.pct, 0) + ' %)</div><table><tr><th>Series</th><th>Drill</th><th style="text-align:right">Size</th><th style="text-align:right">Difference (' + uLen() + ')</th><th style="text-align:right">Engagement</th></tr>' + near + '</table></div>';
+    };
+    out.innerHTML = '<div class="res"><div class="h">Results' + (sel ? ' for ' + rEsc(sel.label) + ' ' + badge(sel.status) : ' for ' + fLen(d) + ' ' + uLen() + ', ' + pitchTxt) + '</div><table>' + rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') + '</table></div>' +
+      order.map(nearTable).join('') +
+      (form && typeof formTapCompare === 'function' ? formTapCompare(R, d, p, pct) : '');
   }
   const pick = $('#tpick', el);
   if (pick) pick.onchange = () => {
@@ -137,12 +182,124 @@ async function renderTapDrill(el) {
     // A standard thread with the same size is selected; anything else goes in as "Other".
     const std = opts.find(o => Math.abs(o.d - d) < 1e-6 && Math.abs(o.p - p) < 1e-6);
     m.d = d; m.p = p; k.value = std ? std.key : 'custom';
-    if (t.type === 'Tap (forming)') tt.value = 'form'; else if (t.type === 'Tap (cutting)') tt.value = 'cut';
+    if (t.type === 'Tap (forming)') m.type = 'form'; else if (t.type === 'Tap (cutting)') m.type = 'cut';
     $('#tpickmsg', el).textContent = 'Filled from ' + ToolLib.describe(t) + (std ? ' (' + std.label + ')' : '') + '.';
-    setCustomFields(); upd();
+    setCustomFields(); setType(); upd();
   };
-  k.onchange = () => { setCustomFields(); upd(); }; tt.onchange = upd; tp.oninput = upd; td.oninput = upd; tpp.oninput = upd;
-  setCustomFields(); upd();
+  tt.querySelectorAll('button').forEach(b => b.onclick = () => { m.type = b.dataset.v; setType(); upd(); });
+  k.onchange = () => { setCustomFields(); upd(); }; tp.oninput = upd; td.oninput = upd; tpp.oninput = upd;
+  setCustomFields(); setType(); upd();
+}
+
+// ------------------------------------------------------------------ spot and centre drill depth
+const CD_FAMS = [
+  ['inch_plain', 'Inch, plain type (#000 to #10)', 'in'],
+  ['inch_bell', 'Inch, bell type (#11 to #20)', 'in'],
+  ['iso866_a', 'Metric type A, ISO 866 / DIN 333 A', 'mm'],
+  ['iso2540_b', 'Metric type B (protecting chamfer), ISO 2540 / DIN 333 B', 'mm'],
+  ['iso2541_r', 'Metric type R (radius form), ISO 2541 / DIN 333 R', 'mm'],
+];
+const CD_FIELD = { body: 'Body (shank) diameter', pilot: 'Pilot (drill) diameter', pilot_len: 'Pilot (drill) length', bell: 'Bell diameter (end of the 60° countersink)',
+  cone: 'Countersink diameter d2 (end of the 60°, start of the 120° chamfer)', l_min: 'Pilot length, smallest', l_max: 'Pilot length, largest', r_max: 'Radius r, largest', r_min: 'Radius r, smallest' };
+async function renderSpotDepth(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, C = R.centredrills;
+  const m = RMEM.spot || (RMEM.spot = { mode: 3, fam: inMode() ? 'inch_plain' : 'iso866_a', size: '', ang: 60, dc: '', z: '', dh: '', dp: '', lp: '', pang: 90 });
+  const num = id => { const x = parseFloat($('#' + id, el).value); return isFinite(x) ? x : NaN; };
+  const inp = (id, label, unit, val) => '<label class="f"><span>' + label + '</span><div class="row"><input id="' + id + '" type="number" step="any" inputmode="decimal" value="' + rEsc(val) + '"><span class="u">' + unit + '</span></div></label>';
+  const memLen = k => m[k] === '' || m[k] === undefined ? '' : String(+toUser(m[k]).toFixed(inMode() ? 4 : 3));
+  function draw() {
+    const fam = C && C.families[m.fam] ? m.fam : 'iso866_a', rows = C ? C.families[fam] : [];
+    if (!rows.find(r => r.size === m.size)) m.size = rows.length ? rows[Math.min(3, rows.length - 1)].size : '';
+    const angs = (C && C.angles[fam]) || [60];
+    if (!angs.includes(+m.ang)) m.ang = angs[0];
+    el.innerHTML = '<div class="grid" style="max-width:760px">' +
+      '<label class="f"><span>Tool</span><div class="row"><select id="sm">' + [[1, 'Spot drill or pointed chamfer tool'], [3, 'Standard centre drill (pick type and size)'], [2, 'Centre drill, your own sizes']].map(o => '<option value="' + o[0] + '"' + (o[0] === m.mode ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></div></label>' +
+      (m.mode === 3 ? '<label class="f"><span>Centre drill type</span><div class="row"><select id="sf">' + CD_FAMS.map(f => '<option value="' + f[0] + '"' + (f[0] === fam ? ' selected' : '') + '>' + f[1] + '</option>').join('') + '</select></div></label>' +
+        '<label class="f"><span>Size</span><div class="row"><select id="ss">' + rows.map(r => '<option value="' + rEsc(r.size) + '"' + (r.size === m.size ? ' selected' : '') + '>' + rEsc(fam.startsWith('inch') ? r.size : r.size + ' mm pilot') + '</option>').join('') + '</select></div></label>' +
+        '<label class="f"><span>Included countersink angle</span><div class="row"><select id="sa">' + angs.map(a => '<option value="' + a + '"' + (+a === +m.ang ? ' selected' : '') + '>' + a + '°</option>').join('') + '</select></div></label>' :
+        inp('sang', 'Included angle of the point or countersink', 'deg', m.pang) +
+        (m.mode === 2 ? inp('sdp', 'Centre drill pilot diameter', uLen(), memLen('dp')) + inp('slp', 'Centre drill: tip to start of the countersink cone', uLen(), memLen('lp')) : '')) +
+      inp('sdc', 'Countersink (chamfer) diameter wanted', uLen(), memLen('dc')) +
+      inp('sz', 'Or a depth from the tip, to get the diameter', uLen(), memLen('z')) +
+      inp('sdh', 'Hole diameter (optional, for the chamfer width)', uLen(), memLen('dh')) +
+      '</div><div id="sres"></div><div id="sdia"></div><div class="note" id="snote"></div>';
+    $('#sm', el).onchange = e => { m.mode = +e.target.value; draw(); };
+    if ($('#sf', el)) $('#sf', el).onchange = e => { m.fam = e.target.value; m.size = ''; draw(); };
+    if ($('#ss', el)) $('#ss', el).onchange = e => { m.size = e.target.value; calc(); };
+    if ($('#sa', el)) $('#sa', el).onchange = e => { m.ang = +e.target.value; calc(); };
+    el.querySelectorAll('input').forEach(i => i.oninput = () => {
+      const k = { sdc: 'dc', sz: 'z', sdh: 'dh', sdp: 'dp', slp: 'lp' }[i.id];
+      if (k) m[k] = i.value === '' ? '' : fromUser(parseFloat(i.value)); else if (i.id === 'sang') m.pang = i.value;
+      calc();
+    });
+    calc();
+  }
+  function calc() {
+    const out = $('#sres', el), dia = $('#sdia', el), note = $('#snote', el), rows = [];
+    const dcU = num('sdc'), zU = num('sz'), dhU = num('sdh'), dpL = inMode() ? 4 : 3;
+    const len = mm => fBoth(mm);
+    let svg = '';
+    if (m.mode !== 3) {
+      const ang = num('sang'), dc = fromUser(dcU), z = fromUser(zU), dh = fromUser(dhU);
+      if (!(ang > 0 && ang < 180)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter an included angle between 0 and 180°.</td></tr></table></div>'; dia.innerHTML = ''; return; }
+      if (m.mode === 2) {
+        const dp = fromUser(num('sdp')), lp = fromUser(num('slp'));
+        if (!(dp > 0 && lp >= 0)) rows.push(['Centre drill', 'Enter the pilot diameter and the length from the tip to the countersink']);
+        else {
+          if (dc > 0) { const zz = W.centre_drill_depth(dc, dp, lp, ang); rows.push(['<b>Depth from the tip</b>', isFinite(zz) ? '<b>' + len(zz) + '</b>' : 'Countersink smaller than the pilot']); }
+          if (z > 0) { const d = W.centre_drill_dia(z, dp, lp, ang); rows.push(['Countersink diameter at that depth', isFinite(d) ? len(d) : 'Depth does not reach the countersink']); }
+          svg = mtSpotSvg(2, dc, ang, dp, lp);
+        }
+      } else {
+        if (dc > 0) rows.push(['<b>Depth from the tip</b>', '<b>' + len(W.spot_depth(dc, ang)) + '</b>']);
+        if (z > 0) rows.push(['Chamfer diameter at that depth', len(W.spot_chamfer_dia(z, ang))]);
+        svg = mtSpotSvg(1, dc, ang);
+      }
+      if (dh > 0 && dc > dh) rows.push(['Chamfer width on the hole (each side)', len((dc - dh) / 2)]);
+      out.innerHTML = '<div class="res"><div class="h">Results</div><table>' + (rows.length ? rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') : '<tr><td class="ms">Enter a countersink diameter or a depth.</td></tr>') + '</table></div>';
+      dia.innerHTML = svg;
+      note.innerHTML = '<b>Working:</b> pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts (it includes the pilot\'s own point). Program the Z depth to the tool tip; a tip with a flat or radius cuts slightly larger at the same depth. Right-triangle geometry of a cone, as in the Drill point length tool.';
+      return;
+    }
+    // Standard centre drill from the table
+    const fam = m.fam, F = C.families[fam], r = F.find(x => x.size === m.size), inch = fam.startsWith('inch');
+    const toMm = v => inch ? v * IN_MM : v, srcs = C.sources, ang = +m.ang;
+    const val = f => r[f] ? toMm(r[f].value) : NaN;
+    const ev = c => badge(c.status) + ' <span class="ms" title="' + rEsc(groupsTitle(srcs, c.groups.map(g => ({ value: inch ? g.value : g.value, publishers: g.publishers })))) + '">' + c.groups.map((g, i) => (i ? '; ' : '') + (c.groups.length > 1 ? (inch ? fx(g.value, 4) + ' in' : g.value + ' mm') + ': ' : '') + g.publishers.map(p => rEsc(pubName(srcs, p))).join(', ')).join('') + '</span>';
+    const dimRows = Object.keys(CD_FIELD).filter(f => r[f]).map(f => '<tr><td>' + CD_FIELD[f] + '</td><td class="v">' + len(val(f)) + '</td><td>' + ev(r[f]) + '</td></tr>').join('') +
+      '<tr><td>Included countersink angle</td><td class="v">' + ang + '°</td><td><span class="ms">' + (fam === 'iso2540_b' ? 'with a 120° protecting chamfer beyond d2' : fam === 'inch_bell' ? 'with a 120° bell chamfer beyond the bell diameter' : fam === 'iso2541_r' ? 'radius form: the profile is an arc, not a cone' : '') + '</span></td></tr>';
+    const dp = val('pilot');
+    const maxDc = fam === 'inch_bell' ? val('bell') : fam === 'iso2540_b' ? val('cone') : val('body');
+    const ls = fam.startsWith('inch') ? [['', val('pilot_len')]] : [['smallest pilot length', val('l_min')], ['largest pilot length', val('l_max')]].filter(x => isFinite(x[1]));
+    const dc = fromUser(dcU), z = fromUser(zU), dh = fromUser(dhU), res = [];
+    if (fam === 'iso2541_r') {
+      res.push(['Depth for a countersink diameter', 'Not worked out for the radius form: the arc touches a 60° lathe centre along a line, and the free sources do not give where the arc starts. Use the tool maker\'s drawing.']);
+    } else if (!(dp > 0) || !ls.length) {
+      res.push(['Depth', 'This size has no pilot length in the sources in hand.']);
+    } else {
+      res.push(['Largest countersink this size can make', len(maxDc)]);
+      ls.forEach(([lab, l]) => res.push(['Depth to that largest countersink' + (lab ? ' <span class="ms">(' + lab + ')</span>' : ''), len(W.centre_drill_depth(maxDc, dp, l, ang))]));
+      if (dc > 0) {
+        if (dc < dp) res.push(['Depth from the tip', 'Countersink smaller than the pilot']);
+        else {
+          ls.forEach(([lab, l]) => res.push(['<b>Depth from the tip</b>' + (lab ? ' <span class="ms">(' + lab + ' ' + fLen(l) + ' ' + uLen() + ')</span>' : ''), '<b>' + len(W.centre_drill_depth(dc, dp, l, ang)) + '</b>']));
+          if (dc > maxDc * (1 + 1e-9)) res.push(['Check', '<span class="warn">Larger than this size can cut (' + fLen(maxDc) + ' ' + uLen() + '): choose a bigger size</span>']);
+          const pt = W.drill_point_length(dp, inch ? 118 : 120);
+          res.push(['If the maker\'s pilot length leaves out the pilot\'s point (' + (inch ? 118 : 120) + '°), add', len(pt)]);
+        }
+      }
+      if (z > 0) ls.forEach(([lab, l]) => { const d = W.centre_drill_dia(z, dp, l, ang); res.push(['Countersink diameter at that depth' + (lab ? ' <span class="ms">(' + lab + ')</span>' : ''), isFinite(d) ? len(Math.min(d, maxDc)) + (d > maxDc ? ' <span class="warn">past the end of the countersink</span>' : '') : 'Depth does not reach the countersink']); });
+      if (dh > 0 && dc > dh) res.push(['Chamfer width on the hole (each side)', len((dc - dh) / 2)]);
+      svg = mtSpotSvg(2, dc > dp ? Math.min(dc, maxDc) : maxDc, ang, dp, ls[0][1]);
+    }
+    out.innerHTML = '<div class="res mtab"><div class="h">' + rEsc((CD_FAMS.find(f => f[0] === fam) || [])[1] || '') + ', size ' + rEsc(m.size) + '</div><table><tr><th>Dimension</th><th style="text-align:right">Value</th><th>Evidence</th></tr>' + dimRows + '</table></div>' +
+      '<div class="res" style="margin-top:12px"><div class="h">Depth</div><table>' + res.map(x => '<tr><td>' + x[0] + '</td><td class="v">' + x[1] + '</td></tr>').join('') + '</table></div>';
+    dia.innerHTML = svg;
+    note.innerHTML = '<b>Working:</b> depth from the tip z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the pilot length, taken as measured from the tip to where the countersink cone starts. The free sources do not draw where the pilot length is measured from; if your maker measures only the parallel part, add the point length shown. Metric types A and B give the pilot length as a range (smallest and largest), so the depth is shown for both. The countersink cannot be larger than the body (plain type, type A), the bell diameter (bell type) or d2 (type B). The radius form (type R) is listed for its sizes only. Program the Z depth to the tool tip and check the first part.<br>' +
+      '<b>Evidence:</b> Confirmed = two or more independent publishers print the same value; One source = a single publisher so far (the type B and type R tables are read from the public preview of the ISO standard only). Inch: ICS Cutting Tools, Greenfield (Cleveland), Michigan Drill and Linear Tools for the plain type; Greenfield, Exact Tooling, Michigan Drill and Linear Tools for the bell type. Linear Tools (UK) prints longer pilot lengths than the US makers for every inch size; they are shown as a differing source, not used. Sizes #00 and #0: ICS and Greenfield print different pilot lengths. Metric type A: ZPS-FN and Linear Tools. Standards cited by name: ISO 866:2016 (type A), ISO 2540:2016 (type B), ISO 2541:2016 (type R), DIN 333:1986.<br><b>Sources:</b><br>' + sourceList(srcs);
+  }
+  draw();
 }
 
 // ------------------------------------------------------------------ thread data

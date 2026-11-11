@@ -667,6 +667,50 @@ const TOOLS = [
   source: "Sandvik Coromant turning formulas (n, machining time); Machinery's Handbook.",
 },
 {
+  id: 'partofftime', level: 'advanced', group: 'Turning', title: 'Part-off and groove time',
+  desc: 'Time to part off, face or plunge a groove from a start diameter to an end diameter with feed per revolution, at constant surface speed with a maximum spindle speed (G50 / G92 clamp) or at constant rpm. Below the diameter where the clamp is reached the rpm stays constant, and the time there is worked out separately.',
+  fields: s => [
+    { id: 'd0', label: 'Start diameter', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'd1', label: 'End diameter (0 = to the centre)', unit: lenU(s), def: 0 },
+    { id: 'f', label: 'Feed per revolution', unit: feedRevU(s), def: s === 'inch' ? 0.003 : 0.08 },
+    { id: 'mode', label: 'Spindle', unit: '', def: 1, options: [[1, 'Constant surface speed (G96)'], [0, 'Constant rpm (G97)']] },
+    { id: 'speed', label: s === 'inch' ? 'Surface speed (CSS)' : 'Cutting speed Vc (CSS)', unit: spdU(s), def: s === 'inch' ? 400 : 120, when: v => v.mode === 1 },
+    { id: 'nmax', label: 'Max spindle speed (G50 / G92 clamp; blank = active machine, else none)', unit: 'RPM', def: '', when: v => v.mode === 1 },
+    { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: '', when: v => v.mode === 0 },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d0 > 0 && v.d1 >= 0 && v.f > 0)) return [];
+    if (!(v.d0 > v.d1)) return [R('Diameters', 'The end diameter must be smaller than the start diameter', '', 0)];
+    const dp = s === 'inch' ? 4 : 2, rows = [];
+    if (v.mode === 0) {
+      if (!(v.rpm > 0)) return [R('Speed', 'Enter the spindle speed', '', 0)];
+      const t = W.partoff_time_rpm(v.d0, v.d1, v.f, v.rpm);
+      return [R('Cutting time', t * 60, 's', 1), R('Cutting time', t, 'min', 3), R('Feed per minute', v.f * v.rpm, feedMinU(s), 2, 'feed')];
+    }
+    if (!(v.speed > 0)) return [R('Speed', 'Enter the cutting speed', '', 0)];
+    const m = typeof Profiles !== 'undefined' ? Profiles.active() : null;
+    const nmax = v.nmax > 0 ? v.nmax : (m && Number(m.rpm_max) > 0 ? Number(m.rpm_max) : 0);
+    const k = s === 'inch' ? 12 : 1000, P = w => W.partoff_time(v.d0, v.d1, v.f, v.speed, nmax, k, w);
+    const t = P(0), t1 = P(1), t2 = P(2), dc = P(3);
+    rows.push(R('Cutting time', t * 60, 's', 1), R('Cutting time', t, 'min', 3));
+    rows.push(R('Spindle speed at the start diameter', P(4), 'RPM', 0, 'rpm'));
+    if (nmax > 0) {
+      rows.push(R('Speed limit used' + (v.nmax > 0 ? '' : ' (active machine)'), nmax, 'RPM', 0));
+      rows.push(R('Diameter where the limit is reached', dc, lenU(s), dp));
+      rows.push(R('Time at constant surface speed (above that diameter)', t1 * 60, 's', 1));
+      rows.push(R('Time at the speed limit (below that diameter)', t2 * 60, 's', 1));
+      rows.push(R('Spindle speed at the end diameter', P(5), 'RPM', 0, 'rpm'));
+    } else {
+      if (v.d1 > 0) rows.push(R('Spindle speed at the end diameter', P(5), 'RPM', 0, 'rpm'));
+      else rows.push(R('Spindle speed at the centre', 'No limit entered: the rpm would rise without end. Enter the G50 / G92 limit or set up a machine.', '', 0));
+    }
+    rows.push(R('Same cut at the start-diameter rpm held constant', W.partoff_time_rpm(v.d0, v.d1, v.f, P(4)) * 60, 's', 1));
+    return rows;
+  },
+  working: 'The tool moves in f x n per minute on the radius, so the diameter falls at 2 f n and t = ∫ dD / (2 f n(D)) from the end to the start diameter. At constant surface speed n = 1000 Vc / (π D) (inch: 12 SFM / (π D)) down to the clamp diameter Dc = 1000 Vc / (π nmax) (inch: 12 SFM / (π nmax)); below Dc the spindle runs at nmax. Integrating each region: above Dc, t1 = π (Da² − Db²) / (4000 f Vc) (inch: π (Da² − Db²) / (48 f SFM)); below Dc, t2 = (Da − Db) / (2 f nmax). Total t = t1 + t2. With no clamp and no limit to the centre the rpm at the centre would be infinite, but the time is still finite (t1 alone). Constant rpm: t = (D0 − D1) / (2 f n). Approach, retract and dwell are not included; add the clearance to the start diameter if you want it counted.',
+  source: 'n = 1000 Vc / (π D): Sandvik Coromant turning formulas. Two regions (constant surface speed down to the radius where the spindle reaches nmax, then nmax): E. Isakov, "Cutting time for facing", Cutting Tool Engineering, 15 Mar 2011 (also: constant surface speed facing takes about half the constant-rpm time); SmartLathe, "Calculation of machining time for facing, parting off and deep grooving on a CNC lathe" (time by integration, separate formula below the clamping diameter). Closed form: own derivation, checked in the Rust core against numerical integration.',
+},
+{
   id: 'boringbar', level: 'advanced', group: 'Turning', title: 'Boring bar deflection',
   pick: { map: { d: 'shank', L: 'stick' }, types: ['Boring bar'] },
   desc: 'Tip deflection of a solid round boring bar under the cutting force, as a cantilever clamped at the holder, for steel, carbide or tungsten heavy metal bars, with the overhang (L/D) guidance published by bar makers.',
@@ -781,11 +825,14 @@ const TOOLS = [
 },
 {
   id: 'bandsaw', level: 'advanced', group: 'Sawing', title: 'Bandsaw cut time',
-  desc: 'Time to cut through a round, rectangular or tube section from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
+  desc: 'Time to cut through a round, rectangular or tube section, one piece or a bundle (pieces across and layers high), from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
   fields: s => [
     { id: 'shape', label: 'Section', unit: '', def: 1, options: [[1, 'Round bar'], [2, 'Rectangle (cut through the height)'], [3, 'Tube']] },
     { id: 'a', label: 'Diameter, or width of the rectangle', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
-    { id: 'b', label: 'Rectangle height, or tube wall', unit: lenU(s), def: '' },
+    { id: 'b', label: 'Rectangle height, or tube wall', unit: lenU(s), def: '', when: v => v.shape !== 1 },
+    { id: 'bundle', label: 'Cut', unit: '', def: 0, options: [[0, 'Single piece'], [1, 'Bundle']] },
+    { id: 'nx', label: 'Pieces across (side by side, across the blade)', unit: '', def: 3, when: v => v.bundle === 1 },
+    { id: 'ny', label: 'Layers high (stacked in the feed direction)', unit: '', def: 2, when: v => v.bundle === 1 },
     { id: 'vf', label: 'Down-feed rate', unit: feedMinU(s), def: '' },
     { id: 'rate', label: 'Or cutting rate', unit: s === 'inch' ? 'in2/min' : 'cm2/min', def: '' },
     { id: 'vb', label: 'Blade speed (for chip per tooth)', unit: s === 'inch' ? 'ft/min' : 'm/min', def: '' },
@@ -793,22 +840,26 @@ const TOOLS = [
   ],
   calc: (v, W, s) => {
     if (!(v.a > 0)) return [];
-    let area, h;
-    if (v.shape === 2) { if (!(v.b > 0)) return [R('Section', 'Enter the height', '', 0)]; area = v.a * v.b; h = v.b; }
-    else if (v.shape === 3) { if (!(v.b > 0 && v.b < v.a / 2)) return [R('Section', 'Enter a wall thinner than half the diameter', '', 0)]; area = Math.PI / 4 * (v.a ** 2 - (v.a - 2 * v.b) ** 2); h = v.a; }
-    else { area = Math.PI / 4 * v.a ** 2; h = v.a; }
+    const bun = v.bundle === 1, nx = bun ? v.nx : 1, ny = bun ? v.ny : 1;
+    if (bun && !(nx >= 1 && ny >= 1)) return [R('Bundle', 'Enter at least 1 piece across and 1 layer', '', 0)];
+    if (bun && (nx % 1 || ny % 1)) return [R('Bundle', 'Pieces and layers are whole numbers', '', 0)];
+    const S = k => W.saw_section(v.shape, v.a, v.b > 0 ? v.b : 0, nx, ny, k);
+    const area = S(0), h = S(1), wid = S(2);
+    if (!isFinite(area)) return [R('Section', v.shape === 3 ? 'Enter a wall thinner than half the diameter' : 'Enter the height', '', 0)];
     const au = s === 'inch' ? 'in2' : 'cm2', ak = s === 'inch' ? 1 : 0.01;
-    const rows = [R('Area cut', area * ak, au, 2), R('Height the blade feeds through', h, lenU(s), 2)];
+    const rows = [R(bun ? 'Metal area cut (' + S(3) + ' pieces)' : 'Area cut', area * ak, au, 2), R('Height the blade feeds through', h, lenU(s), 2), R('Effective width (longest path of the blade in the work)', wid, lenU(s), 2)];
     if (v.vf > 0) rows.push(R('Cut time from the down-feed', h / v.vf, 'min', 2));
-    if (v.rate > 0) { const t = area * ak / v.rate; rows.push(R('Cut time from the cutting rate', t, 'min', 2)); rows.push(R('Average down-feed at that rate', h / t, feedMinU(s), 2)); }
+    if (v.rate > 0) { const t = W.saw_cut_time(area * ak, v.rate); rows.push(R('Cut time from the cutting rate', t, 'min', 2)); rows.push(R('Average down-feed at that rate', h / t, feedMinU(s), 2)); if (bun) rows.push(R('Cut time per piece', t / S(3), 'min', 3)); }
+    if (bun && v.vf > 0) rows.push(R('Cut time per piece (down-feed)', h / v.vf / S(3), 'min', 3));
+    if (bun && v.shape !== 2) rows.push(R('Note', 'Rounds and tubes leave gaps: the blade cuts metal only part of the way down, so the down-feed time and the cutting-rate time differ. Makers quote rates for solid sections; a bundle usually cuts slower than the rate suggests.', '', 0));
     if (v.vf > 0 && v.vb > 0 && v.tpi > 0) {
       const c = s === 'inch' ? W.bandsaw_chip_per_tooth(v.vf * IN_MM, v.vb * FT_M, v.tpi) / IN_MM : W.bandsaw_chip_per_tooth(v.vf, v.vb, v.tpi);
       rows.push(R('Feed per tooth (depth each tooth takes)', c, lenU(s), s === 'inch' ? 6 : 5));
     }
     return rows;
   },
-  working: 'Time = height / down-feed rate, or area / cutting rate (the square inches or cm2 per minute figure saw makers quote). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle W x H. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker.',
-  source: 'Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut); KASCO (teeth per minute = teeth per foot x blade speed). See docs/sources.md.',
+  working: 'Time = height / down-feed rate, or metal area / cutting rate (the square inches or cm2 per minute figure saw makers quote: the cut area divided by the minutes per cut). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle W x H. Bundle of n across and m high, packed square: metal area = n m x piece area, height = m x piece height (D for rounds and tubes), effective width = n x piece width. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker. For a bundle the makers base the blade pitch on the average section (Fabricating and Metalworking, 2020) and keep at least three teeth in the work (The Tube and Pipe Journal, 2007).',
+  source: "Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut for each bar area); Machinery's Handbook 31st ed., band saw blades, p. 1245 (cutting time = area / cutting rate, by name); KASCO (teeth per minute = teeth per foot x blade speed); bundles: A. Popson, 'Bundles of joy', The Tube and Pipe Journal, 2007; 'How to optimize sawing operations', Fabricating and Metalworking, 2020. See docs/sources.md.",
 },
 {
   id: 'sawtpi', level: 'simple', group: 'Sawing', title: 'Saw blade pitch (TPI)',
@@ -854,48 +905,24 @@ const TOOLS = [
 },
 {
   id: 'spotdepth', level: 'simple', group: 'Drilling and tapping', title: 'Spot and centre drill depth',
-  pick: { map: { ang: 'point' }, types: ['Spot', 'Drill', 'Chamfer', 'Other'] },
-  desc: 'Depth to program a spot drill, chamfer tool point or centre drill to for a given chamfer (countersink) diameter, or the diameter a depth gives. The centre drill\'s pilot length is yours to measure or take from its maker.',
-  fields: s => [
-    { id: 'mode', label: 'Tool', unit: '', def: 1, options: [[1, 'Spot drill or pointed chamfer tool'], [2, 'Centre drill (pilot and countersink)']] },
-    { id: 'dc', label: 'Chamfer / countersink diameter wanted', unit: lenU(s), def: s === 'inch' ? 0.3 : 8 },
-    { id: 'ang', label: 'Included angle of the point or countersink', unit: 'deg', def: 90 },
-    { id: 'dh', label: 'Hole diameter (optional, for the chamfer width)', unit: lenU(s), def: '' },
-    { id: 'dp', label: 'Centre drill pilot diameter', unit: lenU(s), def: '' },
-    { id: 'lp', label: 'Centre drill: tip to start of the countersink cone', unit: lenU(s), def: '' },
-    { id: 'z', label: 'Or a depth, to get the diameter', unit: lenU(s), def: '' },
-  ],
-  calc: (v, W, s) => {
-    if (!(v.ang > 0 && v.ang < 180)) return [];
-    const rows = [], dp = s === 'inch' ? 4 : 3;
-    if (v.mode === 2) {
-      if (!(v.dp > 0 && v.lp >= 0)) return [R('Centre drill', 'Enter the pilot diameter and the length from the tip to the countersink', '', 0)];
-      if (v.dc > 0) { const z = W.centre_drill_depth(v.dc, v.dp, v.lp, v.ang); rows.push(R('Depth from the tip', isFinite(z) ? z : 'Countersink smaller than the pilot', isFinite(z) ? lenU(s) : '', dp)); }
-      if (v.z > 0) { const d = W.centre_drill_dia(v.z, v.dp, v.lp, v.ang); rows.push(R('Countersink diameter at that depth', isFinite(d) ? d : 'Depth does not reach the countersink', isFinite(d) ? lenU(s) : '', dp)); }
-    } else {
-      if (v.dc > 0) rows.push(R('Depth from the tip', W.spot_depth(v.dc, v.ang), lenU(s), dp));
-      if (v.z > 0) rows.push(R('Chamfer diameter at that depth', 2 * v.z * Math.tan(v.ang * Math.PI / 360), lenU(s), dp));
-    }
-    if (v.dh > 0 && v.dc > v.dh) rows.push(R('Chamfer width on the hole (each side)', (v.dc - v.dh) / 2, lenU(s), dp));
-    return rows;
-  },
-  diagram: (v, s) => typeof mtSpotSvg === 'function' ? mtSpotSvg(v.mode, v.dc, v.ang, v.dp, v.lp) : '',
-  working: 'Pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts (it includes the pilot\'s own point). Program the Z depth to the tool tip; a tip with a flat or radius cuts slightly larger at the same depth.',
-  source: 'Right-triangle geometry of a cone (as in the Drill point length tool).',
+  desc: 'Depth to program a spot drill, chamfer tool point or centre drill to for a given chamfer (countersink) diameter, or the diameter a depth gives. Standard centre drills (inch plain and bell type #000 to #20, metric ISO 866 type A, ISO 2540 type B, ISO 2541 type R) can be picked by size, with every dimension\'s sources.',
+  render: el => renderSpotDepth(el),
+  working: 'Pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts. Standard sizes: see the note under the tool.',
+  source: 'Right-triangle geometry of a cone (as in the Drill point length tool). Centre drill sizes: ICS Cutting Tools, Greenfield (Cleveland), Michigan Drill, Exact Tooling, Linear Tools, ZPS-FN, TECWERK; ISO 2540:2016 and ISO 2541:2016 (public previews); ISO 866, DIN 333 cited by name. See docs/sources.md.',
 },
 {
   id: 'drillchart', level: 'simple', group: 'Drilling and tapping', title: 'Drill size chart',
   desc: 'Fractional, number, letter and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Number and letter sizes show how many independent publishers print each value.',
   render: el => renderDrillChart(el),
-  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them; they are not given by a formula), so each value is what the publishers listed under the table print. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder lists the drills closest to your size, smaller first.',
+  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them; they are not given by a formula), so each value is what the publishers listed under the table print. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder takes a diameter in inch or mm (whatever the unit setting) and lists, for each series (number, letter, fractional, metric), the nearest drill at or below and the nearest above, with the difference (drill minus your size) in inch and mm.',
   source: 'Wikipedia "Drill bit sizes"; Stoody Industrial & Welding Supply decimal equivalents chart; P. Lobben, Machinists\' and Draftsmen\'s Handbook (1910, public domain). Standards cited, not read: ASME B94.11M-1993 (twist drills, current per ASME catalogue), ISO 235:2016 (metric jobber drill sizes).',
 },
 {
   id: 'tapdrill', level: 'simple', group: 'Drilling and tapping', title: 'Tap drill size',
-  desc: 'Hole size for a chosen percent of thread with a cutting tap or a forming (roll) tap, for ISO metric and Unified threads or any size you enter, with the nearest standard drills and the percent of thread each one gives.',
+  desc: 'Hole size for a chosen thread engagement (55 to 85 %) with a cutting tap or a forming (roll) tap, for ISO metric and Unified threads or any size you enter, with the nearest number, letter, fractional and metric drills and the engagement each one gives.',
   render: el => renderTapDrill(el),
   working: 'See the note under the tool.',
-  source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge; forming taps also North American Tool, Besly (Cutting Tool Engineering 1995) and MSC. ISO 68-1:2023, ASME B1.1-2024.',
+  source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge; forming taps also North American Tool, Besly (Cutting Tool Engineering 1995) and MSC; suggested engagement USCTI tapping tip, FM Carbide, Besly. ISO 68-1:2023, ASME B1.1-2024.',
 },
 {
   id: 'taplimits', level: 'expert', group: 'Drilling and tapping', title: 'Tap pitch diameter limits (H and D numbers)',
@@ -1515,10 +1542,10 @@ const TOOLS = [
 },
 {
   id: 'arc', level: 'advanced', group: 'Geometry', title: 'Chord, arc, sagitta and 3-point circle',
-  desc: 'Solve an arc from any two of radius, angle, chord, sagitta and arc length; segment and sector areas; centre and radius of the circle through three points.',
+  desc: 'Solve an arc from any two of radius, included angle, chord, sagitta (height) and arc length (all ten pairs, with both arcs where two fit); segment and sector areas; centre and radius of the circle through three points.',
   render: el => renderArc(el),
-  working: 'Chord = 2R sin(θ/2); arc = Rθ (radians); sagitta = R(1 - cos(θ/2)); R from chord c and sagitta s = (c²/4 + s²) / 2s; segment area = R²/2 (θ - sin θ); sector = R²θ/2. Three points: centre where the perpendicular bisectors of two chords cross.',
-  source: 'Plane geometry (OpenStax Algebra and Trigonometry 2e; circle relations). Worked examples checked in core tests. See docs/geometry.md.',
+  working: 'Chord c = 2R sin(θ/2); arc L = Rθ (radians); sagitta s = R(1 - cos(θ/2)); R from c and s = (c²/4 + s²) / 2s; R from θ and c = c / (2 sin(θ/2)); from θ and s = s / (1 - cos(θ/2)); from θ and L = L / θ; segment area = R²/2 (θ - sin θ); sector = R²θ/2. Radius and chord fit the minor and the major arc. Chord and arc length: sin(u)/u = c/L with u = θ/2, which falls steadily from 1 to 0 on 0 < u ≤ π, so one arc, found by bisection. Sagitta and arc length: s/L = (1 - cos u)/(2u) rises to a peak of about 0.362 at u sin u = 1 - cos u (θ about 267°) and falls to 1/π at 360°, so it is solved by bisection on each side of the peak: one arc below 1/π, two between 1/π and the peak, none above. Three points: centre where the perpendicular bisectors of two chords cross.',
+  source: 'Plane geometry: OpenStax Algebra and Trigonometry 2e (circle and arc relations); Wikipedia "Circular segment" (chord, sagitta, arc length, segment area). Bracketed solves: own derivation, tested in the Rust core. See docs/geometry.md.',
 },
 {
   id: 'fillet', level: 'advanced', group: 'Geometry', title: 'Fillet and tangent points',
@@ -1995,10 +2022,10 @@ const TOOLS = [
 },
 {
   id: 'units', level: 'simple', group: 'Shop helpers', title: 'Unit converter',
-  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once.',
+  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once. Angles also convert to and from degrees-minutes-seconds, % slope, slope 1 in n, taper per foot, taper ratio 1:x and rate of taper.',
   render: el => renderUnits(el),
-  working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9).',
-  source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. See docs/sources.md.',
+  working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9). Angle forms: % slope = 100 tan a, 1 in n = 1 / tan a (a from the horizontal); taper C = 2 tan(a/2) = 1 : x, taper per foot = 12 C (a the included angle).',
+  source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. Slope: Wikipedia "Grade (slope)". Taper: ISO/R 1119 (public preview), Omni Calculator taper. See docs/sources.md.',
 },
 {
   id: 'calc', level: 'simple', group: 'Shop helpers', title: 'Calculator',

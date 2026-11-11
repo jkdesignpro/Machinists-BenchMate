@@ -87,8 +87,9 @@ function renderTriangle(el) {
 }
 
 // ---------- Arcs, chords, circle through three points ----------
-const ARC_STATE = { mode: 1, x: 50, y: 60, p: [[0, 0], [10, 0], [0, 10]] };
-const ARC_MODES = [[1, 'Radius and angle'], [2, 'Radius and chord'], [3, 'Radius and sagitta (arc height)'], [4, 'Chord and sagitta'], [5, 'Radius and arc length']];
+const ARC_STATE = { ka: 0, x: 50, kb: 1, y: 60, sol: 0, p: [[0, 0], [10, 0], [0, 10]] };
+// Kinds as in core arc_from_two: 0 radius, 1 included angle, 2 chord, 3 arc length, 4 sagitta.
+const ARC_KINDS = [[0, 'Radius'], [1, 'Included angle'], [2, 'Chord length'], [3, 'Arc length'], [4, 'Sagitta (height of the arc above the chord)']];
 function arcDiagram(r, th) {
   const t = th * Math.PI / 180, a0 = Math.PI / 2 - t / 2, a1 = Math.PI / 2 + t / 2;
   const P = a => [r * Math.cos(a), r * Math.sin(a)];
@@ -105,25 +106,32 @@ function arcDiagram(r, th) {
 }
 function renderArc(el) {
   const s = ARC_STATE, W = state.W, u = lenU(state.sys);
-  const lab = { 1: ['Radius', 'Included angle'], 2: ['Radius', 'Chord length'], 3: ['Radius', 'Sagitta (height of the arc above the chord)'], 4: ['Chord length', 'Sagitta'], 5: ['Radius', 'Arc length'] };
   const draw = () => {
-    const [l1, l2] = lab[s.mode];
-    el.innerHTML = '<div class="grid">' + sfield('Known values', gsel('mode', ARC_MODES, s.mode), '') + sfield(l1, sinp('x', s.x), u) + sfield(l2, sinp('y', s.y), +s.mode === 1 ? 'deg' : u) + '</div>' +
-      '<div id="arcdia"></div><div class="res" id="arcres"></div>' +
+    if (+s.ka === +s.kb) s.kb = (+s.ka + 1) % 5;
+    el.innerHTML = '<div class="grid">' + sfield('First known value', gsel('ka', ARC_KINDS, s.ka), '') + sfield('Value', sinp('x', s.x), +s.ka === 1 ? 'deg' : u) +
+      sfield('Second known value', gsel('kb', ARC_KINDS.filter(k => k[0] !== +s.ka), s.kb), '') + sfield('Value', sinp('y', s.y), +s.kb === 1 ? 'deg' : u) + '</div>' +
+      '<div id="arcsol"></div><div id="arcdia"></div><div class="res" id="arcres"></div>' +
       '<h2>Circle through three points</h2><p class="desc">Centre and radius of the circle through three measured points, for example three probe hits on a bore or a radius.</p>' +
       '<div class="grid">' + [0, 1, 2].map(i => sfield('Point ' + (i + 1) + ' X', sinp('p' + i + 'x', s.p[i][0]), u) + sfield('Point ' + (i + 1) + ' Y', sinp('p' + i + 'y', s.p[i][1]), u)).join('') + '</div><div class="res" id="c3res"></div>';
-    el.querySelector('[data-k="mode"]').onchange = e => { s.mode = +e.target.value; draw(); };
-    el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k === 'mode') return; i.oninput = () => { const k = i.dataset.k; if (k[0] === 'p' && k.length === 3) s.p[+k[1]][k[2] === 'x' ? 0 : 1] = i.value; else s[k] = i.value; calc(); }; });
+    el.querySelector('[data-k="ka"]').onchange = e => { s.ka = +e.target.value; s.sol = 0; draw(); };
+    el.querySelector('[data-k="kb"]').onchange = e => { s.kb = +e.target.value; s.sol = 0; draw(); };
+    el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k === 'ka' || i.dataset.k === 'kb') return; i.oninput = () => { const k = i.dataset.k; if (k[0] === 'p' && k.length === 3) s.p[+k[1]][k[2] === 'x' ? 0 : 1] = i.value; else s[k] = i.value; calc(); }; });
     calc();
   };
   const calc = () => {
-    const x = snum(s.x), y = snum(s.y), A = k => W.arc_solve(+s.mode, x, y, k), d = gdp();
-    const r = A(0), t = A(1);
-    if (r > 0 && t > 0) {
+    const x = snum(s.x), y = snum(s.y), d = gdp();
+    const n = W.arc_two(+s.ka, x, +s.kb, y, 0, 9) || 0;
+    if (s.sol >= n) s.sol = 0;
+    const A = k => W.arc_two(+s.ka, x, +s.kb, y, s.sol, k);
+    const r = A(0), t = A(1), solBox = el.querySelector('#arcsol');
+    if (n > 0 && r > 0 && t > 0) {
+      const angOf = i => W.arc_two(+s.ka, x, +s.kb, y, i, 1);
+      solBox.innerHTML = n > 1 ? '<div class="grid"><div class="f"><span>Two arcs fit these values</span><div class="row"><div class="seg" id="arcseg">' + Array.from({ length: n }, (_, i) => '<button type="button" data-i="' + i + '"' + (i === s.sol ? ' class="on"' : '') + '>' + (i === 0 ? 'Smaller' : 'Larger') + ' angle, ' + gf(angOf(i), 2) + '°</button>').join('') + '</div></div></div></div>' : '';
+      solBox.querySelectorAll('button').forEach(b => b.onclick = () => { s.sol = +b.dataset.i; calc(); });
       el.querySelector('#arcdia').innerHTML = arcDiagram(r, t);
       el.querySelector('#arcres').innerHTML = stable('Arc', [['Radius', gf(r, d + 1), u], ['Diameter', gf(A(7), d + 1), u], ['Included angle', gf(t, 4), 'deg'], ['Chord length', gf(A(2), d + 1), u], ['Arc length', gf(A(3), d + 1), u], ['Sagitta (arc height)', gf(A(4), d + 1), u], ['Segment area (between chord and arc)', gf(A(5), d), u + '²'], ['Sector area', gf(A(6), d), u + '²']]) +
-        (+s.mode === 2 || +s.mode === 4 ? '<p class="ms" style="padding:4px 10px">' + (+s.mode === 2 ? 'From a chord the minor arc (180° or less) is shown.' : 'A sagitta larger than the radius gives the major arc.') + '</p>' : '');
-    } else { el.querySelector('#arcdia').innerHTML = ''; el.querySelector('#arcres').innerHTML = stable('Arc', [['Enter two values that fit together (a chord cannot be longer than the diameter)', '', '']]); }
+        (n > 1 ? '<p class="ms" style="padding:4px 10px">' + (+s.ka + +s.kb === 2 ? 'A radius and a chord fit a minor arc and the major arc on the other side of the chord.' : 'A sagitta and an arc length fit two arcs when the sagitta is between 1/π and about 0.36 of the arc length (the ratio peaks at an included angle of about 267°).') + ' Pick the one you mean above.</p>' : '');
+    } else { solBox.innerHTML = ''; el.querySelector('#arcdia').innerHTML = ''; el.querySelector('#arcres').innerHTML = stable('Arc', [['Enter two values that fit together (a chord cannot be longer than the diameter or the arc; an angle is at most 360°)', '', '']]); }
     const p = s.p.flat().map(snum), C = k => W.circle_3pts(...p, k);
     el.querySelector('#c3res').innerHTML = p.every(isFinite) && isFinite(C(2))
       ? stable('Circle through the three points', [['Centre X', gf(C(0), d + 1), u], ['Centre Y', gf(C(1), d + 1), u], ['Radius', gf(C(2), d + 1), u], ['Diameter', gf(2 * C(2), d + 1), u]])
