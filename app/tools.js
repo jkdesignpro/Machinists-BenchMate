@@ -65,8 +65,10 @@ const TOOLS = [
   fields: s => [
     { id: 'speed', label: s === 'inch' ? 'Surface speed' : 'Cutting speed Vc', unit: spdU(s), def: s === 'inch' ? 300 : 90 },
     { id: 'dia', label: 'Diameter', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
-    { level: 'advanced', id: 'rpm', label: 'Or known spindle speed', unit: 'RPM', def: '' },
+    { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: '' },
   ],
+  // Linked pair: type the surface speed or the RPM; the other is worked out.
+  pairs: [['speed', 'rpm', (v, W, s) => s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia), (v, W, s) => s === 'inch' ? W.sfm_from_rpm(v.rpm, v.dia) : W.vc_from_rpm(v.rpm, v.dia)]],
   calc: (v, W, s) => {
     const rows = [];
     if (v.speed > 0 && v.dia > 0) rows.push(R('Spindle speed', s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia), 'RPM', 1, 'rpm'));
@@ -84,8 +86,9 @@ const TOOLS = [
     { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: 3000 },
     { id: 'z', label: 'Number of teeth', unit: '', def: 4 },
     { id: 'fz', label: 'Feed per tooth', unit: lenU(s), def: s === 'inch' ? 0.002 : 0.05 },
-    { level: 'advanced', id: 'vf', label: 'Or known table feed', unit: feedMinU(s), def: '' },
+    { id: 'vf', label: 'Table feed', unit: feedMinU(s), def: '' },
   ],
+  pairs: [['fz', 'vf', (v, W) => W.table_feed(v.rpm, v.fz, v.z), (v, W) => W.feed_per_tooth(v.vf, v.rpm, v.z)]],
   calc: (v, W, s) => {
     const rows = [];
     if (v.rpm > 0 && v.z > 0 && v.fz > 0) rows.push(R('Table feed', W.table_feed(v.rpm, v.fz, v.z), feedMinU(s), 2, 'feed'));
@@ -404,8 +407,9 @@ const TOOLS = [
   fields: s => [
     { id: 'd', label: 'Ball diameter D', unit: lenU(s), def: s === 'inch' ? 0.25 : 6 },
     { id: 'st', label: 'Stepover', unit: lenU(s), def: s === 'inch' ? 0.01 : 0.25 },
-    { id: 'h', label: 'Or target cusp height', unit: s === 'inch' ? 'in' : 'mm', def: '' },
+    { id: 'h', label: 'Cusp height', unit: s === 'inch' ? 'in' : 'mm', def: '' },
   ],
+  pairs: [['st', 'h', (v, W) => W.cusp_height(v.d / 2, v.st), (v, W) => W.stepover_for_cusp(v.d / 2, v.h)]],
   calc: (v, W, s) => {
     if (!(v.d > 0)) return [];
     const r = v.d / 2, rows = [], k = s === 'inch' ? 1e6 : 1000, mu = s === 'inch' ? 'uin' : 'um';
@@ -605,8 +609,11 @@ const TOOLS = [
     { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: '' },
     { id: 'speed', label: s === 'inch' ? 'Or surface speed' : 'Or cutting speed Vc', unit: spdU(s), def: '' },
     { id: 'dia', label: 'with the diameter being cut', unit: lenU(s), def: '' },
-    { level: 'advanced', id: 'vf', label: 'Or known feed per minute', unit: feedMinU(s), def: '' },
+    { id: 'vf', label: 'Feed per minute', unit: feedMinU(s), def: '' },
   ],
+  pairs: [['f', 'vf',
+    (v, W, s) => W.table_feed(v.rpm > 0 ? v.rpm : (s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia)), v.f, 1),
+    (v, W, s) => W.feed_per_tooth(v.vf, v.rpm > 0 ? v.rpm : (s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia)), 1)]],
   calc: (v, W, s) => {
     let n = v.rpm > 0 ? v.rpm : NaN;
     const rows = [];
@@ -704,15 +711,15 @@ const TOOLS = [
   fields: s => [
     { id: 'd', label: 'Diameter the tool cuts at', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
     { id: 'vf', label: 'Feed along the surface', unit: feedMinU(s), def: s === 'inch' ? 10 : 250 },
-    { id: 'deg', label: 'Or C-axis feed', unit: 'deg/min', def: '' },
+    { id: 'deg', label: 'C-axis feed', unit: 'deg/min', def: '' },
     { id: 'lin', label: 'G93 move: linear distance (X, Y or Z)', unit: lenU(s), def: '' },
     { id: 'ang', label: 'G93 move: C rotation', unit: 'deg', def: '' },
   ],
+  pairs: [['vf', 'deg', (v, W) => W.c_axis_deg_min(v.vf, v.d), (v, W) => W.c_axis_feed_from_deg(v.deg, v.d), 'both']],
   calc: (v, W, s) => {
     if (!(v.d > 0)) return [];
     const rows = [];
     if (v.vf > 0) { const dm = W.c_axis_deg_min(v.vf, v.d); rows.push(R('C-axis feed', dm, 'deg/min', 1)); rows.push(R('C-axis speed', dm / 360, 'rev/min', 4)); }
-    if (v.deg > 0) rows.push(R('Feed along the surface for that C feed', W.c_axis_feed_from_deg(v.deg, v.d), feedMinU(s), 2));
     if (v.vf > 0 && (v.lin > 0 || v.ang > 0)) {
       const F = W.inverse_time_f(v.lin > 0 ? v.lin : 0, v.ang > 0 ? v.ang : 0, v.d, v.vf);
       rows.push(R('G93 inverse time F (1 / minutes for the move)', F, '', 4));

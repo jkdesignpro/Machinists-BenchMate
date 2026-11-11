@@ -287,7 +287,7 @@ function mountTool(host, t, opts) {
   host.innerHTML = '<div class="tg' + (mini ? ' mini' : '') + '"><section class="pane inputs">' + (mini ? '' : '<h2>Inputs</h2>') + (!mini && t.pick ? toolPickRow(t.pick) : '') +
     '<div class="grid"></div></section><section class="pane results"><div class="res" id="' + (mini ? '' : 'res') + '"></div><div class="tdia"></div></section></div>';
   const grid = $('.grid', host), res = $('.res', host), dia = $('.tdia', host);
-  const pairs = (t.pairs || []).map(p => ({ a: p[0], b: p[1], ab: p[2], ba: p[3] }));
+  const pairs = (t.pairs || []).map(p => ({ a: p[0], b: p[1], ab: p[2], ba: p[3], both: p[4] === 'both' }));
   const pairOf = id => pairs.find(p => p.a === id || p.b === id);
   const src = {}; pairs.forEach(p => { src[p.a + p.b] = saved['_src_' + p.a] === p.b ? p.b : p.a; });
   let shownCount = 0; const els = {};
@@ -324,19 +324,20 @@ function mountTool(host, t, opts) {
   const read = () => { const v = {}; fields.forEach(f => { const e = els[f.id].inp; const x = e.dataset.def !== undefined ? e.dataset.def : e.value; v[f.id] = x === '' ? NaN : parseFloat(x); }); return v; };
   let last = [];
   function update() {
-    let v = read();
+    const v = read(), vc = Object.assign({}, v);
     // Linked pairs: the box typed in last is the input; the other shows the worked-out value.
+    // The calculation sees the worked-out box as blank (unless the pair says 'both'), so the result is the one asked for.
     pairs.forEach(p => {
       const from = src[p.a + p.b], to = from === p.a ? p.b : p.a, fn = from === p.a ? p.ab : p.ba;
       let out = NaN; try { out = fn(v, state.W, sys); } catch (e) {}
       const e = els[to].inp; e.value = isFinite(out) ? String(+out.toPrecision(7)) : ''; saved[to] = e.value; v[to] = isFinite(out) ? out : NaN;
-      els[to].lab.classList.add('calcd'); els[from].lab.classList.remove('calcd');
+      els[to].lab.classList.add('calcd'); els[from].lab.classList.remove('calcd'); vc[to] = p.both ? v[to] : NaN;
     });
     fields.forEach(f => { if (f.when) { let on = true; try { on = !!f.when(v); } catch (e) {} els[f.id].lab.hidden = !on; } });
     // Required boxes: a box with a starting value must hold a number.
     fields.forEach(f => { const need = f.def !== '' && !f.options && !pairOf(f.id); els[f.id].lab.classList.toggle('bad', need && !isFinite(v[f.id])); });
     let rows = [];
-    try { rows = t.calc(v, state.W, sys); } catch (e) { rows = []; }
+    try { rows = t.calc(vc, state.W, sys); } catch (e) { rows = []; }
     rows = rows.filter(r => typeof r.value === 'string' || isFinite(r.value));
     last = rows;
     const dp = r => Math.max(0, Math.min(10, (r.dp || 0) + (typeof r.value === 'number' && r.dp > 0 ? dpAdj : (dpAdj > 0 && typeof r.value === 'number' ? dpAdj : 0))));
@@ -429,6 +430,7 @@ function initMenu() {
     $$('.mlink', pop).forEach(b => b.onclick = () => { pop.hidden = true; go(b.dataset.go); });
   };
   btn.onclick = e => { e.stopPropagation(); pop.hidden = !pop.hidden; if (!pop.hidden) paint(); };
+  pop.addEventListener('click', e => e.stopPropagation());
   document.addEventListener('click', e => { if (!pop.hidden && !pop.contains(e.target) && e.target !== btn) pop.hidden = true; });
 }
 

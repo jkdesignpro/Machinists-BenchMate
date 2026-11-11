@@ -40,36 +40,117 @@ page.on('response', r => { if (r.status() >= 400) problems.push(`[${where}] HTTP
 // Dialogs (confirm/alert) would block; accept them and note them.
 page.on('dialog', d => { problems.push(`[${where}] unexpected dialog: ${d.message()}`); d.dismiss(); });
 
+// First run: no saved layout, so Home asks what the user mostly does.
 await page.goto(base, { waitUntil: 'load' });
-await page.waitForSelector('#list button.t');
+await page.waitForSelector('#main .onb, #main .dgrid');
 const ver = await page.textContent('#ver');
 if (!/^v\d+\.\d+\.\d+/.test(ver || '')) problems.push(`version label missing: "${ver}"`);
+const open = async (id, wait = 40) => { await page.evaluate(i => openTool(i), id); await page.waitForTimeout(wait); };
+const go = async (h, wait = 60) => { await page.evaluate(x => { location.hash = x; }, h); await page.waitForTimeout(wait); };
+const units = async u => { await page.evaluate(x => setUnits(x), u); };
+const mode = async m => { await page.evaluate(x => setMode(x), m); };
 
-const ids = await page.$$eval('#list button.t', bs => [...new Set(bs.map(b => b.dataset.id))]);
-console.log(`${ids.length} tools`);
-for (const sys of ['inch', 'mm']) {
-  await page.click(`#units button[data-u="${sys}"]`);
-  for (const id of ids) {
-    where = `${sys}/${id}`;
-    await page.click(`#list button.t[data-id="${id}"]`);
-    await page.waitForTimeout(60);
-    const text = (await page.textContent('#main')) || '';
-    if (text.trim().length < 20) problems.push(`[${where}] tool screen is empty`);
-    if (/Could not load|not found \(run scripts\/build-web\.sh\)/.test(text)) problems.push(`[${where}] ${text.slice(0, 120)}`);
+where = 'onboarding';
+if (!(await page.isVisible('#main .onb'))) problems.push(`[${where}] first run did not ask what the user mostly does`);
+await page.click('#main .onb button[data-p="milling"]');
+await page.waitForSelector('#main .dgrid .wd');
+const w0 = await page.$$eval('#main .dgrid .wd', ws => ws.length);
+if (w0 < 5) problems.push(`[${where}] starter layout has only ${w0} widgets`);
+
+// Dashboard: a mini calculator works, the layout can be changed, and it survives a restart.
+where = 'dashboard';
+const heroTxt = async () => (await page.textContent('#main .dgrid .wd .hero .hv b')) || '';
+if (!/\d/.test(await heroTxt())) problems.push(`[${where}] first widget shows no result`);
+await page.click('#dedit');
+await page.click('#main .dgrid .wd:first-child .wded button[data-a="x"]');
+const w1 = await page.$$eval('#main .dgrid .wd', ws => ws.length);
+if (w1 !== w0 - 1) problems.push(`[${where}] remove widget: expected ${w0 - 1} widgets, got ${w1}`);
+await page.click('#dadd');
+await page.fill('#wq', 'stock weight');
+await page.click('#wtools button');
+const w2 = await page.$$eval('#main .dgrid .wd', ws => ws.length);
+if (w2 !== w0) problems.push(`[${where}] add widget: expected ${w0} widgets, got ${w2}`);
+await page.reload({ waitUntil: 'load' });
+await page.waitForSelector('#main .dgrid .wd');
+const w3 = await page.$$eval('#main .dgrid .wd', ws => ws.length);
+if (w3 !== w0) problems.push(`[${where}] layout not kept after a restart: ${w3} widgets, expected ${w0}`);
+
+// Grouping: every page is listed in a workspace; Simple mode lists exactly its 16 pages.
+where = 'grouping';
+const meta = await page.evaluate(() => ({ unlisted: UNLISTED_PAGES, simple: SIMPLE_PAGES, pages: Object.keys(PAGES), tools: TOOLS.map(t => t.id), ws: WORKSPACES.map(w => w.id),
+  missing: WORKSPACES.flatMap(w => w.sections.flatMap(s => s[1])).concat(SIMPLE_PAGES).filter(id => !PAGES[id]) }));
+if (meta.unlisted.length) problems.push(`[${where}] pages in no workspace: ${meta.unlisted.join(', ')}`);
+if (meta.missing.length) problems.push(`[${where}] workspace lists unknown pages: ${meta.missing.join(', ')}`);
+if (meta.simple.length !== 16) problems.push(`[${where}] Simple mode should list 16 pages, the table has ${meta.simple.length}`);
+await mode('simple');
+const simpleRail = await page.$$eval('#list button.t', bs => [...new Set(bs.map(b => b.dataset.id))]);
+if (simpleRail.length !== 16) problems.push(`[${where}] Simple rail shows ${simpleRail.length} tools, expected 16`);
+await mode('advanced');
+console.log(`${meta.tools.length} tools on ${meta.pages.length} pages in ${meta.ws.length} workspaces`);
+
+// Every workspace landing page, then every tool in every mode and both unit systems.
+for (const w of meta.ws) {
+  where = 'workspace ' + w;
+  await go('#/w/' + w);
+  const n = await page.$$eval('#main .tcard', cs => cs.length);
+  if (n < 3) problems.push(`[${where}] landing page shows ${n} cards`);
+}
+for (const m of ['simple', 'advanced', 'expert']) {
+  await mode(m);
+  for (const sys of ['inch', 'mm']) {
+    await units(sys);
+    for (const id of meta.tools) {
+      where = `${m}/${sys}/${id}`;
+      await open(id, 25);
+      const text = (await page.textContent('#main .tpb')) || '';
+      if (text.trim().length < 20) problems.push(`[${where}] tool screen is empty`);
+      if (/Could not load|not found \(run scripts\/build-web\.sh\)/.test(text)) problems.push(`[${where}] ${text.slice(0, 120)}`);
+    }
   }
 }
-// Theme toggle and search should not throw either.
-where = 'theme';
-await page.click('#theme');
+await mode('advanced');
+
+// Compact view at 420 px: nothing may be wider than the window.
+where = 'compact';
+await page.setViewportSize({ width: 420, height: 800 });
+await page.waitForTimeout(80);
+if (!(await page.evaluate(() => document.body.classList.contains('compact')))) problems.push(`[${where}] Compact view did not turn on at 420 px`);
+if (!(await page.isVisible('#bbar'))) problems.push(`[${where}] bottom bar not shown`);
+for (const h of ['#/home', '#/w/milling', '#/t/rpm', '#/t/feeds', '#/t/holepattern', '#/t/boringbar', '#/t/cutopt', '#/t/turntime', '#/t/weight']) {
+  await go(h, 80);
+  const over = await page.evaluate(() => { const m = document.getElementById('main'); return Math.max(document.documentElement.scrollWidth - innerWidth, m.scrollWidth - m.clientWidth); });
+  if (over > 1) problems.push(`[${where}] ${h} is ${over}px wider than a 420 px window`);
+}
+await page.click('#bbar button[data-b="tools"]');
+if (!(await page.evaluate(() => document.body.classList.contains('railopen')))) problems.push(`[${where}] Tools button did not open the tool list`);
+await page.click('#scrim');
+await page.setViewportSize({ width: 1280, height: 900 });
+await page.waitForTimeout(80);
+
+// Search, theme and the linked pair on Spindle speed.
 where = 'search';
 await page.fill('#search', 'thread');
-await page.waitForTimeout(50);
+await page.waitForSelector('#searchpop .sh');
+await page.keyboard.press('Enter');
+await page.waitForTimeout(60);
+if (!/#\/t\//.test(await page.evaluate(() => location.hash))) problems.push(`[${where}] Enter did not open the first result`);
+where = 'theme';
+await page.click('#menubtn');
+await page.click('#mtheme button[data-v="dark"]');
+if ((await page.evaluate(() => document.documentElement.getAttribute('data-theme'))) !== 'dark') problems.push(`[${where}] dark theme not applied`);
+await page.click('#mtheme button[data-v="light"]');
+await page.click('#menubtn');
+where = 'pair rpm';
+await units('inch');
+await open('rpm');
+for (const [k, v] of [['dia', '1'], ['rpm', '1000']]) { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); }
+const sfm = await page.inputValue('#main [data-id="speed"]');
+if (Math.abs(parseFloat(sfm) - 261.7994) > 0.001) problems.push(`[${where}] 1000 RPM at 1 in should fill 261.7994 SFM, got "${sfm}"`);
+await page.click('#main .tpa button[title^="Reset"]');
 
 // Drill chart: "#7" (the placeholder's own example) must find number drill 7 only.
 where = 'drillchart #7';
-await page.fill('#search', '');
-await page.dispatchEvent('#search', 'input');
-await page.click('#list button.t[data-id="drillchart"]');
+await open('drillchart');
 await page.fill('#dq', '#7');
 await page.dispatchEvent('#dq', 'input');
 const drillRows = await page.$$eval('#dres tr', trs => trs.slice(1).map(tr => tr.querySelector('td').textContent.trim()));
@@ -77,15 +158,15 @@ if (drillRows.length !== 1 || drillRows[0] !== '#7') problems.push(`[${where}] e
 
 // Surface finish in mm: Ra 0.33 um must not be rounded to 0.3 (10 % low).
 where = 'finish mm';
-await page.click('#units button[data-u="mm"]');
-await page.click('#list button.t[data-id="finish"]');
+await units('mm');
+await open('finish');
 for (const [k, v] of [['f', '0.092'], ['r', '0.8']]) { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); }
-const raRow = await page.$eval('#res', e => [...e.querySelectorAll('tr')].map(t => t.innerText.replace(/\s+/g, ' ')).find(t => /Theoretical Ra/.test(t)) || '');
+const raRow = await page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).find(t => /Theoretical Ra/i.test(t)) || '');
 if (!/0\.33\b/.test(raRow)) problems.push(`[${where}] expected Ra 0.33 um, got "${raRow}"`);
 
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
-await page.click('#list button.t[data-id="machinetapers"]');
+await open('machinetapers');
 await page.waitForSelector('#tres table');
 const mtText = await page.textContent('#tres');
 if (!/included angle 2\.98/.test(mtText)) problems.push(`[${where}] Morse angle not labelled as included angle`);
@@ -93,8 +174,8 @@ if (!/included angle 2\.98/.test(mtText)) problems.push(`[${where}] Morse angle 
 // Calculator (app/calc.js): typed expression with a mixed number, keypad,
 // fraction readout, history tape; then open it from a field and Use.
 where = 'calc typed';
-await page.click('#units button[data-u="inch"]');
-await page.click('#list button.t[data-id="calc"]');
+await units('inch');
+await open('calc');
 const ce = '#main .bcalc .bc-expr';
 await page.fill(ce, '3-7/16 * 2');
 const cres = (await page.textContent('#main .bcalc .bc-res')) || '';
@@ -112,7 +193,7 @@ where = 'calc bolt circle';
 const bolt = (await page.textContent('#main .bcalc .bc-fout')) || '';
 if (!/Hole 6/.test(bolt)) problems.push(`[${where}] bolt circle list missing: "${bolt.slice(0, 80)}"`);
 where = 'calc use';
-await page.click('#list button.t[data-id="rpm"]');
+await open('rpm');
 await page.evaluate(() => { const i = document.querySelector('#main input'); window.__calcIn = 0; i.addEventListener('input', () => window.__calcIn++); window.BenchCalc.open(i); });
 if (!(await page.isVisible('#bcalc-panel.bc-float'))) problems.push(`[${where}] floating panel not shown`);
 await page.fill('#bcalc-panel .bc-expr', '1/2 + 1/4');

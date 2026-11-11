@@ -136,7 +136,9 @@ label.f .fx .ic{width:15px;height:15px}
 label.f .row:hover .fx,label.f .row:focus-within .fx{display:grid}
 label.f .fx:hover{color:var(--accent)}
 .lvhide{display:none !important}
-.pair{grid-column:1/-1;display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end}
+.pair{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:end}
+label.f{min-width:0}
+label.f .row input,label.f .row select{min-width:0;width:100%}
 .pair .swap{height:32px;display:grid;place-items:center;color:var(--accent)}
 .tg .res{border:0;border-radius:0;max-width:none;background:none}
 .hero{padding:16px 18px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--accent2),transparent)}
@@ -191,7 +193,6 @@ details.why b{color:var(--ink)}
 .wd .tg.mini .hero{padding:9px 12px}
 .wd .tg.mini .hero .hv b{font-size:24px}
 .wd .tg.mini .res td{padding:5px 12px}
-.wd .tg.mini .pair{grid-template-columns:1fr auto 1fr}
 .wlist{display:flex;flex-direction:column;gap:2px}
 .wlist button{display:flex;align-items:center;gap:9px;background:none;border:0;border-radius:var(--r);padding:6px;cursor:pointer;text-align:left;min-width:0}
 .wlist button:hover{background:var(--soft)}

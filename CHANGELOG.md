@@ -3,6 +3,22 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (the 0.2.0 overhaul: shell and look)
+- **Modes**: a Simple / Advanced / Expert selector in the top bar, remembered between runs. Simple lists 16 everyday tools with only their main inputs; Advanced lists every tool; Expert also opens every working, constant and evidence table. A mode never changes a calculation.
+- **Workspaces**: the tools are regrouped by the job into Turning, Milling, Holes and threads, Grinding, sawing and gears, Measure and inspect, Shop maths, Programming and Reference, each with a landing page of cards. Related tools share one page with tabs (for example Feed conversions, Hole patterns, Limits and fits, True position, DXF shapes), so 151 tools sit on 123 pages.
+- **Home dashboard**: a page of widgets you add, remove, resize and reorder (drag, or the arrow buttons). Widgets: any calculator in small form, favourites, recent tools, pinned results, the calculator, tip of the day, tool library and what's new. The first run asks what you mostly do and builds a starter layout.
+- **Calculator panel**: the calculator opens over any page from the top bar or with Alt+C, and from the small calculator button in any number box, which puts the answer back into that box.
+- **Common controls on every calculator**: a large main result, more or fewer decimal places, reset, copy the results, pin a result (with its inputs) to Home, favourite star, and "Formula and sources". Boxes that must hold a number are marked when empty.
+- **Linked pairs**: on Spindle speed, Milling feed, Lathe feed, C-axis feed and Ball-nose cusp, type in either box of a pair (for example surface speed or RPM) and the other is worked out.
+- **Search** in the top bar (Ctrl+K or /) across every tool and tab, with keyboard selection.
+- **Compact view**: one column, the tool list as a drawer and a bottom bar, for a narrow window. Auto (below 820 px), On or Off in the view menu.
+- **What's new** page built from this changelog, and a **tip of the day** (BenchMate's own tips).
+- **Drawing kit** (`app/dk.js`): one engineering-drawing style for all drawings (part outlines, centre lines, dimension lines, angle arcs, leaders, hatching) that follows the light and dark themes; first drawings for Spindle speed and Bolt circle.
+- `tests/smoke/shot.mjs`: takes a screenshot of any screen for checking layouts and drawings.
+### Changed (the 0.2.0 overhaul: shell and look)
+- New look of BenchMate's own: drafting blue and marking-out orange on cool paper, a blueprint dark theme, larger type and controls, cards and a faint drafting grid. Same bones as before: top bar, left rail, content area, token CSS.
+- The address now follows the screen (`#/home`, `#/w/turning`, `#/t/rpm`), so Back and Forward work and the app reopens where you left it. Input values are kept between runs.
+- Smoke test rewritten for the new shell: first-run question, dashboard changes kept after a restart, every tool in all three modes and both unit systems, Compact view at 420 px, search, theme, linked pairs and the calculator.
 
 ## [0.1.0] - 2026-11-11
 ### Added (tooling reference)
