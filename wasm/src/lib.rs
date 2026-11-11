@@ -386,6 +386,7 @@ f1!(cusp_height, c::cusp_height, r, s);
 f1!(stepover_for_cusp, c::stepover_for_cusp, r, h);
 f1!(ball_eff_dia, c::ball_eff_dia, d, ap, tilt);
 f1!(ball_min_dia, c::ball_min_dia, d, ap, tilt);
+f1!(speed_at_nominal_dia, c::speed_at_nominal_dia, vc, d, de);
 f1!(runout_chip_max, c::runout_chip_max, fz, tir, z);
 f1!(runout_fz_for_max, c::runout_fz_for_max, target, tir, z);
 f1!(cutter_approach, c::cutter_approach, d, ae);

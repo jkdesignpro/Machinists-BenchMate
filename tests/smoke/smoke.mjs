@@ -485,6 +485,18 @@ aT = await advTxt();
 if (!/Feed per revolution \(yours, locked\) 0\.100 mm\/rev/.test(aT) || !/feed below the range/.test(aT) || !/Outside/i.test(aT) || !/Below the chip breaker range/.test(aT)) problems.push(`[${where}] below: "${aT.slice(0, 700)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Milling advisor, ball nose: 12 mm ball, depth locked at 2 mm: largest diameter in the cut 2 sqrt(2 x 10) = 8.944 mm, so the table speed
+// of 60.96 m/min needs 60960 / (pi x 8.944) = 2169 rpm instead of 1617. The stick-out slider drives the stick-out box: 5 x D = 60 mm.
+where = 'advmill ball nose';
+await open('advmill');
+await page.selectOption('#main [data-id="shape"]', '1');
+await advSet('ap', '2');
+aT = await advTxt();
+if (!/Spindle speed 2,169 RPM/i.test(aT) || !/Ball nose: largest diameter in the cut at this depth 8\.944 mm/.test(aT) || !/Cutting speed at the largest diameter in the cut 61 m\/min/.test(aT)) problems.push(`[${where}] ball: "${aT.slice(0, 700)}"`);
+await page.$eval('#main [data-id="ld"]', e => { e.value = '5'; e.dispatchEvent(new Event('input', { bubbles: true })); });
+if ((await page.inputValue('#main [data-id="L"]')) !== '60') problems.push(`[${where}] the stick-out slider did not set the stick-out: ${await page.inputValue('#main [data-id="L"]')}`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

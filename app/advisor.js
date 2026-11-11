@@ -188,6 +188,16 @@ function advMachine(v, live) {
   const p = live && !(v.pmax > 0) ? [0, ''] : pick(v.pmax, m ? m.power_kw : 0), t = live && !(v.tmax > 0) ? [0, ''] : pick(v.tmax, m ? m.torque_nm : 0);
   return { name: m ? m.name : '', n: n[0], nSrc: n[1], vf: f[0], vfSrc: f[1], p: p[0], pSrc: p[1], t: t[0], live: !!live };
 }
+// Holder and spindle stiffness (N/um): typed, else the active machine's push test figure, else 0 (rigid). Returns [k, where from].
+function advHolderK(v) {
+  const m = typeof Profiles !== 'undefined' ? Profiles.active() : null;
+  return v.kh > 0 ? [v.kh, 'entered'] : m && advNum(m.holder_k) > 0 ? [advNum(m.holder_k), m.name] : [0, ''];
+}
+// Where the "How hard is this cut" slider starts, from the rigidity class of the active machine (BenchMate's own choice).
+function advHardDefault() {
+  const m = typeof Profiles !== 'undefined' ? Profiles.active() : null, c = m ? String(m.rigidity || '') : '';
+  return c.indexOf('Light') === 0 ? 25 : c === 'Heavy' ? 75 : 50;
+}
 const ADV_MACHINE_FIELDS = [
   { level: 'advanced', id: 'nmax', label: 'Top spindle speed (blank = active machine)', unit: 'RPM', def: '' },
   { level: 'advanced', id: 'vfmax', label: 'Top feed rate (blank = active machine)', unit: 'mm/min', def: '' },
@@ -230,11 +240,14 @@ function advMillRun(v, W, s) {
   const sAe = W.mill_engagement(op, dmm, lf, tH, 0), sAp = W.mill_engagement(op, dmm, lf, tH, 1);
   const aeL = v.ae > 0, apL = v.ap > 0, ae = aeL ? Math.min(v.ae * k, dmm) : sAe, ap = apL ? v.ap * k : sAp;
   const g = kcGroup(m.kc), mach = advMachine(v, v.spn === 1), pE = E_PRESETS[tm], eGpa = v.E > 0 ? v.E * eField(s).k : pE.gpa;
-  const lim = v.lim > 0 ? v.lim * k : advDeflDefault(op), ratio = v.ratio > 0 ? v.ratio : 1;
-  const args = [dmm, v.z, v.dsh > 0 ? v.dsh * k : 0, v.L > 0 ? v.L * k : 0, lf, v.kf > 0 ? v.kf : 0, eGpa, vc, chip, g ? g[5] : 0, g && g[6] != null ? g[6] : 0, ae, ap,
-    (apL ? 1 : 0) + (aeL ? 2 : 0), mach.n, mach.vf, mach.p, mach.t, v.eta > 0 ? v.eta : 0, ratio, v.L > 0 ? lim : 0, v.kh > 0 ? v.kh : 0];
-  const A = i => W.advise_mill(...args, i);
-  return { m, tm, entries, e, fell, g, mach, op, k, inch, vTab, chipTab, cool, vc, chip, sAe, sAp, aeL, apL, ae0: ae, ap0: ap, lim, limOwn: v.lim > 0, ratio, eGpa, eSrc: v.E > 0 ? 'as entered' : pE.name + ' preset', A,
+  const lim = v.lim > 0 ? v.lim * k : advDeflDefault(op), ratio = v.ratio > 0 ? v.ratio : 1, kh = advHolderK(v);
+  // Ball nose: the speed is set at the largest diameter in the cut at the starting depth, 2 sqrt(ap (D - ap)), so the spindle turns
+  // faster than for a square end. If the depth is reduced later the diameter in the cut only gets smaller: the speed is then a little under the table's.
+  const ball = v.shape === 1, de0 = ball ? W.ball_eff_dia(dmm, ap, 0) : dmm, vcEng = ball ? W.speed_at_nominal_dia(vc, dmm, de0) : vc;
+  const args = [dmm, v.z, v.dsh > 0 ? v.dsh * k : 0, v.L > 0 ? v.L * k : 0, lf, v.kf > 0 ? v.kf : 0, eGpa, vcEng, chip, g ? g[5] : 0, g && g[6] != null ? g[6] : 0, ae, ap,
+    (apL ? 1 : 0) + (aeL ? 2 : 0), mach.n, mach.vf, mach.p, mach.t, v.eta > 0 ? v.eta : 0, ratio, v.L > 0 ? lim : 0, kh[0]];
+  const A = i => W.advise_mill(...args, i), de = ball ? W.ball_eff_dia(dmm, A(5), 0) : NaN;
+  return { ball, de, de0, vcDe: ball ? W.vc_from_rpm(A(0), de) : NaN, kh: kh[0], khSrc: kh[1], m, tm, entries, e, fell, g, mach, op, k, inch, vTab, chipTab, cool, vc, chip, sAe, sAp, aeL, apL, ae0: ae, ap0: ap, lim, limOwn: v.lim > 0, ratio, eGpa, eSrc: v.E > 0 ? 'as entered' : pE.name + ' preset', A,
     srcAe: W.mill_engagement(op, dmm, lf, tH, 2), srcAp: W.mill_engagement(op, dmm, lf, tH, 3), dmm,
     rpm: A(0), vcA: A(1), fz: A(2), vf: A(3), ae: A(4), ap: A(5), hm: A(6), hex: A(7), kc: A(8), q: A(9), pNet: A(10), pSp: A(11), tq: A(12), defl: A(13),
     limit: A(14), reduced: A(15), rpmCap: A(16) > 0, feedCap: A(17) > 0, useD: A(18), useP: A(19), pAv: A(20), solid: A(21) > 0, rpmTab: A(22) };
@@ -254,10 +267,12 @@ TOOLS.push(
     { id: 'd', label: 'End mill diameter D', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
     { id: 'z', label: 'Number of flutes', unit: '', def: 4 },
     { id: 'L', label: 'Stick-out (holder face to tip)', unit: lenU(s), def: s === 'inch' ? 1.5 : 40 },
+    { id: 'ld', label: 'Stick-out (in tool diameters: drag, or type the length)', unit: '', def: '', slider: { min: 1.5, max: 6.5, step: 0.25, labels: ['Short', 'Normal', 'Long'] } },
     { id: 'lf', label: 'Flute length', unit: lenU(s), def: s === 'inch' ? 1 : 26 },
+    { id: 'shape', label: 'End of the tool', unit: '', def: 0, options: [[0, 'Square or corner radius'], [1, 'Ball nose']] },
     { id: 'ae', label: 'Width of cut ae (blank = suggested)', unit: lenU(s), def: '', lock: true },
     { id: 'ap', label: 'Depth of cut ap (blank = suggested)', unit: lenU(s), def: '', lock: true },
-    { id: 'hard', label: 'How hard is this cut', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Light', 'Balanced', 'Heavy'] } },
+    { id: 'hard', label: 'How hard is this cut', unit: '', def: advHardDefault(), slider: { min: 0, max: 100, step: 5, labels: ['Light', 'Balanced', 'Heavy'] } },
     { id: 'ag', label: 'Aggressiveness (chip load in the printed range)', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Gentle', 'Middle', 'Aggressive'] } },
     { id: 'sp', label: 'Speed in the printed range (hard stock: low)', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Low', 'Middle', 'High'] } },
     { id: 'cool', label: 'Coolant', unit: '', def: 1, options: ADV_COOL, wide: true },
@@ -266,7 +281,7 @@ TOOLS.push(
     { level: 'advanced', id: 'fzown', label: 'Your own chip load (wins over the table)', unit: lenU(s), def: '' },
     { level: 'advanced', id: 'spn', label: 'Spindle', unit: '', def: 0, options: [[0, 'Main spindle'], [1, 'Driven (live) tool']] },
     { level: 'advanced', id: 'lim', label: 'Deflection allowed at the tip (blank = 0.05 mm rough, 0.01 mm finish)', unit: lenU(s), def: '' },
-    { level: 'advanced', id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = rigid)', unit: 'N/µm', def: '' },
+    { level: 'advanced', id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = active machine, else rigid)', unit: 'N/µm', def: '' },
     { level: 'advanced', id: 'dsh', label: 'Shank diameter (blank = D)', unit: lenU(s), def: '' },
     { level: 'advanced', id: 'kf', label: 'Effective flute diameter / D (blank = solid rod)', unit: 'x D', def: '' },
     { level: 'advanced', id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
@@ -276,7 +291,10 @@ TOOLS.push(
     { level: 'expert', id: 'ktip', label: 'Tap test: stiffness at the tool tip (blank = tool as a bar)', unit: 'N/mm', def: '' },
     { level: 'expert', id: 'zeta', label: 'Damping ratio (blank = 0.03, assumed)', unit: '', def: '' },
     { level: 'expert', id: 'beta', label: 'Force angle beta (blank = 62, assumed)', unit: 'deg', def: '' },
+    { level: 'expert', id: 'tn', label: 'Tool life: your Taylor exponent n', unit: '', def: '' },
+    { level: 'expert', id: 'tcn', label: 'Tool life: your Taylor constant C (speed for 1 min life)', unit: spdU(s), def: '' },
   ]),
+  pairs: [['L', 'ld', v => v.L / v.d, (v, W) => W.apply_factor(v.ld, v.d), 'both']],
   suggest: (v, W, s) => { const r = advMillRun(v, W, s); return r && !r.none ? { ae: r.sAe / r.k, ap: r.sAp / r.k } : {}; },
   calc: (v, W, s) => {
     const r = advMillRun(v, W, s);
@@ -289,7 +307,7 @@ TOOLS.push(
       R('Spindle speed', r.rpm, 'RPM', 0),
       R('Table feed', r.vf / k, feedMinU(s), inch ? 2 : 0),
       R('Feed per tooth', r.fz / k, lu, dpF),
-      R('Cutting speed at the tool', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0),
+      r.ball ? R('Cutting speed at the largest diameter in the cut', inch ? r.vcDe / FT_M : r.vcDe, spdU(s), 0) : R('Cutting speed at the tool', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0),
       R('Width of cut ae (' + how(r.aeL, r.ae0, r.ae, limName, ADV_ENG_SRC[r.srcAe]) + ')', r.ae / k, lu, dpL),
       R('Depth of cut ap (' + how(r.apL, r.ap0, r.ap, limName, ADV_ENG_SRC[r.srcAp]) + ')', r.ap / k, lu, dpL),
       R('Removal rate', inch ? r.q / IN3_CM3 : r.q, inch ? 'in3/min' : 'cm3/min', 2),
@@ -299,7 +317,9 @@ TOOLS.push(
       if (inch) rows.push(R('Spindle power needed', r.pSp * KW_HP, 'hp', 2));
       rows.push(R('Spindle torque needed', inch ? r.tq * NM_LBFIN : r.tq, inch ? 'lbf in' : 'N m', inch ? 1 : 2));
     } else rows.push(R('Power and torque', 'No specific cutting force is published for this material group, so power, torque and deflection are not worked out', '', 0));
-    if (isFinite(r.defl)) rows.push(R(v.kh > 0 ? 'Tool tip deflection (tool bending and a holder of ' + fmt(v.kh, 1) + ' N/µm giving way)' : 'Tool tip deflection (holder and spindle taken as rigid)', r.defl / k, lu, inch ? 5 : 4));
+    if (r.ball) rows.push(R('Ball nose: largest diameter in the cut at this depth', r.de / k, lu, dpL));
+    if (isFinite(r.defl)) rows.push(R(r.kh > 0 ? 'Tool tip deflection (tool bending and a holder of ' + fmt(r.kh, 1) + ' N/µm giving way, ' + (r.khSrc === 'entered' ? 'entered' : 'from ' + r.khSrc) + ')' : 'Tool tip deflection (holder and spindle taken as rigid)', r.defl / k, lu, inch ? 5 : 4));
+    if (v.tn > 0 && v.tcn > 0) rows.push(R('Tool life at this speed (Taylor, your n and C)', W.taylor_life(inch ? (r.ball ? r.vcDe : r.vcA) / FT_M : (r.ball ? r.vcDe : r.vcA), v.tn, v.tcn), 'min', 0));
     rows.push(R('Chip thickness: mean hm', r.hm / k, lu, dpF), R('Chip thickness: largest hex', r.hex / k, lu, dpF));
     if (isFinite(r.kc)) rows.push(R('Specific cutting force kc at hm (Iscar group ' + r.g[0] + ')', r.kc, 'N/mm2', 0));
     // The table value beside the corrected one.
@@ -312,6 +332,7 @@ TOOLS.push(
     if (r.fell) rows.push(R('Publisher', r.fell + ' Using ' + e.pub + '.', '', 0));
     if (v.cool === 3) rows.push(cfNote('Dry or mist: no publisher in the table prints a factor for it, so the table figures are used unchanged. Watch the heat and the chips.'));
     if (e && e.open && !(v.vown > 0)) rows.push(cfNote(e.pub + ' prints this speed as "more than ' + e.v[0] + ' ft/min": the low figure is used.'));
+    if (r.ball) rows.push(cfNote('Ball nose: the spindle speed is set so the table speed is reached at the largest diameter in the cut, 2 x sqrt(ap x (D - ap)), not at the full diameter. Width, depth and feed are worked as for a square end: the feed is not raised for the thinner chip of a shallow ball cut, and the stepover for a finish is on the Ball-nose cutters page.'));
     if (r.solid && v.lf > 0) rows.push(cfNote('Deflection treats the tool as a solid rod of the shank diameter: the fluted part is weaker, so the real figure is higher. Enter the effective flute diameter (Advanced) if you have it.'));
     rows.push(R('Note', ADV_START_NOTE, '', 0));
     return rows;
@@ -353,7 +374,7 @@ TOOLS.push(
     if (!r || r.none || !isFinite(r.kc) || !(v.L > 0)) return null;
     const m = lobeModel(W, { d: v.dsh > 0 ? v.dsh * r.k : r.dmm, L: v.L * r.k, e: r.eGpa, tm: r.tm, z: v.z, ae: r.ae, D: r.dmm, kc: r.kc, fnat: v.fnat, ktip: v.ktip, zeta: v.zeta, beta: v.beta });
     if (!m || !(m.crit > 0)) return null;
-    const vcOf = n => W.vc_from_rpm(n, r.dmm);
+    const vcOf = n => W.vc_from_rpm(n, r.de0);
     return el => lobeChartMount(el, m, { key: 'advmill:' + s, rpm: r.rpm, ap: r.ap, nmax: r.mach.n, inch: r.inch,
       use: n => sendTo('advmill', { vown: r.inch ? vcOf(n) / FT_M : vcOf(n) }) });
   },
@@ -365,6 +386,7 @@ TOOLS.push(
       speed: r.inch ? r.vcA / FT_M : r.vcA, rpm: '', kc: isFinite(r.kc) ? Math.round(r.kc) : '', ratio: r.ratio, lim: r.lim / k }],
       ['Feed rate calculator', 'feed', { rpm: Math.round(r.rpm), z: v.z, fz: r.fz / k }],
       ['Plunge roughing with this tool', 'advplunge', { mat: v.mat, tm: r.tm, d: v.d, z: v.z }],
+      ...(r.ball ? [['Ball-nose stepover and cusp', 'ballnose', { d: v.d, ap: r.ap / k }]] : []),
       ['Tool life and cost per part', 'toollife', { v: Math.round(r.inch ? r.vcA / FT_M : r.vcA) }]];
   },
   working: 'Order of work. 1: starting cutting speed and chip load from the chosen publisher\'s table for the material, tool material and cutter diameter; the sliders pick a place inside the printed range. Between two printed diameters the chip load is read along the straight line; below the smallest it is scaled down with the diameter. 2: coolant factor. 3: spindle speed n = 1000 Vc / (pi D), held to the machine\'s top speed. 4: width ae and depth ap suggested for the kind of cut (slot: full width, depth 0.2 D to 1 D; shoulder roughing: half the diameter wide, one diameter deep; high-speed path: 7 to 30 % of D wide, up to 2 D deep; finishing: 2 to 5 % of D wide, 1.5 D deep), depth held to the flute length. 5: feed per tooth fz = chip load x chip thinning factor for the width (1 at half the diameter or more), so the chip keeps its thickness in a light cut. 6: table feed Vf = n x z x fz, held to the machine\'s top feed. 7: specific cutting force kc = kc1.1 x hm^(-mc) at the mean chip thickness. 8: power Pc = ae x ap x Vf x kc / 60 000 000 kW, spindle power = Pc / efficiency, torque = P x 60 000 / (2 pi n), checked against P(n) = min(P_max, T_max x 2 pi n / 60 000). 9: tool tip deflection as a cantilever under the tangential force (x the bending ratio). If a limit is passed the depth is reduced; if you locked the depth, the width; if you locked both, the feed. A locked value is never changed. The chip loads are used as the chip thickness for a cut half the diameter wide or wider. BenchMate\'s own starting figures, which no publisher prints: 1 D depth for shoulder roughing, 1.5 D for finishing, bending force equal to the tangential force, 0.05 mm (rough) and 0.01 mm (finish) allowed deflection, and tile colours at 80 % and 100 % of a limit.',
@@ -869,6 +891,8 @@ TOOLS.push(
     { level: 'advanced', id: 'pmax', label: 'Spindle power (blank = active machine)', unit: 'kW', def: '' },
     { level: 'advanced', id: 'tmax', label: 'Spindle torque (blank = active machine)', unit: 'N·m', def: '' },
     { level: 'advanced', id: 'eta', label: 'Machine efficiency', unit: '0-1', def: 0.8 },
+    { level: 'expert', id: 'tn', label: 'Tool life: your Taylor exponent n', unit: '', def: '' },
+    { level: 'expert', id: 'tcn', label: 'Tool life: your Taylor constant C (speed for 1 min life)', unit: spdU(s), def: '' },
   ],
   suggest: (v, W, s) => { const r = advTurnRun(v, W, s); return r && !r.none ? { f: r.fSug / r.k, ap: r.apSug / r.k } : {}; },
   calc: (v, W, s) => {
@@ -889,6 +913,7 @@ TOOLS.push(
       if (isFinite(r.pSp)) { rows.push(R('Spindle power needed', r.pSp, 'kW', 2)); if (inch) rows.push(R('Spindle power needed', r.pSp * KW_HP, 'hp', 2)); rows.push(R('Spindle torque needed', inch ? r.tq * NM_LBFIN : r.tq, inch ? 'lbf in' : 'N m', inch ? 1 : 2)); }
       rows.push(R('Specific cutting force kc at this chip (Iscar group ' + r.g[0] + ')', r.kc, 'N/mm2', 0));
     } else rows.push(R('Force and power', 'No specific cutting force is published for this material group', '', 0));
+    if (v.tn > 0 && v.tcn > 0) rows.push(R('Tool life at this speed (Taylor, your n and C)', W.taylor_life(inch ? r.vcA / FT_M : r.vcA, v.tn, v.tcn), 'min', 0));
     if (r.hasCb) {
       const rng = (a, b, u2) => (a > 0 && b > 0 ? fmt(a / k, dpF) + ' to ' + fmt(b / k, dpF) : a > 0 ? 'from ' + fmt(a / k, dpF) : b > 0 ? 'up to ' + fmt(b / k, dpF) : 'not given') + (a > 0 || b > 0 ? ' ' + u2 : '');
       rows.push(R('Chip breaker range of the insert', 'Feed ' + rng(r.cb[0], r.cb[1], feedRevU(s)) + ', depth ' + rng(r.cb[2], r.cb[3], lu) + ': ' + advCbWords(r.cbFlag), '', 0));

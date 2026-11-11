@@ -19,6 +19,9 @@ const Profiles = (() => {
     ['live_rpm_max', 'Live / driven tool max speed (optional)', 'number', 'RPM'],
     ['feed_max', 'Max cutting feed (optional)', 'number', 'mm/min'],
     ['rapid', 'Rapid traverse rate (optional, for cycle times)', 'number', 'mm/min'],
+    ['taper', 'Spindle taper or tool holder (optional)', 'text', 'e.g. BT40, CAT40, HSK-A63, R8, ER32'],
+    ['rigidity', 'Rigidity class (sets where the advisor\'s "How hard is this cut" slider starts)', 'select:Medium,Light (bench or hobby machine),Heavy', ''],
+    ['holder_k', 'Holder and spindle stiffness from a push test (optional; see Tool deflection)', 'number', 'N/µm'],
     ['notes', 'Notes', 'text', ''],
   ];
   return {

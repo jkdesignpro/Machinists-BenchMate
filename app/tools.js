@@ -252,14 +252,14 @@ const TOOLS = [
     { id: 'pc', label: 'Or net cutting power at the cut', unit: 'kW', def: '' },
     { id: 'vc', label: s === 'inch' ? 'Surface speed' : 'Cutting speed Vc', unit: spdU(s), def: '' },
     { id: 'ratio', label: 'Radial / tangential force ratio Fr/Ft', unit: '', def: '' },
-    { level: 'advanced', id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = rigid)', unit: 'N/µm', def: '' },
+    { level: 'advanced', id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = active machine, else rigid)', unit: 'N/µm', def: '' },
     { level: 'advanced', id: 'pf', label: 'Or a push test: force on the holder', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
     { level: 'advanced', id: 'pd', label: 'Push test: indicator reading at the holder', unit: lenU(s), def: '' },
   ]),
   calc: (v, W, s) => {
     const g = toolGeom(v, s), k = s === 'inch' ? IN_MM : 1, fU = s === 'inch' ? 'lbf' : 'N', fk = s === 'inch' ? LBF_N : 1;
     if (!(g.d > 0 && g.L > 0 && g.e > 0)) return [];
-    const khT = v.pf > 0 && v.pd > 0 ? W.stiffness_n_um(v.pf * fk, v.pd * k) : NaN, kh = v.kh > 0 ? v.kh : (khT > 0 ? khT : 0);
+    const khT = v.pf > 0 && v.pd > 0 ? W.stiffness_n_um(v.pf * fk, v.pd * k) : NaN, khA = advHolderK(v), kh = v.kh > 0 ? v.kh : khT > 0 ? khT : khA[0];
     const rows = [R("Young's modulus used (" + g.eSrc + ')', g.eShow, g.eU, g.eDp)];
     const ds = g.dsh || g.d;
     if (g.lf > 0 && !(g.kf > 0)) return rows.concat([R('Flute section', 'Enter the effective flute diameter / D (see the note below), or blank the flute length to treat the tool as solid', '', 0)]);
@@ -279,7 +279,7 @@ const TOOLS = [
       rows.push(R('Tip deflection', s === 'inch' ? d / k * 1000 : d * 1000, s === 'inch' ? 'thou' : 'um', s === 'inch' ? 2 : 1));
       if (kh > 0) {
         rows.push(R('Of which the tool bending', dT / k, lenU(s), s === 'inch' ? 5 : 4), R('Of which the holder and spindle giving way', W.holder_deflection_mm(F, kh) / k, lenU(s), s === 'inch' ? 5 : 4));
-        rows.push(R('Holder and spindle stiffness used (' + (v.kh > 0 ? 'entered' : 'from the push test') + ')', kh, 'N/µm', 1));
+        rows.push(R('Holder and spindle stiffness used (' + (v.kh > 0 ? 'entered' : khT > 0 ? 'from the push test' : 'from ' + khA[1]) + ')', kh, 'N/µm', 1));
       }
     }
     if (!(kh > 0)) rows.push(R('Holder and spindle', 'Taken as rigid. A real holder and spindle give a little: in Advanced enter their stiffness, or a push test (pull on the holder with a known force and read an indicator on it).', '', 0));
@@ -308,7 +308,7 @@ const TOOLS = [
     { id: 'lim', label: 'Deflection limit', unit: lenU(s), def: '' },
     { id: 'pmax', label: 'Spindle power limit (blank = active machine)', unit: 'kW', def: '' },
     { id: 'tmax', label: 'Spindle torque limit (blank = active machine)', unit: 'N·m', def: '' },
-    { id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = rigid)', unit: 'N/µm', def: '' },
+    { id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = active machine, else rigid)', unit: 'N/µm', def: '' },
   ]),
   calc: (v, W, s) => {
     const g = toolGeom(v, s), k = s === 'inch' ? IN_MM : 1, fk = s === 'inch' ? LBF_N : 1, fU = s === 'inch' ? 'lbf' : 'N';
@@ -321,7 +321,7 @@ const TOOLS = [
     const tmax = v.tmax > 0 ? v.tmax : (m ? mnum(m.torque_nm) : 0);
     const pSrc = v.pmax > 0 ? 'entered' : (m && pmax > 0 ? m.name : '');
     const z0 = x => x > 0 ? x : 0;
-    const args = ap => [g.d, g.dsh, z0(g.L), g.lf, g.kf, z0(g.e), v.z, v.ae * k, ap, v.fz * k, vc, z0(v.kc), z0(v.eta), z0(v.ratio), z0(v.F) * fk, z0(v.lim) * k, pmax, tmax, z0(v.kh)];
+    const args = ap => [g.d, g.dsh, z0(g.L), g.lf, g.kf, z0(g.e), v.z, v.ae * k, ap, v.fz * k, vc, z0(v.kc), z0(v.eta), z0(v.ratio), z0(v.F) * fk, z0(v.lim) * k, pmax, tmax, advHolderK(v)[0]];
     const a = args(v.ap * k), C = i => W.cut_check(...a, i);
     const rpm = C(0), vf = C(1), q = C(2), pNet = C(3), pSp = C(4), tq = C(5), ft = C(6), fr = C(7), defl = C(8), pAv = C(9), bind = C(10);
     const rows = [
@@ -344,7 +344,7 @@ const TOOLS = [
     if (g.lf > 0 && !(g.kf > 0)) rows.push(R('Deflection', 'Enter the effective flute diameter / D, or blank the flute length', '', 0));
     else if (isFinite(defl)) {
       rows.push(R("Young's modulus used (" + g.eSrc + ')', g.eShow, g.eU, g.eDp));
-      rows.push(R(v.kh > 0 ? 'Tool tip deflection (tool bending and the holder giving way)' : 'Tool tip deflection (holder and spindle taken as rigid)', defl / k, lenU(s), s === 'inch' ? 5 : 4));
+      rows.push(R(advHolderK(v)[0] > 0 ? 'Tool tip deflection (tool bending and the holder giving way)' : 'Tool tip deflection (holder and spindle taken as rigid)', defl / k, lenU(s), s === 'inch' ? 5 : 4));
     }
     else if (!(v.F > 0 || v.ratio > 0)) rows.push(R('Deflection', 'Enter the Fr/Ft ratio or the radial force', '', 0));
     if (pmax > 0) rows.push(R('Spindle power available at this speed (' + pSrc + ')', pAv, 'kW', 3));
