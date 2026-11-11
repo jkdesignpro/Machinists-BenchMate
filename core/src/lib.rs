@@ -577,6 +577,7 @@ pub mod chatter;
 pub use chatter::*;
 pub mod grinding;
 pub use grinding::*;
+pub mod tnrc;
 
 #[cfg(test)]
 mod tests {

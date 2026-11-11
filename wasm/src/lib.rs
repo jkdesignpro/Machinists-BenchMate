@@ -433,3 +433,20 @@ f1!(over_marked_max, c::over_marked_max, vs, vmax);
 #[no_mangle] #[allow(clippy::too_many_arguments)]
 pub extern "C" fn surface_grind(len: f64, over: f64, cross_travel: f64, cross: f64, vt: f64, stock: f64, down: f64, spark: f64, both: f64, which: f64) -> f64 {
     c::surface_grind(len, over, cross_travel, cross, vt, stock, down, spark, both, which as u32) }
+
+// Tool nose radius compensation by hand (core/src/tnrc.rs). X values are diameters.
+f1!(tnrc_chamfer_dz, c::tnrc::chamfer_dz, r, theta);
+f1!(tnrc_chamfer_dx, c::tnrc::chamfer_dx, r, theta);
+f1!(tnrc_chamfer_error, c::tnrc::chamfer_error, r, theta);
+f1!(tnrc_corner_arc_error, c::tnrc::corner_arc_error, r);
+/// Tip vector component: which 0 = Z, 1 = X (NaN for a bad tip number).
+#[no_mangle] pub extern "C" fn tnrc_tip(tip: f64, which: f64) -> f64 {
+    match c::tnrc::tip_vector(tip.max(0.0) as u32) { Some((z, x)) => if which > 0.5 { x } else { z }, None => f64::NAN } }
+/// Straight element into list_out as [z1', x1', z2', x2', nz, nx]; returns 6.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn tnrc_line(r: f64, tip: f64, z1: f64, x1: f64, z2: f64, x2: f64, side: f64, end1: f64, end2: f64) -> f64 {
+    set_out(c::tnrc::line_path(r, tip.max(0.0) as u32, z1, x1, z2, x2, side, end1.max(0.0) as u32, end2.max(0.0) as u32).to_vec()) }
+/// Arc into list_out as [z1', x1', z2', x2', R', cz', cx', convex]; returns 8.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn tnrc_arc(r: f64, tip: f64, z1: f64, x1: f64, z2: f64, x2: f64, rp: f64, ccw: f64, side: f64) -> f64 {
+    set_out(c::tnrc::arc_path(r, tip.max(0.0) as u32, z1, x1, z2, x2, rp, ccw, side).to_vec()) }

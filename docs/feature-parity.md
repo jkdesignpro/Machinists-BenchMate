@@ -18,6 +18,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Turning | Boring bar deflection | done (bar materials, coolant bore, cutting force, overhang guidance per maker) | `boringbar` | U9 |
 | Turning | C-axis feed converter | done (deg/min, circumference feed, inverse time F) | `caxis` | U10 |
 | Turning | Surface finish from nose radius | done | `finish` | U12 |
+| Turning | Tool nose radius compensation (hand shifts, tip 0-9, G41/G42) | done (ours) | `tnrc` | |
 | Turning | Bar stock planner (parts per bar, weight, cost) | done (ours) | `bar` | |
 | Milling | Speeds and feeds with chip thinning, deflection, power check | partial (checks a cut you enter; no starting data, kc by hand) | `cutopt` | U13, U18 |
 | Milling | Spindle speed and table feed | done | `rpm`, `feed` | U14, U15 |
@@ -72,8 +73,10 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Grinding | Wheel marking decoder | done (marking only; no shapes or selection) | `wheelcode` | MH163, BB60 (partial) |
 | Grinding | Cylindricity error from RPM | missing | | U58 |
 | Gears/splines | Spur gear data, ISO 4156, ANSI B92.1, SAE J499a | missing | | U83-U86 |
-| Library | Formula library | partial (working shown per tool; no library view) | all tools | U97 |
-| Library | Tips, tool wear info, assistant, community cut data | missing | | U91, U98, U101, U102 |
+| Library | Formula library | done (130 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
+| Library | Tool wear information | done (seven wear types, causes and remedies from two makers) | `cncguide` | U91 |
+| Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
+| Library | Tips, assistant, community cut data | missing | | U98, U101, U102 |
 | Library | Indexable insert catalogue | missing (in progress, `claude/ref-data-3`) | | U103 |
 | Shop | Tool library and favourites | done | `toollib` (fill into rpm, feed, arcfeed, helix, deflection, cutopt, drillpoint, tapdrill, finish); star in the side list or by the title | U106, U109 |
 | Shop | Decimal precision, home dashboard, reorderable menu | missing | | U105, U107, U108 |
@@ -81,7 +84,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Platform | Offline, web/desktop link | partial (local web app; no installable offline build) | | U110, U111 |
 | Platform | Mobile apps, languages | missing (later phase) | | U112, U113 |
 
-Count against Ultra (from `parity-audit.md`): 113 rows, 54 done, 16 partial, 41 missing (8 of them in progress), 2 out of scope. The build order is in `parity-audit.md` section 6.
+Count against Ultra (from `parity-audit.md`): 113 rows, 57 done, 15 partial, 39 missing (8 of them in progress), 2 out of scope. The build order is in `parity-audit.md` section 6.
 
 Beyond parity (ours): manufacturer speeds and feeds with PDF import, an adaptive per-machine learning profile (see `vendor-data-and-learning.md`), Swiss-lathe helpers, "show the working" steps for every result, AMW link-up.
 
