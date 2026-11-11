@@ -1183,7 +1183,7 @@ const TOOLS = [
   working: 'L = n x P (n starts). Lead angle = atan(L / (pi E)). To cut the next start, either rotate the work 360 / n degrees with the tool where it is, or move the tool one pitch P along the axis (a G76 or G92 cycle started one pitch later in Z). Feed per revolution on the lathe is the lead, not the pitch.',
   source: 'Thread geometry (lead, pitch and helix angle); see docs/sources.md, Threads round 3.',
 },
-// ---------- Gears and splines (core/src/gears.rs, drawings in app/gears.js) ----------
+// ---------- Gears and splines (core/src/gears.rs, drawings in app/diagrams-eng.js) ----------
 {
   id: 'spurgear', level: 'advanced', group: 'Gears and splines', title: 'Spur gear data',
   desc: 'Involute spur gear dimensions from the module (mm) or diametral pitch (inch): reference, base, tip and root diameters, addendum and dedendum, circular and base pitch, tooth thickness, undercut limit; give a second tooth count for the centre distance and contact ratio of the pair, with profile shift if used. Standard full-depth proportions (addendum 1, dedendum 1.25 times the module) are filled in; change them if your gear uses another basic rack.',
@@ -1232,7 +1232,6 @@ const TOOLS = [
     }
     return rows;
   },
-  diagram: (v, s) => typeof gearToothSvg === 'function' ? gearToothSvg(gearMod(v.mp, s), v.z1, v.pa, isFinite(v.x1) ? v.x1 : 0, v.ha, v.hf, 'Gear 1 teeth, drawn from the true involute') : '',
   working: 'm = 1 / P in inch mode. d = z m; db = d cos α; p = π m; pb = p cos α; ha = (ha* + x) m; hf = (hf* − x) m; da = d + 2 ha; df = d − 2 hf; s = m (π/2 + 2 x tan α); thickness at diameter dy: sy = dy (s/d + inv α − inv αy), cos αy = db/dy. Undercut: z_min = 2 ha*/sin²α, x_min = ha* − z sin²α / 2. Pair: inv αw = 2 tan α (x1 + x2)/(z1 + z2) + inv α; y = (z1 + z2)/2 · (cos α / cos αw − 1); a = ((z1 + z2)/2 + y) m; dw = db / cos αw; tips for standard clearance: ha1 = (ha* + y − x2) m, ha2 = (ha* + y − x1) m. Contact ratio εα = [√(ra1² − rb1²) + √(ra2² − rb2²) − a sin αw] / pb. inv α = tan α − α (radians). The drawing below the root circle uses a radial flank instead of the real fillet, which depends on the cutter.',
   source: 'Basic rack: ISO 53:1998 and AGMA full-depth system (cited by name: addendum 1 m, dedendum 1.25 m). Formulas and the worked example in the tests (m 3, z 12 and 24, x 0.6 and 0.36: a = 56.4999, αw = 26.0886°) from the KHK Gear Technical Reference, calculation of gear dimensions; SDP/SI Elements of Metric Gear Technology; MESYS AG online helical gear calculation. See docs/gears.md.',
 },
@@ -2210,7 +2209,6 @@ const TOOLS = [
     if (v.sec === 6) rows.push(mkNote('An angle bends about its principal axes: a load parallel to a leg also bends it sideways. Use I2 and the least radius of gyration for buckling.'));
     return rows;
   },
-  diagram: (v, s) => typeof mkSectionSvg === 'function' ? mkSectionSvg(v, state.W) : '',
   working: 'Built up from rectangles: A = sum Ai; centroid = sum(Ai ci) / A; I = sum(Ii + Ai d^2) (parallel-axis theorem), rectangle Ii = b h^3 / 12; round I = pi (D^4 - d^4) / 64, J = 2 I. Principal I1,2 = (Ix + Iy)/2 +- sqrt(((Ix - Iy)/2)^2 + Ixy^2), tan 2 theta = -2 Ixy / (Ix - Iy). S = I / c (c = distance from the centroid to the fibre); r = sqrt(I / A). Origin at the lower-left corner of the bounding box; the angle has its corner at the lower left, the channel its web on the left, the tee its flange on top.',
   source: 'Gere and Goodno, Mechanics of Materials, ch. 12 (relations, by name); checked against closed forms and the AISC Manual area of L4x4x1/2. See docs/mechanics.md.',
 },
@@ -2255,11 +2253,6 @@ const TOOLS = [
     }
     rows.push(mkNote('Linear elastic, small deflection, shear deformation ignored (it adds noticeably when the span is under about 10 times the depth). Self-weight only if you include it in w. Supports are taken as ideal: real clamps and fixtures give a little, so a "fixed" end deflects more.'));
     return rows;
-  },
-  diagram: (v, s) => {
-    if (typeof mkBeamSvg !== 'function') return '';
-    const W = state.W, L = v.L, P = v.P || 0, wl = v.w || 0, a = P ? (v.a >= 0 && v.a <= L ? v.a : (v.sup === 0 ? L : L / 2)) : 0;
-    return mkBeamSvg(v.sup, L, a, isFinite(P) ? P : 0, isFinite(wl) ? wl : 0, 1);
   },
   working: 'Sign convention E I y\'\' = -M, deflection positive in the direction of the load. Simply supported, point load at a (b = L - a): y = P b x (L^2 - b^2 - x^2) / (6 E I L) for x <= a; uniform: y = w x (L^3 - 2 L x^2 + x^3) / (24 E I). Cantilever fixed at x = 0: y = P x^2 (3a - x) / (6 E I) for x <= a; uniform: y = w x^2 (6 L^2 - 4 L x + x^2) / (24 E I). Fixed both ends: y = P b^2 x^2 (3 a L - 3 a x - b x) / (6 E I L^3) for x <= a; uniform: y = w x^2 (L - x)^2 / (24 E I). Mirror image beyond the load; both loads add (superposition). Maxima found along the span. Stress = M c / I. Checks: centre load P L^3/48EI, uniform 5wL^4/384EI, cantilever PL^3/3EI and wL^4/8EI, fixed wL^4/384EI and PL^3/192EI.',
   source: "Roark's Formulas for Stress and Strain, Table 8.1, and Gere and Goodno, ch. 9 (relations, by name); maxima checked against American Wood Council Design Aid No. 6, Beam Design Formulas (free). See docs/mechanics.md.",
@@ -2345,12 +2338,6 @@ const TOOLS = [
     if (K * v.L / r < 10) rows.push(mkNote('Very short (K L / r under about 10): this is a compression block; crushing, not buckling, governs.'));
     rows.push(mkNote('Ideal straight column, load on the centroid. Real columns are a little crooked and loaded off-centre, and theoretical K values are hard to achieve: AISC recommends design K of 0.65 (fixed-fixed), 0.80 (fixed-pinned), 1.0 (pinned-pinned) and 2.1 (fixed-free). Use a design code for structures.'));
     return rows;
-  },
-  diagram: (v, s) => {
-    if (typeof mkColumnSvg !== 'function') return '';
-    const u = mku(s), K = v.end > 0 ? v.end : v.K, W = state.W;
-    const r = v.sec === 8 ? v.r : mkSec(W, mkSecArgs(v), 15);
-    return mkColumnSvg(v.E * u.eK, v.Sy * u.sK, K * v.L / r);
   },
   working: 'Slenderness lambda = K L / r, r = sqrt(I_min / A). Euler: sigma_cr = pi^2 E / lambda^2, P_cr = pi^2 E I / (K L)^2. Johnson: sigma_cr = Sy - (Sy lambda / (2 pi))^2 / E. They meet, with the same slope, at lambda_1 = sqrt(2 pi^2 E / Sy), where sigma_cr = Sy / 2; below it Johnson is used, above it Euler. K: 1.0 pinned-pinned, 0.5 fixed-fixed, 0.7 fixed-pinned, 2.0 fixed-free (theoretical).',
   source: "Euler and Johnson relations: Gere and Goodno ch. 11; Shigley's Mechanical Engineering Design, columns (by name). Effective length factors: AISC 360-16 Commentary Table C-A-7.1 (free). See docs/mechanics.md.",
@@ -2444,15 +2431,6 @@ const TOOLS = [
     if (sm <= 0) rows.push(mkNote('Compressive (or zero) mean stress: the factor shown is Se / sa, the usual conservative choice.'));
     rows.push(mkNote('Estimate for infinite life of steel. Se\' and ka are fits to scattered test data (ka differs by a few percent between published fits); kc, kd and ke are yours to enter because published values differ (axial kc is 0.7 in Norton\'s text, 0.85 in Shigley\'s). Kf is applied to the stresses. Not for welded parts or corrosive service.'));
     return rows;
-  },
-  diagram: (v, s) => {
-    if (typeof mkFatigueSvg !== 'function' || !(v.sut > 0 && v.sy > 0)) return '';
-    const W = state.W, inch = s === 'inch';
-    const sep = v.sep > 0 ? v.sep : W.mech_endurance_estimate(v.sut, inch ? 1 : 0);
-    const ka = v.fin === 9 ? v.ka : W.mech_marin_surface(v.fin, v.sut, inch ? 1 : 0);
-    let kb = v.kb > 0 ? v.kb : (v.dia > 0 ? W.mech_marin_size_mm(v.dia * (inch ? 25.4 : 1)) : 1);
-    const se = ka * kb * (v.kc > 0 ? v.kc : 1) * (v.kd > 0 ? v.kd : 1) * (v.ke > 0 ? v.ke : 1) * sep, kf = v.kf > 0 ? v.kf : 1;
-    return mkFatigueSvg(se, v.sut, v.sy, kf * W.mech_stress_alt(v.smax, v.smin), kf * W.mech_stress_mean(v.smax, v.smin));
   },
   working: "Se' = 0.504 Sut for Sut up to 1400 MPa (200 kpsi), 700 MPa (100 kpsi) above. Se = ka kb kc kd ke Se'. ka = a Sut^b: ground 1.58, -0.085; machined or cold-drawn 4.51, -0.265; hot-rolled 57.7, -0.718; as forged 272, -0.995 (MPa; kpsi a: 1.34, 2.70, 14.4, 39.9), capped at 1. kb = (d / 7.62)^-0.1133, d in mm, 2.79 to 51 mm. sa = (max - min)/2, sm = (max + min)/2, both times Kf. Goodman 1/n = sa/Se + sm/Sut; Soderberg 1/n = sa/Se + sm/Sy; Gerber n sa/Se + (n sm/Sut)^2 = 1, n = 1/2 (Sut/sm)^2 (sa/Se) [-1 + sqrt(1 + (2 sm Se/(Sut sa))^2)]; Langer n = Sy/(sa + |sm|).",
   source: "Engineers Edge, Marin endurance limit calculator (after T. H. Brown, Marks' Calculations for Machine Design): Se', ka table, kb fit. Goodman, Soderberg, Gerber and Langer lines: Shigley's Mechanical Engineering Design, ch. 6 (by name); Goodman checked against the Penn State ME 360 fatigue notes (Norton example 6-5). See docs/mechanics.md.",

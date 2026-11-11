@@ -54,7 +54,7 @@ const report = await page.evaluate(([idArg, cols]) => {
     // Compare on-screen boxes (so rotated text is measured as drawn) with the drawing's own frame.
     const fr = svg.getBoundingClientRect(), k = svg.viewBox.baseVal.width / fr.width, vbw = svg.viewBox.baseVal.width, vbh = svg.viewBox.baseVal.height;
     for (const el of svg.querySelectorAll('text, path, line, circle, rect')) {
-      if (el.closest('defs')) continue;
+      if (el.closest('defs, [clip-path]')) continue; // clipped shapes are cut at their clip, not at their own box
       const r = el.getBoundingClientRect(); if (!r.width && !r.height) continue;
       const x0 = (r.left - fr.left) * k, y0 = (r.top - fr.top) * k, x1 = (r.right - fr.left) * k, y1 = (r.bottom - fr.top) * k, pad = 2;
       if (x0 < -pad || y0 < -pad || x1 > vbw + pad || y1 > vbh + pad)
