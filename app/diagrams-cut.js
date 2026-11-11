@@ -567,7 +567,7 @@ Object.assign(DIAGRAMS, {
     if (n > 0) h += DK.text((xs + xsc) / 2, yb - 8, dcN(n, 0) + ' parts', { cls: 'hott' });
     h += DK.text(x1, yb - 8, dcOk(scrap) ? 'scrap ' + dcN(scrap) + ' ' + u + (dcOk(pct) ? ' (' + dcN(pct, 1) + '%)' : '') : '', { cls: 'hott', anchor: 'end' });
     h += DK.dimH(x0, x1, yb + hb + 20, 'bar ' + dcL(v.bar, u, ''), { from: yb + hb + 2, below: true });
-    if (rem > 0) h += DK.text(x1, yb + hb + 50, 'remnant ' + dcN(rem) + ' ' + u, { cls: 'mut', anchor: 'end' });
+    if (rem > 0) h += DK.text(x0, yb - 8, 'remnant ' + dcN(rem) + ' ' + u + ' (hatched)', { cls: 'mut', anchor: 'start' });
     if (start > 0) h += DK.text(x0 + 2, yb + hb + 15, 'start facing', { cls: 'mut', anchor: 'start' });
     // One part's share, enlarged: facing allowance, the part, the cut-off kerf with the parting blade.
     const face = dcOk(v.face) ? v.face : 0, cut = dcOk(v.cut) ? v.cut : 0, tot = v.part + face + cut, ya = 150, ha = 46, xa = 96, xb = 470;
@@ -749,8 +749,10 @@ Object.assign(DIAGRAMS, {
     h += sec('hatch') + '<clipPath id="dcbsc"><rect x="0" y="0" width="' + W + '" height="' + yb.toFixed(1) + '"/></clipPath><g clip-path="url(#dcbsc)">' + sec('part') + '</g>';
     h += DK.cl(cx - Wp / 2 - 12, cy, cx + Wp / 2 + 12, cy) + DK.cl(cx, cy - Hp / 2 - 12, cx, cy + Hp / 2 + 12);
     // Blade a third of the way down, cutting downwards; kerf above it.
-    h += DK.rect(14, yb - 14, 300, 14, 'tool') + dcTeeth(14, 314, yb, 9, 1, 'hot');
-    h += DK.arrow(232, yb - 30, 300, yb - 30, 'dim') + DK.text(228, yb - 26, 'blade', { cls: 'mut', anchor: 'end' });
+    // The blade stops short of the height dimension on the right.
+    const xe = Math.min(314, cx + Wp / 2 + 44);
+    h += DK.rect(14, yb - 14, xe - 14, 14, 'tool') + dcTeeth(14, xe, yb, 9, 1, 'hot');
+    h += DK.arrow(xe - 82, yb - 30, xe - 14, yb - 30, 'dim') + DK.text(xe - 86, yb - 26, 'blade', { cls: 'mut', anchor: 'end' });
     const t1 = dcRow(rows, 'Cut time from the down-feed'), t2 = dcRow(rows, 'Cut time from the cutting rate'), area = (rows.find(r => r.label === 'Area cut') || {});
     h += DK.arrow(34, yb + 4, 34, yb + 50, 'hot') + DK.text(40, yb + 64, 'down-feed', { cls: 'mut', anchor: 'middle' });
     h += DK.text(cx, cy - Hp / 2 - 8, 'cut', { cls: 'mut' });
@@ -876,7 +878,7 @@ Object.assign(DIAGRAMS, {
     h += DK.text(mode === 2 ? 180 : Math.max(cxW, 74), mode === 2 ? contact[1] + 26 : (mode === 1 ? cy + rW + 30 : cy + rW + 22), wLab, { cls: 'dimt' });
     const x = 372, mU = vs.unit || '';
     h += DK.text(x, 40, dcOk(de) ? 'de ' + dcN(de) + ' ' + u : 'de', { cls: 'hott', anchor: 'start' });
-    h += dcLines(x, 58, [mode === 0 ? 'de = dw ds / (dw + ds)' : mode === 1 ? 'de = dw ds / (dw − ds)' : 'surface: de = ds', 'dashed: equivalent wheel'], {});
+    h += dcLines(x, 58, [mode === 0 ? 'de = dw ds / (dw + ds)' : mode === 1 ? 'de = dw ds / (dw − ds)' : 'surface: de = ds', mode === 2 ? '' : 'dashed: equivalent wheel'], {});
     h += dcLines(x, 100, [isFinite(vs.value) ? 'wheel ' + dcN(vs.value) + ' ' + mU : '', isFinite(vw.value) ? 'work ' + dcN(vw.value) + ' ' + vw.unit : '', dcOk(q) ? 'speed ratio q ' + dcN(q, 1) : ''], { cls: 'txt' });
     if (mark) h += dcLines(x, 160, dcWrap(mark, /OVER/.test(mark) ? 18 : 24), { cls: /OVER/.test(mark) ? 'hott' : 'mut' });
     return DK.svg(W, H, h, 'Grinding wheel and work, equivalent diameter');
