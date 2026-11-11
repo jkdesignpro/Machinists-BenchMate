@@ -1,25 +1,36 @@
-/* Shared design tokens, same family as Alkart Mega Wizard (Jacob's apps). Light/dark, JetBrains/Fusion-style tool look. */
+/* BenchMate design tokens: its own look (drafting blue and marking-out orange on cool paper; a blueprint dark theme).
+   Same token names as before so every tool file keeps working. Light and dark. */
 :root{
-  --bg:#e9ebee; --panel:#ffffff; --head:#f4f5f7; --raise:#f7f8fa; --ink:#1f2328; --muted:#636a74; --line:#d3d7dd; --soft:#eef0f3;
-  --accent:#2f6fde; --accent-ink:#ffffff; --accent2:#e3ecfb; --sel:#d6e4fa;
+  --bg:#eaeef3; --panel:#ffffff; --head:#f5f7fa; --raise:#f1f4f8; --ink:#15202c; --muted:#596574; --line:#d3dae3; --soft:#ebeff4;
+  --accent:#1557c8; --accent-ink:#ffffff; --accent2:#e1ebfc; --sel:#d7e5fb;
+  --hot:#cf4a0c; --hot2:#fdeadf;
   --g:#0b4fb3; --m:#86198f; --t:#9a4d00; --c:#7b8189; --q:#11793f;
-  --err:#c42b2b; --warn:#9a6200; --ok:#1d7a3e; --hl:#fff4c2; --gut:#9aa1aa;
-  --r:4px; --mono:"JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
-  --sans:"Segoe UI",system-ui,-apple-system,sans-serif;
+  --err:#c22f2f; --warn:#9a5a00; --ok:#18794e; --err2:#fde8e8; --warn2:#fff2d2; --ok2:#e2f4e9; --hl:#fff4c2; --gut:#9aa1aa;
+  --grid:rgba(21,87,200,.06); --shadow:0 1px 2px rgba(16,32,48,.06),0 4px 14px rgba(16,32,48,.06);
+  --r:6px; --r2:10px; --mono:"JetBrains Mono","Cascadia Mono","SF Mono",Consolas,ui-monospace,monospace;
+  --sans:"Inter","Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){--bg:#1b1c1f;--panel:#1e1f22;--head:#2b2d30;--raise:#26282b;--ink:#dfe1e5;--muted:#8b8f96;--line:#393b40;--soft:#2f3134;
-  --accent:#3d7ef0;--accent-ink:#ffffff;--accent2:#25324a;--sel:#2e436e;--g:#56a8f5;--m:#c77dbb;--t:#e3a54a;--c:#7a7e85;--q:#5fb97d;
-  --err:#f26d6d;--warn:#e0b44e;--ok:#5fb97d;--hl:#3b3520;--gut:#5f636a}
+  :root:not([data-theme="light"]){--bg:#0d1218;--panel:#141b23;--head:#18202a;--raise:#1a232e;--ink:#e3e8ee;--muted:#8794a4;--line:#293441;--soft:#1f2933;
+  --accent:#5ba0ff;--accent-ink:#08111f;--accent2:#1a2b46;--sel:#213a5f;--hot:#ff9050;--hot2:#3a2416;
+  --g:#62aefa;--m:#d08bd0;--t:#e9ab55;--c:#7d8691;--q:#63c38b;
+  --err:#f47272;--warn:#e9b44c;--ok:#5fc48a;--err2:#3d1d1d;--warn2:#3a2f14;--ok2:#163324;--hl:#3b3520;--gut:#5f6873;
+  --grid:rgba(91,160,255,.06);--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.28);color-scheme:dark}
 }
-:root[data-theme="dark"]{--bg:#1b1c1f;--panel:#1e1f22;--head:#2b2d30;--raise:#26282b;--ink:#dfe1e5;--muted:#8b8f96;--line:#393b40;--soft:#2f3134;
-  --accent:#3d7ef0;--accent-ink:#ffffff;--accent2:#25324a;--sel:#2e436e;--g:#56a8f5;--m:#c77dbb;--t:#e3a54a;--c:#7a7e85;--q:#5fb97d;
-  --err:#f26d6d;--warn:#e0b44e;--ok:#5fb97d;--hl:#3b3520;--gut:#5f636a}
+:root[data-theme="dark"]{--bg:#0d1218;--panel:#141b23;--head:#18202a;--raise:#1a232e;--ink:#e3e8ee;--muted:#8794a4;--line:#293441;--soft:#1f2933;
+  --accent:#5ba0ff;--accent-ink:#08111f;--accent2:#1a2b46;--sel:#213a5f;--hot:#ff9050;--hot2:#3a2416;
+  --g:#62aefa;--m:#d08bd0;--t:#e9ab55;--c:#7d8691;--q:#63c38b;
+  --err:#f47272;--warn:#e9b44c;--ok:#5fc48a;--err2:#3d1d1d;--warn2:#3a2f14;--ok2:#163324;--hl:#3b3520;--gut:#5f6873;
+  --grid:rgba(91,160,255,.06);--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.28);color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:12.5px/1.4 var(--sans);display:flex;flex-direction:column;overflow:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased}
 button,select,input,textarea{font:inherit;color:inherit}
 svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
-:focus-visible{outline:1px solid var(--accent);outline-offset:0}
-input,select{border:1px solid var(--line);border-radius:var(--r);padding:3px 7px;background:var(--panel);min-width:0;height:26px}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+svg.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.ic .f{fill:currentColor;stroke:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input,select{border:1px solid var(--line);border-radius:var(--r);padding:4px 8px;background:var(--panel);min-width:0;height:30px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent2)}
+[hidden]{display:none !important}

@@ -1,4 +1,5 @@
-// Tool registry. Each tool: id, group, title, desc, fields(sys) -> [{id,label,unit,def}],
+// Tool registry. Each tool: id, level ('simple' | 'advanced' | 'expert': the lowest mode that lists it), group, title, desc, fields(sys) -> [{id,label,unit,def}],
+// A field may also carry level: 'advanced' (hidden in Simple mode; its default is used).
 // calc(v, W, sys) -> [{label,value,unit,dp}], working (string), source (string).
 // `W` is the Rust (WebAssembly) formula module; no formulas are duplicated in JS.
 const R = (label, value, unit, dp = 3, chk, extra) => Object.assign({ label, value, unit, dp, chk }, extra || {});
@@ -35,12 +36,12 @@ const FLUTE_FACTOR_DEF = '';
 // Shared tool-geometry fields for the deflection and cut tools.
 const toolGeomFields = s => [
   { id: 'd', label: 'Tool (cutting) diameter D', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
-  { id: 'dsh', label: 'Shank diameter (blank = D)', unit: lenU(s), def: '' },
+  { level: 'advanced', id: 'dsh', label: 'Shank diameter (blank = D)', unit: lenU(s), def: '' },
   { id: 'L', label: 'Stick-out (holder face to tip)', unit: lenU(s), def: s === 'inch' ? 1.5 : 40 },
   { id: 'lf', label: 'Flute length (blank = treat as solid)', unit: lenU(s), def: s === 'inch' ? 1 : 26 },
-  { id: 'kf', label: 'Effective flute diameter / D (approximation)', unit: 'x D', def: FLUTE_FACTOR_DEF },
+  { level: 'advanced', id: 'kf', label: 'Effective flute diameter / D (approximation)', unit: 'x D', def: FLUTE_FACTOR_DEF },
   { id: 'mat', label: 'Tool material (sets E)', unit: '', def: 1, options: [[1, 'Solid carbide'], [2, 'HSS (M2)'], [0, 'Other: enter E below']] },
-  { id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
+  { level: 'advanced', id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
 ];
 // Returns metric geometry {d, dsh, L, lf, kf, e} plus E notes, or an error string.
 function toolGeom(v, s) {
@@ -58,13 +59,13 @@ const DXF_SOURCE = 'Autodesk DXF Reference (HEADER $INSUNITS and $MEASUREMENT; L
 
 const TOOLS = [
 {
-  id: 'rpm', group: 'Speeds and feeds', title: 'Spindle speed',
+  id: 'rpm', level: 'simple', group: 'Speeds and feeds', title: 'Spindle speed',
   pick: { map: { dia: 'dia' } },
   desc: 'Convert between spindle RPM and surface (cutting) speed.',
   fields: s => [
     { id: 'speed', label: s === 'inch' ? 'Surface speed' : 'Cutting speed Vc', unit: spdU(s), def: s === 'inch' ? 300 : 90 },
     { id: 'dia', label: 'Diameter', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
-    { id: 'rpm', label: 'Or known spindle speed', unit: 'RPM', def: '' },
+    { level: 'advanced', id: 'rpm', label: 'Or known spindle speed', unit: 'RPM', def: '' },
   ],
   calc: (v, W, s) => {
     const rows = [];
@@ -76,14 +77,14 @@ const TOOLS = [
   source: "Machinery's Handbook (speeds and feeds); ISO cutting-speed symbols",
 },
 {
-  id: 'feed', group: 'Speeds and feeds', title: 'Milling feed rate',
+  id: 'feed', level: 'simple', group: 'Speeds and feeds', title: 'Milling feed rate',
   pick: { map: { z: 'flutes' } },
   desc: 'Table feed from feed per tooth, or the reverse.',
   fields: s => [
     { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: 3000 },
     { id: 'z', label: 'Number of teeth', unit: '', def: 4 },
     { id: 'fz', label: 'Feed per tooth', unit: lenU(s), def: s === 'inch' ? 0.002 : 0.05 },
-    { id: 'vf', label: 'Or known table feed', unit: feedMinU(s), def: '' },
+    { level: 'advanced', id: 'vf', label: 'Or known table feed', unit: feedMinU(s), def: '' },
   ],
   calc: (v, W, s) => {
     const rows = [];
@@ -95,7 +96,7 @@ const TOOLS = [
   source: "Machinery's Handbook; Sandvik Coromant formulas and definitions",
 },
 {
-  id: 'mrr', group: 'Speeds and feeds', title: 'Material removal rate and power',
+  id: 'mrr', level: 'advanced', group: 'Speeds and feeds', title: 'Material removal rate and power',
   desc: 'Turning MRR with an optional power estimate. Specific cutting force kc is yours to enter; BenchMate does not guess it.',
   fields: s => s === 'inch' ? [
     { id: 'speed', label: 'Surface speed', unit: 'SFM', def: 300 },
@@ -123,7 +124,7 @@ const TOOLS = [
   source: "Sandvik Coromant formulas and definitions; Machinery's Handbook",
 },
 {
-  id: 'toollife', group: 'Speeds and feeds', title: 'Tool life and cost per part',
+  id: 'toollife', level: 'expert', group: 'Speeds and feeds', title: 'Tool life and cost per part',
   desc: 'Taylor tool life (V x T^n = C), cost per part and the tool life for lowest cost. The Taylor exponent n and constant C come from your tool maker or your own shop records; BenchMate does not guess them. Leave them blank and enter a known tool life instead if you have one.',
   fields: s => [
     { id: 'v', label: s === 'inch' ? 'Surface speed V' : 'Cutting speed Vc', unit: spdU(s), def: s === 'inch' ? 600 : 180 },
@@ -164,7 +165,7 @@ const TOOLS = [
   source: "F. W. Taylor (1907); W. W. Gilbert, Economics of Machining (ASM, 1950); Machinery's Handbook (machining econometrics)",
 },
 {
-  id: 'arcfeed', group: 'Milling', title: 'Arc feed correction',
+  id: 'arcfeed', level: 'advanced', group: 'Milling', title: 'Arc feed correction',
   pick: { map: { d: 'dia' } },
   desc: 'Programmed tool-centre feed so the cutting edge runs at the feed you want on an arc. Inside arcs need a slower centre feed, outside arcs a faster one.',
   fields: s => [
@@ -187,7 +188,7 @@ const TOOLS = [
   source: "Sandvik Coromant milling formulas (circular and helical interpolation); Machinery's Handbook",
 },
 {
-  id: 'helix', group: 'Milling', title: 'Helical interpolation and ramping',
+  id: 'helix', level: 'advanced', group: 'Milling', title: 'Helical interpolation and ramping',
   pick: { map: { d: 'dia' } },
   desc: 'Helix pitch per turn from a ramp angle, or the ramp angle from a pitch, and the axial (Z) feed. Angles are at the tool-centre path.',
   fields: s => [
@@ -216,7 +217,7 @@ const TOOLS = [
   source: "Sandvik Coromant milling formulas (circular ramping, helical interpolation); Machinery's Handbook (helix geometry)",
 },
 {
-  id: 'deflection', group: 'Milling', title: 'Tool deflection',
+  id: 'deflection', level: 'advanced', group: 'Milling', title: 'Tool deflection',
   pick: { map: { d: 'dia', dsh: 'shank', L: 'stick', lf: 'flute_len', mat: 'material' }, clear: ['dsh', 'lf'] },
   desc: 'Tip deflection of an end mill under a side (radial) force, modelled as a cantilever clamped at the holder face: solid shank, then the fluted length at an effective diameter. Enter the force, or estimate it from cutting power. The radial-to-tangential force ratio depends on engagement and tool geometry; it is yours to enter, BenchMate does not guess it.',
   fields: s => toolGeomFields(s).concat([
@@ -252,7 +253,7 @@ const TOOLS = [
   source: "Cantilever and stepped (nonprismatic) beam deflection: Gere and Goodno, Mechanics of Materials; Roark's Formulas for Stress and Strain (Ch. 8). Equivalent flute diameter concept: Kops and Vo, CIRP Annals 1990. Force from power: Sandvik Coromant milling formulas. E presets: Ceratizit and voestalpine grade data (docs/sources.md).",
 },
 {
-  id: 'cutopt', group: 'Milling', title: 'Cut check and optimiser',
+  id: 'cutopt', level: 'expert', group: 'Milling', title: 'Cut check and optimiser',
   pick: { map: { d: 'dia', dsh: 'shank', L: 'stick', lf: 'flute_len', mat: 'material', z: 'flutes' }, clear: ['dsh', 'lf'] },
   desc: 'Checks a milling cut for speed, feed, removal rate, power, torque and tool deflection against your limits and the active machine, shows which limit binds first, then finds the largest depth (ap) for your width (ae), or the largest width for your depth, inside every limit. kc and the Fr/Ft ratio are yours to enter; BenchMate does not guess them.',
   fields: s => [
@@ -332,7 +333,7 @@ const TOOLS = [
   source: "Sandvik Coromant milling formulas (n, Vf, Q, Pc, hm); Machinery's Handbook; Altintas, Manufacturing Automation, Ch. 2 (chip thickness); Gere and Goodno / Roark (beam deflection); machine limits from the active machine profile or entered here.",
 },
 {
-  id: 'chipthin', group: 'Milling', title: 'Radial chip thinning feed',
+  id: 'chipthin', level: 'advanced', group: 'Milling', title: 'Radial chip thinning feed',
   pick: { map: { d: 'dia', z: 'flutes' } },
   desc: 'With a radial width (stepover) below half the diameter the chip is thinner than the feed per tooth. Enter the chip thickness your tool maker recommends and get the feed per tooth that gives it at your stepover.',
   fields: s => [
@@ -358,7 +359,7 @@ const TOOLS = [
   source: 'Machining Doctor chip thinning calculator (RCTF); Altintas, Manufacturing Automation, Ch. 2 (h = c sin phi). See docs/sources.md.',
 },
 {
-  id: 'cornerfeed', group: 'Milling', title: 'Corner engagement and feed',
+  id: 'cornerfeed', level: 'advanced', group: 'Milling', title: 'Corner engagement and feed',
   pick: { map: { d: 'dia', z: 'flutes' } },
   desc: 'In an inside corner (or round a boss) the same stepover wraps more (or less) of the tool. Shows the engagement on the arc against the straight wall, and the feed per tooth that keeps the chip the same as on the straight wall.',
   fields: s => [
@@ -397,7 +398,7 @@ const TOOLS = [
   source: 'Engagement and chip thickness: Altintas, Manufacturing Automation, Ch. 2; arc feed: Sandvik Coromant milling formulas (circular interpolation). The arc engagement is derived here by the law of cosines and checked in the core tests against a brute-force sample of the tool circle.',
 },
 {
-  id: 'ballcusp', group: 'Milling', title: 'Ball-nose cusp height and stepover',
+  id: 'ballcusp', level: 'advanced', group: 'Milling', title: 'Ball-nose cusp height and stepover',
   pick: { map: { d: 'dia' }, types: ['Ball end mill', 'Other'] },
   desc: 'Scallop (cusp) height left between passes of a ball-nose tool on a flat or gently curved surface, or the stepover for the cusp you want.',
   fields: s => [
@@ -425,7 +426,7 @@ const TOOLS = [
   source: 'Circle geometry; the small-stepover form s^2 / (8 R) as printed by IMCO Carbide Tool (Adjustments for ball nose endmills). See docs/sources.md.',
 },
 {
-  id: 'balleff', group: 'Milling', title: 'Ball-nose effective diameter, speed and feed',
+  id: 'balleff', level: 'advanced', group: 'Milling', title: 'Ball-nose effective diameter, speed and feed',
   pick: { map: { d: 'dia', z: 'flutes' }, types: ['Ball end mill', 'Other'] },
   desc: 'At a shallow depth a ball-nose tool cuts on a smaller diameter than its size. Gives that effective diameter (with the tool tilted, if it is), the spindle speed for your cutting speed at it, and the feed per tooth that restores the chip.',
   fields: s => [
@@ -455,7 +456,7 @@ const TOOLS = [
   source: 'ISCAR, Machining Titanium guide (2019), Table 28 (de = 2 sqrt(d ap - ap^2)); IMCO Carbide Tool and Machining Doctor (feed factor D / De). The tilted form is derived from the sphere and reduces to ISCAR\'s at zero tilt (core tests).',
 },
 {
-  id: 'runout', group: 'Milling', title: 'Runout and chip load',
+  id: 'runout', level: 'expert', group: 'Milling', title: 'Runout and chip load',
   pick: { map: { z: 'flutes' } },
   desc: 'Radial runout (TIR at the cutting edges) makes one tooth cut more than the rest. Shows each tooth\'s chip, how much the worst tooth is overloaded, and the feed per tooth that keeps the worst tooth at the chip you want.',
   fields: s => [
@@ -480,7 +481,7 @@ const TOOLS = [
   source: 'Kline and DeVor, Int. J. Mach. Tool Des. Res. 23 (1983) (runout model for end milling); Altintas, Manufacturing Automation, Ch. 2. Checked in the core tests against a brute-force scan of the runout phase.',
 },
 {
-  id: 'finish', group: 'Turning', title: 'Surface finish from nose radius',
+  id: 'finish', level: 'simple', group: 'Turning', title: 'Surface finish from nose radius',
   pick: { map: { r: 'cr' }, types: ['Turning insert', 'Grooving', 'Threading', 'Boring bar', 'Other'] },
   desc: 'Theoretical roughness for a given feed and nose radius, or the feed for a target Ra. A geometric ideal: real finish is usually worse.',
   fields: s => [
@@ -500,35 +501,35 @@ const TOOLS = [
   source: "Machinery's Handbook; Sandvik Coromant formulas",
 },
 {
-  id: 'insertcode', group: 'Turning', title: 'Insert designation (ISO 1832)',
+  id: 'insertcode', level: 'advanced', group: 'Turning', title: 'Insert designation (ISO 1832)',
   desc: 'Decode or build a metric turning insert code (shape, clearance, tolerance class, type, size, thickness, corner, edge, hand, maker chipbreaker), with the insert shape drawn and the size number computed from the inscribed circle.',
   render: el => renderInsertCode(el),
   working: 'See the note under the tool. Size = cutting edge length in whole mm, l = (d/2)(cot(a1/2) + cot(a2/2)).',
   source: 'ISO 1832:2017; code meanings from the Walter, Mitsubishi Materials, Korloy, Kennametal, YG-1, ISCAR and Dormer Pramet code keys listed under the tool.',
 },
 {
-  id: 'holdercode', group: 'Turning', title: 'Toolholder designation (ISO 5608)',
+  id: 'holdercode', level: 'advanced', group: 'Turning', title: 'Toolholder designation (ISO 5608)',
   desc: 'Decode an external turning toolholder code: clamping system, insert shape, style and approach angle, clearance, hand, shank size, length and insert size.',
   render: el => renderHolderCode(el),
   working: 'See the note under the tool.',
   source: 'ISO 5608:2012; code meanings from the Mitsubishi Materials, YG-1, ZCC Cutting Tools and Dormer Pramet keys and catalogues listed under the tool.',
 },
 {
-  id: 'iso513', group: 'Turning', title: 'Cutting material groups (ISO 513)',
+  id: 'iso513', level: 'advanced', group: 'Turning', title: 'Cutting material groups (ISO 513)',
   desc: 'The P, M, K, N, S and H application groups: colour, workpiece materials, and what the number after the letter means.',
   render: el => renderIso513(el),
   working: 'Reference only.',
   source: 'ISO 513:2012; colours from Dormer Pramet, FM Carbide and Cutting Tool Engineering; numbering from Seco Tools.',
 },
 {
-  id: 'knurl', group: 'Turning', title: 'Knurling blank diameter',
+  id: 'knurl', level: 'advanced', group: 'Turning', title: 'Knurling blank diameter',
   desc: 'Blank diameter for a whole number of knurl teeth, straight or 30 degree diagonal and diamond, with pitch in mm, TPI or diametral pitch.',
   render: el => renderKnurl(el),
   working: 'D = n p / (pi cos h); p = 25.4 / TPI mm or pi / DP in. See the note under the tool.',
   source: 'Dorian Tool and Hommel+Keller (Zeus) knurling catalogues; DIN 82:1973-01, DIN 403.',
 },
 {
-  id: 'passtime', group: 'Turning', title: 'Cut time for a pass',
+  id: 'passtime', level: 'simple', group: 'Turning', title: 'Cut time for a pass',
   desc: 'Time for one turning pass.',
   fields: s => [
     { id: 'len', label: 'Length of cut', unit: lenU(s), def: s === 'inch' ? 1.5 : 40 },
@@ -541,7 +542,7 @@ const TOOLS = [
   source: "Machinery's Handbook",
 },
 {
-  id: 'taper', group: 'Turning', title: 'Taper',
+  id: 'taper', level: 'simple', group: 'Turning', title: 'Taper',
   desc: 'Included angle and taper per unit length from two diameters and a length.',
   fields: s => [
     { id: 'D', label: 'Large diameter', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
@@ -557,7 +558,7 @@ const TOOLS = [
   source: "Machinery's Handbook (tapers)",
 },
 {
-  id: 'bar', group: 'Turning', title: 'Bar stock planner',
+  id: 'bar', level: 'advanced', group: 'Turning', title: 'Bar stock planner',
   desc: 'Parts per bar, scrap, weight and cost for bar-fed and Swiss-type lathes. Density is yours to enter for your material; BenchMate does not guess it.',
   fields: s => [
     { id: 'shape', label: 'Bar shape', unit: '', def: 1, options: [[1, 'Round'], [2, 'Hex (across flats)'], [3, 'Square']] },
@@ -597,14 +598,14 @@ const TOOLS = [
   source: "Machinery's Handbook (areas of plane figures, weights of bar stock)",
 },
 {
-  id: 'lathefeed', group: 'Turning', title: 'Lathe feed: per rev and per minute',
+  id: 'lathefeed', level: 'simple', group: 'Turning', title: 'Lathe feed: per rev and per minute',
   desc: 'Convert a turning feed between per revolution (G95 / G99) and per minute (G94 / G98) at a spindle speed, or at the speed set by a cutting speed and diameter.',
   fields: s => [
     { id: 'f', label: 'Feed per revolution', unit: feedRevU(s), def: s === 'inch' ? 0.006 : 0.15 },
     { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: '' },
     { id: 'speed', label: s === 'inch' ? 'Or surface speed' : 'Or cutting speed Vc', unit: spdU(s), def: '' },
     { id: 'dia', label: 'with the diameter being cut', unit: lenU(s), def: '' },
-    { id: 'vf', label: 'Or known feed per minute', unit: feedMinU(s), def: '' },
+    { level: 'advanced', id: 'vf', label: 'Or known feed per minute', unit: feedMinU(s), def: '' },
   ],
   calc: (v, W, s) => {
     let n = v.rpm > 0 ? v.rpm : NaN;
@@ -619,7 +620,7 @@ const TOOLS = [
   source: "Sandvik Coromant turning formulas; Machinery's Handbook (feeds).",
 },
 {
-  id: 'roughtime', group: 'Turning', title: 'Multi-pass turning time',
+  id: 'roughtime', level: 'advanced', group: 'Turning', title: 'Multi-pass turning time',
   desc: 'Number of roughing passes from the stock and the largest depth of cut, and the cutting time of each, at constant spindle speed or constant surface speed with an rpm limit. Approach and retract moves are not included; add them to the length if you want them counted.',
   fields: s => [
     { id: 'd0', label: 'Stock diameter', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
@@ -659,12 +660,12 @@ const TOOLS = [
   source: "Sandvik Coromant turning formulas (n, machining time); Machinery's Handbook.",
 },
 {
-  id: 'boringbar', group: 'Turning', title: 'Boring bar deflection',
+  id: 'boringbar', level: 'advanced', group: 'Turning', title: 'Boring bar deflection',
   pick: { map: { d: 'shank', L: 'stick' }, types: ['Boring bar'] },
   desc: 'Tip deflection of a solid round boring bar under the cutting force, as a cantilever clamped at the holder, for steel, carbide or tungsten heavy metal bars, with the overhang (L/D) guidance published by bar makers.',
   fields: s => [
     { id: 'mat', label: 'Bar material (sets E)', unit: '', def: 1, options: [[1, 'Steel'], [2, 'Solid carbide'], [3, 'Tungsten heavy metal'], [0, 'Other: enter E below']] },
-    { id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
+    { level: 'advanced', id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
     { id: 'd', label: 'Bar diameter', unit: lenU(s), def: s === 'inch' ? 0.75 : 20 },
     { id: 'di', label: 'Coolant hole diameter (blank = none)', unit: lenU(s), def: '' },
     { id: 'L', label: 'Overhang (holder face to cutting edge)', unit: lenU(s), def: s === 'inch' ? 2.25 : 60 },
@@ -698,7 +699,7 @@ const TOOLS = [
   source: "Gere and Goodno, Mechanics of Materials (cantilever); Sandvik Coromant (Fc = kc ap fn); E: Ovako, Ceratizit, Plansee W-MMC brochure 09.2021; overhang guidance: Seco Tools (2019), Kennametal (The basics of boring), Cutwel (Expert guide to boring bars). See docs/sources.md.",
 },
 {
-  id: 'caxis', group: 'Turning', title: 'C-axis (polar) feed',
+  id: 'caxis', level: 'advanced', group: 'Turning', title: 'C-axis (polar) feed',
   desc: 'Mill-turn and live tooling: angular feed of the C axis for a feed along the part surface at a diameter, and the inverse time feed number (G93) for a move that combines a linear axis and C.',
   fields: s => [
     { id: 'd', label: 'Diameter the tool cuts at', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
@@ -723,21 +724,21 @@ const TOOLS = [
   source: 'Circle geometry; inverse time feed: NIST RS274NGC Interpreter, version 3 (Kramer, Proctor, Messina, NISTIR 6556, 2000). Check your control manual.',
 },
 {
-  id: 'tnrc', group: 'Turning', title: 'Tool nose radius compensation (TNRC)',
+  id: 'tnrc', level: 'advanced', group: 'Turning', title: 'Tool nose radius compensation (TNRC)',
   desc: 'Where to program the imaginary tool tip so a chamfer, taper or corner radius comes out to size without G41/G42: Z and X shifts, the tip path for any element and tip number 0 to 9 (each drawn), and what G41/G42 does instead.',
   render: el => renderTnrc(el),
   working: 'Chamfer at angle θ to Z, tip 3 or 2: dz = r (1 - tan(θ/2)) where it meets a diameter, dx = r (1 - tan((90° - θ)/2)) radial where it meets a face (2 dx on diameter). General element: the tip path is the part line moved by r n + r t (n = unit normal toward the tool, t = tip direction), ended where it meets the moved neighbour line; arcs: radius R + r convex, R - r concave, centre moved by r t. All in the Rust core (core/src/tnrc.rs).',
   source: 'Kentech Inc. / TWI Press (2000, reprinted by Florida International University) and the Industry Arena forum formulas; Haas operator manual (tip 3 OD, tip 2 boring); Haas lathe programming manual (G41/G42, approach move); NIST RS274NGC. See docs/sources.md.',
 },
 {
-  id: 'changegears', group: 'Turning', title: 'Lathe change gears',
+  id: 'changegears', level: 'advanced', group: 'Turning', title: 'Lathe change gears',
   desc: 'Gear trains from your own change gears for a thread (TPI, mm pitch, module or diametral pitch worm) on your leadscrew: simple and compound trains, closest first, with the pitch error.',
   render: el => renderChangeGears(el),
   working: 'Ratio needed = thread lead / (leadscrew lead x fixed ratio). Simple train a/b (any idler); compound (a/b) x (c/d). Error = ratio found / ratio needed - 1. Every pair (and every four) of different gears from your list is tried.',
   source: "Gear-train ratio arithmetic; Machinery's Handbook 'Lathe change gears' (by name). 127 = 5 x 25.4 (inch defined as 25.4 mm, NIST SP 811). See docs/sources.md.",
 },
 {
-  id: 'slitsaw', group: 'Sawing', title: 'Slitting saw speeds and feeds',
+  id: 'slitsaw', level: 'advanced', group: 'Sawing', title: 'Slitting saw speeds and feeds',
   pick: { map: { D: 'dia', z: 'flutes' } },
   desc: 'Spindle speed, table feed, chip thickness and cut time for a slitting or slotting saw from the saw maker\'s cutting speed and feed per tooth. A slot shallower than half the saw diameter thins the chip; the screen shows how much.',
   fields: s => [
@@ -772,7 +773,7 @@ const TOOLS = [
   source: 'Sandvik Coromant milling formulas (n, Vf); Machining Doctor (RCTF); Altintas, Ch. 2 (chip thickness); approach by circle geometry.',
 },
 {
-  id: 'bandsaw', group: 'Sawing', title: 'Bandsaw cut time',
+  id: 'bandsaw', level: 'advanced', group: 'Sawing', title: 'Bandsaw cut time',
   desc: 'Time to cut through a round, rectangular or tube section from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
   fields: s => [
     { id: 'shape', label: 'Section', unit: '', def: 1, options: [[1, 'Round bar'], [2, 'Rectangle (cut through the height)'], [3, 'Tube']] },
@@ -803,7 +804,7 @@ const TOOLS = [
   source: 'Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut); KASCO (teeth per minute = teeth per foot x blade speed). See docs/sources.md.',
 },
 {
-  id: 'sawtpi', group: 'Sawing', title: 'Saw blade pitch (TPI)',
+  id: 'sawtpi', level: 'simple', group: 'Sawing', title: 'Saw blade pitch (TPI)',
   desc: 'Coarsest blade pitch that keeps at least three teeth in the thinnest wall the blade crosses, and how many teeth a given pitch puts in the thickest part of the cut, against the makers\' upper rules of thumb.',
   fields: s => [
     { id: 'thin', label: 'Thinnest section the blade crosses (tube or angle wall)', unit: lenU(s), def: s === 'inch' ? 0.125 : 3 },
@@ -833,7 +834,7 @@ const TOOLS = [
   source: 'L.S. Starrett, Sawing starts with the material (2023); Revolution Machine Tools, Do I have the right TPI (accessed 2026-11-11). See docs/tooling.md.',
 },
 {
-  id: 'drillpoint', group: 'Drilling and tapping', title: 'Drill point length',
+  id: 'drillpoint', level: 'simple', group: 'Drilling and tapping', title: 'Drill point length',
   pick: { map: { dia: 'dia', ang: 'point' }, types: ['Drill', 'Spot', 'Other'] },
   desc: 'Axial length of the drill point.',
   fields: s => [
@@ -845,7 +846,7 @@ const TOOLS = [
   source: "Machinery's Handbook (drills)",
 },
 {
-  id: 'spotdepth', group: 'Drilling and tapping', title: 'Spot and centre drill depth',
+  id: 'spotdepth', level: 'simple', group: 'Drilling and tapping', title: 'Spot and centre drill depth',
   pick: { map: { ang: 'point' }, types: ['Spot', 'Drill', 'Chamfer', 'Other'] },
   desc: 'Depth to program a spot drill, chamfer tool point or centre drill to for a given chamfer (countersink) diameter, or the diameter a depth gives. The centre drill\'s pilot length is yours to measure or take from its maker.',
   fields: s => [
@@ -876,35 +877,35 @@ const TOOLS = [
   source: 'Right-triangle geometry of a cone (as in the Drill point length tool).',
 },
 {
-  id: 'drillchart', group: 'Drilling and tapping', title: 'Drill size chart',
+  id: 'drillchart', level: 'simple', group: 'Drilling and tapping', title: 'Drill size chart',
   desc: 'Fractional, number, letter and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Number and letter sizes show how many independent publishers print each value.',
   render: el => renderDrillChart(el),
   working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them; they are not given by a formula), so each value is what the publishers listed under the table print. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder lists the drills closest to your size, smaller first.',
   source: 'Wikipedia "Drill bit sizes"; Stoody Industrial & Welding Supply decimal equivalents chart; P. Lobben, Machinists\' and Draftsmen\'s Handbook (1910, public domain). Standards cited, not read: ASME B94.11M-1993 (twist drills, current per ASME catalogue), ISO 235:2016 (metric jobber drill sizes).',
 },
 {
-  id: 'tapdrill', group: 'Drilling and tapping', title: 'Tap drill size',
+  id: 'tapdrill', level: 'simple', group: 'Drilling and tapping', title: 'Tap drill size',
   desc: 'Hole size for a chosen percent of thread with a cutting tap or a forming (roll) tap, for ISO metric and Unified threads or any size you enter, with the nearest standard drills and the percent of thread each one gives.',
   render: el => renderTapDrill(el),
   working: 'See the note under the tool.',
   source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge; forming taps also North American Tool, Besly (Cutting Tool Engineering 1995) and MSC. ISO 68-1:2023, ASME B1.1-2024.',
 },
 {
-  id: 'taplimits', group: 'Drilling and tapping', title: 'Tap pitch diameter limits (H and D numbers)',
+  id: 'taplimits', level: 'expert', group: 'Drilling and tapping', title: 'Tap pitch diameter limits (H and D numbers)',
   desc: 'Pitch diameter band of an inch H (and L) or metric D limit tap, checked against the internal thread class (2B, 3B, 1B, 6H, 5H, 7H, 6G), with a suggested limit number and the makers\' printed recommendation where one is in hand.',
   render: el => renderTapLimits(el),
   working: 'See the note under the tool. H n: max = basic + n x 0.0005 in, band 0.0005 in through 1 in; D n: max = basic + n x 0.0005 in (OSG) or n x 0.013 mm (USCTI).',
   source: 'OSG USA tap drill and pitch diameter limit chart vol. 3 (2024); USCTI / GWS Tool Group; MSC; Cutting Tool Supply. Internal thread limits: ASME B1.1, ISO 965-1 formulas (Thread data tool).',
 },
 {
-  id: 'chatter', group: 'Chatter and vibration', title: 'Chatter finder (stable speeds)',
+  id: 'chatter', level: 'expert', group: 'Chatter and vibration', title: 'Chatter finder (stable speeds)',
   desc: 'Listen to a cut through the microphone, or type the chatter frequency, and get the tooth passing frequency and the spindle speeds where a whole number of chatter waves fit between teeth. A rule-of-thumb lobe estimate, not a full stability lobe diagram.',
   render: el => renderChatter(el),
   working: 'Tooth passing frequency f_t = n z / 60 (lathe: z = 1). Stable speed estimate for lobe N = 0, 1, 2 ...: n = 60 fc / (z (N + 1)): the tooth period then holds a whole number of chatter waves, so the wavy surface left by one tooth lines up with the next and does not feed the vibration. fc / f_t gives the lobe the cut is in now. Spectrum: Hann window, radix-2 FFT in the Rust core, averaged over a few frames; peaks within the tolerance of a spindle harmonic (runout, tooth passing and their multiples) are marked and skipped. The chatter frequency sits a little above the natural frequency it comes from, so after a change of speed listen again (Smith and Tlusty repeat the step until it settles). Use the running spindle speed, not the commanded one. Nothing is recorded or stored: the audio stays in this page while you listen and is dropped when you stop.',
   source: 'S. Smith, Finding harmony in stable cutting, Cutting Tool Engineering, Dec. 2010; S. Smith and J. Tlusty, CIRP Annals 41(1), 1992; Y. Altintas, Manufacturing Automation, 2nd ed., Ch. 3; Cooley and Tukey (1965), FFT. See docs/sources.md.',
 },
 {
-  id: 'grindspeed', group: 'Grinding', title: 'Wheel and work speed, equivalent diameter',
+  id: 'grindspeed', level: 'advanced', group: 'Grinding', title: 'Wheel and work speed, equivalent diameter',
   desc: 'Wheel surface speed or rpm, work speed and the speed ratio, equivalent wheel diameter for external, internal and surface grinding, contact length, specific removal rate and equivalent chip thickness. Always obey the maximum operating speed marked on the wheel; BenchMate never assumes one.',
   fields: s => [
     { id: 'mode', label: 'Operation', unit: '', def: 0, options: [[0, 'External cylindrical'], [1, 'Internal'], [2, 'Surface']] },
@@ -949,7 +950,7 @@ const TOOLS = [
   source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
 },
 {
-  id: 'grindtime', group: 'Grinding', title: 'Cylindrical traverse and plunge time',
+  id: 'grindtime', level: 'advanced', group: 'Grinding', title: 'Cylindrical traverse and plunge time',
   desc: 'Traverse rate from the cross-feed per work revolution (a fraction of the wheel width that you choose), overlap ratio and traverse grinding time, and plunge grinding time with spark-out.',
   fields: s => [
     { id: 'bs', label: 'Wheel width', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
@@ -983,7 +984,7 @@ const TOOLS = [
   source: 'W. B. Rowe, Principles of Modern Grinding Technology (overlap ratio); S. Malkin and C. Guo, Grinding Technology (removal rate). Times are distance / rate.',
 },
 {
-  id: 'grindsurf', group: 'Grinding', title: 'Surface grinding time',
+  id: 'grindsurf', level: 'advanced', group: 'Grinding', title: 'Surface grinding time',
   desc: 'Number of strokes and passes and the grinding time on a reciprocating surface grinder, from the table speed, cross-feed per stroke and down-feed per pass.',
   fields: s => [
     { id: 'L', label: 'Length of the part (along the table)', unit: lenU(s), def: s === 'inch' ? 8 : 200 },
@@ -1009,21 +1010,21 @@ const TOOLS = [
   source: 'Distance / rate arithmetic; surface grinding kinematics as in W. B. Rowe, Principles of Modern Grinding Technology.',
 },
 {
-  id: 'gritconv', group: 'Grinding', title: 'Grit size conversion',
+  id: 'gritconv', level: 'advanced', group: 'Grinding', title: 'Grit size conversion',
   desc: 'FEPA F (grinding wheels), ANSI / US mesh and FEPA P (coated) grit sizes in micrometres, as printed by two publishers each, with the nearest sizes in the other systems. Disagreements between publishers are shown.',
   render: el => renderGritConv(el),
   working: 'Sizes are what the publishers print (see the note under the tool for what each number means). Coarse grits are graded with sieves and fine grits by sedimentation, so a coarse grit size is a sieve opening, not a mean grain size. Nearest equivalents compare the first printed size of each grit and are only approximate.',
   source: 'Noritake (JIS R6001 tables), Hapstone, Ted Pella (3M), Steel Data. Standards cited by name: ISO 8486-1:1996 and ISO 8486-2:2007 (F grits), ISO 6344-2/-3:2021 (P grits), FEPA 42 and 43, ANSI B74.12 / B74.10 / B74.18.',
 },
 {
-  id: 'wheelcode', group: 'Grinding', title: 'Grinding wheel marking decoder',
+  id: 'wheelcode', level: 'advanced', group: 'Grinding', title: 'Grinding wheel marking decoder',
   desc: 'Decode a conventional (aluminium oxide or silicon carbide) grinding wheel specification such as A46-K8V or WA 60 K 7 V: abrasive, grit size, grade, structure, bond and the maker\'s record, with how many publishers print each meaning.',
   render: el => renderWheelCode(el),
   working: 'Order: abrasive (letters, often with a maker\'s number in front), grit (number), grade (letter A soft to Z hard), structure (number, low dense, high open; optional), bond (letters), maker\'s record. Letter meanings come from wheel makers and training publishers; where they differ (E, O, AZ), all are shown. Diamond and CBN wheels use a different marking and are not decoded here.',
   source: 'ISO 525:2020 (confirmed 2026) and ANSI B74.13-2016, cited by name; meanings as printed by United Abrasives, CGW, the US Navy Machinery Repairman manual and High Speed Training.',
 },
 {
-  id: 'wires', group: 'Threads', title: 'Thread measurement over wires',
+  id: 'wires', level: 'advanced', group: 'Threads', title: 'Thread measurement over wires',
   desc: 'Pitch diameter, best wire size and the measurement over three wires for 60 degree (UN, metric), 55 degree (Whitworth), 29 degree (ACME) and 30 degree (trapezoidal) threads.',
   fields: s => [
     { id: 'form', label: 'Thread form', unit: '', def: 60, options: [[60, '60 deg: UN, ISO metric'], [55, '55 deg: Whitworth, BSP'], [29, '29 deg: ACME'], [30, '30 deg: trapezoidal'], [291, '29 deg: Stub ACME']] },
@@ -1049,84 +1050,84 @@ const TOOLS = [
   source: "Machinery's Handbook (screw thread measurement), NBS Handbook H28 (wire method); the general angle form is geometry (docs/sources.md, Threads round 3).",
 },
 {
-  id: 'threaddata', group: 'Threads', title: 'Thread data and limits',
+  id: 'threaddata', level: 'simple', group: 'Threads', title: 'Thread data and limits',
   desc: 'Basic dimensions of ISO metric (coarse and fine) and Unified (UNC, UNF, UNEF) threads from the basic profile, with ISO 6g/6H and Unified 2A/3A/2B/3B limits computed from the standards\' formulas and checked against published tables.',
   render: el => renderThreadData(el),
   working: 'See the note under the tool.',
   source: 'ISO 68-1:2023, ISO 261:1998, ISO 262:2023, ISO 965-1:2013 (revised 2026), ASME B1.1-2024; series and published limits from the publishers listed under the tool.',
 },
 {
-  id: 'pipethreads', group: 'Threads', title: 'Pipe threads (BSP and NPT)',
+  id: 'pipethreads', level: 'simple', group: 'Threads', title: 'Pipe threads (BSP and NPT)',
   desc: 'BSP parallel (G, ISO 228-1) and taper (R / Rc / Rp, ISO 7-1) and NPT (ASME B1.20.1): threads per inch, diameters, pitch diameters, gauge and engagement lengths.',
   render: el => renderPipeThreads(el),
   working: 'See the note under the tool.',
   source: 'ISO 228-1:2000, ISO 7-1:1994 (with Cor 1:2007), ASME B1.20.1-2013 (reaffirmed 2018); series values from the publishers listed under the tool.',
 },
 {
-  id: 'whitworth', group: 'Threads', title: 'Whitworth and BA threads',
+  id: 'whitworth', level: 'advanced', group: 'Threads', title: 'Whitworth and BA threads',
   desc: 'BSW, BSF (BS 84) and BA (BS 93) threads: threads per inch, pitch, major, effective and minor diameters, thread depth and radius.',
   render: el => renderWhitworth(el),
   working: 'See the note under the tool.',
   source: 'BS 84:2007, BS 93:2008; series values from the publishers listed under the tool.',
 },
 {
-  id: 'acme', group: 'Threads', title: 'ACME and Stub ACME threads',
+  id: 'acme', level: 'advanced', group: 'Threads', title: 'ACME and Stub ACME threads',
   desc: 'ACME general purpose (2G, 3G, 4G) and centralizing (2C, 3C, 4C) threads to ASME B1.5, and Stub ACME to ASME B1.8: basic dimensions, limits of size for screw and nut, lead angle and best wire.',
   render: el => renderAcme(el),
   working: 'See the note under the tool.',
   source: 'ASME B1.5-1997 (R2024), ASME B1.8-1988 (R2021); formulas confirmed in NBS Handbook H28 (1957) and the publishers listed under the tool.',
 },
 {
-  id: 'trapezoidal', group: 'Threads', title: 'Metric trapezoidal threads (Tr)',
+  id: 'trapezoidal', level: 'advanced', group: 'Threads', title: 'Metric trapezoidal threads (Tr)',
   desc: 'ISO metric trapezoidal threads: clearance, pitch, minor and major diameters of screw and nut from the ISO 2904 basic profile, with lead for multi-start threads and best wire.',
   render: el => renderTrapezoidal(el),
   working: 'See the note under the tool.',
   source: 'ISO 2904:2020 (confirmed 2025), ISO 2901:2016, ISO 2903 (tolerances; BS ISO 2903:2016) (cited by name); published rows from the publishers listed under the tool.',
 },
 {
-  id: 'buttress', group: 'Threads', title: 'Buttress threads (7/45)',
+  id: 'buttress', level: 'expert', group: 'Threads', title: 'Buttress threads (7/45)',
   desc: 'ASME B1.9 inch buttress threads, 7 degree load flank and 45 degree clearance flank: basic thread heights, crest and root, pitch, minor and major diameters at maximum material.',
   render: el => renderButtress(el),
   working: 'See the note under the tool.',
   source: 'ASME B1.9-1973 (R2025), cited by name; constants as printed by AMESweb and derived from the geometry.',
 },
 {
-  id: 'unseries', group: 'Threads', title: 'Constant-pitch UN series and UNS',
+  id: 'unseries', level: 'advanced', group: 'Threads', title: 'Constant-pitch UN series and UNS',
   desc: '8-UN, 12-UN and 16-UN constant-pitch series up to 2 in, with basic pitch and minor diameters, and how UNS (special) threads are designated.',
   render: el => renderUnSeries(el),
   working: 'See the note under the tool.',
   source: 'ASME B1.1-2024 (cited by name); series lists from AMESweb and Torqbolt.',
 },
 {
-  id: 'unm', group: 'Threads', title: 'Unified miniature threads (UNM)',
+  id: 'unm', level: 'advanced', group: 'Threads', title: 'Unified miniature threads (UNM)',
   desc: 'UNM threads 0.30 to 1.40 mm (ASME B1.10M): pitch, basic and design diameters, root radii and published limits of size.',
   render: el => renderUnm(el),
   working: 'See the note under the tool.',
   source: 'ASME B1.10M-2004 (cited by name); Thread Check Inc. and AMESweb.',
 },
 {
-  id: 'unjunr', group: 'Threads', title: 'UNJ and UNR threads',
+  id: 'unjunr', level: 'expert', group: 'Threads', title: 'UNJ and UNR threads',
   desc: 'UNJ controlled root radius and increased internal minor diameter (ASME B1.15), and the UNR rounded-root rule for external Unified threads (ASME B1.1).',
   render: el => renderUnjUnr(el),
   working: 'See the note under the tool.',
   source: 'ASME B1.15-1995, ASME B1.1-2024 (cited by name); publishers listed under the tool.',
 },
 {
-  id: 'sti', group: 'Threads', title: 'Helical insert (STI) tapped holes',
+  id: 'sti', level: 'advanced', group: 'Threads', title: 'Helical insert (STI) tapped holes',
   desc: 'Tapped-hole thread for helical coil (wire) inserts: STI major, pitch and minor diameters from the nominal thread, with the insert makers\' published limits side by side.',
   render: el => renderSti(el),
   working: 'See the note under the tool.',
   source: 'Recoil (Alcoa Fastening Systems), Kato Fastening Systems and Heli-Coil data as reprinted by Vargus; NASM33537 and MA1567 cited by name.',
 },
 {
-  id: 'coating', group: 'Threads', title: 'Plating and coating allowance on threads',
+  id: 'coating', level: 'advanced', group: 'Threads', title: 'Plating and coating allowance on threads',
   desc: 'Pitch diameter change from a coating on the flanks (4 x thickness for 60 degree threads) and the before-coating pitch diameter limits, for screws, nuts and helical inserts.',
   render: el => renderCoating(el),
   working: 'See the note under the tool.',
   source: 'Thread Check Inc. and Kato Fastening Systems (4 x thickness rule); geometry for other thread angles.',
 },
 {
-  id: 'multistart', group: 'Threads', title: 'Multi-start thread lead and pitch',
+  id: 'multistart', level: 'advanced', group: 'Threads', title: 'Multi-start thread lead and pitch',
   desc: 'Lead from pitch and number of starts (or pitch from lead), lead angle at the pitch diameter, and how far to index or shift the tool between starts.',
   fields: s => [
     { id: 'pitch', label: s === 'inch' ? 'Pitch (distance between adjacent threads)' : 'Pitch P', unit: lenU(s), def: s === 'inch' ? 0.1 : 2 },
@@ -1150,7 +1151,7 @@ const TOOLS = [
 },
 // ---------- Gears and splines (core/src/gears.rs, drawings in app/gears.js) ----------
 {
-  id: 'spurgear', group: 'Gears and splines', title: 'Spur gear data',
+  id: 'spurgear', level: 'advanced', group: 'Gears and splines', title: 'Spur gear data',
   desc: 'Involute spur gear dimensions from the module (mm) or diametral pitch (inch): reference, base, tip and root diameters, addendum and dedendum, circular and base pitch, tooth thickness, undercut limit; give a second tooth count for the centre distance and contact ratio of the pair, with profile shift if used. Standard full-depth proportions (addendum 1, dedendum 1.25 times the module) are filled in; change them if your gear uses another basic rack.',
   fields: s => [
     s === 'inch' ? { id: 'mp', label: 'Diametral pitch P', unit: 'teeth/in', def: 10 } : { id: 'mp', label: 'Module m', unit: 'mm', def: 3 },
@@ -1202,7 +1203,7 @@ const TOOLS = [
   source: 'Basic rack: ISO 53:1998 and AGMA full-depth system (cited by name: addendum 1 m, dedendum 1.25 m). Formulas and the worked example in the tests (m 3, z 12 and 24, x 0.6 and 0.36: a = 56.4999, αw = 26.0886°) from the KHK Gear Technical Reference, calculation of gear dimensions; SDP/SI Elements of Metric Gear Technology; MESYS AG online helical gear calculation. See docs/gears.md.',
 },
 {
-  id: 'gearmeasure', group: 'Gears and splines', title: 'Gear measurement: span, pins, chordal',
+  id: 'gearmeasure', level: 'expert', group: 'Gears and splines', title: 'Gear measurement: span, pins, chordal',
   desc: 'Inspection sizes for a spur or helical gear: span (base tangent length) over k teeth, measurement over pins or balls (external) or between pins (internal) with the ideal pin size, and chordal tooth thickness and chordal height for a gear tooth vernier. Nominal values for the basic tooth thickness; subtract your backlash allowance. For a helical gear give the normal module and normal pressure angle.',
   fields: s => [
     s === 'inch' ? { id: 'mp', label: 'Normal diametral pitch P', unit: 'teeth/in', def: 10 } : { id: 'mp', label: 'Normal module m', unit: 'mm', def: 1 },
@@ -1240,7 +1241,7 @@ const TOOLS = [
   source: 'ISO 21771-1:2024 and DIN 3960 (span measurement, cited by name). KHK Gear Technical Reference, tooth thickness (span, over pins, chordal; internal gears); SDP/SI Elements of Metric Gear Technology, section 10; MESYS AG online gear calculation (worked values m 1, z 20, dp 1.7: MdK 22.2941, W2 4.7083); A. Kapelevich, Gear Technology, Jan/Feb 2011 (span form); FRENCO (two-ball size of odd helical gears, 2015). See docs/gears.md.',
 },
 {
-  id: 'helicalgear', group: 'Gears and splines', title: 'Helical gears',
+  id: 'helicalgear', level: 'advanced', group: 'Gears and splines', title: 'Helical gears',
   desc: 'Parallel-axis helical gear pair in the normal system: transverse module and pressure angle, base helix angle, pitch, base, tip and root diameters, lead, axial pitch, centre distance (with profile shift) and contact ratios. The two gears of an external pair have opposite hands.',
   fields: s => [
     s === 'inch' ? { id: 'mp', label: 'Normal diametral pitch Pn', unit: 'teeth/in', def: 8 } : { id: 'mp', label: 'Normal module mn', unit: 'mm', def: 3 },
@@ -1287,7 +1288,7 @@ const TOOLS = [
   source: 'KHK Gear Technical Reference, helical gears in the normal and transverse systems (worked example in the tests: mn 3, β 30°, z 12 and 60, xn1 0.09809: a = 125.000, da 48.153 / 213.842, df 34.657 / 200.346); SDP/SI Elements of Metric Gear Technology, section 6. See docs/gears.md.',
 },
 {
-  id: 'geartrain', group: 'Gears and splines', title: 'Gear train ratio',
+  id: 'geartrain', level: 'advanced', group: 'Gears and splines', title: 'Gear train ratio',
   desc: 'Simple and compound trains: give each driver and driven gear that mesh, up to four pairs (two gears on one shaft make the next pair). An idler only changes the direction; count it below. Output speed = input speed / ratio. To find a train for a wanted ratio from a gear set, give the ratio (input / output speed) and the set.',
   fields: s => [
     { id: 'n', label: 'Input speed', unit: 'RPM', def: 1500 },
@@ -1331,7 +1332,7 @@ const TOOLS = [
   source: 'Gear-train ratio arithmetic; KHK Gear Technical Reference and SDP/SI Elements of Metric Gear Technology, section 13 (gear trains). See docs/gears.md.',
 },
 {
-  id: 'planetary', group: 'Gears and splines', title: 'Planetary gear set',
+  id: 'planetary', level: 'expert', group: 'Gears and splines', title: 'Planetary gear set',
   desc: 'Simple planetary set (sun, planets, ring, carrier) by Willis\' formula: give two of the three speeds (0 for a held member) and leave the third blank. Also the planet tooth count, the three usual ratios and the equal-spacing check.',
   fields: s => [
     { id: 'zs', label: 'Sun teeth', unit: '', def: 24 },
@@ -1359,7 +1360,7 @@ const TOOLS = [
   source: "R. Willis, Principles of Mechanism (1841), relative-speed method (by name); KHK Gear Technical Reference and SDP/SI Elements of Metric Gear Technology, section 13 (planetary gear trains). See docs/gears.md.",
 },
 {
-  id: 'spline', group: 'Gears and splines', title: 'Involute splines (ANSI B92.1, ISO 4156)',
+  id: 'spline', level: 'expert', group: 'Gears and splines', title: 'Involute splines (ANSI B92.1, ISO 4156)',
   desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal). Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
   fields: s => [
     { id: 'std', label: 'Standard', unit: '', def: s === 'inch' ? 1 : 2, options: [[1, 'ANSI B92.1 (inch, P/2P pitch)'], [2, 'ISO 4156 (metric module)']] },
@@ -1396,7 +1397,7 @@ const TOOLS = [
   source: 'ANSI B92.1-1996 and ISO 4156-1:2021 (second edition, replaces ISO 4156-1:2005), cited by name. Factors: Engineers Edge, involute spline basic formulas (ANSI); ISO 4156:1981 table 2 in the iTeh free preview (ISO). Pin formulas as for gears (KHK). Each status is in docs/gears.md.',
 },
 {
-  id: 'worm', group: 'Gears and splines', title: 'Worm and wheel basics',
+  id: 'worm', level: 'expert', group: 'Gears and splines', title: 'Worm and wheel basics',
   desc: 'Cylindrical worm and worm wheel at 90°: lead, lead angle, ratio, wheel pitch diameter and centre distance from the axial module (or axial diametral pitch), number of starts and the worm pitch diameter.',
   fields: s => [
     s === 'inch' ? { id: 'mp', label: 'Axial diametral pitch', unit: 'teeth/in', def: 8 } : { id: 'mp', label: 'Axial module mx', unit: 'mm', def: 3 },
@@ -1420,70 +1421,70 @@ const TOOLS = [
   source: 'KHK Gear Technical Reference, cylindrical worm gear pair; SDP/SI Elements of Metric Gear Technology, section 9 (worm mesh). See docs/gears.md.',
 },
 {
-  id: 'machinetapers', group: 'Setup', title: 'Machine tapers',
+  id: 'machinetapers', level: 'simple', group: 'Setup', title: 'Machine tapers',
   desc: 'Morse, Jacobs, 7:24 steep tapers (ISO 7388-1 / SK, BT, CAT), HSK-A and R8: gauge diameters, lengths, taper per foot and angle, with pull stud (retention knob) references.',
   render: el => renderMachineTapers(el),
   working: 'Included angle = 2 atan(taper per unit length / 2). Values come from published tables, each with its publisher count.',
   source: 'ISO 296:1991 (Morse), ISO 7388-1:2007 and ISO 7388-2:2007 (7/24 shanks), ISO 7388-3:2016 (retention knobs), ISO 12164-1:2023 (HSK), ASME B5.50-2015 (R2025) (CAT), JIS B 6339 (BT, edition not confirmed); publishers listed under the tool.',
 },
 {
-  id: 'fits', group: 'Limits and fits', title: 'ISO limits and fits',
+  id: 'fits', level: 'simple', group: 'Limits and fits', title: 'ISO limits and fits',
   desc: 'IT grades, fundamental deviations and limits of any hole and shaft tolerance class up to 3150 mm (hole basis or shaft basis), including j5 to j7 and J6 to J8, with the clearance or interference of the fit.',
   render: el => renderFits(el),
   working: 'See the note under the tool.',
   source: 'ISO 286-1:2010 (with Cor 1:2013) and ISO 286-2:2010; table values from Wikipedia, Ganter, GOST 25346-89, RoyMech, Simply Bearings and OSG (JIS B 0401); over 500 mm checked against the ISO 286-1 annex formulas.',
 },
 {
-  id: 'surface', group: 'Limits and fits', title: 'Surface texture: Ra, N grades and symbols',
+  id: 'surface', level: 'simple', group: 'Limits and fits', title: 'Surface texture: Ra, N grades and symbols',
   desc: 'Ra in micrometres and microinches with the N grade, why Ra and Rz do not convert, ISO 21920-1 and ISO 1302 drawing symbols in plain words, and typical Ra by process from two publishers.',
   render: el => renderSurface(el),
   working: 'See the notes under the tool. 1 um = 39.37 uin.',
   source: 'ISO 21920-1:2021, ISO 21920-2:2021, ISO 21920-3:2021 (ISO 1302:2002 withdrawn); N grades from CERATIZIT, Werk24, Mechanical-Engineering.com and Engineers Edge; process ranges from Autodesk and Mechanical-Engineering.com.',
 },
 {
-  id: 'hardness', group: 'Limits and fits', title: 'Hardness conversion (steel, approximate)',
+  id: 'hardness', level: 'simple', group: 'Limits and fits', title: 'Hardness conversion (steel, approximate)',
   desc: 'Convert between HV, HB, HRC, HRB, HRA and tensile strength for unalloyed and low alloy steels, interpolated between published table rows, with the working shown.',
   render: el => renderHardness(el),
   working: 'Linear interpolation between adjacent rows of the ISO 18265 steel table. See the caveats under the tool.',
   source: 'ISO 18265:2013, ASTM E140-26; table as printed by Optimas and Bossard.',
 },
 {
-  id: 'shrinkfit', group: 'Limits and fits', title: 'Shrink and press fits',
+  id: 'shrinkfit', level: 'advanced', group: 'Limits and fits', title: 'Shrink and press fits',
   desc: "Temperature to heat a hub (or cool a shaft) to assemble an interference fit with a clearance, and the press-fit contact pressure, hub stress and holding torque. Expansion coefficient, E, Poisson's ratio and friction are your entries.",
   render: el => renderShrinkFit(el),
   working: 'Shrink: dT = (interference + clearance) / (alpha d). Hub with a cooled shaft: T_hub = T0 + (i + c - alpha_s d (T0 - T_s)) / (alpha_h d). Press fit (Lame): p = delta / (d/Eo ((do²+d²)/(do²-d²) + nu_o) + d/Ei ((d²+di²)/(d²-di²) - nu_i)); hub hoop stress p (do²+d²)/(do²-d²); torque mu p pi d² L / 2.',
   source: "Linear expansion dL = alpha L dT; Lame thick-cylinder interference fit as in Shigley's Mechanical Engineering Design (by name). See docs/sources.md.",
 },
 {
-  id: 'gentol', group: 'Limits and fits', title: 'General tolerances (ISO 2768-1)',
+  id: 'gentol', level: 'simple', group: 'Limits and fits', title: 'General tolerances (ISO 2768-1)',
   desc: 'Tolerance of a dimension with no tolerance of its own on an ISO 2768-f, m, c or v drawing: linear sizes, outside radii and chamfers, and angles.',
   render: el => renderGenTol(el),
   working: 'Table lookup by range (over the lower size, up to and including the upper). Angle offset = shorter side x tan(tolerance).',
   source: 'ISO 2768-1:1989 (by name; confirmed current on iso.org). Values from AmesWeb, Star Rapid, Modulus Metal, CamCut and Wevolver.',
 },
 {
-  id: 'ansifits', group: 'Limits and fits', title: 'ANSI inch fits (RC, LC, LT, LN, FN)',
+  id: 'ansifits', level: 'advanced', group: 'Limits and fits', title: 'ANSI inch fits (RC, LC, LT, LN, FN)',
   desc: 'ANSI B4.1 preferred limits and fits, 0 to 19.69 in: hole and shaft limits and the limits of clearance or interference for RC1 to RC9, LC1 to LC11, LT1 to LT6, LN1 to LN3 and FN1 to FN5, with every class of the family at that size.',
   render: el => renderAnsiFits(el),
   working: 'Limits = basic size + deviation / 1000 (deviations in thousandths). Max clearance = hole upper - shaft lower; min clearance = hole lower - shaft upper (negative = interference).',
   source: 'ANSI B4.1-1967 (R1999, R2004), by name; table as reprinted by King Saud University course material (one full source: marked "needs 2nd source"); RC5 example from Engineers Edge; symbols and descriptions from AmesWeb. See docs/inspection.md.',
 },
 {
-  id: 'prefnum', group: 'Limits and fits', title: 'Preferred numbers (Renard R5 to R80)',
+  id: 'prefnum', level: 'expert', group: 'Limits and fits', title: 'Preferred numbers (Renard R5 to R80)',
   desc: 'List the ISO 3 preferred numbers of a Renard series between two values, with the theoretical value, the step and the rounding, or find the preferred number nearest to yours.',
   render: el => renderPrefNum(el),
   working: 'Term i = 10^(i/R) (theoretical); rounded values from the published series; nearest term i = round(R log10 x).',
   source: 'ISO 3:1973 (by name); values from the iTeh Standards preview of ISO 3:1973 and Wikipedia (Renard series). See docs/inspection.md.',
 },
 {
-  id: 'bolt', group: 'Geometry', title: 'Bolt circle',
+  id: 'bolt', level: 'simple', group: 'Geometry', title: 'Bolt circle',
   desc: 'X and Y coordinates of equally spaced holes on a circle.',
   fields: s => [
     { id: 'dia', label: 'Bolt circle diameter', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
     { id: 'n', label: 'Number of holes', unit: '', def: 6 },
     { id: 'start', label: 'Start angle', unit: 'deg', def: 0 },
-    { id: 'cx', label: 'Center X', unit: lenU(s), def: 0 },
-    { id: 'cy', label: 'Center Y', unit: lenU(s), def: 0 },
+    { level: 'advanced', id: 'cx', label: 'Center X', unit: lenU(s), def: 0 },
+    { level: 'advanced', id: 'cy', label: 'Center Y', unit: lenU(s), def: 0 },
   ],
   calc: (v, W, s) => {
     if (!(v.dia > 0 && v.n >= 1 && v.n <= 360)) return [];
@@ -1499,182 +1500,182 @@ const TOOLS = [
   source: "Machinery's Handbook (hole circles)",
 },
 {
-  id: 'triangle', group: 'Geometry', title: 'Triangle solver',
+  id: 'triangle', level: 'simple', group: 'Geometry', title: 'Triangle solver',
   desc: 'Right or any triangle from three known sides and angles, including the two-solution case (two sides and an angle that is not between them).',
   render: el => renderTriangle(el),
   working: 'Angles add to 180°. Law of sines: a / sin A = b / sin B = c / sin C. Law of cosines: a² = b² + c² - 2bc cos A. Side-side-angle: sin B = b sin A / a gives no triangle (> 1), one, or two (B and 180° - B, when both leave room for C). Area = ½ ab sin C.',
   source: 'OpenStax, Algebra and Trigonometry 2e, ch. 10 (non-right triangles: law of sines incl. the ambiguous case, law of cosines). See docs/geometry.md.',
 },
 {
-  id: 'arc', group: 'Geometry', title: 'Chord, arc, sagitta and 3-point circle',
+  id: 'arc', level: 'advanced', group: 'Geometry', title: 'Chord, arc, sagitta and 3-point circle',
   desc: 'Solve an arc from any two of radius, angle, chord, sagitta and arc length; segment and sector areas; centre and radius of the circle through three points.',
   render: el => renderArc(el),
   working: 'Chord = 2R sin(θ/2); arc = Rθ (radians); sagitta = R(1 - cos(θ/2)); R from chord c and sagitta s = (c²/4 + s²) / 2s; segment area = R²/2 (θ - sin θ); sector = R²θ/2. Three points: centre where the perpendicular bisectors of two chords cross.',
   source: 'Plane geometry (OpenStax Algebra and Trigonometry 2e; circle relations). Worked examples checked in core tests. See docs/geometry.md.',
 },
 {
-  id: 'fillet', group: 'Geometry', title: 'Fillet and tangent points',
+  id: 'fillet', level: 'advanced', group: 'Geometry', title: 'Fillet and tangent points',
   desc: 'Tangent points and centre of a fillet in a corner between two lines, or blending a line into an arc, for programming.',
   render: el => renderFillet(el),
   working: 'Corner: tangent distance = r / tan(α/2), centre on the bisector at r / sin(α/2), α the angle between the legs. Line and arc: the fillet centre lies on the line offset by r and on the circle of radius R + r (outside) or R - r (inside) about the arc centre; tangent points are the foot of the perpendicular on the line and the point on the arc in line with both centres.',
   source: 'Plane geometry (BenchMate derivation; tests check each tangent point lies at r from the fillet centre). See docs/geometry.md.',
 },
 {
-  id: 'dovetail', group: 'Geometry', title: 'Dovetail and V-groove over pins',
+  id: 'dovetail', level: 'advanced', group: 'Geometry', title: 'Dovetail and V-groove over pins',
   desc: 'Measurement over (or between) pins for male and female dovetails, and pin height in a V-groove.',
   render: el => renderDovetail(el),
   working: 'A pin in a corner of angle α touches base and flank; its centre is (d/2) cot(α/2) from the sharp corner along the base. Male: M = W + d (1 + cot(α/2)). Female: M = W - d (1 + cot(α/2)). W from the other face: W = top ∓ 2h cot α. V-groove: pin top above face = (d/2)/sin(β/2) + d/2 - (W/2)/tan(β/2).',
   source: 'Plane geometry (BenchMate derivation, checked in tests by constructing the pin position). See docs/geometry.md.',
 },
 {
-  id: 'figures', group: 'Geometry', title: 'Areas and volumes',
+  id: 'figures', level: 'advanced', group: 'Geometry', title: 'Areas and volumes',
   desc: 'Area and perimeter of plane figures (squares, rectangles, trapezoids, circles, rings, ellipses, regular polygons by across flats or corners, sectors) and volume and surface of solids (box, cylinder, tube, cone, frustum, sphere, cap, pyramid, torus, hex bar), with a drawing.',
   render: el => renderFigures(el),
   working: 'Standard mensuration formulas (listed in docs/sources.md). Polygon: side = AF tan(180°/n), AC = AF / cos(180°/n), area = n side AF / 4. Ellipse perimeter: Ramanujan II approximation.',
   source: "Machinery's Handbook 'areas and volumes' (by name); see docs/sources.md.",
 },
 {
-  id: 'compound', group: 'Geometry', title: 'Compound angles',
+  id: 'compound', level: 'advanced', group: 'Geometry', title: 'Compound angles',
   desc: 'True angle and slope direction of a face tilted two ways, from the two drawing (apparent) angles or two successive tilts, and the settings for a swivel and tilt, a compound sine plate or the two views.',
   render: el => renderCompound(el),
   working: 'Face normal n = (sin C cos b, sin C sin b, cos C). Apparent angles: tan ax = tan C cos b, tan ay = tan C sin b, so tan C = sqrt(tan² ax + tan² ay). Two tilts (about X, then the tilted Y): cos C = cos a1 cos a2, sin a2 = sin C cos b, tan a1 = tan C sin b.',
   source: "Vector geometry (rotation of the face normal), BenchMate derivation with round-trip tests; Machinery's Handbook 'compound angles' (by name). See docs/sources.md.",
 },
 {
-  id: 'cycdrill', group: 'G-code cycles', title: 'Drilling and tapping cycles',
+  id: 'cycdrill', level: 'advanced', group: 'G-code cycles', title: 'Drilling and tapping cycles',
   desc: 'G81, G82, G83, G73 drilling and G84 rigid or floating tapping for a bolt circle, a grid or pasted coordinates. Backplot, cycle time, hole CSV.',
   render: el => renderDrillCycles(el),
   working: 'Holes: bolt circle x = cx + (D/2) cos(a0 + 360 i/n); grid in zigzag rows. Tapping feed per minute = pitch x rpm (feed per rev = lead). Dwell: Fanuc-style P in milliseconds without a decimal point, Haas P in seconds. Time: feed moves at F, rapids at the rapid rate, peck clearance assumed 0.5 mm (0.02 in) because the real value is a control parameter.',
   source: 'Cycle formats: FANUC Series 0i-F Plus Operator\'s Manual B-64694EN-2/01 (canned cycles); Haas Mill Programming Workbook and Haas G84 Tapping guide (haascnc.com); CIMCO CNC programming book ch. 5; makeitfrommetal.com Fanuc canned cycles (dwell P in ms, M29 rigid tapping). See docs/cycles.md.',
 },
 {
-  id: 'cyctmill', group: 'G-code cycles', title: 'Thread milling program',
+  id: 'cyctmill', level: 'advanced', group: 'G-code cycles', title: 'Thread milling program',
   desc: 'Helical thread milling program for internal or external, right or left hand threads, climb or conventional, with arc-in and arc-out, optional G41/G42 and several radial passes.',
   render: el => renderThreadMillCycle(el),
   working: 'Tool centre path radius: internal (D - d)/2, external (Dr + d)/2 with Dr the root diameter. Tool centre feed = edge feed x (D - d)/D inside, x (D + d)/D outside. Internal climb milling with M03 runs counter-clockwise (G03); external climb runs clockwise (G02). A right-hand helix rises when it turns counter-clockwise. Lead arcs: 90 degrees, tangent to the thread circle, a quarter pitch of Z each. Feed along the helix = F x sqrt(1 + (P / 2 pi r)^2) if a control applies F in 3D.',
   source: 'Feed adjustment: Harvey Performance (In The Loupe, internal and external adjusted feed, 9/16-18 example) and Travers Tool thread mill speeds and feeds (3/8-16 example). Helical G02/G03 with Z: Haas Mill Programming Workbook, P. Smid CNC Programming Handbook ch. 45. Direction rules: BenchMate derivation, checked in core tests. See docs/cycles.md.',
 },
 {
-  id: 'cycthread', group: 'G-code cycles', title: 'Lathe threading (G76 / G92)',
+  id: 'cycthread', level: 'advanced', group: 'G-code cycles', title: 'Lathe threading (G76 / G92)',
   desc: 'G76 multi-pass threading or one G92 block per pass, with an infeed table: constant volume, constant depth or your own pass depths, minimum cut, finish allowance and spring passes.',
   render: el => renderLatheThreadCycle(el),
   working: 'Depth: external 0.613435 P (to d3), internal 0.541266 P (5/8 H). Constant volume from the first cut: depth after pass n = d1 sqrt(n), each step at least the minimum cut. Over n passes: depth after pass i = ap sqrt(c_i / (n - 1)), c_1 = 0.3, c_i = i - 1. Fanuc-style G76 two blocks: P(finish passes)(pull-out x 0.1 lead)(tool angle) Q(min cut) R(finish), then X Z P(thread depth) Q(first cut) F(lead); P and Q in the least input increment without a decimal point.',
   source: 'Haas G76 page (haascnc.com: D*sqrt(N), P1-P4); ISCAR threading catalogue (infeed formula and worked example); CTE magazine "Single-point thread programming can be fun and easy" and CIMCO Edit Fanuc turning exercise (G76 two-block format); Haas Factory Outlet lathe programming (G92). See docs/cycles.md.',
 },
 {
-  id: 'cyctaper', group: 'G-code cycles', title: 'Lathe taper program',
+  id: 'cyctaper', level: 'advanced', group: 'G-code cycles', title: 'Lathe taper program',
   desc: 'Roughing passes that follow the taper, then a finish pass along the cone, external or internal, with CSS and optional nose radius compensation.',
   render: el => renderTaperCycle(el),
   working: 'Each roughing pass cuts to where the cone (plus the finish allowance) meets its diameter, then follows the cone back up so the finish allowance is even. Half angle = atan((D - d) / 2L). Finish enters on the cone extended in front of the part. Time is integrated along each move with the rpm from CSS at that diameter.',
   source: 'Taper geometry: Machinery\'s Handbook (tapers). G96/G97/G50, G41/G42: Haas Factory Outlet lathe programming; CIMCO CNC programming book, appendix D. See docs/cycles.md.',
 },
 {
-  id: 'cycgroove', group: 'G-code cycles', title: 'Groove and cut-off (CSS)',
+  id: 'cycgroove', level: 'advanced', group: 'G-code cycles', title: 'Groove and cut-off (CSS)',
   desc: 'Groove (several plunges for a wide groove, optional pecking) or cut-off program with constant surface speed, a G50 speed clamp and G97 at the end, plus the cut time with CSS.',
   render: el => renderGrooveCycle(el),
   working: 'n = 1000 Vc / (pi D) (metric) or 12 V / (pi D) (inch), limited to the G50 clamp. Plunge time with CSS from D0 to D1: (D0² - D1²) / (4 f k) with k = 1000 Vc / pi, and below the clamp diameter k / n_max the time is (D/2) / (f n_max).',
   source: 'CSS rpm: Sandvik Coromant turning formulas [SAN]. Time: BenchMate integration of dr / (f n), checked against numerical integration in core tests. G50/G96/G97: Haas Factory Outlet lathe programming; Fanuc G-code system A article (industrialmonitordirect). See docs/cycles.md.',
 },
 {
-  id: 'gsim', group: 'G-code cycles', title: 'G-code backplot (simulator)',
+  id: 'gsim', level: 'advanced', group: 'G-code cycles', title: 'G-code backplot (simulator)',
   desc: 'Paste or load a G-code program (mill or lathe, Generic ISO / Fanuc-style or Haas) and see the programmed path in 2D: rapids dashed, feeds solid, step through it block by block. Distances, extents, an estimated cycle time and every error with its line number. A backplot, not a machine verification.',
   render: el => renderGsim(el),
   working: 'Parsed and run in the Rust core (core/src/gsim.rs). G0/G1/G2/G3 with I/J/K or R (helical arcs too), G17/G18/G19, G20/G21, G90/G91 on the mill, G94/G95 (mill) and G98/G99 (lathe) feed modes, G96/G97 with the G50 clamp, G4, G28 to the intermediate point, F/S/T/M/N words and comments. An arc whose start and end radius differ by more than the tolerance is an error. Mill G73, G74, G81-G86 and G89 are drawn hole by hole (G83/G73 re-entry 0.5 mm or 0.02 in, as in the cycle generators); lathe G70 runs its P..Q contour, G90/G92/G94 are drawn as single cycles. G71-G76 roughing and threading, mill G76/G87/G88, macros and subprograms are listed as not simulated. Lathe X is a diameter, plotted as a radius. Time = length / F (per rev: / (F x rpm)); acceleration is ignored. Other controls are not yet supported.',
   source: 'FANUC Series 0i-F Plus Operator\'s Manual B-64694EN (interpolation, canned cycles, G-code system A for lathes, helical feed along the arc); Haas Mill and Lathe Operator\'s Manuals (G-code chapters); NIST RS274NGC interpreter version 3 report (arc radius check, word order). See docs/gsim.md.',
 },
 {
-  id: 'cycbroach', group: 'G-code cycles', title: 'Keyway broaching program',
+  id: 'cycbroach', level: 'expert', group: 'G-code cycles', title: 'Keyway broaching program',
   desc: 'Keyway broaching (slotting) strokes on a lathe or a mill with the spindle locked: stroke, depth per stroke, lift on the return stroke and spring strokes.',
   render: el => renderBroachCycle(el),
   working: 'Strokes = depth / depth per stroke (rounded up), then spring strokes at full depth. Each stroke: position, feed along Z to the end, lift off the cut, rapid back. Lathe X is the diameter at the cutting edge; on a mill the spindle centre is offset by the edge distance from the axis.',
   source: 'Plain G00/G01 (G98 feed per minute on the lathe, G94 on the mill): Haas Factory Outlet lathe programming; Haas Mill Programming Workbook. Spindle orientation is machine specific and not output. See docs/cycles.md.',
 },
 {
-  id: 'cycg71', group: 'G-code cycles', title: 'G71 / G70 rough and finish',
+  id: 'cycg71', level: 'advanced', group: 'G-code cycles', title: 'G71 / G70 rough and finish',
   desc: 'G71 roughing and G70 finishing from a simple profile of points (straight lines, no undercuts), outside or inside, Fanuc-style two-block or Haas one-block format.',
   render: el => renderG71Cycle(el),
   working: 'Fanuc-style: G71 U(depth) R(retract); G71 P Q U(X allowance on diameter) W F. Haas: G71 P Q U W D(depth) F. The profile blocks carry the finish feed for G70. Type I needs a profile that only grows (outside) or shrinks (inside) toward the chuck. The backplot and time use BenchMate\'s model of the roughing passes.',
   source: 'NPTEL Module 7 CNC programming (G71/G70 parameters); industrialmonitordirect Fanuc G71 parameter reference; Haas Factory Outlet lathe programming (one-block G71 D, G70). See docs/cycles.md.',
 },
 {
-  id: 'gmcodes', group: 'G-code reference', title: 'G and M codes',
+  id: 'gmcodes', level: 'simple', group: 'G-code reference', title: 'G and M codes',
   desc: 'G and M codes per control: generic ISO 6983 / RS-274, Fanuc (lathe systems A/B/C), Haas, Mitsubishi M70/M80 and MELDAS 60, Siemens 840D native and ISO mode, Heidenhain DIN/ISO, Okuma OSP and Mazak EIA/ISO. Search by code or word, filter mill or lathe, compare two controls side by side. Every row shows its source.',
   render: el => renderGmCodes(el),
   working: 'Nothing is calculated. A code is listed for a control only when the maker\'s (or machine builder\'s) public document prints it, or two independent public sources agree; otherwise it shows as not confirmed for that control. Meanings are BenchMate\'s own short wording. The default control comes from the active machine profile. The same number can mean different things on different controls (G70 is a lathe finishing cycle on Fanuc, a bolt circle on a Haas mill and inch mode on Siemens): always check your machine\'s own manual.',
   source: 'NIST RS274NGC v3 (NISTIR 6556, public domain); ISO 6983-1:2009 cited by name; LinuxCNC docs; FANUC 0i-F and 0i-F Plus manuals; Haas operator manual, mill workbook, lathe card and Haas Factory Outlet lathe manual; Mitsubishi M70L manual, MELDAS 60 manual and training texts; Siemens SINUMERIK G/M handbook and ISO Milling manual; HEIDENHAIN TNC 320 ISO manual; Okuma OSP-P200L manual; Mazak EIA/ISO turning manual. Full list under the table and in docs/gm-codes.md.',
 },
 {
-  id: 'macroref', group: 'G-code reference', title: 'Macro reference',
+  id: 'macroref', level: 'expert', group: 'G-code reference', title: 'Macro reference',
   desc: 'Macro and parameter programming per control: Fanuc Custom Macro B variables and IF / WHILE, Haas macros, Siemens R parameters and control structures, Heidenhain Q-parameter jumps, Okuma VC variables and IF branches, with sources and the places where sources disagree.',
   render: el => renderMacroRef(el),
   working: 'Nothing is calculated. Statements are in BenchMate\'s own words with the source section beside each. Variable ranges and system variable numbers depend on the control model, its options and the machine builder: check your manual before writing to any variable.',
   source: 'Tornos B Macro guide (2017); CNCCookbook; Haas Macro Programming Information (2017); Siemens SINUMERIK Job Planning manual (03/2013) and ISO Milling manual; HEIDENHAIN TNC 426 B ISO manual; ICAM pre-processor syntax pages; Okuma OSP-P200L manual and Okuma America blog. See docs/gm-codes.md.',
 },
 {
-  id: 'dxfbolt', group: 'CAD / DXF', title: 'Bolt circle DXF',
+  id: 'dxfbolt', level: 'advanced', group: 'CAD / DXF', title: 'Bolt circle DXF',
   desc: 'Equally spaced holes on a circle, with an optional outside diameter and centre bore, as a DXF file for CAM. Live preview with overall size and hole positions.',
   render: el => renderDxf(el, 'dxfbolt'),
   working: DXF_NOTE + ' Hole positions: x = (D/2) cos(a0 + 360 i / n), y = (D/2) sin(a0 + 360 i / n), the same function as the Bolt circle calculator.',
   source: DXF_SOURCE + " Hole circles: Machinery's Handbook.",
 },
 {
-  id: 'dxfgrid', group: 'CAD / DXF', title: 'Hole grid (rectangular pattern) DXF',
+  id: 'dxfgrid', level: 'advanced', group: 'CAD / DXF', title: 'Hole grid (rectangular pattern) DXF',
   desc: 'A rectangular grid of holes at a pitch in X and Y, optionally on a plate with a margin and corner radius, as a DXF file.',
   render: el => renderDxf(el, 'dxfgrid'),
   working: DXF_NOTE + ' The grid is centred on the origin (or put at the lower-left corner with the origin option). Plate size = (columns - 1) x pitch X + 2 x margin, by (rows - 1) x pitch Y + 2 x margin.',
   source: DXF_SOURCE,
 },
 {
-  id: 'dxfslot', group: 'CAD / DXF', title: 'Slot DXF (straight and arc)',
+  id: 'dxfslot', level: 'advanced', group: 'CAD / DXF', title: 'Slot DXF (straight and arc)',
   desc: 'A straight slot from its centre distance and width, at any angle, or an arc slot on a centreline radius with start and sweep angles, as one closed outline.',
   render: el => renderDxf(el, 'dxfslot'),
   working: DXF_NOTE + ' Straight slot: two straight sides and two half-circle ends (bulge 1); overall length = centre distance + width. Arc slot: outer arc (R + w/2) and inner arc (R - w/2) with bulge tan(sweep / 4), joined by half-circle ends.',
   source: DXF_SOURCE,
 },
 {
-  id: 'dxfrect', group: 'CAD / DXF', title: 'Rectangle with corner radii DXF',
+  id: 'dxfrect', level: 'advanced', group: 'CAD / DXF', title: 'Rectangle with corner radii DXF',
   desc: 'A rectangular plate with an optional corner radius and four corner holes at an inset from the edges, as a DXF file.',
   render: el => renderDxf(el, 'dxfrect'),
   working: DXF_NOTE + ' Corner arcs are 90° polyline arcs (bulge tan 22.5° = 0.414214). Corner holes are checked against the edges and the corner radius.',
   source: DXF_SOURCE,
 },
 {
-  id: 'dxfpoly', group: 'CAD / DXF', title: 'Polygon (hex, square, n sides) DXF',
+  id: 'dxfpoly', level: 'advanced', group: 'CAD / DXF', title: 'Polygon (hex, square, n sides) DXF',
   desc: 'A regular polygon of any number of sides from its size across flats or across corners, with rotation and an optional centre bore, as a DXF file. Shows across corners, across flats and side length.',
   render: el => renderDxf(el, 'dxfpoly'),
   working: DXF_NOTE + ' Across corners = 2R; across flats = 2R cos(180°/n) (even n); for odd n the flat-to-opposite-corner size is R (1 + cos(180°/n)); side = 2R sin(180°/n); area = n R² sin(360°/n) / 2.',
   source: DXF_SOURCE + " Regular polygons: Machinery's Handbook.",
 },
 {
-  id: 'dxfring', group: 'CAD / DXF', title: 'Circle and ring (washer) DXF',
+  id: 'dxfring', level: 'advanced', group: 'CAD / DXF', title: 'Circle and ring (washer) DXF',
   desc: 'A disc or a ring (washer, spacer) from its outside and inside diameters, as a DXF file.',
   render: el => renderDxf(el, 'dxfring'),
   working: DXF_NOTE,
   source: DXF_SOURCE,
 },
 {
-  id: 'dxfprofile', group: 'CAD / DXF', title: 'Keyhole, D-flat and double-D DXF',
+  id: 'dxfprofile', level: 'advanced', group: 'CAD / DXF', title: 'Keyhole, D-flat and double-D DXF',
   desc: 'Simple profiles as one closed outline: a keyhole (head circle and slot), a D-flat (a circle with one flat) and a double-D (two parallel flats), with rotation.',
   render: el => renderDxf(el, 'dxfprofile'),
   working: DXF_NOTE + ' Keyhole: the slot sides meet the head circle at y = -sqrt(R² - (w/2)²). D-flat: the flat is at A - R from the centre (A = across flat). Double-D: flats at ±A/2. The arcs are polyline arcs with bulge tan(included angle / 4).',
   source: DXF_SOURCE,
 },
 {
-  id: 'gdtguide', group: 'GD&T', title: 'GD&T reference guide',
+  id: 'gdtguide', level: 'advanced', group: 'GD&T', title: 'GD&T reference guide',
   desc: 'Datums, Rule #1 versus ISO independency, every geometric characteristic with its tolerance zone, inspection and common mistakes, modifiers, and an ASME Y14.5-2018 / ISO comparison.',
   render: el => renderGdtGuide(el),
   working: 'Reference only. Your drawing\'s standard and edition govern. Source keys next to each rule resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
   source: 'ASME Y14.5-2018 (R2024); ISO 1101:2017, ISO 5459:2024, ISO 2692:2021, ISO 8015:2011, ISO 22081:2021 (cited by name only). Public explanations from Mitutoyo, KEYENCE, Geometric Learning Systems, GD&T Basics, University of Illinois ME 170 notes, Humienny and Zdrojewski (2023) and others: see docs/gdt.md.',
 },
 {
-  id: 'gdtfcf', group: 'GD&T', title: 'Feature control frame builder',
+  id: 'gdtfcf', level: 'advanced', group: 'GD&T', title: 'Feature control frame builder',
   desc: 'Build a feature control frame, see it drawn, read it in plain English, and get a warning for combinations that are invalid or doubtful.',
   render: el => renderFcfBuilder(el),
   working: 'The checks cover the common rules (datums on form tolerances, MMC on surfaces, runout at MMC, diameter zones, modifier use, datum order). They are not a full standards review.',
   source: 'Rules as confirmed in docs/gdt.md (Geometric Learning Systems Y14.5-2018 chart, GD&T Basics, KEYENCE, University of Illinois ME 170 notes, Mitutoyo, Skill-Lync).',
 },
 {
-  id: 'gdttp', group: 'GD&T', title: 'True position check',
+  id: 'gdttp', level: 'advanced', group: 'GD&T', title: 'True position check',
   desc: 'Diametral position deviation from measured X and Y (and Z) deviations, compared with the position tolerance plus any bonus. All lengths in one unit.',
   fields: s => [
     { id: 'dx', label: 'Measured deviation dX from true position', unit: lenU(s), def: s === 'inch' ? 0.003 : 0.05 },
@@ -1710,7 +1711,7 @@ const TOOLS = [
   source: 'GD&T Basics (true position, MMC); Wevolver (true position formula); Skill-Lync and JLCCNC (bonus at MMC and LMC). Standard: ASME Y14.5-2018 (position). See docs/gdt.md.',
 },
 {
-  id: 'gdtbonus', group: 'GD&T', title: 'Bonus, virtual and resultant condition',
+  id: 'gdtbonus', level: 'advanced', group: 'GD&T', title: 'Bonus, virtual and resultant condition',
   desc: 'MMC and LMC sizes, bonus tolerance at an actual size, virtual condition and resultant condition for internal and external features of size.',
   fields: s => [
     { id: 'int', label: 'Feature', unit: '', def: 1, options: [[1, 'Internal (hole, slot)'], [0, 'External (pin, boss)']] },
@@ -1744,7 +1745,7 @@ const TOOLS = [
   source: 'GD&T Basics (virtual condition, inner/outer boundary at RFS); Skill-Lync and JLCCNC (MMC/LMC virtual condition, bonus); Open Exam Prep GDTP study guide (resultant condition at MMC). Standard: ASME Y14.5-2018. See docs/gdt.md.',
 },
 {
-  id: 'gdtconv', group: 'GD&T', title: 'Position and plus/minus conversion',
+  id: 'gdtconv', level: 'advanced', group: 'GD&T', title: 'Position and plus/minus conversion',
   desc: 'Diameter position zone that just contains a plus/minus coordinate zone, and the plus/minus zone that fits inside a position diameter.',
   fields: s => [
     { id: 'tx', label: 'Plus/minus tolerance in X', unit: lenU(s), def: s === 'inch' ? 0.005 : 0.1 },
@@ -1765,7 +1766,7 @@ const TOOLS = [
   source: 'Geometry (BenchMate derivation, tests in core/src/gdt.rs); square versus round zone explained by GD&T Basics and Wevolver (about 57% more area).',
 },
 {
-  id: 'gdtfast', group: 'GD&T', title: 'Fastener position tolerance',
+  id: 'gdtfast', level: 'advanced', group: 'GD&T', title: 'Fastener position tolerance',
   desc: 'Position tolerance (at MMC) for clearance holes from the floating and fixed fastener formulas, or the clearance hole size for given tolerances.',
   fields: s => [
     { id: 'mode', label: 'Case', unit: '', def: 1, options: [[1, 'Floating (clearance holes in both parts)'], [2, 'Fixed (fastener held in one part)']] },
@@ -1792,14 +1793,14 @@ const TOOLS = [
   source: 'ASME Y14.5 nonmandatory appendix on fastener formulas (cited, not reproduced); Open Exam Prep GDTP study guide and Skill-Lync (formulas); GD&T Basics (appendix covers fixed and floating fasteners). See docs/gdt.md.',
 },
 {
-  id: 'gdtcomp', group: 'GD&T', title: 'Composite position checker',
+  id: 'gdtcomp', level: 'expert', group: 'GD&T', title: 'Composite position checker',
   desc: 'Check a hole pattern against a composite position frame: the upper row (PLTZF) locates each hole to the datums, the lower row (FRTZF) relates the holes to each other after the best allowed shift (and rotation) of the whole group.',
   render: el => renderComposite(el),
   working: 'Upper row: each hole, diameter = 2 x sqrt(dX^2 + dY^2) from its basic location, must be within the upper tolerance plus its bonus. Lower row: BenchMate finds the shift (and, with only the primary datum in the lower row, the small rotation) of the group of lower-row zones that minimises the worst hole, max over holes of (2 x distance to its moved zone centre - bonus), and compares it with the lower tolerance. The minimisation is exact for this convex problem (nested golden-section search, checked against grid searches in the tests). Perpendicularity to datum A (the orientation the lower row also controls) is not checked here: measure it separately. Datum feature shift is not included.',
   source: 'FARO (O. Ekinci) and 3DCS help on composite position; GD&T Basics (composite vs multiple single-segment). Standard: ASME Y14.5-2018 (composite positional tolerancing, cited only). See docs/gdt.md.',
 },
 {
-  id: 'gdtprofu', group: 'GD&T', title: 'Unequal profile (U) zone',
+  id: 'gdtprofu', level: 'expert', group: 'GD&T', title: 'Unequal profile (U) zone',
   desc: 'Zone limits for a profile tolerance with the unequally disposed (U) modifier, the equivalent offset for CMM software, and a check of a measured deviation.',
   fields: s => [
     { id: 't', label: 'Total profile tolerance (first value)', unit: lenU(s), def: s === 'inch' ? 0.024 : 0.6 },
@@ -1821,35 +1822,35 @@ const TOOLS = [
   source: 'GD&T Basics (unequally disposed profile, citing Y14.5-2018 6.3.22); Open Exam Prep GDTP study guide (disposition, citing Y14.5-2009 8.3.1.2). ISO 1101:2017 writes the same idea as UZ with a signed offset (KEYENCE). See docs/gdt.md.',
 },
 {
-  id: 'gdtdof', group: 'GD&T', title: 'Datum reference frame and degrees of freedom',
+  id: 'gdtdof', level: 'expert', group: 'GD&T', title: 'Datum reference frame and degrees of freedom',
   desc: 'Step through a three-plane datum reference frame and see which of the six degrees of freedom each datum removes.',
   render: el => renderDof(el),
   working: 'Primary plane A: three or more contact points, removes Tz, Rx, Ry. Secondary plane B, square to A: two or more points, removes Tx, Rz. Tertiary plane C, square to both: one or more point, removes Ty.',
   source: 'GD&T Basics (datums and degrees of freedom); CNCCookbook (3-2-1); University of Illinois ME 170 notes (datum order). Axis assignment: BenchMate geometry. See docs/gdt.md.',
 },
 {
-  id: 'gdtstack', group: 'GD&T', title: 'Tolerance stack (worst case and RSS)',
+  id: 'gdtstack', level: 'expert', group: 'GD&T', title: 'Tolerance stack (worst case and RSS)',
   desc: 'One-dimensional stack of up to 10 dimensions: gap at nominal and mean, worst-case and root-sum-square (RSS) limits.',
   render: el => renderStack(el),
   working: 'Each dimension is centred on its mean, nominal + (plus - minus) / 2, with half tolerance (plus + minus) / 2. Gap = sum of (+/-) means. Worst case = sum of half tolerances. RSS = sqrt(sum of squared half tolerances), which assumes independent, normally distributed dimensions centred in their tolerance and made at the same capability (each half tolerance = 3 sigma). Use RSS only where that is true; otherwise use worst case. Geometric tolerances (position, profile) enter a stack as plus/minus half their zone.',
   source: 'Accendo Reliability (F. Schenkelberg) and Five Flute RSS tolerance analysis guides; BenchMate arithmetic with tests in core/src/gdt.rs.',
 },
 {
-  id: 'abbrev', group: 'Drawings', title: 'Drawing abbreviations',
+  id: 'abbrev', level: 'advanced', group: 'Drawings', title: 'Drawing abbreviations',
   desc: 'Common abbreviations on engineering drawings (CSK, CBORE, THRU, PCD, TYP, MMC...) in plain words, with how many free publishers list each.',
   render: el => renderAbbrev(el),
   working: "No calculation: BenchMate's own list and wording.",
   source: 'ASME Y14.38 and ISO 128 (by name only); Wikipedia and IS 11670:1993 (Public.Resource.Org). See docs/sources.md.',
 },
 {
-  id: 'weight', group: 'Stock and sheet metal', title: 'Stock weight',
+  id: 'weight', level: 'simple', group: 'Stock and sheet metal', title: 'Stock weight',
   desc: 'Weight of round, hex, square, tube, flat bar, plate and sheet stock, per piece, per batch and per metre or foot.',
   render: el => renderWeight(el),
   working: 'Weight = section area x length x density. Round πd²/4; hex (√3/2)s² across flats s; square s²; tube π/4 (D² - (D - 2t)²); flat, plate or sheet width x thickness. Sharp corners assumed (no corner radii on hex, square or flat).',
   source: 'Areas of plane figures; densities from the material data where Confirmed, else from your data sheet. See docs/geometry.md.',
 },
 {
-  id: 'bend', group: 'Stock and sheet metal', title: 'Sheet-metal bend allowance',
+  id: 'bend', level: 'advanced', group: 'Stock and sheet metal', title: 'Sheet-metal bend allowance',
   desc: 'Bend allowance, outside setback and bend deduction for a bend, flat length of a two-flange part, and the K-factor from a test bend.',
   fields: s => [
     { id: 't', label: 'Material thickness', unit: lenU(s), def: '' },
@@ -1876,62 +1877,62 @@ const TOOLS = [
   source: 'KETIV Technologies, Sheet metal unfold rule equations (BA, OSSB, BD, K); Aircraft Systems Tech, Making straight line bends (FAA-based: bend allowance, setback = K(R + T) with K = 1 at 90°, flat = mould line dimensions - setbacks + bend allowances). See docs/geometry.md.',
 },
 {
-  id: 'capability', group: 'Inspection and quality', title: 'Process capability (Cp, Cpk, Pp, Ppk)',
+  id: 'capability', level: 'expert', group: 'Inspection and quality', title: 'Process capability (Cp, Cpk, Pp, Ppk)',
   desc: 'Paste measurements (in production order) or enter a mean and sigma. Gives Cp, Cpk, Pp, Ppk, expected parts per million out of spec and a histogram with the fitted normal curve.',
   render: el => renderCapability(el),
   working: 'Cp = (USL - LSL) / 6 sigma; Cpk = min((USL - mean) / 3 sigma, (mean - LSL) / 3 sigma); one-sided: only the index for the limit given. Cp and Cpk use the within (short-term) sigma: average moving range / d2 (d2 = 1.128 for ranges of two consecutive values), or for subgroups of k consecutive values the mean range / d2(k). Pp and Ppk use the same formulas with the overall sample standard deviation (divisor n - 1). Expected ppm: normal tail areas beyond each limit. Histogram bins: Sturges (ceil(log2 n) + 1).',
   source: 'NIST/SEMATECH e-Handbook of Statistical Methods, 6.1.6 (capability indices, ppm table, ~50 values) and 6.3.2 (d2) (public domain); Minitab support, methods and formulas for normal capability analysis (within and overall sigma). Pp/Ppk as the same formulas on the overall sigma: one source read, to be verified. Normal tail: Numerical Recipes erfc. See docs/shop-helpers.md.',
 },
 {
-  id: 'ctrlchart', group: 'Inspection and quality', title: 'Control charts (X-bar/R, individuals)',
+  id: 'ctrlchart', level: 'expert', group: 'Inspection and quality', title: 'Control charts (X-bar/R, individuals)',
   desc: 'Individuals and moving range, or X-bar and R charts for subgroups of 2 to 10, from pasted measurements: centre lines, control limits, the charts with points beyond a limit marked, and the A2, D3, D4 constants checked against two tables.',
   render: el => renderCtrlChart(el),
   working: 'Individuals: mean +/- 3 MR-bar / 1.128; MR UCL = 3.267 MR-bar. X-bar: grand mean +/- A2 R-bar; R: D3 R-bar to D4 R-bar. See the note under the tool.',
   source: 'NIST/SEMATECH e-Handbook of Statistical Methods 6.3.2.1 and 6.3.2.2; University of York factors for control charts; d2 and d3 computed by numerical integration (core tests). See docs/inspection.md.',
 },
 {
-  id: 'sampling', group: 'Inspection and quality', title: 'Sampling plan OC curve',
+  id: 'sampling', level: 'expert', group: 'Inspection and quality', title: 'Sampling plan OC curve',
   desc: 'For a single sampling plan (sample n, accept on c or fewer defectives): chance of accepting a lot at any percent defective, the OC curve, the 95 % and 10 % points and the AOQL, plus how ISO 2859-1 / ANSI Z1.4 choose plans (tables not reproduced).',
   render: el => renderSampling(el),
   working: 'Pa = sum_{k=0..c} C(n,k) p^k (1-p)^(n-k) (binomial), Poisson with lambda = n p; AOQ = p Pa (N - n) / N.',
   source: 'Binomial and Poisson distributions; NIST/SEMATECH e-Handbook 6.2.3 (by name); ISO 2859-1:1999 and ANSI/ASQ Z1.4-2003 described by name only. See docs/inspection.md.',
 },
 {
-  id: 'tempcomp', group: 'Inspection and quality', title: 'Temperature compensation',
+  id: 'tempcomp', level: 'expert', group: 'Inspection and quality', title: 'Temperature compensation',
   desc: 'Correct a measurement taken away from the 20 °C (68 °F) reference temperature to the length at 20 °C, allowing for both the part and the gauge expanding.',
   render: el => renderTempComp(el),
   working: 'L20 = reading x (1 + a_gauge x (T_gauge - 20)) / (1 + a_part x (T_part - 20)), temperatures in °C, a in 1/K. The gauge graduations grow with its temperature; the part grows with its own. Inverse for the reading a to-size part gives. Coefficient uncertainty: L x u(a) x |T_part - 20|.',
   source: 'ISO 1:2022 (reference temperature 20 °C, cited only); T. Doiron, J. Res. NIST 112(1), 2007 (history and use of 20 °C); expansion formula dL = L a dT. See docs/shop-helpers.md.',
 },
 {
-  id: 'ballcone', group: 'Inspection and quality', title: 'Ball in a countersink or tapered bore',
+  id: 'ballcone', level: 'advanced', group: 'Inspection and quality', title: 'Ball in a countersink or tapered bore',
   desc: 'Height of a gauge ball over the face of a countersink or tapered bore, the face diameter from a ball reading, and the angle and diameter of a tapered bore from two balls.',
   render: el => renderBallCone(el),
   working: 'a = half the included angle, r = ball radius, D = diameter at the face, h = height of the ball top over the face. h = r + r / sin a - D / (2 tan a); D = 2 (r / cos a - (h - r) tan a). Two balls: sin a = (r2 - r1) / ((h2 - r2) - (h1 - r1)).',
   source: "Plane geometry (circle tangent to two lines), BenchMate derivation checked in tests by round trips; method as in Machinery's Handbook 'measuring tapers with balls' (by name). See docs/sources.md.",
 },
 {
-  id: 'taperrolls', group: 'Inspection and quality', title: 'Taper over rolls',
+  id: 'taperrolls', level: 'advanced', group: 'Inspection and quality', title: 'Taper over rolls',
   desc: 'External taper measured over a pair of rolls on gauge blocks: the measurement for a known taper, or the included angle and small-end diameter from two readings at two block heights.',
   render: el => renderTaperRolls(el),
   working: 'M = D_H + d (1 + tan(45° + a/2)), D_H = D0 + 2 H tan a (a = half angle, d = roll diameter, H = block height). Two readings: tan a = (M2 - M1) / (2 (H2 - H1)).',
   source: "Plane geometry; the same relation as Machinery's Handbook 'measuring tapers with rolls' (by name); 1 + tan(45° + a/2) = 1 + tan a + sec a checked in tests. See docs/sources.md.",
 },
 {
-  id: 'scales', group: 'Inspection and quality', title: 'Micrometer and vernier reading',
+  id: 'scales', level: 'simple', group: 'Inspection and quality', title: 'Micrometer and vernier reading',
   desc: 'A reading aid: shows a micrometer (0.01 mm, 0.001 mm, 0.001 in, 0.0001 in) or vernier caliper (0.02 mm, 0.05 mm, 0.001 in) scale at a value, and how the reading is made up.',
   render: el => renderScales(el),
   working: 'Micrometer: sleeve value + thimble division x (pitch / divisions) + vernier line x resolution. Caliper: main scale value + coinciding vernier line x resolution.',
   source: "Instrument makers' reading guides (see docs/sources.md); Machinery's Handbook 'reading verniers and micrometers' (by name).",
 },
 {
-  id: 'coolconc', group: 'Shop helpers', title: 'Coolant concentration (refractometer)',
+  id: 'coolconc', level: 'simple', group: 'Shop helpers', title: 'Coolant concentration (refractometer)',
   desc: 'Concentration of a water-miscible coolant from the refractometer reading and the fluid\'s refractometer factor.',
   fields: s => [
     { id: 'brix', label: 'Refractometer reading', unit: '°Brix', def: '' },
     { id: 'k', label: 'Refractometer factor (from the fluid data sheet)', unit: 'x', def: '' },
-    { id: 'lo', label: 'Recommended range, low (optional)', unit: '%', def: '' },
-    { id: 'hi', label: 'Recommended range, high (optional)', unit: '%', def: '' },
+    { level: 'advanced', id: 'lo', label: 'Recommended range, low (optional)', unit: '%', def: '' },
+    { level: 'advanced', id: 'hi', label: 'Recommended range, high (optional)', unit: '%', def: '' },
   ],
   calc: (v, W) => {
     if (!(v.k > 0)) return [R('Refractometer factor needed: copy it from the fluid\'s data sheet (it differs between fluids)', 'not entered', '', 0)];
@@ -1946,7 +1947,7 @@ const TOOLS = [
   source: 'Fastenal, Tool Talk: Refractometers; Zebra Skimmers, refractometer product profile. See docs/shop-helpers.md.',
 },
 {
-  id: 'coolmix', group: 'Shop helpers', title: 'Coolant mix and top-up',
+  id: 'coolmix', level: 'advanced', group: 'Shop helpers', title: 'Coolant mix and top-up',
   desc: 'How much concentrate or water to add to reach a target concentration, what mix to top up with, or what goes into a fresh fill.',
   fields: s => [
     { id: 'v', label: 'Volume in the sump now', unit: s === 'inch' ? 'US gal' : 'L', def: '' },
@@ -1979,175 +1980,175 @@ const TOOLS = [
   source: 'Volume mass balance (BenchMate derivation, checked in tests); add concentrate to water: Fastenal Tool Talk. See docs/shop-helpers.md.',
 },
 {
-  id: 'fraction', group: 'Shop helpers', title: 'Fraction, decimal and mm',
+  id: 'fraction', level: 'simple', group: 'Shop helpers', title: 'Fraction, decimal and mm',
   desc: 'Convert fractions, decimal inches and millimetres; nearest fraction (to 1/64 or another denominator) and the error.',
   render: el => renderFraction(el),
   working: '1 in = 25.4 mm exactly. Nearest fraction: numerator = round(value x denominator), then reduced by the greatest common divisor. Error = value - fraction.',
   source: 'NIST SP 811, appendix B: inch = 0.0254 m exactly (1959 definition). See docs/shop-helpers.md.',
 },
 {
-  id: 'units', group: 'Shop helpers', title: 'Unit converter',
+  id: 'units', level: 'simple', group: 'Shop helpers', title: 'Unit converter',
   desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once.',
   render: el => renderUnits(el),
   working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9).',
   source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. See docs/sources.md.',
 },
 {
-  id: 'calc', group: 'Shop helpers', title: 'Calculator',
+  id: 'calc', level: 'simple', group: 'Shop helpers', title: 'Calculator',
   desc: 'Type an expression with brackets, powers, trig (degrees or radians), roots, logs and factorials. Also degrees-minutes-seconds, prime factors and linear interpolation.',
   render: el => renderCalc(el),
   working: "BenchMate's own recursive-descent parser in the Rust core (no eval): + - * / % ^ ! and functions. Powers bind right to left and above unary minus. Involute inv a = tan a - a.",
   source: 'Operator precedence as in common mathematical convention; functions from the Rust standard library (IEEE 754 double precision). See docs/sources.md.',
 },
 {
-  id: 'economics', group: 'Shop helpers', title: 'Shop economics',
+  id: 'economics', level: 'advanced', group: 'Shop helpers', title: 'Shop economics',
   desc: 'Machine hourly rate from price, resale, life, interest and running costs; break-even quantity for a job; simple and discounted payback and net present value. All inputs are yours.',
   render: el => renderEconomics(el),
   working: 'CRF = i(1+i)^n / ((1+i)^n - 1); capital per year = (P - S) CRF + S i. Break-even = fixed / (price - variable). Payback = I / A; discounted n = -ln(1 - I i / A) / ln(1 + i); NPV = A (1 - (1+i)^-n) / i + S (1+i)^-n - I.',
   source: "Engineering economy interest formulas (Machinery's Handbook 'engineering economics', by name); see docs/sources.md.",
 },
 {
-  id: 'machines', group: 'Setup', title: 'Machine profiles',
+  id: 'machines', level: 'simple', group: 'Setup', title: 'Machine profiles',
   desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
   render: el => renderMachines(el),
   working: 'Power available at speed n: P(n) = min(P_max, T_max x 2 pi n / 60 000). Constant torque below base speed, constant power above it.',
   source: 'Standard spindle power/torque characteristic [SAN]. Machine limits come from the builder\'s spec sheet or manual.',
 },
 {
-  id: 'toollib', group: 'Setup', title: 'Tool library',
+  id: 'toollib', level: 'simple', group: 'Setup', title: 'Tool library',
   desc: 'Save your end mills, drills, taps, reamers and inserts once: type, diameter, flutes, flute length, overall length, stick-out, corner radius, material and coating, maker and part number. Then fill them into the speed, feed, cut, deflection, helix, drill point, tap drill and finish calculators. Saved in this browser; export and import as a JSON file.',
   render: el => renderToolLibrary(el),
   working: "Nothing is calculated here. Each tool keeps the units it was entered in; when it is filled into a calculator set to the other units, lengths are converted with 1 in = 25.4 mm (exact). A tap's pitch is mm for a metric tool and TPI for an inch tool. Import adds new tools and skips tools that are already in the library; it never overwrites one. Only a tool marked Solid carbide sets the carbide E preset in the deflection screens; other materials leave E as it is.",
   source: 'BenchMate design. Inch definition: NIST SP 811, appendix B.',
 },
 {
-  id: 'setupsheet', group: 'Setup', title: 'Setup sheet',
+  id: 'setupsheet', level: 'advanced', group: 'Setup', title: 'Setup sheet',
   desc: 'A printable setup sheet: job, machine, tool list with stick-out and offsets, work offsets and notes. Saved in this browser; export and import as JSON.',
   render: el => renderSetupSheet(el),
   working: 'Nothing is calculated here. Sheets are kept in this browser (localStorage) and can be moved by exporting a JSON file. Print uses a print layout without the app frame.',
   source: 'BenchMate layout.',
 },
 {
-  id: 'sinebar', group: 'Setup', title: 'Sine bar and gauge-block stack',
+  id: 'sinebar', level: 'simple', group: 'Setup', title: 'Sine bar and gauge-block stack',
   desc: 'Gauge-block height for a sine bar angle (or the angle from a stack) and the stack with the fewest blocks from a standard or your own block set.',
   render: el => renderSineBar(el),
   working: 'H = L sin(angle); angle = asin(H / L), L the centre distance of the rolls. Stack: an exact search for the fewest blocks (each block used once) that add up to the size, in steps of the set\'s finest block (0.0005 mm or 0.00005 in).',
   source: 'Set compositions as printed by Mitutoyo (via Cutwel and Transcat), Starrett and Insize; see docs/geometry.md. Sine relation: right-triangle trigonometry.',
 },
 {
-  id: 'indexing', group: 'Setup', title: 'Dividing head and rotary table indexing',
+  id: 'indexing', level: 'advanced', group: 'Setup', title: 'Dividing head and rotary table indexing',
   desc: 'Simple, angular and differential indexing with your own index plate hole circles and change gears.',
   render: el => renderIndexing(el),
   working: 'Simple: crank turns per division = ratio / N (ratio 40 on most dividing heads); the fraction must come out exactly on a hole circle. Angle: turns = ratio x angle / 360°. Differential: index as if for a nearby A\' that the plates can do, and gear the plate to the spindle with ratio x (A\' - N) / A\'; idlers: with A\' above N use 1 or 3 in a simple train, below N none or 2; a compound train reverses this.',
   source: 'US Navy Machinery Repairman training manual, ch. 7 Indexing (differential indexing ratio and idlers; public domain). Plates and gears are never defaulted: enter your own. See docs/geometry.md.',
 },
 {
-  id: 'materials', group: 'Materials', title: 'Material equivalents',
+  id: 'materials', level: 'simple', group: 'Materials', title: 'Material equivalents',
   desc: 'Find comparable grades for steels, aluminium, copper alloys, titanium, nickel alloys and cast irons across US, European, UK, Japanese and Chinese systems. Every value shows how many independent publishers print it, and you can see exactly what each source says.',
   render: el => renderMaterials(el),
   working: 'Equivalents are comparable grades, not identical: chemistry and properties differ between standards. Check the actual standard or mill certificate before substituting.',
   source: 'Listed under the table and in docs/sources.md. Confirmed = two or more independent publishers agree on the key designation and none disagree with equal support.',
 },
 {
-  id: 'tempercolours', group: 'Materials', title: 'Temper and heat-tint colours',
+  id: 'tempercolours', level: 'advanced', group: 'Materials', title: 'Temper and heat-tint colours',
   desc: 'Oxide colours of plain carbon steel against temperature, and the heat-tint colours of stainless steel, with each publisher\'s temperature. Colours are approximate and depend on time.',
   render: el => renderTemperColours(el),
   working: 'No calculation: colours and temperatures as printed; °C and °F by the unit converter. Confirmed = two independent publishers within 10 °C.',
   source: 'US Navy AM training manual, West Yorkshire Steel, Wikipedia (Kraemer 1983; BSSA chart), Heat Treat Today. See docs/materials-reference.md.',
 },
 {
-  id: 'heattreat', group: 'Materials', title: 'Heat treatment reference',
+  id: 'heattreat', level: 'advanced', group: 'Materials', title: 'Heat treatment reference',
   desc: 'Heat treatment terms in plain words, and annealing, hardening, quench and tempering temperatures for 1045, 4140, 4340, O1, A2, D2, S7, H13, M2, 416, 420, 440C and 17-4PH H900 to H1150, side by side from the steel makers.',
   render: el => renderHeatTreat(el),
   working: 'No calculation: temperatures as printed by each publisher, °F and °C by the unit converter. Confirmed = two independent publishers print the same range within 3 °C. Follow the data sheet of your steel.',
   source: 'Uddeholm, Doerrenberg, Lucefin, Hudson Tool Steel, GMH Gruppe, Atlas Steels, Aalco, ATI data sheets. See docs/materials-reference.md.',
 },
 {
-  id: 'galvanic', group: 'Materials', title: 'Galvanic series and two-metal check',
+  id: 'galvanic', level: 'advanced', group: 'Materials', title: 'Galvanic series and two-metal check',
   desc: 'The galvanic series in seawater and an anodic index table: pick two metals to see the potential difference, which one corrodes and whether the pair passes the common rule of thumb.',
   render: el => renderGalvanic(el),
   working: 'ΔE = |E_A − E_B| (Rust core). Seawater: the more negative metal is the anode; limit 0.20 V (Gerr). Anodic index: the larger index is the anode; limits 0.15 V harsh, 0.25 V normal, 0.50 V controlled (Engineers Edge, Carr Lane).',
   source: 'D. Gerr, Controlling Galvanic Corrosion; Wikipedia, Galvanic series (MIL-STD-889C order); Engineers Edge; Carr Lane. See docs/materials-reference.md.',
 },
 {
-  id: 'plastics', group: 'Materials', title: 'Machining plastics',
+  id: 'plastics', level: 'advanced', group: 'Materials', title: 'Machining plastics',
   desc: 'Acetal, nylon 6 and 66, PEEK, UHMW-PE, PTFE, PC, acrylic, PVC, PP, ABS and PEI: maximum service temperature, expansion, annealing and each maker\'s starting turning data side by side, with practical notes.',
   render: el => renderPlastics(el),
   working: 'No calculation: values as printed, converted between ft/min, in/rev, °F and metric units. Makers\' cutting data differ; start low and test on scrap.',
   source: 'Mitsubishi Chemical Advanced Materials, Ensinger, Boedeker Plastics, W.S. Hampshire, Professional Plastics; density and expansion from the material data. See docs/materials-reference.md.',
 },
 {
-  id: 'metalid', group: 'Materials', title: 'Metal identification',
+  id: 'metalid', level: 'advanced', group: 'Materials', title: 'Metal identification',
   desc: 'Spark, magnet, chip and file tests to sort an unknown bar into a family of metals, in plain words.',
   render: el => renderMetalId(el),
   working: 'No calculation. These tests sort metals into families only; a mill certificate or PMI analysis identifies a grade.',
   source: 'US Navy Steelworker training manual (spark, chip and magnetic tests). See docs/materials-reference.md.',
 },
 {
-  id: 'boltgrade', group: 'Fasteners', title: 'Bolt grades and property classes',
+  id: 'boltgrade', level: 'advanced', group: 'Fasteners', title: 'Bolt grades and property classes',
   desc: 'ISO 898-1 property classes 4.6 to 12.9, SAE J429 grades 2, 5 and 8 and ASTM A574 socket head cap screws: proof, yield and tensile minimums with the publishers that print them, and how to read the head marks.',
   render: el => renderBoltGrades(el),
   working: 'No calculation: minimum values as printed, with the number of independent publishers that agree. Inch mode shows MPa values in ksi (1 ksi = 6.894757 MPa).',
   source: 'ISO 898-1:2013 and SAE J429, ASTM A574 (by name only); Optimas, Westfield Fasteners, Mutual Screw, Bossard, MSC, AFT Fasteners. See docs/sources.md.',
 },
 {
-  id: 'bolttorque', group: 'Fasteners', title: 'Bolt torque and preload',
+  id: 'bolttorque', level: 'simple', group: 'Fasteners', title: 'Bolt torque and preload',
   desc: 'Tightening torque from preload with the VDI 2230 relation, preload from yield utilisation or percent of proof load. Thread and head friction are yours to enter; BenchMate shows the cited typical ranges but never fills them in.',
   render: el => renderBoltTorque(el),
   working: 'MA = F (0.16 P + 0.58 d2 muG + DKm/2 muK); FM = As nu Rp0.2 / sqrt(1 + 3 [3/2 d2/d0 (P/(pi d2) + 1.155 muG)]^2). See the note under the tool.',
   source: 'VDI 2230 Part 1:2015 (R7, R13), by name only; formula also printed by FVA and by Hameedi and Völgyi (2025); friction classes from Bossard. See docs/sources.md.',
 },
 {
-  id: 'shcs', group: 'Fasteners', title: 'Socket head cap screws',
+  id: 'shcs', level: 'simple', group: 'Fasteners', title: 'Socket head cap screws',
   desc: 'Head diameter, head height and hex key of metric (ISO 4762) and inch (ASME B18.3) socket head cap screws, with clearance holes and counterbores.',
   render: el => renderShcs(el),
   working: 'No calculation: values as printed, each with its publisher count. Counterbores are maker recommendations and differ between publishers; both are shown.',
   source: 'ISO 4762:2004, ASME B18.3 (by name only); MSC, MISUMI, AFT Fasteners, American Fastener, NBK, TR Fastenings, Optimas, Fractory.',
 },
 {
-  id: 'clearance', group: 'Fasteners', title: 'Clearance holes',
+  id: 'clearance', level: 'simple', group: 'Fasteners', title: 'Clearance holes',
   desc: 'Clearance holes for bolts and screws: ISO 273 fine, medium and coarse (M1.6 to M48) and inch close, normal and free fits, with every publisher disagreement shown.',
   render: el => renderClearance(el),
   working: 'No calculation: values as printed. Inch drill names are converted with the drill chart.',
   source: 'ISO 273:1979, ASME B18.2.8 (by name only); NBK (JIS B 1001), TR Fastenings, Optimas, Fractory, MSC.',
 },
 {
-  id: 'spanner', group: 'Fasteners', title: 'Spanner and hex key sizes',
+  id: 'spanner', level: 'simple', group: 'Fasteners', title: 'Spanner and hex key sizes',
   desc: 'Width across flats for metric (ISO 272, old DIN, JIS) and inch hex heads, and the hex key for socket head cap screws. Type a spanner size to see which threads it fits.',
   render: el => renderSpanner(el),
   working: 'No calculation: values as printed. The lookup matches within 0.05 mm or 0.001 in.',
   source: 'ISO 272:1982, ASME B18.2.1, ASME B18.3 (by name only); Wikipedia, Accu, SLS Bearings and the socket screw publishers.',
 },
 {
-  id: 'tslots', group: 'Fasteners', title: 'T-slots',
+  id: 'tslots', level: 'advanced', group: 'Fasteners', title: 'T-slots',
   desc: 'T-slot dimensions for machine tool tables (ISO 299 / DIN 650): head space width and height, total depth, bolt size and slot pitch, with a section drawing.',
   render: el => renderTslots(el),
   working: 'No calculation: values as printed (min to max).',
   source: 'ISO 299:1987, DIN 650 (by name only); Engineers Edge (ASME B5.1M mm columns), iTeh preview of ISO 299.',
 },
 {
-  id: 'keys', group: 'Machine elements', title: 'Keys and keyways',
+  id: 'keys', level: 'advanced', group: 'Machine elements', title: 'Keys and keyways',
   desc: 'Parallel key size, shaft and hub keyway depths and check dimensions from the shaft diameter: metric (DIN 6885-1 / ISO 773) and inch (ASME B17.1).',
   render: el => renderKeys(el),
   working: 'Metric: d - t1 and d + t2. Inch: Y = (D - sqrt(D^2 - W^2))/2, shaft D - Y - H/2, hub D - Y + H/2. See the note under the tool.',
   source: 'DIN 6885-1, ISO 773, JIS B 1301, ASME B17.1 (by name only); fasten.it, AIMS Industrial, MISUMI, Engineers Edge, AMES.',
 },
 {
-  id: 'oring', group: 'Machine elements', title: 'O-ring glands',
+  id: 'oring', level: 'advanced', group: 'Machine elements', title: 'O-ring glands',
   desc: 'AS568 O-ring sizes and a gland check for piston, rod and face seals: gland depth, squeeze, stretch and gland fill against two seal makers\' guidance, and a groove suggested from your own targets.',
   render: el => renderOring(el),
   working: 'Squeeze = (CS - depth)/CS; stretch = (seat - ID)/ID; fill = ring volume / groove volume. See the note under the tool.',
   source: 'SAE AS568, ISO 3601-1:2012 (by name only); Parker ORD 5700 (cited); Global O-Ring and Seal, Apple Rubber; sizes from Greene Tweed, eFunda, O-Rings Inc.',
 },
 {
-  id: 'bearinglife', group: 'Machine elements', title: 'Bearing rating life (L10)',
+  id: 'bearinglife', level: 'advanced', group: 'Machine elements', title: 'Bearing rating life (L10)',
   desc: 'Basic rating life of a rolling bearing in revolutions and hours from its dynamic load rating C and the equivalent load P, and the C needed for a life.',
   render: el => renderBearingLife(el),
   working: 'L10 = (C/P)^p, p = 3 ball, 10/3 roller; L10h = 10^6 L10 / (60 n); P = X Fr + Y Fa.',
   source: 'ISO 281:2007 clause 6 (by name only). See docs/sources.md.',
 },
 {
-  id: 'section', group: 'Mechanics', title: 'Section properties',
+  id: 'section', level: 'advanced', group: 'Mechanics', title: 'Section properties',
   desc: 'Area, centroid, second moments (Ix, Iy, product and principal), section moduli and radii of gyration of a rectangle, box tube, round bar, tube, I-beam, channel, angle or tee, built up from rectangles (sharp corners).',
   fields: s => mkSecFields(s),
   calc: (v, W, s) => {
@@ -2169,7 +2170,7 @@ const TOOLS = [
   source: 'Gere and Goodno, Mechanics of Materials, ch. 12 (relations, by name); checked against closed forms and the AISC Manual area of L4x4x1/2. See docs/mechanics.md.',
 },
 {
-  id: 'beam', group: 'Mechanics', title: 'Beam deflection and bending stress',
+  id: 'beam', level: 'advanced', group: 'Mechanics', title: 'Beam deflection and bending stress',
   desc: 'Cantilever, simply supported or fixed-both-ends beam with a point load anywhere and a uniform load over the whole span (either or both): deflection, slope, reactions, shear, bending moment and bending stress, with a drawing.',
   fields: s => {
     const u = mku(s), inch = s === 'inch';
@@ -2219,7 +2220,7 @@ const TOOLS = [
   source: "Roark's Formulas for Stress and Strain, Table 8.1, and Gere and Goodno, ch. 9 (relations, by name); maxima checked against American Wood Council Design Aid No. 6, Beam Design Formulas (free). See docs/mechanics.md.",
 },
 {
-  id: 'torsion', group: 'Mechanics', title: 'Shaft torsion and power',
+  id: 'torsion', level: 'advanced', group: 'Mechanics', title: 'Shaft torsion and power',
   desc: 'Shear stress and angle of twist of a solid or hollow round shaft, torque from power and speed (or power from torque), and the solid diameter for an allowable shear stress.',
   fields: s => {
     const u = mku(s), inch = s === 'inch';
@@ -2266,7 +2267,7 @@ const TOOLS = [
   source: 'Gere and Goodno, Mechanics of Materials, ch. 3 (torsion of circular bars, power transmission; relations by name). NIST SP 811 (unit factors). See docs/mechanics.md.',
 },
 {
-  id: 'column', group: 'Mechanics', title: 'Column buckling (Euler and Johnson)',
+  id: 'column', level: 'expert', group: 'Mechanics', title: 'Column buckling (Euler and Johnson)',
   desc: 'Critical buckling load of a straight column from its length, end conditions, section and material: Euler for slender columns, the Johnson parabola for intermediate ones, switching at the transition slenderness.',
   fields: s => {
     const u = mku(s), inch = s === 'inch';
@@ -2310,7 +2311,7 @@ const TOOLS = [
   source: "Euler and Johnson relations: Gere and Goodno ch. 11; Shigley's Mechanical Engineering Design, columns (by name). Effective length factors: AISC 360-16 Commentary Table C-A-7.1 (free). See docs/mechanics.md.",
 },
 {
-  id: 'stressconc', group: 'Mechanics', title: 'Stress concentration (holes)',
+  id: 'stressconc', level: 'expert', group: 'Mechanics', title: 'Stress concentration (holes)',
   desc: 'Peak stress at a round hole in a plate under tension (finite width) and at an elliptical hole in a wide plate, with the fatigue notch factor from your notch sensitivity. Only closed forms printed by a free source are included; shoulder fillets and grooves are not.',
   fields: s => {
     const u = mku(s), inch = s === 'inch';
@@ -2354,7 +2355,7 @@ const TOOLS = [
   source: 'B. McGinty, Stress concentrations at holes, fracturemechanics.org (Kirsch solution and the finite-width fit, net-section basis); Inglis 1913 (by name); Kf relation as printed by Engineers Edge (after Marks\' Calculations for Machine Design). See docs/mechanics.md.',
 },
 {
-  id: 'fatigue', group: 'Mechanics', title: 'Fatigue: endurance limit and Goodman',
+  id: 'fatigue', level: 'expert', group: 'Mechanics', title: 'Fatigue: endurance limit and Goodman',
   desc: 'Estimated endurance limit of a steel part with Marin factors, then the fatigue factor of safety by the modified Goodman, Soderberg and Gerber lines and the first-cycle yield check, with a diagram. The endurance limit here is an estimate: use test data when you have it.',
   fields: s => {
     const u = mku(s), inch = s === 'inch';
@@ -2412,7 +2413,7 @@ const TOOLS = [
   source: "Engineers Edge, Marin endurance limit calculator (after T. H. Brown, Marks' Calculations for Machine Design): Se', ka table, kb fit. Goodman, Soderberg, Gerber and Langer lines: Shigley's Mechanical Engineering Design, ch. 6 (by name); Goodman checked against the Penn State ME 360 fatigue notes (Norton example 6-5). See docs/mechanics.md.",
 },
 {
-  id: 'chuckforce', group: 'Mechanics', title: 'Centrifugal force and chuck grip',
+  id: 'chuckforce', level: 'advanced', group: 'Mechanics', title: 'Centrifugal force and chuck grip',
   desc: 'Centrifugal force on chuck jaws and how much grip is left at speed, or the force on any rotating mass. Jaws gripping an outside diameter are flung outward and lose grip as speed rises; jaws gripping a bore gain grip. Your chuck maker\'s speed and grip data govern.',
   fields: s => {
     const u = mku(s), inch = s === 'inch';
@@ -2458,7 +2459,7 @@ const TOOLS = [
   source: 'F = m r omega^2: OpenStax University Physics Vol. 1, ch. 6.3 (by name). Grip at speed and the sign rule: VDI 3106 (by name), Optimum lathe manual section 4.23.8 (Fsp0 = Ssp (Fsp +- Fc)); one-third rule: Berg Spanntechnik speed notes (free PDF). See docs/mechanics.md.',
 },
 {
-  id: 'balance', group: 'Mechanics', title: 'Balancing (ISO 21940-11 grade G)',
+  id: 'balance', level: 'expert', group: 'Mechanics', title: 'Balancing (ISO 21940-11 grade G)',
   desc: 'Permissible residual unbalance of a rigid rotor for a balance grade G (ISO 21940-11, formerly ISO 1940-1), split over two correction planes, the correction mass at a radius, the force the unbalance makes at speed, and the grade a measured unbalance reaches.',
   fields: s => {
     const u = mku(s), inch = s === 'inch';
@@ -2493,7 +2494,7 @@ const TOOLS = [
   source: 'ISO 21940-11:2016 (formerly ISO 1940-1:2003), by name; formula, plane allocation and worked example (1000 lb rotor, 900 rpm, G 6.3: 21 oz·in per plane) from IRD Balancing Technical Paper 1, Balance quality requirements of rigid rotors (free). See docs/mechanics.md.',
 },
 {
-  id: 'critspeed', group: 'Mechanics', title: 'Critical speed of a shaft',
+  id: 'critspeed', level: 'expert', group: 'Mechanics', title: 'Critical speed of a shaft',
   desc: 'First critical (whirling) speed of a round shaft between bearings or overhung, with up to three discs (pulleys, wheels, chucks) and its own mass: Rayleigh (upper estimate) and Dunkerley (lower estimate), and the exact value for the plain shaft.',
   fields: s => {
     const u = mku(s), inch = s === 'inch';
@@ -2533,21 +2534,21 @@ const TOOLS = [
   source: 'Rayleigh and Dunkerley methods and beam frequencies: W. T. Thomson, Theory of Vibration with Applications (by name); checks: single disc sqrt(48 E I / m L^3) and the Rayleigh static-curve result sqrt(3024/31) for a plain shaft (derived in docs/mechanics.md).',
 },
 {
-  id: 'cncguide', group: 'Guides', title: 'CNC knowledge guide',
+  id: 'cncguide', level: 'advanced', group: 'Guides', title: 'CNC knowledge guide',
   desc: 'Machine axes and the right-hand rule, machine, work and tool coordinates, work, length, radius and wear offsets, program structure, climb and conventional milling, chip formation, tool wear with causes and remedies, turning and milling troubleshooting, workholding and shop safety.',
   render: el => renderCncGuide(el),
   working: 'Reference only. Your machine and control manuals govern. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
   source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
 },
 {
-  id: 'toolguide', group: 'Guides', title: 'Tooling guide',
+  id: 'toolguide', level: 'advanced', group: 'Guides', title: 'Tooling guide',
   desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps and tap limits, saw blade pitch and broken tap removal.',
   render: el => renderToolGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements without two independent public sources are marked "needs 2nd source". Coating temperatures show every value printed.',
   source: 'Tool and coating makers and distributors listed under the guide and in docs/tooling.md (data/refdata/tooling-evidence.json).',
 },
 {
-  id: 'formulas', group: 'Guides', title: 'Formula library',
+  id: 'formulas', level: 'advanced', group: 'Guides', title: 'Formula library',
   desc: 'Every formula BenchMate uses, searchable: the formula, its variables and units, the tool that uses it and its source. Click a tool name to open it.',
   render: el => renderFormulaLibrary(el),
   working: 'Built from the formula registry in app/formulas.js. The Rust core does the arithmetic in every tool; this list is for reading.',

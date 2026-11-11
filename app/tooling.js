@@ -27,8 +27,7 @@ const tp = (html, keys) => '<p>' + html + ' ' + tgTags(keys) + '</p>';
 const tgLink = (id, text) => '<button class="btn tglink" data-id="' + id + '">' + rEsc(text) + '</button>';
 function tgWireLinks(el) {
   el.querySelectorAll('.tglink').forEach(b => b.onclick = () => {
-    state.tool = b.dataset.id; try { localStorage.setItem('bm.tool', b.dataset.id); } catch (e) {}
-    renderList($('#search').value); renderTool(); $('#main').scrollTop = 0;
+    openTool(b.dataset.id);
   });
 }
 // Every group a publisher prints, never only the top one.

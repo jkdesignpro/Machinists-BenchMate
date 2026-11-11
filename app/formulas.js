@@ -350,8 +350,7 @@ function renderFormulaLibrary(el) {
           '<div class="fs">' + f.src.map(k => '<abbr class="gsrc" title="' + esc(FORMULA_SOURCES[k] || k) + '">' + k + '</abbr>').join('') + ' <span class="ms">' + esc(t.group) + '</span></div></div>';
       }).join('');
     el.querySelectorAll('.flink').forEach(b => b.onclick = () => {
-      state.tool = b.dataset.id; try { localStorage.setItem('bm.tool', b.dataset.id); } catch (e) {}
-      renderList($('#search').value); renderTool(); $('#main').scrollTop = 0;
+      openTool(b.dataset.id);
     });
   };
   const q = $('#fq', el), g = $('#fg', el);

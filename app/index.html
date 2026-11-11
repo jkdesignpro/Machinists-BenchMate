@@ -6,23 +6,33 @@
 <title>Machinists BenchMate</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="shell.css">
 </head>
 <body>
 <div id="titlebar">
-  <div class="brand"><span class="mark">BM</span>Machinists BenchMate <small id="ver"></small></div>
+  <button class="ib" id="railbtn" data-ic="menu" title="Tools" aria-label="Show the tool list"></button>
+  <a class="brand" href="#/home" title="Home"><svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><rect x="1" y="1" width="26" height="26" rx="6"/><circle cx="14" cy="14" r="6.5"/><path d="M14 4.5v19M4.5 14h19"/></svg><span>BenchMate</span><small id="ver"></small></a>
+  <div id="searchbox"><input id="search" type="search" placeholder="Search tools   (Ctrl+K)" aria-label="Search tools" autocomplete="off"><div id="searchpop" hidden></div></div>
   <div class="sp"></div>
-  <select id="machine" title="Active machine: results are checked against its limits" style="max-width:220px"></select>
-  <div class="seg" id="units"><button data-u="inch" class="on">inch</button><button data-u="mm">mm</button></div>
-  <button class="btn" id="theme">Theme</button>
+  <div class="seg" id="mode" role="group" aria-label="Mode"><button data-m="simple" title="Everyday tools, main inputs only">Simple</button><button data-m="advanced" title="Every tool and input">Advanced</button><button data-m="expert" title="Also shows the workings, constants and evidence">Expert</button></div>
+  <select id="machine" title="Active machine: results are checked against its limits"></select>
+  <div class="seg" id="units" role="group" aria-label="Units"><button data-u="inch" class="on">inch</button><button data-u="mm">mm</button></div>
+  <button class="ib" id="calcbtn" data-ic="calc" title="Calculator (Alt+C)" aria-label="Calculator"></button>
+  <button class="ib" id="menubtn" data-ic="sliders" title="View and settings" aria-label="View and settings"></button>
+  <div id="menupop" hidden></div>
 </div>
 <div id="shell">
-  <nav id="side"><input id="search" type="search" placeholder="Search tools" aria-label="Search tools"><div id="list"></div></nav>
+  <nav id="side" aria-label="Tools"><div id="list"></div></nav>
+  <div id="scrim"></div>
   <main id="main"></main>
 </div>
-<div id="status">Formulas run in Rust (WebAssembly). Results are for guidance; verify before cutting.</div>
+<div id="bbar"><button data-b="home" data-ic="home"><span>Home</span></button><button data-b="tools" data-ic="menu"><span>Tools</span></button><button data-b="search" data-ic="search"><span>Search</span></button><button data-b="calc" data-ic="calc"><span>Calculator</span></button></div>
+<div id="status">Formulas run in Rust (WebAssembly). Results are a guide: check them before you cut.</div>
+<script src="icons.js"></script>
 <script src="profiles.js"></script>
 <script src="toollib.js"></script>
 <script src="tools.js"></script>
+<script src="materials.js"></script>
 <script src="gdt.js"></script>
 <script src="shop.js"></script>
 <script src="geometry.js"></script>
@@ -43,10 +53,15 @@
 <script src="tooling.js"></script>
 <script src="formulas.js"></script>
 <script src="maths.js"></script>
-<script src="calc.js"></script>
 <script src="inspect.js"></script>
 <script src="gears.js"></script>
 <script src="mechanics.js"></script>
+<script src="calc.js"></script>
+<script src="dk.js"></script>
+<script src="diagrams.js"></script>
+<script src="workspaces.js"></script>
+<script src="tips.js"></script>
+<script src="dashboard.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
