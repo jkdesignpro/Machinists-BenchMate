@@ -578,6 +578,10 @@ pub use chatter::*;
 pub mod grinding;
 pub use grinding::*;
 pub mod tnrc;
+pub mod measure;
+pub use measure::*;
+pub mod units;
+pub mod expr;
 
 #[cfg(test)]
 mod tests {

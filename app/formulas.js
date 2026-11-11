@@ -53,6 +53,11 @@ const FORMULA_SOURCES = {
   KENTECH: 'Kentech Inc., TWI Press 2000, reprinted by Florida International University (nose radius shifts)',
   IA: 'Industry Arena / CNCzone forum, manual tool comp for a lathe (2005-2009)',
   HFO: 'Haas operator manual (Haas Factory Outlet, 12/2018): tip 3 OD, tip 2 boring',
+  BIEG: 'D. Biegert, Measuring countersink diameter using gage balls, Math Encounters, 2014',
+  NIMI: 'NIMI, CITS Fitter Trade Theory, p. 113 (taper over rollers worked set-up)',
+  EEPF: 'Engineers Edge, interference press fit cylinder design (Lamé)',
+  MITU: 'Mitutoyo America, quick guide to precision measuring instruments, 2019',
+  ISO2768: 'ISO 2768-1:1989, general tolerances (cited by name)',
   OWN: 'BenchMate derivation, with tests in benchmate-core',
 };
 
@@ -189,11 +194,32 @@ const FORMULAS = [
   F('tnrc', 'X shift where a chamfer meets a face', 'dx = r · (1 − tan((90° − θ) / 2)) = tan θ · dz  (×2 on diameter)', 'r: nose radius; θ: chamfer angle to the Z axis', ['IA', 'KENTECH']),
   F('tnrc', 'Tip path of a corner radius', 'R_tip = R + r (convex), R − r (concave); centre moved by r along the tip direction', 'R: part radius; r: nose radius', ['KENTECH', 'IA', 'OWN']),
   F('tnrc', 'Error with no compensation on a chamfer', 'e = r · (sin θ + cos θ − 1)', 'e: nose stand-off from the line; θ: chamfer angle', ['OWN']),
+  F('changegears', 'Gear ratio needed', 'i = thread lead / (leadscrew lead · fixed ratio); simple a/b, compound (a/b)·(c/d)', 'a, c: driver teeth; b, d: driven teeth', ['MH', 'OWN']),
+  F('changegears', 'Pitch error of a train', 'error = i_found / i_needed − 1', 'i: gear ratio', ['OWN']),
+  F('shrinkfit', 'Temperature rise for a shrink fit', 'ΔT = (i + c) / (α · d)', 'i: interference; c: assembly clearance; α: expansion coefficient [1/K]; d: diameter', ['MH', 'OWN']),
+  F('shrinkfit', 'Press-fit pressure (Lamé)', 'p = δ / (d/Eo · ((do² + d²)/(do² − d²) + νo) + d/Ei · ((d² + di²)/(d² − di²) − νi))', 'δ: diametral interference; do: hub outside; di: shaft bore; E, ν: modulus and Poisson ratio', ['EEPF', 'ROARK']),
+  F('shrinkfit', 'Hub hoop stress at the bore', 'σ = p · (do² + d²) / (do² − d²)', 'p: fit pressure', ['EEPF', 'ROARK']),
+  F('shrinkfit', 'Holding torque', 'T = μ · p · π · d² · L / 2', 'μ: friction coefficient; L: fit length', ['EEPF', 'OWN']),
+  F('gentol', 'Angular tolerance as a length', 'offset = shorter side · tan(tolerance)', 'tolerance from the ISO 2768-1 table', ['ISO2768', 'OWN']),
+  F('figures', 'Regular polygon from across flats', 'side = AF · tan(180°/n); AC = AF / cos(180°/n); A = n · side · AF / 4', 'n: number of sides; AF: across flats; AC: across corners', ['MH', 'OWN']),
+  F('figures', 'Ellipse perimeter (Ramanujan II)', 'P ≈ π (a + b) (1 + 3h / (10 + √(4 − 3h))), h = (a − b)² / (a + b)²', 'a, b: semi-axes', ['MH']),
+  F('compound', 'True angle from two apparent angles', 'tan C = √(tan² ax + tan² ay)', 'ax, ay: angles seen in two views at 90°', ['OWN']),
+  F('compound', 'Two tilts about X then Y', 'cos C = cos a1 · cos a2', 'a1, a2: tilt settings', ['OWN']),
+  F('ballcone', 'Ball height over a countersink face', 'h = r + r / sin a − D / (2 tan a)', 'r: ball radius; a: half the included angle; D: diameter at the face', ['BIEG', 'OWN']),
+  F('ballcone', 'Included angle from two balls', 'sin a = (r2 − r1) / ((h2 − r2) − (h1 − r1))', 'r: ball radii; h: heights of the ball tops', ['BIEG', 'OWN']),
+  F('taperrolls', 'Measurement over rolls on a taper', 'M = D_H + d · (1 + tan(45° + a/2)), D_H = D0 + 2 H tan a', 'd: roll diameter; a: half angle; H: block height; D0: small end diameter', ['NIMI', 'OWN']),
+  F('taperrolls', 'Half angle from two readings', 'tan a = (M2 − M1) / (2 (H2 − H1))', 'M: readings over rolls; H: block heights', ['NIMI', 'OWN']),
+  F('scales', 'Micrometer reading', 'reading = sleeve + thimble division · pitch / divisions + vernier line · resolution', 'pitch: spindle pitch', ['MITU']),
+  F('units', 'Unit conversion', 'x_SI = (x + offset) · factor; x_target = x_SI / factor_target − offset_target', 'offset only for temperature', ['SP811']),
+  F('calc', 'Involute function', 'inv a = tan a − a', 'a: angle in radians', ['MH']),
+  F('economics', 'Capital recovery factor', 'CRF = i (1 + i)ⁿ / ((1 + i)ⁿ − 1); capital per year = (P − S) · CRF + S · i', 'i: interest per year; n: years; P: price; S: resale', ['OWN']),
+  F('economics', 'Break-even quantity', 'Q = fixed cost / (price − variable cost)', '', ['OWN']),
+  F('economics', 'Net present value', 'NPV = A (1 − (1 + i)⁻ⁿ) / i + S (1 + i)⁻ⁿ − I', 'A: yearly saving; I: investment; S: resale', ['OWN']),
 ];
 
 // Tools that only show reference data (no formula of their own).
 const FORMULA_EXEMPT = ['holdercode', 'iso513', 'drillchart', 'tapdrill', 'gritconv', 'wheelcode', 'threaddata', 'pipethreads', 'whitworth', 'fits', 'surface', 'hardness',
-  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'cncguide', 'formulas'];
+  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'formulas'];
 
 const FLIB = { q: '', g: '' };
 function renderFormulaLibrary(el) {

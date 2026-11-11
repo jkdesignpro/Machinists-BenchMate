@@ -454,11 +454,35 @@ def build_fasteners(drills):
     return out
 
 
+# ---------------------------------------------------------------- ISO 2768-1, drawing abbreviations
+def build_iso2768():
+    ev = load_ev('iso2768-evidence.json')
+    if not ev: return None
+    out = {'sources': sources_of(ev), 'standard': ev['standard']}
+    for sec, order in (('linear', 'linear_ranges'), ('edge', 'edge_ranges'), ('angle_min', 'angle_ranges')):
+        rng = ev[order]
+        out[sec] = build_series(ev[sec], ['f', 'm', 'c', 'v'], order=lambda s, r=rng: r.index(s), exact=True)
+        out[order] = rng
+    return out
+
+
+def build_abbrev():
+    ev = load_ev('abbrev-evidence.json')
+    if not ev: return None
+    rows = []
+    for ab, own, cat in ev['own']:
+        printed = {pub: m[ab] for pub, m in ev['printed'].items() if ab in m}
+        if not printed: raise SystemExit(f'abbreviation {ab}: no publisher')
+        rows.append({'ab': ab, 'own': own, 'cat': cat, 'printed': printed,
+                     'status': 'confirmed' if len(printed) >= 2 else 'review'})
+    return {'sources': sources_of(ev), 'rows': rows}
+
+
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
            'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes(),
-           'grinding': build_grinding()}
+           'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev()}
     out['fasteners'] = build_fasteners(out['drills']['drills'])
     for sec in ('other_threads', 'tapers'):
         if not out[sec]: continue
@@ -514,6 +538,9 @@ def main():
                 for f, c in r.items():
                     if isinstance(c, dict) and c['status'] not in ('confirmed', 'review'):
                         print('    ', sec, r['size'], f, [(g['value'], g['publishers']) for g in c['groups']])
+    i2 = out['iso2768']
+    print('  iso2768', {k: dict(collections.Counter(c['status'] for r in i2[k] for f, c in r.items() if isinstance(c, dict))) for k in ('linear', 'edge', 'angle_min')})
+    print('  abbreviations', dict(collections.Counter(r['status'] for r in out['abbrev']['rows'])))
     print('  knurl pitches', [(x['p'], x['status']) for x in out['knurl']['pitches_mm']])
 
 

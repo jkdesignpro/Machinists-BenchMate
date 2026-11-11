@@ -450,3 +450,74 @@ pub extern "C" fn tnrc_line(r: f64, tip: f64, z1: f64, x1: f64, z2: f64, x2: f64
 #[no_mangle] #[allow(clippy::too_many_arguments)]
 pub extern "C" fn tnrc_arc(r: f64, tip: f64, z1: f64, x1: f64, z2: f64, x2: f64, rp: f64, ccw: f64, side: f64) -> f64 {
     set_out(c::tnrc::arc_path(r, tip.max(0.0) as u32, z1, x1, z2, x2, rp, ccw, side).to_vec()) }
+// Measurement and shop maths (core/src/measure.rs)
+fn pick<const N: usize>(a: [f64; N], which: f64) -> f64 { a.get(which as usize).copied().unwrap_or(f64::NAN) }
+f1!(ball_height_in_cone, c::ball_height_in_cone, ball_d, face_d, included);
+f1!(cone_face_dia_from_ball, c::cone_face_dia_from_ball, ball_d, height, included);
+/// Two balls in a tapered bore: which 0 included angle, 1 face diameter.
+#[no_mangle] pub extern "C" fn cone_two_balls(d1: f64, h1: f64, d2: f64, h2: f64, which: f64) -> f64 { pick(c::cone_from_two_balls(d1, h1, d2, h2), which) }
+f1!(taper_over_rolls, c::taper_over_rolls, dia0, included, d, h);
+/// External taper from two roll measurements: which 0 included angle, 1 diameter at the plate.
+#[no_mangle] pub extern "C" fn taper_from_rolls(d: f64, m1: f64, h1: f64, m2: f64, h2: f64, which: f64) -> f64 { pick(c::taper_from_rolls(d, m1, h1, m2, h2), which) }
+f1!(shrink_fit_dt, c::shrink_fit_dt, d, interference, clearance, alpha);
+f1!(shrink_fit_hub_temp, c::shrink_fit_hub_temp, d, interference, clearance, alpha_hub, alpha_shaft, t0, t_shaft);
+f1!(press_fit_pressure, c::press_fit_pressure, d, delta, d_out, d_in, e_hub, nu_hub, e_shaft, nu_shaft);
+f1!(press_fit_compliance, c::press_fit_compliance, d, d_out, d_in, e_hub, nu_hub, e_shaft, nu_shaft);
+f1!(press_fit_hub_stress, c::press_fit_hub_stress, p, d, d_out);
+f1!(press_fit_torque, c::press_fit_torque, p, d, len, mu);
+f1!(press_fit_axial_force, c::press_fit_axial_force, p, d, len, mu);
+/// Compound angles: which 0 true angle, 1 direction.
+#[no_mangle] pub extern "C" fn compound_apparent(ax: f64, ay: f64, which: f64) -> f64 { pick(c::compound_from_apparent(ax, ay), which) }
+#[no_mangle] pub extern "C" fn compound_sequential(a1: f64, a2: f64, which: f64) -> f64 { pick(c::compound_from_sequential(a1, a2), which) }
+/// Settings for a true angle: which 0 apparent X, 1 apparent Y, 2 first tilt (about X), 3 second tilt.
+#[no_mangle] pub extern "C" fn compound_settings(cc: f64, dir: f64, which: f64) -> f64 { pick(c::compound_settings(cc, dir), which) }
+f1!(angle_between_faces, c::angle_between_faces, c1, dir1, c2, dir2);
+f1!(change_gear_ratio, c::change_gear_ratio, target, leadscrew, fixed);
+/// Change-gear trains from the first `n` buffer values (tooth counts) into
+/// list_out as (a, b, c, d, ratio) per train, c = d = 0 for a simple train;
+/// returns the train count.
+#[no_mangle] pub extern "C" fn change_gears(n: f64, target: f64, compound: f64, max: f64) -> f64 {
+    let g: Vec<u32> = buf(n).iter().filter(|x| **x >= 1.0 && **x <= 1000.0).map(|x| x.round() as u32).collect();
+    let t = c::change_gear_trains(&g, target, compound != 0.0, max.clamp(1.0, 200.0) as usize);
+    let k = t.len();
+    set_out(t.iter().flat_map(|t| [t.a as f64, t.b as f64, t.c as f64, t.d as f64, t.ratio]).collect()); k as f64 }
+f1!(capital_recovery_factor, c::capital_recovery_factor, i, n);
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn machine_hourly_rate(price: f64, resale: f64, years: f64, interest: f64, hours: f64, fixed: f64, kw: f64, load: f64, kwh: f64, labour: f64, which: f64) -> f64 {
+    c::machine_hourly_rate(price, resale, years, interest, hours, fixed, kw, load, kwh, labour, which as u32) }
+f1!(break_even_qty, c::break_even_qty, fixed, price, variable);
+f1!(payback_years, c::payback_years, investment, saving);
+f1!(discounted_payback_years, c::discounted_payback_years, investment, saving, i);
+f1!(npv, c::npv, investment, saving, n, i, resale);
+/// Plane figure `kind`: which 0 area, 1 perimeter, 2-3 extra values (see core).
+#[no_mangle] pub extern "C" fn plane_figure(kind: f64, a: f64, b: f64, cc: f64, which: f64) -> f64 { pick(c::plane_figure(kind as u32, a, b, cc), which) }
+/// Solid `kind`: which 0 volume, 1 total surface, 2 lateral surface, 3 extra.
+#[no_mangle] pub extern "C" fn solid_figure(kind: f64, a: f64, b: f64, cc: f64, which: f64) -> f64 { pick(c::solid_figure(kind as u32, a, b, cc), which) }
+#[no_mangle] pub extern "C" fn scale_spec(kind: f64, which: f64) -> f64 { pick(c::scale_spec(kind as u32), which) }
+#[no_mangle] pub extern "C" fn scale_reading(kind: f64, value: f64, which: f64) -> f64 { pick(c::scale_reading(kind as u32, value), which) }
+
+// Unit converter (core/src/units.rs)
+/// Quantity names, one per line, into the string buffer; returns the length.
+#[no_mangle] pub extern "C" fn unit_quantities() -> f64 { set_str(&c::units::QUANTITIES.join("\n")) }
+/// Units of quantity `q` as text (`symbol|name|exact|factor` lines) into the string buffer.
+#[no_mangle] pub extern "C" fn unit_list(q: f64) -> f64 { set_str(&c::units::units_text(q as u32)) }
+#[no_mangle] pub extern "C" fn unit_convert(q: f64, from: f64, to: f64, x: f64) -> f64 { c::units::convert(q as u32, from as u32, to as u32, x) }
+
+// Expression calculator (core/src/expr.rs)
+static mut EXPR_POS: f64 = 0.0;
+/// Evaluate the expression whose character codes are the first `n` buffer
+/// values. Returns the value, or NaN with the error message in the string
+/// buffer (its length from `expr_err_len`) and its position from `expr_err_pos`.
+#[no_mangle] pub extern "C" fn expr_eval(n: f64, deg: f64, ans: f64) -> f64 {
+    let s: String = buf(n).iter().map(|c| char::from_u32(*c as u32).unwrap_or('?')).collect();
+    match c::expr::eval(&s, deg != 0.0, ans) {
+        c::expr::Eval::Ok(v) => { set_str(""); v }
+        c::expr::Eval::Err(m, i) => { set_str(&m); unsafe { *core::ptr::addr_of_mut!(EXPR_POS) = i as f64; } f64::NAN }
+    } }
+#[no_mangle] pub extern "C" fn expr_err_len() -> f64 { let s: &String = unsafe { &*core::ptr::addr_of!(STR) }; s.len() as f64 }
+#[no_mangle] pub extern "C" fn expr_err_pos() -> f64 { unsafe { *core::ptr::addr_of!(EXPR_POS) } }
+/// Decimal degrees to degrees, minutes, seconds: which 0, 1, 2.
+#[no_mangle] pub extern "C" fn deg_to_dms(x: f64, which: f64) -> f64 { pick(c::expr::deg_to_dms(x), which) }
+/// Prime factors of `n` into list_out; returns the count.
+#[no_mangle] pub extern "C" fn prime_factors(n: f64) -> f64 { set_out(c::expr::prime_factors(n)) }
+f1!(interpolate, c::expr::interpolate, x1, y1, x2, y2, x);
