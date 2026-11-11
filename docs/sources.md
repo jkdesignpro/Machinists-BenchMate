@@ -613,3 +613,45 @@ Full detail, counts and disagreements in `docs/inspection.md`. All pages accesse
 - **[YORK]** University of York, Department of Mathematics, "Factors useful in the construction of control charts", https://www.york.ac.uk/depts/maths/tables/controlfactors.htm . Agrees with NIST on A2; differs in the last digit on D4 for n = 2 to 6 and 8 and D3 for n = 8 (the computed values round to NIST's).
 - **Own derivation (tests):** d2 and d3 by numerical integration of the range distribution of n standard normal values (Simpson and trapezoid rules; n = 2 against the closed forms 2/sqrt(pi) and sqrt(2 - 4/pi)); binomial and Poisson acceptance probabilities checked against direct sums.
 
+## Materials reference (`app/matref.js`, `core/src/matref.rs`, `data/refdata/matref-evidence.json`)
+
+Temper and heat-tint colours, heat treatment, galvanic series and two-metal check, machining
+plastics, metal identification. Decisions, agreement rules and findings in
+`docs/materials-reference.md`. All accessed 2026-11-11; the app lists each source under its
+screen with title and URL.
+
+### Colours
+- **[NAVY_AM]** US Navy, Aviation Structural Mechanic (AM) training manual, Table 6-2 (public domain). https://navyaviation.tpub.com/14315/Table-6-2-Color-Chart-For-Various-Tempering-Temperatures-Of-Carbon-Steel-251.html
+- **[WYS]** West Yorkshire Steel, Steel tempering temperatures colour chart. https://www.westyorkssteel.com/technical-information/steel-heat-treatment/tempering-temperatures/
+- **[WIKI_HC]** Wikipedia, Heat coloring of metals (steel row citing O. P. Kraemer 1983; stainless row citing the British Stainless Steel Association, counted as **[BSSA]**). https://en.wikipedia.org/wiki/Heat_coloring_of_metals
+- **[HTT]** Heat Treat Today, D. Herring, "What are the heat tint colors for stainless steel and when do they form?" (2026-07-21). https://www.heattreattoday.com/?p=69814
+
+### Heat treatment (steel makers' and stockists' data sheets)
+- Uddeholm (voestalpine): Arne (O1, ed. 11 2019), Sverker 21 (D2, ed. 13 2019), Orvar Supreme (H13, ed. 13 2021); voestalpine HPM Denmark HSS/M2 1.3343 (2025). URLs in the evidence file.
+- Doerrenberg Edelstahl: 1.2510, 1.2363, 1.2344 (02/24). Lucefin Group: C45E and 42CrMo4 (rev. 2024), 1.2379 (rev. 2018).
+- Hudson Tool Steel: A2, S7 technical data. GMH Gruppe: SWG 2357 (AISI S7, 09/2020).
+- Atlas Steels: 4340 (2021), 416, 420, 630/17-4PH (print date 8 June 2021). Aalco: 1.4005 (416, same text as Atlas, counted once), 1.4125 (440C), 1.4542 (17-4PH naming rule). ATI: 410/420/425 Mod/440A/440C data sheet v1 (2014).
+
+### Galvanic corrosion
+- **[GERR]** Dave Gerr, Controlling Galvanic Corrosion, part 1 (1991, 2010): seawater series in mV vs Ag/AgCl; 0.20 V rule. https://www.gerrmarine.com/Articles/controllingcorrosionpt1.pdf
+- **[WIKI_GS]** Wikipedia, Galvanic series (order in stagnant seawater, citing MIL-STD-889C). https://en.wikipedia.org/wiki/Galvanic_series
+- **[EE_GALV]** Engineers Edge, Galvanic compatibility (anodic index; 0.15 / 0.25 / 0.50 V). https://www.engineersedge.com/galvanic_capatability.htm
+- **[CARRLANE]** Carr Lane, Practical guideline for the anodic index of materials in different environments. https://www.carrlane.com/engineering-resources/technical-information/galvanic-corrosion/practical-guideline-for-the-anodic-index-of-materials-in-different-environments
+- **[MISUMI_GALV]** MISUMI USA, Galvanic compatibility and corrosion table (different scale; listed, not used in the check). https://us.misumi-ec.com/blog/galvanic-compatiblity-and-corrosion-table/
+- MIL-STD-889 (Dissimilar metals) is cited by name only, through the sources above.
+
+### Plastics
+- **[MCAM_TK]** Mitsubishi Chemical Advanced Materials, Guide to machining plastic parts (Machinist Toolkit, A4 EU metric). https://www.mcam.com/mam/41701/MCG-Machinist-Toolkit-A4-EU-metric.pdf
+- **[ENSINGER_MG]** Ensinger, Machining Engineering Plastics (hosted by Curbell Plastics; 09/12 edition). https://www.curbellplastics.com/wp-content/uploads/2022/11/Machining-Engineering-Plastics.pdf
+- **[BOEDEKER_T]** Boedeker Plastics, Plastic turning machining guidelines. https://www.boedeker.com/Technical-Resources/Plastic-Machining-Guidelines/Plastic-Turning-Machining-Guidelines
+- **[WSH]** W.S. Hampshire, Thermoplastic properties chart. https://catalog.wshampshire.com/Asset/Plastic-Properties.pdf
+- **[PROPLAS_T]** Professional Plastics, Thermal properties of plastic materials. https://www.professionalplastics.com/professionalplastics/content/downloads/ThermalPropertiesofPlasticMaterials.pdf
+
+### Metal identification
+- **[NAVY_SW]** US Navy, Steelworker training manual, chapter 1, spark, chip and magnetic tests (public domain). https://tpub.com/steelworker1/6.htm
+
+### Findings (from `scripts/build_refdata.py`)
+- Temper colours of carbon steel: 7 confirmed, 1 with an outlier, 1 differs, 4 single source. Stainless heat tint: 5 single source (BSSA).
+- Heat treatment: 70 values for 12 steels: 2 confirmed (D2 hardening, 420 annealing), 16 differ, 38 single source, 14 printed text. 17-4PH: naming rule confirmed; H900-H1150 °C, times and properties single source (Atlas). Tempering-hardness tables: none shown (no two publishers agree on one).
+- Galvanic: seawater potentials (33) and anodic indices (19) single source; environment limits confirmed (3).
+- Plastics: 79 values: 15 confirmed (10 of 12 maximum service temperatures, 3 expansions, PA6 annealing, PEI rake), 39 differ (all but one of the cutting-data comparisons), 25 single source.

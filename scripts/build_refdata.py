@@ -633,13 +633,177 @@ def build_preferred():
     return {'sources': sources_of(ev), 'series': out}
 
 
+# ---------------------------------------------------------------- materials reference (B4)
+# Unit of each evidence key -> (canonical unit, factor, offset): canonical = (printed - offset) * factor.
+MR_UNITS = {'c': (1, 0), 'f': (5 / 9, 32), 'm': (1, 0), 'ft': (0.3048, 0), 'mm': (1, 0), 'in': (25.4, 0),
+            'd': (1, 0), 'x5f': (18, 0), 'k': (1, 0), 'sg': (1000, 0)}
+
+
+def mr_family(srcs, key, entry=None):
+    return (entry or {}).get('family') or srcs[key].get('family') or key
+
+
+def mr_interval(entry):
+    """(lo, hi) in canonical units from an evidence entry, or None for text-only entries."""
+    for k, (fac, off) in MR_UNITS.items():
+        if k in entry:
+            parts = [float(x) for x in str(entry[k]).split('-')]
+            lo, hi = parts[0], parts[-1]
+            return (round((lo - off) * fac, 3), round((hi - off) * fac, 3))
+    return None
+
+
+def mr_fmt(iv):
+    f = lambda x: f"{x:.3f}".rstrip('0').rstrip('.')
+    return f(iv[0]) if iv[0] == iv[1] else f(iv[0]) + '-' + f(iv[1])
+
+
+def mr_consensus(srcs, field_ev, mode):
+    """field_ev: {source: entry}. mode 'temp': ends within 3 degC (degF/degC rounding);
+    'range': ends within 2 %; 'overlap': the printed intervals overlap (3 degC or 2 % slack);
+    'colour': within 10 degC. Copies of one source (same family) count once."""
+    rows = []
+    for k, e in field_ev.items():
+        if k not in srcs: raise SystemExit(f'matref: unknown source {k}')
+        iv = mr_interval(e)
+        rows.append((k, mr_family(srcs, k, e), iv, e))
+    num = [r for r in rows if r[2]]
+    if not num:  # text only: shown as printed, no comparison
+        fams = {r[1] for r in rows}
+        return {'status': 'printed', 'groups': [], 'printed': field_ev, 'families': len(fams)}
+    def ok(a, b):
+        if mode == 'temp': return abs(a[0] - b[0]) <= 3 and abs(a[1] - b[1]) <= 3
+        if mode == 'colour': return abs(a[0] - b[0]) <= 10
+        if mode == 'overlap':
+            # 3 units of slack for degC and 10^-6/K (rounding of converted printings), 2 % for densities
+            slack = 3 if max(abs(a[1]), abs(b[1])) < 700 else 0.02 * max(abs(a[1]), abs(b[1]))
+            return a[0] <= b[1] + slack and b[0] <= a[1] + slack
+        tol = lambda x, y: abs(x - y) <= 0.02 * max(abs(x), abs(y)) + 1e-9
+        return tol(a[0], b[0]) and tol(a[1], b[1])
+    groups = []
+    for k, fam, iv, e in num:
+        for g in groups:
+            if ok(g['iv'], iv): g['publishers'].append(k); g['fams'].add(fam); break
+        else: groups.append({'iv': iv, 'publishers': [k], 'fams': {fam}})
+    groups.sort(key=lambda g: -len(g['fams']))
+    strong = [g for g in groups if len(g['fams']) >= 2]
+    if len(groups) == 1: status = 'confirmed' if len(groups[0]['fams']) >= 2 else 'review'
+    elif len(strong) == 1: status = 'confirmed_with_outlier'
+    else: status = 'differs'
+    printed = {k: dict(e, lo=iv[0], hi=iv[1]) if iv else e for k, fam, iv, e in rows}
+    return {'status': status, 'printed': printed,
+            'groups': [{'value': mr_fmt(g['iv']), 'lo': g['iv'][0], 'hi': g['iv'][1], 'publishers': g['publishers'], 'families': len(g['fams'])} for g in groups]}
+
+
+def mr_said(srcs, keys):
+    """Status of an own-words statement from the publishers that say the same."""
+    for k in keys:
+        if k not in srcs: raise SystemExit(f'matref: unknown source {k}')
+    n = len({mr_family(srcs, k) for k in keys})
+    return 'confirmed' if n >= 2 else 'review' if n == 1 else 'unverified'
+
+
+def build_matref():
+    ev = load_ev('matref-evidence.json')
+    if not ev: return None
+    srcs = sources_of(ev)
+    out = {'sources': srcs, 'about': ev['_about']}
+    # temper and heat-tint colours
+    for sec in ('temper_carbon', 'tint_stainless'):
+        t = ev[sec]
+        rows = []
+        for key in t['order']:
+            pr = {pub: {x: v[key][x] for x in ('c', 'fp', 'name', 'v') if x in v[key]} for pub, v in t['printed'].items() if key in v}
+            c = mr_consensus(srcs, pr, 'colour')
+            rows.append({'key': key, 'name': t['own'][key][0], 'swatch': t['own'][key][1], **c})
+        out[sec] = {'rows': rows, 'note': t['_note']}
+    out['colour_factors'] = [{'factor': f, 'text': x, 'src': s, 'status': mr_said(srcs, s)} for f, x, s in ev['colour_factors']]
+    out['titanium_note'] = ev['titanium_note']
+    # heat treatment
+    out['terms'] = [dict(t, status=mr_said(srcs, t['used_by'])) for t in ev['terms']]
+    g = ev['grades']
+    rows = []
+    for gr in g['order']:
+        r = g['rows'][gr]
+        fields = {f: mr_consensus(srcs, fe, 'temp') for f, fe in r['fields'].items()}
+        rows.append({'grade': gr, 'label': r['label'], 'kind': r['kind'], 'fields': fields,
+                     'publishers': sorted({p for fe in r['fields'].values() for p in fe})})
+    out['grades'] = {'fields': g['_fields'], 'rows': rows}
+    ph = ev['ph174']
+    for c in ph['conditions']:  # the condition name is the ageing temperature in degF; check the printed degC against it
+        if abs((c['f'] - 32) * 5 / 9 - float(c['ATLAS_630']['c'])) > 3: raise SystemExit(f"17-4 {c['cond']}: printed degC does not match the name")
+    out['ph174'] = dict(ph, naming_status=mr_said(srcs, list(ph['naming'])))
+    out['temper_hardness_note'] = ev['temper_hardness_note']
+    # galvanic series
+    gs, go = ev['galv_sea'], ev['galv_order']
+    rank = {}
+    for i, (name, key) in enumerate(go['rows']):
+        if key: rank.setdefault(key, []).append(i)
+    out['galv_sea'] = {'src': gs['src'], 'note': gs['_note'], 'rule': gs['rule'],
+                       'rows': [{'key': k, 'name': n, 'v': float(v), 'printed': v, 'wiki_rank': rank.get(k), 'status': 'review'} for k, n, v in gs['rows']]}
+    out['galv_order'] = {'src': go['src'], 'note': go['_note'], 'rows': go['rows']}
+    ai = ev['anodic_index']
+    lim = []
+    for L in ai['limits']:
+        pr = {k: {'d': v['v'], 'v': v['text']} for k, v in L.items() if k in srcs}
+        lim.append({'env': L['env'], 'label': L['label'], **mr_consensus(srcs, pr, 'range')})
+    out['anodic_index'] = {'src': ai['src'], 'note': ai['_note'], 'limits': lim,
+                           'rows': [{'key': k, 'name': n, 'v': float(v), 'printed': v, 'status': 'review'} for k, n, v in ai['rows']]}
+    # plastics: link to the materials data where it already holds the plastic
+    mats = {}
+    mp = ROOT / 'data' / 'materials.json'
+    if mp.exists():
+        for m in json.loads(mp.read_text())['materials']:
+            mats[m['grade']] = m
+    pl = ev['plastics']
+    prow = []
+    for key in pl['order']:
+        r = pl['rows'][key]
+        mode = {'max_temp': 'overlap', 'cte': 'overlap', 'density': 'overlap', 'anneal_hold': 'temp'}
+        fields = {f: mr_consensus(srcs, fe, mode.get(f, 'range')) for f, fe in r['fields'].items()}
+        link = None
+        if r.get('material'):
+            m = mats.get(r['material'])
+            if not m: raise SystemExit(f"matref plastics {key}: material {r['material']} not in data/materials.json")
+            link = {'grade': m['grade'], 'props': {}}
+            for pr in m.get('properties', []):
+                if pr['prop'] in ('density', 'cte') and pr['prop'] not in link['props']:
+                    v = pr['values'][0]
+                    link['props'][pr['prop']] = {'value': v['value'], 'max': v.get('max'), 'unit': pr['unit'], 'status': pr['status'], 'publishers': v['publishers'],
+                                                 'others': [x['value'] for x in pr['values'][1:]]}
+            for f in ('density', 'cte'):
+                if f in fields: raise SystemExit(f'matref plastics {key}: {f} is already in the materials data, do not duplicate')
+        notes = [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in r['notes']]
+        prow.append({'key': key, 'name': r['name'], 'fields': fields, 'materials': link, 'notes': notes})
+    out['plastics'] = {'fields': pl['_fields'], 'units': pl['_units'], 'rows': prow,
+                       'general': [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in pl['general']]}
+    mi = ev['metalid']
+    out['metalid'] = {'spark': mi['spark'], 'tests': [{'test': a, 'text': b, 'src': s, 'status': mr_said(srcs, s)} for a, b, s in mi['tests']]}
+    return out
+
+
+def matref_summary(m):
+    """Counts of compared values by status (heat treatment, colours, plastics, galvanic limits)."""
+    st = collections.Counter()
+    for sec in ('temper_carbon', 'tint_stainless'):
+        for r in m[sec]['rows']: st[r['status']] += 1
+    for r in m['grades']['rows']:
+        for c in r['fields'].values(): st[c['status']] += 1
+    for r in m['plastics']['rows']:
+        for c in r['fields'].values(): st[c['status']] += 1
+    for c in m['anodic_index']['limits']: st[c['status']] += 1
+    st['review'] += len(m['galv_sea']['rows']) + len(m['anodic_index']['rows']) + len(m['ph174']['conditions'])
+    return st
+
+
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
            'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes(),
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
-           'ansi_fits': build_ansi_fits(), 'preferred': build_preferred()}
+           'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),
+           'matref': build_matref()}
     out['fasteners'] = build_fasteners(out['drills']['drills'])
     for sec in ('other_threads', 'tapers', 'power_threads'):
         if not out[sec]: continue
@@ -707,6 +871,8 @@ def main():
     print('  ANSI fits', len(af['classes']), 'classes, cells', dict(collections.Counter(r[f]['status'] for c in af['classes'].values() for r in c['rows'] for f in ANSI_FIELDS)),
           'rows with check notes:', sum(1 for c in af['classes'].values() for r in c['rows'] if r['notes']))
     print('  ISO 286 j/J', {k: dict(collections.Counter(c['status'] for rows in iso[k].values() for c in rows.values())) for k in ('j_shaft', 'j_hole')})
+    if out['matref']:
+        print('  matref', dict(matref_summary(out['matref'])))
     print('  knurl pitches', [(x['p'], x['status']) for x in out['knurl']['pitches_mm']])
 
 

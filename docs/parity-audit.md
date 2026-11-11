@@ -30,12 +30,12 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 67 | 15 | 29 (8) | 2 | 0 | 60 % |
-| Machinery's Handbook 31 | 306 | 45 | 89 | 138 (11) | 6 | 28 | 17 % |
-| Engineers' Data Book | 94 | 9 | 26 | 21 (0) | 12 | 26 | 16 % |
-| Engineers Black Book | 80 | 21 | 26 | 32 (9) | 1 | 0 | 27 % |
+| CNC Machinist Calculator Ultra | 113 | 68 | 14 | 29 (8) | 2 | 0 | 61 % |
+| Machinery's Handbook 31 | 306 | 47 | 95 | 130 (12) | 6 | 28 | 17 % |
+| Engineers' Data Book | 94 | 10 | 27 | 19 (1) | 12 | 26 | 18 % |
+| Engineers Black Book | 80 | 23 | 26 | 30 (9) | 1 | 0 | 29 % |
 | CNC Machining handbook | 83 | 13 | 17 | 49 (0) | 0 | 4 | 16 % |
-| **All** | **676** | **155** | **173** | **269 (28)** | **21** | **58** | **26 %** |
+| **All** | **676** | **161** | **179** | **257 (30)** | **21** | **58** | **27 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -46,6 +46,8 @@ features are names only.
 **Update (branch `claude/calcs-3`, 2026-11-10):** batches A7, A8 and A9 are built: U4, U5, U9, U10, U16, U19-U23, U26, U55, U56, U57, U59, U60, U90 and MH149 done; U32, MH163, MH166, MH167, MH169 and BB60 partial. Not built: U58 (cylindricity from RPM) and U27 (vibration sensor). Summary counts recounted from section 1.
 
 **Update (branch `claude/measure-maths`, 2026-11-11):** batches A13 (except SHCS holes, done on `claude/fasteners`, and the knurl calculator), B7 (shop maths), part of B5 (ISO 2768-1, micrometer and vernier reading, measurement over balls and rolls) and part of B11 (drawing abbreviations) are built. U68, U70, U79, U80, MH1, MH2, MH10, MH12, MH15, MH18, MH44, MH76, MH82, MH303-MH305, ED13, BB31-BB34, BB70, BB79 done; MH3, MH9, MH11, MH16, MH19, MH24, MH84, MH86, MH92, MH256, MH301, MH306, ED3, ED10 partial. Not built: ANSI B4.1 fits (MH77), j/J deviations (U61, MH79), weld symbols (ED86). Summary counts recounted from all rows.
+
+**Update (branch `claude/materials-ref`, 2026-11-11):** batch B4 (materials round 3) partly built: temper and heat-tint colours, heat treatment reference, galvanic series and two-metal check, machining plastics, metal identification. MH68, BB76, BB77 done; MH51, MH56, MH57, MH58, MH65, MH66, ED62, ED64 partial. Not built: tool steel selection, nonferrous and non-metal machining (MH159, MH160), mill certificates (ED63), zinc and magnesium (ED58), titanium heat tint. Summary counts for the three books recounted from the rows by script (the Ultra row left as it was).
 
 **Update (branch `claude/gdt-3`, 2026-11-11):** BB73 done (letter-address table added to the G and M codes screen). GD&T round 3 (composite profile added to the guide) changes no row status. Summary counts updated for BB73.
 
@@ -96,6 +98,8 @@ properties: Rm, Rp0.2, hardness, elongation, CTE, conductivity, density, E).
 Shell: search, inch/metric toggle, light/dark theme, active machine checks.
 There is no decimal-precision setting, no favourites, no tool library and no
 offline/PWA manifest.
+
+**Update (2026-11-11, merge of mechanics, tooling, inspection round 2 and materials reference):** summary recounted by script from the row statuses after all four merges.
 
 ## 1. CNC Machinist Calculator Ultra
 
@@ -340,24 +344,24 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH48 | Tabulated properties of ceramics, plastics, investment-casting and powder metal alloys | partial | `materials` | 5 plastics; no ceramics, casting or PM alloys |
 | MH49 | Elastic properties; effect of temperature on strength | partial | `materials` | E for 27 entries; no temperature effect |
 | MH50 | Standard steels: classification, AISI/SAE/UNS numbering | partial | `materials` | Equivalents only; no numbering-system explainer |
-| MH51 | Identifying metals | missing | | |
+| MH51 | Identifying metals | partial | `metalid` | Spark, magnet and chip tests (one source); no chemical spot tests |
 | MH52 | Compositions of carbon, alloy and stainless steels | missing | | Chemistry not stored |
 | MH53 | Applications and mechanical properties of steels | partial | `materials` | Properties for some grades; no applications |
 | MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials` | 10 tool-steel grades as equivalents; no selection guide, faults or heat treatment |
 | MH55 | Tool steel mill forms, machining allowances, decarburization limits | missing | | |
-| MH56 | Heat treatment: definitions, hardness and hardenability | missing | | |
-| MH57 | Hardening, quenching, tempering temperatures, annealing, normalising | missing | | |
-| MH58 | Case hardening: carburising, nitriding, flame and induction hardening | missing | | |
+| MH56 | Heat treatment: definitions, hardness and hardenability | partial | `heattreat` | Terms in our words (7 of 12 used by two publishers); no hardness and hardenability theory |
+| MH57 | Hardening, quenching, tempering temperatures, annealing, normalising | partial | `heattreat`, `tempercolours` | 12 steels side by side (2 confirmed, 16 differ); no tempering-hardness tables (no two sources agree) |
+| MH58 | Case hardening: carburising, nitriding, flame and induction hardening | partial | `heattreat` | Terms and 4340 nitriding only; no case depth or process data |
 | MH59 | Heat treating high-speed steels; subzero treatment | missing | | |
 | MH60 | Hardness tests: Brinell, Rockwell, Vickers, Knoop, Shore, Mohs, durometer | missing | | In progress (`claude/ref-data-3`) |
 | MH61 | Comparison of hardness scales | missing | | In progress (`claude/ref-data-3`) |
 | MH62 | Nonferrous: copper alloys | partial | `materials` | 12 copper alloys; no temper explainer |
 | MH63 | Aluminium: temper designations, alloy designations, heat-treatability | partial | `materials` | Grades only; no temper (T6, H32...) explainer |
 | MH64 | Magnesium, nickel, titanium alloys | partial | `materials` | Ni and Ti present; no magnesium |
-| MH65 | Corrosion types and galvanic corrosion | missing | | |
-| MH66 | Plastics: families, properties, design analysis | partial | `materials` | 5 plastics; no design data |
+| MH65 | Corrosion types and galvanic corrosion | partial | `galvanic` | Galvanic series and two-metal check; no other corrosion types |
+| MH66 | Plastics: families, properties, design analysis | partial | `materials`, `plastics` | 12 plastics with service temperature and expansion; no design data |
 | MH67 | Plastics processing (thermoforming, moulding) and additive manufacturing | out of scope? | | |
-| MH68 | Machining plastics | missing | | |
+| MH68 | Machining plastics | done | `plastics` | Makers' turning data side by side, annealing, notes (`claude/materials-ref`) |
 
 ### Dimensioning, gauging and measuring
 
@@ -707,9 +711,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED59 | 12.10 Copper alloys | partial | `materials` | |
 | ED60 | 12.11 Aluminium alloys | partial | `materials` | No temper explainer |
 | ED61 | 12.12 Titanium alloys | partial | `materials` | |
-| ED62 | 12.13 Engineering plastics | partial | `materials` | 5 plastics |
+| ED62 | 12.13 Engineering plastics | partial | `materials`, `plastics` | 12 plastics in `plastics` |
 | ED63 | 12.14 Material traceability and documentation (certificates) | missing | | Reading a mill cert |
-| ED64 | 12.15 Corrosion | missing | | |
+| ED64 | 12.15 Corrosion | partial | `galvanic` | Galvanic corrosion only |
 | ED65 | 13.1 Screw fasteners | partial | `bolttorque`, `boltgrade` | Torque, preload and grades; no joint stiffness or fatigue |
 | ED66 | 13.2 Bearings | missing | | |
 | ED67 | 13.3 Ball and roller bearings | missing | | |
@@ -820,8 +824,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB73 | G-codes, letter addresses, miscellaneous function words | done | `gmcodes` | G and M words per control; letter-address table A-Z (NIST RS274NGC and Haas mill columns, each from its own document) under the code list (`claude/gdt-3`) |
 | BB74 | Surface roughness tables | partial | `finish` | Conversions in progress (`claude/ref-data-3`) |
 | BB75 | Surface finish expected from manufacturing processes | missing | | In progress (`claude/ref-data-3`) |
-| BB76 | Terms used in heat treatment of steel | missing | | |
-| BB77 | Hardening and tempering temperatures by colour | missing | | |
+| BB76 | Terms used in heat treatment of steel | done | `heattreat` | 12 terms in our words (`claude/materials-ref`) |
+| BB77 | Hardening and tempering temperatures by colour | done | `tempercolours`, `heattreat` | Temper colours with three publishers, hardening and tempering temperatures (`claude/materials-ref`) |
 | BB78 | Hardness comparison chart | missing | | In progress (`claude/ref-data-3`) |
 | BB79 | Natural sines and tangents table | done | `calc` | Any sine or tangent from the calculator instead of a table (`claude/measure-maths`) |
 | BB80 | Drill point sharpening gauge (back cover) | missing | | |
@@ -957,7 +961,7 @@ U65, U67, U69, U75-U78, U81 and U103 move to done or partial.
 | B1 | **Fasteners**: clearance and counterbore holes, hex/SHCS/cap/set screw dimensions, spanner and socket sizes, bolt grades and marks, thread engagement length, torque and preload, T-slots, dowel and taper pins, retaining-ring grooves, helical inserts | MH198-216, BB3, BB5, BB15, BB16, BB43, BB48, BB49, ED65 | heavy research |
 | B2 | **Machine elements for machinists**: keys and keyways (incl. Woodruff), bearing shaft/housing fits and L10, belts and pulleys, chains and sprockets, O-ring glands, adhesives and threadlockers | MH283-296, BB44, BB46, BB47, BB59, ED66-71, ED75-76 | heavy research |
 | B3 | **Tooling reference**: tool geometry terms, carbide grades (ISO 513) and coatings, end mill and drill types, drill point geometry and sharpening, reamers, tap types and H limits, broaching, burrs, mounted points, files, hole saws and saw blade selection, broken-tap removal | MH96-133, BB8-9, BB13-14, BB18-19, BB22, BB24-27, BB61-65, BB68-69 | heavy research |
-| B4 | **Materials round 3**: heat treatment terms and temperatures, temper colours, tool steel selection, corrosion and galvanic series, machining plastics and nonferrous metals, metal identification, mill certificates, zinc and magnesium | MH51-68, MH159-160, BB76-77, ED58, ED63-64 | heavy research |
+| B4 | **Materials round 3**: heat treatment terms and temperatures, temper colours, tool steel selection, corrosion and galvanic series, machining plastics and nonferrous metals, metal identification, mill certificates, zinc and magnesium | MH51-68, MH159-160, BB76-77, ED58, ED63-64 | heavy research; partly built on `claude/materials-ref` (colours, heat treatment, galvanic, plastics, metal ID) |
 | B5 | **Inspection round 2** (built on `claude/measure-maths` and `claude/inspection-2` except thread gauges and radius over pins; ANSI fits single-source): ANSI fits (RC/LC/LT/LN/FN), ISO 2768 general tolerances, j/J classes and over 500 mm, preferred numbers, measurement over pins/rolls and radius, micrometer and vernier reading, thread gauges, control charts, sampling | MH75-95, MH245, MH248, ED13, ED79, ED81 | mixed: maths/UI plus moderate research |
 | B6 | **CNC knowledge guide**: coordinate systems, work and tool offsets, TNRC and cutter compensation, program structure, 2D/3D and lathe toolpath strategies, CSS, workholding and vise practice, operator procedures, shop safety, glossary; plus a TNRC calculator | MH174-185, CN3-CN82 | writing in our own words, some maths; light research |
 | B7 | **Shop maths**: plane and solid figures beyond the geometry branch, across corners, angle conversion, compound angles, interpolation, involute function, prime factors, lathe change gears, engineering economics | MH1-24, MH256, BB29-34, BB79 | maths/UI |

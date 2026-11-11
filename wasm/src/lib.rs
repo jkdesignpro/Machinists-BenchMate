@@ -678,3 +678,9 @@ f1!(sampling, c::sampling_f, n, ac, p, lot, which);
 #[no_mangle] pub extern "C" fn spc_xbar_r_buf(n: f64, sg: f64, which: f64) -> f64 { c::spc_xbar_r(buf(n), sg.max(0.0) as usize, which.max(0.0) as u32) }
 /// Individuals/moving range chart of the first `n` buffer values; `which` as in `spc_imr`.
 #[no_mangle] pub extern "C" fn spc_imr_buf(n: f64, which: f64) -> f64 { c::spc_imr(buf(n), which.max(0.0) as u32) }
+// Materials reference (B4): two-metal galvanic check.
+f1!(galv_diff, c::matref::galvanic_difference, a, b);
+/// 0 = first metal is the anode, 1 = second, -1 = equal; index_scale 1 for an anodic index table.
+#[no_mangle] pub extern "C" fn galv_anode(a: f64, b: f64, index_scale: f64) -> f64 { c::matref::galvanic_anode(a, b, index_scale != 0.0) as f64 }
+/// 1 when the difference is within the limit, else 0.
+#[no_mangle] pub extern "C" fn galv_within(diff: f64, limit: f64) -> f64 { if c::matref::galvanic_within(diff, limit) { 1.0 } else { 0.0 } }

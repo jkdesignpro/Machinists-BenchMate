@@ -589,6 +589,7 @@ pub mod gears;
 pub mod mechanics;
 pub mod inspect;
 pub use inspect::*;
+pub mod matref;
 
 #[cfg(test)]
 mod tests {
