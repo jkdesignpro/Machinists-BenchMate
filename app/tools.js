@@ -1964,10 +1964,10 @@ const TOOLS = [
 },
 {
   id: 'units', level: 'simple', group: 'Shop helpers', title: 'Unit converter',
-  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once.',
+  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once. Angles also convert to and from degrees-minutes-seconds, % slope, slope 1 in n, taper per foot, taper ratio 1:x and rate of taper.',
   render: el => renderUnits(el),
-  working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9).',
-  source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. See docs/sources.md.',
+  working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9). Angle forms: % slope = 100 tan a, 1 in n = 1 / tan a (a from the horizontal); taper C = 2 tan(a/2) = 1 : x, taper per foot = 12 C (a the included angle).',
+  source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. Slope: Wikipedia "Grade (slope)". Taper: ISO/R 1119 (public preview), Omni Calculator taper. See docs/sources.md.',
 },
 {
   id: 'calc', level: 'simple', group: 'Shop helpers', title: 'Calculator',

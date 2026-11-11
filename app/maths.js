@@ -218,24 +218,56 @@ async function renderShrinkFit(el) {
 
 // ---------- Unit converter ----------
 const UNIT_STATE = { q: 0, from: 1, x: 1 };
+// Angle forms that are not a fixed factor (kinds of core units::angle_form_*), offered as extra "From" choices.
+const ANGLE_FORMS = [['dms', 'Degrees, minutes, seconds (type 29 30 15)'], ['f0', '% slope (100 tan a)'], ['f1', 'Slope 1 in n'], ['f2', 'Taper per foot (in of diameter per ft)'], ['f3', 'Taper ratio 1:x (on the diameter)'], ['f4', 'Rate of taper C = (D - d) / L']];
 function renderUnits(el) {
   const s = UNIT_STATE, W = state.W;
   const qs = mStr(W, W.unit_quantities()).split('\n');
   const list = q => mStr(W, W.unit_list(q)).split('\n').map(l => { const [sym, name, ex, k] = l.split('|'); return { sym, name, exact: ex === '1', k: +k }; });
+  const isAngle = () => qs[s.q] === 'Angle';
   const draw = () => {
-    const us = list(s.q); if (s.from >= us.length) s.from = 0;
-    el.innerHTML = '<div class="grid">' + sfield('Quantity', gsel('q', qs.map((n, i) => [i, n]), s.q), '') + sfield('Value', sinp('x', s.x, 160), '') + sfield('From', gsel('from', us.map((x, i) => [i, sesc(x.sym + ' (' + x.name + ')')]), s.from), '') + '</div><div id="ures"></div>';
+    const us = list(s.q); if (!(isAngle() && ANGLE_FORMS.some(f => f[0] === s.from)) && !(+s.from < us.length)) s.from = 0;
+    const opts = us.map((x, i) => [i, sesc(x.sym + ' (' + x.name + ')')]).concat(isAngle() ? ANGLE_FORMS : []);
+    const txt = s.from === 'dms';
+    el.innerHTML = '<div class="grid">' + sfield('Quantity', gsel('q', qs.map((n, i) => [i, n]), s.q), '') + sfield('Value', txt ? mtxt('x', s.x, 160, '29 30 15') : sinp('x', s.x, 160), '') + sfield('From', gsel('from', opts, s.from), '') + '</div><div id="ures"></div>';
     el.querySelector('[data-k="q"]').onchange = e => { s.q = +e.target.value; s.from = 1; draw(); };
-    el.querySelector('[data-k="from"]').onchange = e => { s.from = +e.target.value; calc(); };
+    el.querySelector('[data-k="from"]').onchange = e => { const v = e.target.value, wasTxt = s.from === 'dms'; s.from = /^\d+$/.test(v) ? +v : v; if (wasTxt !== (s.from === 'dms')) draw(); else calc(); };
     el.querySelector('[data-k="x"]').oninput = e => { s.x = e.target.value; calc(); };
     calc();
   };
+  const fmtv = v => { const a = Math.abs(v); return a !== 0 && (a >= 1e9 || a < 1e-4) ? v.toExponential(6) : (+v.toPrecision(10)).toLocaleString('en-GB', { maximumFractionDigits: 10 }); };
   const calc = () => {
-    const us = list(s.q), x = snum(s.x), out = el.querySelector('#ures');
+    const us = list(s.q), out = el.querySelector('#ures');
+    if (isAngle() && typeof s.from === 'string') { angleCalc(us, out); return; }
+    const x = snum(s.x);
     if (!isFinite(x)) { out.innerHTML = mMsg('Converted', 'Enter a value'); return; }
-    const fmtv = v => { const a = Math.abs(v); return a !== 0 && (a >= 1e9 || a < 1e-4) ? v.toExponential(6) : (+v.toPrecision(10)).toLocaleString('en-GB', { maximumFractionDigits: 10 }); };
     out.innerHTML = '<div class="res"><div class="h">' + sesc(fmtv(x) + ' ' + us[s.from].sym) + ' is</div><table>' + us.map((t, i) => '<tr' + (i === s.from ? ' class="on"' : '') + '><td>' + sesc(t.name) + (t.exact ? '' : ' <span class="ms">(conventional value)</span>') + '</td><td class="v">' + fmtv(W.unit_convert(s.q, s.from, i, x)) + '</td><td class="u">' + sesc(t.sym) + '</td></tr>').join('') + '</table></div>' +
-      mNote('Factors are built from the exact definitions in NIST SP 811 Appendix B (inch 0.0254 m, pound 0.45359237 kg, standard gravity 9.80665 m/s², and so on); results are shown to 10 significant digits. ' + (s.q === 12 ? 'Temperature converts a reading (20 °C = 68 °F); use "Temperature difference" for a change or an expansion coefficient (10 K = 18 °F).' : s.q === 6 ? 'mmHg, inHg and inH₂O are conventional values (standard mercury and water density with standard gravity).' : ''));
+      (isAngle() ? angleForms(W.unit_convert(s.q, s.from, 1, x)) : '') +
+      mNote('Factors are built from the exact definitions in NIST SP 811 Appendix B (inch 0.0254 m, pound 0.45359237 kg, standard gravity 9.80665 m/s², and so on); results are shown to 10 significant digits. ' + (s.q === 12 ? 'Temperature converts a reading (20 °C = 68 °F); use "Temperature difference" for a change or an expansion coefficient (10 K = 18 °F).' : s.q === 6 ? 'mmHg, inHg and inH₂O are conventional values (standard mercury and water density with standard gravity).' : isAngle() ? ANGLE_NOTE : ''));
+  };
+  const ANGLE_NOTE = 'Angle factors are exact: 1° = π/180 rad, 1 gon = π/200 rad = 0.9°, 1′ = 1/60°, 1″ = 1/3600° (NIST SP 811). Slope and taper forms are not fixed factors: % slope = 100 tan a and 1 in n with n = 1 / tan a take the angle from the horizontal (Wikipedia "Grade (slope)"); the tapers take it as the included angle of a cone: rate of taper C = (D − d) / L = 2 tan(a/2) = 1 : x with x = 1 / (2 tan(a/2)) (ISO 1119 definition, as printed in the public preview of ISO/R 1119), and taper per foot = 12 C inches of diameter per foot (Omni Calculator taper; Machinery\'s Handbook, tapers, by name). Worked in the Rust core.';
+  // Slope and taper forms of an angle in degrees.
+  const angleForms = deg => {
+    const F = k => W.angle_form_from_deg(k, deg), half = deg / 2;
+    const row = (label, v, u) => '<tr><td>' + label + '</td><td class="v">' + (isFinite(v) ? fmtv(v) : '<span class="ms">not meaningful for this angle</span>') + '</td><td class="u">' + u + '</td></tr>';
+    return '<div class="res" style="margin-top:12px"><div class="h">The same angle as degrees, minutes, seconds, slope and taper</div><table>' +
+      '<tr><td>Degrees, minutes, seconds</td><td class="v">' + mdms(W, deg) + '</td><td class="u"></td></tr>' +
+      row('As a slope from the horizontal: percent', F(0), '%') + row('As a slope: 1 in n', F(1), 'n') +
+      row('As the included angle of a taper: taper per foot', F(2), 'in/ft') + row('Taper ratio 1 : x', F(3), 'x') + row('Rate of taper C (diameter change per length)', F(4), 'per unit') +
+      '<tr><td>Half angle (each side of the taper)</td><td class="v">' + fmtv(half) + '° <span class="ms">' + mdms(W, half) + '</span></td><td class="u"></td></tr></table></div>';
+  };
+  const angleCalc = (us, out) => {
+    let deg = NaN, shown = '';
+    if (s.from === 'dms') {
+      const p = String(s.x).trim().split(/[^0-9.+-]+/).filter(Boolean).map(Number);
+      if (p.length && p.every(isFinite)) { deg = W.dms_to_deg(p[0], p[1] || 0, p[2] || 0); shown = String(s.x).trim(); }
+    } else {
+      const x = snum(s.x);
+      if (isFinite(x)) { deg = W.angle_form_to_deg(+s.from.slice(1), x); shown = fmtv(x) + ' (' + ANGLE_FORMS.find(f => f[0] === s.from)[1] + ')'; }
+    }
+    if (!isFinite(deg)) { out.innerHTML = mMsg('Converted', s.from === 'dms' ? 'Enter degrees, minutes and seconds, e.g. 29 30 15' : 'Enter a value this form allows (a slope or taper above zero)'); return; }
+    out.innerHTML = '<div class="res"><div class="h">' + sesc(shown) + ' is</div><table>' + us.map((t, i) => '<tr><td>' + sesc(t.name) + '</td><td class="v">' + fmtv(W.unit_convert(s.q, 1, i, deg)) + '</td><td class="u">' + sesc(t.sym) + '</td></tr>').join('') + '</table></div>' +
+      angleForms(deg) + mNote((s.from === 'f0' || s.from === 'f1' ? 'The angle above is the slope angle from the horizontal. ' : s.from === 'dms' ? '' : 'The angle above is the included angle of the taper. ') + ANGLE_NOTE);
   };
   draw();
 }

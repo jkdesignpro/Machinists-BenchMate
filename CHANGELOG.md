@@ -9,6 +9,8 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - `benchmate-core`: `spot_chamfer_dia` (diameter a pointed tool cuts at a depth; was worked out in the screen) with tests, and table-size tests for `centre_drill_depth`.
 - **Chord, arc and sagitta**: enter any two of radius, included angle, chord, sagitta and arc length (all ten pairs) and get the rest with segment and sector areas. Chord + arc length and sagitta + arc length are solved in the Rust core by bisection on a bracket where the function is monotonic; where two arcs fit (radius + chord, and some sagitta + arc length pairs) both are offered. The 3-point circle is unchanged.
 - `benchmate-core`: `arc_from_two`, `arc_two_flat`, `arc_sl_peak` and a general `bisect`, with tests that rebuild minor and major arcs from every pair.
+- **Unit converter, angles**: type an angle as degrees-minutes-seconds, % slope, slope 1 in n, taper per foot, taper ratio 1:x or rate of taper, and see it in every angle unit; any angle is also shown as DMS, slope and taper with the half angle. Factors are exact (1 gon = 0.9°); tests against ISO/R 1119 (1:20 = 2°51′51.1″), the grade-of-slope examples and the NPT taper.
+- `benchmate-core`: `units::dms_to_deg`, `angle_form_from_deg`, `angle_form_to_deg` with tests.
 ### Changed
 - The spot and centre drill tool is now its own screen (it was a plain form) so each table value can show its sources.
 

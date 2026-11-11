@@ -523,6 +523,9 @@ f1!(npv, c::npv, investment, saving, n, i, resale);
 /// Units of quantity `q` as text (`symbol|name|exact|factor` lines) into the string buffer.
 #[no_mangle] pub extern "C" fn unit_list(q: f64) -> f64 { set_str(&c::units::units_text(q as u32)) }
 #[no_mangle] pub extern "C" fn unit_convert(q: f64, from: f64, to: f64, x: f64) -> f64 { c::units::convert(q as u32, from as u32, to as u32, x) }
+f1!(dms_to_deg, c::units::dms_to_deg, d, m, s);
+#[no_mangle] pub extern "C" fn angle_form_from_deg(kind: f64, a: f64) -> f64 { c::units::angle_form_from_deg(kind as u32, a) }
+#[no_mangle] pub extern "C" fn angle_form_to_deg(kind: f64, x: f64) -> f64 { c::units::angle_form_to_deg(kind as u32, x) }
 
 // Expression calculator (core/src/expr.rs)
 static mut EXPR_POS: f64 = 0.0;

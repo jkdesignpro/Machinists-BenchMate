@@ -93,6 +93,49 @@ pub fn convert(q: u32, from: u32, to: u32, x: f64) -> f64 {
     }
 }
 
+/// Degrees, minutes and seconds to decimal degrees. The sign of the first
+/// non-zero part applies to the whole angle (-0 30 0 is -0.5 deg).
+pub fn dms_to_deg(d: f64, m: f64, s: f64) -> f64 {
+    let neg = d < 0.0 || (d == 0.0 && (m < 0.0 || (m == 0.0 && s < 0.0))) || (d == 0.0 && d.is_sign_negative());
+    let v = d.abs() + m.abs() / 60.0 + s.abs() / 3600.0;
+    if neg { -v } else { v }
+}
+
+/// Angle forms that are not a fixed factor of the radian. `kind`:
+/// 0 percent slope = 100 tan(a) (a measured from the horizontal, |a| < 90 deg);
+/// 1 slope "1 in n": n = 1 / tan(a) (0 < a < 90);
+/// 2 taper per foot, inch of diameter per foot of length, with a the included
+///   angle: 24 tan(a/2) (= 12 x 2 tan(a/2));
+/// 3 taper ratio 1:x on the diameter (ISO 1119 rate of taper C = (D - d) / L =
+///   2 tan(a/2) = 1 : x), x = 1 / (2 tan(a/2)), a the included angle;
+/// 4 rate of taper C = 2 tan(a/2), diameter change per unit length (in/in, mm/mm).
+/// Returns NaN outside the range where the form means something.
+pub fn angle_form_from_deg(kind: u32, a: f64) -> f64 {
+    let t = |x: f64| x.to_radians().tan();
+    match kind {
+        0 if a.abs() < 90.0 => 100.0 * t(a),
+        1 if a > 0.0 && a < 90.0 => 1.0 / t(a),
+        2 if a >= 0.0 && a < 180.0 => 24.0 * t(a / 2.0),
+        3 if a > 0.0 && a < 180.0 => 1.0 / (2.0 * t(a / 2.0)),
+        4 if a >= 0.0 && a < 180.0 => 2.0 * t(a / 2.0),
+        _ => f64::NAN,
+    }
+}
+
+/// Inverse of `angle_form_from_deg`: the angle in degrees (slope angle for
+/// kinds 0 and 1, included angle for the tapers 2 to 4).
+pub fn angle_form_to_deg(kind: u32, x: f64) -> f64 {
+    let at = |v: f64| v.atan().to_degrees();
+    match kind {
+        0 if x.is_finite() => at(x / 100.0),
+        1 if x > 0.0 => at(1.0 / x),
+        2 if x >= 0.0 => 2.0 * at(x / 24.0),
+        3 if x > 0.0 => 2.0 * at(1.0 / (2.0 * x)),
+        4 if x >= 0.0 => 2.0 * at(x / 2.0),
+        _ => f64::NAN,
+    }
+}
+
 /// The unit list of quantity `q` as text: one line per unit, `symbol|name|exact (1/0)|factor to SI`.
 pub fn units_text(q: u32) -> String {
     units(q).iter().map(|u| format!("{}|{}|{}|{:e}", u.sym, u.name, if u.exact { 1 } else { 0 }, u.k)).collect::<Vec<_>>().join("\n")
@@ -139,6 +182,38 @@ mod tests {
         rel(convert(9, 3, 2, 1000.0), 18.288, 1e-12);       // 1000 ft/min = 18.288 km/h
         rel(convert(9, 3, 1, 1000.0), 304.8, 1e-12);
         rel(convert(16, 1, 0, 180.0), PI, 1e-15);
+        // Angle units: 1 gon = 0.9 deg, 1 rev = 400 gon = 21600 arc-minutes (exact factors).
+        rel(convert(16, 4, 1, 1.0), 0.9, 1e-15);
+        rel(convert(16, 5, 4, 1.0), 400.0, 1e-15);
+        rel(convert(16, 5, 2, 1.0), 21_600.0, 1e-15);
+        rel(convert(16, 1, 3, 1.0), 3600.0, 1e-15);
+    }
+
+    #[test]
+    fn angle_forms() {
+        fn close(a: f64, b: f64, tol: f64) { assert!((a - b).abs() <= tol, "{a} vs {b}"); }
+        close(dms_to_deg(29.0, 30.0, 0.0), 29.5, 1e-15);
+        close(dms_to_deg(-1.0, 47.0, 24.0), -(1.0 + 47.0 / 60.0 + 24.0 / 3600.0), 1e-15);
+        close(dms_to_deg(0.0, -30.0, 0.0), -0.5, 1e-15);
+        // Wikipedia "Grade (slope)": 45 deg = 100 %, 1 in 1; 5.71 deg = 10 %, 1 in 10.
+        close(angle_form_from_deg(0, 45.0), 100.0, 1e-12);
+        close(angle_form_from_deg(1, 45.0), 1.0, 1e-12);
+        close(angle_form_to_deg(0, 10.0), 5.71, 0.005);
+        close(angle_form_to_deg(1, 10.0), 5.71, 0.005);
+        // ISO R 1119 (preview): rate of taper 1:20 has included angle 2 deg 51' 51.1" = 2.864192 deg.
+        close(angle_form_to_deg(3, 20.0), 2.864192, 1e-6);
+        close(angle_form_from_deg(3, 2.864192), 20.0, 1e-4);
+        close(angle_form_to_deg(4, 1.0 / 20.0), 2.864192, 1e-6);
+        // NPT: 3/4 in per foot on the diameter, half angle 1 deg 47' 24" (published, Wikipedia
+        // "National pipe thread"): included angle 2 atan(0.75/24) = 3.5798 deg.
+        close(angle_form_to_deg(2, 0.75) / 2.0, dms_to_deg(1.0, 47.0, 24.0), 1e-4);
+        // Omni Calculator taper example: half angle 80.5 deg gives a taper of 11.952 per unit length.
+        close(angle_form_from_deg(4, 161.0), 11.952, 5e-4);
+        close(angle_form_from_deg(2, 161.0), 12.0 * 11.952, 6e-3);
+        // Round trips and ranges
+        for k in 0..5 { for a in [0.5, 3.0, 30.0, 60.0] { close(angle_form_to_deg(k, angle_form_from_deg(k, a)), a, 1e-10); } }
+        assert!(angle_form_from_deg(0, 90.0).is_nan());
+        assert!(angle_form_from_deg(3, 0.0).is_nan());
         assert!(convert(0, 99, 0, 1.0).is_nan());
         assert_eq!(units_text(12).lines().count(), 4);
         for q in 0..QUANTITIES.len() as u32 { assert!(!units(q).is_empty()); assert_eq!(units(q)[0].k, 1.0); }

@@ -53,6 +53,12 @@ Full list, the check table and open items: **`docs/cad-dxf.md`**. Summary:
 - **[EZDXF]** ezdxf 1.4.5 (MIT), https://ezdxf.mozman.at/ : independent reader used to load and audit the generated files (`scripts/check_dxf.py`); not a source of code.
 - Regular polygon relations: [MH] (regular polygons); bolt circle: [MH] (hole circles).
 
+## Angle forms in the unit converter (`core/src/units.rs`, `app/maths.js`)
+All accessed 2026-11-11.
+- Exact factors: degree = pi/180 rad, gon = pi/200 rad, minute and second of arc (NIST SP 811 Appendix B, as for the other units).
+- Slope: percent = 100 tan(a), "1 in n" with n = 1 / tan(a), a from the horizontal. Wikipedia, "Grade (slope)", https://en.wikipedia.org/wiki/Grade_(slope) (examples 45 deg = 100 %, 5.71 deg = 10 % = 1 in 10, used in a test). Second source: the same relation is the definition of the tangent (OpenStax, cited above); no second slope-specific page was read.
+- Taper: rate of taper C = (D - d) / L = 2 tan(a/2) = 1 : (1/2) cot(a/2), a the included angle. ISO/R 1119:1969 public preview, https://cdn.standards.iteh.ai/samples/393/59b5e966c1344a30b4189b766d61e88e/ISO-R-1119-1969.pdf (1:20 = 2 deg 51' 51.1", used in a test; current edition ISO 1119:2011, cited by name). Taper per foot = 12 (D - d) / L: Omni Calculator, "Taper calculator", https://www.omnicalculator.com/construction/taper (worked example half angle 80.5 deg, taper 11.952, used in a test); Machinery's Handbook, tapers (by name). NPT check: 3/4 in per foot is a half angle of 1 deg 47' 24" (Wikipedia "National pipe thread").
+
 ## Tool library and favourites (`app/toollib.js`, `app/app.js`)
 - Own design. Unit conversion 1 in = 25.4 mm exactly: NIST SP 811, appendix B.
 
