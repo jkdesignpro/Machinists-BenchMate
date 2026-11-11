@@ -35,6 +35,12 @@ Stage 2 of the plan: drawings and editors. Built on top of 0.3.0.
 - **Checked against ISO 3364:1997**: the 18 corner heights m that the standard's public preview prints for triangular, square and 55 degree rhombic inserts are reproduced by the core to 0.001 mm (the standard works from the inch radii: code 08 is 1/32 in = 0.794 mm, not 0.8). The same standard adds evidence for the type letters: A, M and G have a cylindrical hole; A no chip breaker, M on one face, G on both (the chip breaker meaning of A, M and G and the hole of M are now Confirmed; the hole of G is one source).
 - `benchmate-core`: new module `insert` (`corner_angles`, `sharp_corners`, `outline`, `dim`, `base_ic`, `doc`) with 8 tests; wasm exports `insert_outline`, `insert_dim`, `insert_base_ic`, `insert_dxf`.
 
+### Added (live spline tooth profile)
+- **Involute splines: the tooth space and its pin, enlarged and live.** Under the whole-spline picture there is now one tooth space of the shaft and one of the hub, to scale, with the teeth either side, the pitch circle, the base circle where it is in view, the measuring pin, its centre and the two points where it touches the flanks. The flanks are the true involute. Typing an actual tooth thickness, space width or pin size redraws it at once.
+- **New results**: the diameter on which each pin touches the flanks (the pitch diameter for the ideal pin), and a warning when a pin cannot measure: it does not touch the involute flanks (too large, or too small to reach them), it sits on the root, or it does not stand proud of the teeth.
+- **The drawing matches the computed dimensions**, by test: the thickness measured on the drawn profile at the pitch circle is the calculator's value, the pin centre is where the measurement over or between pins puts it, and the contact point is half a pin diameter from the centre (core test over four splines, external and internal, even and odd tooth counts; page test on the drawn picture, also with a typed thickness and space width).
+- `benchmate-core`: `gears::space_view` and `space_view_flat` with 2 tests; wasm export `gear_space_view`.
+
 ### Fixed
 - Insert designation: the type letter G (as in CNMG) showed no fixing hole, because no maker key that could be read printed it. ISO 3364 does.
 - DXF text strings: a caret in a text is written as caret and space, as the DXF reference asks, so it is not read as a control character.

@@ -1522,7 +1522,7 @@ const TOOLS = [
 },
 {
   id: 'spline', level: 'expert', group: 'Gears and splines', title: 'Involute splines (ANSI B92.1, ISO 4156)',
-  desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal). Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
+  desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal), with one tooth space of the shaft and of the hub drawn enlarged with its pin. Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
   fields: s => [
     { id: 'std', label: 'Standard', unit: '', def: s === 'inch' ? 1 : 2, options: [[1, 'ANSI B92.1 (inch, P/2P pitch)'], [2, 'ISO 4156 (metric module)']] },
     { id: 'mp', label: 'Pitch P (ANSI, e.g. 8 for 8/16) or module m (ISO, mm)', unit: '', def: s === 'inch' ? 8 : 2 },
@@ -1550,11 +1550,19 @@ const TOOLS = [
     const pe = v.dpe > 0 ? v.dpe : W.gear_ideal_pin_ext(m, v.z, 30, 0), pi = v.dpi > 0 ? v.dpi : W.gear_ideal_pin_int(m, v.z, 30, 0);
     rows.push(R('Pin diameter, external', pe, u, dp + 1), R('Measurement over pins, external', W.gear_over_pins_ext(v.z, d, 30, st, pe), u, dp + 1),
       R('Pin diameter, internal', pi, u, dp + 1), R('Measurement between pins, internal', W.gear_between_pins_int(v.z, d, 30, et, pi), u, dp + 1));
+    // Where each pin touches, and whether it measures at all: from the tooth space the core draws (gears::space_view).
+    const minE = isFinite(g(7)) && !(v.std === 1 && v.mp > 12) ? g(7) : NaN, minI = g(5);
+    [[0, st, g(4), minE, pe, 'external'], [1, et, minI, g(6), pi, 'internal']].forEach(([inn, t, tip, root, pin, name]) => {
+      if (!(tip > 0 && root > 0 && pin > 0) || !(W.gear_space_view(inn, v.z, d, 30, t, tip, root, pin, 8) > 6)) return;
+      const dk = W.list_out(1), fl = W.list_out(4);
+      if (isFinite(dk) && !(fl & 1)) rows.push(R('Pins touch the flanks on diameter, ' + name, dk, u, dp + 1));
+      SPLINE_PIN_MSG.forEach((msg, i) => { if (fl & (1 << i)) rows.push(R('Check the ' + name + ' pin', msg + [': it is too large for this tooth space, or too small to reach the flanks', ': it is too small', ', so the measuring faces would touch the teeth first: it is too small'][i], '', 0)); });
+    });
     rows.push(R('Major and minor diameter factors', v.std === 1 ? 'one free source so far (Engineers Edge)' : 'one free source so far (ISO 4156:1981 preview)', '', 0));
     rows.push(R('Pin size', 'the pins shown touch at the pitch diameter; the standards list their own measuring pin sizes: enter the size on your inspection sheet', '', 0));
     return rows;
   },
-  working: 'm = 1/P (ANSI) or the module (ISO). D = m z; Db = D cos 30°; p = π m; basic s = e = p/2. ANSI B92.1 30° flat root side fit: Do = (N + 1)/P, Di = (N − 1)/P, Dri = (N + 1.35)/P, Dre = (N − 1.35)/P (Dre rule for 2.5/5 to 12/24 pitch). ISO 4156 30° flat root: Dee = m (z + 1), Dei = m (z + 1.5), Die = m (z − 1.5) (basic, before deviations). Pins: external inv φ = s/D + inv 30° + dp/Db − π/z, M = Db / cos φ + dp (even z; odd z × cos(90°/z) before + dp); internal inv φ = e/D + inv 30° − dp/Db, M = Db / cos φ − dp. Ideal pins touch at the pitch diameter (as for a gear with x = 0).',
+  working: 'm = 1/P (ANSI) or the module (ISO). D = m z; Db = D cos 30°; p = π m; basic s = e = p/2. ANSI B92.1 30° flat root side fit: Do = (N + 1)/P, Di = (N − 1)/P, Dri = (N + 1.35)/P, Dre = (N − 1.35)/P (Dre rule for 2.5/5 to 12/24 pitch). ISO 4156 30° flat root: Dee = m (z + 1), Dei = m (z + 1.5), Die = m (z − 1.5) (basic, before deviations). Pins: external inv φ = s/D + inv 30° + dp/Db − π/z, M = Db / cos φ + dp (even z; odd z × cos(90°/z) before + dp); internal inv φ = e/D + inv 30° − dp/Db, M = Db / cos φ − dp. Ideal pins touch at the pitch diameter (as for a gear with x = 0). Tooth space drawing: half angle of a tooth of thickness s at radius r, ψ = s/D + inv 30° − inv α_r with cos α_r = Db / (2r); the pin centre is on Db / cos φ and touches the flank where the line from its centre, tangent to the base circle, is dp/2 shorter (external) or longer (internal).',
   source: 'ANSI B92.1-1996 and ISO 4156-1:2021 (second edition, replaces ISO 4156-1:2005), cited by name. Factors: Engineers Edge, involute spline basic formulas (ANSI); ISO 4156:1981 table 2 in the iTeh free preview (ISO). Pin formulas as for gears (KHK). Each status is in docs/gears.md.',
 },
 {

@@ -109,6 +109,56 @@ const deCross = (x, y, r) => DK.cl(x - r, y, x + r, y) + DK.cl(x, y - r, x, y + 
 // Thread form data for the wire drawing: flank half-angle, crest height and root depth from the pitch line (x P).
 const DE_FORMS = { 60: [30, 0.324760, 0.216506, '60° UN / ISO metric'], 55: [27.5, 0.320163, 0.320163, '55° Whitworth'], 29: [14.5, 0.25, 0.25, '29° ACME'], 30: [15, 0.25, 0.25, '30° trapezoidal'], 291: [14.5, 0.15, 0.15, '29° Stub ACME'] };
 
+// What is wrong with a measuring pin, by the flag bits of gears::space_view.
+const SPLINE_PIN_MSG = ['This pin does not touch the involute flanks', 'This pin sits on the root', 'This pin does not stand proud of the teeth'];
+// One tooth space of a spline or gear, enlarged, with its measuring pin: the tooth either side, the tip, root,
+// pitch and base circles, the pin and where it touches. Geometry from the core (gear_space_view); placed in a
+// w x h window whose top centre is (cx, top). t: tooth thickness (external) or space width (internal) on d.
+function deSpace(id, cx, top, w, h, internal, z, d, t, dTip, dRoot, dPin, u, dp, note) {
+  const C = state.W, n = C.gear_space_view(internal ? 1 : 0, z, d, 30, t, dTip, dRoot, dPin > 0 ? dPin : 0, 24);
+  if (!(n > 6)) return DK.text(cx, top + h / 2, 'These sizes do not make a tooth space', { cls: 'mut' });
+  const dc = C.list_out(0), rc = dc / 2, dk = C.list_out(1), kx = C.list_out(2), ky = C.list_out(3), flags = C.list_out(4), np = C.list_out(5), pts = [];
+  for (let i = 0; i < np; i++) pts.push([C.list_out(6 + 2 * i), C.list_out(7 + 2 * i)]);
+  const rt = dTip / 2, rr = dRoot / 2, depth = Math.abs(rt - rr), pin = dPin > 0 && deFin(rc), pr = dPin / 2;
+  // Window in part units: one and a half pitches wide, from behind the root to past the pin.
+  const lo = internal ? Math.min(rt, pin ? rc - pr : rt) - 0.45 * depth : rr - 0.5 * depth;
+  const hi = internal ? rr + 0.5 * depth : Math.max(rt, pin ? rc + pr : rt) + 0.45 * depth;
+  const half = 0.95 * Math.PI * d / z, yTop = top + 4, hh = h - 64;
+  const k = Math.min(w / (2 * half), hh / (hi - lo));
+  // External: outwards is up. Internal: the hub is above the space, the bore centre below, so outwards is up as well.
+  const X = x => cx + x * k, Y = y => yTop + (hi - y) * k + (hh - (hi - lo) * k) / 2;
+  const turn = (p, a) => [p[0] * Math.cos(a) + p[1] * Math.sin(a), -p[0] * Math.sin(a) + p[1] * Math.cos(a)];
+  const all = [];
+  [-1, 0, 1].forEach(j => pts.forEach((p, i) => { if (j === -1 || i > 0) all.push(turn(p, j * 2 * Math.PI / z)); }));
+  const back = internal ? yTop - 4 : yTop + hh + 4;
+  let g = '<clipPath id="' + id + '"><rect x="' + deF(cx - w / 2) + '" y="' + deF(yTop) + '" width="' + deF(w) + '" height="' + deF(hh) + '"/></clipPath><g clip-path="url(#' + id + ')">';
+  g += '<path class="part" id="' + id + 'p" d="M' + all.map(p => deF(X(p[0])) + ' ' + deF(Y(p[1]))).join('L') + 'L' + deF(X(all[all.length - 1][0])) + ' ' + deF(back) + 'L' + deF(X(all[0][0])) + ' ' + deF(back) + 'Z"/>';
+  const ring = (r, cls, cid) => '<circle class="' + cls + '"' + (cid ? ' id="' + id + cid + '"' : '') + ' cx="' + deF(X(0)) + '" cy="' + deF(Y(0)) + '" r="' + deF(r * k) + '"/>';
+  g += ring(d / 2, 'cl', 'd');
+  const rb = d * Math.cos(Math.PI / 6) / 2, showBase = rb > lo && rb < hi;
+  if (showBase) g += ring(rb, 'hid');
+  if (pin) {
+    g += '<circle class="tool" id="' + id + 'pin" cx="' + deF(X(0)) + '" cy="' + deF(Y(rc)) + '" r="' + deF(pr * k) + '"/>' + DK.line(X(0) - 5, Y(rc), X(0) + 5, Y(rc), 'thin') + DK.line(X(0), Y(rc) - 5, X(0), Y(rc) + 5, 'thin');
+    if (deFin(kx)) g += [1, -1].map(sg => DK.line(X(0), Y(rc), X(sg * kx), Y(ky), 'hot') + '<circle class="hotf' + (sg > 0 ? '" id="' + id + 'k' : '') + '" cx="' + deF(X(sg * kx)) + '" cy="' + deF(Y(ky)) + '" r="2.6"/>').join('');
+  }
+  g += '</g><rect class="thin" x="' + deF(cx - w / 2) + '" y="' + deF(yTop) + '" width="' + deF(w) + '" height="' + deF(hh) + '"/>';
+  // Labels: the thickness on the pitch circle; the circles, the pin and its contact circle in words underneath.
+  const onPitch = pts.filter(p => Math.abs(Math.hypot(p[0], p[1]) - d / 2) < 1e-9 * d);
+  if (onPitch.length === 2) {
+    // On the pitch circle. External: the thickness of the tooth on the right of the pin. Internal: the width of the
+    // space the pin sits in, with the dimension line below the pin.
+    const A = internal ? onPitch[0] : onPitch[1], B = internal ? onPitch[1] : turn(onPitch[0], 2 * Math.PI / z);
+    g += DK.dim(X(A[0]), Y(A[1]), X(B[0]), Y(B[1]), (internal ? 'e ' : 's ') + DK.n(t, dp), { off: internal ? -((pin ? Y(rc - pr) : Y(rt)) - Y(A[1]) + 14) : -16, below: true });
+  }
+  const lines = [internal ? 'minor Ø ' + DK.n(dTip, dp - 1) + ', major Ø ' + DK.n(dRoot, dp - 1) : 'major Ø ' + DK.n(dTip, dp - 1) + ', minor Ø ' + DK.n(dRoot, dp - 1)];
+  if (pin) lines.push('pin Ø ' + DK.n(dPin, dp) + ', centre on Ø ' + DK.n(dc, dp));
+  if (pin && deFin(dk) && !(flags & 1)) lines.push('touches the flanks on Ø ' + DK.n(dk, dp) + ' (pitch Ø ' + DK.n(d, dp - 1) + ')');
+  const bad = SPLINE_PIN_MSG.filter((m, i) => flags & (1 << i));
+  g += lines.concat(note ? [note] : []).map((l, i) => DK.text(cx, yTop + hh + 14 + 13 * i, l, { cls: 'mut', size: 10.5 })).join('');
+  g += bad.map((l, i) => DK.text(cx, yTop + hh + 14 + 13 * (lines.length + (note ? 1 : 0) + i), l, { cls: 'hotf', size: 10.5 })).join('');
+  return g;
+}
+
 Object.assign(DIAGRAMS, {
   // Three-wire measurement: the thread in axial section to scale, wires seated on the flanks, anvils and M.
   wires(v, sys, rows) {
@@ -429,7 +479,7 @@ Object.assign(DIAGRAMS, {
 
   // Involute splines: external with pins over, internal with pins between, both drawn from the 30° involute.
   spline(v, sys, rows) {
-    const W = 520, H = 310, u = deU(sys), dp = deDp(sys) + 1;
+    const W = 520, H = 590, u = deU(sys), dp = deDp(sys) + 1;
     if (!(v.mp > 0 && v.z >= 6 && v.z <= 200 && (v.std === 1 || v.std === 2))) return '';
     const z = Math.round(v.z), m = v.std === 1 ? (sys === 'inch' ? 1 / v.mp : 25.4 / v.mp) : (sys === 'inch' ? v.mp / 25.4 : v.mp), D = deV(rows, 'Pitch diameter D');
     if (!(D > 0)) return '';
@@ -455,8 +505,13 @@ Object.assign(DIAGRAMS, {
     h += deRing(ix, cy, Rf * 1.16 * s, gi) + DK.circle(ix, cy, D / 2 * s, 'cl') + deCross(ix, cy, Rf * 1.16 * s + 10);
     const pi = deV(rows, 'Pin diameter, internal'), Mi = deV(rows, 'Measurement between pins, internal');
     if (pi > 0 && Mi > 0) { const q = pins(ix, (Mi + pi) / 2 / co, pi, true, Mi); h += q.g; lab += q.d; }
+    // Below: one tooth space of each, enlarged, with its pin. The profile, the pin centre and the contact
+    // points come from the Rust core (gears::space_view); this only places them on the page.
+    const tipI = Dmi > 0 ? 2 * Ra : NaN;
+    lab += deSpace('spe', ex, 326, 244, 236, false, z, D, st, 2 * ra, 2 * rf, pe, u, dp, !(Die > 0) ? 'minor Ø drawn at m (z − 1.35): no rule for this pitch here' : '');
+    lab += deSpace('spi', ix, 326, 244, 236, true, z, D, et, 2 * Ra, 2 * Rf, pi, u, dp, !(Dmi > 0) ? 'minor Ø drawn at m (z − 1): not given by the source' : '');
     lab += DK.text(ex, 18, 'External (shaft): over pins', { cls: 'txt' }) + DK.text(ix, 18, 'Internal (hub): between pins', { cls: 'txt' });
-    lab += DK.text(W / 2, H - 6, z + ' teeth, ' + (v.std === 1 ? DK.n(v.mp, 3) + '/' + DK.n(2 * v.mp, 3) + ' pitch' : 'module ' + DK.n(v.mp, 3)) + ', 30° pressure angle, pitch Ø ' + DK.n(D, dp - 1) + ' ' + u + ' (chain circle)', { cls: 'mut' });
+    lab += DK.text(W / 2, 304, z + ' teeth, ' + (v.std === 1 ? DK.n(v.mp, 3) + '/' + DK.n(2 * v.mp, 3) + ' pitch' : 'module ' + DK.n(v.mp, 3)) + ', 30° pressure angle, pitch Ø ' + DK.n(D, dp - 1) + ' ' + u + ' (chain circle)', { cls: 'mut' });
     if (pe > 0) lab += DK.text(ex, 34, 'pins Ø ' + DK.n(pe, dp), { cls: 'mut' });
     if (pi > 0) lab += DK.text(ix, 34, 'pins Ø ' + DK.n(pi, dp), { cls: 'mut' });
     return DK.svg(W, H, h + lab, 'Involute spline, external and internal, with measuring pins');

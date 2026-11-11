@@ -749,6 +749,52 @@ where = 'insertcode';
   await units('mm');
 }
 
+// Involute splines: the enlarged tooth space is the core's profile, and what is drawn agrees with the numbers
+// in the result table: pin size against the pitch circle, the pin touching both flanks, the tooth thickness
+// on the pitch circle, and a pin that cannot measure is said so.
+where = 'spline';
+{
+  await units('inch');
+  await page.evaluate(() => setMode('expert'));
+  await open('spline', 80);
+  const row = async label => page.$$eval('#res tr', (trs, l) => { const t = trs.find(x => x.textContent.includes(l)); return t ? t.innerText.replace(/\s+/g, ' ') : ''; }, label);
+  const geo = id => page.evaluate(id => {
+    const c = s => { const e = document.querySelector('#' + id + s); return e ? { x: +e.getAttribute('cx'), y: +e.getAttribute('cy'), r: +e.getAttribute('r') } : null; };
+    const pitch = c('d'), pin = c('pin'), k = c('k'), path = document.querySelector('#' + id + 'p');
+    if (!pitch || !path) return null;
+    const pts = path.getAttribute('d').slice(1, -1).split('L').map(p => p.split(' ').map(Number));
+    // profile points on the pitch circle, nearest the middle of the picture: the two flanks of the space the pin sits in
+    const on = pts.filter(p => Math.abs(Math.hypot(p[0] - pitch.x, p[1] - pitch.y) - pitch.r) < 0.03).sort((a, b) => Math.abs(a[0] - pitch.x) - Math.abs(b[0] - pitch.x)).slice(0, 2);
+    const space = on.length === 2 ? 2 * Math.asin(Math.hypot(on[0][0] - on[1][0], on[0][1] - on[1][1]) / 2 / pitch.r) : NaN;
+    return { pinOverPitch: pin ? pin.r / pitch.r : NaN, touch: pin && k ? Math.hypot(k.x - pin.x, k.y - pin.y) / pin.r : NaN, space, kr: k ? Math.hypot(k.x - pitch.x, k.y - pitch.y) / pitch.r : NaN };
+  }, id);
+  // defaults: ANSI 8/16, 24 teeth, ideal pins 0.23598 and 0.21877, which touch on the pitch circle
+  let e = await geo('spe'), i = await geo('spi');
+  if (!e || !i) problems.push(`[${where}] the enlarged tooth spaces are not drawn`);
+  else {
+    if (Math.abs(e.pinOverPitch - 0.23598 / 3) > 2e-4 || Math.abs(i.pinOverPitch - 0.21877 / 3) > 2e-4) problems.push(`[${where}] pins are not drawn to scale against the pitch circle: ${e.pinOverPitch} ${i.pinOverPitch}`);
+    if (Math.abs(e.touch - 1) > 2e-3 || Math.abs(i.touch - 1) > 2e-3) problems.push(`[${where}] the contact points are not on the pins: ${e.touch} ${i.touch}`);
+    if (Math.abs(e.kr - 1) > 2e-4 || Math.abs(i.kr - 1) > 2e-4) problems.push(`[${where}] ideal pins should touch on the pitch circle: ${e.kr} ${i.kr}`);
+    // basic thickness: tooth and space each take half the pitch, so the space spans pi / z
+    if (Math.abs(e.space - Math.PI / 24) > 2e-4 || Math.abs(i.space - Math.PI / 24) > 2e-4) problems.push(`[${where}] the space drawn on the pitch circle is not half the pitch: ${e.space} ${i.space}`);
+  }
+  if (!/3\.00000 in/.test(await row('Pins touch the flanks on diameter, external')) || !/3\.00000 in/.test(await row('Pins touch the flanks on diameter, internal'))) problems.push(`[${where}] the contact diameter of the ideal pins should be the pitch diameter: "${await row('Pins touch the flanks on diameter, external')}"`);
+  // a thinner tooth (0.18) and a wider space (0.21): the drawing follows the typed sizes
+  await page.fill('#main [data-id="st"]', '0.18'); await page.fill('#main [data-id="et"]', '0.21'); await page.waitForTimeout(80);
+  e = await geo('spe'); i = await geo('spi');
+  const p = Math.PI / 8;
+  if (!e || !i || Math.abs(e.space - (p - 0.18) / 1.5) > 2e-4 || Math.abs(i.space - 0.21 / 1.5) > 2e-4) problems.push(`[${where}] typed thickness 0.18 and space 0.21 should be what is drawn: ${e && e.space * 1.5} ${i && i.space * 1.5}`);
+  if (e && (Math.abs(e.touch - 1) > 2e-3 || Math.abs(i.touch - 1) > 2e-3)) problems.push(`[${where}] with typed sizes the pins should still touch the flanks: ${e.touch} ${i.touch}`);
+  // pins that cannot measure
+  await page.fill('#main [data-id="st"]', ''); await page.fill('#main [data-id="et"]', '');
+  await page.fill('#main [data-id="dpe"]', '0.4'); await page.fill('#main [data-id="dpi"]', '0.12'); await page.waitForTimeout(80);
+  const svg = await page.$eval('#main svg.dk', s => s.textContent);
+  if (!/does not touch the involute flanks/.test(await row('Check the external pin')) || !/sits on the root/.test(await row('Check the internal pin')) || !/does not touch the involute flanks/.test(svg) || !/sits on the root/.test(svg) || (await row('Pins touch the flanks on diameter, external'))) problems.push(`[${where}] a 0.4 pin outside and a 0.12 pin inside should both be refused in the table and the drawing`);
+  await page.fill('#main [data-id="dpe"]', ''); await page.fill('#main [data-id="dpi"]', '');
+  await page.evaluate(() => setMode('advanced'));
+  await units('mm');
+}
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

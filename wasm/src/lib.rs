@@ -641,6 +641,11 @@ pub extern "C" fn gear_measure(mn: f64, z: f64, an: f64, beta: f64, xn: f64, dp:
 /// One tooth outline (x, y pairs) into list_out; returns the value count.
 #[no_mangle] pub extern "C" fn gear_tooth(d: f64, db: f64, da: f64, df: f64, s: f64, n: f64) -> f64 {
     set_out(c::gears::tooth_outline(d, db, da, df, s, n.max(0.0) as usize)) }
+/// One tooth space with its measuring pin into list_out (see `gears::space_view_flat`:
+/// pin centre diameter, contact diameter, contact x, y, flags, point count, points); returns the value count.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gear_space_view(internal: f64, z: f64, d: f64, alpha: f64, t: f64, d_tip: f64, d_root: f64, dp: f64, n: f64) -> f64 {
+    set_out(c::gears::space_view_flat(internal != 0.0, z, d, alpha, t, d_tip, d_root, dp, n.max(0.0) as usize)) }
 /// Gear train ratio from the first `n` buffer values (driver, driven, driver, driven, ...).
 #[no_mangle] pub extern "C" fn gear_train_ratio(n: f64) -> f64 { c::gears::train_ratio(buf(n)) }
 f1!(gear_willis, c::gears::willis, zs, zr, ns, nr, nc);

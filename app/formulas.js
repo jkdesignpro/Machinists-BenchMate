@@ -356,6 +356,8 @@ const FORMULAS = [
   F('planetary', 'Planet teeth and spacing', 'zp = (zr − zs)/2;  (zs + zr)/n whole for n equally spaced planets', '', ['SDPSI', 'KHK']),
   F('spline', 'Spline basic dimensions', 'D = m z (m = 1/P);  Db = D cos 30°;  p = π m;  s = e = p/2', '', ['B92', 'ISO4156']),
   F('spline', 'Spline major and minor diameters, 30° flat root', 'ANSI: Do = (N+1)/P, Di = (N−1)/P, Dri = (N+1.35)/P, Dre = (N−1.35)/P;  ISO: Dee = m(z+1), Dei = m(z+1.5), Die = m(z−1.5)', 'basic values before tolerances', ['B92', 'ISO4156']),
+  F('spline', 'Tooth thickness at any radius', 'ψ(r) = s/D + inv α − inv α_r,   cos α_r = Db / (2r)', 'ψ: half angle of the tooth at radius r; s: thickness on the pitch circle D; Db: base diameter; an internal space of width e has the same shape', ['KHK', 'OWN']),
+  F('spline', 'Where a pin touches the flank', 'r_c = √((Db/2)² + ((Db/2) · tan φ ∓ dp/2)²)', 'r_c: radius of the contact point; φ: from the over or between pins formula; − external, + internal', ['KHK', 'OWN']),
   F('spline', 'Spline over and between pins', 'inv φ = s/D + inv 30° + dp/Db − π/z, M = Db/cos φ + dp;  internal inv φ = e/D + inv 30° − dp/Db, M = Db/cos φ − dp', '', ['KHK', 'OWN']),
   F('worm', 'Worm lead and lead angle', 'L = z1 π mx;  tan γ = z1 mx / d1', 'z1: starts; mx: axial module; d1: worm pitch diameter', ['KHK', 'SDPSI']),
   F('worm', 'Worm ratio and centre distance', 'i = z2 / z1;  a = (d1 + z2 mx) / 2', '', ['KHK', 'SDPSI']),
