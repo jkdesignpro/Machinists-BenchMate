@@ -43,7 +43,7 @@ function stBox() {
 
 // ---------- Sources (full list with URLs and access dates in docs/gdt.md) ----------
 const GDT_SOURCES = {
-  ISO: 'ISO online catalogue (iso.org): ISO 1101:2017, ISO 2692:2021, ISO 8015:2011, ISO 22081:2021, ISO 5459:2024 listing, ISO 2768-2:1989 and ISO 5459:2011 withdrawn (accessed 2026-11-10)',
+  ISO: 'ISO online catalogue (iso.org): ISO 1101:2017, ISO 2692:2021, ISO 8015:2011, ISO 22081:2021, ISO 5459:2024 (committee.iso.org mirror, edition 3, 2024-10), ISO 2768-2:1989 and ISO 5459:2011 withdrawn (accessed 2026-11-10/11)',
   ASME: 'ASME catalogue page, Y14.5-2018 (R2024) Dimensioning and Tolerancing, stabilized maintenance (asme.org, accessed 2026-11-10)',
   MIT: 'J. Salsbury, "GD&T and the new ASME Y14.5-2018", Mitutoyo America Corporation, 2019',
   GLS: 'Geometric Learning Systems (gdtseminars.com), GD&T reference chart for ASME Y14.5-2018, 2019',
@@ -61,6 +61,14 @@ const GDT_SOURCES = {
   FARO: 'O. Ekinci, Understanding composite positional tolerances in GD&T, FARO Technologies (cites ASME Y14.5-2018 section 10.5)',
   DCS: 'Dimensional Control Systems, 3DCS help manual: Composite GD&T',
   GEN: 'Genorma standards catalogue, ISO 2768-2:1989 status page (withdrawn 2021-02-04, revised by ISO 22081:2021)',
+  PTC: 'PTC Creo help, model-based definition: "Optional modifiers (ASME)" and "Datum feature label has syntax errors (ASME)" (support.ptc.com, Creo Parametric 13)',
+  GLS12: 'Stolter LLC and Geometric Learning Systems, comparison chart of ASME Y14.5-2009, Y14.5M-1994, ANSI Y14.5M-1982 and ISO, 2012 (hosted on qualityforum.zeiss.com)',
+  HEX: 'Hexagon Manufacturing Intelligence, PC-DMIS 2023.1 help: Profile of a line (composite segments)',
+  SIS: 'SIS Swedish Institute for Standards, catalogue page for ISO 2768-2:1989 (status withdrawn, replaced by ISO 22081:2021)',
+  BSI: 'BSI Knowledge, BS EN ISO 5459:2024 product page (published 2024-10-31, supersedes the 2011 edition, summary of changes)',
+  QM: 'E. Morse, "Tolerancing standards: a comparison", Quality Magazine, 2016-08-01',
+  MMS: 'G. Schuetz (Mahr Inc.), "Approximating geometry measurement", Modern Machine Shop, 2008-08-20',
+  PMPA: 'Precision Machined Products Association (pmpa.org), "pseudo-round" (lobed) parts article, about 2010',
   OWN: 'BenchMate derivation (geometry or arithmetic), with tests in core/src/gdt.rs',
 };
 // Render source keys; fewer than two independent keys (OWN counts for maths only) = to be verified.
@@ -88,9 +96,9 @@ const CHARS = [
   { id: 'circularity', name: 'Circularity (roundness)', cat: 'Form', datums: 'never', fos: false, mc: false, dia: false, asme: true, iso: true,
     zone: 'In each cross-section square to the axis: two concentric circles whose radii differ by the tolerance. Every section is checked on its own.',
     controls: 'Roundness of each section. Not straightness, taper or location.',
-    inspect: 'Roundness machine (part rotated on a precision spindle). Two-point measurement with a micrometer may not reveal odd-lobed shapes (three lobes, five lobes), so on its own it is not a circularity check (to be verified: how lobing affects V-block and two-point readings).',
+    inspect: 'Roundness machine (part rotated on a precision spindle). A two-point check (micrometer, snap gauge) can read a constant diameter on a part with an odd number of lobes (three, five...), because each high spot faces a low spot; so it is not a circularity check. A V-block with an indicator does show lobing, and its included angle can be chosen to suit the expected number of lobes (the two-point limit: PMPA and MMS; the V-angle rule is from PMPA only, to be verified).',
     mistakes: 'Treating the tolerance as a diameter difference: the zone is a radial width. Adding a datum. Giving a value equal to or larger than the size tolerance, which Rule #1 already covers. Spinning the part on a datum instead of its own axis measures runout, not circularity.',
-    src: ['GDTB', 'UIUC', 'GLS'] },
+    src: ['GDTB', 'UIUC', 'GLS', 'PMPA', 'MMS'] },
   { id: 'cylindricity', name: 'Cylindricity', cat: 'Form', datums: 'never', fos: false, mc: false, dia: false, asme: true, iso: true,
     zone: 'Two coaxial cylinders whose radii differ by the tolerance; the whole surface must lie between them.',
     controls: 'Circularity, straightness of the surface elements and taper of the surface together.',
@@ -252,17 +260,17 @@ const MODS = [
   { k: 'L', show: () => circled('L'), name: 'Least material condition (LMC) / boundary (LMB)', asmeIso: 'ASME Y14.5-2018; ISO 2692:2021 (least material requirement, LMR)',
     text: 'The tolerance applies at LMC size (largest hole, smallest pin); bonus grows as the feature moves towards MMC. Used to protect a minimum wall or edge distance.', src: ['SKL', 'JLC', 'KEY'] },
   { k: 'RFS', show: () => '<span class="gtx">(none)</span>', name: 'Regardless of feature size (RFS)', asmeIso: 'Default in ASME Y14.5-2018',
-    text: 'No modifier: the stated tolerance applies at any actual size and there is no bonus. Older drawings may show a circled S for RFS; current ASME practice shows no symbol (the edition that dropped it: sources differ).', src: ['GDTB', 'SKL', 'KEY'], tbv: true },
+    text: 'No modifier: the stated tolerance applies at any actual size and there is no bonus. Old drawings may show a circled S. It was required for RFS position in ANSI Y14.5M-1982; Y14.5M-1994 made RFS the default and allowed the symbol only as a legacy option; Y14.5-2009 and 2018 have no RFS symbol.', src: ['GDTB', 'GLS12', 'KEY', 'OEP'] },
   { k: 'P', show: () => circled('P'), name: 'Projected tolerance zone', asmeIso: 'ASME and ISO',
-    text: 'The zone is projected above the part for a stated height, usually where the mating part sits. Used for threaded and press-fit holes, where a tilted fixed fastener could otherwise hit the mating part.', src: ['UIUC', 'KEY', 'GDTB'] },
+    text: 'The zone is projected above the part for a stated minimum height, usually where the mating part sits. Applies to a feature of size (normally a hole) and limits its tilt. Used for threaded and press-fit holes, where a tilted fixed fastener could otherwise hit the mating part.', src: ['UIUC', 'KEY', 'GDTB', 'PTC'] },
   { k: 'F', show: () => circled('F'), name: 'Free state', asmeIso: 'ASME and ISO',
     text: 'The tolerance applies with the part unrestrained, for non-rigid parts that deflect when clamped.', src: ['KEY', 'GDTB', 'GLS'] },
   { k: 'T', show: () => circled('T'), name: 'Tangent plane', asmeIso: 'ASME (KEYENCE lists it as ASME only)',
-    text: 'The tolerance applies to the plane touching the high points of the surface, not to every point of it. Useful on mounting faces where contact matters.', src: ['KEY', 'GDTB', 'GLS'] },
+    text: 'The tolerance applies to the plane touching the high points of the surface, not to every point of it. Applies to a surface, not an axis. Useful on mounting faces where contact matters; the surface form may need its own control.', src: ['KEY', 'GDTB', 'GLS', 'PTC'] },
   { k: 'U', show: () => circled('U'), name: 'Unequally disposed profile', asmeIso: 'ASME (U); ISO 1101:2017 uses UZ',
     text: 'Profile only. The zone is not split equally about the true profile. The frame gives the total width, then, after the U, the part of it that lies on the material-adding side (outside the material): equal values put the whole zone outside, zero puts it all inside. See the Unequal profile (U) zone calculator.', src: ['GDTB', 'OEP', 'KEY'] },
   { k: 'ST', show: () => stBox(), name: 'Statistical tolerance', asmeIso: 'ASME (KEYENCE lists it as ASME only)',
-    text: 'The tolerance relies on statistical tolerancing, so the feature is expected to be made under statistical process control (to be verified: only one source read).', src: ['KEY'], tbv: true },
+    text: 'The tolerance was assigned by a statistical stack (for example root sum square) rather than worst case, so the feature must be made under statistical process control. The drawing carries a note saying so; one study guide adds that the required capability indices should be stated. Rarely used; one CAD maker calls it loosely defined.', src: ['KEY', 'OEP', 'PTC'] },
   { k: 'CF', show: () => '<span class="gtx">CF</span>', name: 'Continuous feature', asmeIso: 'ASME (KEYENCE lists it as ASME only)',
     text: 'Interrupted surfaces (for example a bore broken by a groove) are treated as one feature under one tolerance.', src: ['KEY', 'GDTB'] },
   { k: 'I', show: () => circled('I'), name: 'Independency', asmeIso: 'ASME only, next to a size dimension',
@@ -280,7 +288,7 @@ function renderGdtGuide(el) {
     '<dt>Tolerance zone</dt><dd>' + gesc(c.zone) + '</dd><dt>What it controls</dt><dd>' + gesc(c.controls) + '</dd>' +
     '<dt>Typical inspection</dt><dd>' + gesc(c.inspect) + '</dd><dt>Common mistakes</dt><dd>' + gesc(c.mistakes) + '</dd></dl></div></section>';
   const cats = ['Form', 'Profile', 'Orientation', 'Location', 'Runout'];
-  const toc = [['g-purpose', 'Purpose'], ['g-rule1', 'Rule #1 vs ISO 8015'], ['g-datums', 'Datums'], ['g-chars', 'Characteristics'], ['g-comp', 'Composite position'], ['g-mods', 'Modifiers'], ['g-cmp', 'ASME vs ISO'], ['g-eds', 'Editions'], ['g-srcs', 'Sources']];
+  const toc = [['g-purpose', 'Purpose'], ['g-rule1', 'Rule #1 vs ISO 8015'], ['g-datums', 'Datums'], ['g-chars', 'Characteristics'], ['g-comp', 'Composite position'], ['g-cprof', 'Composite profile'], ['g-mods', 'Modifiers'], ['g-cmp', 'ASME vs ISO'], ['g-eds', 'Editions'], ['g-srcs', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Written for BenchMate in our own words, for ASME Y14.5-2018 and the current ISO GPS editions. Standards are cited by name, year and clause only. Each rule carries the keys of the public sources that confirm it (hover a key); anything not confirmed in two independent sources is marked <span class="gtbv">to be verified</span>. Always work to the standard and edition named on your drawing.</p>' +
@@ -298,6 +306,7 @@ function renderGdtGuide(el) {
     '<p><b>Terms.</b> The <i>datum feature</i> is the real, imperfect surface on the part, marked with the datum feature symbol. The <i>datum</i> is the theoretically exact plane, axis or point taken from it. The <i>datum feature simulator</i> is the physical stand-in used in manufacture and inspection: a surface plate, gauge block, gauge pin, collet, or a CMM\'s virtual equivalent. ' + srcTags(['GDTB', 'KEY', 'CNCC']) + '</p>' +
     '<p><b>3-2-1 and degrees of freedom.</b> A free part has six degrees of freedom: three translations and three rotations. For a part with three plane datum features, the primary datum feature contacts its simulator at three or more points and removes three degrees of freedom, the secondary at two or more points and removes two, and the tertiary at one or more point and removes the last. ' + srcTags(['GDTB', 'CNCC']) + '</p>' +
     '<p><b>Order of precedence.</b> The first datum letter in the feature control frame is primary, the second secondary, the third tertiary. The order is the order of set-up, not alphabetical, and changing it can change the result. ' + srcTags(['UIUC', 'CNCC', 'GDTB']) + '</p>' +
+    '<p><b>Datum letters.</b> Datum features are named with capital letters. I, O and Q are not used (they are easily read as 1 and 0); when A to Z run out, double letters follow (AA, AB ...). ' + srcTags(['PTC', 'GDTB']) + '</p>' +
     '<p><b>Datum targets.</b> On warped or irregular surfaces the drawing can name points, lines or small areas to contact instead of the whole surface, so set-up is repeatable. ' + srcTags(['KEY', 'CNCC']) + '</p>' +
     '<p><b>Datum features of size at MMB/LMB.</b> When a hole or pin is a datum feature it can be referenced at its maximum or least material boundary (M or L after the datum letter). The simulator is then fixed at that boundary size, and if the actual datum feature departs from it the part may shift relative to the simulator. This datum feature shift is not a bonus on the feature tolerance and must not simply be added to it. A plane datum feature has no size, so it cannot take MMB or LMB. ' + srcTags(['GLS', 'GDTB', 'OEP']) + mmbDiagram() + '</p>' +
 
@@ -307,6 +316,8 @@ function renderGdtGuide(el) {
 
     '<h2 id="g-comp">Composite position</h2>' + compositeDiagram() +
     '<p>One position symbol spanning two rows of a frame. The upper row (pattern-locating tolerance zone framework, PLTZF) locates the pattern of holes to the datums, like an ordinary position tolerance. The lower row (feature-relating tolerance zone framework, FRTZF) is tighter and controls the holes relative to each other: its zones form one rigid group that may shift (and, with only the primary datum repeated, rotate) as long as each hole stays in both of its zones. Datums in the lower row orient the group only. Two frames each with their own position symbol (multiple single-segment) are different: there the lower datums locate as well, so the result is tighter. Use the Composite position checker to test measured holes. ' + srcTags(['FARO', 'DCS', 'GDTB']) + '</p>' +
+    '<h2 id="g-cprof">Composite profile</h2>' +
+    '<p>The profile counterpart of composite position: one profile symbol over two (or more) rows. The upper row works like an ordinary profile tolerance and fixes the zone in location and orientation to its datums. The lower row has the smaller value; its zone keeps its basic shape and size but is no longer tied in location to the datums, so it may float within the upper zone. Datums repeated in the lower row hold orientation only. The lower row may repeat the upper datums, or drop the trailing ones, but in the same order and with the same modifiers, and may not add new ones. The surface must lie in both zones. Two frames each with their own profile symbol (multiple single-segment) differ: there the lower datums also locate. ' + srcTags(['OEP', 'HEX']) + ' Composite and single-segment forms are defined for profile in Y14.5M-1994 and later. ' + srcTags(['GLS12', 'OEP']) + ' BenchMate has no composite profile checker; measure with a CMM best fit constrained as described.</p>' +
     '<h2 id="g-mods">Modifiers</h2><div class="res" style="max-width:none"><table class="gtab"><tr><th>Symbol</th><th>Name</th><th>Meaning</th><th>Standards</th></tr>' +
     MODS.map(m => '<tr><td class="gsc">' + m.show() + '</td><td><b>' + gesc(m.name) + '</b></td><td>' + gesc(m.text) + ' ' + srcTags(m.src, m.tbv) + '</td><td>' + gesc(m.asmeIso) + '</td></tr>').join('') +
     '<tr><td class="gsc">' + sym('dia') + '</td><td><b>Diameter, spherical diameter</b></td><td>The zone is a cylinder; S before the diameter symbol means a spherical zone. Not used with runout, circularity or cylindricity, whose zones are radial widths. ' + srcTags(['UIUC', 'GDTB']) + '</td><td>ASME and ISO</td></tr>' +
@@ -315,22 +326,22 @@ function renderGdtGuide(el) {
     '<h2 id="g-cmp">ASME Y14.5-2018 and ISO GPS compared</h2><div class="res" style="max-width:none"><table class="gtab"><tr><th>Topic</th><th>ASME Y14.5-2018</th><th>ISO GPS (current editions)</th></tr>' +
     [['Size and form by default', 'Rule #1: perfect form at MMC.', 'Independency principle, ISO 8015:2011. Envelope only where E is shown (ISO 14405-1).', ['HZ', 'GDTB'], false],
      ['Concentricity and symmetry', 'Removed in the 2018 edition (present in 2009). Use position, runout or profile.', 'Still in ISO 1101:2017.', ['MIT', 'GLS', 'KEY'], false],
-     ['Position on a plane surface', 'Position is for features of size only; use profile for surfaces.', 'Position may also be applied to plane surfaces.', ['HZ'], true],
+     ['Position on a plane surface', 'Position is for features of size only; a single plane is not one, so use profile of a surface.', 'Position may also be applied to plane surfaces.', ['HZ', 'QM'], false],
      ['Unequal profile zone', 'U modifier.', 'UZ.', ['KEY', 'GDTB'], false],
      ['ASME-only modifiers', 'Tangent plane, statistical, continuous feature, independency.', 'Not in ISO in the same form; ISO has CZ (common zone) and others.', ['KEY', 'GDTB'], false],
      ['Material condition', 'MMC/LMC modifiers; RFS by default.', 'MMR and LMR, ISO 2692:2021.', ['ISO', 'KEY'], false],
-     ['Datums', 'Y14.5-2018 datum reference frames.', 'ISO 5459:2024. Common datum written A-A in ISO.', ['ISO', 'HZ'], true],
-     ['General geometric tolerances', 'No ASME general geometric tolerance table; by drawing note or company standard (to be verified).', 'ISO 22081:2021. ISO 2768-2:1989 was withdrawn on 2021-02-04; one catalogue lists ISO 22081:2021 as its revision (ISO\'s own page does not say so).', ['ISO', 'GEN'], true],
-     ['Fastener formulas', 'Nonmandatory appendix (floating and fixed fastener formulas).', 'No ISO counterpart found (to be verified).', ['GDTB', 'OEP'], true],
+     ['Datums', 'Y14.5-2018 datum reference frames.', 'ISO 5459:2024 (edition 3, 2024-10). Common datum written A-A in ISO (one source, HZ: to be verified).', ['ISO', 'BSI', 'HZ'], false],
+     ['General geometric tolerances', 'No ASME general geometric tolerance table; by drawing note or company standard (no source read for this side).', 'ISO 22081:2021. ISO 2768-2:1989 was withdrawn on 2021-02-04 and replaced by ISO 22081:2021 (Swedish standards body SIS and the Genorma catalogue; ISO\'s own page does not name the replacement).', ['SIS', 'GEN'], false],
+     ['Fastener formulas', 'Nonmandatory Appendix B, formulas for positional tolerancing, in Y14.5-2009; one study guide says the letter is B in every revision (2018 letter to be verified).', 'No ISO counterpart found (to be verified).', ['GDTB', 'OEP'], true],
     ].map(([a, b, c, s, t]) => '<tr><td><b>' + a + '</b></td><td>' + b + '</td><td>' + c + ' ' + srcTags(s, t) + '</td></tr>').join('') + '</table></div>' +
 
     '<h2 id="g-eds">Current editions and superseded practice</h2><div class="res" style="max-width:none"><table class="gtab"><tr><th>Standard</th><th>Status (standards body catalogue, checked 2026-11-10)</th><th>Superseded practice to watch for</th></tr>' +
-    [['ASME Y14.5-2018', 'Current, reaffirmed 2024 (R2024), on stabilized maintenance. Replaces Y14.5-2009.', 'Concentricity and symmetry (2009 and earlier). Circled S for RFS on old drawings.'],
+    [['ASME Y14.5-2018', 'Current, reaffirmed 2024 (R2024), on stabilized maintenance. Replaces Y14.5-2009.', 'Concentricity and symmetry (2009 and earlier). Circled S for RFS on drawings to Y14.5M-1994 or older.'],
      ['ISO 1101:2017', 'Current, edition 4, last reviewed and confirmed 2022.', 'Older ISO 1101 editions.'],
-     ['ISO 5459:2024', 'Listed as the current edition in the ISO catalogue (detail page could not be loaded); ISO 5459:2011 is withdrawn.', 'Datum rules from ISO 5459:2011.'],
+     ['ISO 5459:2024', 'Current, edition 3, published 2024-10; ISO 5459:2011 is withdrawn. BSI lists the British adoption as current from 2024-10-31; it adds datums from surface classes other than planes, cylinders and spheres, and new or clarified symbols and modifiers.', 'Datum rules from ISO 5459:2011.'],
      ['ISO 2692:2021', 'Current, edition 4 (under systematic review).', 'ISO 2692:2014 and earlier.'],
      ['ISO 8015:2011', 'Current, edition 2, last reviewed and confirmed 2021.', 'ISO 8015:1985.'],
-     ['ISO 22081:2021', 'Current, edition 1, last reviewed and confirmed 2026.', 'ISO 2768-2:1989 (general geometrical tolerances), withdrawn. Many drawings still quote it: read it as the drawing says, but do not use it for new drawings to ISO.'],
+     ['ISO 22081:2021', 'Current, edition 1, last reviewed and confirmed 2026.', 'ISO 2768-2:1989 (general geometrical tolerances), withdrawn 2021-02-04 and replaced by ISO 22081:2021. Many drawings still quote it: read it as the drawing says, but do not use it for new drawings to ISO.'],
     ].map(([a, b, c]) => '<tr><td><b>' + a + '</b></td><td>' + b + ' ' + srcTags(['ISO', 'ASME'].filter(k => (a.startsWith('ASME') ? k === 'ASME' : k === 'ISO'))) + '</td><td>' + c + '</td></tr>').join('') + '</table></div>' +
 
     '<h2 id="g-srcs">Sources</h2><ul class="gsl">' + Object.entries(GDT_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
@@ -358,7 +369,7 @@ function fcfCheck(s) {
   if (letters[1] && !letters[0] || letters[2] && !letters[1]) err('Fill the datum cells in order: primary, then secondary, then tertiary.');
   const seen = {};
   ds.forEach(([l]) => { if (seen[l]) err('Datum ' + l + ' is used twice.'); seen[l] = 1; });
-  ds.forEach(([l]) => { if (/^[IOQ]$/.test(l)) warn('Datum letters I, O and Q are commonly avoided because they look like 1 and 0.', [], true); });
+  ds.forEach(([l]) => { if (/^[IOQ]$/.test(l)) err('Datum letters I, O and Q are not used (they read as 1 and 0).', ['PTC', 'GDTB']); });
   if (ds.some(x => x[1])) warn('MMB/LMB after a datum letter only means something if that datum feature is a feature of size (hole, pin, slot, tab).', ['GLS', 'GDTB']);
   if (s.mc && !s.fos) err('MMC and LMC apply only to features of size (axis or median plane), not to a plain surface.', ['GDTB', 'GLS', 'KEY']);
   if (s.mc && s.ch.startsWith('profile')) warn('MMC/LMC on the profile tolerance value: not allowed under Y14.5-2009 (profile is a surface control, RFS only); one source mentions a Y14.5-2018 use. Avoid it unless your standard edition clearly allows it. MMB/LMB on the datum references is fine when the datum feature is a feature of size.', ['GDTB', 'OEP', 'SKL'], true);
@@ -367,16 +378,16 @@ function fcfCheck(s) {
   if (s.zone === 'dia' && !c.dia) err('A diameter zone does not apply to ' + c.name.toLowerCase() + '; its zone is a width between lines, planes, circles or cylinders.', ['UIUC', 'GDTB']);
   if ((s.zone === 'dia' || s.zone === 'sdia') && !s.fos) err('A diameter (cylindrical or spherical) zone needs an axis or centre point, so the toleranced feature must be a feature of size.', ['UIUC', 'GDTB']);
   if (s.zone === 'sdia' && s.ch !== 'position') warn('A spherical diameter zone is normally used to locate a sphere centre with position.', ['GDTB'], true);
-  if (s.ch === 'position' && !s.fos) err('In ASME Y14.5 position locates features of size only. Locate a plain surface with profile of a surface. (ISO allows position on planes.)', ['HZ', 'GDTB']);
+  if (s.ch === 'position' && !s.fos) err('In ASME Y14.5 position locates features of size only. Locate a plain surface with profile of a surface. (ISO allows position on planes.)', ['HZ', 'QM', 'GDTB']);
   if (s.fos && s.zone === 'width' && ['position', 'straightness', 'perpendicularity', 'parallelism', 'angularity'].includes(s.ch)) warn('With no diameter symbol the zone is two parallel planes: right for a slot or tab (median plane), wrong if you meant a hole or pin axis.', ['GDTB', 'KEY']);
   if (s.u && !s.ch.startsWith('profile')) err('The unequal (U) modifier is used only with profile tolerances.', ['GDTB', 'KEY']);
   if (s.u && !(parseFloat(s.uv) >= 0 && parseFloat(s.uv) <= v)) err('Unequal profile: the offset must be between 0 and the total tolerance.');
-  if (s.p && !['position', 'perpendicularity', 'parallelism', 'angularity'].includes(s.ch)) warn('A projected tolerance zone is normally used with position (and orientation) of threaded or press-fit holes.', ['GDTB', 'UIUC'], true);
-  if (s.p && !s.fos) err('A projected tolerance zone projects the axis of a hole or pin, so it needs a feature of size.', ['GDTB', 'UIUC'], true);
+  if (s.p && !['position', 'perpendicularity', 'parallelism', 'angularity'].includes(s.ch)) warn('A projected tolerance zone limits the tilt of a feature of size and is normally used with position (or orientation) of threaded or press-fit holes.', ['GDTB', 'UIUC', 'PTC']);
+  if (s.p && !s.fos) err('A projected tolerance zone projects the axis of a hole or pin, so it needs a feature of size.', ['GDTB', 'UIUC', 'PTC']);
   if (s.p && !(parseFloat(s.ph) > 0)) warn('Give the projection height (usually where the mating part sits).', ['GDTB', 'UIUC']);
   if (s.t && c.cat !== 'Orientation') warn('The tangent plane modifier is normally used with orientation tolerances on a surface.', ['KEY', 'GDTB'], true);
-  if (s.t && s.fos) err('Tangent plane applies to a surface, not to an axis or median plane.', ['KEY', 'GDTB']);
-  if (s.st) warn('Statistical tolerance: the drawing is expected to state the statistical process control requirement in a note.', ['KEY'], true);
+  if (s.t && s.fos) err('Tangent plane applies to a surface, not to an axis or median plane.', ['KEY', 'GDTB', 'PTC']);
+  if (s.st) warn('Statistical tolerance: the drawing must carry a note that statistically toleranced features are made under statistical process control.', ['KEY', 'OEP', 'PTC']);
   if (s.ch === 'flatness' && s.mc && s.fos) warn('Flatness (or straightness) on a feature of size controls the derived median plane (or line) and overrides Rule #1; at MMC its boundary is the virtual condition.', ['GDTB', 'HZ']);
   return out;
 }

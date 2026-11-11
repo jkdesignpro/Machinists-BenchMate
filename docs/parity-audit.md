@@ -30,18 +30,22 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 38 | 19 | 54 (8) | 2 | 0 | 34 % |
-| Machinery's Handbook 31 | 306 | 19 | 54 | 199 (14) | 6 | 28 | 7 % |
+| CNC Machinist Calculator Ultra | 113 | 55 | 16 | 40 (8) | 2 | 0 | 50 % |
+| Machinery's Handbook 31 | 306 | 20 | 57 | 195 (14) | 6 | 28 | 7 % |
 | Engineers' Data Book | 94 | 4 | 22 | 30 (1) | 12 | 26 | 7 % |
-| Engineers Black Book | 80 | 13 | 18 | 48 (10) | 1 | 0 | 16 % |
+| Engineers Black Book | 80 | 14 | 18 | 47 (10) | 1 | 0 | 18 % |
 | CNC Machining handbook | 83 | 4 | 9 | 66 (0) | 0 | 4 | 5 % |
-| **All** | **676** | **78** | **122** | **397 (32)** | **21** | **58** | **13 %** |
+| **All** | **676** | **97** | **122** | **378 (32)** | **21** | **58** | **16 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
 
-**Update (branch `claude/fasteners`, 2026-11-11):** batch B1 and part of B2 are built (bolt grades, bolt torque and preload, socket head cap screws with counterbores, clearance holes, spanner sizes, T-slots, keys, O-ring glands, bearing L10). U71, MH199, MH205, MH206, MH251, ED68, BB3, BB16, BB43, BB48 done; MH112, MH198, MH200, MH202, MH204, MH210, MH212, MH285, MH288, MH294, ED65, ED71, BB5, BB44, BB49 partial. Still missing from B1/B2: thread engagement length, wrench clearances, helical inserts, pins, retaining rings, Woodruff keys, bearing fits. Summary counts updated for these rows.
+**Update (branch `claude/fasteners`, 2026-11-11):** batch B1 and part of B2 are built (bolt grades, bolt torque and preload, socket head cap screws with counterbores, clearance holes, spanner sizes, T-slots, keys, O-ring glands, bearing L10). U71, MH199, MH205, MH206, MH251, ED68, BB3, BB16, BB43, BB48 done; MH112, MH198, MH200, MH202, MH204, MH210, MH212, MH285, MH288, MH294, ED65, ED71, BB5, BB44, BB49 partial. Still missing from B1/B2: thread engagement length, wrench clearances, helical inserts, pins, retaining rings, Woodruff keys, bearing fits. Summary counts recounted from the rows after merging `claude/calcs-3` and `claude/gdt-3`.
+
+**Update (branch `claude/calcs-3`, 2026-11-10):** batches A7, A8 and A9 are built: U4, U5, U9, U10, U16, U19-U23, U26, U55, U56, U57, U59, U60, U90 and MH149 done; U32, MH163, MH166, MH167, MH169 and BB60 partial. Not built: U58 (cylindricity from RPM) and U27 (vibration sensor). Summary counts recounted from section 1.
+
+**Update (branch `claude/gdt-3`, 2026-11-11):** BB73 done (letter-address table added to the G and M codes screen). GD&T round 3 (composite profile added to the guide) changes no row status. Summary counts updated for BB73.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -96,13 +100,13 @@ Store list is the fuller of the two store lists.
 | U1 | Lathe cutting speed and feed recommendations (material, machinability, hardness, insert, strategy) | missing | | No cutting-data database: `rpm` only converts a speed you already know |
 | U2 | Turning feed and depth-of-cut engine | missing | | Chip-breaker window, feed/DOC suggestion |
 | U3 | Lathe spindle speed conversion (SFM/Vc and RPM) | done | `rpm` | |
-| U4 | Lathe feed rate conversion (per rev and per minute) | missing | | No IPR/IPM or mm/rev/mm/min converter for turning |
-| U5 | Rough pass cut time | partial | `passtime` | Time for one pass at fixed RPM only; no number of passes from stock and DOC, no CSS |
+| U4 | Lathe feed rate conversion (per rev and per minute) | done | `lathefeed` | mm/rev and mm/min (IPR and IPM) both ways from RPM (`claude/calcs-3`) |
+| U5 | Rough pass cut time | done | `roughtime`, `passtime` | Number of passes from stock and depth of cut, RPM per pass at constant Vc (capped at the machine max), time per pass and total; CSS within a single facing pass is in `cycgroove` (`claude/calcs-3`) |
 | U6 | Groove and cut-off cycle time | done | `cycgroove` | Groove and cut-off program with CSS, G50 clamp, cut time integrated as the diameter shrinks (`claude/cycles`) |
 | U7 | Taper calculation | done | `taper` | |
 | U8 | Lathe taper G-code / taper programming | done | `cyctaper` | Roughing along the cone and finish pass, external or internal (`claude/cycles`) |
-| U9 | Boring bar deflection | partial | `deflection` | The cantilever model fits, but the tool is set up for end mills (flute length, end-mill moduli); no boring-bar materials (steel, carbide, heavy metal), no overhang L/D guidance |
-| U10 | C-axis rotational feed converter | missing | | |
+| U9 | Boring bar deflection | done | `boringbar` | Steel, carbide and heavy metal presets (or own E), coolant bore, Fc = kc ap f, overhang L/D guidance from Seco, Kennametal and Cutwel shown per maker (`claude/calcs-3`) |
+| U10 | C-axis rotational feed converter | done | `caxis` | Degrees/min, feed along the circumference, combined linear and rotary path, inverse time F (G93) (`claude/calcs-3`) |
 | U11 | Lathe cycle generator, CAD profile to canned cycles (G71/G70 style) | partial | `cycg71` | G71/G70 from a typed list of points (straight lines, type I only); no CAD/DXF input, no arcs (`claude/cycles`) |
 | U12 | Lathe surface finish | done | `finish` | |
 
@@ -113,14 +117,14 @@ Store list is the fuller of the two store lists.
 | U13 | Mill speeds and feeds with physics engine (chip thinning, deflection, power) | partial | `cutopt` | Checks a cut you enter against power, torque and deflection. No recommended starting speed or feed for a material and tool, no kc by material |
 | U14 | Mill spindle speed / SFM | done | `rpm` | |
 | U15 | Mill feed rate conversion | done | `feed` | |
-| U16 | Radial chip thinning | partial | `cutopt` | Shows hm and hex for a given fz, but no compensated feed for a target chip thickness |
+| U16 | Radial chip thinning | done | `chipthin` | Compensated feed for a target chip thickness, RCTF, engagement angle, drawing (`claude/calcs-3`) |
 | U17 | Metal removal rate | done | `mrr` (turning), `cutopt` (milling) | Milling MRR only inside `cutopt` |
 | U18 | Horsepower / machine power | partial | `mrr`, `cutopt` | You have to enter kc yourself; no unit-power or kc table by material |
-| U19 | Ball end mill cusp height | missing | | |
-| U20 | Ball end mill effective cutting diameter | missing | | |
-| U21 | Adaptive feed control (rounded corners) | partial | `arcfeed` | Arc feed compensation only; no feed reduction for higher engagement in corners |
-| U22 | Max tool runout / endmill runout | missing | | |
-| U23 | Slitting saw speeds and feeds | missing | | |
+| U19 | Ball end mill cusp height | done | `ballcusp` | Cusp from step-over and step-over for a cusp, exact circle form (`claude/calcs-3`) |
+| U20 | Ball end mill effective cutting diameter | done | `balleff` | Effective diameter at depth with tool tilt; corrected RPM and feed (`claude/calcs-3`) |
+| U21 | Adaptive feed control (rounded corners) | done | `cornerfeed`, `arcfeed` | Engagement angle into an inside corner or round a boss and the feed that keeps the straight-wall chip (`claude/calcs-3`) |
+| U22 | Max tool runout / endmill runout | done | `runout` | Worst-tooth chip from dial TIR (Kline and DeVor model), per-tooth table, feed that keeps the worst tooth at target (`claude/calcs-3`) |
+| U23 | Slitting saw speeds and feeds | done | `slitsaw` | RPM, feed from fz and teeth, cut time (`claude/calcs-3`) |
 | U24 | Thread milling calculators | done | `cyctmill` | Path radius, tool-centre feed, helix angle and 3D helix feed (`claude/cycles`) |
 | U25 | Thread mill program generator | done | `cyctmill` | Internal/external, RH/LH, climb/conventional, arc-in/out, G41/G42 option, radial and spring passes (`claude/cycles`) |
 
@@ -128,7 +132,7 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U26 | Chatter listener (microphone, stable speeds from lobes, mill and lathe) | missing | | |
+| U26 | Chatter listener (microphone, stable speeds from lobes, mill and lathe) | done | `chatter` | Microphone (Web Audio, FFT in Rust) or typed frequency; harmonics of spindle and tooth passing marked; stable speeds per lobe; mill (teeth) and lathe (one); on-device only (`claude/calcs-3`); microphone also enabled in the desktop app (`claude/gdt-3`: verified on Linux, macOS and Windows set up but not run) |
 | U27 | Vibration check (device sensor) | missing | | Desktop first; needs a phone build or a USB sensor |
 
 ### Drilling and tapping
@@ -139,7 +143,7 @@ Store list is the fuller of the two store lists.
 | U29 | Drill point length | done | `drillpoint` | |
 | U30 | Drill chart | done | `drillchart` | |
 | U31 | Tap drill size (cut and form, % thread 55-85) | done | `tapdrill` | |
-| U32 | Center drill dimensions / center drill hole depth | missing | | |
+| U32 | Center drill dimensions / center drill hole depth | partial | `spotdepth` | Spot and centre drill depth for a countersink diameter and the reverse; centre drill pilot length is an input, no centre drill size table (`claude/calcs-3`) |
 | U33 | Reaming speeds, feeds and allowance | missing | | |
 | U34 | Gun drill calculators | missing | | |
 | U35 | Tapping speed calculators | missing | | |
@@ -172,12 +176,12 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U55 | Grinding equivalent diameter | missing | | |
-| U56 | Grit size conversion | missing | | |
-| U57 | Plunge grinding | missing | | |
+| U55 | Grinding equivalent diameter | done | `grindspeed` | External, internal and surface; contact length (`claude/calcs-3`) |
+| U56 | Grit size conversion | done | `gritconv` | ANSI, FEPA F, FEPA P from four publishers, values per source with badges (`claude/calcs-3`) |
+| U57 | Plunge grinding | done | `grindtime` | Plunge time and specific removal rate, plus traverse time (`claude/calcs-3`) |
 | U58 | Grind RPM cylindricity error | missing | | |
-| U59 | Wheel and workpiece speed | missing | | |
-| U60 | Surface grinding | missing | | |
+| U59 | Wheel and workpiece speed | done | `grindspeed` | Wheel m/s and sfpm, RPM for a speed, work speed from a speed ratio; checked against the marked max speed the user types (never defaulted) (`claude/calcs-3`) |
+| U60 | Surface grinding | done | `grindsurf` | Strokes, down-feed layers, spark-out, overtravel, total time (`claude/calcs-3`) |
 
 ### Inspection and measurement
 
@@ -217,7 +221,7 @@ Store list is the fuller of the two store lists.
 | U87 | Knurl calculator | missing | | |
 | U88 | Keyway broach program generator | done | `cycbroach` | Lathe or mill, depth per stroke, lift, spring strokes (`claude/cycles`) |
 | U89 | Coolant concentration | done | `coolconc`, `coolmix` | |
-| U90 | Bandsaw cut time | missing | | |
+| U90 | Bandsaw cut time | done | `bandsaw` | Cut time from cutting rate or down-feed, chip per tooth from blade speed and TPI (`claude/calcs-3`) |
 | U91 | Tool wear information | missing | | |
 
 ### G-code and programming
@@ -438,7 +442,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH146 | Speeds for metal-cutting saws | missing | | |
 | MH147 | Estimating machining power: power constants, feed and wear factors | partial | `mrr`, `cutopt` | kc entered by user; no constants |
 | MH148 | Drilling thrust, torque and power | missing | | |
-| MH149 | Boring: cutting force and boring bar deflection | partial | `deflection` | See U9 |
+| MH149 | Boring: cutting force and boring bar deflection | done | `boringbar` | See U9 (`claude/calcs-3`) |
 | MH150 | Micromachining: tools, stiffness, offsets, fluids, micromilling/drilling/turning | missing | | |
 | MH151 | Tool wear and tool life: ECT, Taylor, G and H curves | partial | `toollife` | Taylor only; no ECT or extended Taylor |
 | MH152 | Minimum cost, production rate, cost function, global optimum | partial | `toollife` | Cost per part and economic life; no max-production or feed/speed optimisation |
@@ -452,13 +456,13 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH160 | Machining non-metals (hard rubber, laminates) | missing | | |
 | MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | missing | | |
 | MH162 | Grinding data selection and grindability groups | missing | | |
-| MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | missing | | |
+| MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | partial | `wheelcode`, `gritconv` | Abrasives, bonds, grade, structure and markings decoded with sources; no wheel shapes or selection guide (`claude/calcs-3`) |
 | MH164 | Dressing and truing; diamond sizes | missing | | |
 | MH165 | Diamond wheels: shapes, designations, selection | missing | | |
-| MH166 | Grinding wheel safety and safe operating speeds | missing | | |
-| MH167 | Cylindrical grinding (traverse, plunge, high speed, troubles) | missing | | |
+| MH166 | Grinding wheel safety and safe operating speeds | partial | `grindspeed`, `wheelcode` | Speed check against the marked max speed and the rule to obey it; no full safety code (`claude/calcs-3`) |
+| MH167 | Cylindrical grinding (traverse, plunge, high speed, troubles) | partial | `grindtime`, `grindspeed` | Traverse and plunge time, speed ratio, equivalent diameter; no high-speed grinding or troubleshooting (`claude/calcs-3`) |
 | MH168 | Centerless grinding | missing | | |
-| MH169 | Surface grinding | missing | | |
+| MH169 | Surface grinding | partial | `grindsurf` | Cycle time only; no wheel or feed recommendations (`claude/calcs-3`) |
 | MH170 | Offhand, belt grinding and abrasive cutting | missing | | |
 | MH171 | Honing | missing | | |
 | MH172 | Laps and lapping | missing | | |
@@ -789,7 +793,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB57 | Workpiece material comparison table | done | `materials` | |
 | BB58 | Engineering plastics | partial | `materials` | 5 plastics |
 | BB59 | Engineering adhesives | missing | | |
-| BB60 | Grinding wheels: markings, specs, shapes, faces | missing | | |
+| BB60 | Grinding wheels: markings, specs, shapes, faces | partial | `wheelcode` | Markings and specs decoded; no shapes or faces (`claude/calcs-3`) |
 | BB61 | Mounted wheels and points | missing | | |
 | BB62 | Tungsten carbide burrs | missing | | |
 | BB63 | Surface coatings (tool coatings) | missing | | |
@@ -802,7 +806,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB70 | Abbreviations used in drawings | missing | | |
 | BB71 | Standards for engineering drawings | missing | | |
 | BB72 | Human physical dimensions | out of scope | | |
-| BB73 | G-codes, letter addresses, miscellaneous function words | partial | `gmcodes` | G and M words per control; no letter-address table yet |
+| BB73 | G-codes, letter addresses, miscellaneous function words | done | `gmcodes` | G and M words per control; letter-address table A-Z (NIST RS274NGC and Haas mill columns, each from its own document) under the code list (`claude/gdt-3`) |
 | BB74 | Surface roughness tables | partial | `finish` | Conversions in progress (`claude/ref-data-3`) |
 | BB75 | Surface finish expected from manufacturing processes | missing | | In progress (`claude/ref-data-3`) |
 | BB76 | Terms used in heat treatment of steel | missing | | |
@@ -917,9 +921,9 @@ mostly formulas, drawing and screens from knowledge we already have.
 | A4 | **G-code and M-code reference, custom macro reference** per control profile (generic ISO 6983 set, then Fanuc-style, Haas, Siemens, Mitsubishi, Citizen) | U92, U93, U94, BB73, CN21-24, CN81 | heavy research |
 | A5 | **G-code simulator**: 2D backplot of G0-G3, canned cycles from A1/A2, cycle-time estimate; 3D later | U95 | maths/UI |
 | A6 | **Tool library and app shell**: saved tools (end mills, drills, taps, reamers) with one-click fill into any tool; favourites; decimal precision; home dashboard; reorderable menu | U109, U105, U106, U107, U108 | maths/UI |
-| A7 | **Chatter finder and vibration**: microphone FFT, tooth-passing and stable-speed lobes for mill and lathe, all on-device | U26 (U27 later with mobile) | maths/UI |
-| A8 | **Grinding calculators**: equivalent diameter, wheel and work speed, plunge, surface grind, cylindricity from RPM, grit size conversion, wheel marking decoder | U55-U60, MH163, BB60 | maths/UI plus moderate research (grit tables, ANSI B74.13 / ISO 525 marking) |
-| A9 | **Small milling and turning calculators**: ball-nose cusp height and effective diameter, runout, slitting saw feeds, chip-thinning compensated feed, corner engagement feed, lathe feed conversion, multi-pass rough time, C-axis feed converter, boring bar deflection presets, bandsaw cut time, center drill dimensions and depth | U19-U23, U16, U21, U4, U5, U10, U9, U90, U32 | maths/UI; light research (center drill sizes) |
+| A7 | **Chatter finder and vibration** (chatter finder built on `claude/calcs-3`; vibration sensor not built): microphone FFT, tooth-passing and stable-speed lobes for mill and lathe, all on-device | U26 (U27 later with mobile) | maths/UI |
+| A8 | **Grinding calculators** (built on `claude/calcs-3` except cylindricity from RPM): equivalent diameter, wheel and work speed, plunge, surface grind, cylindricity from RPM, grit size conversion, wheel marking decoder | U55-U60, MH163, BB60 | maths/UI plus moderate research (grit tables, ANSI B74.13 / ISO 525 marking) |
+| A9 | **Small milling and turning calculators** (built on `claude/calcs-3`; no centre drill size table): ball-nose cusp height and effective diameter, runout, slitting saw feeds, chip-thinning compensated feed, corner engagement feed, lathe feed conversion, multi-pass rough time, C-axis feed converter, boring bar deflection presets, bandsaw cut time, center drill dimensions and depth | U19-U23, U16, U21, U4, U5, U10, U9, U90, U32 | maths/UI; light research (center drill sizes) |
 | A10 | **Cutting-data engine, part 1 (turning and milling)**: starting Vc and fz/f by ISO material group and tool material from free maker catalogues, kc table, hardness correction, link to `materials` | U1, U2, U13, U18, U82, MH139-141, MH147 | heavy research |
 | A11 | **Cutting-data engine, part 2 (holes)**: drilling (HSS/carbide, point angle, coating, coolant), reaming speeds and allowance, tapping speeds, gun drilling | U28, U33, U34, U35, MH142, BB20, BB21 | heavy research |
 | A12 | **Threads round 3**: ACME, stub ACME, trapezoidal, buttress, UNJ, UNM, UNR root, constant-pitch UN series, coated-thread (plating/anodise) allowance, STI, Whitworth tolerances, NPTF, wire measurement for ACME and Whitworth | U39-U46, U49, MH220-238, MH247 | heavy research (standards formulas, cross-checks) |

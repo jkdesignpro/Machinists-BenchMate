@@ -18,7 +18,7 @@ These are standard machining formulas, published in many references. Each functi
 
 ## GD&T (`core/src/gdt.rs`, `app/gdt.js`)
 Full list with URLs, access dates (2026-11-10), the per-statement check table and the items still "to be verified" is in **`docs/gdt.md`**. Summary:
-- **Standards (cited by name, year and clause only; status checked on the standards bodies' catalogue pages):** ASME Y14.5-2018 (R2024); ISO 1101:2017; ISO 5459:2024 (ISO 5459:2011 withdrawn); ISO 2692:2021; ISO 8015:2011; ISO 14405-1 (envelope requirement); ISO 22081:2021 (ISO 2768-2:1989 withdrawn). No text, figures or tables from them were copied.
+- **Standards (cited by name, year and clause only; status checked on the standards bodies' catalogue pages):** ASME Y14.5-2018 (R2024); ISO 1101:2017; ISO 5459:2024, edition 3, 2024-10 (ISO 5459:2011 withdrawn); ISO 2692:2021; ISO 8015:2011; ISO 14405-1 (envelope requirement); ISO 22081:2021 (ISO 2768-2:1989 withdrawn). No text, figures or tables from them were copied.
 - **[MIT]** J. Salsbury, "GD&T and the new ASME Y14.5-2018", Mitutoyo America, 2019.
 - **[GLS]** Geometric Learning Systems, GD&T reference chart for ASME Y14.5-2018, 2019.
 - **[GDTB]** GD&T Basics, educational articles (gdandtbasics.com).
@@ -29,6 +29,7 @@ Full list with URLs, access dates (2026-11-10), the per-statement check table an
 - **[ACC]** Accendo Reliability and **[FF]** Five Flute, RSS tolerance analysis (stack helpers).
 - **[FARO]** O. Ekinci, composite positional tolerances, FARO; **[DCS]** 3DCS help manual, Composite GD&T (composite position checker).
 - **[GEN]** Genorma catalogue, ISO 2768-2:1989 status (withdrawn 2021-02-04, revised by ISO 22081:2021).
+- Round 3 (accessed 2026-11-10/11): **[PTC]** PTC Creo help (ASME optional modifiers; datum label rules); **[GLS12]** Stolter / Geometric Learning Systems edition comparison chart, 2012 (RFS symbol by edition, composite profile); **[HEX]** Hexagon PC-DMIS help, profile of a line (composite segments); **[SIS]** Swedish Institute for Standards, ISO 2768-2:1989 replaced by ISO 22081:2021; **[BSI]** BSI Knowledge, BS EN ISO 5459:2024 (published 2024-10-31, supersedes 2011); **[QM]** E. Morse, "Tolerancing standards: a comparison", Quality Magazine, 2016 (position on planes, ISO vs ASME); **[MMS]** G. Schuetz (Mahr), Modern Machine Shop, 2008, and **[PMPA]** Precision Machined Products Association (lobed parts and two-point gauges). ISO 5459:2024 edition 3 (2024-10) read on committee.iso.org.
 
 ## Shop helpers (`core/src/shop.rs`, `app/shop.js`)
 Full list with URLs, the statement check table and open items: **`docs/shop-helpers.md`**. Summary:
@@ -387,3 +388,56 @@ Cited by the edition the publishers name; not checked on a catalogue page:
 - **AS568.** Greene Tweed and eFunda differ on the ID tolerance of -102 and -113. Greene Tweed prints -391 ID 21.995, which looks like a typo against the size steps around it; shown as printed.
 - **Single-source values, labelled.** ASTM A574 yield and tensile (MSC; hardness confirmed by AFT), T-slot depth h (ISO 299 preview only), inch counterbores (MSC only).
 - **Left out:** Woodruff keys (no second free source for seat dimensions), ISO 3601-1 G series and AS568 -9xx, bearing shaft and housing fits (no two makers compared), DIN 471/472 retaining rings and dowel pins.
+## Small milling and turning (`core/src/millturn.rs`, `app/millturn.js`, tools in `app/tools.js`)
+All web sources accessed 2026-11-10. Drawings are our own SVG. Worked-example tests in `core/src/millturn.rs` were computed independently (hand examples and brute-force scans).
+- **[MD]** Machining Doctor, chip thinning calculator. https://www.machiningdoctor.com/calculators/chip-thinning-calculator/ . Radial chip thinning factor RCTF = 1 / sqrt(1 - (1 - 2 ae / D)^2) for ae < D/2; ball nose axial factor D / sqrt(D^2 - (D - 2 ap)^2).
+- **[ALT]** Altintas (above), Ch. 2: h(phi) = c sin(phi). Engagement angle on a straight wall; on an inside corner or a convex boss it is derived here with the law of cosines and tested against a numerical scan.
+- **[ISCAR-TI]** ISCAR, *Machining Titanium* (2019), p. 46, Table 28: ball nose effective diameter 2 sqrt(D ap - ap^2) with the axis normal to the surface. https://iscar.co.za/Catalogs/flipview/reference-user-guides/machining_titanium_05_2019/files/basic-html/page46.html
+- **[IMCO]** IMCO Carbide Tool, "Adjustments for ball nose end mills": speed from the effective diameter, adjusted fz = D fz / De, scallop height about ae^2 / (8 R). https://cms.imcousa.com/wp-content/uploads/2021/01/Adjustments-for-Ball-Nose-Endmills.pdf . BenchMate uses the exact circle form h = R - sqrt(R^2 - (s/2)^2), which the IMCO approximation tends to.
+- **Tilted ball nose (derived here, not taken from a source):** a point at polar angle psi from the tool axis turns on a diameter D sin(psi); with the axis tilted beta, the band in cut reaches psi = acos(1 - 2 ap / D) + beta, so De = D sin(min(that, 90 deg)). With beta = 0 it reduces to [ISCAR-TI].
+- **[KD]** W. A. Kline, R. E. DeVor, "The effect of runout on cutting geometry and forces in end milling", *Int. J. Mach. Tool Des. Res.* 23(2/3), 1983 (pages to be verified; the paper was not read for this project). Chip per tooth with radial runout: tooth i cuts the minimum over k of (k fz + r_i - r_(i-k)). BenchMate models one eccentricity giving the dial-indicator TIR; the largest chip is then fz + TIR sin(pi / z). Tested by a brute-force scan.
+- **[RS274]** NISTIR 6556 (see "G and M codes" above), inverse time feed G93: F = 1 / minutes for the move. Not re-read for this batch; the Haas G93 page could not be fetched.
+- **[GERE]** (above): boring bar as a cantilever, delta = F L^3 / (3 E I), I = pi (d^4 - di^4) / 64 with an optional coolant bore. **[SAN]** (above): turning force Fc = kc ap fn.
+- **Boring bar overhang guidance (shown per maker, not merged):**
+  - Seco Tools, boring bar article. https://www.secotools.com/article/89275 . Steel 4 x D, carbide 8 x D, heavy metal 6 x D, damped (Steadyline) 10 x D.
+  - Kennametal, "The basics of boring". https://dev65.kennametal.com/ar/en/resources/blog/metal-cutting/the-basics-of-boring.html . Steel 3 x D, carbide 6 x D, heavy metal 6 x D, damped 10 x D or more.
+  - Cutwel, "Expert guide to using boring bars in metalworking". https://www.cutwel.co.uk/blog/expert-guide-to-using-boring-bars-in-metalworking . Steel 4 x D, carbide 6-8 x D.
+- **Bar modulus presets (`BAR_E`):** steel 210 GPa (Ovako 4140 / 42CrMo4, see `docs/material-sources.md`); solid carbide 580 GPa (Ceratizit CTS20L, see "Tool material data" above); tungsten heavy metal 360 GPa from Plansee, *Tungsten heavy metal (W-MMC)* brochure 09.2021, Densimet D176, https://cdn.plansee-group.com/is/content/planseemedia/plansee/downloads/werkstoffe/W_MMC_Broschuere_Plansee_09-2021.pdf . Users can type their own modulus.
+- **[STAR]** L. S. Starrett, *Band saw cutting rate chart*, Bulletin 193: cutting rate as area per minute. https://origin-www.starrett.com/docs/other-downloadable-resources/band-saw-cutting-rate-chart---bulletin-193.pdf
+- **[KASCO]** KASCO, "How to calculate surface feet per minute and teeth per minute": teeth per minute = teeth per foot x blade speed. https://kasco.com/blogs/buying-guides/how-to-calculate-surface-feet-per-minute-sfpm-and-teeth-per-minute-tpm
+- Slitting saw, lathe feed (mm/rev = mm/min / rpm), multi-pass turning time, cutter approach, teeth engaged, spot drill depth (chamfer diameter / (2 tan(point angle / 2))): standard geometry and the speed and feed relations of [SAN] and [MH]. Centre drill depth: pilot length (user input, from the maker or measured) plus the cone. No centre drill size table is shipped.
+
+## Chatter (`core/src/chatter.rs`, `app/chatter.js`)
+- **[SMITH10]** S. Smith, "Finding harmony in stable cutting", *Cutting Tool Engineering*, Dec. 2010. https://ctemag.com/articles/finding-harmony-stable-cutting/ (accessed 2026-11-10). Choose a speed whose tooth-passing frequency matches the chatter frequency, n = 60 fc / z; chatter frequency is near, not equal to, a natural frequency; use the running speed. Test: 427 Hz with 2 teeth gives 12 810 rpm.
+- **[ST92]** S. Smith, J. Tlusty, "Stabilizing chatter by automatic spindle speed regulation", *CIRP Annals* 41(1), 1992 (pages to be verified; not read). Speed selection from the measured chatter frequency, repeated.
+- **[ALT]** (above), Ch. 3: regenerative chatter and stability lobes; stable speeds n = 60 fc / (z (N + 1)) for lobe N.
+- **[CT65]** J. W. Cooley, J. W. Tukey, "An algorithm for the machine calculation of complex Fourier series", *Math. Comp.* 19 (1965), 297-301: radix-2 FFT. Hann window and its coherent gain: Press et al., *Numerical Recipes*, 2nd ed., 12.2 and 13.4. Tests: FFT against a direct DFT, Parseval, and a synthetic tone found with spindle harmonics skipped.
+- Microphone capture uses the browser's `getUserMedia` and Web Audio `AnalyserNode` (W3C specifications). Echo cancellation, noise suppression and auto gain are off. The sound is analysed in memory, never stored or sent.
+
+## Grinding (`core/src/grinding.rs`, `app/grinding.js`, `data/refdata/grinding-evidence.json`)
+All web sources accessed 2026-11-10.
+### Formulas
+- **[GOETZ]** D. S. Goetz, "Wear mechanics of cylindrical grinding wheels", *Cutting Tool Engineering*, 24 Oct 2017. https://ctemag.com/news/wear-mechanics-cylindrical-grinding-wheels/ . Wheel speed sfpm = 0.2618 D (in) rpm; equivalent diameter De = Dwheel Dwork / (Dwheel + Dwork); contact length sqrt(doc De).
+- **[MALKIN]** S. Malkin, C. Guo, *Grinding Technology*, 2nd ed., Industrial Press, 2008, Ch. 2 (cited by name): equivalent diameter (+ external, - internal, wheel diameter for surface grinding), contact length, equivalent chip thickness heq = ae vw / vs, specific removal rate Q'w = ae vw.
+- **[ROWE]** W. B. Rowe, *Principles of Modern Grinding Technology*, 2nd ed., Elsevier, 2014 (cited by name): speed ratio q = vs / vw; overlap ratio = wheel width / traverse per work revolution.
+- **[BED]** B. Bednarski (Saint-Gobain Abrasives), quoted in "Working an inside job", *American Machinist*, 19 Oct 2006. https://www.americanmachinist.com/machining-cutting/working-inside-job . Speed ratio about 25:1 to 65:1, shown as guidance, never as a default.
+- Surface grinding time (strokes x down-feed layers plus spark-out) and plunge and traverse time: own derivation from the table and wheel motions; tests are hand examples.
+- **Wheel speed:** the maximum operating speed marked on the wheel is never defaulted. Every grinding screen tells the user to obey the speed marked on the wheel or its label.
+### Standards cited (iso.org listings checked 2026-11-10)
+- ISO 525:2020, Bonded abrasive products, general requirements (current, confirmed 2026). https://www.iso.org/standard/78476.html
+- ISO 8486-1:1996 (macrogrits F4 to F220) and ISO 8486-2:2007 (microgrits F230 to F2000), bonded abrasives grain size (both current, confirmed 2021). https://www.iso.org/standard/15695.html , https://www.iso.org/standard/42206.html
+- ISO 6344-2 and -3:2021, coated abrasives, P grits; EN 12413, safety of bonded abrasive products; ANSI B7.1, safety code for abrasive wheels. All cited by name.
+- ANSI B74.13-2016, markings for grinding wheels and other bonded abrasives. Edition from the NSAI shop listing (https://shop.standards.ie/en-ie/standards/ansi-b74-13-2016-1066989_saig_uama_uama_2480763); the UAMA page was not read.
+### Publishers (grit sizes and wheel marking; keys as in the evidence file)
+- **[NORITAKE]** Noritake, technical support: grain (tables after JIS R6001 / R6010 / B4130). https://www.noritake.co.jp/eng/supports/detail/25/ . F4-F220 as the control-sieve aperture (not a mean size); F230-F1200 as ds-50.
+- **[HAPSTONE]** Hapstone, "What is the FEPA grit system?" (27 May 2026). https://hapstone.eu/en-eu/blogs/news/what-is-the-fepa-grit-system
+- **[TEDPELLA]** Ted Pella, abrasive grit grading systems (tables courtesy of 3M). https://www.tedpella.com/Material-Sciences_html/Abrasive_Grit_Grading_Systems.aspx
+- **[STEELDATA]** Steel Data, grit size table (ANSI B74.18-1996 / CAMI and FEPA 43-GB-1984 mid-points). https://steeldata.info/semi/demo/help/others/grit_size_table.html
+- **[UNITED]** United Abrasives, ANSI standard marking system (6 Aug 2023). https://www.unitedabrasives.com/?p=40696
+- **[CGW]** CGW (Camel Grinding Wheels), vitrified and surface grinding wheels catalogue pp. 119-125, hosted by Travers Tool. https://docs.travers.com/assets/pdf/105547_tech.pdf
+- **[NAVY]** US Navy, Machinery Repairman training manual, Figure 5-4 (public domain). https://enginemechanics.tpub.com/14345/Figure-5-4-Standard-Marking-System-For-Grinding-Wheels-Except-Diamond-103.html
+- **[HST]** High Speed Training, "Understanding the marking system for abrasive wheels" (2016, updated 2023). https://www.highspeedtraining.co.uk/hub/?p=6487 . Commodious (commodious.co.uk) prints the same lists word for word, so it is not counted as a second source.
+### Findings (from `scripts/build_refdata.py`)
+- Grit sizes are shown per system with the value each publisher prints and a badge; they are not averaged. Coated-abrasive gradings (P, ANSI/CAMI) and bonded gradings (F) differ, and the screen says so. ANSI: 6 confirmed, 10 differ, 9 single source; FEPA F: 2 confirmed, 3 differ, 23 single source; FEPA P: 9 confirmed, 8 differ, 11 single source.
+- Marking: abrasive letters 5 confirmed, 20 maker-specific or single source, 1 differs (AZ: zirconia [HST], blue aluminium oxide [CGW]). Bond letters 4 confirmed, 4 single source, 2 differ (E: shellac [UNITED], epoxy [HST]; O: oxychloride [UNITED], magnesia [HST]). Grit groups: coarse 8-24 [UNITED][CGW] against 10-24 [NAVY]; fine 70-180 [UNITED][NAVY] against 80-180 [CGW].
+- Not used: Gritomatic, metallographic.com and several PDF grit charts (images, scrambled text, or no clear primary source).

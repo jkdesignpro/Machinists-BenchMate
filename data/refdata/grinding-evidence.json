@@ -1,0 +1,319 @@
+{
+ "sources": {
+  "NORITAKE": {
+   "publisher": "Noritake Co., Limited",
+   "title": "Technical support: Grain (grain size tables after JIS R6001, JIS R6010, JIS B4130)",
+   "url": "https://www.noritake.co.jp/eng/supports/detail/25/",
+   "accessed": "2026-11-10",
+   "note": "Wheel maker. F4-F220: test-sieve stages; the value used here is the stage 3 (control) sieve aperture, which must retain a set share of the grains, not a mean size. F230-F1200: ds-50 (median) diameter by sedimentation, with a tolerance."
+  },
+  "HAPSTONE": {
+   "publisher": "Hapstone",
+   "title": "A. Havrylenko, What is the FEPA grit system? (27 May 2026)",
+   "url": "https://hapstone.eu/en-eu/blogs/news/what-is-the-fepa-grit-system",
+   "accessed": "2026-11-10",
+   "note": "Sharpening-system maker. Approximate particle size for five F grits; says F is used for grinding wheels and stones and P for coated abrasives, and that F400 and P400 are different sizes. Its FEPA/JIS chart is an image and was not read."
+  },
+  "TEDPELLA": {
+   "publisher": "Ted Pella, Inc.",
+   "title": "Abrasive grit grading systems (tables courtesy of 3M)",
+   "url": "https://www.tedpella.com/Material-Sciences_html/Abrasive_Grit_Grading_Systems.aspx",
+   "accessed": "2026-11-10",
+   "note": "Lab supplier. Average particle size in um for ANSI and FEPA P grits. These are coated-abrasive gradings."
+  },
+  "STEELDATA": {
+   "publisher": "Steel Data",
+   "title": "Grit size table",
+   "url": "https://steeldata.info/semi/demo/help/others/grit_size_table.html",
+   "accessed": "2026-11-10",
+   "note": "Mid-points of the size ranges for ANSI/CAMI graded paper (ANSI B74.18-1996, from the CAMI booklet Coated Abrasives, 1996) and FEPA P graded paper (FEPA 43-GB-1984). Coated-abrasive gradings."
+  },
+  "UNITED": {
+   "publisher": "United Abrasives",
+   "title": "ANSI standard marking system and wheel configurations (6 Aug 2023)",
+   "url": "https://www.unitedabrasives.com/?p=40696",
+   "accessed": "2026-11-10",
+   "note": "US wheel maker. ANSI order: abrasive, grit, grade, bond (example A 24 R BF); grit groups; bond letters."
+  },
+  "CGW": {
+   "publisher": "CGW (Camel Grinding Wheels)",
+   "title": "Vitrified and surface grinding wheels catalogue pages 119-125, as hosted by Travers Tool",
+   "url": "https://docs.travers.com/assets/pdf/105547_tech.pdf",
+   "accessed": "2026-11-10",
+   "note": "Wheel maker catalogue. Example 7 x 1/2 x 1 1/4 RA 46H 8V; its own abrasive codes; grit groups; soft, medium and hard grade letters; structure; bond letters."
+  },
+  "NAVY": {
+   "publisher": "US Navy",
+   "title": "Machinery Repairman training manual, Figure 5-4, standard marking system for grinding wheels except diamond (public domain)",
+   "url": "https://enginemechanics.tpub.com/14345/Figure-5-4-Standard-Marking-System-For-Grinding-Wheels-Except-Diamond-103.html",
+   "accessed": "2026-11-10",
+   "note": "Six stations: abrasive, grain size, grade, structure, bond, maker's record. Grain size groups; grade A (soft) to Z (hard). The bond and structure lists of the figure were not in the text read."
+  },
+  "HST": {
+   "publisher": "High Speed Training",
+   "title": "L. Petty, Understanding the marking system for abrasive wheels (2016, updated 2023)",
+   "url": "https://www.highspeedtraining.co.uk/hub/?p=6487",
+   "accessed": "2026-11-10",
+   "note": "UK safety training. Cites BS EN 12413 and BS ISO 525. Specification order abrasive, grit, grade, structure, bond (example WA 60 K 7 V); abrasive and bond codes; structure 1 (dense) to 14 (open); speed stripe colours. Commodious (commodious.co.uk, abrasive wheel marking) prints the same lists word for word, so it is not counted as a second source."
+  }
+ },
+ "_note": "Transcribed from the pages listed, 2026-11-10. Values are as printed. Coarse F grits are graded by sieves and fine F grits by sedimentation, so the size printed for a coarse F grit (Noritake: control sieve aperture) is not the same kind of number as a mean particle size; the ANSI and P values here are for coated abrasives. Nearest-size equivalents are approximate.",
+ "grit_um": {
+  "ANSI": {
+   "TEDPELLA": {
+    "12": "1842",
+    "16": "1320",
+    "20": "905",
+    "24": "728",
+    "30": "630",
+    "36": "530",
+    "40": "420",
+    "50": "351",
+    "60": "264",
+    "80": "195",
+    "100": "141",
+    "120": "116",
+    "150": "93",
+    "180": "78",
+    "220": "66",
+    "240": "53",
+    "280": "44",
+    "320": "36",
+    "360": "30",
+    "400": "24",
+    "500": "20",
+    "600": "16",
+    "800": "12",
+    "1000": "9",
+    "1200": "6.5"
+   },
+   "STEELDATA": {
+    "60": "268.0",
+    "80": "188.0",
+    "100": "148.0",
+    "120": "116.0",
+    "180": "78.0",
+    "220": "66.0",
+    "240": "51.8",
+    "280": "42.3",
+    "320": "34.3",
+    "360": "27.3",
+    "400": "22.1",
+    "500": "18.2",
+    "600": "14.5",
+    "800": "12.2",
+    "1000": "9.2",
+    "1200": "6.5"
+   }
+  },
+  "FEPA_F": {
+   "NORITAKE": {
+    "F12": "1700",
+    "F16": "1180",
+    "F20": "1000",
+    "F24": "710",
+    "F30": "600",
+    "F36": "500",
+    "F46": "355",
+    "F54": "300",
+    "F60": "250",
+    "F70": "212",
+    "F80": "180",
+    "F90": "150",
+    "F100": "125",
+    "F120": "106",
+    "F150": "75",
+    "F180": "63",
+    "F220": "53",
+    "F230": "55.7",
+    "F240": "47.5",
+    "F280": "39.9",
+    "F320": "32.8",
+    "F360": "26.7",
+    "F400": "21.4",
+    "F500": "17.1",
+    "F600": "13.7",
+    "F800": "11.0",
+    "F1000": "9.1",
+    "F1200": "7.6"
+   },
+   "HAPSTONE": {
+    "F120": "106",
+    "F220": "53",
+    "F400": "17",
+    "F600": "9",
+    "F1000": "4.5"
+   }
+  },
+  "FEPA_P": {
+   "TEDPELLA": {
+    "P12": "1746",
+    "P16": "1320",
+    "P20": "984",
+    "P24": "728",
+    "P30": "630",
+    "P36": "530",
+    "P40": "420",
+    "P50": "326",
+    "P60": "264",
+    "P80": "195",
+    "P100": "156",
+    "P120": "127",
+    "P150": "97",
+    "P180": "78",
+    "P220": "66",
+    "P240": "60",
+    "P280": "53",
+    "P320": "46",
+    "P360": "41",
+    "P400": "36",
+    "P500": "30",
+    "P600": "26",
+    "P800": "22",
+    "P1000": "18",
+    "P1200": "15",
+    "P1500": "9",
+    "P2000": "6.5"
+   },
+   "STEELDATA": {
+    "P60": "269.0",
+    "P80": "201.0",
+    "P100": "162.0",
+    "P120": "127.0",
+    "P180": "78.0",
+    "P240": "58.5",
+    "P280": "52.2",
+    "P320": "46.2",
+    "P360": "40.5",
+    "P400": "35.0",
+    "P500": "30.2",
+    "P600": "25.8",
+    "P800": "21.8",
+    "P1000": "18.3",
+    "P1200": "15.3",
+    "P1500": "12.6",
+    "P2000": "10.3",
+    "P2500": "8.4"
+   }
+  }
+ },
+ "abrasive": {
+  "UNITED": {
+   "A": "alox",
+   "C": "sic",
+   "Z": "zirconia_alox",
+   "SG": "seeded_gel"
+  },
+  "HST": {
+   "A": "alox",
+   "WA": "white_alox",
+   "19A": "mix_a_wa",
+   "SD": "synthetic_diamond",
+   "ASD": "synthetic_diamond_coated",
+   "FA": "semi_friable_alox",
+   "PA": "pink_alox",
+   "SA": "single_crystal_alox",
+   "HA": "single_crystal_alox",
+   "23A": "mix_a_sa",
+   "AZ": "zirconia",
+   "C": "sic",
+   "GC": "green_sic",
+   "RC": "mix_c_gc"
+  },
+  "CGW": {
+   "A": "alox",
+   "94A": "semi_friable_alox",
+   "AS3": "ceramic_alox",
+   "32A": "single_crystal_alox",
+   "AZ": "blue_alox",
+   "RA": "red_alox",
+   "PA": "pink_alox",
+   "PASP": "pink_alox_premium",
+   "83A": "white_alox",
+   "WA": "white_alox",
+   "91A": "mix_a_wa",
+   "CA": "mix_alox_sic",
+   "GC": "green_sic",
+   "C": "sic",
+   "72C": "sic",
+   "WAG": "white_friable"
+  },
+  "NAVY": {
+   "A": "alox",
+   "C": "sic"
+  }
+ },
+ "bond": {
+  "UNITED": {
+   "B": "resinoid",
+   "BF": "resinoid_reinforced",
+   "E": "shellac",
+   "O": "oxychloride",
+   "R": "rubber",
+   "RF": "rubber_reinforced",
+   "S": "silicate",
+   "V": "vitrified"
+  },
+  "HST": {
+   "V": "vitrified",
+   "B": "resinoid",
+   "R": "rubber",
+   "O": "magnesia",
+   "E": "epoxy",
+   "M": "metal",
+   "EP": "electroplated"
+  },
+  "CGW": {
+   "V": "vitrified",
+   "B": "resinoid",
+   "BF": "resinoid_reinforced"
+  }
+ },
+ "grit_group": {
+  "UNITED": {
+   "coarse": "8-24",
+   "medium": "30-60",
+   "fine": "70-180",
+   "very_fine": "220-600"
+  },
+  "NAVY": {
+   "coarse": "10-24",
+   "medium": "30-60",
+   "fine": "70-180",
+   "very_fine": "220-600"
+  },
+  "CGW": {
+   "coarse": "8-24",
+   "medium": "30-60",
+   "fine": "80-180",
+   "very_fine": "220-600"
+  }
+ },
+ "grade_scale": {
+  "NAVY": "A-Z soft to hard",
+  "UNITED": "A-Z soft to hard"
+ },
+ "grade_group": {
+  "CGW": {
+   "soft": "B-H",
+   "medium": "I-N",
+   "hard": "O-T"
+  }
+ },
+ "structure": {
+  "HST": {
+   "range": "1-14",
+   "low": "dense"
+  },
+  "CGW": {
+   "range": "3-12 and 18 shown; 5-8 closed, 10-14 open",
+   "low": "dense"
+  }
+ },
+ "order": {
+  "UNITED": "abrasive, grit, grade, bond",
+  "NAVY": "abrasive, grit, grade, structure, bond, maker's record",
+  "HST": "abrasive, grit, grade, structure, bond",
+  "CGW": "abrasive, grit, grade, structure, bond"
+ }
+}

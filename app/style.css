@@ -220,6 +220,23 @@ svg.cadp circle.cp-h{fill:var(--panel)}
 .res table.codes td:first-child { white-space: nowrap; vertical-align: top; }
 .res table.codes td:last-child { width: 30%; }
 @media (max-width: 600px) { .res table.codes td:first-child { white-space: normal; } .res table.codes td:last-child { min-width: 0; } }
+
+/* Long text results wrap; drawings under declarative tools; calculators batch 3 */
+.res td.v.txt{white-space:normal;text-align:left;font-family:var(--sans);font-weight:400}
+.tdia{max-width:760px}
+.tdia:empty{display:none}
+svg.geo .gw{stroke:var(--warn);stroke-width:1.4}
+svg.geo .gsoft{fill:var(--soft);stroke:var(--line)}
+svg.geo .gacc{fill:color-mix(in srgb,var(--accent) 22%,var(--panel));stroke:var(--accent);stroke-width:1.2}
+.spec{width:100%;max-width:760px;height:auto;display:block;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);margin:8px 0}
+.spec .ax{stroke:var(--line);stroke-width:1}
+.spec .ln{fill:none;stroke:var(--accent);stroke-width:1.2}
+.spec .hm{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.spec .pk{fill:var(--warn)}
+.spec text{fill:var(--muted);font:10.5px var(--mono)}
+.chbtns{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.chstat{color:var(--muted)}
+.chstat.err{color:var(--err)}
 /* G and M code reference */
 .gmf{flex-wrap:wrap;align-items:flex-end;gap:8px 12px}
 .gml{display:flex;flex-direction:column;gap:2px;min-width:0;max-width:100%}
