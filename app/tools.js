@@ -723,6 +723,13 @@ const TOOLS = [
   source: 'Circle geometry; inverse time feed: NIST RS274NGC Interpreter, version 3 (Kramer, Proctor, Messina, NISTIR 6556, 2000). Check your control manual.',
 },
 {
+  id: 'tnrc', group: 'Turning', title: 'Tool nose radius compensation (TNRC)',
+  desc: 'Where to program the imaginary tool tip so a chamfer, taper or corner radius comes out to size without G41/G42: Z and X shifts, the tip path for any element and tip number 0 to 9 (each drawn), and what G41/G42 does instead.',
+  render: el => renderTnrc(el),
+  working: 'Chamfer at angle θ to Z, tip 3 or 2: dz = r (1 - tan(θ/2)) where it meets a diameter, dx = r (1 - tan((90° - θ)/2)) radial where it meets a face (2 dx on diameter). General element: the tip path is the part line moved by r n + r t (n = unit normal toward the tool, t = tip direction), ended where it meets the moved neighbour line; arcs: radius R + r convex, R - r concave, centre moved by r t. All in the Rust core (core/src/tnrc.rs).',
+  source: 'Kentech Inc. / TWI Press (2000, reprinted by Florida International University) and the Industry Arena forum formulas; Haas operator manual (tip 3 OD, tip 2 boring); Haas lathe programming manual (G41/G42, approach move); NIST RS274NGC. See docs/sources.md.',
+},
+{
   id: 'changegears', group: 'Turning', title: 'Lathe change gears',
   desc: 'Gear trains from your own change gears for a thread (TPI, mm pitch, module or diametral pitch worm) on your leadscrew: simple and compound trains, closest first, with the pitch error.',
   render: el => renderChangeGears(el),
@@ -1760,5 +1767,19 @@ const TOOLS = [
   render: el => renderBearingLife(el),
   working: 'L10 = (C/P)^p, p = 3 ball, 10/3 roller; L10h = 10^6 L10 / (60 n); P = X Fr + Y Fa.',
   source: 'ISO 281:2007 clause 6 (by name only). See docs/sources.md.',
+},
+{
+  id: 'cncguide', group: 'Guides', title: 'CNC knowledge guide',
+  desc: 'Machine axes and the right-hand rule, machine, work and tool coordinates, work, length, radius and wear offsets, program structure, climb and conventional milling, chip formation, tool wear with causes and remedies, turning and milling troubleshooting, workholding and shop safety.',
+  render: el => renderCncGuide(el),
+  working: 'Reference only. Your machine and control manuals govern. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
+  source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'formulas', group: 'Guides', title: 'Formula library',
+  desc: 'Every formula BenchMate uses, searchable: the formula, its variables and units, the tool that uses it and its source. Click a tool name to open it.',
+  render: el => renderFormulaLibrary(el),
+  working: 'Built from the formula registry in app/formulas.js. The Rust core does the arithmetic in every tool; this list is for reading.',
+  source: 'Source keys as listed under the library and in docs/sources.md.',
 },
 ];

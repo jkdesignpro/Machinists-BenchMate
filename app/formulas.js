@@ -1,0 +1,257 @@
+// Formula registry and the Formula library screen (parity A15, U97).
+// One entry per formula BenchMate uses: the tool that uses it, a readable form,
+// the variables with units, and source keys that resolve to FORMULA_SOURCES (and
+// to the same keys in docs/sources.md). The library screen is built from this
+// list; tests/smoke checks that every entry names a real tool and every
+// calculator has at least one entry. The Rust core is the working copy of each
+// formula: this file is documentation only and never computes anything.
+'use strict';
+
+const FORMULA_SOURCES = {
+  MH: "Machinery's Handbook, 31st ed., Industrial Press, 2020 (chapter named in docs/sources.md)",
+  SAN: 'Sandvik Coromant, formulas and definitions for turning, milling and drilling (public pages)',
+  ISO3002: 'ISO 3002-1, basic quantities in cutting and grinding (symbols; cited by name)',
+  TAY: 'F. W. Taylor, On the Art of Cutting Metals, Trans. ASME 28, 1907',
+  GIL: 'W. W. Gilbert, Economics of Machining, ASM, 1950',
+  GERE: 'J. M. Gere, B. J. Goodno, Mechanics of Materials, 9th ed., 2018',
+  ROARK: "Young, Budynas, Sadegh, Roark's Formulas for Stress and Strain, 8th ed., 2012",
+  ALT: 'Y. Altintas, Manufacturing Automation, 2nd ed., 2012, ch. 2 and 3',
+  MD: 'Machining Doctor, chip thinning and ball-nose calculators',
+  ISCAR: 'ISCAR, Machining Titanium guide (2019) and threading catalogue (2023)',
+  IMCO: 'IMCO Carbide Tool, adjustments for ball nose end mills',
+  KD: 'W. A. Kline, R. E. DeVor, runout in end milling, Int. J. Mach. Tool Des. Res. 23, 1983',
+  RS274: 'NIST RS274NGC Interpreter v3, NISTIR 6556, 2000 (inverse time feed)',
+  STAR: 'Starrett Bulletin 193, band saw cutting rates',
+  KASCO: 'KASCO, band saw teeth per minute',
+  SMITH: 'S. Smith, Cutting Tool Engineering 2010; Smith and Tlusty, CIRP Annals 1992',
+  GOETZ: 'D. S. Goetz, Cutting Tool Engineering, 2017 (grinding speed, contact length)',
+  MALKIN: 'S. Malkin, C. Guo, Grinding Technology, 2nd ed., 2008',
+  ROWE: 'W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014',
+  OPENSTAX: 'OpenStax, Algebra and Trigonometry 2e, ch. 10',
+  KETIV: 'KETIV Technologies, sheet metal unfold rule equations',
+  AST: 'Aircraft Systems Tech, making straight line bends (FAA based)',
+  NISTSEM: 'NIST/SEMATECH e-Handbook of Statistical Methods, 6.1.6 and 6.3.2',
+  MINITAB: 'Minitab support, normal capability analysis formulas',
+  DOIRON: 'ISO 1:2022 (20 °C, cited); T. Doiron, J. Res. NIST 112(1), 2007',
+  FASTENAL: 'Fastenal Tool Talk, refractometers and coolant mixing',
+  SP811: 'NIST SP 811, appendix B (1 in = 25.4 mm exactly)',
+  NAVY: 'US Navy Machinery Repairman training manual, ch. 7 Indexing',
+  VDI: 'VDI 2230 Part 1:2015 (cited by name); FVA; Hameedi and Völgyi 2025',
+  ORING: 'Parker ORD 5700 (cited); Global O-Ring and Seal; Apple Rubber',
+  ISO281: 'ISO 281:2007 clause 6 (cited by name)',
+  KEYS: 'DIN 6885-1, ASME B17.1 (cited); fasten.it, MISUMI, Engineers Edge',
+  HARVEY: 'Harvey Performance, In The Loupe, thread milling feed',
+  TRAVERS: 'Travers Tool, thread mill speeds and feeds',
+  HAAS: 'Haas Automation, G76 page and Mill Programming Workbook',
+  DXF: 'Autodesk DXF Reference (polyline bulge)',
+  GDTB: 'GD&T Basics (gdandtbasics.com)',
+  WEV: 'Wevolver, true position formula',
+  OEP: 'Open Exam Prep, ASME GDTP study guide',
+  ACC: 'Accendo Reliability and Five Flute, RSS tolerance analysis',
+  KNURL: 'Dorian Tool and Hommel+Keller (Zeus) knurling catalogues',
+  ISO1832: 'ISO 1832:2017 (cited); insert makers\' code keys',
+  KENTECH: 'Kentech Inc., TWI Press 2000, reprinted by Florida International University (nose radius shifts)',
+  IA: 'Industry Arena / CNCzone forum, manual tool comp for a lathe (2005-2009)',
+  HFO: 'Haas operator manual (Haas Factory Outlet, 12/2018): tip 3 OD, tip 2 boring',
+  BIEG: 'D. Biegert, Measuring countersink diameter using gage balls, Math Encounters, 2014',
+  NIMI: 'NIMI, CITS Fitter Trade Theory, p. 113 (taper over rollers worked set-up)',
+  EEPF: 'Engineers Edge, interference press fit cylinder design (Lamé)',
+  MITU: 'Mitutoyo America, quick guide to precision measuring instruments, 2019',
+  ISO2768: 'ISO 2768-1:1989, general tolerances (cited by name)',
+  OWN: 'BenchMate derivation, with tests in benchmate-core',
+};
+
+// F(tool id, name, formula, variables 'sym: meaning [unit]; ...', source keys)
+const F = (tool, name, expr, vars, src) => ({ tool, name, expr, vars, src });
+const FORMULAS = [
+  F('rpm', 'Spindle speed from cutting speed (metric)', 'n = 1000 · Vc / (π · D)', 'n: spindle speed [rpm]; Vc: cutting speed [m/min]; D: diameter [mm]', ['SAN', 'MH']),
+  F('rpm', 'Spindle speed from surface speed (inch)', 'n = 12 · SFM / (π · D)', 'n: spindle speed [rpm]; SFM: surface speed [ft/min]; D: diameter [in]', ['MH']),
+  F('rpm', 'Cutting speed from spindle speed', 'Vc = π · D · n / 1000   (inch: SFM = π · D · n / 12)', 'Vc: cutting speed [m/min]; D: diameter [mm or in]; n: spindle speed [rpm]', ['SAN', 'MH']),
+  F('feed', 'Milling table feed', 'Vf = n · z · fz', 'Vf: table feed [mm/min or in/min]; n: spindle speed [rpm]; z: number of teeth; fz: feed per tooth [mm or in]', ['SAN', 'MH']),
+  F('feed', 'Feed per tooth from table feed', 'fz = Vf / (n · z)', 'fz: feed per tooth [mm or in]; Vf: table feed [per min]; n: [rpm]; z: teeth', ['SAN', 'MH']),
+  F('mrr', 'Turning removal rate (metric)', 'Q = Vc · ap · fn', 'Q: removal rate [cm³/min]; Vc: [m/min]; ap: depth of cut [mm]; fn: feed [mm/rev]', ['SAN']),
+  F('mrr', 'Turning removal rate (inch)', 'Q = 12 · SFM · DOC · IPR', 'Q: [in³/min]; SFM: [ft/min]; DOC: depth of cut [in]; IPR: feed [in/rev]', ['MH']),
+  F('mrr', 'Cutting power', 'Pc = Q · kc / (60 000 · η)', 'Pc: power [kW]; Q: [cm³/min]; kc: specific cutting force [N/mm²]; η: machine efficiency', ['SAN']),
+  F('toollife', 'Taylor tool life', 'V · T^n = C   →   T = (C / V)^(1/n)', 'V: cutting speed; T: tool life [min]; n: Taylor exponent; C: speed for 1 min life', ['TAY', 'MH']),
+  F('toollife', 'Cost per part', 'cost = t_cycle · rate + edge cost · t_cut / T + material', 't_cycle: cycle time [min]; rate: machine and labour [per min]; t_cut: cutting time [min]; T: tool life [min]', ['GIL', 'MH']),
+  F('toollife', 'Minimum-cost tool life', 'T_c = (1/n − 1) · (edge cost / rate + t_change)', 'n: Taylor exponent; rate: [per min]; t_change: tool change time [min]', ['GIL', 'MH']),
+  F('toollife', 'Maximum-production tool life', 'T_p = (1/n − 1) · t_change', 'n: Taylor exponent; t_change: tool change time [min]', ['GIL', 'MH']),
+  F('arcfeed', 'Tool-centre feed on an inside arc', 'Fc = Fe · (R − r) / R', 'Fc: programmed (centre) feed; Fe: feed at the edge; R: part arc radius; r: tool radius', ['SAN', 'MH']),
+  F('arcfeed', 'Tool-centre feed on an outside arc', 'Fc = Fe · (R + r) / R', 'Fc: programmed feed; Fe: edge feed; R: part arc radius; r: tool radius', ['SAN', 'MH']),
+  F('helix', 'Helical path diameter', 'hole: Dpath = Dhole − Dtool;  boss: Dpath = Dboss + Dtool', 'D: diameters [mm or in]', ['SAN']),
+  F('helix', 'Pitch for a ramp angle', 'pitch = π · Dpath · tan(α)', 'pitch: Z per turn; Dpath: path diameter; α: ramp angle [deg]', ['SAN', 'MH']),
+  F('helix', 'Axial feed of a helix', 'Vz = F · tan(α) (F in the plane)  or  F · sin(α) (F along the helix)', 'F: programmed feed; α: ramp angle', ['SAN']),
+  F('deflection', 'Second moment of a round section', 'I = π · d⁴ / 64', 'I: [mm⁴ or in⁴]; d: diameter', ['GERE']),
+  F('deflection', 'Two-section cantilever deflection', 'δ = F / (3E) · [ (L³ − a³) / I_shank + a³ / I_flute ]', 'δ: tip deflection; F: radial force [N or lbf]; E: Young\'s modulus; L: stick-out; a: flute length', ['GERE', 'ROARK']),
+  F('deflection', 'Tangential force from power', 'Ft = Pc · 60 000 / Vc', 'Ft: [N]; Pc: power at the cut [kW]; Vc: [m/min]', ['SAN']),
+  F('cutopt', 'Milling removal rate', 'Q = ae · ap · Vf', 'Q: removal rate; ae: radial width; ap: axial depth; Vf: table feed', ['SAN', 'MH']),
+  F('cutopt', 'Spindle torque', 'T = P · 60 000 / (2π · n)', 'T: [N·m]; P: [kW]; n: [rpm]', ['SAN']),
+  F('cutopt', 'Power available at a speed', 'P(n) = min(P_max, T_max · 2π · n / 60 000)', 'P_max: rated power [kW]; T_max: rated torque [N·m]; n: [rpm]', ['SAN']),
+  F('cutopt', 'Mean chip thickness', 'hm = fz · (1 − cos φ) / φ,  φ = acos(1 − 2 ae / D)', 'hm: mean chip; fz: feed per tooth; φ: engagement angle [rad]; ae: radial width; D: tool diameter', ['ALT', 'SAN']),
+  F('chipthin', 'Engagement angle on a straight wall', 'φ = acos(1 − 2 · ae / D)', 'φ: engagement angle; ae: radial width; D: tool diameter', ['ALT']),
+  F('chipthin', 'Radial chip thinning factor', 'RCTF = 1 / √(1 − (1 − 2 ae / D)²)  (ae < D/2; else 1)', 'ae: radial width; D: tool diameter', ['MD', 'ALT']),
+  F('chipthin', 'Maximum chip thickness', 'hex = fz · sin φ  (fz once φ ≥ 90°)', 'hex: max chip; fz: feed per tooth; φ: engagement angle', ['ALT']),
+  F('cornerfeed', 'Engagement in an inside corner', 'cos φ = ((R − ae)² − (R − r)² − r²) / (2 r (R − r))', 'R: finished wall radius; ae: radial width; r: tool radius', ['OWN', 'ALT']),
+  F('cornerfeed', 'Engagement round a boss', 'cos φ = ((R + r)² + r² − (R + ae)²) / (2 r (R + r))', 'R: finished wall radius; ae: radial width; r: tool radius', ['OWN', 'ALT']),
+  F('ballcusp', 'Ball-nose cusp height', 'h = R − √(R² − (s/2)²)  ≈ s² / (8R)', 'h: cusp; R: ball radius; s: stepover', ['OWN', 'IMCO']),
+  F('ballcusp', 'Stepover for a cusp', 's = 2 · √(2 R h − h²)', 's: stepover; R: ball radius; h: cusp', ['OWN', 'IMCO']),
+  F('balleff', 'Ball-nose effective diameter', 'De = 2 · √(ap · (D − ap))   (axis normal to the surface)', 'De: effective diameter; ap: depth of cut; D: ball diameter', ['ISCAR', 'IMCO']),
+  F('balleff', 'Effective diameter with tilt', 'De = D · sin(min(θ0 + β, 90°)),  θ0 = acos(1 − 2 ap / D)', 'β: tilt from the surface normal; ap: depth; D: ball diameter', ['OWN', 'ISCAR']),
+  F('balleff', 'Feed correction for the effective diameter', 'fz_adj = fz · D / De', 'fz: chip load wanted; D: ball diameter; De: effective diameter', ['IMCO', 'MD']),
+  F('runout', 'Worst-tooth chip with runout', 'h_max = fz + TIR · sin(π / z)', 'fz: programmed feed per tooth; TIR: indicator reading at the edges; z: teeth', ['KD', 'OWN']),
+  F('runout', 'Feed for a chip limit with runout', 'fz = c − TIR · sin(π / z)', 'c: largest chip allowed; TIR: runout; z: teeth', ['KD', 'OWN']),
+  F('finish', 'Theoretical peak-to-valley', 'Rt = f² / (8 r)', 'Rt: [mm or in]; f: feed per rev; r: nose radius', ['MH', 'SAN']),
+  F('finish', 'Theoretical Ra', 'Ra = f² / (32 r)', 'Ra; f: feed per rev; r: nose radius (valid for f < 2r)', ['MH', 'SAN']),
+  F('insertcode', 'Insert edge length from the IC', 'l = (d/2) · (cot(a1/2) + cot(a2/2))', 'l: cutting edge length; d: inscribed circle; a1, a2: corner angles', ['ISO1832', 'OWN']),
+  F('knurl', 'Knurling blank diameter', 'D = n · p / (π · cos h)', 'D: blank diameter; n: teeth round the work; p: circular pitch; h: helix angle', ['KNURL']),
+  F('passtime', 'Time for a turning pass', 't = L / (f · n)', 't: [min]; L: length of cut; f: feed per rev; n: [rpm]', ['MH', 'SAN']),
+  F('taper', 'Taper half angle', 'tan(α/2) = (D − d) / (2 L)', 'α: included angle; D, d: large and small diameters; L: length', ['MH']),
+  F('bar', 'Parts per bar', 'parts = ⌊(bar − remnant − start facing) / (part + cut-off + facing)⌋', 'lengths [mm or in]', ['MH']),
+  F('bar', 'Hexagon section area', 'A = (√3 / 2) · s²', 'A: area; s: across flats', ['MH']),
+  F('lathefeed', 'Lathe feed per minute', 'Vf = fn · n', 'Vf: [per min]; fn: feed per rev; n: [rpm]', ['SAN', 'MH']),
+  F('roughtime', 'Number of roughing passes', 'N = ⌈(D0 − D1) / (2 · ap_max)⌉', 'D0: stock; D1: finished diameter; ap_max: largest depth per pass', ['SAN']),
+  F('roughtime', 'Spindle speed at constant surface speed', 'n = 1000 · Vc / (π · Di), capped at the clamp', 'Di: diameter of the pass; Vc: [m/min]', ['SAN']),
+  F('boringbar', 'Section of a bar with a coolant hole', 'I = π · (d⁴ − di⁴) / 64', 'd: bar diameter; di: coolant hole', ['GERE']),
+  F('boringbar', 'Boring bar deflection', 'δ = F · L³ / (3 E I)', 'F: cutting force; L: overhang; E: modulus; I: second moment', ['GERE', 'ROARK']),
+  F('boringbar', 'Turning cutting force', 'Fc = kc · ap · fn', 'Fc: [N]; kc: [N/mm²]; ap: [mm]; fn: [mm/rev]', ['SAN']),
+  F('caxis', 'C-axis rotary feed', 'deg/min = Vf · 360 / (π · D)', 'Vf: feed on the surface; D: diameter', ['OWN']),
+  F('caxis', 'Inverse time feed (G93)', 'F = Vf / path,  path = √(lin² + (π · D · angle / 360)²)', 'F: [1/min]; lin: linear move; angle: [deg]', ['RS274', 'OWN']),
+  F('slitsaw', 'Teeth in the cut', 'z_e = z · φ / 360°', 'z: saw teeth; φ: engagement angle [deg]', ['ALT', 'OWN']),
+  F('slitsaw', 'Saw approach distance', 'approach = √(ae · (D − ae))', 'ae: depth of cut; D: saw diameter', ['OWN']),
+  F('bandsaw', 'Cut time from a cutting rate', 't = area / cutting rate', 'area: [in² or cm²]; rate: [per min]', ['STAR']),
+  F('bandsaw', 'Band saw chip per tooth', 'f_tooth = down-feed / (blade speed · teeth per length)', 'down-feed: [per min]; blade speed: [ft/min or m/min]', ['KASCO', 'STAR']),
+  F('drillpoint', 'Drill point length', 'h = (d / 2) / tan(θ / 2)', 'h: point length; d: drill diameter; θ: point angle', ['MH']),
+  F('spotdepth', 'Spot drill depth for a chamfer', 'z = (Dc / 2) / tan(θ / 2)', 'z: depth from the tip; Dc: chamfer diameter; θ: tool point angle', ['OWN', 'MH']),
+  F('spotdepth', 'Centre drill depth', 'z = l + (Dc − d) / (2 · tan(θ / 2))', 'l: tip to start of the cone; d: pilot diameter', ['OWN']),
+  F('chatter', 'Tooth passing frequency', 'f_t = n · z / 60', 'f_t: [Hz]; n: [rpm]; z: teeth (lathe 1)', ['SMITH', 'ALT']),
+  F('chatter', 'Stable speed for lobe N', 'n = 60 · fc / (z · (N + 1))', 'fc: chatter frequency [Hz]; z: teeth; N: lobe 0, 1, 2 ...', ['SMITH', 'ALT']),
+  F('grindspeed', 'Wheel peripheral speed', 'vs = π · ds · ns / 60 000   (SFPM = π · ds · ns / 12)', 'vs: [m/s]; ds: wheel diameter [mm or in]; ns: [rpm]', ['GOETZ']),
+  F('grindspeed', 'Equivalent wheel diameter', 'de = dw·ds / (dw + ds) external, dw·ds / (dw − ds) internal', 'dw: work diameter; ds: wheel diameter', ['GOETZ', 'MALKIN']),
+  F('grindspeed', 'Contact length', 'lg = √(ae · de)', 'ae: depth of cut; de: equivalent diameter', ['GOETZ', 'MALKIN']),
+  F('grindspeed', 'Speed ratio', 'q = vs · 60 / vw', 'vs: [m/s]; vw: work speed [m/min]', ['ROWE']),
+  F('grindspeed', 'Equivalent chip thickness', 'heq = ae · vw / vs', 'ae: depth; vw, vs: work and wheel speed (same units)', ['MALKIN']),
+  F('grindtime', 'Traverse grinding time', 't = L / (fa · nw) · passes', 'L: length; fa: traverse per work rev; nw: work speed [rpm]', ['ROWE', 'OWN']),
+  F('grindtime', 'Specific removal rate in plunge', "Q'w = π · dw · vfr / 60", "Q'w: [mm³/mm/s]; dw: work diameter [mm]; vfr: radial infeed [mm/min]", ['MALKIN']),
+  F('grindsurf', 'Surface grinding time', 't = strokes · layers · stroke length / table speed', 'stroke length = L + 2 · overtravel', ['ROWE', 'OWN']),
+  F('wires', 'Pitch diameter of a 60° thread', 'E = D − 0.649519 · P', 'E: pitch diameter; D: major diameter; P: pitch', ['MH']),
+  F('wires', 'Best wire size', 'w = 0.57735 · P', 'w: wire diameter; P: pitch', ['MH']),
+  F('wires', 'Measurement over three wires', 'M = E + 3w − 0.866025 · P', 'M: over wires; E: pitch diameter; w: wire; P: pitch', ['MH']),
+  F('machinetapers', 'Included angle of a taper', 'α = 2 · atan(taper per unit length / 2)', 'α: included angle', ['MH']),
+  F('bolt', 'Bolt circle hole position', 'x = cx + (D/2) cos(a0 + 360 i / n);  y = cy + (D/2) sin(a0 + 360 i / n)', 'D: circle diameter; n: holes; a0: start angle; i = 0 ... n−1', ['MH']),
+  F('triangle', 'Law of sines', 'a / sin A = b / sin B = c / sin C', 'a, b, c: sides; A, B, C: opposite angles', ['OPENSTAX']),
+  F('triangle', 'Law of cosines', 'a² = b² + c² − 2bc · cos A', 'a, b, c: sides; A: angle opposite a', ['OPENSTAX']),
+  F('arc', 'Chord and sagitta', 'c = 2R · sin(θ/2);  s = R · (1 − cos(θ/2))', 'R: radius; θ: included angle', ['OPENSTAX']),
+  F('arc', 'Radius from chord and sagitta', 'R = (c²/4 + s²) / (2s)', 'c: chord; s: sagitta', ['OPENSTAX']),
+  F('fillet', 'Fillet tangent distance in a corner', 't = r / tan(α/2)', 'r: fillet radius; α: angle between the legs', ['OWN']),
+  F('dovetail', 'Male dovetail over pins', 'M = W + d · (1 + cot(α/2))', 'W: width at the sharp corners; d: pin diameter; α: dovetail angle', ['OWN']),
+  F('cycdrill', 'Tapping feed', 'F = pitch · n', 'F: feed per minute; pitch: thread lead; n: [rpm]', ['HAAS']),
+  F('cyctmill', 'Thread mill centre feed', 'internal F = Fe · (D − d) / D;  external F = Fe · (D + d) / D', 'Fe: edge feed; D: thread diameter; d: cutter diameter', ['HARVEY', 'TRAVERS']),
+  F('cycthread', 'Constant-volume infeed', 'depth after pass n = d1 · √n', 'd1: first cut depth', ['ISCAR', 'HAAS']),
+  F('cycthread', 'External thread depth', 'h = 0.613435 · P   (internal 0.541266 · P)', 'P: pitch', ['ISCAR']),
+  F('cycgroove', 'Plunge time at constant surface speed', 't = (D0² − D1²) / (4 · f · k),  k = 1000 · Vc / π', 'D0, D1: start and end diameter; f: feed per rev; Vc: [m/min]', ['OWN', 'SAN']),
+  F('cycbroach', 'Broaching strokes', 'strokes = ⌈depth / depth per stroke⌉ + spring strokes', 'depth: keyway depth; depth per stroke: chosen cut', ['OWN', 'HAAS']),
+  F('cycg71', 'G71 roughing passes', 'passes = ⌈(stock radius − profile radius − U/2) / depth per pass⌉', 'U: finish allowance on diameter; depth per pass: radial', ['OWN', 'HAAS']),
+  F('cyctaper', 'Taper half angle for the program', 'α/2 = atan((D − d) / (2 L))', 'D, d: diameters; L: length', ['MH']),
+  F('dxfbolt', 'Polyline arc bulge', 'bulge = tan(included angle / 4)', 'included angle of the arc', ['DXF']),
+  F('dxfpoly', 'Regular polygon across flats', 'AF = 2R · cos(180° / n)', 'R: circumradius; n: sides (even)', ['MH']),
+  F('dxfrect', 'Bulge of a 90° corner', 'bulge = tan(22.5°) = 0.414214', '', ['DXF']),
+  F('dxfslot', 'Arc slot sides', 'outer R + w/2, inner R − w/2', 'R: slot centre radius; w: slot width', ['OWN']),
+  F('dxfgrid', 'Hole grid plate size', 'width = (cols − 1) · pitch X + 2 · margin', '', ['OWN']),
+  F('dxfring', 'Ring (washer) outline', 'outer circle Ø D, hole Ø d on the same centre', 'D, d: diameters', ['OWN']),
+  F('dxfprofile', 'Keyhole slot meeting point', 'y = −√(R² − (w/2)²)', 'R: head radius; w: slot width', ['OWN']),
+  F('gdttp', 'True position (diametral)', 'TP = 2 · √(dX² + dY²)', 'dX, dY: deviations from the basic location', ['GDTB', 'WEV']),
+  F('gdtbonus', 'Bonus tolerance at MMC', 'bonus = |actual size − MMC size|', '', ['GDTB', 'OEP']),
+  F('gdtbonus', 'Virtual condition of an MMC hole', 'VC = MMC − tolerance  (pin: MMC + tolerance)', '', ['GDTB', 'OEP']),
+  F('gdtconv', 'Circle round a ± rectangle', 'Ø = 2 · √(tx² + ty²)', 'tx, ty: plus/minus tolerances', ['OWN', 'GDTB']),
+  F('gdtfast', 'Floating fastener', 'T = H − F', 'H: clearance hole MMC; F: fastener MMC', ['OEP', 'GDTB']),
+  F('gdtfast', 'Fixed fastener', 't1 + t2 = H − F', 'H: clearance hole MMC; F: fastener MMC', ['OEP', 'GDTB']),
+  F('gdtcomp', 'Lower-row (pattern) check', 'min over shift and rotation of max_i (2 · |p_i − z_i| − bonus_i) ≤ t_lower', 'p_i: measured hole; z_i: moved zone centre', ['OWN', 'GDTB']),
+  F('gdtprofu', 'Equal-zone offset for a U zone', 'offset = u − t/2, then ± t/2', 't: total profile tolerance; u: outside share', ['GDTB', 'OEP']),
+  F('gdtstack', 'Worst-case stack', 'WC = Σ tᵢ', 'tᵢ: half tolerances', ['ACC']),
+  F('gdtstack', 'Root sum square stack', 'RSS = √(Σ tᵢ²)', 'tᵢ: half tolerances (independent, centred, 3σ each)', ['ACC']),
+  F('weight', 'Stock weight', 'W = A · L · ρ', 'A: section area; L: length; ρ: density', ['OWN', 'MH']),
+  F('weight', 'Tube section', 'A = π/4 · (D² − (D − 2t)²)', 'D: outside diameter; t: wall', ['MH']),
+  F('bend', 'Bend allowance', 'BA = angle · (R + K · t)', 'angle [rad]; R: inside radius; K: K-factor; t: thickness', ['KETIV', 'AST']),
+  F('bend', 'Outside setback and bend deduction', 'OSSB = tan(angle/2) · (R + t);  BD = 2 · OSSB − BA', '', ['KETIV', 'AST']),
+  F('capability', 'Process capability', 'Cp = (USL − LSL) / 6σ;  Cpk = min(USL − x̄, x̄ − LSL) / 3σ', 'σ: within sigma (moving range / d2)', ['NISTSEM', 'MINITAB']),
+  F('capability', 'Within sigma from moving ranges', 'σ = MR̄ / d2,  d2 = 1.128', 'MR̄: average moving range of two', ['NISTSEM']),
+  F('tempcomp', 'Measurement at 20 °C', 'L20 = reading · (1 + αg (Tg − 20)) / (1 + αp (Tp − 20))', 'α: expansion coefficient [1/K]; T: temperature [°C]', ['DOIRON', 'OWN']),
+  F('coolconc', 'Coolant concentration', 'c = Brix reading · refractometer factor', 'c: [%]; factor from the fluid data sheet', ['FASTENAL']),
+  F('coolmix', 'Concentrate to raise strength', 'x = V · (c_target − c_now) / (c_conc − c_target)', 'V: sump volume; c: concentrations [%]', ['OWN', 'FASTENAL']),
+  F('fraction', 'Inch to millimetre', 'mm = in · 25.4', 'exact by definition', ['SP811']),
+  F('fraction', 'Nearest fraction', 'numerator = round(value · denominator)', '', ['OWN']),
+  F('machines', 'Spindle power curve', 'P(n) = min(P_max, T_max · 2π · n / 60 000)', 'P: [kW]; T: [N·m]; n: [rpm]', ['SAN']),
+  F('sinebar', 'Sine bar height', 'H = L · sin(angle)', 'H: gauge stack; L: roll centre distance', ['OPENSTAX']),
+  F('indexing', 'Simple indexing', 'turns = ratio / N', 'ratio: head ratio (often 40); N: divisions', ['NAVY']),
+  F('indexing', 'Differential indexing gear ratio', 'gear ratio = ratio · (A\' − N) / A\'', "A': indexable approximate number; N: divisions wanted", ['NAVY']),
+  F('bolttorque', 'Tightening torque', 'MA = F · (0.16 P + 0.58 d2 μG + DKm/2 · μK)', 'F: preload; P: pitch; d2: pitch diameter; μG, μK: thread and head friction; DKm: bearing diameter', ['VDI']),
+  F('oring', 'O-ring squeeze', 'squeeze = (CS − depth) / CS', 'CS: cross-section; depth: gland depth', ['ORING']),
+  F('oring', 'O-ring stretch', 'stretch = (seat diameter − ID) / ID', '', ['ORING']),
+  F('bearinglife', 'Basic rating life', 'L10 = (C / P)^p,  p = 3 ball, 10/3 roller', 'C: dynamic load rating; P: equivalent load', ['ISO281']),
+  F('bearinglife', 'Life in hours', 'L10h = 10⁶ · L10 / (60 · n)', 'n: [rpm]', ['ISO281']),
+  F('keys', 'Inch keyseat chordal height', 'Y = (D − √(D² − W²)) / 2', 'D: shaft diameter; W: key width', ['KEYS']),
+  F('tnrc', 'Z shift where a chamfer meets a diameter', 'dz = r · (1 − tan(θ / 2))', 'r: nose radius; θ: chamfer angle to the Z axis', ['KENTECH', 'IA']),
+  F('tnrc', 'X shift where a chamfer meets a face', 'dx = r · (1 − tan((90° − θ) / 2)) = tan θ · dz  (×2 on diameter)', 'r: nose radius; θ: chamfer angle to the Z axis', ['IA', 'KENTECH']),
+  F('tnrc', 'Tip path of a corner radius', 'R_tip = R + r (convex), R − r (concave); centre moved by r along the tip direction', 'R: part radius; r: nose radius', ['KENTECH', 'IA', 'OWN']),
+  F('tnrc', 'Error with no compensation on a chamfer', 'e = r · (sin θ + cos θ − 1)', 'e: nose stand-off from the line; θ: chamfer angle', ['OWN']),
+  F('changegears', 'Gear ratio needed', 'i = thread lead / (leadscrew lead · fixed ratio); simple a/b, compound (a/b)·(c/d)', 'a, c: driver teeth; b, d: driven teeth', ['MH', 'OWN']),
+  F('changegears', 'Pitch error of a train', 'error = i_found / i_needed − 1', 'i: gear ratio', ['OWN']),
+  F('shrinkfit', 'Temperature rise for a shrink fit', 'ΔT = (i + c) / (α · d)', 'i: interference; c: assembly clearance; α: expansion coefficient [1/K]; d: diameter', ['MH', 'OWN']),
+  F('shrinkfit', 'Press-fit pressure (Lamé)', 'p = δ / (d/Eo · ((do² + d²)/(do² − d²) + νo) + d/Ei · ((d² + di²)/(d² − di²) − νi))', 'δ: diametral interference; do: hub outside; di: shaft bore; E, ν: modulus and Poisson ratio', ['EEPF', 'ROARK']),
+  F('shrinkfit', 'Hub hoop stress at the bore', 'σ = p · (do² + d²) / (do² − d²)', 'p: fit pressure', ['EEPF', 'ROARK']),
+  F('shrinkfit', 'Holding torque', 'T = μ · p · π · d² · L / 2', 'μ: friction coefficient; L: fit length', ['EEPF', 'OWN']),
+  F('gentol', 'Angular tolerance as a length', 'offset = shorter side · tan(tolerance)', 'tolerance from the ISO 2768-1 table', ['ISO2768', 'OWN']),
+  F('figures', 'Regular polygon from across flats', 'side = AF · tan(180°/n); AC = AF / cos(180°/n); A = n · side · AF / 4', 'n: number of sides; AF: across flats; AC: across corners', ['MH', 'OWN']),
+  F('figures', 'Ellipse perimeter (Ramanujan II)', 'P ≈ π (a + b) (1 + 3h / (10 + √(4 − 3h))), h = (a − b)² / (a + b)²', 'a, b: semi-axes', ['MH']),
+  F('compound', 'True angle from two apparent angles', 'tan C = √(tan² ax + tan² ay)', 'ax, ay: angles seen in two views at 90°', ['OWN']),
+  F('compound', 'Two tilts about X then Y', 'cos C = cos a1 · cos a2', 'a1, a2: tilt settings', ['OWN']),
+  F('ballcone', 'Ball height over a countersink face', 'h = r + r / sin a − D / (2 tan a)', 'r: ball radius; a: half the included angle; D: diameter at the face', ['BIEG', 'OWN']),
+  F('ballcone', 'Included angle from two balls', 'sin a = (r2 − r1) / ((h2 − r2) − (h1 − r1))', 'r: ball radii; h: heights of the ball tops', ['BIEG', 'OWN']),
+  F('taperrolls', 'Measurement over rolls on a taper', 'M = D_H + d · (1 + tan(45° + a/2)), D_H = D0 + 2 H tan a', 'd: roll diameter; a: half angle; H: block height; D0: small end diameter', ['NIMI', 'OWN']),
+  F('taperrolls', 'Half angle from two readings', 'tan a = (M2 − M1) / (2 (H2 − H1))', 'M: readings over rolls; H: block heights', ['NIMI', 'OWN']),
+  F('scales', 'Micrometer reading', 'reading = sleeve + thimble division · pitch / divisions + vernier line · resolution', 'pitch: spindle pitch', ['MITU']),
+  F('units', 'Unit conversion', 'x_SI = (x + offset) · factor; x_target = x_SI / factor_target − offset_target', 'offset only for temperature', ['SP811']),
+  F('calc', 'Involute function', 'inv a = tan a − a', 'a: angle in radians', ['MH']),
+  F('economics', 'Capital recovery factor', 'CRF = i (1 + i)ⁿ / ((1 + i)ⁿ − 1); capital per year = (P − S) · CRF + S · i', 'i: interest per year; n: years; P: price; S: resale', ['OWN']),
+  F('economics', 'Break-even quantity', 'Q = fixed cost / (price − variable cost)', '', ['OWN']),
+  F('economics', 'Net present value', 'NPV = A (1 − (1 + i)⁻ⁿ) / i + S (1 + i)⁻ⁿ − I', 'A: yearly saving; I: investment; S: resale', ['OWN']),
+];
+
+// Tools that only show reference data (no formula of their own).
+const FORMULA_EXEMPT = ['holdercode', 'iso513', 'drillchart', 'tapdrill', 'gritconv', 'wheelcode', 'threaddata', 'pipethreads', 'whitworth', 'fits', 'surface', 'hardness',
+  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'formulas'];
+
+const FLIB = { q: '', g: '' };
+function renderFormulaLibrary(el) {
+  const esc = x => String(x ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const tool = id => TOOLS.find(t => t.id === id);
+  const groups = [...new Set(FORMULAS.map(f => (tool(f.tool) || {}).group).filter(Boolean))];
+  el.innerHTML = '<div class="flib-bar"><input id="fq" type="search" placeholder="Search formulas: rpm, chip, cusp, taper, torque ..." aria-label="Search formulas"><select id="fg" aria-label="Filter by group"><option value="">All groups</option>' +
+    groups.map(g => '<option>' + esc(g) + '</option>').join('') + '</select></div><div id="flist"></div>' +
+    '<h2>Source keys</h2><ul class="gsl">' + Object.entries(FORMULA_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + esc(v) + '</li>').join('') + '</ul>';
+  const draw = () => {
+    const q = FLIB.q.trim().toLowerCase();
+    const rows = FORMULAS.filter(f => {
+      const t = tool(f.tool); if (!t) return false;
+      if (FLIB.g && t.group !== FLIB.g) return false;
+      return !q || (f.name + ' ' + f.expr + ' ' + f.vars + ' ' + t.title + ' ' + f.src.join(' ')).toLowerCase().includes(q);
+    });
+    $('#flist', el).innerHTML = '<p class="desc">' + rows.length + ' of ' + FORMULAS.length + ' formulas, from ' + new Set(FORMULAS.map(f => f.tool)).size + ' tools. Click a tool name to open it.</p>' +
+      rows.map(f => {
+        const t = tool(f.tool);
+        return '<div class="frow"><div class="fh"><b>' + esc(f.name) + '</b> <button class="btn flink" data-id="' + f.tool + '">' + esc(t.title) + '</button></div>' +
+          '<div class="fx">' + esc(f.expr) + '</div>' +
+          (f.vars ? '<div class="fv">' + f.vars.split(';').map(v => esc(v.trim())).join('<br>') + '</div>' : '') +
+          '<div class="fs">' + f.src.map(k => '<abbr class="gsrc" title="' + esc(FORMULA_SOURCES[k] || k) + '">' + k + '</abbr>').join('') + ' <span class="ms">' + esc(t.group) + '</span></div></div>';
+      }).join('');
+    el.querySelectorAll('.flink').forEach(b => b.onclick = () => {
+      state.tool = b.dataset.id; try { localStorage.setItem('bm.tool', b.dataset.id); } catch (e) {}
+      renderList($('#search').value); renderTool(); $('#main').scrollTop = 0;
+    });
+  };
+  const q = $('#fq', el), g = $('#fg', el);
+  q.value = FLIB.q; g.value = FLIB.g;
+  q.oninput = () => { FLIB.q = q.value; draw(); };
+  g.onchange = () => { FLIB.g = g.value; draw(); };
+  draw();
+}

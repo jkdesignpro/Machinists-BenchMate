@@ -577,6 +577,7 @@ pub mod chatter;
 pub use chatter::*;
 pub mod grinding;
 pub use grinding::*;
+pub mod tnrc;
 pub mod measure;
 pub mod power_threads;
 pub use power_threads::*;

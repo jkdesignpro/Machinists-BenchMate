@@ -30,12 +30,12 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 65 | 15 | 31 (8) | 2 | 0 | 59 % |
-| Machinery's Handbook 31 | 306 | 36 | 74 | 162 (12) | 6 | 28 | 13 % |
+| CNC Machinist Calculator Ultra | 113 | 67 | 14 | 30 (8) | 2 | 0 | 60 % |
+| Machinery's Handbook 31 | 306 | 40 | 77 | 155 (12) | 6 | 28 | 15 % |
 | Engineers' Data Book | 94 | 5 | 24 | 27 (0) | 12 | 26 | 9 % |
 | Engineers Black Book | 80 | 20 | 18 | 41 (9) | 1 | 0 | 25 % |
-| CNC Machining handbook | 83 | 4 | 9 | 66 (0) | 0 | 4 | 5 % |
-| **All** | **676** | **130** | **140** | **327 (29)** | **21** | **58** | **22 %** |
+| CNC Machining handbook | 83 | 13 | 16 | 50 (0) | 0 | 4 | 16 % |
+| **All** | **676** | **145** | **149** | **303 (29)** | **21** | **58** | **24 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -49,7 +49,9 @@ features are names only.
 
 **Update (branch `claude/gdt-3`, 2026-11-11):** BB73 done (letter-address table added to the G and M codes screen). GD&T round 3 (composite profile added to the guide) changes no row status. Summary counts updated for BB73.
 
-**Update (branch `claude/threads-3`, 2026-11-11):** batch A12 (threads round 3) is built except Whitworth tolerances, taper and buttress wire measurement and the trapezoidal tolerances. U39, U40, U42, U45, U46, U49, MH222, MH224, MH225, MH232 done; U41, U44, MH207, MH220, MH221, MH228, MH230, MH233, MH234, MH238, MH247 partial (U47, U51, MH246, BB7 notes updated). Summary counts recounted from all rows by script (the in-progress column kept as it was).
+**Update (branch `claude/cnc-guide`, 2026-11-11):** batch B6 (first part) and the rest of A15 except tips: tool nose radius compensation calculator (`tnrc`), CNC knowledge guide (`cncguide`: axes, coordinate systems, offsets, program structure, climb/conventional, chip formation, tool wear, troubleshooting, workholding, safety) and the formula library (`formulas`). U91, U97, MH131, MH176, MH178, MH183, CN8, CN10, CN12, CN13, CN15, CN16, CN20, CN24, CN48 done; MH100, MH137, MH174, CN4, CN5, CN23, CN41, CN49, CN62, CN63, CN64 partial. Not built: tip of the day (U98), toolpath strategies, CSS explainer, operator procedures (CN25-CN34), 3D toolpaths, glossary. Summary counts recounted from all rows.
+
+**Update (branch `claude/threads-3`, 2026-11-11):** batch A12 (threads round 3) is built except Whitworth tolerances, taper and buttress wire measurement and the trapezoidal tolerances. U39, U40, U42, U45, U46, U49, MH222, MH224, MH225, MH232 done; U41, U44, MH207, MH220, MH221, MH228, MH230, MH233, MH234, MH238, MH247 partial (U47, U51, MH246, BB7 notes updated). Summary counts recounted from all rows by script after merging `claude/cnc-guide` (the in-progress column kept as it was).
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -226,7 +228,7 @@ Store list is the fuller of the two store lists.
 | U88 | Keyway broach program generator | done | `cycbroach` | Lathe or mill, depth per stroke, lift, spring strokes (`claude/cycles`) |
 | U89 | Coolant concentration | done | `coolconc`, `coolmix` | |
 | U90 | Bandsaw cut time | done | `bandsaw` | Cut time from cutting rate or down-feed, chip per tooth from blade speed and TPI (`claude/calcs-3`) |
-| U91 | Tool wear information | missing | | |
+| U91 | Tool wear information | done | `cncguide` | Wear types (flank, crater, notch, built-up edge, chipping, thermal cracks, plastic deformation) with causes and remedies from Mitsubishi Materials and Seco, own sketches (`claude/cnc-guide`) |
 
 ### G-code and programming
 
@@ -242,7 +244,7 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U97 | Machining formula library | partial | every tool's "Working" note | Formulas appear only inside each tool; no browsable or searchable library |
+| U97 | Machining formula library | done | `formulas` | Searchable library of 151 formulas from 85 tools with variables, units, tool link and source key, built from the registry in `app/formulas.js` (`claude/cnc-guide`) |
 | U98 | Machinist tip of the day | missing | | |
 | U99 | Machinist knowledge test / quiz | out of scope | | Jacob dropped quizzes |
 | U100 | Tolerance stack mini game | out of scope | | Jacob dropped games (a stack calculator exists: `gdtstack`) |
@@ -392,7 +394,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH97 | Indexable insert identification system | missing | | In progress (`claude/ref-data-3`) |
 | MH98 | Indexable insert holder identification and selection | missing | | |
 | MH99 | Carbide blanks and carbide-tipped tool styles | missing | | |
-| MH100 | Insert radius compensation (NC); threading insert radius | missing | | Tool nose radius compensation calculator |
+| MH100 | Insert radius compensation (NC); threading insert radius | partial | `tnrc` | Nose radius shifts for chamfers, tapers and arcs, any tip 0-9, G41/G42 explained; no threading insert radius (`claude/cnc-guide`) |
 | MH101 | Cemented carbides, ceramics, superhard materials | missing | | |
 | MH102 | ISO classification of hardmetals (P/M/K/N/S/H) | partial | `materials` (ISO group) | Groups shown on work materials; no grade chart |
 | MH103 | Milling cutters: selection, number of teeth, plain/side/T-slot/angle/shell/end mills | missing | | |
@@ -423,7 +425,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | missing | | |
 | MH129 | Files and burs; speeds of rotary burs | missing | | |
 | MH130 | Knurls and knurling: sizes, formulas for knurled work, tolerances | missing | | |
-| MH131 | Tool wear: flank wear, cratering, chipping, deformation | missing | | |
+| MH131 | Tool wear: flank wear, cratering, chipping, deformation | done | `cncguide` | See U91 (`claude/cnc-guide`) |
 | MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | missing | | |
 | MH133 | Sieves, mesh and abrasive grit numbers | missing | | |
 
@@ -434,7 +436,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH134 | Work materials and cutting tool materials | missing | | |
 | MH135 | Cutting speed, feed, depth of cut, tool wear and tool life | partial | `toollife` | Taylor life only |
 | MH136 | Selecting cutting conditions | missing | | |
-| MH137 | Tool troubleshooting | missing | | |
+| MH137 | Tool troubleshooting | partial | `cncguide` | Short turning and milling troubleshooting tables (chatter, finish, tool life, burrs); not a full maker guide (`claude/cnc-guide`) |
 | MH138 | Cutting speed formulas; RPM for drills and diameters | done | `rpm` | |
 | MH139 | Speeds and feeds tables for turning (by material) | missing | | Starting data from tool makers |
 | MH140 | Speeds and feeds tables for milling (by material), slit milling | missing | | |
@@ -471,16 +473,16 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH171 | Honing | missing | | |
 | MH172 | Laps and lapping | missing | | |
 | MH173 | Nontraditional: water jet, ultrasonic, abrasive flow, laser, plasma, electron beam | missing | | Low priority |
-| MH174 | CNC introduction, coordinate geometry, word address format, program structure | missing | | |
+| MH174 | CNC introduction, coordinate geometry, word address format, program structure | partial | `cncguide` | Axes, coordinate systems, block and word format, modal groups, program order; no coordinate geometry worked examples (`claude/cnc-guide`) |
 | MH175 | M-codes, G20/G21, G90/G91, S, F, inverse time feed, T | missing | | |
-| MH176 | Tool nose radius compensation | missing | | |
+| MH176 | Tool nose radius compensation | done | `tnrc` | Hand compensation and G41/G42 with tip numbers (`claude/cnc-guide`) |
 | MH177 | Rapid, linear, circular and helical interpolation | partial | `helix`, `arcfeed` | Feed maths only; no G-code reference or output |
-| MH178 | Work offsets, tool length offsets, cutter radius offsets | missing | | `setupsheet` records offsets only |
+| MH178 | Work offsets, tool length offsets, cutter radius offsets | done | `cncguide` | Work offsets (G54-G59 and extended), tool length, cutter radius and wear offsets explained (`claude/cnc-guide`) |
 | MH179 | Fixed (canned) cycles for holes | partial | `cycdrill` | Generator for G81/G82/G83/G73/G84; no reference text on the cycles |
 | MH180 | Contouring, turning and boring on CNC | missing | | |
 | MH181 | Thread cutting on CNC lathes: depth, infeed, G32, G76, multi-start | partial | `cycthread` | Depth, infeed, G76 and G92; no G32, no multi-start, no tapered threads |
 | MH182 | Subprograms, macros and parametric programming | missing | | |
-| MH183 | Axis nomenclature | missing | | |
+| MH183 | Axis nomenclature | done | `cncguide` | ISO 841 right-hand rule, mill and lathe axes, rotary axes (`claude/cnc-guide`) |
 | MH184 | Total indicator reading | missing | | |
 | MH185 | CAD/CAM: drawing types, projections, exchange standards | missing | | |
 
@@ -828,27 +830,27 @@ One row per learning objective.
 | CN1 | L1 Course goals, audience, tools, lessons, resources | out of scope? | | Course administration |
 | CN2 | L1 Subtractive vs additive rapid prototyping | out of scope? | | |
 | CN3 | L1 Overall CAD/CAM/CNC process | missing | | Explainer |
-| CN4 | L2 Shop safety awareness, rules, clothing, conduct | missing | | |
-| CN5 | L2 Safety precautions when running a new CNC program | missing | | Prove-out checklist |
+| CN4 | L2 Shop safety awareness, rules, clothing, conduct | partial | `cncguide` | Short safety page (guards, dress, chips, coolant, lock-out); points to HSE/OSHA, not a full course (`claude/cnc-guide`) |
+| CN5 | L2 Safety precautions when running a new CNC program | partial | `cncguide` | Prove-out steps in the safety page (`claude/cnc-guide`) |
 | CN6 | L3 Common CNC tools | missing | | |
 | CN7 | L3 Spindle rotation direction | missing | | |
-| CN8 | L3 Chip formation | missing | | |
+| CN8 | L3 Chip formation | done | `cncguide` | Shear zone, chip types, chip thickness (`claude/cnc-guide`) |
 | CN9 | L3 Chip load definition | partial | `feed`, `cutopt` | Used, not explained |
-| CN10 | L3 Climb vs conventional milling | missing | | |
+| CN10 | L3 Climb vs conventional milling | done | `cncguide` | With drawing (`claude/cnc-guide`) |
 | CN11 | L3 Speeds and feeds from reference tables | partial | `rpm`, `feed` | Formulas only; no tables |
-| CN12 | L4 Cartesian coordinate system | missing | | |
-| CN13 | L4 Work coordinate system and how to choose it | missing | | |
+| CN12 | L4 Cartesian coordinate system | done | `cncguide` | Right-handed axes (`claude/cnc-guide`) |
+| CN13 | L4 Work coordinate system and how to choose it | done | `cncguide` | Work coordinates and where to put part zero (`claude/cnc-guide`) |
 | CN14 | L4 Closed-loop servo control | out of scope? | | Machine design |
-| CN15 | L4 Machine coordinate system | missing | | |
-| CN16 | L4 Fixture offset XY | partial | `setupsheet` | Records offsets; no explainer |
+| CN15 | L4 Machine coordinate system | done | `cncguide` | Machine coordinates, G53 (`claude/cnc-guide`) |
+| CN16 | L4 Fixture offset XY | done | `cncguide`, `setupsheet` | Explainer in the guide; offsets recorded on the setup sheet (`claude/cnc-guide`) |
 | CN17 | L4 Tool length offset with a 1-2-3 block | missing | | |
 | CN18 | L4 Fixture offset Z with 1-2-3 block and indicator | missing | | |
 | CN19 | L4 Inch and metric programming units | partial | `app.js` (unit toggle) | No G20/G21 explanation |
-| CN20 | L5 What a CNC program is; sequence of operations | missing | | |
+| CN20 | L5 What a CNC program is; sequence of operations | done | `cncguide` | Program as blocks, typical order of one tool (`claude/cnc-guide`) |
 | CN21 | L5 Common G-codes | done | `gmcodes` | |
 | CN22 | L5 Common M-codes | done | `gmcodes` | |
-| CN23 | L5 Special characters in a program | missing | | |
-| CN24 | L5 Organisation of a simple program | missing | | |
+| CN23 | L5 Special characters in a program | partial | `cncguide` | Comments and block delete; no full character list (`claude/cnc-guide`) |
+| CN24 | L5 Organisation of a simple program | done | `cncguide` | Safe start line, block anatomy, tool order (`claude/cnc-guide`) |
 | CN25 | L6 Steps to set up and run a CNC mill | missing | | |
 | CN26 | L6 Control panel layout (one control maker) | missing | | Per control profile |
 | CN27 | L6 Start and home the machine | missing | | |
@@ -865,15 +867,15 @@ One row per learning objective.
 | CN38 | L7 Machining parameters for 2D toolpaths (stepover, stepdown) | missing | | |
 | CN39 | L7 Facing toolpaths | missing | | |
 | CN40 | L7 2D contour toolpaths | missing | | |
-| CN41 | L7 Cutter diameter compensation rules | missing | | |
+| CN41 | L7 Cutter diameter compensation rules | partial | `cncguide`, `tnrc` | G41/G42 sides and entry/exit rules; no mill contour worked example (`claude/cnc-guide`) |
 | CN42 | L7 Pocketing toolpaths | missing | | |
 | CN43 | L7 Slot milling | missing | | |
 | CN44 | L7 Chamfer milling | missing | | Chamfer mill depth for width |
 | CN45 | L7 Radius milling | missing | | |
 | CN46 | L7 Drilling and peck drilling | missing | | |
 | CN47 | L7 Tapping toolpaths | missing | | |
-| CN48 | L8 Lathe coordinate system | missing | | |
-| CN49 | L8 Lathe workholding | missing | | |
+| CN48 | L8 Lathe coordinate system | done | `cncguide`, `tnrc` | Lathe Z and X, diameter programming, imaginary tip (`claude/cnc-guide`) |
+| CN49 | L8 Lathe workholding | partial | `cncguide` | Chuck speed, stick-out, support; no collet or chuck selection (`claude/cnc-guide`) |
 | CN50 | L8 Common lathe tools | missing | | |
 | CN51 | L8 Lathe speeds and feeds | partial | `rpm`, `passtime` | No recommendations |
 | CN52 | L8 Constant surface speed | missing | | |
@@ -886,9 +888,9 @@ One row per learning objective.
 | CN59 | L9 3D finishing toolpaths (and scallop height) | missing | | |
 | CN60 | L9 Rest milling | missing | | |
 | CN61 | L9 Pencil milling | missing | | |
-| CN62 | L10 CNC workholding components | missing | | |
-| CN63 | L10 CNC vise parts and accessories | missing | | |
-| CN64 | L10 Hard, step and soft jaws | missing | | |
+| CN62 | L10 CNC workholding components | partial | `cncguide` | Locate then clamp, vise on parallels; no fixture plate or clamp kit detail (`claude/cnc-guide`) |
+| CN63 | L10 CNC vise parts and accessories | partial | `cncguide` | Vise practice paragraph (`claude/cnc-guide`) |
+| CN64 | L10 Hard, step and soft jaws | partial | `cncguide` | Soft jaws mentioned only (`claude/cnc-guide`) |
 | CN65 | App A: align a vise | missing | | |
 | CN66 | App A: square a block | missing | | |
 | CN67 | App A: 2D contour with cutter compensation | missing | | |
