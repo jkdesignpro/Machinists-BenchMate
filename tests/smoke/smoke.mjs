@@ -118,6 +118,29 @@ for (const m of ['simple', 'advanced', 'expert']) {
 }
 await mode('advanced');
 
+// Every calculator has a drawing. A calculator built from fields must show its drawing with the
+// default inputs. A custom screen must have a registered drawing (the Drawing panel), or draw its
+// own figure, or be on this list of screens with nothing to draw: reference tables, converters,
+// managers, and three that draw a small figure of their own once something is picked.
+where = 'drawings';
+const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'calc', 'formulas',
+  'machines', 'toollib', 'setupsheet', 'materials', 'tempercolours', 'heattreat', 'plastics', 'metalid',
+  'gsim', 'insertcode', 'gdtfcf', 'boltgrade']);
+await units('inch');
+const noDrawing = [];
+for (const id of meta.tools) {
+  if (NO_DRAWING.has(id)) continue;
+  await open(id, 70);
+  const ok = await page.evaluate(i => {
+    const t = TOOLS.find(x => x.id === i), m = document.querySelector('#main .tpb');
+    const kit = [...m.querySelectorAll('.tdia')].some(d => !d.hidden && d.querySelector('svg'));
+    if (!t.render) return kit;
+    return kit || [...m.querySelectorAll('svg')].some(g => g.viewBox && g.viewBox.baseVal.width > 150);
+  }, id);
+  if (!ok) noDrawing.push(id);
+}
+if (noDrawing.length) problems.push(`[${where}] no drawing with the default inputs: ${noDrawing.join(', ')}`);
+
 // Compact view at 420 px: nothing may be wider than the window.
 where = 'compact';
 await page.setViewportSize({ width: 420, height: 800 });

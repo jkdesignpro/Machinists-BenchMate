@@ -474,13 +474,33 @@ function renderChangeGears(el) {
 
 // ---------- Shop economics ----------
 const ECO_STATE = { price: '', resale: '', years: '', rate: '', hours: '', fixed: '', kw: '', load: '', kwh: '', labour: '', bf: '', bp: '', bv: '', inv: '', save: '', pn: '', pi: '' };
+// Break-even chart: income and total cost against the number of parts. The lines are drawn from the
+// inputs to show the shape; the break-even quantity written on it is the core's result.
+function ecoChart(bf, bp, bv, q) {
+  if (typeof DK === 'undefined') return '';
+  const live = isFinite(q) && q > 0 && bf >= 0 && bp > 0 && bv >= 0;
+  const F = live ? bf : 3, P = live ? bp : 1, V = live ? bv : 0.4, Q = live ? q : 5;
+  const W = 520, H = 250, x0 = 60, x1 = 470, yb = 196, yt = 36, qmax = 2 * Q, cmax = Math.max(P * qmax, F + V * qmax);
+  const X = n => x0 + (x1 - x0) * n / qmax, Y = c => yb - (yb - yt) * c / cmax;
+  let h = DK.poly([[X(0), Y(F)], [X(Q), Y(P * Q)], [X(0), Y(0)]], 'hatch') + DK.poly([[X(Q), Y(P * Q)], [X(qmax), Y(P * qmax)], [X(qmax), Y(F + V * qmax)]], 'tool');
+  h += DK.line(x0, yt - 12, x0, yb, 'thin') + DK.line(x0, yb, x1 + 14, yb, 'thin');
+  h += DK.line(X(0), Y(0), X(qmax), Y(P * qmax), 'ln') + DK.line(X(0), Y(F), X(qmax), Y(F + V * qmax), 'hot') + DK.line(X(0), Y(F), X(qmax), Y(F), 'hid');
+  h += DK.line(X(Q), Y(P * Q), X(Q), yb, 'hid') + DK.circle(X(Q), Y(P * Q), 3.2, 'hotf');
+  h += DK.text(x0 - 8, yt - 16, 'money', { cls: 'mut', anchor: 'start' }) + DK.text(x1 + 14, yb + 16, 'parts', { cls: 'mut', anchor: 'end' });
+  h += DK.text(X(qmax) + 4, Y(P * qmax) + 4, 'income', { cls: 'txt', anchor: 'start' }) + DK.text(X(qmax) + 4, Y(F + V * qmax) + 4, 'cost', { cls: 'hott', anchor: 'start' });
+  h += DK.text(x0 - 6, Y(F) + 4, live ? fmt(bf, 0) : 'fixed', { cls: 'mut', anchor: 'end' });
+  h += DK.text(X(Q), yb + 16, live ? fmt(q, 1) + ' parts' : 'break-even', { cls: 'dimt' });
+  h += DK.text(X(Q / 3), Y((F + P * Q) / 3) + 4, 'loss', { cls: 'mut' }) + DK.text(X(Q * 5 / 3), Y((P * Q + P * qmax + F + V * qmax) / 3) + 4, 'profit', { cls: 'hott' });
+  h += DK.text(x0, H - 8, live ? 'Fixed cost, then each part adds its margin (price less variable cost).' : 'Enter the fixed cost, the price and the variable cost per part.', { cls: 'mut', anchor: 'start' });
+  return DK.svg(W, H, h, 'Break-even chart: income and cost against the number of parts');
+}
 function renderEconomics(el) {
   const s = ECO_STATE, W = state.W, cur = '(money)';
   el.innerHTML = '<p class="desc">Every input is yours: BenchMate does not suggest prices, rates or lives. Use any one currency throughout.</p>' +
     '<h2>Machine hourly rate</h2><div class="grid">' + sfield('Machine price (installed)', sinp('price', s.price), cur) + sfield('Resale value at the end', sinp('resale', s.resale), cur) + sfield('Years of use', sinp('years', s.years), 'years') +
     sfield('Interest rate (cost of the money)', sinp('rate', s.rate), '% a year') + sfield('Hours run per year', sinp('hours', s.hours), 'h') + sfield('Yearly fixed costs (floor space, service, insurance)', sinp('fixed', s.fixed), cur) +
     sfield('Machine power', sinp('kw', s.kw), 'kW') + sfield('Average load (0 to 1)', sinp('load', s.load), '') + sfield('Electricity price', sinp('kwh', s.kwh), 'per kWh') + sfield('Operator rate', sinp('labour', s.labour), 'per hour') + '</div><div id="eres1"></div>' +
-    '<h2>Break-even quantity</h2><div class="grid">' + sfield('Fixed cost of the job (setup, tooling, fixtures)', sinp('bf', s.bf), cur) + sfield('Price per part', sinp('bp', s.bp), cur) + sfield('Variable cost per part (material, machine time)', sinp('bv', s.bv), cur) + '</div><div id="eres2"></div>' +
+    '<h2>Break-even quantity</h2><div class="grid">' + sfield('Fixed cost of the job (setup, tooling, fixtures)', sinp('bf', s.bf), cur) + sfield('Price per part', sinp('bp', s.bp), cur) + sfield('Variable cost per part (material, machine time)', sinp('bv', s.bv), cur) + '</div><div id="eres2"></div><div class="tdia" id="edia" style="max-width:640px;margin-top:10px"></div>' +
     '<h2>Payback</h2><div class="grid">' + sfield('Investment', sinp('inv', s.inv), cur) + sfield('Net saving per year', sinp('save', s.save), cur) + sfield('Years to compare over', sinp('pn', s.pn), 'years') + sfield('Interest rate', sinp('pi', s.pi), '% a year') + '</div><div id="eres3"></div>';
   gbind(el, s, calc);
   function calc() {
@@ -494,6 +514,7 @@ function renderEconomics(el) {
     } else el.querySelector('#eres1').innerHTML = mMsg('Per hour run', 'Enter the price, years of use and hours run per year');
     const q = W.break_even_qty(v('bf'), v('bp'), v('bv'));
     el.querySelector('#eres2').innerHTML = isFinite(q) && v('bf') >= 0 ? mRes('Break-even', [['Parts to cover the fixed cost', fmt(q, 1), 'parts'], ['Margin per part', m(v('bp') - v('bv')), cur]]) : mMsg('Break-even', 'Enter the fixed cost and a price above the variable cost');
+    el.querySelector('#edia').innerHTML = ecoChart(v('bf'), v('bp'), v('bv'), q);
     const pb = W.payback_years(v('inv'), v('save'));
     if (isFinite(pb)) {
       const pi = (v('pi') || 0) / 100, rows = [['Simple payback', fmt(pb, 2), 'years']];
