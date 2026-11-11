@@ -24,6 +24,13 @@
 //! - Percent: `%` followed by the end, `)`, `,` or an operator is a postfix
 //!   percent (`15%` = 0.15, `200*15%` = 30); between two operands it is the
 //!   remainder (`7 % 3` = 1).
+//! - Lengths with units (`eval_units` only, with the app's unit as the base):
+//!   `12.7mm`, `1/2 in`, `3 7/16"`, `0.5 thou`, `2 ft`, `5' 3 1/2"`, also cm,
+//!   m, um. Each is converted to the base unit (inch or mm), so
+//!   `12.7mm + 1/2 in` is 1 in inch mode and 25.4 in mm mode. A plain
+//!   fraction straight before a unit is one number: `1/2 in` is half an inch.
+//!   Exact factors: 1 in = 25.4 mm, 1 ft = 12 in, 1 thou = 0.001 in.
+//! - Degrees, minutes, seconds: `29°30'15"` is 29.5041666... decimal degrees.
 
 use std::f64::consts::{E, PI};
 
@@ -35,7 +42,7 @@ const MAX_DEPTH: usize = 64;
 #[derive(Debug, PartialEq)]
 pub enum Eval { Ok(f64), Err(String, usize) }
 
-struct P<'a> { s: &'a [u8], i: usize, deg: bool, ans: f64, depth: usize }
+struct P<'a> { s: &'a [u8], i: usize, deg: bool, ans: f64, depth: usize, base: f64, used: bool }
 
 type R = Result<f64, (String, usize)>;
 
@@ -82,9 +89,57 @@ impl<'a> P<'a> {
         loop {
             if self.eat(b'!') { v = fact(v).ok_or_else(|| ("Factorial needs a whole number from 0 to 170".to_string(), self.i))?; }
             else if self.peek() == Some(b'%') && self.percent_postfix() { self.i += 1; v /= 100.0; }
+            else if let Some((mm, end, feet)) = self.unit_at(self.i) {
+                if self.base <= 0.0 { return self.err("Length units (mm, in, ft) need inch or mm mode"); }
+                self.i = end; self.used = true;
+                v = v * mm / self.base;
+                // Feet and inches: 5' 3 1/2" adds the inches that follow.
+                if feet && matches!(self.peek(), Some(c) if c.is_ascii_digit() || c == b'.') {
+                    let st = self.i;
+                    let w = self.number()?;
+                    match self.unit_at(self.i) {
+                        Some((m2, e2, false)) if m2 == 25.4 => { self.i = e2; v += w * 25.4 / self.base; }
+                        _ => return Err(("After feet, give inches, for example 5' 3 1/2\"".to_string(), st)),
+                    }
+                }
+            }
+            else if self.s.get(self.i..self.i + 2) == Some(&[0xC2, 0xB0]) {
+                // Degree sign: degrees, then optional minutes (') and seconds (").
+                self.i += 2;
+                for (mark, div) in [(b'\'', 60.0), (b'"', 3600.0)] {
+                    if !matches!(self.peek(), Some(c) if c.is_ascii_digit() || c == b'.') { break; }
+                    let st = self.i;
+                    let w = self.number()?;
+                    if div == 60.0 && self.peek() == Some(b'"') { self.i += 1; v += w / 3600.0; break; }
+                    if !self.eat(mark) { return Err(("After degrees, give minutes with ' and seconds with \"".to_string(), st)); }
+                    v += w / div;
+                }
+            }
             else { break; }
         }
         Ok(v)
+    }
+    /// A length unit at `k` (after optional spaces): (millimetres per unit, end, is feet).
+    fn unit_at(&self, mut k: usize) -> Option<(f64, usize, bool)> {
+        let s = self.s;
+        while k < s.len() && s[k].is_ascii_whitespace() { k += 1; }
+        match s.get(k)? {
+            b'"' => return Some((25.4, k + 1, false)),
+            b'\'' => return Some((304.8, k + 1, true)),
+            _ => {}
+        }
+        if s.get(k..k + 3) == Some(&[0xC2, 0xB5, b'm']) && !matches!(s.get(k + 3), Some(c) if c.is_ascii_alphanumeric()) { return Some((0.001, k + 3, false)); }
+        let st = k;
+        while k < s.len() && s[k].is_ascii_alphabetic() { k += 1; }
+        if k == st || matches!(s.get(k), Some(c) if c.is_ascii_digit() || *c == b'(' || *c == b'_') { return None; }
+        let w = std::str::from_utf8(&s[st..k]).ok()?.to_ascii_lowercase();
+        let mm = match w.as_str() {
+            "mm" => 1.0, "cm" => 10.0, "m" => 1000.0, "um" => 0.001,
+            "in" | "inch" | "inches" => 25.4, "thou" => 0.0254,
+            "ft" | "foot" | "feet" => 304.8,
+            _ => return None,
+        };
+        Some((mm, k, w == "ft" || w == "foot" || w == "feet"))
     }
     /// The `%` at `self.i` is a postfix percent (not the remainder operator)
     /// when nothing that can start an operand follows it.
@@ -116,7 +171,7 @@ impl<'a> P<'a> {
         let (n, k) = self.whole(k)?;
         if s.get(k) != Some(&b'/') { return None; }
         let (d, k) = self.whole(k + 1)?;
-        if let Some(c) = s.get(k) { if *c == b'.' || *c == b'(' || c.is_ascii_alphabetic() { return None; } }
+        if let Some(c) = s.get(k) { if *c == b'.' || *c == b'(' || (c.is_ascii_alphabetic() && self.unit_at(k).is_none()) { return None; } }
         if !(d > 0.0 && n < d) { return None; }
         Some((w + n / d, k))
     }
@@ -135,6 +190,12 @@ impl<'a> P<'a> {
             Ok(v) => {
                 if s[st..j].iter().all(|c| c.is_ascii_digit()) {
                     if let Some((m, end)) = self.mixed(st, j, v) { self.i = end; return Ok(m); }
+                    // A plain fraction straight before a length unit is one number: 1/2 in.
+                    if s.get(j) == Some(&b'/') {
+                        if let Some((d, k)) = self.whole(j + 1) {
+                            if d > 0.0 && s.get(k) != Some(&b'.') && self.unit_at(k).is_some() { self.i = k; return Ok(v / d); }
+                        }
+                    }
                 }
                 self.i = j; Ok(v)
             }
@@ -215,17 +276,23 @@ fn fact(x: f64) -> Option<f64> {
 
 /// Evaluate `src`. `deg` = trig functions take and give degrees; `ans` is
 /// the value of the name `ans` (the last result).
-pub fn eval(src: &str, deg: bool, ans: f64) -> Eval {
-    if src.len() > MAX_LEN { return Eval::Err(format!("Too long (over {MAX_LEN} characters)"), MAX_LEN); }
-    let mut p = P { s: src.as_bytes(), i: 0, deg, ans, depth: 0 };
-    if p.peek().is_none() { return Eval::Err("Type an expression".into(), 0); }
-    match p.expr() {
+pub fn eval(src: &str, deg: bool, ans: f64) -> Eval { eval_units(src, deg, ans, 0.0).0 }
+
+/// As `eval`, but lengths may carry units. `base_mm` is the size of the unit
+/// the result is in, in millimetres (25.4 for inch mode, 1 for mm mode; 0
+/// refuses units). Also returns whether any length unit was used.
+pub fn eval_units(src: &str, deg: bool, ans: f64, base_mm: f64) -> (Eval, bool) {
+    if src.len() > MAX_LEN { return (Eval::Err(format!("Too long (over {MAX_LEN} characters)"), MAX_LEN), false); }
+    let mut p = P { s: src.as_bytes(), i: 0, deg, ans, depth: 0, base: base_mm, used: false };
+    if p.peek().is_none() { return (Eval::Err("Type an expression".into(), 0), false); }
+    let r = match p.expr() {
         Ok(v) => {
-            if p.peek().is_some() { return Eval::Err(format!("Unexpected '{}'", p.s[p.i] as char), p.i); }
-            if v.is_finite() { Eval::Ok(v) } else { Eval::Err(if v.is_nan() { "Not a real number (outside the function's range)".into() } else { "Result too large".into() }, src.len()) }
+            if p.peek().is_some() { Eval::Err(format!("Unexpected '{}'", p.s[p.i] as char), p.i) }
+            else if v.is_finite() { Eval::Ok(v) } else { Eval::Err(if v.is_nan() { "Not a real number (outside the function's range)".into() } else { "Result too large".into() }, src.len()) }
         }
         Err((m, i)) => Eval::Err(m, i),
-    }
+    };
+    (r, p.used)
 }
 
 /// Decimal degrees to [degrees, minutes, seconds] (sign on the degrees, or
@@ -327,6 +394,46 @@ mod tests {
         // A decimal is never the whole part.
         assert!(matches!(eval("2.5 1/2", true, 0.0), Eval::Err(_, _)));
         close(ok("2.5-1/2", true), 2.0, 0.0);
+    }
+
+    #[test]
+    fn lengths_with_units() {
+        let u = |s: &str, base: f64| match eval_units(s, true, 0.0, base) { (Eval::Ok(v), used) => (v, used), (Eval::Err(m, i), _) => panic!("{s}: {m} at {i}") };
+        // Exact definitions: 1 in = 25.4 mm, 1 ft = 12 in, 1 thou = 0.001 in.
+        close(u("12.7mm", 25.4).0, 0.5, 1e-15);
+        close(u("1/2 in", 1.0).0, 12.7, 1e-12);
+        close(u("1/2in", 25.4).0, 0.5, 0.0);
+        close(u("12.7mm + 1/2 in", 25.4).0, 1.0, 1e-15);
+        close(u("12.7mm + 1/2 in", 1.0).0, 25.4, 1e-12);
+        close(u("3 7/16\"", 1.0).0, 3.4375 * 25.4, 1e-12);
+        close(u("3-7/16in", 25.4).0, 3.4375, 0.0);
+        close(u("5' 3 1/2\"", 25.4).0, 63.5, 1e-12);
+        close(u("5'", 25.4).0, 60.0, 1e-12);
+        close(u("2 ft", 1.0).0, 609.6, 1e-12);
+        close(u("5 thou", 1.0).0, 0.127, 1e-15);
+        close(u("25 um", 1.0).0, 0.025, 1e-15);
+        close(u("2 * 3 mm", 1.0).0, 6.0, 0.0);
+        close(u("(1 + 2) cm", 1.0).0, 30.0, 0.0);
+        assert!(u("1 in", 1.0).1);
+        assert!(!u("1 + 2", 1.0).1);
+        // Without a base, units are refused; names that are not units still fail.
+        assert!(matches!(eval("1 in", true, 0.0), Eval::Err(_, _)));
+        assert!(matches!(eval_units("2 pi", true, 0.0, 1.0).0, Eval::Err(_, _)));
+        assert!(matches!(eval_units("5' 3", true, 0.0, 25.4).0, Eval::Err(_, _)));
+        // min( and max( after a value are not the unit m.
+        assert!(matches!(eval_units("2 min(1, 2)", true, 0.0, 1.0).0, Eval::Err(_, _)));
+    }
+
+    #[test]
+    fn degrees_minutes_seconds() {
+        close(ok("29\u{b0}30'", true), 29.5, 1e-12);
+        close(ok("29\u{b0}30'15\"", true), 29.0 + 30.0 / 60.0 + 15.0 / 3600.0, 1e-12);
+        close(ok("29\u{b0} 30' 15\"", true), 29.0 + 30.0 / 60.0 + 15.0 / 3600.0, 1e-12);
+        close(ok("-0\u{b0}30'", true), -0.5, 1e-12);
+        close(ok("sin(30\u{b0})", true), 0.5, 1e-12);
+        close(ok("10\u{b0} + 5", true), 15.0, 0.0);
+        close(ok("0\u{b0}0'36\"", true), 0.01, 1e-12);
+        assert!(matches!(eval("10\u{b0} 5", true, 0.0), Eval::Err(_, _)));
     }
 
     #[test]

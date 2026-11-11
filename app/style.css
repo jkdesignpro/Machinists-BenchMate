@@ -293,6 +293,7 @@ svg.geo.cnw{width:150px;max-width:150px;flex:none;margin:0}
 .bcalc .bc-res.bad{font:12px var(--sans);color:var(--err);text-align:left;padding:4px 0}
 .bcalc .bc-alt{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px;font:11.5px var(--mono);color:var(--muted);min-height:16px}
 .bcalc .bc-alt i{font-style:normal;color:var(--warn)}
+.bcalc .bc-alt .bc-un{color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
 .bcalc .bc-caret{white-space:pre;color:var(--err);margin-right:auto;overflow:hidden}
 .bcalc .bc-mem{font:10.5px var(--mono);color:var(--accent)}
 .bcalc .bc-mem:empty{display:none}
@@ -342,12 +343,12 @@ svg.geo.cnw{width:150px;max-width:150px;flex:none;margin:0}
 #bcalc-panel.bc-float .bc-head{cursor:move}
 #bcalc-panel.bc-modal{position:fixed;z-index:1000;left:0;right:0;bottom:0;max-height:94vh;border-radius:var(--r) var(--r) 0 0;border-bottom:0}
 .bc-back{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.4)}
-.bc-inline .bcalc{max-width:900px;margin-bottom:14px}
+.bc-inline.bcalc{max-width:900px;margin-bottom:14px}
 @media (min-width:900px){
-  .bc-inline .bcalc .bc-main{flex-direction:row;align-items:flex-start}
-  .bc-inline .bcalc .bc-left{width:380px;flex:none}
-  .bc-inline .bcalc .bc-right{flex:1;padding:10px 10px 10px 0}
-  .bc-inline .bcalc .bc-tape{max-height:220px}
+  .bc-inline.bcalc .bc-main{flex-direction:row;align-items:flex-start}
+  .bc-inline.bcalc .bc-left{width:380px;flex:none}
+  .bc-inline.bcalc .bc-right{flex:1;padding:10px 10px 10px 0}
+  .bc-inline.bcalc .bc-tape{max-height:220px}
 }
 @media (max-width:720px){.bcalc .bc-keys button{height:40px}}
 /* ===== end Calculator ===== */

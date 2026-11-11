@@ -389,6 +389,7 @@ async function renderNews(main) {
 // ---- Units, theme, mode, compact view ----
 function setUnits(u) {
   state.sys = u; lsSet('bm.units', u);
+  if (window.BenchCalc) BenchCalc.unitsChanged();
   $$('#units button').forEach(b => { const on = b.dataset.u === u; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
   renderMain();
 }

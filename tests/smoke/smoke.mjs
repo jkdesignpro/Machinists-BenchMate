@@ -189,6 +189,25 @@ where = 'calc keypad';
 for (const a of ['x:ac', 'i:2', 'o:+', 'i:3', 'o:*', 'i:4', 'x:eq']) await page.click(`#main .bcalc .bc-keys button[data-a="${a}"]`);
 const kres = (await page.textContent('#main .bcalc .bc-res')) || '';
 if (kres.trim() !== '= 14') problems.push(`[${where}] 2 + 3 * 4: expected "= 14", got "${kres}"`);
+where = 'calc units';
+// Lengths with units mix freely and come back in the app's unit; feet and
+// inches, degrees-minutes-seconds and curly quotes are read as typed.
+const cexpr = async txt => { await page.fill(ce, txt); return ((await page.textContent('#main .bcalc .bc-res')) || '').trim(); };
+for (const [txt, want] of [['12.7mm + 1/2 in', '= 1 in'], ['5\u2019 3 1/2\u201D', '= 63.5 in'], ['29\u00B030\u2019', '= 29.5'], ['sin(29\u00B030\u203215\u2033)', '= 0.492486852854'], ['3 \u00D7 2', '= 6']]) {
+  const got = await cexpr(txt);
+  if (got !== want) problems.push(`[${where}] ${txt}: expected "${want}", got "${got}"`);
+}
+await units('mm');
+const umm = await cexpr('1/2 in + 12.7mm');
+if (umm !== '= 25.4 mm') problems.push(`[${where}] mm mode 1/2 in + 12.7mm: expected "= 25.4 mm", got "${umm}"`);
+where = 'calc speed';
+await page.click('#main .bcalc .bc-fsel button[data-f="speed"]');
+await page.fill('#main .bcalc .bc-form [data-fk="d"]', '10');
+await page.fill('#main .bcalc .bc-form [data-fk="v"]', '100');
+const sp = (await page.textContent('#main .bcalc .bc-fout')) || '';
+if (!/Spindle RPM\s*3183\.09886184/.test(sp)) problems.push(`[${where}] 100 m/min at 10 mm: expected 3183.09886184 RPM, got "${sp}"`);
+await page.click('#main .bcalc .bc-fsel button[data-f="bolt"]');
+await units('inch');
 where = 'calc bolt circle';
 const bolt = (await page.textContent('#main .bcalc .bc-fout')) || '';
 if (!/Hole 6/.test(bolt)) problems.push(`[${where}] bolt circle list missing: "${bolt.slice(0, 80)}"`);
@@ -227,4 +246,4 @@ if (problems.length) {
   console.error(`FAILED: ${problems.length} problem(s)`);
   process.exit(1);
 }
-console.log(`OK: ${ids.length} tools opened in inch and mm with no console errors`);
+console.log(`OK: ${meta.tools.length} tools opened in three modes, inch and mm, with no console errors`);

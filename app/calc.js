@@ -24,17 +24,23 @@
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ deg: S.deg, ans: S.ans, mem: S.mem, hist: S.hist.slice(0, 50), fn: S.fn, f: S.f })); } catch (e) {} };
   const live = new Set();
   const W = () => (typeof state !== 'undefined' && state.W) || null;
+  const sys = () => (typeof state !== 'undefined' && state.sys) || 'inch';
+  // Typed and pasted text: curly quotes, primes and the printed operator signs
+  // become the plain characters the parser reads (same length, so error
+  // positions still line up).
+  const tidy = t => String(t).replace(/[\u2018\u2019\u2032]/g, "'").replace(/[\u201C\u201D\u2033]/g, '"').replace(/\u00D7/g, '*').replace(/\u00F7/g, '/').replace(/[\u2212\u2013]/g, '-').replace(/\u00BA/g, '\u00B0');
   const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
   // ---- Rust calls ----
   function evaluate(txt) {
     const w = W();
     if (!w) return { err: 'Calculation module is still loading', pos: 0 };
-    const codes = Array.from(String(txt)).map(ch => ch.codePointAt(0));
+    const codes = Array.from(tidy(txt)).map(ch => ch.codePointAt(0));
     const n = Math.min(codes.length, w.buf_len());
     new Float64Array(w.memory.buffer, w.buf_ptr(), n).set(codes.slice(0, n));
-    const v = w.expr_eval(n, S.deg, S.ans);
-    if (isFinite(v)) return { v };
+    // Lengths typed with a unit (1/2 in, 12.7mm, 5' 3 1/2") come back in the app's unit.
+    const v = w.expr_eval_u(n, S.deg, S.ans, sys() === 'inch' ? 25.4 : 1);
+    if (isFinite(v)) return { v, len: w.expr_len_used() === 1 };
     const len = w.expr_err_len();
     return { err: new TextDecoder().decode(new Uint8Array(w.memory.buffer, w.str_ptr(), len)), pos: w.expr_err_pos() };
   }
@@ -73,6 +79,7 @@
     bolt: ['Bolt circle', [['n', 'Holes', 6], ['pcd', 'Circle dia (PCD)', 4], ['a0', 'Start angle \u00B0', 0], ['cx', 'Centre X', 0], ['cy', 'Centre Y', 0]]],
     chord: ['Chord', [['d', 'Circle dia', 4], ['th', 'Included angle \u00B0', 60], ['n', 'or equal spaces', '']]],
     sine: ['Sine bar', [['l', 'Bar length', 5], ['th', 'Angle \u00B0', 30], ['h', 'or stack height', '']]],
+    speed: ['Speed', [['d', 'Diameter', ''], ['v', s => s === 'inch' ? 'Surface speed ft/min' : 'Cutting speed m/min', ''], ['n', 'or spindle RPM', '']]],
     tri: ['Right triangle', [['a', 'Side a (opposite A)', 3], ['b', 'Side b (adjacent A)', 4], ['c', 'Hypotenuse c', ''], ['A', 'Angle A \u00B0', ''], ['B', 'Angle B \u00B0', '']]],
   };
   const fv = (fn, k, dflt) => (S.f[fn + '.' + k] !== undefined ? S.f[fn + '.' + k] : dflt);
@@ -86,7 +93,7 @@
       '<div class="seg bc-deg" role="group" aria-label="Angle unit"><button type="button" data-d="1">DEG</button><button type="button" data-d="0">RAD</button></div>' +
       (inline ? '' : '<button type="button" class="bc-x" aria-label="Close calculator" title="Close (Esc)"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>') + '</div>' +
       '<div class="bc-main"><div class="bc-left">' +
-      '<div class="bc-disp"><input class="bc-expr" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Expression" placeholder="e.g. 3-7/16 * 2">' +
+      '<div class="bc-disp"><input class="bc-expr" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Expression" placeholder="e.g. 3-7/16 * 2  or  12.7mm + 1/2 in">' +
       '<div class="bc-res" aria-live="polite"></div><div class="bc-alt"></div><div class="bc-mem"></div></div>' +
       '<div class="bc-keys">' + KEYS.map(k => '<button type="button" class="' + k[3] + '" data-a="' + esc(k[1]) + '"' + (k[2] ? ' title="' + esc(k[2]) + '"' : '') + '>' + esc(k[0]) + '</button>').join('') + '</div>' +
       '<div class="bc-use"><button type="button" class="btn bc-usebtn"></button></div>' +
@@ -94,7 +101,7 @@
       '<div class="bc-sec"><div class="bc-sh"><span>History</span><button type="button" class="bc-link bc-clr">Clear</button></div><div class="bc-tape"></div></div>' +
       '<details class="bc-sec bc-fns"' + (inline ? ' open' : '') + '><summary class="bc-sh">Functions</summary>' +
       '<div class="seg bc-fsel" role="group" aria-label="Function">' + Object.entries(FN).map(([k, f]) => '<button type="button" data-f="' + k + '">' + f[0] + '</button>').join('') + '</div>' +
-      '<div class="bc-form"></div><div class="bc-fout"></div><p class="bc-hint">Fields take expressions and fractions. Lengths in any one unit; angles in degrees. Click a result to put it in the expression.</p></details>' +
+      '<div class="bc-form"></div><div class="bc-fout"></div><p class="bc-hint">Fields take expressions, fractions and units (1/2 in, 12.7mm, 29\u00B030\u2019). Lengths without a unit are in the app\u2019s unit; angles in degrees. Click a result to put it in the expression.</p></details>' +
       '</div></div>';
     const q = s => root.querySelector(s);
     const inp = q('.bc-expr');
@@ -109,10 +116,12 @@
       last = r && 'v' in r ? r.v : null;
       if (!r) { res.className = 'bc-res'; res.textContent = '= ' + fmt(S.ans); alt.innerHTML = '<span>ANS</span>'; }
       else if ('v' in r) {
-        res.className = 'bc-res ok'; res.textContent = '= ' + fmt(r.v);
+        const inch = sys() === 'inch';
+        res.className = 'bc-res ok'; res.textContent = '= ' + fmt(r.v) + (r.len ? (inch ? ' in' : ' mm') : '');
         const f = fraction(r.v, 64);
-        alt.innerHTML = (f ? '<span title="Nearest 1/64">' + (f.exact ? '= ' : '\u2248 ') + esc(f.t) + (f.exact ? '' : ' <i>err ' + (f.err > 0 ? '+' : '') + esc(f.err.toFixed(6)) + '</i>') + '</span>' : '') +
-          '<span title="Value \u00D7 25.4">in\u2192mm ' + esc(fmt(r.v * 25.4)) + '</span><span title="Value \u00F7 25.4">mm\u2192in ' + esc(fmt(r.v / 25.4)) + '</span>';
+        alt.innerHTML = (f && (inch || !r.len) ? '<span title="Nearest 1/64">' + (f.exact ? '= ' : '\u2248 ') + esc(f.t) + (r.len ? ' in' : '') + (f.exact ? '' : ' <i>err ' + (f.err > 0 ? '+' : '') + esc(f.err.toFixed(6)) + '</i>') + '</span>' : '') +
+          (r.len ? '<span title="The same length in the other unit">= ' + esc(fmt(inch ? r.v * 25.4 : r.v / 25.4)) + (inch ? ' mm' : ' in') + '</span><span class="bc-un" title="A length unit was typed, so the answer is in the app\u2019s unit (change it with the in / mm switch)">length</span>'
+            : '<span title="Value \u00D7 25.4">in\u2192mm ' + esc(fmt(r.v * 25.4)) + '</span><span title="Value \u00F7 25.4">mm\u2192in ' + esc(fmt(r.v / 25.4)) + '</span>');
       } else {
         res.className = 'bc-res bad'; res.textContent = r.err;
         alt.innerHTML = '<span class="bc-caret">' + esc(txt) + '\n' + ' '.repeat(Math.min(r.pos, txt.length)) + '^</span>';
@@ -227,10 +236,12 @@
     const fsel = () => {
       root.querySelectorAll('.bc-fsel button').forEach(b => b.classList.toggle('on', b.dataset.f === S.fn));
       const [, fields] = FN[S.fn];
-      q('.bc-form').innerHTML = fields.map(([k, l, d]) => '<label><span>' + esc(l) + '</span><input type="text" spellcheck="false" autocomplete="off" data-fk="' + k + '" value="' + esc(fv(S.fn, k, d)) + '"></label>').join('');
+      q('.bc-form').innerHTML = fields.map(([k, l, d]) => '<label><span>' + esc(typeof l === 'function' ? l(sys()) : l) + '</span><input type="text" spellcheck="false" autocomplete="off" data-fk="' + k + '" value="' + esc(fv(S.fn, k, d)) + '"></label>').join('');
       fcalc();
     };
     const fout = (rows, msg) => {
+      // Trig leaves dust such as 6e-17 where the answer is 0; show it as 0.
+      rows = rows.map(r => r.map((c, i) => i > 0 && Math.abs(c) < 1e-12 ? 0 : c));
       q('.bc-fout').innerHTML = (msg ? '<p class="bc-fmsg">' + esc(msg) + '</p>' : '') + (rows.length ? '<table>' + rows.map(r => '<tr>' + r.map((c, i) => i === 0 ? '<td>' + esc(c) + '</td>' : '<td><button type="button" class="bc-fv" data-v="' + esc(full(c)) + '">' + esc(fmt(c)) + '</button></td>').join('') + '</tr>').join('') + '</table>' : '');
     };
     const fcalc = () => {
@@ -256,6 +267,12 @@
         if (!blank('h')) { const a = w.sine_bar_angle(l, g('h')); return isFinite(a) ? fout([['Angle \u00B0', a], ['Stack height', g('h')]]) : fout([], 'The stack must be from 0 to the bar length.'); }
         const h = w.sine_bar_height(l, g('th'));
         isFinite(h) ? fout([['Stack height', h], ['Angle \u00B0', g('th')]]) : fout([], 'Angle from 0 to 90\u00B0.');
+      } else if (S.fn === 'speed') {
+        const d = g('d'), inch = sys() === 'inch', u = inch ? 'ft/min' : 'm/min';
+        if (!(d > 0)) return fout([], 'Enter the diameter (' + (inch ? 'in' : 'mm') + '), then the ' + (inch ? 'surface' : 'cutting') + ' speed or the RPM.');
+        if (!blank('n')) { const n = g('n'); return n > 0 ? fout([[(inch ? 'Surface speed ' : 'Cutting speed ') + u, inch ? w.sfm_from_rpm(n, d) : w.vc_from_rpm(n, d)], ['Spindle RPM', n]]) : fout([], 'Enter an RPM above 0.'); }
+        const v = g('v');
+        v > 0 ? fout([['Spindle RPM', inch ? w.rpm_from_sfm(v, d) : w.rpm_from_vc(v, d)], [(inch ? 'Surface speed ' : 'Cutting speed ') + u, v]]) : fout([], 'Enter the ' + (inch ? 'surface speed in ft/min' : 'cutting speed in m/min') + ' or the RPM.');
       } else {
         const v = ['a', 'b', 'c', 'A', 'B'].map(k => blank(k) ? NaN : g(k)), known = v.filter(x => isFinite(x)).length;
         if (known !== 2) return fout([], 'Fill in exactly two values (at least one side); the right angle C is 90\u00B0.');
@@ -270,7 +287,7 @@
       const k = e.target.dataset.fk; if (!k) return;
       S.f[S.fn + '.' + k] = e.target.value;
       // Alternatives: an entry in "or ..." clears the field it replaces, and back.
-      const pair = { chord: { n: 'th', th: 'n' }, sine: { h: 'th', th: 'h' } }[S.fn];
+      const pair = { chord: { n: 'th', th: 'n' }, sine: { h: 'th', th: 'h' }, speed: { n: 'v', v: 'n' } }[S.fn];
       if (pair && pair[k] && e.target.value.trim()) { const o = q('.bc-form [data-fk="' + pair[k] + '"]'); if (o) { o.value = ''; S.f[S.fn + '.' + pair[k]] = ''; } }
       save(); fcalc();
     });
@@ -289,7 +306,7 @@
     q('.bc-usebtn').onclick = use;
 
     const inst = {
-      root, inp, show, tape,
+      root, inp, show, tape, fsel: () => fsel(),
       setTarget(t) {
         target = t || null; done = false;
         q('.bc-tgt').textContent = target ? 'for ' + targetName(target) : '';
@@ -308,7 +325,7 @@
     const s = (lab && (lab.querySelector('span') || lab).textContent) || t.getAttribute('aria-label') || t.title || t.placeholder || 'the field';
     return s.trim().replace(/\s+/g, ' ').slice(0, 40);
   }
-  function refreshAll() { for (const i of live) { if (!i.root.isConnected && i !== panel) { live.delete(i); continue; } i.tape(); i.show(); } }
+  function refreshAll(units) { for (const i of live) { if (!i.root.isConnected && i !== panel) { live.delete(i); continue; } i.tape(); i.show(); if (units) i.fsel(); } }
 
   // ---- Floating panel / modal sheet ----
   let panel = null, back = null, pos = null, lastFocus = null;
@@ -365,6 +382,8 @@
       el.appendChild(host);
       return build(host, { inline: true });
     },
+    // The app's in / mm switch changed: redo results and the drawer labels.
+    unitsChanged() { refreshAll(true); },
     get isOpen() { return !!panel && !panel.root.hidden; },
   };
   window.BenchCalc = api;

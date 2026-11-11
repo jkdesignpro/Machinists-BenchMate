@@ -533,6 +533,18 @@ static mut EXPR_POS: f64 = 0.0;
         c::expr::Eval::Ok(v) => { set_str(""); v }
         c::expr::Eval::Err(m, i) => { set_str(&m); unsafe { *core::ptr::addr_of_mut!(EXPR_POS) = i as f64; } f64::NAN }
     } }
+static mut EXPR_USED: f64 = 0.0;
+/// As `expr_eval`, with length units allowed: `base_mm` is 25.4 in inch mode and 1 in mm mode.
+/// `expr_len_used` then says whether the expression held a length unit (1) or not (0).
+#[no_mangle] pub extern "C" fn expr_eval_u(n: f64, deg: f64, ans: f64, base_mm: f64) -> f64 {
+    let s: String = buf(n).iter().map(|c| char::from_u32(*c as u32).unwrap_or('?')).collect();
+    let (r, used) = c::expr::eval_units(&s, deg != 0.0, ans, base_mm);
+    unsafe { *core::ptr::addr_of_mut!(EXPR_USED) = if used { 1.0 } else { 0.0 }; }
+    match r {
+        c::expr::Eval::Ok(v) => { set_str(""); v }
+        c::expr::Eval::Err(m, i) => { set_str(&m); unsafe { *core::ptr::addr_of_mut!(EXPR_POS) = i as f64; } f64::NAN }
+    } }
+#[no_mangle] pub extern "C" fn expr_len_used() -> f64 { unsafe { *core::ptr::addr_of!(EXPR_USED) } }
 #[no_mangle] pub extern "C" fn expr_err_len() -> f64 { let s: &String = unsafe { &*core::ptr::addr_of!(STR) }; s.len() as f64 }
 #[no_mangle] pub extern "C" fn expr_err_pos() -> f64 { unsafe { *core::ptr::addr_of!(EXPR_POS) } }
 /// Decimal degrees to degrees, minutes, seconds: which 0, 1, 2.
