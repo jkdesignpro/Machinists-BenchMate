@@ -2007,6 +2007,30 @@ const TOOLS = [
   source: 'Definitions of limits of size, deviations and tolerance as in ISO 286-1:2010 clause 3 and ASME Y14.5-2018 (cited by name; nothing reproduced). The middle is plain arithmetic; worked examples in the core tests.',
 },
 {
+  id: 'offsetadj', level: 'advanced', group: 'Inspection and quality', title: 'Wear offset adjustment',
+  desc: 'Type what the part measures and what it should be. It gives the change to make to the wear offset, with its sign, and the new offset value: for turned diameters and bores, sizes milled with cutter compensation, depths and heights.',
+  fields: s => [
+    { id: 'kind', label: 'What was cut', unit: '', def: 1, options: [[1, 'Lathe: diameter or bore'], [2, 'Mill: outside, cutter comp'], [3, 'Mill: inside, cutter comp'], [4, 'Depth below Z zero'], [5, 'Height or length left']] },
+    { id: 'meas', label: 'Measured size', unit: lenU(s), def: s === 'inch' ? 1.002 : 25.04 },
+    { id: 'targ', label: 'Target size', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
+    { id: 'xval', label: 'The X offset is a', unit: '', def: 1, options: [[1, 'Diameter value'], [2, 'Radius value']], when: v => v.kind === 1 },
+    { id: 'dval', label: 'The D offset is a', unit: '', def: 2, options: [[2, 'Radius value'], [1, 'Diameter value']], when: v => v.kind === 2 || v.kind === 3 },
+    { id: 'cur', label: 'Wear offset now', unit: lenU(s), def: 0 },
+  ],
+  calc: (v, W, s) => {
+    if (![v.meas, v.targ].every(isFinite)) return [];
+    const k = v.kind, sense = k === 3 || k === 4 ? 1 : -1, half = (k === 1 && v.xval === 2) || ((k === 2 || k === 3) && v.dval === 2) ? 1 : 0;
+    const t = i => W.offset_adjust(v.meas, v.targ, sense, half, isFinite(v.cur) ? v.cur : 0, i), inch = s === 'inch', dp = inch ? 5 : 4, u = lenU(s);
+    const name = k === 1 ? 'X wear' : k <= 3 ? 'D (cutter) wear' : 'Z or tool length wear', c = +t(1).toFixed(dp + 2);
+    const eff = k === 1 ? ['toward X minus: a smaller diameter', 'toward X plus: a larger diameter'] : k <= 3 ? ['toward the wall: more is removed', 'away from the wall: less is removed'] : ['toward Z minus: deeper', 'toward Z plus: shallower'];
+    const words = c === 0 ? 'On target: no change needed' : (c > 0 ? 'Add ' : 'Subtract ') + DK.n(Math.abs(c), dp) + ' ' + u + '. The ' + (k === 2 || k === 3 ? 'cutter' : 'tool') + ' moves ' + eff[c > 0 ? 1 : 0];
+    return [R('Change the ' + name + ' offset by', t(1), u, dp), R('New ' + name + ' offset value', t(2), u, dp), R('In words', words, '', 0),
+      R('Error (measured minus target)', t(0), u, dp), R('Change in ' + (inch ? 'mm' : 'inches'), W.unit_convert(0, inch ? 5 : 1, inch ? 1 : 5, t(1)), inch ? 'mm' : 'in', inch ? 4 : 5)];
+  },
+  working: 'error = measured - target. Lathe diameter or bore: change = -error when the X offset is a diameter value, -error / 2 when it is a radius value. Mill with cutter compensation, D as a radius value: outside size change = -error / 2, inside size change = +error / 2 (a smaller D value lets the cutter remove more on both); as a diameter value, -error and +error. Depth below Z zero: change = +error. Height or length left: change = -error. New value = wear offset now + change. This assumes the control adds the wear value to the tool position (X and Z wear on a lathe, the G43 length offset on a mill) and that G41 / G42 hold the cutter away from the programmed part outline by the D value. Controls, posts and shops differ (G44, wear kept on the work offset, "inverse wear" from a CAM post, a boring bar set on the far side), and tool pressure changes the size too: make the change, cut and measure again before you trust the sign.',
+  source: 'Turned diameter: Modern Machine Shop, "Taking full advantage of geometry and wear offsets" (0.002 in oversize, -0.002 in the X wear offset). Outside size with cutter compensation: Autodesk Fusion blog, "Cutter compensation for beginners" (boss 1.001 for 1.000, -0.001 in a diameter table) and CIMCO CNC Handbook chapter 6, "Adjusting CDC offsets" (1.0120 for 1.0000, -0.0120). G43 adds the length offset to the Z position: Machinist Guides, "G43 G-code". The inside size, radius value, depth and height rules are BenchMate\'s own arithmetic from those and have no second publisher yet (tests in core/src/measure.rs).',
+},
+{
   id: 'tempcomp', level: 'expert', group: 'Inspection and quality', title: 'Temperature compensation',
   desc: 'Correct a measurement taken away from the 20 °C (68 °F) reference temperature to the length at 20 °C, allowing for both the part and the gauge expanding.',
   render: el => renderTempComp(el),

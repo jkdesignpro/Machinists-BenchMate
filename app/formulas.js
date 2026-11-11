@@ -90,6 +90,8 @@ const FORMULA_SOURCES = {
   YORK: 'University of York, Department of Mathematics, factors for control charts',
   ISO2859: 'ISO 2859-1:1999 and ANSI/ASQ Z1.4-2003, attribute sampling (cited by name, tables not used)',
   OWN: 'BenchMate derivation, with tests in benchmate-core',
+  MMSWEAR: 'Modern Machine Shop, Taking full advantage of geometry and wear offsets (CNC tech talk column)',
+  CIMCOCDC: 'CIMCO CNC Handbook, chapter 6, Adjusting CDC offsets; Autodesk Fusion blog, Cutter compensation for beginners',
   GERR: 'D. Gerr, Controlling Galvanic Corrosion (galvanic series in seawater, V vs Ag/AgCl; 0.20 V rule)',
   EEGALV: 'Engineers Edge, galvanic compatibility (anodic index; 0.15 / 0.25 / 0.50 V); Carr Lane, anodic index guideline',
 };
@@ -218,6 +220,8 @@ const FORMULAS = [
   F('capability', 'Process capability', 'Cp = (USL − LSL) / 6σ;  Cpk = min(USL − x̄, x̄ − LSL) / 3σ', 'σ: within sigma (moving range / d2)', ['NISTSEM', 'MINITAB']),
   F('capability', 'Within sigma from moving ranges', 'σ = MR̄ / d2,  d2 = 1.128', 'MR̄: average moving range of two', ['NISTSEM']),
   F('threadid', 'Thread identifier: closeness of a standard thread', 'score = √((Δp / 0.02)² + (Δd / (0.02 · d + 0.05))²)', 'Δp: (measured pitch − its pitch) / its pitch; Δd: measured diameter − its basic diameter [mm]; d: its basic diameter [mm]; listed when |Δp| ≤ 0.06 and |Δd| ≤ max(0.06 · d, 0.3)', ['OWN']),
+  F('offsetadj', 'Wear offset change, turned diameter or outside milled size', 'change = −(measured − target)', 'for an X offset or a D offset held as a diameter; halve it for a radius value', ['MMSWEAR', 'CIMCOCDC']),
+  F('offsetadj', 'Wear offset change, inside milled size or depth', 'change = +(measured − target)', 'inside size with cutter compensation (halve for a radius value); depth below Z zero with G43', ['OWN']),
   F('tolmid', 'Middle of a tolerance', 'middle = (upper limit + lower limit) / 2', 'upper limit = size + larger deviation; lower limit = size + smaller deviation', ['OWN']),
   F('tempcomp', 'Measurement at 20 °C', 'L20 = reading · (1 + αg (Tg − 20)) / (1 + αp (Tp − 20))', 'α: expansion coefficient [1/K]; T: temperature [°C]', ['DOIRON', 'OWN']),
   F('coolconc', 'Coolant concentration', 'c = Brix reading · refractometer factor', 'c: [%]; factor from the fluid data sheet', ['FASTENAL']),

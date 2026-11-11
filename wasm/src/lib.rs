@@ -483,6 +483,8 @@ fn pick<const N: usize>(a: [f64; N], which: f64) -> f64 { a.get(which as usize).
 f1!(ball_height_in_cone, c::ball_height_in_cone, ball_d, face_d, included);
 /// Limits and middle of a tolerance: which 0 upper limit, 1 lower limit, 2 middle, 3 tolerance, 4 half the tolerance, 5 middle - nominal.
 #[no_mangle] pub extern "C" fn tol_limits(nominal: f64, dev_a: f64, dev_b: f64, which: f64) -> f64 { pick(c::tol_limits(nominal, dev_a, dev_b), which) }
+/// Wear offset change: which 0 error (measured - target), 1 change, 2 new offset value.
+#[no_mangle] pub extern "C" fn offset_adjust(measured: f64, target: f64, sense: f64, halve: f64, current: f64, which: f64) -> f64 { pick(c::offset_adjust(measured, target, sense, halve, current), which) }
 f1!(cone_face_dia_from_ball, c::cone_face_dia_from_ball, ball_d, height, included);
 /// Two balls in a tapered bore: which 0 included angle, 1 face diameter.
 #[no_mangle] pub extern "C" fn cone_two_balls(d1: f64, h1: f64, d2: f64, h2: f64, which: f64) -> f64 { pick(c::cone_from_two_balls(d1, h1, d2, h2), which) }

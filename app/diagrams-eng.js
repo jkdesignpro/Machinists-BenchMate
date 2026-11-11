@@ -916,6 +916,26 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h + lab, 'Beam with loads, deflected shape and moment diagram');
   },
 
+  // Wear offset adjustment: target and measured size on a size line, the error between them and the
+  // change to make. The spacing is fixed; only the labels carry numbers.
+  offsetadj(v, sys, rows) {
+    const W = 520, H = 230, y = 96, xt = 260, u = deU(sys), dp = deDp(sys) + 1;
+    const e = deV(rows, /^Error/), c = deV(rows, /^Change the/), live = deFin(e) && deFin(c);
+    const far = live && Math.abs(e) > 1e-9, xm = far ? xt + (e > 0 ? 120 : -120) : xt;
+    let s = DK.line(40, y, W - 40, y, 'thin') + DK.text(44, y - 8, 'smaller', { cls: 'mut', anchor: 'start' }) + DK.text(W - 44, y - 8, 'larger', { cls: 'mut', anchor: 'end' });
+    s += DK.line(xt, y - 30, xt, y + 30, 'ln') + DK.text(xt, y - 52, 'target', { cls: 'mut', anchor: 'middle' }) + DK.text(xt, y - 38, deIn(v.targ, dp, u, 'T'), { anchor: 'middle' });
+    if (far || !live) {
+      const x = live ? xm : xt + 120;
+      s += DK.line(x, y - 30, x, y + 30, 'hot') + DK.circle(x, y, 3.5, 'hotf');
+      s += DK.text(x, y - 52, 'measured', { cls: 'hott', anchor: 'middle' }) + DK.text(x, y - 38, deIn(v.meas, dp, u, 'M'), { cls: 'hott', anchor: 'middle' });
+      s += DK.dimH(Math.min(xt, x), Math.max(xt, x), y + 52, live ? 'error ' + deT(rows, /^Error/) : 'error = M - T', { from: y + 30, below: true });
+    } else s += DK.circle(xt, y, 3.5, 'hotf') + DK.text(xt + 12, y + 46, 'measured is on target', { cls: 'hott', anchor: 'start' });
+    const row = deRow(rows, /^Change the/), words = deRow(rows, 'In words');
+    s += deLines(40, H - 30, [live && row ? row.label + ' ' + (c > 0 ? '+' : '') + deT(rows, /^Change the/) : 'change = error with the sign for the offset you picked',
+      words && typeof words.value === 'string' ? words.value : 'Cut and measure again before you trust the sign.']);
+    return DK.svg(W, H, s, 'Target and measured size on a line, with the error between them and the wear offset change');
+  },
+
   // Limits and middle of a tolerance: the tolerance zone on a size line, with the middle marked and
   // the drawing size where it falls. The zone has a fixed width; only the labels carry numbers.
   tolmid(v, sys, rows) {

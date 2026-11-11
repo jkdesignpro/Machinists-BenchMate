@@ -250,6 +250,19 @@ const tolRows = await page.$eval('#res', e => [...e.querySelectorAll('.rrow')].m
 if (!/Middle of the tolerance[^;]*25\.0150 mm/i.test(tolRows) || !/Upper limit[^;]*25\.0500 mm/i.test(tolRows) || !/Lower limit[^;]*24\.9800 mm/i.test(tolRows)) problems.push(`[${where}] 25 +0.05/-0.02: got "${tolRows}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Wear offset adjustment: a 25.04 mm diameter for 25.00 needs -0.04 on a lathe; the same as a pocket
+// with a radius-type D offset needs +0.02.
+where = 'offsetadj';
+await open('offsetadj');
+for (const [k, v] of [['meas', '25.04'], ['targ', '25'], ['cur', '0']]) { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); }
+const offRows = () => page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).join(' ; '));
+let off = await offRows();
+if (!/Change the X wear offset by -0\.0400 mm/i.test(off) || !/Subtract 0\.04 mm/.test(off)) problems.push(`[${where}] lathe 25.04 for 25: got "${off}"`);
+await page.selectOption('#main [data-id="kind"]', '3');
+off = await offRows();
+if (!/Change the D \(cutter\) wear offset by 0\.0200 mm/i.test(off) || !/Add 0\.02 mm/.test(off)) problems.push(`[${where}] pocket 25.04 for 25, radius value: got "${off}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

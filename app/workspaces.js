@@ -75,7 +75,7 @@ const WORKSPACES = [
   ] },
   { id: 'inspect', name: 'Measure and inspect', icon: 'inspection', blurb: 'GD&T, fits, surface finish, gauge blocks and quality checks.', sections: [
     ['GD&T', ['gdtguide', 'gdtfcf', 'gdtpos', 'gdtprofu', 'gdtdof', 'gdtstack'], 'frame'],
-    ['Fits and finish', ['fitlookup', 'tolmid', 'shrinkfit', 'surfacefin', 'prefnum'], 'fit'],
+    ['Fits and finish', ['fitlookup', 'tolmid', 'offsetadj', 'shrinkfit', 'surfacefin', 'prefnum'], 'fit'],
     ['Measuring', ['sinebar', 'scales', 'wires', 'tapergauge', 'dovetail', 'hardness', 'tempcomp'], 'caliper'],
     ['Quality', ['capability', 'ctrlchart', 'sampling'], 'chart'],
   ] },
@@ -89,7 +89,7 @@ const WORKSPACES = [
     ['Codes', ['gmcodes', 'macroref'], 'code'],
     ['Cycle generators', ['cycdrill', 'threadprog', 'cyctaper', 'cycgroove', 'cycg71', 'cycbroach'], 'code'],
     ['Simulate and draw', ['gsim', 'holepattern', 'dxfshapes'], 'play'],
-    ['Setup', ['setupsheet', 'tnrc'], 'sheet'],
+    ['Setup', ['setupsheet', 'tnrc', 'offsetadj'], 'sheet'],
   ] },
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
     ['Materials', ['materials', 'hardness', 'heattreat', 'tempercolours', 'galvanic', 'plastics', 'metalid'], 'material'],
