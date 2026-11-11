@@ -122,13 +122,15 @@ current practice and says so in the tool's notes.
 | **GD&T: symbols, datums, modifiers, tolerance zones, bonus tolerance, virtual condition** | MH31 EDB | built (guide, frame builder, calculators; see docs/gdt.md) | see "GD&T" below |
 | ISO limits and fits (IT grades, all hole/shaft deviations) | MH31 EBB EDB | partial: up to 500 mm, without j/J | ISO 286-1 formulas (cited), computed and checked |
 | ANSI preferred fits (RC, LC, LT, LN, FN) | MH31 | missing | ANSI B4.1 (cited) |
-| General tolerances (ISO 2768) | EDB | missing | ISO 2768 (cited) |
+| General tolerances (ISO 2768) | EDB | built (`gentol`: ISO 2768-1 linear, edges, angles; five publishers) | ISO 2768-1:1989 (cited), publisher tables |
 | Surface texture: Ra/Rz, symbols, process ranges, N grades | MH31 EBB EDB | built (N grades, Ra/Rz caution with computed profile ratios, ISO 21920-1 vs ISO 1302 in our words, process ranges from two publishers; no symbol drawing tool) | ISO 21920-1/-2/-3:2021 (cited), ISO 1302:2002 withdrawn |
-| Measuring: micrometer, vernier, dial reading | MH31 | missing | own explanations |
+| Measuring: micrometer, vernier, dial reading | MH31 | partial (`scales`: micrometer and vernier caliper reading aid; no dial reading) | own drawings; Mitutoyo and PGI reading guides |
+| Balls and rolls: countersinks, tapered bores, tapers | MH31 | built (`ballcone`, `taperrolls`) | own derivation, checked against Biegert and NIMI |
+| Shrink and press fits | MH31 | built (`shrinkfit`; inputs are yours) | expansion law, Lame equations |
 | Temperature compensation of measurements | MH31 | built (`tempcomp`) | thermal expansion data with sources |
 | Statistics: Cpk, SPC, tolerance stack (worst case, RSS) | MH31 | partial (1D worst-case and RSS stack; Cp/Cpk/Pp/Ppk with histogram; control charts still to do) | stack: Accendo, Five Flute (docs/gdt.md); Cpk/SPC: NIST/SEMATECH e-Handbook (public domain) |
 | Hardness conversion | EBB MH31 | built (steel, ISO 18265 table from two publishers, interpolation shown; no ASTM E140 tables, no non-steel tables) | ISO 18265:2013, ASTM E140-26 (cited) |
-| Drawing standards and abbreviations | EBB EDB | missing | own wording, ISO 128 / ASME Y14 cited |
+| Drawing standards and abbreviations | EBB EDB | partial (`abbrev`: 65 abbreviations in our words; no drawing-standards guide, no weld symbols) | own wording, ISO 128 / ASME Y14.38 cited; Wikipedia, IS 11670 |
 
 ## Mathematics and geometry
 
@@ -137,11 +139,14 @@ current practice and says so in the tool's notes.
 | Bolt circle, hole coordinates | EBB | built | geometry |
 | Right and oblique triangles | MH31 EBB | missing (in progress on `claude/geometry`) | trigonometry |
 | Chords, segments, arcs, tangent points | MH31 EBB | missing (in progress on `claude/geometry`) | geometry |
-| Plane area and solid volume, weight | MH31 EBB | missing (stock weight in progress on `claude/geometry`) | geometry, densities from supplier data |
+| Plane area and solid volume, weight | MH31 EBB | built (`figures`; weight in `weight`) | geometry, densities from supplier data |
+| Compound angles | MH31 | built (`compound`) | vector geometry |
+| Calculator, angle conversion, prime factors, interpolation | MH31 EBB | built (`calc`) | own parser |
+| Lathe change gears | MH31 | partial (`changegears`: trains from your gears; no quick-change gearbox tables) | ratio arithmetic |
 | Bar, tube and sheet weights | EBB | partial (round/hex/square bar in the bar stock planner with your density; full tool in progress on `claude/geometry`) | geometry × cited density |
 | Sheet gauges, bend allowance, K-factor | EBB MH31 | missing (bend allowance in progress on `claude/geometry`) | gauge tables from public standards; bend formula |
-| Fractions, decimals, unit conversions | EBB MH31 | partial (fraction / decimal / mm converter built) | NIST SP 811 (public domain) |
-| Engineering economics (payback, hourly rate) | MH31 | missing | standard formulas |
+| Fractions, decimals, unit conversions | EBB MH31 | built (`fraction`, `units`: 17 quantities) | NIST SP 811 (public domain) |
+| Engineering economics (payback, hourly rate) | MH31 | built (`economics`; no depreciation schedules) | standard interest formulas |
 
 ## Mechanics and machine elements
 

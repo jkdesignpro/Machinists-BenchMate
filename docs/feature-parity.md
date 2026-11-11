@@ -46,7 +46,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Reference | Material properties | partial (properties, no SFM/machinability data; round 2 in progress) | `materials` | U82 |
 | Reference | Material weight | partial (bar only; full tool in progress on `claude/geometry`) | `bar` | U81 |
 | Reference | Hardness conversion | missing (in progress, `claude/ref-data-3`) | | U67 |
-| Reference | Thermal expansion | partial (measurement correction only) | `tempcomp` | U68 |
+| Reference | Thermal expansion | done (measurement correction, growth, shrink-fit temperatures, press-fit pressure) | `tempcomp`, `shrinkfit` | U68 |
 | Reference | Socket head cap screw holes (counterbore and clearance) | done (metric and inch; publisher disagreements shown) | `shcs`, `clearance` | U71 |
 | Reference | Knurling, reaming | missing | | U87, U33 |
 | Fasteners | Bolt grades, torque and preload (VDI 2230), spanner sizes, T-slots | done (beyond Ultra; friction always user-entered) | `boltgrade`, `bolttorque`, `spanner`, `tslots` | MH198-MH212 (section 2) |
@@ -55,13 +55,17 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Geometry | Rectangular hole pattern, coordinate export | done (grid, bolt circle, pasted list; CSV and G-code) | `cycdrill` | U73, U74 |
 | Geometry | Triangle solver, arc calculator, geometry, angles | missing (in progress, `claude/geometry`) | | U75-U78 |
 | Geometry | Sine bar, gauge block stack | missing (in progress, `claude/geometry`) | | U69, U65 |
-| Geometry | Height over ball (countersinks, tapered bores) | missing | | U70 |
+| Geometry | Height over ball (countersinks, tapered bores) | done (one or two balls; tapers over rolls too) | `ballcone`, `taperrolls` | U70 |
+| Geometry | Areas and volumes, compound angles (ours) | done | `figures`, `compound` | |
+| Turning | Lathe change gears (ours) | done (simple and compound trains from your gears) | `changegears` | |
+| Reference | ISO 2768-1 general tolerances, micrometer reading aid, drawing abbreviations (ours) | done | `gentol`, `scales`, `abbrev` | |
+| Economics | Machine hourly rate, break-even, payback (ours) | done | `economics` | |
 | GD&T | True position with MMC/LMC bonus | done | `gdttp`, `gdtbonus` | U62 |
 | GD&T | Learning centre (no quiz), frame builder | done | `gdtguide`, `gdtfcf`, `gdtdof` and others | U63, U64 |
 | Finish | Surface finish (lathe, mill, conversions) | partial (lathe only; conversions in progress) | `finish` | U66 |
 | Tools | Keyway broach G-code, G76, G84, G81/82/83/73 generators | done (generic Fanuc-style and Haas; other controls not yet supported, see `cycles.md`) | `cycbroach`, `cycthread`, `cycdrill` | U36, U37, U53, U54, U88 |
-| Tools | Unit conversions | partial (length only) | `fraction` | U79 |
-| Tools | Scientific calculator | missing | | U80 |
+| Tools | Unit conversions | done (17 quantities, NIST SP 811) | `units`, `fraction` | U79 |
+| Tools | Scientific calculator | done (typed expressions, own parser; no RPN or graphing) | `calc` | U80 |
 | Tools | Bandsaw cut time | done (cut rate or down-feed, chip per tooth) | `bandsaw` | U90 |
 | Tools | G-code simulator | missing | | U95 |
 | Tools | 2D CAD / DXF generator | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` (parametric shapes, live preview, DXF R2000/R12 export; no free sketching, snapping or angle measure) | U96 |

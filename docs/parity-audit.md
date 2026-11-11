@@ -30,12 +30,12 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 55 | 16 | 40 (8) | 2 | 0 | 50 % |
-| Machinery's Handbook 31 | 306 | 20 | 57 | 195 (14) | 6 | 28 | 7 % |
-| Engineers' Data Book | 94 | 4 | 22 | 30 (1) | 12 | 26 | 7 % |
-| Engineers Black Book | 80 | 14 | 18 | 47 (10) | 1 | 0 | 18 % |
+| CNC Machinist Calculator Ultra | 113 | 59 | 14 | 38 (8) | 2 | 0 | 53 % |
+| Machinery's Handbook 31 | 306 | 32 | 66 | 174 (12) | 6 | 28 | 12 % |
+| Engineers' Data Book | 94 | 5 | 24 | 27 (0) | 12 | 26 | 9 % |
+| Engineers Black Book | 80 | 20 | 18 | 41 (9) | 1 | 0 | 25 % |
 | CNC Machining handbook | 83 | 4 | 9 | 66 (0) | 0 | 4 | 5 % |
-| **All** | **676** | **97** | **122** | **378 (32)** | **21** | **58** | **16 %** |
+| **All** | **676** | **120** | **131** | **346 (29)** | **21** | **58** | **20 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -44,6 +44,8 @@ features are names only.
 **Update (branch `claude/fasteners`, 2026-11-11):** batch B1 and part of B2 are built (bolt grades, bolt torque and preload, socket head cap screws with counterbores, clearance holes, spanner sizes, T-slots, keys, O-ring glands, bearing L10). U71, MH199, MH205, MH206, MH251, ED68, BB3, BB16, BB43, BB48 done; MH112, MH198, MH200, MH202, MH204, MH210, MH212, MH285, MH288, MH294, ED65, ED71, BB5, BB44, BB49 partial. Still missing from B1/B2: thread engagement length, wrench clearances, helical inserts, pins, retaining rings, Woodruff keys, bearing fits. Summary counts recounted from the rows after merging `claude/calcs-3` and `claude/gdt-3`.
 
 **Update (branch `claude/calcs-3`, 2026-11-10):** batches A7, A8 and A9 are built: U4, U5, U9, U10, U16, U19-U23, U26, U55, U56, U57, U59, U60, U90 and MH149 done; U32, MH163, MH166, MH167, MH169 and BB60 partial. Not built: U58 (cylindricity from RPM) and U27 (vibration sensor). Summary counts recounted from section 1.
+
+**Update (branch `claude/measure-maths`, 2026-11-11):** batches A13 (except SHCS holes, done on `claude/fasteners`, and the knurl calculator), B7 (shop maths), part of B5 (ISO 2768-1, micrometer and vernier reading, measurement over balls and rolls) and part of B11 (drawing abbreviations) are built. U68, U70, U79, U80, MH1, MH2, MH10, MH12, MH15, MH18, MH44, MH76, MH82, MH303-MH305, ED13, BB31-BB34, BB70, BB79 done; MH3, MH9, MH11, MH16, MH19, MH24, MH84, MH86, MH92, MH256, MH301, MH306, ED3, ED10 partial. Not built: ANSI B4.1 fits (MH77), j/J deviations (U61, MH79), weld symbols (ED86). Summary counts recounted from all rows.
 
 **Update (branch `claude/gdt-3`, 2026-11-11):** BB73 done (letter-address table added to the G and M codes screen). GD&T round 3 (composite profile added to the guide) changes no row status. Summary counts updated for BB73.
 
@@ -194,9 +196,9 @@ Store list is the fuller of the two store lists.
 | U65 | Gauge block stack | missing | | In progress (`claude/geometry`, `sinebar`) |
 | U66 | Surface finish (lathe, mill, conversions) | partial | `finish` | Lathe only; no milling (stepover/cusp) finish, no Ra/Rz/RMS/N-grade conversions (conversions in progress on `claude/ref-data-3`) |
 | U67 | Hardness conversions | missing | | In progress (`claude/ref-data-3`) |
-| U68 | Thermal expansion calculator | partial | `tempcomp` | Corrects a measurement to 20 °C; no plain growth/shrink calculator (e.g. shrink-fit heating) |
+| U68 | Thermal expansion calculator | done | `tempcomp`, `shrinkfit` | Measurement correction to 20 °C; plain growth, shrink-fit heating/cooling temperatures and press-fit pressure (`claude/measure-maths`) |
 | U69 | Sine bar | missing | | In progress (`claude/geometry`) |
-| U70 | Height over ball for countersinks and tapered bores | missing | | |
+| U70 | Height over ball for countersinks and tapered bores | done | `ballcone`, `taperrolls` | Ball height in countersinks and tapered bores, face diameter from a ball, angle from two balls; external taper over rolls (`claude/measure-maths`) |
 | U71 | Socket head cap screw hole dimensions | done | `shcs`, `clearance` | Metric and inch counterbores and clearance holes, publisher disagreements shown (`claude/fasteners`) |
 
 ### Shop maths and geometry
@@ -210,8 +212,8 @@ Store list is the fuller of the two store lists.
 | U76 | Arc calculator | missing | | In progress (`claude/geometry`) |
 | U77 | Geometry calculations | missing | | In progress (`claude/geometry`: chord, sagitta, fillet, dovetail) |
 | U78 | Angle solving | missing | | In progress (`claude/geometry`) |
-| U79 | Unit converter | partial | `fraction` | Length only (fraction, inch, mm); no area, volume, mass, force, pressure, torque, power, temperature, speed |
-| U80 | Scientific calculator | missing | | |
+| U79 | Unit converter | done | `units`, `fraction` | 17 quantities from NIST SP 811 exact definitions (`claude/measure-maths`) |
+| U80 | Scientific calculator | done | `calc` | Expression calculator (own parser in Rust, no eval), degrees/radians, DMS, prime factors, interpolation (`claude/measure-maths`) |
 | U81 | Material weight | partial | `bar` | Round, hex and square bar with a density you enter; no plate, tube or sections. Full tool in progress (`claude/geometry`, `weight`) |
 | U82 | Material property search with SFM data | partial | `materials` | Properties exist; no cutting speed/SFM or machinability data per grade. Round 2 in progress |
 | U83 | Spur gear data | missing | | |
@@ -269,30 +271,30 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH1 | Real numbers, fractions, decimals, ratio, percentage | partial | `fraction` | Fractions to decimals only; no general calculator |
-| MH2 | Powers, roots, scientific notation, factorials, combinations | missing | | Scientific calculator |
-| MH3 | Prime factorization and prime/factor tables | missing | | Useful for change gears and indexing |
+| MH1 | Real numbers, fractions, decimals, ratio, percentage | done | `calc`, `fraction` | Expression calculator and fraction converter (`claude/measure-maths`) |
+| MH2 | Powers, roots, scientific notation, factorials, combinations | done | `calc` | Powers, roots, logs, factorials, nCr, nPr; numbers in e notation (`claude/measure-maths`) |
+| MH3 | Prime factorization and prime/factor tables | partial | `calc` | Prime factors of any whole number to 10^12; no printed factor tables (`claude/measure-maths`) |
 | MH4 | Algebra: expressions, equations, rearranging formulas, polynomials, quadratic/cubic | out of scope? | | Maths teaching, not a machining tool |
 | MH5 | Functions, logarithms, sequences | out of scope? | | |
 | MH6 | Analytic geometry: lines, slopes, circle, ellipse, sphere, parabola, hyperbola | missing | | Line/circle intersections, ellipse points. Partly in progress (`claude/geometry`) |
 | MH7 | Complex numbers | out of scope? | | |
 | MH8 | Pure geometry propositions and geometric constructions | missing | | |
-| MH9 | Area and volume rules (prismoidal, Pappus, irregular areas, tank contents) | missing | | |
-| MH10 | Dimensions of plane figures, polygons, segments of a circle | missing | | In progress (`claude/geometry`: chord, sagitta) |
-| MH11 | Circles and squares of equal area; diagonals of squares and hexagons | missing | | Across-corners from across-flats |
-| MH12 | Volumes of solids | missing | | |
+| MH9 | Area and volume rules (prismoidal, Pappus, irregular areas, tank contents) | partial | `figures` | Torus (Pappus), frustum, cap; no prismoidal formula, irregular areas or tank contents (`claude/measure-maths`) |
+| MH10 | Dimensions of plane figures, polygons, segments of a circle | done | `figures`, `arc` | Squares, rectangles, parallelograms, trapezoids, circles, rings, ellipses, regular polygons, sectors; segments in `arc` (`claude/measure-maths`) |
+| MH11 | Circles and squares of equal area; diagonals of squares and hexagons | partial | `figures` | Across corners and flats of any regular polygon; no equal-area circle/square table (`claude/measure-maths`) |
+| MH12 | Volumes of solids | done | `figures` | Cube, box, cylinder, tube, cone, frustum, sphere, cap, pyramid, torus, hex bar (`claude/measure-maths`) |
 | MH13 | Trigonometry: angle measure, ratios, laws of sines and cosines, identities | missing | | In progress (`claude/geometry`) |
 | MH14 | Solution of right and oblique triangles | missing | | In progress (`claude/geometry`, `triangle`) |
-| MH15 | Angular measure conversion (degrees-minutes-seconds, radians) | missing | | |
-| MH16 | Trig function values, versed sine, involute functions | missing | | Involute function needed for gears and splines |
+| MH15 | Angular measure conversion (degrees-minutes-seconds, radians) | done | `calc`, `units` | Decimal degrees, DMS, radians, gon, revolutions (`claude/measure-maths`) |
+| MH16 | Trig function values, versed sine, involute functions | partial | `calc` | Any trig value and the involute function; no versed sine, no printed tables (`claude/measure-maths`) |
 | MH17 | Spherical trigonometry | out of scope? | | |
-| MH18 | Compound angles | missing | | Compound-angle setups on tilting tables and vises |
-| MH19 | Interpolation | missing | | |
+| MH18 | Compound angles | done | `compound` | True angle from apparent angles or two tilts; swivel-and-tilt and compound sine plate settings (`claude/measure-maths`) |
+| MH19 | Interpolation | partial | `calc` | Linear interpolation only (`claude/measure-maths`) |
 | MH20 | Matrices | out of scope? | | |
 | MH21 | Calculus, Newton's method, series | out of scope? | | |
 | MH22 | Statistics: probability and normal distribution | partial | `capability` | Normal fit and ppm only |
 | MH23 | Applying statistics: minimum number of tests, comparing averages | missing | | |
-| MH24 | Engineering economics: interest, present value, annuities, depreciation | missing | | Machine purchase and payback |
+| MH24 | Engineering economics: interest, present value, annuities, depreciation | partial | `economics` | Capital recovery factor, machine hourly rate, break-even, payback, discounted payback, NPV; no depreciation schedules (`claude/measure-maths`) |
 
 ### Mechanics and strength of materials
 
@@ -322,7 +324,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | MH42 | The elements | missing | | Symbol and property table |
 | MH43 | Latent heat, specific heat, heat loss from steam pipes | out of scope | | Thermodynamics, steam |
-| MH44 | Thermal properties; adjusting length for temperature | partial | `tempcomp`, `materials` (CTE) | Only measurement correction |
+| MH44 | Thermal properties; adjusting length for temperature | done | `tempcomp`, `shrinkfit`, `materials` (CTE) | Measurement correction and plain growth for a temperature change (`claude/measure-maths`) |
 | MH45 | Density and specific gravity | partial | `materials` | Density for 34 grade/condition entries only |
 | MH46 | Weight of piles, molecular weight, mole, air, alligation, soil weight | out of scope? | | |
 | MH47 | Properties of wood | out of scope? | | |
@@ -359,23 +361,23 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH73 | GD&T and CAD models, digital product definition | missing | | |
 | MH74 | Checking designs and drawings, arrangement of views | out of scope? | | Design office work |
 | MH75 | Limits and fits basics: unilateral/bilateral tolerances | partial | `fits` | Only via ISO classes |
-| MH76 | Force, expansion and shrink fits; temperatures for shrinkage fits | missing | | |
+| MH76 | Force, expansion and shrink fits; temperatures for shrinkage fits | done | `shrinkfit` | Shrink-fit temperatures (hub heated, shaft cooled, both) and Lame press-fit pressure, stress, torque; inputs are yours (`claude/measure-maths`) |
 | MH77 | ANSI/ASME standard fits (RC, LC, LT, LN, FN) | missing | | |
 | MH78 | ANSI preferred metric limits and fits | partial | `fits` | Any class works; preferred fits not listed |
 | MH79 | ISO metric limits and fits | partial | `fits` | No j/J; up to 500 mm |
 | MH80 | Tolerance stack-up chain, analysis and assignment | partial | `gdtstack` | 1D worst case and RSS; no tolerance assignment |
 | MH81 | Preferred numbers and sizes | missing | | |
-| MH82 | Reading verniers and micrometers | missing | | |
+| MH82 | Reading verniers and micrometers | done | `scales` | Reading aid for micrometers (0.01, 0.001 mm; 0.001, 0.0001 in) and vernier calipers (0.02, 0.05 mm; 0.001 in) (`claude/measure-maths`) |
 | MH83 | Sine bar use and constants | missing | | In progress (`claude/geometry`, `sinebar`) |
-| MH84 | Measuring tapers with V-block; dimensioning tapers; taper per foot | partial | `taper`, `machinetapers` | Taper per foot and angle only |
+| MH84 | Measuring tapers with V-block; dimensioning tapers; taper per foot | partial | `taper`, `machinetapers`, `taperrolls` | Taper per foot, angle, over-rolls measurement; no V-block method (`claude/measure-maths`) |
 | MH85 | Measuring angles and dovetail slides | missing | | In progress (`claude/geometry`, `dovetail`) |
-| MH86 | Measurement over pins and rolls; V-groove; radius of arc | missing | | In progress (`claude/geometry`, `dovetail` covers V-groove) |
+| MH86 | Measurement over pins and rolls; V-groove; radius of arc | partial | `dovetail`, `taperrolls`, `ballcone` | Dovetails, V-grooves, tapers over rolls, balls in bores; no radius-of-arc over rolls (`claude/measure-maths`) |
 | MH87 | Checking shaft conditions | missing | | |
 | MH88 | Coordinates for hole circles; chord lengths; hole coordinate tables | done | `bolt` | |
 | MH89 | Gauge blocks and gauge block sets | missing | | In progress (`claude/geometry`, `sinebar`) |
 | MH90 | Surface plates, V-blocks, parallels, angle plates and their calibration | missing | | |
 | MH91 | Measurements using light, interferometer | out of scope? | | |
-| MH92 | Micrometers, verniers, dial and digital calipers; their calibration | missing | | |
+| MH92 | Micrometers, verniers, dial and digital calipers; their calibration | partial | `scales` | Reading only; no calibration (`claude/measure-maths`) |
 | MH93 | Surface texture: terms, sampling lengths, roughness and waviness parameters | missing | | In progress (`claude/ref-data-3`) |
 | MH94 | Roughness average values, lay symbols, castings | partial | `finish` | Theoretical Ra/Rt from feed and nose radius only |
 | MH95 | ISO surface finish standards and profiles | missing | | In progress (`claude/ref-data-3`) |
@@ -564,7 +566,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH253 | Tap drills and power for pipe taps | missing | | |
 | MH254 | High-speed CNC tapping; combined drilling and tapping | missing | | |
 | MH255 | Relief angles for thread cutting tools | missing | | |
-| MH256 | Lathe change gears (inch, metric, fractional, quick-change gearbox) | missing | | |
+| MH256 | Lathe change gears (inch, metric, fractional, quick-change gearbox) | partial | `changegears` | Simple and compound trains from your gears for TPI, mm, module and DP; no quick-change gearbox tables (`claude/measure-maths`) |
 | MH257 | Relieving helical-fluted hobs | out of scope? | | |
 | MH258 | Thread rolling: machines, blank diameter, roll diameter, speeds | missing | | |
 | MH259 | Thread grinding | missing | | |
@@ -624,12 +626,12 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | MH300 | Greek alphabet, abbreviations, mathematical signs, letter symbols | missing | | |
-| MH301 | SI system, prefixes, US customary system, constants | missing | | |
+| MH301 | SI system, prefixes, US customary system, constants | partial | `units` | US customary and SI units; no prefix or constants table (`claude/measure-maths`) |
 | MH302 | Length conversions (inches, fractions, mm, feet) | done | `fraction` | |
-| MH303 | Area, volume and flow conversions | missing | | |
-| MH304 | Mass, density, pressure, force and torque conversions | missing | | |
-| MH305 | Energy, power, heat and temperature conversions | missing | | |
-| MH306 | Velocity, acceleration, viscosity and miscellaneous units | missing | | |
+| MH303 | Area, volume and flow conversions | done | `units` | Area, volume, flow (`claude/measure-maths`) |
+| MH304 | Mass, density, pressure, force and torque conversions | done | `units` | Mass, density, pressure, force, torque (`claude/measure-maths`) |
+| MH305 | Energy, power, heat and temperature conversions | done | `units` | Energy, power, temperature and temperature difference (`claude/measure-maths`) |
+| MH306 | Velocity, acceleration, viscosity and miscellaneous units | partial | `units` | Speed, feed and angle; no acceleration or viscosity (`claude/measure-maths`) |
 
 ## 3. Engineers' Data Book (Clifford Matthews)
 
@@ -637,17 +639,17 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | ED1 | 1.1-1.7 Engineering careers (7 entries) | out of scope | | |
 | ED2 | 2.1 Greek alphabet | missing | | |
-| ED3 | 2.2 Units systems | missing | | |
+| ED3 | 2.2 Units systems | partial | `units` | SI and US customary conversions; no units-system explainer (`claude/measure-maths`) |
 | ED4 | 2.3 Units and conversions | partial | `fraction` | Length only |
 | ED5 | 2.4 Consistency of units | out of scope? | | |
 | ED6 | 2.5 Dimensional analysis | out of scope? | | |
 | ED7 | 2.6 Essential engineering mathematics | missing | | Scientific calculator, trig (in progress) |
 | ED8 | 2.7 Maths and the real world | out of scope? | | |
 | ED9 | 3.1-3.12 Engineering design process and principles (12 entries) | out of scope? | | Design methodology |
-| ED10 | 4.1 Engineering abbreviations | missing | | |
+| ED10 | 4.1 Engineering abbreviations | partial | `abbrev` | Drawing abbreviations only (`claude/measure-maths`) |
 | ED11 | 4.2 Datums and tolerances: principles | done | `gdtguide`, `gdtdof` | |
 | ED12 | 4.3 Toleranced dimensions | partial | `gdtguide`, `gdtstack` | No guide to plus/minus dimensioning |
-| ED13 | 4.4 General tolerances (ISO 2768) | missing | | |
+| ED13 | 4.4 General tolerances (ISO 2768) | done | `gentol` | ISO 2768-1 linear, broken edges and angles, five publishers; ISO 2768-2 is withdrawn (`claude/measure-maths`) |
 | ED14 | 4.5 Holes | partial | `fits` | |
 | ED15 | 4.6 Screw threads | done | `threaddata` | |
 | ED16 | 4.7 Limits and fits | partial | `fits` | No j/J |
@@ -764,10 +766,10 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB28 | Lubricants and coolants for cutting tools | partial | `coolconc`, `coolmix` | No selection guide |
 | BB29 | Trigonometry, Pythagoras, rise per degree, 3-4-5 rule | missing | | In progress (`claude/geometry`) |
 | BB30 | Geometrical construction | missing | | |
-| BB31 | Formulae for dimensions of plane figures | missing | | In progress in part (`claude/geometry`) |
-| BB32 | Area and measurement of plane figures | missing | | |
-| BB33 | Distance across corners of squares and hexagons | missing | | |
-| BB34 | Area and volume of solid figures | missing | | |
+| BB31 | Formulae for dimensions of plane figures | done | `figures` | (`claude/measure-maths`) |
+| BB32 | Area and measurement of plane figures | done | `figures` | (`claude/measure-maths`) |
+| BB33 | Distance across corners of squares and hexagons | done | `figures` | Any regular polygon, across flats to across corners (`claude/measure-maths`) |
+| BB34 | Area and volume of solid figures | done | `figures` | (`claude/measure-maths`) |
 | BB35 | Tapers | done | `taper`, `machinetapers` | |
 | BB36 | Taper turning and sine bar formulae | partial | `taper` | No tailstock set-over or compound setting; sine bar in progress |
 | BB37 | Dividing head / rotary table indexing | missing | | In progress (`claude/geometry`, `indexing`) |
@@ -803,7 +805,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB67 | Quick visual identification of insert shapes | missing | | In progress (`claude/ref-data-3`) |
 | BB68 | Carbide toolholder identification | missing | | |
 | BB69 | Carbide toolholder selection and application | missing | | |
-| BB70 | Abbreviations used in drawings | missing | | |
+| BB70 | Abbreviations used in drawings | done | `abbrev` | 65 abbreviations in our words, 34 listed by two publishers (`claude/measure-maths`) |
 | BB71 | Standards for engineering drawings | missing | | |
 | BB72 | Human physical dimensions | out of scope | | |
 | BB73 | G-codes, letter addresses, miscellaneous function words | done | `gmcodes` | G and M words per control; letter-address table A-Z (NIST RS274NGC and Haas mill columns, each from its own document) under the code list (`claude/gdt-3`) |
@@ -812,7 +814,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB76 | Terms used in heat treatment of steel | missing | | |
 | BB77 | Hardening and tempering temperatures by colour | missing | | |
 | BB78 | Hardness comparison chart | missing | | In progress (`claude/ref-data-3`) |
-| BB79 | Natural sines and tangents table | missing | | Scientific calculator / trig (in progress) |
+| BB79 | Natural sines and tangents table | done | `calc` | Any sine or tangent from the calculator instead of a table (`claude/measure-maths`) |
 | BB80 | Drill point sharpening gauge (back cover) | missing | | |
 
 ## 5. CNC Machining for Engineers and Makers (course handbook)

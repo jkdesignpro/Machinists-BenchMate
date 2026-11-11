@@ -723,6 +723,13 @@ const TOOLS = [
   source: 'Circle geometry; inverse time feed: NIST RS274NGC Interpreter, version 3 (Kramer, Proctor, Messina, NISTIR 6556, 2000). Check your control manual.',
 },
 {
+  id: 'changegears', group: 'Turning', title: 'Lathe change gears',
+  desc: 'Gear trains from your own change gears for a thread (TPI, mm pitch, module or diametral pitch worm) on your leadscrew: simple and compound trains, closest first, with the pitch error.',
+  render: el => renderChangeGears(el),
+  working: 'Ratio needed = thread lead / (leadscrew lead x fixed ratio). Simple train a/b (any idler); compound (a/b) x (c/d). Error = ratio found / ratio needed - 1. Every pair (and every four) of different gears from your list is tried.',
+  source: "Gear-train ratio arithmetic; Machinery's Handbook 'Lathe change gears' (by name). 127 = 5 x 25.4 (inch defined as 25.4 mm, NIST SP 811). See docs/sources.md.",
+},
+{
   id: 'slitsaw', group: 'Sawing', title: 'Slitting saw speeds and feeds',
   pick: { map: { D: 'dia', z: 'flutes' } },
   desc: 'Spindle speed, table feed, chip thickness and cut time for a slitting or slotting saw from the saw maker\'s cutting speed and feed per tooth. A slot shallower than half the saw diameter thins the chip; the screen shows how much.',
@@ -1044,6 +1051,20 @@ const TOOLS = [
   source: 'ISO 18265:2013, ASTM E140-26; table as printed by Optimas and Bossard.',
 },
 {
+  id: 'shrinkfit', group: 'Limits and fits', title: 'Shrink and press fits',
+  desc: "Temperature to heat a hub (or cool a shaft) to assemble an interference fit with a clearance, and the press-fit contact pressure, hub stress and holding torque. Expansion coefficient, E, Poisson's ratio and friction are your entries.",
+  render: el => renderShrinkFit(el),
+  working: 'Shrink: dT = (interference + clearance) / (alpha d). Hub with a cooled shaft: T_hub = T0 + (i + c - alpha_s d (T0 - T_s)) / (alpha_h d). Press fit (Lame): p = delta / (d/Eo ((do²+d²)/(do²-d²) + nu_o) + d/Ei ((d²+di²)/(d²-di²) - nu_i)); hub hoop stress p (do²+d²)/(do²-d²); torque mu p pi d² L / 2.',
+  source: "Linear expansion dL = alpha L dT; Lame thick-cylinder interference fit as in Shigley's Mechanical Engineering Design (by name). See docs/sources.md.",
+},
+{
+  id: 'gentol', group: 'Limits and fits', title: 'General tolerances (ISO 2768-1)',
+  desc: 'Tolerance of a dimension with no tolerance of its own on an ISO 2768-f, m, c or v drawing: linear sizes, outside radii and chamfers, and angles.',
+  render: el => renderGenTol(el),
+  working: 'Table lookup by range (over the lower size, up to and including the upper). Angle offset = shorter side x tan(tolerance).',
+  source: 'ISO 2768-1:1989 (by name; confirmed current on iso.org). Values from AmesWeb, Star Rapid, Modulus Metal, CamCut and Wevolver.',
+},
+{
   id: 'bolt', group: 'Geometry', title: 'Bolt circle',
   desc: 'X and Y coordinates of equally spaced holes on a circle.',
   fields: s => [
@@ -1093,6 +1114,20 @@ const TOOLS = [
   render: el => renderDovetail(el),
   working: 'A pin in a corner of angle α touches base and flank; its centre is (d/2) cot(α/2) from the sharp corner along the base. Male: M = W + d (1 + cot(α/2)). Female: M = W - d (1 + cot(α/2)). W from the other face: W = top ∓ 2h cot α. V-groove: pin top above face = (d/2)/sin(β/2) + d/2 - (W/2)/tan(β/2).',
   source: 'Plane geometry (BenchMate derivation, checked in tests by constructing the pin position). See docs/geometry.md.',
+},
+{
+  id: 'figures', group: 'Geometry', title: 'Areas and volumes',
+  desc: 'Area and perimeter of plane figures (squares, rectangles, trapezoids, circles, rings, ellipses, regular polygons by across flats or corners, sectors) and volume and surface of solids (box, cylinder, tube, cone, frustum, sphere, cap, pyramid, torus, hex bar), with a drawing.',
+  render: el => renderFigures(el),
+  working: 'Standard mensuration formulas (listed in docs/sources.md). Polygon: side = AF tan(180°/n), AC = AF / cos(180°/n), area = n side AF / 4. Ellipse perimeter: Ramanujan II approximation.',
+  source: "Machinery's Handbook 'areas and volumes' (by name); see docs/sources.md.",
+},
+{
+  id: 'compound', group: 'Geometry', title: 'Compound angles',
+  desc: 'True angle and slope direction of a face tilted two ways, from the two drawing (apparent) angles or two successive tilts, and the settings for a swivel and tilt, a compound sine plate or the two views.',
+  render: el => renderCompound(el),
+  working: 'Face normal n = (sin C cos b, sin C sin b, cos C). Apparent angles: tan ax = tan C cos b, tan ay = tan C sin b, so tan C = sqrt(tan² ax + tan² ay). Two tilts (about X, then the tilted Y): cos C = cos a1 cos a2, sin a2 = sin C cos b, tan a1 = tan C sin b.',
+  source: "Vector geometry (rotation of the face normal), BenchMate derivation with round-trip tests; Machinery's Handbook 'compound angles' (by name). See docs/sources.md.",
 },
 {
   id: 'cycdrill', group: 'G-code cycles', title: 'Drilling and tapping cycles',
@@ -1382,6 +1417,13 @@ const TOOLS = [
   source: 'Accendo Reliability (F. Schenkelberg) and Five Flute RSS tolerance analysis guides; BenchMate arithmetic with tests in core/src/gdt.rs.',
 },
 {
+  id: 'abbrev', group: 'Drawings', title: 'Drawing abbreviations',
+  desc: 'Common abbreviations on engineering drawings (CSK, CBORE, THRU, PCD, TYP, MMC...) in plain words, with how many free publishers list each.',
+  render: el => renderAbbrev(el),
+  working: "No calculation: BenchMate's own list and wording.",
+  source: 'ASME Y14.38 and ISO 128 (by name only); Wikipedia and IS 11670:1993 (Public.Resource.Org). See docs/sources.md.',
+},
+{
   id: 'weight', group: 'Stock and sheet metal', title: 'Stock weight',
   desc: 'Weight of round, hex, square, tube, flat bar, plate and sheet stock, per piece, per batch and per metre or foot.',
   render: el => renderWeight(el),
@@ -1428,6 +1470,27 @@ const TOOLS = [
   render: el => renderTempComp(el),
   working: 'L20 = reading x (1 + a_gauge x (T_gauge - 20)) / (1 + a_part x (T_part - 20)), temperatures in °C, a in 1/K. The gauge graduations grow with its temperature; the part grows with its own. Inverse for the reading a to-size part gives. Coefficient uncertainty: L x u(a) x |T_part - 20|.',
   source: 'ISO 1:2022 (reference temperature 20 °C, cited only); T. Doiron, J. Res. NIST 112(1), 2007 (history and use of 20 °C); expansion formula dL = L a dT. See docs/shop-helpers.md.',
+},
+{
+  id: 'ballcone', group: 'Inspection and quality', title: 'Ball in a countersink or tapered bore',
+  desc: 'Height of a gauge ball over the face of a countersink or tapered bore, the face diameter from a ball reading, and the angle and diameter of a tapered bore from two balls.',
+  render: el => renderBallCone(el),
+  working: 'a = half the included angle, r = ball radius, D = diameter at the face, h = height of the ball top over the face. h = r + r / sin a - D / (2 tan a); D = 2 (r / cos a - (h - r) tan a). Two balls: sin a = (r2 - r1) / ((h2 - r2) - (h1 - r1)).',
+  source: "Plane geometry (circle tangent to two lines), BenchMate derivation checked in tests by round trips; method as in Machinery's Handbook 'measuring tapers with balls' (by name). See docs/sources.md.",
+},
+{
+  id: 'taperrolls', group: 'Inspection and quality', title: 'Taper over rolls',
+  desc: 'External taper measured over a pair of rolls on gauge blocks: the measurement for a known taper, or the included angle and small-end diameter from two readings at two block heights.',
+  render: el => renderTaperRolls(el),
+  working: 'M = D_H + d (1 + tan(45° + a/2)), D_H = D0 + 2 H tan a (a = half angle, d = roll diameter, H = block height). Two readings: tan a = (M2 - M1) / (2 (H2 - H1)).',
+  source: "Plane geometry; the same relation as Machinery's Handbook 'measuring tapers with rolls' (by name); 1 + tan(45° + a/2) = 1 + tan a + sec a checked in tests. See docs/sources.md.",
+},
+{
+  id: 'scales', group: 'Inspection and quality', title: 'Micrometer and vernier reading',
+  desc: 'A reading aid: shows a micrometer (0.01 mm, 0.001 mm, 0.001 in, 0.0001 in) or vernier caliper (0.02 mm, 0.05 mm, 0.001 in) scale at a value, and how the reading is made up.',
+  render: el => renderScales(el),
+  working: 'Micrometer: sleeve value + thimble division x (pitch / divisions) + vernier line x resolution. Caliper: main scale value + coinciding vernier line x resolution.',
+  source: "Instrument makers' reading guides (see docs/sources.md); Machinery's Handbook 'reading verniers and micrometers' (by name).",
 },
 {
   id: 'coolconc', group: 'Shop helpers', title: 'Coolant concentration (refractometer)',
@@ -1489,6 +1552,27 @@ const TOOLS = [
   render: el => renderFraction(el),
   working: '1 in = 25.4 mm exactly. Nearest fraction: numerator = round(value x denominator), then reduced by the greatest common divisor. Error = value - fraction.',
   source: 'NIST SP 811, appendix B: inch = 0.0254 m exactly (1959 definition). See docs/shop-helpers.md.',
+},
+{
+  id: 'units', group: 'Shop helpers', title: 'Unit converter',
+  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once.',
+  render: el => renderUnits(el),
+  working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9).',
+  source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. See docs/sources.md.',
+},
+{
+  id: 'calc', group: 'Shop helpers', title: 'Calculator',
+  desc: 'Type an expression with brackets, powers, trig (degrees or radians), roots, logs and factorials. Also degrees-minutes-seconds, prime factors and linear interpolation.',
+  render: el => renderCalc(el),
+  working: "BenchMate's own recursive-descent parser in the Rust core (no eval): + - * / % ^ ! and functions. Powers bind right to left and above unary minus. Involute inv a = tan a - a.",
+  source: 'Operator precedence as in common mathematical convention; functions from the Rust standard library (IEEE 754 double precision). See docs/sources.md.',
+},
+{
+  id: 'economics', group: 'Shop helpers', title: 'Shop economics',
+  desc: 'Machine hourly rate from price, resale, life, interest and running costs; break-even quantity for a job; simple and discounted payback and net present value. All inputs are yours.',
+  render: el => renderEconomics(el),
+  working: 'CRF = i(1+i)^n / ((1+i)^n - 1); capital per year = (P - S) CRF + S i. Break-even = fixed / (price - variable). Payback = I / A; discounted n = -ln(1 - I i / A) / ln(1 + i); NPV = A (1 - (1+i)^-n) / i + S (1+i)^-n - I.',
+  source: "Engineering economy interest formulas (Machinery's Handbook 'engineering economics', by name); see docs/sources.md.",
 },
 {
   id: 'machines', group: 'Setup', title: 'Machine profiles',
