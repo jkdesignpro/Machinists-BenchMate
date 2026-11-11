@@ -445,6 +445,13 @@ static mut CHAT_FRAMES: f64 = 0.0;
     set_out(p.into_iter().flat_map(|(f, a)| [f, a, c::harmonic_order(f, rpm / 60.0, tol)]).collect()); n as f64 }
 f1!(tooth_pass_hz, c::tooth_pass_hz, rpm, z);
 f1!(stable_rpm, c::stable_rpm, fc, z, lobe);
+// Stability chart (core/src/lobes.rs)
+f1!(cantilever_fn_hz, c::cantilever_fn_hz, d, l, e_gpa, rho);
+f1!(cantilever_tip_stiffness, c::cantilever_tip_stiffness, d, l, e_gpa);
+f1!(ks_resultant, c::ks_resultant, kc, beta);
+f1!(lobe_critical_depth, c::lobe_critical_depth, k, zeta, ks, beta, nt_star);
+/// Stability limit at a spindle speed: which 0 limiting depth (mm), 1 chatter frequency (Hz), 2 lobe number.
+#[no_mangle] pub extern "C" fn lobe_limit_at_rpm(k: f64, zeta: f64, fn_hz: f64, ks: f64, beta: f64, nt_star: f64, nt: f64, rpm: f64, which: f64) -> f64 { pick(c::lobe_limit_at_rpm(k, zeta, fn_hz, ks, beta, nt_star, nt, rpm), which) }
 f1!(chatter_ratio, c::chatter_ratio, fc, rpm, z);
 f1!(harmonic_order, c::harmonic_order, f, base, tol);
 

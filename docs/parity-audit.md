@@ -133,7 +133,7 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U13 | Mill speeds and feeds with physics engine (chip thinning, deflection, power) | partial | `advmill`, `cutopt` | Starting speed and chip load by material and cutter size, width and depth suggested, chip thinning, power, torque and deflection checks with a limit card. End mills only (no face mill, ball or chamfer tools); no stability chart or tool life in the advisor yet |
+| U13 | Mill speeds and feeds with physics engine (chip thinning, deflection, power) | partial | `advmill`, `cutopt` | Starting speed and chip load by material and cutter size, width and depth suggested, chip thinning, power, torque and deflection checks with a limit card. Stability chart with a draggable speed marker (simple tool model or a tap test). End mills only (no face mill, ball or chamfer tools); no tool life in the advisor yet |
 | U14 | Mill spindle speed / SFM | done | `rpm` |  |
 | U15 | Mill feed rate conversion | done | `feed` |  |
 | U16 | Radial chip thinning | done | `chipthin` |  |

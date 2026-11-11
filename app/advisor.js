@@ -270,7 +270,12 @@ TOOLS.push(
     { level: 'advanced', id: 'kf', label: 'Effective flute diameter / D (blank = solid rod)', unit: 'x D', def: '' },
     { level: 'advanced', id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
     { level: 'advanced', id: 'ratio', label: 'Bending force / tangential force (blank = 1)', unit: '', def: '' },
-  ].concat(ADV_MACHINE_FIELDS),
+  ].concat(ADV_MACHINE_FIELDS, [
+    { level: 'expert', id: 'fnat', label: 'Tap test: natural frequency at the tool tip (blank = tool as a bar)', unit: 'Hz', def: '' },
+    { level: 'expert', id: 'ktip', label: 'Tap test: stiffness at the tool tip (blank = tool as a bar)', unit: 'N/mm', def: '' },
+    { level: 'expert', id: 'zeta', label: 'Damping ratio (blank = 0.03, assumed)', unit: '', def: '' },
+    { level: 'expert', id: 'beta', label: 'Force angle beta (blank = 62, assumed)', unit: 'deg', def: '' },
+  ]),
   suggest: (v, W, s) => { const r = advMillRun(v, W, s); return r && !r.none ? { ae: r.sAe / r.k, ap: r.sAp / r.k } : {}; },
   calc: (v, W, s) => {
     const r = advMillRun(v, W, s);
@@ -340,6 +345,16 @@ TOOLS.push(
     const lm = ADV_LMS[r.m.lms];
     if (lm && r.tm === 2) rows.push([ADV_PUB.lms, lm[0] + ' (milling table; tool material not stated)', (lm[3][0] === lm[3][1] ? sp(lm[3][0]) : sp(lm[3][0]) + ' to ' + sp(lm[3][1])) + ' ' + spdU(s), 'not printed', 'speed only']);
     return { title: 'What each publisher prints for this material, ' + (r.tm === 1 ? 'carbide' : 'HSS') + ' end mill of this size', head: ['Publisher', 'Row as printed', 'Speed', 'Chip load per tooth', ''], rows, text: true };
+  },
+  // Stability chart: the tool as a round bar of the shank diameter (or a tap test), the cutting force from kc at the mean chip thickness.
+  widget: (v, W, s) => {
+    const r = advMillRun(v, W, s);
+    if (!r || r.none || !isFinite(r.kc) || !(v.L > 0)) return null;
+    const m = lobeModel(W, { d: v.dsh > 0 ? v.dsh * r.k : r.dmm, L: v.L * r.k, e: r.eGpa, tm: r.tm, z: v.z, ae: r.ae, D: r.dmm, kc: r.kc, fnat: v.fnat, ktip: v.ktip, zeta: v.zeta, beta: v.beta });
+    if (!m || !(m.crit > 0)) return null;
+    const vcOf = n => W.vc_from_rpm(n, r.dmm);
+    return el => lobeChartMount(el, m, { key: 'advmill:' + s, rpm: r.rpm, ap: r.ap, nmax: r.mach.n, inch: r.inch,
+      use: n => sendTo('advmill', { vown: r.inch ? vcOf(n) / FT_M : vcOf(n) }) });
   },
   sends: (v, W, s) => {
     const r = advMillRun(v, W, s);

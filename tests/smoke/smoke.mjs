@@ -378,6 +378,23 @@ aT = await advTxt();
 if (!/Spindle speed 8,000 RPM/i.test(aT) || !/What is limiting this cut Top spindle speed/i.test(aT)) problems.push(`[${where}] "${aT.slice(0, 400)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Stability chart in the milling advisor. 12 mm carbide bar, 40 mm out: k = 3 x 580000 x 1017.88 / 64000 = 27 674 N/mm, zeta 0.03,
+// kc at hm 0.04495 mm = 1350 x 0.04495^-0.21 = 2590, Ks = 2590 / sin 62 = 2933, Nt* = 4 x 90 / 360 = 1:
+// stable at every speed = 4 x 27674 x 0.03 x 1.03 / (2 x 2933 x cos 62) = 1.242 mm. The marker moves and can set the advisor's speed.
+where = 'advmill stability chart';
+await open('advmill');
+await page.waitForSelector('#res .rwidget svg.lobe');
+let lobeT = await page.$eval('#res .rwidget', e => e.innerText.replace(/\s+/g, ' '));
+if (!/stable at every speed: 1\.242 mm/.test(lobeT) || !/At 1,617 RPM/.test(lobeT)) problems.push(`[${where}] "${lobeT.slice(0, 300)}"`);
+await page.$eval('#res .lobesl', e => { e.value = '2000'; e.dispatchEvent(new Event('input', { bubbles: true })); });
+lobeT = await page.$eval('#res .lobeout', e => e.innerText.replace(/\s+/g, ' '));
+if (!/At 2,000 RPM/.test(lobeT)) problems.push(`[${where}] the marker did not move: "${lobeT.slice(0, 200)}"`);
+await page.click('#res .lobebtn button');
+await page.waitForTimeout(150);
+aT = await advTxt();
+if (!/Spindle speed 2,000 RPM/i.test(aT)) problems.push(`[${where}] the chart did not set the advisor's speed: "${aT.slice(0, 200)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Boring bar advisor. 20 mm steel bar, 60 mm out, low carbon steel, 0.4 mm nose radius: feed 0.1667 mm/rev, kc 1968 (as the turning
 // advisor above), Fc = 1968 x 1.016 x 0.1667 = 333.3 N; I = pi 20^4 / 64 = 7853.98 mm4; delta = 333.3 x 60^3 / (3 x 210000 x 7853.98) = 0.01455 mm.
 where = 'boringbar advisor';

@@ -101,6 +101,7 @@ const FORMULA_SOURCES = {
   ADVT: 'Published starting tables, kept apart: Harvey Tool, RedLine Tools, University of Pennsylvania, University of Florida, LittleMachineShop, ICS Cutting Tools, Gammons Hoaglund (docs/sources.md, Advisor)',
   MITCR: 'Mitsubishi Materials, technical information for turning, Corner radius (a corner radius 2 to 3 times the feed)',
   UFSF: 'University of Florida, MAE design lab, Speeds and Feeds (web page and EML2322L handout)',
+  TS13: 'C. T. Tyler, T. L. Schmitz, Analytical process damping stability prediction, J. Manuf. Processes 15(1), 2013 (average tooth angle approach); Tyler, Troutman, Schmitz, Precision Engineering 40, 2015',
   GERR: 'D. Gerr, Controlling Galvanic Corrosion (galvanic series in seawater, V vs Ag/AgCl; 0.20 V rule)',
   EEGALV: 'Engineers Edge, galvanic compatibility (anodic index; 0.15 / 0.25 / 0.50 V); Carr Lane, anodic index guideline',
 };
@@ -239,6 +240,9 @@ const FORMULAS = [
   F('advmill', 'Milling advisor: speed and feed from the table', 'n = 1000 · Vc / (π D);  fz = chip load · RCTF(ae, D);  Vf = n · z · fz', 'Vc and chip load from the chosen publisher; RCTF: radial chip thinning factor, 1 at ae ≥ D / 2', ['ADVT', 'SAN', 'MD']),
   F('advmill', 'Milling advisor: power and torque against the spindle', 'Pc = ae · ap · Vf · kc / 60 000 000;  P(n) = min(P_max, T_max · 2π n / 60 000)', 'kc = kc1.1 · hm^(−mc) at the mean chip thickness; spindle power = Pc / efficiency', ['SAN', 'ISCKC', 'ALT']),
   F('advmill', 'Milling advisor: carbide and coolant factors', 'Vc carbide = 2.5 · Vc HSS;  oil by hand: 0.6 · speed and feed', 'one publisher', ['UFSF']),
+  F('advmill', 'Stability chart: limiting depth of cut', 'b_lim = −1 / (2 · Ks · Re[G_or] · Nt*)', 'Ks: resultant specific force; G_or: oriented response at the tool tip; Nt*: average teeth in the cut', ['TS13']),
+  F('advmill', 'Stability chart: chatter frequency and spindle speed', 'fc / (Ω · Nt) = N + ε / 2π;  ε = 2π − 2 · atan(Re[G_or] / Im[G_or])', 'Ω: rev/s; N: whole waves between teeth; best speeds just above 60 fn / (Nt (N + 1))', ['TS13']),
+  F('advmill', 'Stability chart: tool as a bar', 'f1 = (1.8751² / 2π) · √(E I / (ρ A L⁴));  k = 3 E I / L³', 'one vibration mode; holder and spindle left out', ['THOM', 'GERE', 'OWN']),
   F('advdrill', 'Drilling advisor: time to depth and removal rate', 't = (depth + point length) / (fn · n);  Q = π/4 · D² · Vf', 'point length = (D / 2) / tan(point / 2)', ['SAN', 'OWN']),
   F('advream', 'Reaming: hole to drill first', 'drill = reamer diameter − stock on the diameter', 'stock from the reamer maker\'s table, or about 3 % of the hole', ['ADVT']),
   F('advream', 'Reaming speed and feed against drilling', 'Vc = 1/2 (or 2/3) · drilling Vc;  fn = 2 (to 3) · drilling fn', 'publishers differ: each is shown', ['UFSF', 'ADVT']),

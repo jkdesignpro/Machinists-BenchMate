@@ -520,6 +520,11 @@ function mountTool(host, t, opts) {
         res.appendChild(bar);
       }
     }
+    // A tool may add a live widget under its results (t.widget -> a function that fills the box it is given), for example a chart with a marker to drag.
+    if (!mini && t.widget && rows.length) {
+      let fill = null; try { fill = t.widget(v, state.W, sys, rows); } catch (e) { fill = null; }
+      if (fill) { const box = document.createElement('div'); box.className = 'rwidget'; res.appendChild(box); try { fill(box); } catch (e) { box.remove(); } }
+    }
     // A tool may add a table under its results (t.table): { head, rows, dp, copies: [[label, text]] }.
     if (!mini && t.table) {
       let tb = null; try { tb = rows.length ? t.table(v, state.W, sys, dpAdj) : null; } catch (e) { tb = null; }

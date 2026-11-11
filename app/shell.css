@@ -377,3 +377,17 @@ label.f.lk .fx{right:76px}
 @media print{.rsend,label.f .flock{display:none}}
 .rtab.text th,.rtab.text td,.tg .res .rtab.text td.v{white-space:normal;text-align:left;font:12.5px/1.35 var(--sans);vertical-align:top;padding:5px 8px}
 .rtab.text .rtabs{max-height:none}
+
+/* Live widget under the results (stability chart) */
+.rwidget{border-top:1px solid var(--line);padding:0 0 10px}
+.rwidget .rtabh{margin-bottom:6px}
+.rwidget svg.dk{display:block;width:100%;height:auto;padding:0 10px;box-sizing:border-box}
+.rwidget svg.lobe{cursor:ew-resize;touch-action:none;user-select:none}
+.dk .lobeun{fill:var(--err);opacity:.13;stroke:none}
+.rwidget .lobesl{display:block;width:calc(100% - 32px);margin:2px 16px 6px;accent-color:var(--accent)}
+.rwidget .lobeout{padding:0 16px;font-size:12.5px;color:var(--ink);line-height:1.45}
+.rwidget .lobeok{color:var(--ok)}
+.rwidget .lobebad{color:var(--err)}
+.rwidget .lobebtn{padding:6px 16px 0}
+.rwidget .lobebtn:empty{display:none}
+.rwidget .lobenote{margin:8px 16px 0;font-size:11.5px;color:var(--muted);line-height:1.45}

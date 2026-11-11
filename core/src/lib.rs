@@ -598,8 +598,10 @@ pub use inspect::*;
 pub mod matref;
 pub mod cutforce;
 pub mod advisor;
+pub mod lobes;
 pub use cutforce::*;
 pub use advisor::*;
+pub use lobes::*;
 
 #[cfg(test)]
 mod tests {
