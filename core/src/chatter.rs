@@ -84,27 +84,61 @@ pub fn amplitude_spectrum(x: &[f64]) -> Vec<f64> {
     (0..n / 2).map(|k| 2.0 * (re[k] * re[k] + im[k] * im[k]).sqrt() / gain).collect()
 }
 
-/// Up to `k` largest local maxima of `mag` (bin spacing `df` Hz) between fmin and
-/// fmax, each refined by a parabola through the log magnitudes of the peak bin and its
-/// neighbours (frequency to a small part of a bin; amplitude within a few per cent).
-/// Returns (frequency Hz, amplitude), largest first.
+/// Hann window main-lobe half width in bins: a single tone spreads over +-2 bins.
+pub const HANN_MAIN_LOBE_BINS: f64 = 2.0;
+/// Peaks more than this far (dB) below the largest peak in range are not listed.
+pub const PEAK_FLOOR_DB: f64 = 40.0;
+/// Margin (dB) above the Hann side-lobe envelope that a nearby weaker peak needs
+/// to count as a tone of its own (covers leakage raised by drift and averaging).
+pub const SIDELOBE_MARGIN_DB: f64 = 15.0;
+
+/// Hann window side-lobe level (dB, below the main peak) at `d` bins from it:
+/// the first side lobe is -31.5 dB at about 2.5 bins and the lobes then fall at
+/// 18 dB per octave (1/d^3). [HARRIS] F. J. Harris, Proc. IEEE 66(1), 1978.
+pub fn hann_sidelobe_db(d: f64) -> f64 { -31.5 - 60.0 * (d.max(2.5) / 2.5).log10() }
+
+/// Real peaks of a Hann-windowed amplitude spectrum `mag` (bin spacing `df` Hz)
+/// between fmin and fmax, at most `k`, largest first, as (frequency Hz, amplitude).
+///
+/// * Only local maxima are candidates; each is refined by a parabola through the log
+///   magnitudes of the peak bin and its neighbours (frequency to a small part of a bin,
+///   amplitude within a few per cent).
+/// * Going from the largest down, a candidate is dropped when it lies inside the main
+///   lobe (2 bins) of a stronger accepted peak, or when it is not at least
+///   `SIDELOBE_MARGIN_DB` above that peak's side-lobe envelope: a single tone then
+///   gives a single peak, not a comb of side lobes.
+/// * Candidates more than `PEAK_FLOOR_DB` below the largest peak in range are dropped.
 pub fn spectrum_peaks(mag: &[f64], df: f64, fmin: f64, fmax: f64, k: usize) -> Vec<(f64, f64)> {
-    let mut p = vec![];
+    if k == 0 { return vec![]; }
+    let l = |v: f64| v.max(1e-300).ln();
+    // (bin position, amplitude)
+    let mut cand: Vec<(f64, f64)> = vec![];
     for i in 1..mag.len().saturating_sub(1) {
-        let f = i as f64 * df;
-        if f < fmin || f > fmax { continue; }
         if mag[i] > mag[i - 1] && mag[i] >= mag[i + 1] && mag[i] > 0.0 {
-            // parabola through the log magnitudes (closer than linear for a Hann window)
-            let l = |v: f64| v.max(1e-300).ln();
             let (a, b, c) = (l(mag[i - 1]), l(mag[i]), l(mag[i + 1]));
             let den = a - 2.0 * b + c;
             let d = if den.abs() > 1e-300 { (0.5 * (a - c) / den).clamp(-0.5, 0.5) } else { 0.0 };
-            p.push(((i as f64 + d) * df, (b - 0.25 * (a - c) * d).exp()));
+            cand.push((i as f64 + d, (b - 0.25 * (a - c) * d).exp()));
         }
     }
-    p.sort_by(|x, y| y.1.partial_cmp(&x.1).unwrap_or(std::cmp::Ordering::Equal));
-    p.truncate(k);
-    p
+    cand.sort_by(|x, y| y.1.partial_cmp(&x.1).unwrap_or(std::cmp::Ordering::Equal));
+    let in_range = |p: f64| { let f = p * df; f >= fmin && f <= fmax };
+    let top = cand.iter().find(|c| in_range(c.0)).map(|c| c.1).unwrap_or(0.0);
+    let floor = top * 10f64.powf(-PEAK_FLOOR_DB / 20.0);
+    // Accepted peaks, in and out of range (a strong tone just outside still hides its side lobes).
+    let mut acc: Vec<(f64, f64)> = vec![];
+    let mut out = vec![];
+    for (p, a) in cand {
+        if a < floor { break; }
+        let hidden = acc.iter().any(|&(q, b)| {
+            let d = (p - q).abs();
+            d <= HANN_MAIN_LOBE_BINS || a <= b * 10f64.powf((hann_sidelobe_db(d) + SIDELOBE_MARGIN_DB) / 20.0)
+        });
+        if hidden { continue; }
+        acc.push((p, a));
+        if in_range(p) { out.push((p * df, a)); if out.len() >= k { break; } }
+    }
+    out
 }
 
 /// Order of the spindle harmonic `f` is near (f = order x base within `tol` Hz), or 0.
@@ -161,6 +195,7 @@ mod tests {
         assert_eq!(m.len(), n / 2);
         let df = fs / n as f64;
         let pk = spectrum_peaks(&m, df, 50.0, 5000.0, 5);
+        assert_eq!(pk.len(), 3, "only the three tones, no side lobes: {pk:?}");
         assert!(close(pk[0].0, 400.0, 0.3));
         assert!(close(pk[0].1, 0.8, 0.04)); // window gain corrected amplitude (400 Hz sits half-way between bins)
         let base = 6000.0 / 60.0;
@@ -168,6 +203,97 @@ mod tests {
         assert!(close(chat[0].0, 1234.5, 0.3), "{:?}", pk);
         assert!(close(chat[0].1, 0.3, 0.015));
         assert_eq!(harmonic_order(800.2, base, 2.0), 8.0);
+    }
+
+    /// Deterministic noise in -1..1 (LCG), so the tests do not depend on a crate.
+    fn noise(n: usize, seed: u64) -> Vec<f64> {
+        let mut s = seed;
+        (0..n).map(|_| { s = s.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407); ((s >> 11) as f64 / (1u64 << 53) as f64) * 2.0 - 1.0 }).collect()
+    }
+    fn tones(fs: f64, n: usize, t: &[(f64, f64)], noise_amp: f64, seed: u64) -> Vec<f64> {
+        let w = noise(n, seed);
+        (0..n).map(|i| { let tt = i as f64 / fs; t.iter().map(|&(f, a)| a * (2.0 * PI * f * tt + 0.7).sin()).sum::<f64>() + noise_amp * w[i] }).collect()
+    }
+    /// Averaged spectrum of `frames` consecutive frames, as the microphone screen does.
+    fn avg_spectrum(x: &[f64], n: usize, frames: usize) -> Vec<f64> {
+        let mut avg = vec![0.0; n / 2];
+        for f in 0..frames { let m = amplitude_spectrum(&x[f * n / 2..f * n / 2 + n]); for (a, v) in avg.iter_mut().zip(&m) { *a += v / frames as f64; } }
+        avg
+    }
+
+    #[test]
+    fn single_tone_gives_one_peak() {
+        // The desktop report: one 1234 Hz tone listed with its side lobes (1226, 1219 Hz ...).
+        for &fs in &[44100.0, 48000.0] {
+            for &f0 in &[1234.0, 1234.5, 1236.7, 440.0, 3001.3] {
+                let n = 16384;
+                let x = tones(fs, n * 5, &[(f0, 0.5)], 1e-4, 7);
+                let m = avg_spectrum(&x, n, 9);
+                let df = fs / n as f64;
+                let pk = spectrum_peaks(&m, df, 50.0, 5000.0, 6);
+                assert_eq!(pk.len(), 1, "fs {fs} f0 {f0}: {pk:?}");
+                assert!(close(pk[0].0, f0, 0.1 * df), "fs {fs} f0 {f0}: {pk:?}");
+                assert!(close(pk[0].1, 0.5, 0.02), "{pk:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn drifting_tone_gives_one_peak() {
+        // Tone wandering by +-1 Hz between frames (a real spindle): wider leakage, still one peak.
+        let (fs, n) = (44100.0, 16384);
+        let df = fs / n as f64;
+        let mut avg = vec![0.0; n / 2];
+        for fr in 0..9 {
+            let f0 = 1234.0 + ((fr as f64) * 1.3).sin();
+            let m = amplitude_spectrum(&tones(fs, n, &[(f0, 0.5)], 1e-3, fr as u64 + 1));
+            for (a, v) in avg.iter_mut().zip(&m) { *a += v / 9.0; }
+        }
+        let pk = spectrum_peaks(&avg, df, 50.0, 5000.0, 6);
+        assert_eq!(pk.len(), 1, "{pk:?}");
+        assert!(close(pk[0].0, 1234.0, 1.5), "{pk:?}");
+    }
+
+    #[test]
+    fn two_tones_give_two_peaks() {
+        let (fs, n) = (48000.0, 16384);
+        let df = fs / n as f64;
+        // Far apart, 20 dB difference.
+        let m = avg_spectrum(&tones(fs, n * 5, &[(1234.0, 1.0), (2817.3, 0.1)], 1e-4, 3), n, 9);
+        let pk = spectrum_peaks(&m, df, 50.0, 5000.0, 6);
+        assert_eq!(pk.len(), 2, "{pk:?}");
+        assert!(close(pk[0].0, 1234.0, 0.3) && close(pk[1].0, 2817.3, 0.3), "{pk:?}");
+        assert!(close(pk[1].1, 0.1, 0.005), "{pk:?}");
+        // Close together: 1234 Hz and 1262 Hz (about 9.6 bins apart), 10 dB down.
+        let m = avg_spectrum(&tones(fs, n * 5, &[(1234.0, 1.0), (1262.0, 0.316)], 1e-4, 4), n, 9);
+        let pk = spectrum_peaks(&m, df, 50.0, 5000.0, 6);
+        assert_eq!(pk.len(), 2, "{pk:?}");
+        assert!(close(pk[0].0, 1234.0, 0.3) && close(pk[1].0, 1262.0, 0.3), "{pk:?}");
+        // Out of range tone does not appear, and its side lobes do not leak in.
+        let pk = spectrum_peaks(&m, df, 1250.0, 5000.0, 6);
+        assert_eq!(pk.len(), 1, "{pk:?}");
+        assert!(close(pk[0].0, 1262.0, 0.3), "{pk:?}");
+        // k = 0 lists nothing.
+        assert!(spectrum_peaks(&m, df, 50.0, 5000.0, 0).is_empty());
+    }
+
+    #[test]
+    fn sidelobe_envelope() {
+        assert!(close(hann_sidelobe_db(2.5), -31.5, 1e-12));
+        assert!(close(hann_sidelobe_db(5.0), -31.5 - 18.06, 0.01)); // 18 dB per octave
+        // Exact Hann side lobe heights stay under the envelope used for suppression.
+        let n = 4096; let k0 = 300.0;
+        let x: Vec<f64> = (0..n).map(|i| (2.0 * PI * k0 * i as f64 / n as f64).sin()).collect();
+        let m = amplitude_spectrum(&x);
+        // An on-bin tone has nulls elsewhere; use an off-bin tone to see the lobes.
+        let x2: Vec<f64> = (0..n).map(|i| (2.0 * PI * (k0 + 0.5) * i as f64 / n as f64).sin()).collect();
+        let m2 = amplitude_spectrum(&x2);
+        let top = m2.iter().cloned().fold(0.0, f64::max);
+        for d in 3..40usize {
+            let v = m2[300 + d].max(m2[301 - d]);
+            assert!(20.0 * (v / top).log10() <= hann_sidelobe_db(d as f64 - 0.5) + 1.0, "d {d}");
+        }
+        assert!(close(m[300], 1.0, 1e-9));
     }
 
     #[test]
