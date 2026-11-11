@@ -760,6 +760,31 @@ mod tests {
         assert!(close(a.rpm, 916.7, 0.1));
     }
 
+    /// Mitsubishi Materials, "Cutting power for turning": mild steel at 120 m/min, 3 mm deep, 0.2 mm/rev, machine
+    /// coefficient 80 %, Kc = 3100 MPa: Pc = (3 x 0.2 x 120 x 3100) / (60 x 10^3 x 0.8) = 4.65 kW.
+    /// (mc = 0 holds kc at the printed 3100 whatever the chip thickness.)
+    #[test]
+    fn published_mitsubishi_turning_power() {
+        let a = advise_turn(&TurnJob { d: 50.0, vc: 120.0, f: 0.2, ap: 3.0, kappa_deg: 90.0, kc11: 3100.0, mc: 0.0,
+            f_locked: false, ap_locked: false, n_max: 0.0, p_max: 0.0, t_max: 0.0, eta: 0.8 });
+        assert!(close(a.p_spindle, 4.65, 0.005) && close(a.kc, 3100.0, 1e-9) && close(a.q, 72.0, 1e-9) && a.limit == 0);
+        assert!(close(advise_turn_f(50.0, 120.0, 0.2, 3.0, 90.0, 3100.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.8, 9.0), 4.65, 0.005));
+    }
+
+    /// Mitsubishi Materials, "Formulas for drilling": a 12 mm drill at 1350 rpm cuts at 50.9 m/min; 0.2 mm/rev at
+    /// 1350 rpm feeds 270 mm/min; a 1.2 in hole at 165 SFM and 0.006 in/rev with a 0.59 in drill takes
+    /// n = 1068.8 rpm and 0.187 min = 11.2 s. The page rounds pi to 3.14, so the tolerances are 0.1 %.
+    #[test]
+    fn published_mitsubishi_drilling() {
+        assert!(close(vc_from_rpm(1350.0, 12.0), 50.9, 0.05));
+        let h = advise_hole(vc_from_rpm(1350.0, 12.0), 12.0, 0.2, 0.0, 0.0);
+        assert!(close(h[0], 1350.0, 1e-6) && close(h[3], 270.0, 1e-6) && h[5] == 0.0);
+        let (vc, d, f, depth) = (165.0 * 0.3048, 0.59 * MM_PER_IN, 0.006 * MM_PER_IN, 1.2 * MM_PER_IN);
+        let h = advise_hole(vc, d, f, 0.0, 0.0);
+        assert!(close(h[0], 1068.8, 1.1));
+        assert!(close(drill_time_min(depth, 0.0, h[2], h[0]) * 60.0, 11.2, 0.1));
+    }
+
     #[test]
     fn published_corrections() {
         // oil by hand: 60 % of 950 rpm is 570 rpm [UF]; carbide: 2.5 x 250 sfm = 625 sfm [UF]
