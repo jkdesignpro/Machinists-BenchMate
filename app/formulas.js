@@ -178,6 +178,8 @@ const FORMULAS = [
   F('triangle', 'Law of cosines', 'a² = b² + c² − 2bc · cos A', 'a, b, c: sides; A: angle opposite a', ['OPENSTAX']),
   F('arc', 'Chord and sagitta', 'c = 2R · sin(θ/2);  s = R · (1 − cos(θ/2))', 'R: radius; θ: included angle', ['OPENSTAX']),
   F('arc', 'Radius from chord and sagitta', 'R = (c²/4 + s²) / (2s)', 'c: chord; s: sagitta', ['OPENSTAX']),
+  F('arc', 'Angle from chord and arc length (solved by bisection)', 'sin(u) / u = c / L,  θ = 2u,  R = c / (2 sin u)', 'u: half the included angle [rad]; one root on 0 < u ≤ π', ['OWN']),
+  F('arc', 'Angle from sagitta and arc length (solved by bisection)', '(1 − cos u) / (2u) = s / L,  θ = 2u,  R = L / (2u)', 'peak at u · sin u = 1 − cos u (θ ≈ 267°): up to two arcs', ['OWN']),
   F('fillet', 'Fillet tangent distance in a corner', 't = r / tan(α/2)', 'r: fillet radius; α: angle between the legs', ['OWN']),
   F('dovetail', 'Male dovetail over pins', 'M = W + d · (1 + cot(α/2))', 'W: width at the sharp corners; d: pin diameter; α: dovetail angle', ['OWN']),
   F('cycdrill', 'Tapping feed', 'F = pitch · n', 'F: feed per minute; pitch: thread lead; n: [rpm]', ['HAAS']),

@@ -164,6 +164,7 @@ f1!(mixed_to_decimal, c::mixed_to_decimal, whole, num, den);
 // Geometry (core/src/geometry.rs)
 f1!(tri_solve, c::solve_triangle_flat, a, b, cc, aa, bb, ccc, sol, which);
 f1!(arc_solve, c::arc_solve_flat, mode, x, y, which);
+f1!(arc_two, c::arc_two_flat, ka, a, kb, b, sol, which);
 f1!(circle_3pts, c::circle_3pts_flat, x1, y1, x2, y2, x3, y3, which);
 f1!(sine_bar_height, c::sine_bar_height, l, theta);
 f1!(sine_bar_angle, c::sine_bar_angle, l, h);

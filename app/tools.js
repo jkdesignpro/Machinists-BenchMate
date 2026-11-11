@@ -1484,10 +1484,10 @@ const TOOLS = [
 },
 {
   id: 'arc', level: 'advanced', group: 'Geometry', title: 'Chord, arc, sagitta and 3-point circle',
-  desc: 'Solve an arc from any two of radius, angle, chord, sagitta and arc length; segment and sector areas; centre and radius of the circle through three points.',
+  desc: 'Solve an arc from any two of radius, included angle, chord, sagitta (height) and arc length (all ten pairs, with both arcs where two fit); segment and sector areas; centre and radius of the circle through three points.',
   render: el => renderArc(el),
-  working: 'Chord = 2R sin(θ/2); arc = Rθ (radians); sagitta = R(1 - cos(θ/2)); R from chord c and sagitta s = (c²/4 + s²) / 2s; segment area = R²/2 (θ - sin θ); sector = R²θ/2. Three points: centre where the perpendicular bisectors of two chords cross.',
-  source: 'Plane geometry (OpenStax Algebra and Trigonometry 2e; circle relations). Worked examples checked in core tests. See docs/geometry.md.',
+  working: 'Chord c = 2R sin(θ/2); arc L = Rθ (radians); sagitta s = R(1 - cos(θ/2)); R from c and s = (c²/4 + s²) / 2s; R from θ and c = c / (2 sin(θ/2)); from θ and s = s / (1 - cos(θ/2)); from θ and L = L / θ; segment area = R²/2 (θ - sin θ); sector = R²θ/2. Radius and chord fit the minor and the major arc. Chord and arc length: sin(u)/u = c/L with u = θ/2, which falls steadily from 1 to 0 on 0 < u ≤ π, so one arc, found by bisection. Sagitta and arc length: s/L = (1 - cos u)/(2u) rises to a peak of about 0.362 at u sin u = 1 - cos u (θ about 267°) and falls to 1/π at 360°, so it is solved by bisection on each side of the peak: one arc below 1/π, two between 1/π and the peak, none above. Three points: centre where the perpendicular bisectors of two chords cross.',
+  source: 'Plane geometry: OpenStax Algebra and Trigonometry 2e (circle and arc relations); Wikipedia "Circular segment" (chord, sagitta, arc length, segment area). Bracketed solves: own derivation, tested in the Rust core. See docs/geometry.md.',
 },
 {
   id: 'fillet', level: 'advanced', group: 'Geometry', title: 'Fillet and tangent points',
