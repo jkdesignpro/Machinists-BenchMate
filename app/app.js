@@ -258,6 +258,19 @@ function renderPage(main, page, tabId) {
   why.open = state.mode === 'expert'; if (state.mode === 'simple') why.hidden = true;
   let api = null;
   if (t.render) {
+    // Reference drawing for a tool that draws its own screen: a key to the names its tables use.
+    // Folded state is the user's choice (one setting for all tools); folded by default in Compact view.
+    const ref = typeof DIAGRAMS !== 'undefined' && DIAGRAMS[t.id];
+    let rh = ''; if (ref) { try { rh = ref({}, state.sys, []) || ''; } catch (e) { rh = ''; } }
+    if (rh) {
+      const d = document.createElement('details'); d.className = 'dref'; d.dataset.kept = '1';
+      const pref = lsGet('bm.dref');
+      d.open = pref ? pref === '1' : !document.body.classList.contains('compact');
+      d.innerHTML = '<summary>Drawing</summary><div class="tdia"></div>';
+      $('.tdia', d).innerHTML = rh;
+      $('summary', d).addEventListener('click', () => setTimeout(() => lsSet('bm.dref', d.open ? '1' : '0')));
+      body.appendChild(d);
+    }
     const card = document.createElement('div'); card.className = 'card wide'; card.innerHTML = '<div class="body"></div>'; body.appendChild(card);
     t.render($('.body', card));
   } else {
