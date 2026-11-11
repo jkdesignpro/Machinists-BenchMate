@@ -1,0 +1,2683 @@
+{
+ "note": "Material properties, evidence round 3. See docs/material-equivalents.md.",
+ "sources": {
+  "VDM_400": {
+   "title": "VDM Alloy 400 material data sheet No. 4110",
+   "url": "https://www.vdm-metals.com/fileadmin/user_upload/Downloads/Data_Sheets/Data_Sheet_VDM_Alloy_400.pdf",
+   "publisher": "VDM Metals",
+   "accessed": "2026-11-11",
+   "revision": "Material Data Sheet No. 4110, Revision 01, November 2020 (imprint 23.11.2020)",
+   "notes": "Thermal expansion blank at 20 °C (first value at 100 °C, basis not stated): not recorded. Stress-relieved ASTM row prints Rp0.2 275-415 and Rm 550-600 in a table labelled minimum values: not recorded until checked against the PDF. Hardness printed as HRB '≥ 170' / '≤ 150', impossible on HRB: not recorded."
+  },
+  "ZAPP_400": {
+   "title": "Zapp Alloy 400 data sheet",
+   "url": "https://www.zapp.com/fileadmin/_documents/Downloads/materials/high_performance_alloys/en/Alloy-400-Datasheet.pdf",
+   "publisher": "Zapp",
+   "accessed": "2026-11-11",
+   "revision": "Last revision: January 2022 (printed 'Janury')"
+  },
+  "VDM_K500": {
+   "title": "VDM Alloy K-500 material data sheet No. 4126",
+   "url": "https://www.vdm-metals.com/fileadmin/user_upload/Downloads/Data_Sheets/Data_Sheet_VDM_Alloy_K-500.pdf",
+   "publisher": "VDM Metals",
+   "accessed": "2026-11-11",
+   "revision": "Material Data Sheet No. 4126, Revision 01, 23 November 2020",
+   "notes": "No hardness printed. Thermal expansion blank at 20 °C: not recorded."
+  },
+  "ROLLED_K500": {
+   "title": "Rolled Alloys Alloy K-500 data sheet",
+   "url": "https://www.rolledalloys.ca/wp-content/uploads/K-500_Datasheet-rolled-alloys_US_EN.pdf",
+   "publisher": "Rolled Alloys",
+   "accessed": "2026-11-11",
+   "revision": "Bulletin No. 500USe 10/11 (© 2011)",
+   "notes": "Thermal conductivity row could not be aligned to its temperature column in the extraction: not recorded. ASTM B 865 bar minimums (110 / 80 ksi, 20 %, 310 HB max) printed without the condition they apply to: not recorded."
+  },
+  "ZAPP_600": {
+   "title": "Zapp Alloy 600 data sheet",
+   "url": "https://www.zapp.com/fileadmin/_documents/Downloads/materials/high_performance_alloys/en/Alloy-600-Datasheet.pdf",
+   "publisher": "Zapp",
+   "accessed": "2026-11-11",
+   "revision": "Last revision: January 2022"
+  },
+  "ROLLED_600": {
+   "title": "Rolled Alloys Alloy 600 data sheet",
+   "url": "https://www.rolledalloys.com/wp-content/uploads/2022/07/600_nickel-datasheet-rolled-alloys.pdf",
+   "publisher": "Rolled Alloys",
+   "accessed": "2026-11-11",
+   "revision": "Bulletin No. 1075USe 02/21 (© 2021)",
+   "notes": "'Representative tensile properties' printed without a condition or product form: not recorded. Expansion has no 70 °F value (first range 70-1000 °F): not recorded."
+  },
+  "VDM_C276": {
+   "title": "VDM Alloy C-276 material data sheet No. 4115",
+   "url": "https://www.vdm-metals.com/fileadmin/user_upload/Downloads/Data_Sheets/Data_Sheet_VDM_Alloy_C-276.pdf",
+   "publisher": "VDM Metals",
+   "accessed": "2026-11-11",
+   "revision": "Material Data Sheet No. 4115, Revision 02, March 2022",
+   "notes": "Thermal expansion printed at 20 °C without a mean/instantaneous basis: not recorded."
+  },
+  "ZAPP_C276": {
+   "title": "Zapp HASTELLOY C-276 alloy data sheet",
+   "url": "https://www.zapp.com/fileadmin/_documents/Downloads/materials/high_performance_alloys/en/HASTELLOY_C-276-alloy-Datasheet.pdf",
+   "publisher": "Zapp",
+   "accessed": "2026-11-11",
+   "revision": "Last revision: January 2022",
+   "notes": "A Zapp document (HASTELLOY named as Haynes International's trade mark); not a reproduction of a Haynes sheet."
+  },
+  "TIMET_50A": {
+   "title": "TIMET TIMETAL 50A (CP Grade 2) data sheet",
+   "url": "https://www.timet.com/documents/datasheets/cp-grades/timetal-50a.pdf",
+   "publisher": "TIMET",
+   "accessed": "2026-11-11",
+   "revision": "TMC-0159, © 2000 (no later revision printed)",
+   "notes": "'Typical mechanical properties' row sits under 'Anneal / Stress relieve' with no clear condition: not recorded. Thermal conductivity printed with no temperature."
+  },
+  "ALLEIMA_TI2": {
+   "title": "Alleima Ti Grade 2 datasheet (tube and pipe, seamless)",
+   "url": "https://alleima.com/contentassets/a495aa0b17a443d395a07671faa5fc30/datasheet-alleima-ti-grade-2-en-v2024-01-11-1032-version-1.pdf/download",
+   "publisher": "Alleima",
+   "accessed": "2026-11-11",
+   "revision": "Datasheet last updated 2024-01-11",
+   "notes": "The sheet's conductivity line also quotes TIMET (12.6 / 21.8); Alleima's own value (22) is recorded. Max row and typical row could not be aligned reliably: not recorded. No thermal expansion printed."
+  },
+  "KE_GJS": {
+   "title": "Kemptener Eisengießerei Adam Hönig AG material table EN-GJS (KE works standard based on EN 1563:2012-03)",
+   "url": "https://www.ke-ag.de/wp-content/uploads/2018/10/Kopie-von-Werkstofftabelle-GJS_ver2018-Tabelle1.pdf",
+   "publisher": "Kemptener Eisengießerei",
+   "accessed": "2026-11-11",
+   "revision": "file name 'ver2018'; EN 1563:2012-03 cited",
+   "notes": "Table does not say whether values are minimum or typical: mechanical values recorded as 'unstated'. Conductivity, expansion and specific heat could not be aligned to grades: not recorded. Applied to GGG 40 through the EN-GJS-400-15 column (Marks GmbH prints EN-GJS-400-15 (GGG40); KIPP prints EN-GJS-400 / GGG 40)."
+  },
+  "KIPP_GJS400": {
+   "title": "KIPP USA: cast iron with spheroidal graphite (ductile iron)",
+   "url": "https://www.kippusa.com/en-us/cast-iron-with-spheroidal-graphite-ductile-iron",
+   "publisher": "KIPP",
+   "accessed": "2026-11-11",
+   "revision": "no date printed (© KIPP 2026 footer)",
+   "notes": "Prints EN-GJS-400 / EN-JS1020 / GGG 40. Yield 240, tensile 400 and elongation 15 % are printed without a condition: not recorded."
+  },
+  "ENSINGER_POM": {
+   "title": "Ensinger product page: TECAFORM AH natural (POM-C)",
+   "url": "https://ensingerplastics.com/en-sg/shapes/tecaform-ah-natural",
+   "publisher": "Ensinger",
+   "accessed": "2026-11-11",
+   "revision": "no date printed on the page (linked data sheet file name ends '_13')",
+   "notes": "Tensile strength and tensile strength at yield both printed as 67 MPa."
+  },
+  "ENSINGER_PA6": {
+   "title": "Ensinger product page: TECAMID 6 natural (PA 6)",
+   "url": "https://ensingerplastics.com/en-sg/shapes/tecamid-6-natural",
+   "publisher": "Ensinger",
+   "accessed": "2026-11-11",
+   "revision": "no date printed on the page (linked data sheet file name ends '_13')",
+   "notes": "Page does not say whether PA 6 values are dry or conditioned."
+  },
+  "ENSINGER_PEEK": {
+   "title": "Ensinger product page: TECAPEEK natural (PEEK)",
+   "url": "https://www.ensingerplastics.com/en-sg/shapes/tecapeek-natural",
+   "publisher": "Ensinger",
+   "accessed": "2026-11-11",
+   "revision": "no date printed on the page (linked data sheet file name ends '_13')"
+  },
+  "ENSINGER_PTFE": {
+   "title": "Ensinger product page: TECAFLON PTFE natural",
+   "url": "https://www.ensingerplastics.com/en/shapes/tecaflon-ptfe-natural",
+   "publisher": "Ensinger",
+   "accessed": "2026-11-11",
+   "revision": "no date printed on the page",
+   "notes": "No tensile modulus printed."
+  },
+  "MCAM_POMC": {
+   "title": "Mitsubishi Chemical Group (MCAM) data sheet: Acetron GP FG / Ertacetal C FG POM-C",
+   "url": "https://www.mcam.com/mam/61336/GEP-Ertacetal™ C FG POM-C_en_US.pdf",
+   "publisher": "Mitsubishi Chemical Advanced Materials",
+   "accessed": "2026-11-11",
+   "revision": "Date of issue 28/09/2026"
+  },
+  "MCAM_PA6": {
+   "title": "Mitsubishi Chemical Group (MCAM) data sheet: Ertalon 6 SA PA6",
+   "url": "https://mcam.com/mam/51011/Bronymec-GEP-Ertalon® 6 SA PA6_en_US.pdf",
+   "publisher": "Mitsubishi Chemical Advanced Materials",
+   "accessed": "2026-11-11",
+   "revision": "Date of issue / revision 04/12/2024",
+   "notes": "'NYP: there is no yield point.' Shore D cell empty in the extraction."
+  },
+  "MCAM_PEEK": {
+   "title": "Mitsubishi Chemical Advanced Materials Ketron 1000 PEEK ASTM product data sheet (hosted by Polymershapes)",
+   "url": "https://www.polymershapes.com/wp-content/uploads/2020/04/Polymershapes_MitsubishiChemicalAdvancedMaterials_DataSheet-Ketron-1000-PEEK.pdf",
+   "publisher": "Mitsubishi Chemical Advanced Materials",
+   "accessed": "2026-11-11",
+   "revision": "no date printed (file path 2020/04)",
+   "notes": "MCAM's current German Ketron PEEK sheet (issue 20/06/2025, mcam.com/mam/59409) extracted with density 1.41, Rm 76 MPa, A 9 %, E 3,100 MPa, which do not look like unfilled PEEK; not recorded until checked against the PDF."
+  },
+  "LUCEFIN_25CRMO4": {
+   "title": "Lucefin Group data sheet 25CrMo4 (1.7218)",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/25CrMo4.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-11",
+   "revision": "rev. 2024; ISO 683-2:2018",
+   "notes": "Modulus, conductivity and expansion rows do not line up with their temperature headings in the extraction: not recorded. Annealed HBW rows ambiguous: not recorded."
+  },
+  "OVAKO_25CRMO4": {
+   "title": "Ovako Steel Navigator: 25CrMo4",
+   "url": "https://steelnavigator.ovako.com/steel-grades/25crmo4/",
+   "publisher": "Ovako",
+   "accessed": "2026-11-11",
+   "revision": "Last revised 17 Jan 2025",
+   "notes": "Mechanical rows are for Ovako variants 6014 / 6016 / MoC 210 M (round bar); Rp0.2 values marked '*' (ReH). The page names no standard for these rows."
+  },
+  "LUCEFIN_20NICRMO2": {
+   "title": "Lucefin Group data sheet 20NiCrMo2-2 (1.6523)",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/20NiCrMo2-2.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-11",
+   "revision": "rev. 2024; ISO 683-3:2018 (footer cites EN ISO 683-7:24)",
+   "notes": "Section hardness table headers not in the extraction: not recorded. Tempering-curve values (Ø10 mm, 860 °C oil) not recorded. Conductivity printed without a temperature."
+  },
+  "OVAKO_20NICRMO2": {
+   "title": "Ovako Steel Navigator: 20NiCrMo2-2",
+   "url": "https://steelnavigator.ovako.com/steel-grades/20nicrmo2-2/",
+   "publisher": "Ovako",
+   "accessed": "2026-11-11",
+   "revision": "Last revised 10 Sep 2026",
+   "notes": "Rp0.2 / Rm / A columns empty on the page."
+  },
+  "LUCEFIN_11SMNPB37": {
+   "title": "Lucefin Group data sheet 11SMnPb37 (1.0737)",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/11SMnPb37.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-11",
+   "revision": "rev. 2024; ISO 683-4:2018",
+   "notes": "Min/max labels for Rp0.2 and A were not captured in the extraction of this sheet: recorded as 'unstated' (the same table on Lucefin's 11SMn30 sheet labels them minimums). No physical properties printed."
+  },
+  "LUCEFIN_11SMN30": {
+   "title": "Lucefin Group data sheet 11SMn30 (1.0715)",
+   "url": "https://lucefin.com/eeloavys/2025/01/ENG-11SMn30.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-11",
+   "revision": "rev. 2024; ISO 683-4:2018",
+   "notes": "Designation row prints 230M07 and 1215 among others. No physical properties printed."
+  },
+  "ROLLED_155PH": {
+   "title": "Rolled Alloys 15-5 data sheet",
+   "url": "https://www.rolledalloys.com/wp-content/uploads/15-5_Data-Sheet-rolled-alloys.pdf",
+   "publisher": "Rolled Alloys",
+   "accessed": "2026-11-11",
+   "revision": "© 2025 Rolled Alloys 11/25",
+   "notes": "'* Minimum specified properties per ASTM A 564' (the asterisk is not clearly attached to cells). Conductivity printed at 212 °F only: not recorded."
+  },
+  "AIRCRAFT_AMS5659": {
+   "title": "Aircraft Materials: 15-5PH stainless steel (AMS 5659 / AMS 5862)",
+   "url": "https://www.aircraftmaterials.com/data/alstst/ams5659.html",
+   "publisher": "Aircraft Materials",
+   "accessed": "2026-11-11",
+   "revision": "© 2013 footer; no data date",
+   "notes": "Bar table hardness column is headed 'Rockwell C' but holds Brinell-range numbers (e.g. H900 388-444; Cond A '363 HB max'): not recorded. Table does not say min or typical."
+  }
+ },
+ "grades": [
+  {
+   "grade": "Monel 400",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "VDM_400",
+     "printed_as": "VDM Alloy 400 (2.4360, N04400)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8.82,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Density 8.82 g/cm3 (0.32 lb/in3) at 20 °C (68 °F)"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 182,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Table 3 | 20 | 68 | 452 | 0.108 | 23.0 | 160.0 | 51.3 | 182 | 26.4",
+       "note": "Column mapping by unit conversion check in the extraction."
+      },
+      {
+       "prop": "k",
+       "value": 23.0,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Table 3 | 20 | 68 | 452 | 0.108 | 23.0 | 160.0 | 51.3 | 182 | 26.4",
+       "note": "Column mapping by unit conversion check in the extraction."
+      },
+      {
+       "prop": "rp02",
+       "value": 195,
+       "unit": "MPa",
+       "cond": "Annealed (ASTM/ASME)",
+       "condition": "Sheet, plate, rod, bar; annealed; ASTM, ASME, QQ-N (sheet ≤ 50 mm, bar ≤ 200 mm)",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values | Product form | Condition | Standard | Rp0.2 MPa/ksi | Rm MPa/ksi | A % | Sheet, plate / rod, bar | annealed | ASTM, ASME, QQN | ≥ 195 / ≥ 28.3 | ≥ 480 / ≥ 69.6 | ≥ 35"
+      },
+      {
+       "prop": "rm",
+       "value": 480,
+       "unit": "MPa",
+       "cond": "Annealed (ASTM/ASME)",
+       "condition": "Sheet, plate, rod, bar; annealed; ASTM, ASME, QQ-N (sheet ≤ 50 mm, bar ≤ 200 mm)",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values | Product form | Condition | Standard | Rp0.2 MPa/ksi | Rm MPa/ksi | A % | Sheet, plate / rod, bar | annealed | ASTM, ASME, QQN | ≥ 195 / ≥ 28.3 | ≥ 480 / ≥ 69.6 | ≥ 35"
+      },
+      {
+       "prop": "elongation",
+       "value": 35,
+       "unit": "%",
+       "cond": "Annealed (ASTM/ASME)",
+       "condition": "Sheet, plate, rod, bar; annealed; ASTM, ASME, QQ-N; gauge not printed",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values | Product form | Condition | Standard | Rp0.2 MPa/ksi | Rm MPa/ksi | A % | ... | annealed | ASTM, ASME, QQN | ... | ≥ 35"
+      },
+      {
+       "prop": "rp02",
+       "value": 175,
+       "unit": "MPa",
+       "cond": "Annealed sheet (DIN / EN level)",
+       "condition": "Sheet, plate, rod, bar; annealed; DIN, VdTÜV (sheet ≤ 50 mm, bar ≤ 200 mm)",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values | Product form | Condition | Standard | Rp0.2 MPa/ksi | Rm MPa/ksi | A % | Sheet, plate / rod, bar | annealed | DIN, VdTÜV | ≥ 175 / ≥ 25.4 | ≥ 450 / ≥ 65.3 | ≥ 30"
+      },
+      {
+       "prop": "rm",
+       "value": 450,
+       "unit": "MPa",
+       "cond": "Annealed sheet (DIN / EN level)",
+       "condition": "Sheet, plate, rod, bar; annealed; DIN, VdTÜV (sheet ≤ 50 mm, bar ≤ 200 mm)",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values | Product form | Condition | Standard | Rp0.2 MPa/ksi | Rm MPa/ksi | A % | Sheet, plate / rod, bar | annealed | DIN, VdTÜV | ≥ 175 / ≥ 25.4 | ≥ 450 / ≥ 65.3 | ≥ 30"
+      },
+      {
+       "prop": "elongation",
+       "value": 30,
+       "unit": "%",
+       "cond": "Annealed sheet (DIN / EN level)",
+       "condition": "Sheet, plate, rod, bar; annealed; DIN, VdTÜV; gauge not printed",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values | Product form | Condition | Standard | Rp0.2 MPa/ksi | Rm MPa/ksi | A % | ... | annealed | DIN, VdTÜV | ... | ≥ 30"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "ZAPP_400",
+     "printed_as": "Alloy 400 (2.4360)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8830,
+       "unit": "kg/m3",
+       "cond": "RT",
+       "condition": "Room temperature",
+       "basis": "typical",
+       "verbatim": "Density* 8830 [kg · m-3] (* at room temperature)"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 188,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Room temperature, 'approximately'",
+       "basis": "typical",
+       "verbatim": "Modulus of elasticity* (approximately) 188 [GPa]"
+      },
+      {
+       "prop": "k",
+       "value": 21.5,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "Room temperature",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity* 21.5 [W · m-1· K-1]"
+      },
+      {
+       "prop": "cte",
+       "value": 13.0,
+       "unit": "x10^-6 /K",
+       "cond": "20-95C",
+       "condition": "20-95 °C",
+       "basis": "typical",
+       "verbatim": "Coefficient of thermal expansion 20 - 95°C 13.0 x 10-6 [K-1]"
+      },
+      {
+       "prop": "rp02",
+       "value": 175,
+       "unit": "MPa",
+       "cond": "Annealed sheet (DIN / EN level)",
+       "condition": "Sheet, soft annealed; size and standard not printed",
+       "basis": "min",
+       "verbatim": "Semi-finished product: sheet | soft annealed | stress-relief annealed ; Rp 0.2 min [MPa] 175 400 ; Rm [MPa] 450-600 580-780 ; Amin [%] 30 18",
+       "note": "Column order inferred from the extraction (first column soft annealed)."
+      },
+      {
+       "prop": "rm",
+       "value": 450,
+       "max": 600,
+       "unit": "MPa",
+       "cond": "Annealed sheet (DIN / EN level)",
+       "condition": "Sheet, soft annealed; size and standard not printed",
+       "basis": "range",
+       "verbatim": "Semi-finished product: sheet | soft annealed | stress-relief annealed ; Rp 0.2 min [MPa] 175 400 ; Rm [MPa] 450-600 580-780 ; Amin [%] 30 18",
+       "note": "Column order inferred from the extraction."
+      },
+      {
+       "prop": "elongation",
+       "value": 30,
+       "unit": "%",
+       "cond": "Annealed sheet (DIN / EN level)",
+       "condition": "Sheet, soft annealed; size and standard not printed; gauge not printed",
+       "basis": "min",
+       "verbatim": "Semi-finished product: sheet | soft annealed | stress-relief annealed ; Rp 0.2 min [MPa] 175 400 ; Rm [MPa] 450-600 580-780 ; Amin [%] 30 18",
+       "note": "Column order inferred from the extraction."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Monel K-500",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "VDM_K500",
+     "printed_as": "VDM Alloy K-500 (2.4375, N05500)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8.5,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Density 8.5 g/cm3 (0.31 lb/in3) at 20 °C (68 °F)"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 179,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Table 3 typical | 20 68 420 0.100 17.4 120.7 61 179 26.0"
+      },
+      {
+       "prop": "k",
+       "value": 17.4,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Table 3 typical | 20 68 420 0.100 17.4 120.7 61 179 26.0"
+      },
+      {
+       "prop": "rp02",
+       "value": 655,
+       "unit": "MPa",
+       "cond": "Aged bar 75-100 mm QQ-N-286",
+       "condition": "Rod, bar 75-100 mm; solution annealed and age hardened; QQ-N-286",
+       "basis": "min",
+       "verbatim": "Table 5 min. values according to QQ-N-286 | Product form | Dimensions mm (in) | Rp0.2 MPa/ksi | Rm MPa/ksi | A % ; Rod, bar 75-100 2.95-3.94 ≥ 655 ≥ 95.0 ≥ 930 ≥ 134.9 ≥ 20"
+      },
+      {
+       "prop": "rm",
+       "value": 930,
+       "unit": "MPa",
+       "cond": "Aged bar 75-100 mm QQ-N-286",
+       "condition": "Rod, bar 75-100 mm; solution annealed and age hardened; QQ-N-286",
+       "basis": "min",
+       "verbatim": "Table 5 min. values according to QQ-N-286 | Product form | Dimensions mm (in) | Rp0.2 MPa/ksi | Rm MPa/ksi | A % ; Rod, bar 75-100 2.95-3.94 ≥ 655 ≥ 95.0 ≥ 930 ≥ 134.9 ≥ 20"
+      },
+      {
+       "prop": "elongation",
+       "value": 20,
+       "unit": "%",
+       "cond": "Aged bar 75-100 mm QQ-N-286",
+       "condition": "Rod, bar 75-100 mm; solution annealed and age hardened; QQ-N-286; gauge not printed",
+       "basis": "min",
+       "verbatim": "Table 5 min. values according to QQ-N-286 | Product form | Dimensions mm (in) | Rp0.2 MPa/ksi | Rm MPa/ksi | A % ; Rod, bar 75-100 2.95-3.94 ≥ 655 ≥ 95.0 ≥ 930 ≥ 134.9 ≥ 20"
+      },
+      {
+       "prop": "rp02",
+       "value": 690,
+       "unit": "MPa",
+       "cond": "Aged, typical 20 °C (VDM)",
+       "condition": "Solution annealed and age hardened, product form not stated, 20 °C",
+       "basis": "typical",
+       "verbatim": "Table 4 typical short-term properties, solution-annealed and age-hardened, room temperature | 20 68 690 100.1 1,100 159.5 24"
+      },
+      {
+       "prop": "rm",
+       "value": 1100,
+       "unit": "MPa",
+       "cond": "Aged, typical 20 °C (VDM)",
+       "condition": "Solution annealed and age hardened, product form not stated, 20 °C",
+       "basis": "typical",
+       "verbatim": "Table 4 typical short-term properties, solution-annealed and age-hardened, room temperature | 20 68 690 100.1 1,100 159.5 24"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "ROLLED_K500",
+     "printed_as": "Alloy K-500",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 0.306,
+       "unit": "lb/in3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density: 0.306 lb/in3"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Inconel 600",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "ZAPP_600",
+     "printed_as": "Alloy 600 (2.4816)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8450,
+       "unit": "kg/m3",
+       "cond": "RT",
+       "condition": "Room temperature",
+       "basis": "typical",
+       "verbatim": "Density* 8450 [kg · m-3] (* at room temperature)"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 206,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Room temperature, 'approximately'",
+       "basis": "typical",
+       "verbatim": "Modulus of elasticity* (approximately) 206 [GPa]"
+      },
+      {
+       "prop": "k",
+       "value": 14.8,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "Room temperature",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity* 14.8 [W · m-1· K-1]"
+      },
+      {
+       "prop": "cte",
+       "value": 13.3,
+       "unit": "x10^-6 /K",
+       "cond": "20-100C",
+       "condition": "Mean, 20-100 °C",
+       "basis": "typical",
+       "verbatim": "Coefficient of thermal expansion 20 - 100°C 13.3 x 10-6 [K-1]"
+      },
+      {
+       "prop": "rp02",
+       "value": 200,
+       "unit": "MPa",
+       "cond": "Annealed (Zapp)",
+       "condition": "Annealed delivery condition; product form and size not printed",
+       "basis": "min",
+       "verbatim": "Delivery condition | Rp 0.2 min [MPa] | Rm [MPa] | A min [%] ; Annealed 200 550 - 750 30 ; Solution annealed 180 500 - 700 35"
+      },
+      {
+       "prop": "rm",
+       "value": 550,
+       "max": 750,
+       "unit": "MPa",
+       "cond": "Annealed (Zapp)",
+       "condition": "Annealed delivery condition; product form and size not printed",
+       "basis": "range",
+       "verbatim": "Delivery condition | Rp 0.2 min [MPa] | Rm [MPa] | A min [%] ; Annealed 200 550 - 750 30 ; Solution annealed 180 500 - 700 35"
+      },
+      {
+       "prop": "elongation",
+       "value": 30,
+       "unit": "%",
+       "cond": "Annealed (Zapp)",
+       "condition": "Annealed delivery condition; gauge not printed",
+       "basis": "min",
+       "verbatim": "Delivery condition | Rp 0.2 min [MPa] | Rm [MPa] | A min [%] ; Annealed 200 550 - 750 30 ; Solution annealed 180 500 - 700 35"
+      },
+      {
+       "prop": "rp02",
+       "value": 180,
+       "unit": "MPa",
+       "cond": "Solution annealed (Zapp)",
+       "condition": "Solution annealed delivery condition; product form and size not printed",
+       "basis": "min",
+       "verbatim": "Delivery condition | Rp 0.2 min [MPa] | Rm [MPa] | A min [%] ; Annealed 200 550 - 750 30 ; Solution annealed 180 500 - 700 35"
+      },
+      {
+       "prop": "rm",
+       "value": 500,
+       "max": 700,
+       "unit": "MPa",
+       "cond": "Solution annealed (Zapp)",
+       "condition": "Solution annealed delivery condition; product form and size not printed",
+       "basis": "range",
+       "verbatim": "Delivery condition | Rp 0.2 min [MPa] | Rm [MPa] | A min [%] ; Annealed 200 550 - 750 30 ; Solution annealed 180 500 - 700 35"
+      },
+      {
+       "prop": "elongation",
+       "value": 35,
+       "unit": "%",
+       "cond": "Solution annealed (Zapp)",
+       "condition": "Solution annealed delivery condition; gauge not printed",
+       "basis": "min",
+       "verbatim": "Delivery condition | Rp 0.2 min [MPa] | Rm [MPa] | A min [%] ; Annealed 200 550 - 750 30 ; Solution annealed 180 500 - 700 35"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "ROLLED_600",
+     "printed_as": "Alloy 600",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 0.304,
+       "unit": "lb/in3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density: 0.304 lb/in3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 30.0,
+       "unit": "Msi",
+       "cond": "RT",
+       "condition": "70 °F, dynamic modulus",
+       "basis": "typical",
+       "verbatim": "Modulus of Elasticity, Dynamic psi x 10^6 | 70 °F 30.0"
+      },
+      {
+       "prop": "k",
+       "value": 8.6,
+       "unit": "BTU/h.ft.F",
+       "cond": "RT",
+       "condition": "70 °F",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity Btu•ft/ft2•hr•°F | 70 °F 8.6",
+       "note": "Unit printed Btu·ft/ft²·h·°F, which equals Btu/(h·ft·°F)."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Hastelloy C-276",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "VDM_C276",
+     "printed_as": "VDM Alloy C-276 (2.4819, N10276)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8.9,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Density 8.9 g/cm3 (0.32 lb/in3) at 20 °C (68 °F)"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 208,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Table 3 typical | 20 68 426 0.102 10.2 70.8 125 208 30.2 12.1 6.72"
+      },
+      {
+       "prop": "k",
+       "value": 10.2,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "20 °C",
+       "basis": "typical",
+       "verbatim": "Table 3 typical | 20 68 426 0.102 10.2 70.8 125 208 30.2 12.1 6.72"
+      },
+      {
+       "prop": "rp02",
+       "value": 310,
+       "unit": "MPa",
+       "cond": "Sheet <=5 mm",
+       "condition": "Sheet ≤ 5 mm; solution annealed; VdTÜV Material Sheet 400",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values, VdTÜV Material Sheet 400, solution annealed | Product form | Dimensions mm | Rp0.2 | Rm | A % | HB | Sheet ≤ 5 | ≥ 310 / ≥ 45.0 | ≥ 730 / ≥ 105.9 | ≥ 30 | ≤ 240"
+      },
+      {
+       "prop": "rm",
+       "value": 730,
+       "unit": "MPa",
+       "cond": "Sheet <=5 mm",
+       "condition": "Sheet ≤ 5 mm; solution annealed; VdTÜV Material Sheet 400",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values, VdTÜV Material Sheet 400, solution annealed | Product form | Dimensions mm | Rp0.2 | Rm | A % | HB | Sheet ≤ 5 | ≥ 310 / ≥ 45.0 | ≥ 730 / ≥ 105.9 | ≥ 30 | ≤ 240"
+      },
+      {
+       "prop": "elongation",
+       "value": 30,
+       "unit": "%",
+       "cond": "Sheet <=5 mm",
+       "condition": "Sheet ≤ 5 mm; solution annealed; VdTÜV Material Sheet 400; gauge not printed",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values, VdTÜV Material Sheet 400, solution annealed | Product form | Dimensions mm | Rp0.2 | Rm | A % | HB | Sheet ≤ 5 | ... | ≥ 30 | ≤ 240"
+      },
+      {
+       "prop": "hardness",
+       "value": 240,
+       "unit": "HB",
+       "cond": "Sheet <=5 mm",
+       "condition": "Sheet ≤ 5 mm; solution annealed; VdTÜV Material Sheet 400",
+       "basis": "max",
+       "verbatim": "Table 5 minimum values, VdTÜV Material Sheet 400, solution annealed | Product form | Dimensions mm | Rp0.2 | Rm | A % | HB | Sheet ≤ 5 | ... | ≤ 240"
+      },
+      {
+       "prop": "rp02",
+       "value": 280,
+       "unit": "MPa",
+       "cond": "Bar <=100 mm (VdTÜV 400)",
+       "condition": "Rod, bar ≤ 100 mm; solution annealed; VdTÜV Material Sheet 400",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values, VdTÜV Material Sheet 400, solution annealed | Product form | Dimensions mm | Rp0.2 | Rm | A % | HB | Rod, bar ≤ 100 | ≥ 280 / ≥ 40.6 | ≥ 730 / ≥ 105.9 | ≥ 30 | ≤ 240"
+      },
+      {
+       "prop": "rm",
+       "value": 730,
+       "unit": "MPa",
+       "cond": "Bar <=100 mm (VdTÜV 400)",
+       "condition": "Rod, bar ≤ 100 mm; solution annealed; VdTÜV Material Sheet 400",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values, VdTÜV Material Sheet 400, solution annealed | Product form | Dimensions mm | Rp0.2 | Rm | A % | HB | Rod, bar ≤ 100 | ≥ 280 / ≥ 40.6 | ≥ 730 / ≥ 105.9 | ≥ 30 | ≤ 240"
+      },
+      {
+       "prop": "elongation",
+       "value": 30,
+       "unit": "%",
+       "cond": "Bar <=100 mm (VdTÜV 400)",
+       "condition": "Rod, bar ≤ 100 mm; solution annealed; VdTÜV Material Sheet 400; gauge not printed",
+       "basis": "min",
+       "verbatim": "Table 5 minimum values, VdTÜV Material Sheet 400, solution annealed | Product form | Dimensions mm | Rp0.2 | Rm | A % | HB | Rod, bar ≤ 100 | ... | ≥ 30 | ≤ 240"
+      },
+      {
+       "prop": "hardness",
+       "value": 240,
+       "unit": "HB",
+       "cond": "Bar <=100 mm (VdTÜV 400)",
+       "condition": "Rod, bar ≤ 100 mm; solution annealed; VdTÜV Material Sheet 400",
+       "basis": "max",
+       "verbatim": "Table 5 minimum values, VdTÜV Material Sheet 400, solution annealed | Product form | Dimensions mm | Rp0.2 | Rm | A % | HB | Rod, bar ≤ 100 | ... | ≤ 240"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "ZAPP_C276",
+     "printed_as": "HASTELLOY C-276 (2.4819)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8890,
+       "unit": "kg/m3",
+       "cond": "RT",
+       "condition": "Room temperature",
+       "basis": "typical",
+       "verbatim": "Density* 8,890 [kg · m-3] (* at room temperature)"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 205,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Room temperature, 'approximately'",
+       "basis": "typical",
+       "verbatim": "Modulus of elasticity* (approximately) 205 [GPa]"
+      },
+      {
+       "prop": "k",
+       "value": 9.2,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "Room temperature",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity* 9.2 [W · m-1· K-1]"
+      },
+      {
+       "prop": "cte",
+       "value": 11.2,
+       "unit": "x10^-6 /K",
+       "cond": "20-100C",
+       "condition": "Mean, 20-100 °C",
+       "basis": "typical",
+       "verbatim": "Coefficient of thermal expansion 20-100°C 11.2 x 10-6 [K-1]"
+      },
+      {
+       "prop": "rp02",
+       "value": 310,
+       "unit": "MPa",
+       "cond": "Sheet <=5 mm",
+       "condition": "Sheet ≤ 5 mm; condition not printed in the table (delivery forms listed as solution annealed)",
+       "basis": "min",
+       "verbatim": "Sheet ≤ 5 mm thickness | Forging/bar ≤ 90 mm ∅, sheet > 5 to ≤ 20 mm ; Rp 0.2 min [MPa] 310 280 ; Rm [MPa] 750 – 1,000 700 – 950 ; A min [%] 30 25"
+      },
+      {
+       "prop": "rm",
+       "value": 750,
+       "max": 1000,
+       "unit": "MPa",
+       "cond": "Sheet <=5 mm",
+       "condition": "Sheet ≤ 5 mm; condition not printed in the table (delivery forms listed as solution annealed)",
+       "basis": "range",
+       "verbatim": "Sheet ≤ 5 mm thickness | Forging/bar ≤ 90 mm ∅, sheet > 5 to ≤ 20 mm ; Rp 0.2 min [MPa] 310 280 ; Rm [MPa] 750 – 1,000 700 – 950 ; A min [%] 30 25"
+      },
+      {
+       "prop": "elongation",
+       "value": 30,
+       "unit": "%",
+       "cond": "Sheet <=5 mm",
+       "condition": "Sheet ≤ 5 mm; condition not printed in the table (delivery forms listed as solution annealed); gauge not printed",
+       "basis": "min",
+       "verbatim": "Sheet ≤ 5 mm thickness | Forging/bar ≤ 90 mm ∅, sheet > 5 to ≤ 20 mm ; Rp 0.2 min [MPa] 310 280 ; Rm [MPa] 750 – 1,000 700 – 950 ; A min [%] 30 25"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Ti CP Grade 2 (Ti 99.7)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "TIMET_50A",
+     "printed_as": "TIMETAL 50A (ASTM Grade 2)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 4.51,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 0.163 lb in-3 4.51 g cm-3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 105,
+       "max": 120,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Room temperature, about 20-25 °C",
+       "basis": "range",
+       "verbatim": "Elastic Modulus* 15.2-17.4 Msi 105-120 GPa (*Typical values at room temperature of about 68-78°F (20-25°C))"
+      },
+      {
+       "prop": "k",
+       "value": 21.79,
+       "unit": "W/m.K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 12.60 Btu hr-1 ft-1 °F-1 21.79 W m-1K-1"
+      },
+      {
+       "prop": "cte",
+       "value": 8.6,
+       "unit": "x10^-6 /K",
+       "cond": "20-100C",
+       "condition": "Mean, 20-100 °C",
+       "basis": "typical",
+       "verbatim": "Mean CTE 68-212°F (20-100°C) 4.8 x 10-6 in in-1 °F-1 8.6 x 10-6 m m-1 °C-1"
+      },
+      {
+       "prop": "cte",
+       "value": 9.5,
+       "unit": "x10^-6 /K",
+       "cond": "20-300C",
+       "condition": "Mean, 20-300 °C",
+       "basis": "typical",
+       "verbatim": "Mean CTE 68-572°F (20-300°C) 5.3 x 10-6 in in-1 °F-1 9.5 x 10-6 m m-1 °C-1"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "ALLEIMA_TI2",
+     "printed_as": "Alleima Ti Grade 2",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 4.51,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 0.162 lbs/in3, 4.51 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 103,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Modulus of elasticity, Tension (E) 15.0 x 10^6 psi 103 GPa"
+      },
+      {
+       "prop": "k",
+       "value": 22,
+       "unit": "W/m.C",
+       "cond": "RT",
+       "condition": "Room temperature",
+       "basis": "typical",
+       "verbatim": "22 W/m'C (12.7 BTU) för RT (Timet: 12,6 resp. 21,8. BPVC: 22-19.9 RT-200'C.)"
+      },
+      {
+       "prop": "rm",
+       "value": 345,
+       "unit": "MPa",
+       "cond": "ASTM B338 tube",
+       "condition": "Seamless tube, ASTM B338 grade 2 (cold reduced, or cold reduced and annealed)",
+       "basis": "min",
+       "verbatim": "Tensile properties for Grade 2 titanium, as specified by ASTM B338 | Ultimate strength ksi MPa | Yield strength ksi MPa | Elongation 2\" % ; Min 50 345 40 275 20"
+      },
+      {
+       "prop": "rp02",
+       "value": 275,
+       "unit": "MPa",
+       "cond": "ASTM B338 tube",
+       "condition": "Seamless tube, ASTM B338 grade 2 (cold reduced, or cold reduced and annealed)",
+       "basis": "min",
+       "verbatim": "Tensile properties for Grade 2 titanium, as specified by ASTM B338 | Ultimate strength ksi MPa | Yield strength ksi MPa | Elongation 2\" % ; Min 50 345 40 275 20"
+      },
+      {
+       "prop": "elongation",
+       "value": 20,
+       "unit": "%",
+       "cond": "ASTM B338 tube, A 2 in",
+       "condition": "Seamless tube, ASTM B338 grade 2 (cold reduced, or cold reduced and annealed), 2 in gauge",
+       "basis": "min",
+       "verbatim": "Tensile properties for Grade 2 titanium, as specified by ASTM B338 | Ultimate strength ksi MPa | Yield strength ksi MPa | Elongation 2\" % ; Min 50 345 40 275 20"
+      },
+      {
+       "prop": "hardness",
+       "value": 92,
+       "unit": "HRB",
+       "cond": "ASTM B338 tube",
+       "condition": "Seamless tube, ASTM B338 grade 2 (cold reduced, or cold reduced and annealed)",
+       "basis": "max",
+       "verbatim": "Hardness 92 HRB max"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Ductile iron GGG 40",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KE_GJS",
+     "printed_as": "EN-GJS-400-15",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 7.1,
+       "unit": "kg/dm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; Density kg/dm³ | 7.1 | 7.1 | 7.1 | 7.1 | 7.1 | 7.2 | 7.0"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 169,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; E-modulus GN/m² | 169 | 169 | 169 | 169 | 169 | 174 | 170",
+       "note": "Printed in GN/m² (= GPa)."
+      },
+      {
+       "prop": "rm",
+       "value": 400,
+       "unit": "MPa",
+       "cond": "t<=30 mm",
+       "condition": "EN-GJS-400-15, separately cast or cast-on test pieces, wall thickness t ≤ 30 mm",
+       "basis": "unstated",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; Rm (1) N/mm² | 350 | 400 | 400 | 400 | 500 | 600 | 600"
+      },
+      {
+       "prop": "rp02",
+       "value": 250,
+       "unit": "MPa",
+       "cond": "t<=30 mm",
+       "condition": "EN-GJS-400-15, separately cast or cast-on test pieces, wall thickness t ≤ 30 mm",
+       "basis": "unstated",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; Rp0.2 (1) N/mm² | 220 | 240 | 250 | 250 | 320 | 370 | 470"
+      },
+      {
+       "prop": "elongation",
+       "value": 15,
+       "unit": "%",
+       "cond": "t<=30 mm, A5",
+       "condition": "EN-GJS-400-15, separately cast or cast-on test pieces, wall thickness t ≤ 30 mm, A5",
+       "basis": "unstated",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; A5 (1) % | 22 | 18 | 18 | 15 | 7 | 3 | 10"
+      },
+      {
+       "prop": "rm",
+       "value": 390,
+       "unit": "MPa",
+       "cond": "30<t<=60 mm cast-on",
+       "condition": "EN-GJS-400-15, cast-on test pieces, wall thickness 30 < t ≤ 60 mm",
+       "basis": "unstated",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; Rm (2) N/mm² | 330 | 390 | 390 | 390 | 450 | 600 | 580"
+      },
+      {
+       "prop": "rp02",
+       "value": 250,
+       "unit": "MPa",
+       "cond": "30<t<=60 mm cast-on",
+       "condition": "EN-GJS-400-15, cast-on test pieces, wall thickness 30 < t ≤ 60 mm",
+       "basis": "unstated",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; Rp0.2 (2) N/mm² | 210 | 230 | 250 | 250 | 300 | 360 | 450"
+      },
+      {
+       "prop": "elongation",
+       "value": 14,
+       "unit": "%",
+       "cond": "30<t<=60 mm cast-on, A5",
+       "condition": "EN-GJS-400-15, cast-on test pieces, wall thickness 30 < t ≤ 60 mm, A5",
+       "basis": "unstated",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; A5 (2) % | 18 | 15 | 15 | 14 | 7 | 2 | 8"
+      },
+      {
+       "prop": "hardness",
+       "value": 130,
+       "max": 190,
+       "unit": "HB",
+       "cond": "EN-GJS-400-15",
+       "condition": "EN-GJS-400-15, wall thickness not printed",
+       "basis": "range",
+       "verbatim": "EN-GJS- | 350-22-LT | 400-18-LT | 400-18 | 400-15 | 500-7 | 600-3 | 600-10 ; HB | <170 | 120-175 | 130-190 | 130-190 | 170-230 | 190-270 | 200-230"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "KIPP_GJS400",
+     "printed_as": "EN-GJS-400 (GGG 40)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 7.1,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 7.10 g/cm³"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 169,
+       "unit": "kN/mm2",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic modulus E 169 kN/mm²"
+      },
+      {
+       "prop": "hardness",
+       "value": 135,
+       "max": 180,
+       "unit": "HB",
+       "cond": "Sample <30 mm (KIPP)",
+       "condition": "Sample < 30 mm, HB30",
+       "basis": "range",
+       "verbatim": "Brinell hardness 135-180 HB (HB30, Sample <30 mm)"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Acetal (POM)",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "ENSINGER_POM",
+     "printed_as": "TECAFORM AH natural (POM-C)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.41,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 1.41 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 2800,
+       "unit": "MPa",
+       "cond": "RT",
+       "condition": "Tensile test, DIN EN ISO 527-2, 1 mm/min; dry/conditioned not stated",
+       "basis": "typical",
+       "verbatim": "Modulus of elasticity (tensile test) 2800 MPa DIN EN ISO 527-2 1mm/min"
+      },
+      {
+       "prop": "rm",
+       "value": 67,
+       "unit": "MPa",
+       "cond": "ISO 527-2",
+       "condition": "Tensile test DIN EN ISO 527-2, 50 mm/min; temperature and moisture state not printed",
+       "basis": "typical",
+       "verbatim": "Tensile strength 67 MPa DIN EN ISO 527-2 50mm/min"
+      },
+      {
+       "prop": "elongation",
+       "value": 32,
+       "unit": "%",
+       "cond": "ISO 527-2, at break",
+       "condition": "Elongation at break, DIN EN ISO 527-2, 50 mm/min",
+       "basis": "typical",
+       "verbatim": "Elongation at break (tensile test) 32 % DIN EN ISO 527-2 50mm/min"
+      },
+      {
+       "prop": "hardness",
+       "value": 82,
+       "unit": "Shore D",
+       "cond": "Shore D, ISO 868",
+       "condition": "Shore hardness, DIN EN ISO 868, scale D",
+       "basis": "typical",
+       "verbatim": "Shore hardness 82 DIN EN ISO 868 Scale D"
+      },
+      {
+       "prop": "k",
+       "value": 0.39,
+       "unit": "W/K.m",
+       "cond": "temperature not stated",
+       "condition": "ISO 22007-4:2008, temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity 0.39 W/(k*m) ISO 22007-4:2008",
+       "note": "Unit printed 'W/(k*m)'."
+      },
+      {
+       "prop": "cte",
+       "value": 13,
+       "unit": "x10^-5 /K",
+       "cond": "23-60C",
+       "condition": "Mean, 23-60 °C, longitudinal (DIN EN ISO 11359-1;2)",
+       "basis": "typical",
+       "verbatim": "Thermal expansion (CLTE) 13 10-5*1/K DIN EN ISO 11359-1;2 23-60°C, longitudinal"
+      },
+      {
+       "prop": "cte",
+       "value": 14,
+       "unit": "x10^-5 /K",
+       "cond": "23-100C",
+       "condition": "Mean, 23-100 °C, longitudinal (DIN EN ISO 11359-1;2)",
+       "basis": "typical",
+       "verbatim": "Thermal expansion (CLTE) 14 10-5*1/K DIN EN ISO 11359-1;2 23-100°C, longitudinal"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "MCAM_POMC",
+     "printed_as": "Acetron GP FG / Ertacetal C FG (POM-C)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.41,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "ISO 1183-1",
+       "basis": "typical",
+       "verbatim": "Density ISO 1183-1 g/cm³ 1.41"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 3000,
+       "unit": "MPa",
+       "cond": "RT",
+       "condition": "Tensile modulus ISO 527-1/-2, 1 mm/min, dry, 23 °C",
+       "basis": "typical",
+       "verbatim": "Tensile modulus of elasticity ISO 527-1/-2 (9) MPa 3,000 ASTM D638 (8) KSI 400"
+      },
+      {
+       "prop": "rm",
+       "value": 66,
+       "unit": "MPa",
+       "cond": "ISO 527-2",
+       "condition": "ISO 527-1/-2, dry specimens, 23 °C (sheet: average values, not for specification)",
+       "basis": "typical",
+       "verbatim": "Tensile strength ISO 527-1/-2 (7) MPa 66 ASTM D638 (8) PSI 9,500"
+      },
+      {
+       "prop": "elongation",
+       "value": 40,
+       "unit": "%",
+       "cond": "ISO 527-2, at break",
+       "condition": "Tensile strain at break, ISO 527-1/-2, dry specimens, 23 °C (sheet: average values, not for specification)",
+       "basis": "typical",
+       "verbatim": "Tensile strain (elongation) at break ISO 527-1/-2 (7) % 40 ASTM D638 (8) % 30"
+      },
+      {
+       "prop": "hardness",
+       "value": 79,
+       "unit": "Shore D",
+       "cond": "Shore D, ISO 868",
+       "condition": "Shore D, ISO 868, 23 °C",
+       "basis": "typical",
+       "verbatim": "Shore Hardness D (14) ISO 868 79 ASTM D2240 85"
+      },
+      {
+       "prop": "hardness",
+       "value": 85,
+       "unit": "Shore D",
+       "cond": "Shore D, ASTM D2240",
+       "condition": "Shore D, ASTM D2240, 23 °C",
+       "basis": "typical",
+       "verbatim": "Shore Hardness D (14) ISO 868 79 ASTM D2240 85"
+      },
+      {
+       "prop": "hardness",
+       "value": 84,
+       "unit": "HRM",
+       "cond": "Rockwell M, ISO 2039-2",
+       "condition": "Rockwell M, ISO 2039-2, 23 °C",
+       "basis": "typical",
+       "verbatim": "Rockwell M hardness (14) ISO 2039-2 84 ASTM D785 88"
+      },
+      {
+       "prop": "k",
+       "value": 0.31,
+       "unit": "W/K.m",
+       "cond": "RT",
+       "condition": "23 °C",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity at 23°C (73°F) W/(K.m) 0.31 BTU in./(hr.ft².°F) 1.6"
+      },
+      {
+       "prop": "cte",
+       "value": 110,
+       "unit": "µm/m.K",
+       "cond": "23-60C",
+       "condition": "Mean, 23-60 °C",
+       "basis": "typical",
+       "verbatim": "Coefficient of linear thermal expansion (23 to 60°C) µm/(m.K) 110"
+      },
+      {
+       "prop": "cte",
+       "value": 125,
+       "unit": "µm/m.K",
+       "cond": "23-100C",
+       "condition": "Mean, 23-100 °C",
+       "basis": "typical",
+       "verbatim": "Coefficient of linear thermal expansion (23 to 100°C) µm/(m.K) 125"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Nylon (PA)",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "ENSINGER_PA6",
+     "printed_as": "TECAMID 6 natural (PA 6)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.14,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 1.14 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 3300,
+       "unit": "MPa",
+       "cond": "RT",
+       "condition": "Tensile test, DIN EN ISO 527-2, 1 mm/min; dry/conditioned not stated",
+       "basis": "typical",
+       "verbatim": "Modulus of elasticity (tensile test) 3300 MPa DIN EN ISO 527-2 1mm/min"
+      },
+      {
+       "prop": "rm",
+       "value": 79,
+       "unit": "MPa",
+       "cond": "ISO 527-2",
+       "condition": "Tensile test DIN EN ISO 527-2, 50 mm/min; temperature and moisture state not printed",
+       "basis": "typical",
+       "verbatim": "Tensile strength 79 MPa DIN EN ISO 527-2 50mm/min"
+      },
+      {
+       "prop": "elongation",
+       "value": 130,
+       "unit": "%",
+       "cond": "ISO 527-2, at break",
+       "condition": "Elongation at break, DIN EN ISO 527-2, 50 mm/min",
+       "basis": "typical",
+       "verbatim": "Elongation at break (tensile test) 130 % DIN EN ISO 527-2 50mm/min"
+      },
+      {
+       "prop": "hardness",
+       "value": 79,
+       "unit": "Shore D",
+       "cond": "Shore D, ISO 868",
+       "condition": "Shore hardness, DIN EN ISO 868, scale D",
+       "basis": "typical",
+       "verbatim": "Shore hardness 79 DIN EN ISO 868 Scale D"
+      },
+      {
+       "prop": "k",
+       "value": 0.37,
+       "unit": "W/K.m",
+       "cond": "temperature not stated",
+       "condition": "ISO 22007-4:2008, temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity 0.37 W/(k*m) ISO 22007-4:2008",
+       "note": "Unit printed 'W/(k*m)'."
+      },
+      {
+       "prop": "cte",
+       "value": 12,
+       "unit": "x10^-5 /K",
+       "cond": "23-60C",
+       "condition": "Mean, 23-60 °C, longitudinal (DIN EN ISO 11359-1;2)",
+       "basis": "typical",
+       "verbatim": "Thermal expansion (CLTE) 12 10-5*1/K DIN EN ISO 11359-1;2 23-60°C, longitudinal"
+      },
+      {
+       "prop": "cte",
+       "value": 13,
+       "unit": "x10^-5 /K",
+       "cond": "23-100C",
+       "condition": "Mean, 23-100 °C, longitudinal (DIN EN ISO 11359-1;2)",
+       "basis": "typical",
+       "verbatim": "Thermal expansion (CLTE) 13 10-5*1/K DIN EN ISO 11359-1;2 23-100°C, longitudinal"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "MCAM_PA6",
+     "printed_as": "Ertalon 6 SA (PA 6)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.14,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "ISO 1183-1",
+       "basis": "typical",
+       "verbatim": "Density ISO 1183-1 g/cm³ 1.14"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 3300,
+       "unit": "MPa",
+       "cond": "RT",
+       "condition": "Tensile modulus ISO 527-1/-2, 1 mm/min, dry, 23 °C",
+       "basis": "typical",
+       "verbatim": "Tensile modulus of elasticity ISO 527-1/-2 (9) MPa 3300"
+      },
+      {
+       "prop": "rm",
+       "value": 80,
+       "unit": "MPa",
+       "cond": "ISO 527-2",
+       "condition": "ISO 527-1/-2, dry specimens, 23 °C (sheet: average values, not for specification)",
+       "basis": "typical",
+       "verbatim": "Tensile strength ISO 527-1/-2 (7) MPa 80"
+      },
+      {
+       "prop": "elongation",
+       "value": 50,
+       "unit": "%",
+       "cond": "ISO 527-2, at break",
+       "condition": "Tensile strain at break, ISO 527-1/-2, dry specimens, 23 °C (sheet: average values, not for specification)",
+       "basis": "typical",
+       "verbatim": "Tensile strain (elongation) at break ISO 527-1/-2 (7) % 50"
+      },
+      {
+       "prop": "hardness",
+       "value": 88,
+       "unit": "HRM",
+       "cond": "Rockwell M, ISO 2039-2",
+       "condition": "Rockwell M, ISO 2039-2, 23 °C",
+       "basis": "typical",
+       "verbatim": "Rockwell M hardness (14) ISO 2039-2 88"
+      },
+      {
+       "prop": "k",
+       "value": 0.28,
+       "unit": "W/K.m",
+       "cond": "RT",
+       "condition": "23 °C",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity at 23°C (73°F) W/(K.m) 0.28"
+      },
+      {
+       "prop": "cte",
+       "value": 90,
+       "unit": "µm/m.K",
+       "cond": "23-60C",
+       "condition": "Mean, 23-60 °C",
+       "basis": "typical",
+       "verbatim": "Coefficient of linear thermal expansion (23 to 60°C) µm/(m.K) 90"
+      },
+      {
+       "prop": "cte",
+       "value": 105,
+       "unit": "µm/m.K",
+       "cond": "23-100C",
+       "condition": "Mean, 23-100 °C",
+       "basis": "typical",
+       "verbatim": "Coefficient of linear thermal expansion (23 to 100°C) µm/(m.K) 105"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "PEEK",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "ENSINGER_PEEK",
+     "printed_as": "TECAPEEK natural (PEEK)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.31,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 1.31 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 4200,
+       "unit": "MPa",
+       "cond": "RT",
+       "condition": "Tensile test, DIN EN ISO 527-2, 1 mm/min; dry/conditioned not stated",
+       "basis": "typical",
+       "verbatim": "Modulus of elasticity (tensile test) 4200 MPa DIN EN ISO 527-2 1mm/min"
+      },
+      {
+       "prop": "rm",
+       "value": 116,
+       "unit": "MPa",
+       "cond": "ISO 527-2",
+       "condition": "Tensile test DIN EN ISO 527-2, 50 mm/min; temperature and moisture state not printed",
+       "basis": "typical",
+       "verbatim": "Tensile strength 116 MPa DIN EN ISO 527-2 50mm/min"
+      },
+      {
+       "prop": "elongation",
+       "value": 15,
+       "unit": "%",
+       "cond": "ISO 527-2, at break",
+       "condition": "Elongation at break, DIN EN ISO 527-2, 50 mm/min",
+       "basis": "typical",
+       "verbatim": "Elongation at break (tensile test) 15 % DIN EN ISO 527-2 50mm/min"
+      },
+      {
+       "prop": "hardness",
+       "value": 89,
+       "unit": "Shore D",
+       "cond": "Shore D, ISO 868",
+       "condition": "Shore hardness, DIN EN ISO 868, scale D",
+       "basis": "typical",
+       "verbatim": "Shore hardness 89 DIN EN ISO 868 Scale D"
+      },
+      {
+       "prop": "k",
+       "value": 0.27,
+       "unit": "W/K.m",
+       "cond": "temperature not stated",
+       "condition": "ISO 22007-4:2008, temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity 0.27 W/(k*m) ISO 22007-4:2008",
+       "note": "Unit printed 'W/(k*m)'."
+      },
+      {
+       "prop": "cte",
+       "value": 5,
+       "unit": "x10^-5 /K",
+       "cond": "23-60C",
+       "condition": "Mean, 23-60 °C, longitudinal (DIN EN ISO 11359-1;2)",
+       "basis": "typical",
+       "verbatim": "Thermal expansion (CLTE) 5 10-5*1/K DIN EN ISO 11359-1;2 23-60°C, longitudinal"
+      },
+      {
+       "prop": "cte",
+       "value": 5,
+       "unit": "x10^-5 /K",
+       "cond": "23-100C",
+       "condition": "Mean, 23-100 °C, longitudinal (DIN EN ISO 11359-1;2)",
+       "basis": "typical",
+       "verbatim": "Thermal expansion (CLTE) 5 10-5*1/K DIN EN ISO 11359-1;2 23-100°C, longitudinal"
+      },
+      {
+       "prop": "cte",
+       "value": 7,
+       "unit": "x10^-5 /K",
+       "cond": "100-150C",
+       "condition": "Mean, 100-150 °C, longitudinal (DIN EN ISO 11359-1;2)",
+       "basis": "typical",
+       "verbatim": "Thermal expansion (CLTE) 7 10-5*1/K DIN EN ISO 11359-1;2 100-150°C, longitudinal"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "MCAM_PEEK",
+     "printed_as": "Ketron 1000 PEEK",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.31,
+       "unit": "sg",
+       "cond": "RT",
+       "condition": "Specific gravity, ASTM D792",
+       "basis": "typical",
+       "verbatim": "Specific Gravity 1.31 g/cc ASTM D792"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 4.34,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Tensile modulus, ASTM D638",
+       "basis": "typical",
+       "verbatim": "Tensile Modulus 4.34 GPa 630 ksi ASTM D638"
+      },
+      {
+       "prop": "rm",
+       "value": 110,
+       "unit": "MPa",
+       "cond": "ASTM D638",
+       "condition": "ASTM D638; temperature and moisture state not printed",
+       "basis": "typical",
+       "verbatim": "Tensile Strength 110 MPa 16000 psi ASTM D638"
+      },
+      {
+       "prop": "elongation",
+       "value": 40,
+       "unit": "%",
+       "cond": "ASTM D638, at break",
+       "condition": "Elongation at break, ASTM D638; temperature and moisture state not printed",
+       "basis": "typical",
+       "verbatim": "Elongation at Break 40 % ASTM D638"
+      },
+      {
+       "prop": "hardness",
+       "value": 100,
+       "unit": "HRM",
+       "cond": "Rockwell M, ASTM D785",
+       "condition": "Rockwell M, ASTM D785",
+       "basis": "typical",
+       "verbatim": "Hardness, Rockwell M 100 ASTM D785"
+      },
+      {
+       "prop": "hardness",
+       "value": 85,
+       "unit": "Shore D",
+       "cond": "Shore D, ASTM D2240",
+       "condition": "Shore D, ASTM D2240",
+       "basis": "typical",
+       "verbatim": "Hardness, Shore D 85 ASTM D2240"
+      },
+      {
+       "prop": "k",
+       "value": 0.252,
+       "unit": "W/m.K",
+       "cond": "temperature not stated",
+       "condition": "ASTM F433, temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 0.252 W/m-K 1.75 BTU-in/hr-ft²-°F ASTM F433"
+      },
+      {
+       "prop": "cte",
+       "value": 46.8,
+       "unit": "µm/m.C",
+       "cond": "-40-149C",
+       "condition": "Mean, -40 to 149 °C (ASTM E831)",
+       "basis": "typical",
+       "verbatim": "CTE, linear 46.8 µm/m-°C @Temperature -40.0 - 149 °C ASTM E831"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "PTFE",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "ENSINGER_PTFE",
+     "printed_as": "TECAFLON PTFE natural",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 2.15,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 2.15 g/cm3"
+      },
+      {
+       "prop": "rm",
+       "value": 22,
+       "unit": "MPa",
+       "cond": "ASTM D4894",
+       "condition": "Tensile strength, ASTM D 4894",
+       "basis": "typical",
+       "verbatim": "Tensile strength 22 MPa ASTM D 4894"
+      },
+      {
+       "prop": "elongation",
+       "value": 220,
+       "unit": "%",
+       "cond": "ASTM D4894, at break",
+       "condition": "Elongation at break, ASTM D 4894",
+       "basis": "typical",
+       "verbatim": "Elongation at break 220 % ASTM D 4894"
+      },
+      {
+       "prop": "hardness",
+       "value": 55,
+       "unit": "Shore D",
+       "cond": "Shore D, ASTM D2240",
+       "condition": "Shore hardness, ASTM D 2240",
+       "basis": "typical",
+       "verbatim": "Shore hardness 55 Shore D ASTM D 2240"
+      },
+      {
+       "prop": "hardness",
+       "value": 59,
+       "unit": "Shore D",
+       "cond": "Shore D, ISO 868",
+       "condition": "Shore hardness, DIN EN ISO 868",
+       "basis": "typical",
+       "verbatim": "Shore hardness 59 D DIN EN ISO 868"
+      },
+      {
+       "prop": "k",
+       "value": 0.2,
+       "unit": "W/K.m",
+       "cond": "temperature not stated",
+       "condition": "ASTM C 177, temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal conductivity 0.20 W/(k*m) ASTM C 177"
+      },
+      {
+       "prop": "cte",
+       "value": 13,
+       "unit": "x10^-5 /K",
+       "cond": "23-100C",
+       "condition": "Mean, 23-100 °C, longitudinal (ASTM D 696)",
+       "basis": "typical",
+       "verbatim": "Thermal expansion (CLTE) 13 10-5*1/K ASTM D 696 23-100°C, long."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "4130",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_25CRMO4",
+     "printed_as": "25CrMo4 (1.7218; AISI/SAE 4130)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 7.83,
+       "unit": "kg/dm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Massa Volumica Kg/dm3 7.83"
+      },
+      {
+       "prop": "rm",
+       "value": 800,
+       "max": 950,
+       "unit": "MPa",
+       "cond": "+QT 16-40 mm",
+       "condition": "Quenched and tempered, diameter 16-40 mm (ISO 683-2:2018)",
+       "basis": "range",
+       "verbatim": "Hot-rolled +QT, ISO 683-2:2018 | size d (t) mm | R N/mm² | Rp0.2 min | A% min | Z% min | Kv2 +20°C min J | HBW (for information) | 16/8 40/20 800-950 600 14 55 50 240-286"
+      },
+      {
+       "prop": "rp02",
+       "value": 600,
+       "unit": "MPa",
+       "cond": "+QT 16-40 mm",
+       "condition": "Quenched and tempered, diameter 16-40 mm (ISO 683-2:2018)",
+       "basis": "min",
+       "verbatim": "Hot-rolled +QT, ISO 683-2:2018 | size d (t) mm | R N/mm² | Rp0.2 min | A% min | Z% min | Kv2 +20°C min J | HBW (for information) | 16/8 40/20 800-950 600 14 55 50 240-286"
+      },
+      {
+       "prop": "elongation",
+       "value": 14,
+       "unit": "%",
+       "cond": "+QT 16-40 mm",
+       "condition": "Quenched and tempered, diameter 16-40 mm (ISO 683-2:2018)",
+       "basis": "min",
+       "verbatim": "Hot-rolled +QT, ISO 683-2:2018 | size d (t) mm | R N/mm² | Rp0.2 min | A% min | Z% min | Kv2 +20°C min J | HBW (for information) | 16/8 40/20 800-950 600 14 55 50 240-286"
+      },
+      {
+       "prop": "hardness",
+       "value": 240,
+       "max": 286,
+       "unit": "HBW",
+       "cond": "+QT 16-40 mm",
+       "condition": "Quenched and tempered, diameter 16-40 mm (ISO 683-2:2018)",
+       "basis": "range",
+       "verbatim": "Hot-rolled +QT, ISO 683-2:2018 | size d (t) mm | R N/mm² | Rp0.2 min | A% min | Z% min | Kv2 +20°C min J | HBW (for information) | 16/8 40/20 800-950 600 14 55 50 240-286",
+       "note": "Printed 'for information'."
+      },
+      {
+       "prop": "rm",
+       "value": 700,
+       "max": 850,
+       "unit": "MPa",
+       "cond": "+QT 40-100 mm",
+       "condition": "Quenched and tempered, diameter 40-100 mm (ISO 683-2:2018)",
+       "basis": "range",
+       "verbatim": "Hot-rolled +QT, ISO 683-2:2018 | size d (t) mm | R N/mm² | Rp0.2 min | A% min | Z% min | Kv2 +20°C min J | HBW (for information) | 40/20 100/60 700-850 450 15 60 50 213-253"
+      },
+      {
+       "prop": "rp02",
+       "value": 450,
+       "unit": "MPa",
+       "cond": "+QT 40-100 mm",
+       "condition": "Quenched and tempered, diameter 40-100 mm (ISO 683-2:2018)",
+       "basis": "min",
+       "verbatim": "Hot-rolled +QT, ISO 683-2:2018 | size d (t) mm | R N/mm² | Rp0.2 min | A% min | Z% min | Kv2 +20°C min J | HBW (for information) | 40/20 100/60 700-850 450 15 60 50 213-253"
+      },
+      {
+       "prop": "elongation",
+       "value": 15,
+       "unit": "%",
+       "cond": "+QT 40-100 mm",
+       "condition": "Quenched and tempered, diameter 40-100 mm (ISO 683-2:2018)",
+       "basis": "min",
+       "verbatim": "Hot-rolled +QT, ISO 683-2:2018 | size d (t) mm | R N/mm² | Rp0.2 min | A% min | Z% min | Kv2 +20°C min J | HBW (for information) | 40/20 100/60 700-850 450 15 60 50 213-253"
+      },
+      {
+       "prop": "hardness",
+       "value": 213,
+       "max": 253,
+       "unit": "HBW",
+       "cond": "+QT 40-100 mm",
+       "condition": "Quenched and tempered, diameter 40-100 mm (ISO 683-2:2018)",
+       "basis": "range",
+       "verbatim": "Hot-rolled +QT, ISO 683-2:2018 | size d (t) mm | R N/mm² | Rp0.2 min | A% min | Z% min | Kv2 +20°C min J | HBW (for information) | 40/20 100/60 700-850 450 15 60 50 213-253",
+       "note": "Printed 'for information'."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "OVAKO_25CRMO4",
+     "printed_as": "25CrMo4 (similar: 4130, 1.7218)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 7800,
+       "unit": "kg/m3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 7800 kg/m3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 210,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Young's modulus 210 GPa"
+      },
+      {
+       "prop": "cte",
+       "value": 12,
+       "unit": "µm/m.K",
+       "cond": "20-300C",
+       "condition": "Average, 20-300 °C",
+       "basis": "typical",
+       "verbatim": "Average CTE 20-300°C 12 µm/m°K"
+      },
+      {
+       "prop": "k",
+       "value": 40,
+       "max": 45,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "Ambient temperature",
+       "basis": "range",
+       "verbatim": "Thermal conductivity Ambient temperature 40 - 45 W/m°K"
+      },
+      {
+       "prop": "rp02",
+       "value": 450,
+       "unit": "MPa",
+       "cond": "+QT 40-100 mm",
+       "condition": "Quenched and tempered round bar, 40-100 mm (Ovako 6014/6016/MoC 210 M)",
+       "basis": "min",
+       "verbatim": "Variant 6014, 6016, MoC 210 M | +QT | Round bar | Dimension mm | Rp0.2 min MPa | Rm MPa | A5 min % | Hardness | 40 < 100 | 450* | 700-850 | 15 | 200-250 HB",
+       "note": "'*' = ReH."
+      },
+      {
+       "prop": "rm",
+       "value": 700,
+       "max": 850,
+       "unit": "MPa",
+       "cond": "+QT 40-100 mm",
+       "condition": "Quenched and tempered round bar, 40-100 mm (Ovako 6014/6016/MoC 210 M)",
+       "basis": "range",
+       "verbatim": "Variant 6014, 6016, MoC 210 M | +QT | Round bar | Dimension mm | Rp0.2 min MPa | Rm MPa | A5 min % | Hardness | 40 < 100 | 450* | 700-850 | 15 | 200-250 HB"
+      },
+      {
+       "prop": "elongation",
+       "value": 15,
+       "unit": "%",
+       "cond": "+QT 40-100 mm",
+       "condition": "Quenched and tempered round bar, 40-100 mm (Ovako 6014/6016/MoC 210 M)",
+       "basis": "min",
+       "verbatim": "Variant 6014, 6016, MoC 210 M | +QT | Round bar | Dimension mm | Rp0.2 min MPa | Rm MPa | A5 min % | Hardness | 40 < 100 | 450* | 700-850 | 15 | 200-250 HB"
+      },
+      {
+       "prop": "hardness",
+       "value": 200,
+       "max": 250,
+       "unit": "HB",
+       "cond": "+QT 40-100 mm",
+       "condition": "Quenched and tempered round bar, 40-100 mm (Ovako 6014/6016/MoC 210 M)",
+       "basis": "range",
+       "verbatim": "Variant 6014, 6016, MoC 210 M | +QT | Round bar | Dimension mm | Rp0.2 min MPa | Rm MPa | A5 min % | Hardness | 40 < 100 | ... | 200-250 HB"
+      },
+      {
+       "prop": "rp02",
+       "value": 600,
+       "unit": "MPa",
+       "cond": "+QT 25-40 mm",
+       "condition": "Quenched and tempered round bar, 25-40 mm (Ovako 6014/6016/MoC 210 M)",
+       "basis": "min",
+       "verbatim": "Variant 6014, 6016, MoC 210 M | +QT | Round bar | Dimension mm | Rp0.2 min MPa | Rm MPa | A5 min % | Hardness | 25 < 40 | 600* | 800-950 | 14 | 240-280 HB",
+       "note": "'*' = ReH."
+      },
+      {
+       "prop": "rm",
+       "value": 800,
+       "max": 950,
+       "unit": "MPa",
+       "cond": "+QT 25-40 mm",
+       "condition": "Quenched and tempered round bar, 25-40 mm (Ovako 6014/6016/MoC 210 M)",
+       "basis": "range",
+       "verbatim": "Variant 6014, 6016, MoC 210 M | +QT | Round bar | Dimension mm | Rp0.2 min MPa | Rm MPa | A5 min % | Hardness | 25 < 40 | 600* | 800-950 | 14 | 240-280 HB"
+      },
+      {
+       "prop": "hardness",
+       "value": 220,
+       "unit": "HB",
+       "cond": "+A 25-160 mm",
+       "condition": "Soft annealed round bar, 25-160 mm (Ovako 6014/6016/MoC 210 M)",
+       "basis": "max",
+       "verbatim": "+A | Round bar | 25 < 160 | < 220 HB"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "8620",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_20NICRMO2",
+     "printed_as": "20NiCrMo2-2 (1.6523; AISI/SAE 8620 appr.)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 7.86,
+       "unit": "kg/dm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Massa volumica Kg/dm3 7.86"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 210,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Temperature not printed",
+       "basis": "typical",
+       "verbatim": "Modulo Elastico long. GPa 210"
+      },
+      {
+       "prop": "k",
+       "value": 46,
+       "unit": "W/m.K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Conducibilità Termica W/(m●K) 46"
+      },
+      {
+       "prop": "cte",
+       "value": 11.5,
+       "unit": "x10^-6 /K",
+       "cond": "20-100C",
+       "condition": "Mean, 20-100 °C",
+       "basis": "typical",
+       "verbatim": "Espansione termica 10-6 K-1 ► 11.5 12.5 13.3 13.9 (headings 20 100 200 300 400 °C)",
+       "note": "Four values under five temperature headings; read as intervals from 20 °C (first = 20-100 °C)."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "OVAKO_20NICRMO2",
+     "printed_as": "20NiCrMo2-2 (similar: 8620, 1.6523)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 7800,
+       "unit": "kg/m3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "210 | 0.3 | 80 | 7800 (Young's modulus GPa | Poisson | Shear modulus GPa | Density kg/m3)"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 210,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "210 | 0.3 | 80 | 7800"
+      },
+      {
+       "prop": "cte",
+       "value": 12,
+       "unit": "µm/m.K",
+       "cond": "20-300C",
+       "condition": "Average, 20-300 °C",
+       "basis": "typical",
+       "verbatim": "Average CTE 20-300°C (µm/m°K) 12"
+      },
+      {
+       "prop": "k",
+       "value": 40,
+       "max": 45,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "Ambient temperature",
+       "basis": "range",
+       "verbatim": "Thermal conductivity Ambient temperature (W/m°K) 40 - 45"
+      },
+      {
+       "prop": "hardness",
+       "value": 212,
+       "unit": "HB",
+       "cond": "+A 40-80 mm (Ovako 152A)",
+       "condition": "Soft annealed round bar 40-80 mm (Ovako 152A)",
+       "basis": "typical",
+       "verbatim": "152A | +A | Round bar | 40 < 80 | 212 HB typical"
+      },
+      {
+       "prop": "hardness",
+       "value": 230,
+       "unit": "HB",
+       "cond": "+AR 40-80 mm (Ovako 152A)",
+       "condition": "As rolled round bar 40-80 mm (Ovako 152A)",
+       "basis": "typical",
+       "verbatim": "152A | +AR | Round bar | 40 < 80 | 230 HB typical"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "12L14",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_11SMNPB37",
+     "printed_as": "11SMnPb37 (1.0737)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "rm",
+       "value": 460,
+       "max": 710,
+       "unit": "MPa",
+       "cond": "+C 16-40 mm",
+       "condition": "Cold drawn +C, 16-40 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 16 40 | 460-710 | 375 | 8 | 139-218",
+       "note": "Min/max label not captured in the extraction."
+      },
+      {
+       "prop": "rp02",
+       "value": 375,
+       "unit": "MPa",
+       "cond": "+C 16-40 mm",
+       "condition": "Cold drawn +C, 16-40 mm (ISO 683-4:2018)",
+       "basis": "unstated",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 16 40 | 460-710 | 375 | 8 | 139-218",
+       "note": "Min/max label not captured in the extraction."
+      },
+      {
+       "prop": "elongation",
+       "value": 8,
+       "unit": "%",
+       "cond": "+C 16-40 mm",
+       "condition": "Cold drawn +C, 16-40 mm (ISO 683-4:2018)",
+       "basis": "unstated",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 16 40 | 460-710 | 375 | 8 | 139-218",
+       "note": "Min/max label not captured in the extraction."
+      },
+      {
+       "prop": "hardness",
+       "value": 139,
+       "max": 218,
+       "unit": "HB",
+       "cond": "+C 16-40 mm",
+       "condition": "Cold drawn +C, 16-40 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 16 40 | 460-710 | 375 | 8 | 139-218",
+       "note": "Min/max label not captured in the extraction."
+      },
+      {
+       "prop": "rm",
+       "value": 400,
+       "max": 650,
+       "unit": "MPa",
+       "cond": "+C 40-63 mm",
+       "condition": "Cold drawn +C, 40-63 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 40 63 | 400-650 | 305 | 9 | 119-200",
+       "note": "Min/max label not captured in the extraction."
+      },
+      {
+       "prop": "rp02",
+       "value": 305,
+       "unit": "MPa",
+       "cond": "+C 40-63 mm",
+       "condition": "Cold drawn +C, 40-63 mm (ISO 683-4:2018)",
+       "basis": "unstated",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 40 63 | 400-650 | 305 | 9 | 119-200",
+       "note": "Min/max label not captured in the extraction."
+      },
+      {
+       "prop": "elongation",
+       "value": 9,
+       "unit": "%",
+       "cond": "+C 40-63 mm",
+       "condition": "Cold drawn +C, 40-63 mm (ISO 683-4:2018)",
+       "basis": "unstated",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 40 63 | 400-650 | 305 | 9 | 119-200",
+       "note": "Min/max label not captured in the extraction."
+      },
+      {
+       "prop": "hardness",
+       "value": 119,
+       "max": 200,
+       "unit": "HB",
+       "cond": "+C 40-63 mm",
+       "condition": "Cold drawn +C, 40-63 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 40 63 | 400-650 | 305 | 9 | 119-200",
+       "note": "Min/max label not captured in the extraction."
+      },
+      {
+       "prop": "rm",
+       "value": 380,
+       "max": 570,
+       "unit": "MPa",
+       "cond": "Hot rolled 16-40 mm",
+       "condition": "Hot rolled, untreated, 16-40 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Hot rolled, untreated, ISO 683-4:2018 ('not suitable for heat treatment') | size mm | R N/mm² | HBW max | 16-40 | 380-570 | 169"
+      },
+      {
+       "prop": "hardness",
+       "value": 169,
+       "unit": "HBW",
+       "cond": "Hot rolled 16-40 mm",
+       "condition": "Hot rolled, untreated, 16-40 mm (ISO 683-4:2018)",
+       "basis": "max",
+       "verbatim": "Hot rolled, untreated, ISO 683-4:2018 ('not suitable for heat treatment') | size mm | R N/mm² | HBW max | 16-40 | 380-570 | 169"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "EN1A",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_11SMN30",
+     "printed_as": "11SMn30 (1.0715; BS 230M07)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "rm",
+       "value": 460,
+       "max": 710,
+       "unit": "MPa",
+       "cond": "+C 16-40 mm",
+       "condition": "Cold drawn +C, 16-40 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 16 40 | 460-710 | 375 | 8 | 139-218"
+      },
+      {
+       "prop": "rp02",
+       "value": 375,
+       "unit": "MPa",
+       "cond": "+C 16-40 mm",
+       "condition": "Cold drawn +C, 16-40 mm (ISO 683-4:2018)",
+       "basis": "min",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 16 40 | 460-710 | 375 | 8 | 139-218"
+      },
+      {
+       "prop": "elongation",
+       "value": 8,
+       "unit": "%",
+       "cond": "+C 16-40 mm",
+       "condition": "Cold drawn +C, 16-40 mm (ISO 683-4:2018)",
+       "basis": "min",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 16 40 | 460-710 | 375 | 8 | 139-218"
+      },
+      {
+       "prop": "hardness",
+       "value": 139,
+       "max": 218,
+       "unit": "HB",
+       "cond": "+C 16-40 mm",
+       "condition": "Cold drawn +C, 16-40 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 16 40 | 460-710 | 375 | 8 | 139-218",
+       "note": "Printed 'for inform.'"
+      },
+      {
+       "prop": "rm",
+       "value": 400,
+       "max": 650,
+       "unit": "MPa",
+       "cond": "+C 40-63 mm",
+       "condition": "Cold drawn +C, 40-63 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 40 63 | 400-650 | 305 | 9 | 119-200"
+      },
+      {
+       "prop": "rp02",
+       "value": 305,
+       "unit": "MPa",
+       "cond": "+C 40-63 mm",
+       "condition": "Cold drawn +C, 40-63 mm (ISO 683-4:2018)",
+       "basis": "min",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 40 63 | 400-650 | 305 | 9 | 119-200"
+      },
+      {
+       "prop": "elongation",
+       "value": 9,
+       "unit": "%",
+       "cond": "+C 40-63 mm",
+       "condition": "Cold drawn +C, 40-63 mm (ISO 683-4:2018)",
+       "basis": "min",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 40 63 | 400-650 | 305 | 9 | 119-200"
+      },
+      {
+       "prop": "hardness",
+       "value": 119,
+       "max": 200,
+       "unit": "HB",
+       "cond": "+C 40-63 mm",
+       "condition": "Cold drawn +C, 40-63 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Cold drawn +C (also +C+G), ISO 683-4:2018 | size mm | R N/mm² | Rp0.2 | A% | HB | 40 63 | 400-650 | 305 | 9 | 119-200",
+       "note": "Printed 'for inform.'"
+      },
+      {
+       "prop": "rm",
+       "value": 380,
+       "max": 570,
+       "unit": "MPa",
+       "cond": "Hot rolled 16-40 mm",
+       "condition": "Hot rolled, untreated, 16-40 mm (ISO 683-4:2018)",
+       "basis": "range",
+       "verbatim": "Hot rolled, untreated, ISO 683-4:2018 ('not suitable for heat treatment') | size mm | R N/mm² | HBW max | 16-40 | 380-570 | 169"
+      },
+      {
+       "prop": "hardness",
+       "value": 169,
+       "unit": "HBW",
+       "cond": "Hot rolled 16-40 mm",
+       "condition": "Hot rolled, untreated, 16-40 mm (ISO 683-4:2018)",
+       "basis": "max",
+       "verbatim": "Hot rolled, untreated, ISO 683-4:2018 ('not suitable for heat treatment') | size mm | R N/mm² | HBW max | 16-40 | 380-570 | 169"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "15-5PH",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ROLLED_155PH",
+     "printed_as": "15-5 (S15500)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 0.282,
+       "unit": "lb/in3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 0.282 lb/in3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 28.5,
+       "unit": "Msi",
+       "cond": "RT",
+       "condition": "68 °F",
+       "basis": "typical",
+       "verbatim": "Modulus of Elasticity (68°F) 28.5 •106 psi",
+       "note": "'•106' read as x10^6."
+      },
+      {
+       "prop": "cte",
+       "value": 6.3,
+       "unit": "µin/in.F",
+       "cond": "20-100C",
+       "condition": "Mean, 68-212 °F (20-100 °C)",
+       "basis": "typical",
+       "verbatim": "Coefficient of Thermal Expansion (68°F - 212°F) 6.3 µin/in •°F"
+      },
+      {
+       "prop": "rm",
+       "value": 190,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H900",
+       "condition": "Condition H900 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H900 | 190 | 170 | 10 | ... | 388 | 40"
+      },
+      {
+       "prop": "rp02",
+       "value": 170,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H900",
+       "condition": "Condition H900 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H900 | 190 | 170 | 10 | ... | 388 | 40"
+      },
+      {
+       "prop": "elongation",
+       "value": 10,
+       "unit": "%",
+       "cond": "ASTM A564 min, H900, 2 in",
+       "condition": "Condition H900 (age hardened), ASTM A564 minimum, 2 in gauge",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H900 | 190 | 170 | 10 | ... | 388 | 40"
+      },
+      {
+       "prop": "hardness",
+       "value": 388,
+       "unit": "HB",
+       "cond": "ASTM A564 min, H900",
+       "condition": "Condition H900 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H900 | 190 | 170 | 10 | ... | 388 | 40"
+      },
+      {
+       "prop": "hardness",
+       "value": 40,
+       "unit": "HRC",
+       "cond": "ASTM A564 min, H900",
+       "condition": "Condition H900 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H900 | 190 | 170 | 10 | ... | 388 | 40"
+      },
+      {
+       "prop": "rm",
+       "value": 155,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H1025",
+       "condition": "Condition H1025 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1025 | 155 | 145 | 12 | ... | 331 | 34"
+      },
+      {
+       "prop": "rp02",
+       "value": 145,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H1025",
+       "condition": "Condition H1025 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1025 | 155 | 145 | 12 | ... | 331 | 34"
+      },
+      {
+       "prop": "elongation",
+       "value": 12,
+       "unit": "%",
+       "cond": "ASTM A564 min, H1025, 2 in",
+       "condition": "Condition H1025 (age hardened), ASTM A564 minimum, 2 in gauge",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1025 | 155 | 145 | 12 | ... | 331 | 34"
+      },
+      {
+       "prop": "hardness",
+       "value": 331,
+       "unit": "HB",
+       "cond": "ASTM A564 min, H1025",
+       "condition": "Condition H1025 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1025 | 155 | 145 | 12 | ... | 331 | 34"
+      },
+      {
+       "prop": "hardness",
+       "value": 34,
+       "unit": "HRC",
+       "cond": "ASTM A564 min, H1025",
+       "condition": "Condition H1025 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1025 | 155 | 145 | 12 | ... | 331 | 34"
+      },
+      {
+       "prop": "rm",
+       "value": 145,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H1075",
+       "condition": "Condition H1075 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1075 | 145 | 125 | 13 | ... | 311 | 31"
+      },
+      {
+       "prop": "rp02",
+       "value": 125,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H1075",
+       "condition": "Condition H1075 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1075 | 145 | 125 | 13 | ... | 311 | 31"
+      },
+      {
+       "prop": "elongation",
+       "value": 13,
+       "unit": "%",
+       "cond": "ASTM A564 min, H1075, 2 in",
+       "condition": "Condition H1075 (age hardened), ASTM A564 minimum, 2 in gauge",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1075 | 145 | 125 | 13 | ... | 311 | 31"
+      },
+      {
+       "prop": "hardness",
+       "value": 311,
+       "unit": "HB",
+       "cond": "ASTM A564 min, H1075",
+       "condition": "Condition H1075 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1075 | 145 | 125 | 13 | ... | 311 | 31"
+      },
+      {
+       "prop": "hardness",
+       "value": 31,
+       "unit": "HRC",
+       "cond": "ASTM A564 min, H1075",
+       "condition": "Condition H1075 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1075 | 145 | 125 | 13 | ... | 311 | 31"
+      },
+      {
+       "prop": "rm",
+       "value": 135,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H1150",
+       "condition": "Condition H1150 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150 | 135 | 105 | 16 | ... | 277 | 28"
+      },
+      {
+       "prop": "rp02",
+       "value": 105,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H1150",
+       "condition": "Condition H1150 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150 | 135 | 105 | 16 | ... | 277 | 28"
+      },
+      {
+       "prop": "elongation",
+       "value": 16,
+       "unit": "%",
+       "cond": "ASTM A564 min, H1150, 2 in",
+       "condition": "Condition H1150 (age hardened), ASTM A564 minimum, 2 in gauge",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150 | 135 | 105 | 16 | ... | 277 | 28"
+      },
+      {
+       "prop": "hardness",
+       "value": 277,
+       "unit": "HB",
+       "cond": "ASTM A564 min, H1150",
+       "condition": "Condition H1150 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150 | 135 | 105 | 16 | ... | 277 | 28"
+      },
+      {
+       "prop": "hardness",
+       "value": 28,
+       "unit": "HRC",
+       "cond": "ASTM A564 min, H1150",
+       "condition": "Condition H1150 (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150 | 135 | 105 | 16 | ... | 277 | 28"
+      },
+      {
+       "prop": "rm",
+       "value": 115,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H1150M",
+       "condition": "Condition H1150M (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150M | 115 | 75 | 18 | ... | 255 | 24"
+      },
+      {
+       "prop": "rp02",
+       "value": 75,
+       "unit": "ksi",
+       "cond": "ASTM A564 min, H1150M",
+       "condition": "Condition H1150M (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150M | 115 | 75 | 18 | ... | 255 | 24"
+      },
+      {
+       "prop": "elongation",
+       "value": 18,
+       "unit": "%",
+       "cond": "ASTM A564 min, H1150M, 2 in",
+       "condition": "Condition H1150M (age hardened), ASTM A564 minimum, 2 in gauge",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150M | 115 | 75 | 18 | ... | 255 | 24"
+      },
+      {
+       "prop": "hardness",
+       "value": 255,
+       "unit": "HB",
+       "cond": "ASTM A564 min, H1150M",
+       "condition": "Condition H1150M (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150M | 115 | 75 | 18 | ... | 255 | 24"
+      },
+      {
+       "prop": "hardness",
+       "value": 24,
+       "unit": "HRC",
+       "cond": "ASTM A564 min, H1150M",
+       "condition": "Condition H1150M (age hardened), ASTM A564 minimum",
+       "basis": "min",
+       "verbatim": "Condition | UTS ksi | 0.2% YS ksi | Elongation % 2\" minimum | RA % | Brinell | Rockwell (* Minimum specified properties per ASTM A 564) | H1150M | 115 | 75 | 18 | ... | 255 | 24"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "AIRCRAFT_AMS5659",
+     "printed_as": "15-5PH (AMS 5659)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "rm",
+       "value": 190,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H900",
+       "condition": "Bar, condition H900 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H900 | 190 | 170 | 10"
+      },
+      {
+       "prop": "rp02",
+       "value": 170,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H900",
+       "condition": "Bar, condition H900 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H900 | 190 | 170 | 10"
+      },
+      {
+       "prop": "elongation",
+       "value": 10,
+       "unit": "%",
+       "cond": "AMS 5659 bar, H900, 2D",
+       "condition": "Bar, condition H900 (AMS 5659); min/typical not stated, gauge 2D",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H900 | 190 | 170 | 10"
+      },
+      {
+       "prop": "rm",
+       "value": 170,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H925",
+       "condition": "Bar, condition H925 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H925 | 170 | 155 | 10"
+      },
+      {
+       "prop": "rp02",
+       "value": 155,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H925",
+       "condition": "Bar, condition H925 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H925 | 170 | 155 | 10"
+      },
+      {
+       "prop": "elongation",
+       "value": 10,
+       "unit": "%",
+       "cond": "AMS 5659 bar, H925, 2D",
+       "condition": "Bar, condition H925 (AMS 5659); min/typical not stated, gauge 2D",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H925 | 170 | 155 | 10"
+      },
+      {
+       "prop": "rm",
+       "value": 155,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H1025",
+       "condition": "Bar, condition H1025 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1025 | 155 | 145 | 12"
+      },
+      {
+       "prop": "rp02",
+       "value": 145,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H1025",
+       "condition": "Bar, condition H1025 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1025 | 155 | 145 | 12"
+      },
+      {
+       "prop": "elongation",
+       "value": 12,
+       "unit": "%",
+       "cond": "AMS 5659 bar, H1025, 2D",
+       "condition": "Bar, condition H1025 (AMS 5659); min/typical not stated, gauge 2D",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1025 | 155 | 145 | 12"
+      },
+      {
+       "prop": "rm",
+       "value": 145,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H1075",
+       "condition": "Bar, condition H1075 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1075 | 145 | 125 | 13"
+      },
+      {
+       "prop": "rp02",
+       "value": 125,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H1075",
+       "condition": "Bar, condition H1075 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1075 | 145 | 125 | 13"
+      },
+      {
+       "prop": "elongation",
+       "value": 13,
+       "unit": "%",
+       "cond": "AMS 5659 bar, H1075, 2D",
+       "condition": "Bar, condition H1075 (AMS 5659); min/typical not stated, gauge 2D",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1075 | 145 | 125 | 13"
+      },
+      {
+       "prop": "rm",
+       "value": 140,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H1100",
+       "condition": "Bar, condition H1100 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1100 | 140 | 115 | 14"
+      },
+      {
+       "prop": "rp02",
+       "value": 115,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H1100",
+       "condition": "Bar, condition H1100 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1100 | 140 | 115 | 14"
+      },
+      {
+       "prop": "elongation",
+       "value": 14,
+       "unit": "%",
+       "cond": "AMS 5659 bar, H1100, 2D",
+       "condition": "Bar, condition H1100 (AMS 5659); min/typical not stated, gauge 2D",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1100 | 140 | 115 | 14"
+      },
+      {
+       "prop": "rm",
+       "value": 135,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H1150",
+       "condition": "Bar, condition H1150 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1150 | 135 | 105 | 16"
+      },
+      {
+       "prop": "rp02",
+       "value": 105,
+       "unit": "ksi",
+       "cond": "AMS 5659 bar, H1150",
+       "condition": "Bar, condition H1150 (AMS 5659); min/typical not stated",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1150 | 135 | 105 | 16"
+      },
+      {
+       "prop": "elongation",
+       "value": 16,
+       "unit": "%",
+       "cond": "AMS 5659 bar, H1150, 2D",
+       "condition": "Bar, condition H1150 (AMS 5659); min/typical not stated, gauge 2D",
+       "basis": "unstated",
+       "verbatim": "Bar AMS 5659 | Condition | UTS ksi | 0.2% Yield ksi | Elongation % in 2D | % RA | H1150 | 135 | 105 | 16"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  }
+ ]
+}
