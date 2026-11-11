@@ -1029,6 +1029,255 @@ const TOOLS = [
   working: 'See the note under the tool.',
   source: 'BS 84:2007, BS 93:2008; series values from the publishers listed under the tool.',
 },
+// ---------- Gears and splines (core/src/gears.rs, drawings in app/gears.js) ----------
+{
+  id: 'spurgear', group: 'Gears and splines', title: 'Spur gear data',
+  desc: 'Involute spur gear dimensions from the module (mm) or diametral pitch (inch): reference, base, tip and root diameters, addendum and dedendum, circular and base pitch, tooth thickness, undercut limit; give a second tooth count for the centre distance and contact ratio of the pair, with profile shift if used. Standard full-depth proportions (addendum 1, dedendum 1.25 times the module) are filled in; change them if your gear uses another basic rack.',
+  fields: s => [
+    s === 'inch' ? { id: 'mp', label: 'Diametral pitch P', unit: 'teeth/in', def: 10 } : { id: 'mp', label: 'Module m', unit: 'mm', def: 3 },
+    { id: 'z1', label: 'Teeth, gear 1 (pinion)', unit: '', def: s === 'inch' ? 20 : 12 },
+    { id: 'z2', label: 'Teeth, gear 2 (blank = one gear only)', unit: '', def: s === 'inch' ? 40 : 24 },
+    { id: 'pa', label: 'Pressure angle', unit: 'deg', def: 20, options: [[20, '20°'], [14.5, '14.5°'], [25, '25°']] },
+    { id: 'x1', label: 'Profile shift x, gear 1', unit: 'x m', def: 0 },
+    { id: 'x2', label: 'Profile shift x, gear 2', unit: 'x m', def: 0 },
+    { id: 'ha', label: 'Addendum factor ha*', unit: 'x m', def: 1 },
+    { id: 'hf', label: 'Dedendum factor hf*', unit: 'x m', def: 1.25 },
+  ],
+  calc: (v, W, s) => {
+    const m = gearMod(v.mp, s), u = lenU(s), x1 = isFinite(v.x1) ? v.x1 : 0, x2 = isFinite(v.x2) ? v.x2 : 0;
+    if (!(m > 0 && v.z1 >= 3 && v.pa > 0 && v.ha > 0 && v.hf > 0)) return [];
+    const g = i => W.gear_spur(m, v.z1, v.pa, x1, v.ha, v.hf, i), dp = s === 'inch' ? 4 : 3;
+    const rows = [];
+    if (s === 'inch') rows.push(R('Module equivalent (25.4 / P)', 25.4 / v.mp, 'mm', 4));
+    rows.push(R('Involute function of the pressure angle', W.gear_involute(v.pa), '', 6));
+    rows.push(R('Circular pitch p = π m', g(7), u, dp + 1), R('Base pitch pb = p cos α', g(8), u, dp + 1));
+    const one = (n, gi, z) => {
+      rows.push(R(n + ': reference (pitch) diameter', gi(0), u, dp), R(n + ': base diameter', gi(1), u, dp),
+        R(n + ': tip (outside) diameter', gi(2), u, dp), R(n + ': root diameter', gi(3), u, dp),
+        R(n + ': addendum', gi(4), u, dp), R(n + ': dedendum', gi(5), u, dp), R(n + ': whole depth', gi(6), u, dp),
+        R(n + ': tooth thickness on the reference circle (arc)', gi(9), u, dp + 1),
+        R(n + ': tooth thickness at the tip (arc)', gi(13), u, dp + 1));
+      const xm = gi(12);
+      rows.push(R(n + ': smallest profile shift without undercut', xm, 'x m', 3));
+    };
+    one('Gear 1', g, v.z1);
+    rows.push(R('Fewest teeth without undercut (x = 0)', g(11), '', 2));
+    if (v.z2 >= 3) {
+      const g2 = i => W.gear_spur(m, v.z2, v.pa, x2, v.ha, v.hf, i);
+      const p = i => W.gear_spur_pair(m, v.z1, v.z2, v.pa, x1, x2, v.ha, v.hf, i);
+      one('Gear 2', g2, v.z2);
+      rows.push(R('Ratio z2 / z1', v.z2 / v.z1, '', 4));
+      rows.push(R('Standard centre distance (no shift)', p(3), u, dp));
+      if (x1 !== 0 || x2 !== 0) {
+        rows.push(R('Involute of the working pressure angle', p(0), '', 6), R('Working pressure angle', p(1), 'deg', 4),
+          R('Centre distance modification coefficient y', p(2), '', 5));
+      }
+      rows.push(R('Centre distance', p(4), u, dp), R('Working pitch diameter, gear 1', p(5), u, dp), R('Working pitch diameter, gear 2', p(6), u, dp));
+      if (x1 !== 0 || x2 !== 0) rows.push(R('Tip diameter for standard clearance, gear 1', p(10), u, dp), R('Tip diameter for standard clearance, gear 2', p(11), u, dp));
+      rows.push(R('Transverse contact ratio', p(14), '', 3));
+    }
+    return rows;
+  },
+  diagram: (v, s) => typeof gearToothSvg === 'function' ? gearToothSvg(gearMod(v.mp, s), v.z1, v.pa, isFinite(v.x1) ? v.x1 : 0, v.ha, v.hf, 'Gear 1 teeth, drawn from the true involute') : '',
+  working: 'm = 1 / P in inch mode. d = z m; db = d cos α; p = π m; pb = p cos α; ha = (ha* + x) m; hf = (hf* − x) m; da = d + 2 ha; df = d − 2 hf; s = m (π/2 + 2 x tan α); thickness at diameter dy: sy = dy (s/d + inv α − inv αy), cos αy = db/dy. Undercut: z_min = 2 ha*/sin²α, x_min = ha* − z sin²α / 2. Pair: inv αw = 2 tan α (x1 + x2)/(z1 + z2) + inv α; y = (z1 + z2)/2 · (cos α / cos αw − 1); a = ((z1 + z2)/2 + y) m; dw = db / cos αw; tips for standard clearance: ha1 = (ha* + y − x2) m, ha2 = (ha* + y − x1) m. Contact ratio εα = [√(ra1² − rb1²) + √(ra2² − rb2²) − a sin αw] / pb. inv α = tan α − α (radians). The drawing below the root circle uses a radial flank instead of the real fillet, which depends on the cutter.',
+  source: 'Basic rack: ISO 53:1998 and AGMA full-depth system (cited by name: addendum 1 m, dedendum 1.25 m). Formulas and the worked example in the tests (m 3, z 12 and 24, x 0.6 and 0.36: a = 56.4999, αw = 26.0886°) from the KHK Gear Technical Reference, calculation of gear dimensions; SDP/SI Elements of Metric Gear Technology; MESYS AG online helical gear calculation. See docs/gears.md.',
+},
+{
+  id: 'gearmeasure', group: 'Gears and splines', title: 'Gear measurement: span, pins, chordal',
+  desc: 'Inspection sizes for a spur or helical gear: span (base tangent length) over k teeth, measurement over pins or balls (external) or between pins (internal) with the ideal pin size, and chordal tooth thickness and chordal height for a gear tooth vernier. Nominal values for the basic tooth thickness; subtract your backlash allowance. For a helical gear give the normal module and normal pressure angle.',
+  fields: s => [
+    s === 'inch' ? { id: 'mp', label: 'Normal diametral pitch P', unit: 'teeth/in', def: 10 } : { id: 'mp', label: 'Normal module m', unit: 'mm', def: 1 },
+    { id: 'z', label: 'Number of teeth', unit: '', def: s === 'inch' ? 30 : 20 },
+    { id: 'pa', label: 'Normal pressure angle', unit: 'deg', def: 20, options: [[20, '20°'], [14.5, '14.5°'], [25, '25°']] },
+    { id: 'beta', label: 'Helix angle (0 = spur)', unit: 'deg', def: 0 },
+    { id: 'x', label: 'Profile shift x', unit: 'x m', def: 0 },
+    { id: 'int', label: 'Gear type', unit: '', def: 0, options: [[0, 'External'], [1, 'Internal (pins between)']] },
+    { id: 'dp', label: 'Pin or ball diameter (blank = ideal)', unit: lenU(s), def: s === 'inch' ? '' : 1.7 },
+    { id: 'k', label: 'Teeth spanned k (blank = suggested)', unit: '', def: '' },
+    { id: 'ha', label: 'Addendum factor ha*', unit: 'x m', def: 1 },
+  ],
+  calc: (v, W, s) => {
+    const m = gearMod(v.mp, s), u = lenU(s), x = isFinite(v.x) ? v.x : 0, b = isFinite(v.beta) ? v.beta : 0, int = v.int === 1 ? 1 : 0;
+    if (!(m > 0 && v.z >= 3 && v.pa > 0 && v.ha > 0)) return [];
+    const q = i => W.gear_measure(m, v.z, v.pa, b, x, v.dp > 0 ? v.dp : 0, int, v.k > 0 ? v.k : 0, v.ha, i), dp = s === 'inch' ? 4 : 3;
+    const rows = [];
+    if (!int) {
+      rows.push(R('Tip diameter', q(14), u, dp));
+      if (b !== 0) rows.push(R('Virtual number of teeth zv = z / cos³β', q(13), '', 3));
+      rows.push(R('Span: teeth spanned k', q(6), '', 0), R('Span: k from the formula (before rounding)', q(9), '', 3),
+        R('Span measurement W over k teeth', q(7), u, dp + 1), R('Span: anvils touch at diameter', q(8), u, dp));
+      if (b !== 0) rows.push(R('Span: least face width for the anvils (W sin βb, plus margin)', q(10), u, dp));
+    }
+    rows.push(R((b !== 0 ? 'Ball' : 'Pin') + ' diameter used', q(1), u, dp + 1), R('Ideal ' + (b !== 0 ? 'ball' : 'pin') + ' (touches near d + 2xm)', q(2), u, dp + 1),
+      R(int ? 'Measurement between pins' : 'Measurement over ' + (b !== 0 ? 'balls' : 'pins'), q(0), u, dp + 1),
+      R('Pin centres on diameter', q(3), u, dp));
+    if (b === 0) rows.push(R('Pins touch the flanks at diameter', q(4), u, dp));
+    if (Math.round(v.z) % 2) rows.push(R('Odd tooth count', 'pins on opposite spaces are not on one diameter; the cos(90°/z) form is used', '', 0));
+    if (b !== 0 && Math.round(v.z) % 2) rows.push(R('Helical, odd teeth', 'the true two-ball reading is a little smaller than this formula (balls not in one transverse plane)', '', 0));
+    if (!int) rows.push(R('Chordal tooth thickness at the reference circle', q(11), u, dp + 1), R('Chordal height (from the tip)', q(12), u, dp + 1));
+    return rows;
+  },
+  working: 'm = 1 / P in inch mode. Span: W = mn cos αn [π (k − 0.5) + z inv αt] + 2 x mn sin αn; tan αt = tan αn / cos β. Suggested k makes the anvils touch near d + 2 x m: k = [(W′ − 2 x mn sin αn)/(mn cos αn) − z inv αt]/π + 0.5, W′ = 2 √(rx² − rb²)/cos βb, rounded. Pins (external): inv φ = st/d + inv αt + dp/(z mn cos αn) − π/z, st = mt (π/2 + 2 x tan αn); M = db / cos φ + dp (even z), db cos(90°/z) / cos φ + dp (odd z). Internal: inv φ = et/d + inv αt − dp/(z mn cos αn); M = db / cos φ − dp (odd: × cos(90°/z) before − dp). Ideal pin (KHK): ψ = π/(2z) − inv α − 2 x tan α / z, cos αx = db/(d + 2xm), φ = tan αx + ψ, dp = z m cos α (inv φ + ψ); internal ψ = π/(2z) + inv α + 2 x tan α / z, φ = tan αx − ψ, dp = z m cos α (ψ − inv φ); helical: same with zv = z / cos³β. Chordal: ψ = π/(2z) + 2 x tan α / z, s̄ = z m sin ψ, h̄ = ha + (z m / 2)(1 − cos ψ) (helical: zv and mn). Internal gears: profile shift sign as in the KHK reference (positive x widens the space).',
+  source: 'ISO 21771-1:2024 and DIN 3960 (span measurement, cited by name). KHK Gear Technical Reference, tooth thickness (span, over pins, chordal; internal gears); SDP/SI Elements of Metric Gear Technology, section 10; MESYS AG online gear calculation (worked values m 1, z 20, dp 1.7: MdK 22.2941, W2 4.7083); A. Kapelevich, Gear Technology, Jan/Feb 2011 (span form); FRENCO (two-ball size of odd helical gears, 2015). See docs/gears.md.',
+},
+{
+  id: 'helicalgear', group: 'Gears and splines', title: 'Helical gears',
+  desc: 'Parallel-axis helical gear pair in the normal system: transverse module and pressure angle, base helix angle, pitch, base, tip and root diameters, lead, axial pitch, centre distance (with profile shift) and contact ratios. The two gears of an external pair have opposite hands.',
+  fields: s => [
+    s === 'inch' ? { id: 'mp', label: 'Normal diametral pitch Pn', unit: 'teeth/in', def: 8 } : { id: 'mp', label: 'Normal module mn', unit: 'mm', def: 3 },
+    { id: 'z1', label: 'Teeth, gear 1', unit: '', def: s === 'inch' ? 20 : 12 },
+    { id: 'z2', label: 'Teeth, gear 2', unit: '', def: s === 'inch' ? 40 : 60 },
+    { id: 'pa', label: 'Normal pressure angle', unit: 'deg', def: 20, options: [[20, '20°'], [14.5, '14.5°'], [25, '25°']] },
+    { id: 'beta', label: 'Helix angle β', unit: 'deg', def: s === 'inch' ? 15 : 30 },
+    { id: 'x1', label: 'Normal profile shift, gear 1', unit: 'x mn', def: 0 },
+    { id: 'x2', label: 'Normal profile shift, gear 2', unit: 'x mn', def: 0 },
+    { id: 'b', label: 'Face width (for the overlap ratio)', unit: lenU(s), def: s === 'inch' ? 1 : 30 },
+    { id: 'ha', label: 'Addendum factor ha*', unit: 'x mn', def: 1 },
+    { id: 'hf', label: 'Dedendum factor hf*', unit: 'x mn', def: 1.25 },
+  ],
+  calc: (v, W, s) => {
+    const m = gearMod(v.mp, s), u = lenU(s), x1 = isFinite(v.x1) ? v.x1 : 0, x2 = isFinite(v.x2) ? v.x2 : 0, dp = s === 'inch' ? 4 : 3;
+    if (!(m > 0 && v.z1 >= 3 && v.pa > 0 && v.beta >= 0 && v.beta < 60 && v.ha > 0 && v.hf > 0)) return [];
+    const h1 = i => W.gear_helical(m, v.z1, v.pa, v.beta, x1, v.ha, v.hf, i);
+    const rows = [R('Transverse module mt = mn / cos β', h1(0), u, dp + 1)];
+    if (s === 'inch') rows.push(R('Transverse diametral pitch Pt = Pn cos β', 1 / h1(0), 'teeth/in', 4));
+    rows.push(R('Transverse pressure angle', h1(1), 'deg', 4), R('Base helix angle', h1(6), 'deg', 4),
+      R('Normal circular pitch', h1(9), u, dp + 1), R('Transverse circular pitch', h1(10), u, dp + 1));
+    if (v.beta > 0) rows.push(R('Axial pitch', h1(8), u, dp + 1));
+    const gear = (n, h, z) => {
+      rows.push(R(n + ': pitch (reference) diameter', h(2), u, dp), R(n + ': base diameter', h(3), u, dp));
+      if (v.beta > 0) rows.push(R(n + ': lead', h(7), u, dp - 1));
+      rows.push(R(n + ': virtual number of teeth', h(11), '', 2));
+    };
+    gear('Gear 1', h1, v.z1);
+    if (v.z2 >= 3) {
+      const h2 = i => W.gear_helical(m, v.z2, v.pa, v.beta, x2, v.ha, v.hf, i);
+      const p = i => W.gear_helical_pair(m, v.z1, v.z2, v.pa, v.beta, x1, x2, v.ha, v.hf, i);
+      gear('Gear 2', h2, v.z2);
+      rows.push(R('Ratio z2 / z1', v.z2 / v.z1, '', 4), R('Standard centre distance (no shift)', p(8), u, dp));
+      if (x1 !== 0 || x2 !== 0) rows.push(R('Working transverse pressure angle', p(1), 'deg', 4), R('Centre distance modification coefficient y', p(2), '', 5));
+      rows.push(R('Centre distance', p(0), u, dp), R('Gear 1: tip diameter', p(3), u, dp), R('Gear 2: tip diameter', p(4), u, dp),
+        R('Gear 1: root diameter', p(5), u, dp), R('Gear 2: root diameter', p(6), u, dp));
+      const ea = p(7), eb = v.b > 0 ? W.gear_overlap_ratio(v.b, m, v.beta) : NaN;
+      rows.push(R('Transverse contact ratio εα', ea, '', 3));
+      if (isFinite(eb)) rows.push(R('Overlap ratio εβ', eb, '', 3), R('Total contact ratio εγ = εα + εβ', ea + eb, '', 3));
+    } else rows.push(R('Gear 1: tip diameter', h1(4), u, dp), R('Gear 1: root diameter', h1(5), u, dp));
+    return rows;
+  },
+  working: 'mt = mn / cos β; tan αt = tan αn / cos β; d = z mt; db = d cos αt; tan βb = tan β cos αt; lead = π d / tan β; axial pitch px = π mn / sin β; zv = z / cos³β. Single gear: da = d + 2 (ha* + xn) mn, df = d − 2 (hf* − xn) mn. Pair: inv αwt = 2 tan αn (xn1 + xn2)/(z1 + z2) + inv αt; y = (z1 + z2)/(2 cos β) · (cos αt / cos αwt − 1); a = ((z1 + z2)/(2 cos β) + y) mn; tips for standard clearance da1 = d1 + 2 (ha* + y − xn2) mn; df = da − 2 (ha* + hf* + y − xn1 − xn2) mn. εα in the transverse plane with pbt = π mt cos αt; εβ = b sin β / (π mn).',
+  source: 'KHK Gear Technical Reference, helical gears in the normal and transverse systems (worked example in the tests: mn 3, β 30°, z 12 and 60, xn1 0.09809: a = 125.000, da 48.153 / 213.842, df 34.657 / 200.346); SDP/SI Elements of Metric Gear Technology, section 6. See docs/gears.md.',
+},
+{
+  id: 'geartrain', group: 'Gears and splines', title: 'Gear train ratio',
+  desc: 'Simple and compound trains: give each driver and driven gear that mesh, up to four pairs (two gears on one shaft make the next pair). An idler only changes the direction; count it below. Output speed = input speed / ratio.',
+  fields: s => [
+    { id: 'n', label: 'Input speed', unit: 'RPM', def: 1500 },
+    { id: 'a1', label: 'Pair 1: driver teeth', unit: '', def: 20 }, { id: 'b1', label: 'Pair 1: driven teeth', unit: '', def: 60 },
+    { id: 'a2', label: 'Pair 2: driver teeth', unit: '', def: 18 }, { id: 'b2', label: 'Pair 2: driven teeth', unit: '', def: 54 },
+    { id: 'a3', label: 'Pair 3: driver teeth', unit: '', def: '' }, { id: 'b3', label: 'Pair 3: driven teeth', unit: '', def: '' },
+    { id: 'a4', label: 'Pair 4: driver teeth', unit: '', def: '' }, { id: 'b4', label: 'Pair 4: driven teeth', unit: '', def: '' },
+    { id: 'idl', label: 'Idlers (external gears between)', unit: '', def: 0 },
+  ],
+  calc: (v, W, s) => {
+    const p = [];
+    for (let i = 1; i <= 4; i++) if (v['a' + i] > 0 && v['b' + i] > 0) p.push(v['a' + i], v['b' + i]);
+    if (!p.length) return [];
+    const nb = toBuf(W, p), r = W.gear_train_ratio(nb), ext = p.length / 2 + (v.idl > 0 ? Math.round(v.idl) : 0);
+    const rows = [R('Train ratio (input / output speed)', r, ': 1', 5), R('Output turns per input turn', 1 / r, '', 6)];
+    if (v.n > 0) rows.push(R('Output speed', v.n / r, 'RPM', 2));
+    rows.push(R('Output direction (external gears only)', W.gear_train_sign(ext) > 0 ? 'same as the input' : 'opposite to the input', '', 0));
+    return rows;
+  },
+  working: 'Ratio = (driven1 / driver1) × (driven2 / driver2) × ... ; n_out = n_in / ratio. Each external mesh reverses the direction, so the output turns the same way as the input when the number of external meshes (pairs plus idlers) is even. An internal (ring) gear mesh does not reverse; allow for it yourself.',
+  source: 'Gear-train ratio arithmetic; KHK Gear Technical Reference and SDP/SI Elements of Metric Gear Technology, section 13 (gear trains). See docs/gears.md.',
+},
+{
+  id: 'planetary', group: 'Gears and splines', title: 'Planetary gear set',
+  desc: 'Simple planetary set (sun, planets, ring, carrier) by Willis\' formula: give two of the three speeds (0 for a held member) and leave the third blank. Also the planet tooth count, the three usual ratios and the equal-spacing check.',
+  fields: s => [
+    { id: 'zs', label: 'Sun teeth', unit: '', def: 24 },
+    { id: 'zr', label: 'Ring teeth', unit: '', def: 72 },
+    { id: 'np', label: 'Number of planets', unit: '', def: 3 },
+    { id: 'ns', label: 'Sun speed (blank = solve)', unit: 'RPM', def: 1000 },
+    { id: 'nr', label: 'Ring speed (blank = solve)', unit: 'RPM', def: 0 },
+    { id: 'nc', label: 'Carrier speed (blank = solve)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.zs > 0 && v.zr > v.zs)) return [];
+    const rows = [R('Planet teeth for unshifted gears (zr − zs)/2', W.gear_planet_teeth(v.zs, v.zr), '', 1)];
+    const blank = ['ns', 'nr', 'nc'].filter(k => !isFinite(v[k]));
+    if (blank.length === 1) {
+      const out = W.gear_willis(v.zs, v.zr, v.ns, v.nr, v.nc);
+      rows.push(R({ ns: 'Sun speed', nr: 'Ring speed', nc: 'Carrier speed' }[blank[0]], out, 'RPM', 2));
+    } else rows.push(R('Speeds', 'leave exactly one of the three speeds blank', '', 0));
+    rows.push(R('Ring held: sun in, carrier out', 1 / W.gear_willis(v.zs, v.zr, 1, 0, NaN), ': 1', 4),
+      R('Sun held: ring in, carrier out', 1 / W.gear_willis(v.zs, v.zr, 0, 1, NaN), ': 1', 4),
+      R('Carrier held: sun in, ring out (reverses)', 1 / W.gear_willis(v.zs, v.zr, 1, NaN, 0), ': 1', 4));
+    if (v.np >= 1) rows.push(R('Equal planet spacing', W.gear_planets_assemble(v.zs, v.zr, Math.round(v.np)) ? 'yes: (zs + zr) / n is a whole number' : 'no: (zs + zr) / n is not a whole number', '', 0));
+    return rows;
+  },
+  working: "Willis: (ns − nc) / (nr − nc) = −zr / zs, so ns + (zr/zs) nr − (1 + zr/zs) nc = 0; solved for the blank speed. Ring held: ratio 1 + zr/zs; sun held: 1 + zs/zr; carrier held: −zr/zs. Unshifted planets: zp = (zr − zs)/2. Equal spacing of n planets needs (zs + zr)/n to be a whole number.",
+  source: "R. Willis, Principles of Mechanism (1841), relative-speed method (by name); KHK Gear Technical Reference and SDP/SI Elements of Metric Gear Technology, section 13 (planetary gear trains). See docs/gears.md.",
+},
+{
+  id: 'spline', group: 'Gears and splines', title: 'Involute splines (ANSI B92.1, ISO 4156)',
+  desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal). Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
+  fields: s => [
+    { id: 'std', label: 'Standard', unit: '', def: s === 'inch' ? 1 : 2, options: [[1, 'ANSI B92.1 (inch, P/2P pitch)'], [2, 'ISO 4156 (metric module)']] },
+    { id: 'mp', label: 'Pitch P (ANSI, e.g. 16 for 16/32) or module m (ISO, mm)', unit: '', def: s === 'inch' ? 16 : 2 },
+    { id: 'z', label: 'Number of teeth', unit: '', def: s === 'inch' ? 24 : 20 },
+    { id: 'dpe', label: 'Pin diameter, external (blank = ideal)', unit: lenU(s), def: '' },
+    { id: 'dpi', label: 'Pin diameter, internal (blank = ideal)', unit: lenU(s), def: '' },
+    { id: 'st', label: 'Actual tooth thickness (blank = basic)', unit: lenU(s), def: '' },
+    { id: 'et', label: 'Actual space width (blank = basic)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.mp > 0 && v.z >= 6 && (v.std === 1 || v.std === 2))) return [];
+    // Module in the current length unit: ANSI m = 1/P inch; ISO m in mm.
+    const m = v.std === 1 ? (s === 'inch' ? 1 / v.mp : 25.4 / v.mp) : (s === 'inch' ? v.mp / 25.4 : v.mp);
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3, g = i => W.gear_spline(v.std, m, v.z, i);
+    const rows = [];
+    if (v.std === 1) rows.push(R('Pitch', v.mp + '/' + 2 * v.mp + ' (stub pitch 2P sets the depth)', '', 0));
+    rows.push(R('Pitch diameter D', g(0), u, dp), R('Base diameter Db = D cos 30°', g(1), u, dp), R('Circular pitch p', g(2), u, dp + 1),
+      R('Basic tooth thickness = basic space width (p / 2)', g(3), u, dp + 1),
+      R('Major diameter, external (basic)', g(4), u, dp), R('Minor diameter, external (flat root, basic)', g(7), u, dp),
+      R('Major diameter, internal (flat root, basic)', g(6), u, dp));
+    if (isFinite(g(5))) rows.push(R('Minor diameter, internal (basic)', g(5), u, dp));
+    else rows.push(R('Minor diameter, internal', 'from the external form diameter and form clearance in ISO 4156 (not given here)', '', 0));
+    const d = g(0), st = v.st > 0 ? v.st : g(3), et = v.et > 0 ? v.et : g(3);
+    const pe = v.dpe > 0 ? v.dpe : W.gear_ideal_pin_ext(m, v.z, 30, 0), pi = v.dpi > 0 ? v.dpi : W.gear_ideal_pin_int(m, v.z, 30, 0);
+    rows.push(R('Pin diameter, external', pe, u, dp + 1), R('Measurement over pins, external', W.gear_over_pins_ext(v.z, d, 30, st, pe), u, dp + 1),
+      R('Pin diameter, internal', pi, u, dp + 1), R('Measurement between pins, internal', W.gear_between_pins_int(v.z, d, 30, et, pi), u, dp + 1));
+    rows.push(R('Major and minor diameter factors', v.std === 1 ? 'one free source so far (Engineers Edge)' : 'one free source so far (ISO 4156:1981 preview)', '', 0));
+    return rows;
+  },
+  working: 'm = 1/P (ANSI) or the module (ISO). D = m z; Db = D cos 30°; p = π m; basic s = e = p/2. ANSI B92.1 30° flat root side fit: Do = (N + 1)/P, Di = (N − 1)/P, Dri = (N + 1.35)/P, Dre = (N − 1.35)/P. ISO 4156 30° flat root: Dee = m (z + 1), Dei = m (z + 1.5), Die = m (z − 1.5) (basic, before deviations). Pins: external inv φ = s/D + inv 30° + dp/Db − π/z, M = Db / cos φ + dp (even z; odd z × cos(90°/z) before + dp); internal inv φ = e/D + inv 30° − dp/Db, M = Db / cos φ − dp. Ideal pins touch at the pitch diameter (as for a gear with x = 0).',
+  source: 'ANSI B92.1-1996 and ISO 4156-1:2021 (second edition, replaces ISO 4156-1:2005), cited by name. Factors: Engineers Edge, involute spline basic formulas (ANSI); ISO 4156:1981 table 2 in the iTeh free preview (ISO). Pin formulas as for gears (KHK). Each status is in docs/gears.md.',
+},
+{
+  id: 'worm', group: 'Gears and splines', title: 'Worm and wheel basics',
+  desc: 'Cylindrical worm and worm wheel at 90°: lead, lead angle, ratio, wheel pitch diameter and centre distance from the axial module (or axial diametral pitch), number of starts and the worm pitch diameter.',
+  fields: s => [
+    s === 'inch' ? { id: 'mp', label: 'Axial diametral pitch', unit: 'teeth/in', def: 8 } : { id: 'mp', label: 'Axial module mx', unit: 'mm', def: 3 },
+    { id: 'z1', label: 'Worm starts (threads)', unit: '', def: 1 },
+    { id: 'z2', label: 'Wheel teeth', unit: '', def: s === 'inch' ? 40 : 30 },
+    { id: 'd1', label: 'Worm pitch diameter', unit: lenU(s), def: s === 'inch' ? 1 : 44 },
+    { id: 'n', label: 'Worm speed (optional)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    const m = gearMod(v.mp, s), u = lenU(s), dp = s === 'inch' ? 4 : 3;
+    if (!(m > 0 && v.z1 >= 1 && v.z2 >= 1 && v.d1 > 0)) return [];
+    const w = i => W.gear_worm(m, v.z1, v.z2, v.d1, i);
+    const rows = [R('Axial pitch (= wheel circular pitch)', w(6), u, dp + 1), R('Lead = starts × axial pitch', w(0), u, dp + 1),
+      R('Lead angle (at the worm pitch diameter)', w(1), 'deg', 4), R('Ratio z2 / z1', w(2), ': 1', 3),
+      R('Wheel pitch diameter', w(4), u, dp), R('Centre distance', w(3), u, dp), R('Normal module mn = mx cos γ', w(5), u, dp + 1)];
+    if (s === 'inch') rows.push(R('Normal diametral pitch', 1 / w(5), 'teeth/in', 4));
+    if (v.n > 0) rows.push(R('Wheel speed', v.n / w(2), 'RPM', 2));
+    return rows;
+  },
+  working: 'm = 1 / P in inch mode. px = π mx; lead L = z1 px; tan γ = z1 mx / d1; ratio = z2 / z1; d2 = z2 mx; a = (d1 + d2)/2; mn = mx cos γ.',
+  source: 'KHK Gear Technical Reference, cylindrical worm gear pair; SDP/SI Elements of Metric Gear Technology, section 9 (worm mesh). See docs/gears.md.',
+},
 {
   id: 'machinetapers', group: 'Setup', title: 'Machine tapers',
   desc: 'Morse, Jacobs, 7:24 steep tapers (ISO 7388-1 / SK, BT, CAT), HSK-A and R8: gauge diameters, lengths, taper per foot and angle, with pull stud (retention knob) references.',

@@ -521,3 +521,42 @@ static mut EXPR_POS: f64 = 0.0;
 /// Prime factors of `n` into list_out; returns the count.
 #[no_mangle] pub extern "C" fn prime_factors(n: f64) -> f64 { set_out(c::expr::prime_factors(n)) }
 f1!(interpolate, c::expr::interpolate, x1, y1, x2, y2, x);
+
+// Gears and splines (core/src/gears.rs). Lengths in any one unit (module or 1/P).
+f1!(gear_involute, c::gears::involute, deg);
+f1!(gear_inv_angle, c::gears::inv_angle_deg, inv);
+/// Spur gear: which 0 d, 1 db, 2 da, 3 df, 4 ha, 5 hf, 6 h, 7 p, 8 pb, 9 s, 10 e, 11 z_min, 12 x_min, 13 s at tip.
+#[no_mangle] pub extern "C" fn gear_spur(m: f64, z: f64, alpha: f64, x: f64, ha: f64, hf: f64, which: f64) -> f64 { c::gears::spur_flat(m, z, alpha, x, ha, hf, which as u32) }
+/// Spur pair: which 0 inv aw, 1 aw, 2 y, 3 a0, 4 a, 5 dw1, 6 dw2, 7 ha1, 8 ha2, 9 h, 10 da1, 11 da2, 12 df1, 13 df2, 14 contact ratio.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gear_spur_pair(m: f64, z1: f64, z2: f64, alpha: f64, x1: f64, x2: f64, ha: f64, hf: f64, which: f64) -> f64 { c::gears::spur_pair_flat(m, z1, z2, alpha, x1, x2, ha, hf, which as u32) }
+f1!(gear_shift_sum_for_centre, c::gears::shift_sum_for_centre, m, z1, z2, alpha, a);
+f1!(gear_thickness_at, c::gears::thickness_at, d, s, alpha, dy);
+/// Helical gear: which 0 mt, 1 at, 2 d, 3 db, 4 da, 5 df, 6 beta_b, 7 lead, 8 px, 9 pn, 10 pt, 11 zv.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gear_helical(mn: f64, z: f64, an: f64, beta: f64, xn: f64, ha: f64, hf: f64, which: f64) -> f64 { c::gears::helical_flat(mn, z, an, beta, xn, ha, hf, which as u32) }
+/// Helical pair: which 0 a, 1 a_wt, 2 y, 3 da1, 4 da2, 5 df1, 6 df2, 7 eps_alpha, 8 a0.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gear_helical_pair(mn: f64, z1: f64, z2: f64, an: f64, beta: f64, xn1: f64, xn2: f64, ha: f64, hf: f64, which: f64) -> f64 { c::gears::helical_pair_flat(mn, z1, z2, an, beta, xn1, xn2, ha, hf, which as u32) }
+f1!(gear_overlap_ratio, c::gears::overlap_ratio, face, mn, beta);
+/// Gear measurement (see `gear_measure_flat` for `which`).
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gear_measure(mn: f64, z: f64, an: f64, beta: f64, xn: f64, dp: f64, internal: f64, k: f64, ha: f64, which: f64) -> f64 {
+    c::gears::gear_measure_flat(mn, z, an, beta, xn, dp, internal != 0.0, k, ha, which as u32) }
+/// One tooth outline (x, y pairs) into list_out; returns the value count.
+#[no_mangle] pub extern "C" fn gear_tooth(d: f64, db: f64, da: f64, df: f64, s: f64, n: f64) -> f64 {
+    set_out(c::gears::tooth_outline(d, db, da, df, s, n.max(0.0) as usize)) }
+/// Gear train ratio from the first `n` buffer values (driver, driven, driver, driven, ...).
+#[no_mangle] pub extern "C" fn gear_train_ratio(n: f64) -> f64 { c::gears::train_ratio(buf(n)) }
+f1!(gear_willis, c::gears::willis, zs, zr, ns, nr, nc);
+f1!(gear_planet_teeth, c::gears::planet_teeth, zs, zr);
+#[no_mangle] pub extern "C" fn gear_planets_assemble(zs: f64, zr: f64, n: f64) -> f64 { if c::gears::planets_assemble(zs, zr, n) { 1.0 } else { 0.0 } }
+/// Worm: which 0 lead, 1 lead angle, 2 ratio, 3 centre distance, 4 wheel pitch dia, 5 normal module, 6 axial pitch.
+#[no_mangle] pub extern "C" fn gear_worm(mx: f64, z1: f64, z2: f64, d1: f64, which: f64) -> f64 { pick(c::gears::worm(mx, z1, z2, d1), which) }
+f1!(gear_train_sign, c::gears::train_sign, n);
+f1!(gear_over_pins_ext, c::gears::over_pins_ext, z, d, alpha, s, dp);
+f1!(gear_between_pins_int, c::gears::between_pins_int, z, d, alpha, e, dp);
+f1!(gear_ideal_pin_ext, c::gears::ideal_pin_ext, m, z, alpha, x);
+f1!(gear_ideal_pin_int, c::gears::ideal_pin_int, m, z, alpha, x);
+/// Involute spline, 30 deg flat root side fit: std 1 ANSI B92.1, 2 ISO 4156; which as `spline_flat`.
+#[no_mangle] pub extern "C" fn gear_spline(std: f64, m: f64, z: f64, which: f64) -> f64 { c::gears::spline_flat(std as u32, m, z, which as u32) }
