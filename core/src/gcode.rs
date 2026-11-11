@@ -273,7 +273,7 @@ pub fn gen_drill(j: &DrillJob) -> Program {
     let (x0, y0) = j.holes[0];
     let mut b = B::new(j.metric, j.ctrl, false, [x0, y0, j.z_init]);
     let name = match j.cycle { 81 => "DRILL G81", 82 => "SPOT/COUNTERBORE G82", 83 => "PECK DRILL G83", 73 => "CHIP BREAK G73", _ => if j.rigid { "RIGID TAP G84" } else { "FLOATING TAP G84" } };
-    let mut notes = vec![format!("T{} - {} HOLE(S) - Z{} R{}", j.tool, j.holes.len(), b.n(j.z), b.n(j.r))];
+    let mut notes = vec![format!("T{} - {} HOLES - Z{} R{}", j.tool, j.holes.len(), b.n(j.z), b.n(j.r))];
     if tap {
         notes.push(format!("TAP FEED F = PITCH X RPM = {} X {}", fnum(j.pitch, if j.metric { 4 } else { 6 }), j.rpm.round() as i64));
         if !j.rigid { notes.push("FLOATING HOLDER: CHECK THE HOLDER MAKER'S FEED ADVICE".into()); }
@@ -378,7 +378,7 @@ pub fn gen_thread_mill(j: &ThreadMillJob) -> Program {
     let gc = |c: bool| if c { "G03" } else { "G02" };
     let notes = vec![
         format!("T{} - {} {} THREAD D{} P{}", j.tool, if j.left_hand { "LH" } else { "RH" }, if j.internal { "INTERNAL" } else { "EXTERNAL" }, b.n(j.major), fnum(j.pitch, if j.metric { 4 } else { 6 })),
-        format!("{} MILLING, {} RADIAL PASS(ES), {} SPRING PASS(ES)", if j.climb { "CLIMB" } else { "CONVENTIONAL" }, j.passes, j.spring),
+        format!("{} MILLING, {} RADIAL PASSES, {} SPRING PASSES", if j.climb { "CLIMB" } else { "CONVENTIONAL" }, j.passes, j.spring),
         format!("TOOL DIA {} - {}", b.n(j.tool_dia), if j.comp { format!("G41/G42 WITH D{}: SET D TO THE TOOL RADIUS {}", j.d_reg, b.n(rt)) } else { "TOOL CENTRE PATH, NO COMPENSATION".to_string() }),
         format!("F IS THE TOOL CENTRE FEED FOR {} AT THE CUTTING EDGE", b.feed(j.edge_feed)),
         "Z REFERENCE: THE TOOL'S THREAD-FORM TOOTH".into(),
@@ -499,7 +499,7 @@ pub fn gen_lathe_thread(j: &LatheThreadJob) -> Program {
     let notes = vec![
         format!("T{:02}{:02} - {} THREAD D{} LEAD {}", j.tool, j.tool, if j.internal { "INTERNAL" } else { "EXTERNAL" }, b.n(j.major), fnum(j.lead, ldp)),
         format!("DEPTH {} RADIAL, ROOT DIA {}", b.n(j.depth), b.xd(r_root)),
-        format!("{} PASS(ES) + {} SPRING PASS(ES)", j.passes.len(), j.spring),
+        format!("{} PASSES + {} SPRING PASSES", j.passes.len(), j.spring),
     ];
     b.header(j.prog, if j.g76 { "THREAD G76" } else { "THREAD G92" }, &notes);
     b.l(format!("{} G40 G99", b.units_line()));
@@ -687,7 +687,7 @@ pub fn gen_groove(j: &GrooveJob) -> Program {
     let mut b = B::new(j.metric, j.ctrl, true, [rcl, 0.0, zs[0]]);
     let notes = vec![
         format!("T{:02}{:02} - {} D{} TO D{}", j.tool, j.tool, if j.cutoff { "CUT-OFF" } else { "GROOVE" }, b.n(j.stock_dia), b.n(j.bottom_dia)),
-        format!("TOOL WIDTH {}{} - Z IS THE TOOL'S FRONT (+Z) CORNER", b.n(j.tool_width), if j.cutoff { String::new() } else { format!(", GROOVE WIDTH {}, {} PLUNGE(S)", b.n(width), n) }),
+        format!("TOOL WIDTH {}{} - Z IS THE TOOL'S FRONT +Z CORNER", b.n(j.tool_width), if j.cutoff { String::new() } else { format!(", GROOVE WIDTH {}, {} PLUNGES", b.n(width), n) }),
     ];
     b.header(j.prog, if j.cutoff { "CUT-OFF" } else { "GROOVE" }, &notes);
     b.l(format!("{} G40 G99", b.units_line()));
@@ -762,7 +762,7 @@ pub fn gen_broach(j: &BroachJob) -> Program {
     let mut b = B::new(j.metric, j.ctrl, j.lathe, start);
     let notes = vec![
         format!("T{} - KEYWAY BROACH, BORE D{}, DEPTH {}", j.tool, b.n(j.bore_dia), b.n(j.depth)),
-        format!("{} STROKE(S) OF {} + {} SPRING, FEED {} PER MIN", n, b.n(j.doc), j.spring, b.feed(j.feed)),
+        format!("{} STROKES OF {} + {} SPRING, FEED {} PER MIN", n, b.n(j.doc), j.spring, b.feed(j.feed)),
         "SPINDLE MUST BE ORIENTED AND LOCKED - THE CODE IS MACHINE SPECIFIC".into(),
         "CUTTING EDGE MUST FACE THE KEYWAY DIRECTION".into(),
     ];
