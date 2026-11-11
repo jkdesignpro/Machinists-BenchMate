@@ -30,12 +30,12 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 68 | 14 | 29 (8) | 2 | 0 | 61 % |
+| CNC Machinist Calculator Ultra | 113 | 82 | 16 | 13 (0) | 2 | 0 | 74 % |
 | Machinery's Handbook 31 | 306 | 47 | 95 | 130 (12) | 6 | 28 | 17 % |
 | Engineers' Data Book | 94 | 10 | 27 | 19 (1) | 12 | 26 | 18 % |
 | Engineers Black Book | 80 | 23 | 26 | 30 (9) | 1 | 0 | 29 % |
 | CNC Machining handbook | 83 | 13 | 17 | 49 (0) | 0 | 4 | 16 % |
-| **All** | **676** | **161** | **179** | **257 (30)** | **21** | **58** | **27 %** |
+| **All** | **676** | **175** | **181** | **241 (22)** | **21** | **58** | **29 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -59,6 +59,8 @@ features are names only.
 
 **Update (branch `claude/tooling-ref`, 2026-11-11):** batch B3 (tooling reference) is built: tooling guide (`toolguide`), tap pitch diameter limits (`taplimits`), saw blade pitch (`sawtpi`) and a forming-tap makers' comparison in `tapdrill`. BB63 done; MH96, MH101, MH103, MH107, MH109, MH114, MH115, MH156, BB8, BB13, BB19, BB22, BB25, BB26, BB64, BB65, CN6 partial. MH97 (done, `insertcode`) and MH98 (partial, `holdercode`) corrected: those tools were merged earlier but the rows still said missing. Not built: hole saw speeds (BB24: no two independent charts compared), broaching, burrs, mounted points, files, drill and toolbit sharpening, colour-coded taps. Summary counts recounted from all rows by script (the in-progress column changed only for MH97).
 **Update (branch `claude/inspection-2`, 2026-11-11):** batch B5 (inspection round 2) is built except thread gauges and measurement over pins for a radius: ANSI B4.1 inch fits (`ansifits`, one full source, so its rows are marked "needs 2nd source"), ISO 286 j/J and sizes up to 3150 mm (`fits`), preferred numbers (`prefnum`), control charts (`ctrlchart`) and sampling plan OC curves (`sampling`; ISO 2859-1 / Z1.4 tables not included). U61, MH79, ED79 done; MH77, MH81, ED81 partial. Summary counts updated for these six rows. Details in `docs/inspection.md`.
+
+**Update (branch `claude/overhaul`, 2026-11-11):** section 1 was re-judged row by row against the 0.2.0 code: Ultra is now 82 done, 16 partial, 13 missing (0 in progress), 2 out of scope, 74 % done of in-scope rows (was 68, 14, 29, 61 %), and the **All** line is re-added with the book lines unchanged. Status changes: U32, U65, U67, U69, U75, U76, U77, U78, U81, U83, U87, U98, U103, U107 missing or partial -> done; U84, U85, U105, U108 missing -> partial. Tool ids and "What's missing" were rewritten for every U row. Cutting-data engines (U1, U2, U28) are still missing.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -112,169 +114,169 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U1 | Lathe cutting speed and feed recommendations (material, machinability, hardness, insert, strategy) | missing | | No cutting-data database: `rpm` only converts a speed you already know |
-| U2 | Turning feed and depth-of-cut engine | missing | | Chip-breaker window, feed/DOC suggestion |
-| U3 | Lathe spindle speed conversion (SFM/Vc and RPM) | done | `rpm` | |
-| U4 | Lathe feed rate conversion (per rev and per minute) | done | `lathefeed` | mm/rev and mm/min (IPR and IPM) both ways from RPM (`claude/calcs-3`) |
-| U5 | Rough pass cut time | done | `roughtime`, `passtime` | Number of passes from stock and depth of cut, RPM per pass at constant Vc (capped at the machine max), time per pass and total; CSS within a single facing pass is in `cycgroove` (`claude/calcs-3`) |
-| U6 | Groove and cut-off cycle time | done | `cycgroove` | Groove and cut-off program with CSS, G50 clamp, cut time integrated as the diameter shrinks (`claude/cycles`) |
-| U7 | Taper calculation | done | `taper` | |
-| U8 | Lathe taper G-code / taper programming | done | `cyctaper` | Roughing along the cone and finish pass, external or internal (`claude/cycles`) |
-| U9 | Boring bar deflection | done | `boringbar` | Steel, carbide and heavy metal presets (or own E), coolant bore, Fc = kc ap f, overhang L/D guidance from Seco, Kennametal and Cutwel shown per maker (`claude/calcs-3`) |
-| U10 | C-axis rotational feed converter | done | `caxis` | Degrees/min, feed along the circumference, combined linear and rotary path, inverse time F (G93) (`claude/calcs-3`) |
-| U11 | Lathe cycle generator, CAD profile to canned cycles (G71/G70 style) | partial | `cycg71` | G71/G70 from a typed list of points (straight lines, type I only); no CAD/DXF input, no arcs (`claude/cycles`) |
-| U12 | Lathe surface finish | done | `finish` | |
+| U1 | Lathe cutting speed and feed recommendations (material, machinability, hardness, insert, strategy) | missing |  | No cutting-data database: `rpm` only converts a speed you already know; `iso513` only names the material groups |
+| U2 | Turning feed and depth-of-cut engine | missing |  | Chip-breaker window and feed or depth-of-cut suggestion |
+| U3 | Lathe spindle speed conversion (SFM/Vc and RPM) | done | `rpm` |  |
+| U4 | Lathe feed rate conversion (per rev and per minute) | done | `lathefeed` |  |
+| U5 | Rough pass cut time | done | `roughtime`, `passtime` |  |
+| U6 | Groove and cut-off cycle time | done | `cycgroove`, `partofftime` |  |
+| U7 | Taper calculation | done | `taper` |  |
+| U8 | Lathe taper G-code / taper programming | done | `cyctaper` |  |
+| U9 | Boring bar deflection | done | `boringbar` |  |
+| U10 | C-axis rotational feed converter | done | `caxis` |  |
+| U11 | Lathe cycle generator, CAD profile to canned cycles (G71/G70 style) | partial | `cycg71` | Straight lines only, type I only, typed point list; no arcs and no CAD or DXF input |
+| U12 | Lathe surface finish | done | `finish` |  |
 
 ### Milling
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U13 | Mill speeds and feeds with physics engine (chip thinning, deflection, power) | partial | `cutopt` | Checks a cut you enter against power, torque and deflection. No recommended starting speed or feed for a material and tool, no kc by material |
-| U14 | Mill spindle speed / SFM | done | `rpm` | |
-| U15 | Mill feed rate conversion | done | `feed` | |
-| U16 | Radial chip thinning | done | `chipthin` | Compensated feed for a target chip thickness, RCTF, engagement angle, drawing (`claude/calcs-3`) |
-| U17 | Metal removal rate | done | `mrr` (turning), `cutopt` (milling) | Milling MRR only inside `cutopt` |
+| U13 | Mill speeds and feeds with physics engine (chip thinning, deflection, power) | partial | `cutopt` | Checks a cut you enter against power, torque and deflection; no recommended starting speed or feed for a material and tool, no kc by material |
+| U14 | Mill spindle speed / SFM | done | `rpm` |  |
+| U15 | Mill feed rate conversion | done | `feed` |  |
+| U16 | Radial chip thinning | done | `chipthin` |  |
+| U17 | Metal removal rate | done | `mrr` (turning), `cutopt` (milling) |  |
 | U18 | Horsepower / machine power | partial | `mrr`, `cutopt` | You have to enter kc yourself; no unit-power or kc table by material |
-| U19 | Ball end mill cusp height | done | `ballcusp` | Cusp from step-over and step-over for a cusp, exact circle form (`claude/calcs-3`) |
-| U20 | Ball end mill effective cutting diameter | done | `balleff` | Effective diameter at depth with tool tilt; corrected RPM and feed (`claude/calcs-3`) |
-| U21 | Adaptive feed control (rounded corners) | done | `cornerfeed`, `arcfeed` | Engagement angle into an inside corner or round a boss and the feed that keeps the straight-wall chip (`claude/calcs-3`) |
-| U22 | Max tool runout / endmill runout | done | `runout` | Worst-tooth chip from dial TIR (Kline and DeVor model), per-tooth table, feed that keeps the worst tooth at target (`claude/calcs-3`) |
-| U23 | Slitting saw speeds and feeds | done | `slitsaw` | RPM, feed from fz and teeth, cut time (`claude/calcs-3`) |
-| U24 | Thread milling calculators | done | `cyctmill` | Path radius, tool-centre feed, helix angle and 3D helix feed (`claude/cycles`) |
-| U25 | Thread mill program generator | done | `cyctmill` | Internal/external, RH/LH, climb/conventional, arc-in/out, G41/G42 option, radial and spring passes (`claude/cycles`) |
+| U19 | Ball end mill cusp height | done | `ballcusp` |  |
+| U20 | Ball end mill effective cutting diameter | done | `balleff` |  |
+| U21 | Adaptive feed control (rounded corners) | done | `cornerfeed`, `arcfeed` |  |
+| U22 | Max tool runout / endmill runout | done | `runout` |  |
+| U23 | Slitting saw speeds and feeds | done | `slitsaw` |  |
+| U24 | Thread milling calculators | done | `cyctmill` |  |
+| U25 | Thread mill program generator | done | `cyctmill` |  |
 
 ### Chatter and vibration
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U26 | Chatter listener (microphone, stable speeds from lobes, mill and lathe) | done | `chatter` | Microphone (Web Audio, FFT in Rust) or typed frequency; harmonics of spindle and tooth passing marked; stable speeds per lobe; mill (teeth) and lathe (one); on-device only (`claude/calcs-3`); microphone also enabled in the desktop app (`claude/gdt-3`: verified on Linux, macOS and Windows set up but not run) |
-| U27 | Vibration check (device sensor) | missing | | Desktop first; needs a phone build or a USB sensor |
+| U26 | Chatter listener (microphone, stable speeds from lobes, mill and lathe) | done | `chatter` |  |
+| U27 | Vibration check (device sensor) | missing |  | Needs a device vibration sensor; desktop first, so a phone build or a USB sensor |
 
 ### Drilling and tapping
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U28 | Drill cutting speed and feed recommendations (point angle, tool material, coating, coolant, MRR, G-code) | missing | | |
-| U29 | Drill point length | done | `drillpoint` | |
-| U30 | Drill chart | done | `drillchart` | |
-| U31 | Tap drill size (cut and form, % thread 55-85) | done | `tapdrill` | |
-| U32 | Center drill dimensions / center drill hole depth | partial | `spotdepth` | Spot and centre drill depth for a countersink diameter and the reverse; centre drill pilot length is an input, no centre drill size table (`claude/calcs-3`) |
-| U33 | Reaming speeds, feeds and allowance | missing | | |
-| U34 | Gun drill calculators | missing | | |
-| U35 | Tapping speed calculators | missing | | |
-| U36 | G84 tap cycle generator | done | `cycdrill` | Rigid (Fanuc-style M29) or floating; F = pitch x rpm (`claude/cycles`) |
-| U37 | G81/G82/G83/G73 drill cycle generator | done | `cycdrill` | Generic Fanuc-style and Haas (`claude/cycles`) |
+| U28 | Drill cutting speed and feed recommendations (point angle, tool material, coating, coolant, MRR, G-code) | missing |  | No cutting-data database for drilling |
+| U29 | Drill point length | done | `drillpoint` |  |
+| U30 | Drill chart | done | `drillchart` |  |
+| U31 | Tap drill size (cut and form, % thread 55-85) | done | `tapdrill` |  |
+| U32 | Center drill dimensions / center drill hole depth | done | `spotdepth` |  |
+| U33 | Reaming speeds, feeds and allowance | missing |  | Only a reamer description in `toolguide`; no reaming speeds, feeds or allowance calculator |
+| U34 | Gun drill calculators | missing |  |  |
+| U35 | Tapping speed calculators | missing |  | No tapping speed calculator (`tapdrill` and `cycdrill` give hole size and F = pitch x rpm only) |
+| U36 | G84 tap cycle generator | done | `cycdrill` |  |
+| U37 | G81/G82/G83/G73 drill cycle generator | done | `cycdrill` |  |
 
 ### Threads
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U38 | UNC, UNF, UNEF data and class limits | done | `threaddata` | 2A/2B checked against published tables; 1A/3A/1B/3B computed, not checked; no 1B/3B minor limits |
-| U39 | UN constant-pitch and UNS (special) threads | done | `unseries`, `threaddata` (custom size) | 8-UN, 12-UN, 16-UN lists to 2 in with publisher counts; UNS designation explained, limits through the custom size; no 4, 6, 20, 28, 32-UN lists (`claude/threads-3`) |
-| U40 | UNJ threads | done | `unjunr` | Root radius range, screw minor limits, nut minor minimum for any UN size, classes 2 and 3; checked against published UNJC rows (`claude/threads-3`) |
-| U41 | UNR threads | partial | `unjunr` | UNR rule (root radius at least 0.108 P, external only) stated; UNR minor diameter limits not computed (`claude/threads-3`) |
-| U42 | UNM (miniature) threads | done | `unm` | 0.30 to 1.40 UNM basic and design sizes from two publishers, limits of size from one (`claude/threads-3`) |
-| U43 | Metric M profile threads | done | `threaddata` | 6g/6H checked; other classes computed only |
-| U44 | Special UN and metric sizes with anodize and plating allowance | partial | `coating` | Pitch diameter change and before-coating limits for any thread angle; no tables of special coated sizes (`claude/threads-3`) |
-| U45 | ACME threads | done | `acme` | General purpose 2G-4G and centralizing 2C-4C limits, single start; no 5G/5C/6C or multi-start allowance (`claude/threads-3`) |
-| U46 | Stub ACME threads | done | `acme` | Stub ACME (2G fit); no modified forms 1 and 2 (`claude/threads-3`) |
-| U47 | NPT threads | done | `pipethreads` | Basic dimensions; NPTF notes; no tolerances (`claude/threads-3`) |
-| U48 | BSPP threads | done | `pipethreads` | |
-| U49 | STI (helical insert) threads | done | `sti` | Tapped-hole major, pitch, minor from the nominal thread, three makers' limits side by side (`claude/threads-3`) |
-| U50 | Whitworth BSW and BSF | done | `whitworth` | Basic dimensions; no tolerances |
-| U51 | Thread data and over-wire measurement | done | `wires` | 60, 55, 30 and 29 degree threads; lead angle neglected (`claude/threads-3`) |
-| U52 | Thread size tolerance data (menu item) | done | `threaddata` | |
-| U53 | G76 lathe thread program generator | done | `cycthread` | G76 (Fanuc-style two-block, Haas one-block) or G92 per pass, with infeed table (`claude/cycles`) |
-| U54 | Thread programming (menu item) | done | `cycthread` | (`claude/cycles`) |
+| U38 | UNC, UNF, UNEF data and class limits | done | `threaddata` | Classes other than 2A/2B are computed, not checked against published tables; no 1B/3B minor limits |
+| U39 | UN constant-pitch and UNS (special) threads | done | `unseries`, `threaddata` (custom size) | No 4, 6, 20, 28 or 32-UN lists |
+| U40 | UNJ threads | done | `unjunr` |  |
+| U41 | UNR threads | partial | `unjunr` | UNR rule (root radius at least 0.108 P, external only) is stated; the UNR minor diameter limits are not computed |
+| U42 | UNM (miniature) threads | done | `unm` |  |
+| U43 | Metric M profile threads | done | `threaddata` | Classes other than 6g/6H are computed only |
+| U44 | Special UN and metric sizes with anodize and plating allowance | partial | `coating` | Pitch diameter change and before-coating limits for any thread angle; no tables of special coated sizes |
+| U45 | ACME threads | done | `acme` | No 5G, 5C or 6C classes and no multi-start allowance |
+| U46 | Stub ACME threads | done | `acme` | No modified forms 1 and 2 |
+| U47 | NPT threads | done | `pipethreads` | NPT basic dimensions only; no tolerances |
+| U48 | BSPP threads | done | `pipethreads` |  |
+| U49 | STI (helical insert) threads | done | `sti` |  |
+| U50 | Whitworth BSW and BSF | done | `whitworth` | Basic dimensions only; no tolerances |
+| U51 | Thread data and over-wire measurement | done | `wires` | Lead angle neglected |
+| U52 | Thread size tolerance data (menu item) | done | `threaddata` |  |
+| U53 | G76 lathe thread program generator | done | `cycthread` |  |
+| U54 | Thread programming (menu item) | done | `cycthread` |  |
 
 ### Grinding
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U55 | Grinding equivalent diameter | done | `grindspeed` | External, internal and surface; contact length (`claude/calcs-3`) |
-| U56 | Grit size conversion | done | `gritconv` | ANSI, FEPA F, FEPA P from four publishers, values per source with badges (`claude/calcs-3`) |
-| U57 | Plunge grinding | done | `grindtime` | Plunge time and specific removal rate, plus traverse time (`claude/calcs-3`) |
-| U58 | Grind RPM cylindricity error | missing | | |
-| U59 | Wheel and workpiece speed | done | `grindspeed` | Wheel m/s and sfpm, RPM for a speed, work speed from a speed ratio; checked against the marked max speed the user types (never defaulted) (`claude/calcs-3`) |
-| U60 | Surface grinding | done | `grindsurf` | Strokes, down-feed layers, spark-out, overtravel, total time (`claude/calcs-3`) |
+| U55 | Grinding equivalent diameter | done | `grindspeed` |  |
+| U56 | Grit size conversion | done | `gritconv` |  |
+| U57 | Plunge grinding | done | `grindtime` |  |
+| U58 | Grind RPM cylindricity error | missing |  |  |
+| U59 | Wheel and workpiece speed | done | `grindspeed` |  |
+| U60 | Surface grinding | done | `grindsurf` |  |
 
 ### Inspection and measurement
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U61 | ISO 286 fits and tolerances | done | `fits` | j5-j7 and J6-J8 added; sizes up to 3150 mm (over 500 mm: one table each, checked against the ISO 286-1 formulas) (`claude/inspection-2`) |
-| U62 | True position with MMC/LMC bonus | done | `gdttp`, `gdtbonus` | |
-| U63 | GD&T learning centre (without quizzes) | done | `gdtguide`, `gdtdof` | Quiz part out of scope |
-| U64 | Feature control frame builder | done | `gdtfcf` | |
-| U65 | Gauge block stack | missing | | In progress (`claude/geometry`, `sinebar`) |
-| U66 | Surface finish (lathe, mill, conversions) | partial | `finish` | Lathe only; no milling (stepover/cusp) finish, no Ra/Rz/RMS/N-grade conversions (conversions in progress on `claude/ref-data-3`) |
-| U67 | Hardness conversions | missing | | In progress (`claude/ref-data-3`) |
-| U68 | Thermal expansion calculator | done | `tempcomp`, `shrinkfit` | Measurement correction to 20 °C; plain growth, shrink-fit heating/cooling temperatures and press-fit pressure (`claude/measure-maths`) |
-| U69 | Sine bar | missing | | In progress (`claude/geometry`) |
-| U70 | Height over ball for countersinks and tapered bores | done | `ballcone`, `taperrolls` | Ball height in countersinks and tapered bores, face diameter from a ball, angle from two balls; external taper over rolls (`claude/measure-maths`) |
-| U71 | Socket head cap screw hole dimensions | done | `shcs`, `clearance` | Metric and inch counterbores and clearance holes, publisher disagreements shown (`claude/fasteners`) |
+| U61 | ISO 286 fits and tolerances | done | `fits` |  |
+| U62 | True position with MMC/LMC bonus | done | `gdttp`, `gdtbonus` |  |
+| U63 | GD&T learning centre (without quizzes) | done | `gdtguide`, `gdtdof` | Quiz part is out of scope |
+| U64 | Feature control frame builder | done | `gdtfcf` |  |
+| U65 | Gauge block stack | done | `sinebar` |  |
+| U66 | Surface finish (lathe, mill, conversions) | partial | `surface`, `finish` | Ra, microinch and N-grade conversions and symbols exist (Ra and Rz are deliberately not converted); the lathe finish is from nose radius and feed only; no milling finish (flat end mill or face mill) and no RMS conversion |
+| U67 | Hardness conversions | done | `hardness` | Unalloyed and low alloy steels only, approximate |
+| U68 | Thermal expansion calculator | done | `tempcomp`, `shrinkfit` |  |
+| U69 | Sine bar | done | `sinebar` |  |
+| U70 | Height over ball for countersinks and tapered bores | done | `ballcone`, `taperrolls` |  |
+| U71 | Socket head cap screw hole dimensions | done | `shcs`, `clearance` |  |
 
 ### Shop maths and geometry
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U72 | Bolt circle | done | `bolt` | |
-| U73 | Rectangular hole pattern | done | `cycdrill` | Grid pattern in zigzag order (`claude/cycles`) |
-| U74 | Hole pattern coordinate export | done | `cycdrill` | CSV download and G-code for bolt circle, grid or pasted holes (`claude/cycles`) |
-| U75 | Triangle solver | missing | | In progress (`claude/geometry`) |
-| U76 | Arc calculator | missing | | In progress (`claude/geometry`) |
-| U77 | Geometry calculations | missing | | In progress (`claude/geometry`: chord, sagitta, fillet, dovetail) |
-| U78 | Angle solving | missing | | In progress (`claude/geometry`) |
-| U79 | Unit converter | done | `units`, `fraction` | 17 quantities from NIST SP 811 exact definitions (`claude/measure-maths`) |
-| U80 | Scientific calculator | done | `calc` | Expression calculator (own parser in Rust, no eval), degrees/radians, DMS, prime factors, interpolation (`claude/measure-maths`) |
-| U81 | Material weight | partial | `bar` | Round, hex and square bar with a density you enter; no plate, tube or sections. Full tool in progress (`claude/geometry`, `weight`) |
-| U82 | Material property search with SFM data | partial | `materials` | Properties exist; no cutting speed/SFM or machinability data per grade. Round 2 in progress |
-| U83 | Spur gear data | missing | | |
-| U84 | Involute splines per ANSI B92.1 | missing | | |
-| U85 | Involute splines per ISO 4156 | missing | | |
-| U86 | SAE J499a splines | missing | | |
-| U87 | Knurl calculator | missing | | |
-| U88 | Keyway broach program generator | done | `cycbroach` | Lathe or mill, depth per stroke, lift, spring strokes (`claude/cycles`) |
-| U89 | Coolant concentration | done | `coolconc`, `coolmix` | |
-| U90 | Bandsaw cut time | done | `bandsaw` | Cut time from cutting rate or down-feed, chip per tooth from blade speed and TPI (`claude/calcs-3`) |
-| U91 | Tool wear information | done | `cncguide` | Wear types (flank, crater, notch, built-up edge, chipping, thermal cracks, plastic deformation) with causes and remedies from Mitsubishi Materials and Seco, own sketches (`claude/cnc-guide`) |
+| U72 | Bolt circle | done | `bolt` |  |
+| U73 | Rectangular hole pattern | done | `cycdrill`, `dxfgrid` |  |
+| U74 | Hole pattern coordinate export | done | `cycdrill`, `bolt` |  |
+| U75 | Triangle solver | done | `triangle` |  |
+| U76 | Arc calculator | done | `arc` |  |
+| U77 | Geometry calculations | done | `arc`, `fillet`, `dovetail`, `figures` |  |
+| U78 | Angle solving | done | `triangle`, `compound`, `units` |  |
+| U79 | Unit converter | done | `units`, `fraction` |  |
+| U80 | Scientific calculator | done | `calc` |  |
+| U81 | Material weight | done | `weight`, `bar` | No angle, channel or beam sections |
+| U82 | Material property search with SFM data | partial | `materials` | Properties exist; no cutting speed, SFM or machinability data per grade |
+| U83 | Spur gear data | done | `spurgear`, `gearmeasure` |  |
+| U84 | Involute splines per ANSI B92.1 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
+| U85 | Involute splines per ISO 4156 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
+| U86 | SAE J499a splines | missing |  | SAE J499a splines are not in `spline` |
+| U87 | Knurl calculator | done | `knurl` |  |
+| U88 | Keyway broach program generator | done | `cycbroach` |  |
+| U89 | Coolant concentration | done | `coolconc`, `coolmix` |  |
+| U90 | Bandsaw cut time | done | `bandsaw` |  |
+| U91 | Tool wear information | done | `cncguide` |  |
 
 ### G-code and programming
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U92 | G-code reference | done | `gmcodes` | Ten controls (generic RS274NGC, Fanuc mill and lathe A/B/C, Haas mill and lathe, Mitsubishi M70/M80, MELDAS 60, Siemens native and ISO, Heidenhain ISO, Okuma OSP lathe, Mazak EIA turning), search, mill/lathe filter, side-by-side compare, source per row (`claude/gmcodes`) |
-| U93 | M-code reference | done | `gmcodes` | Program-control and builder M codes where the maker prints them; builder-specific codes are flagged; Heidenhain, Mazak and Siemens ISO M codes are gaps (`claude/gmcodes`) |
-| U94 | Custom macro information | partial | `macroref` | Fanuc Macro B, Haas, Siemens R parameters and control structures, Okuma VC/IF, Heidenhain Q jumps; Mitsubishi variable ranges and IF/WHILE not yet confirmed (`claude/gmcodes`) |
-| U95 | G-code simulator (2D/3D, cycle time) | partial | `gsim` | 2D backplot (XY/XZ/YZ, lathe XZ), step through, distances, extents, cycle time, arc check; mill drilling cycles and lathe G70/G90/G92/G94 drawn; G71-G76 reported, no 3D. See docs/gsim.md |
-| U96 | 2D CAD and DXF generator (snapping, angle measure) | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | Parametric shapes with DXF export (branch `claude/dxf-toollib`); no free sketching, snapping or angle measure |
+| U92 | G-code reference | done | `gmcodes` |  |
+| U93 | M-code reference | done | `gmcodes` | Heidenhain, Mazak and Siemens ISO M codes are gaps; builder-specific M codes are flagged |
+| U94 | Custom macro information | partial | `macroref` | Mitsubishi variable ranges and IF/WHILE not yet confirmed |
+| U95 | G-code simulator (2D/3D, cycle time) | partial | `gsim` | 2D backplot with cycle time only; G71 to G76 are reported, not drawn; no 3D |
+| U96 | 2D CAD and DXF generator (snapping, angle measure) | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | Parametric shapes with DXF export; no free sketching, snapping or angle measure |
 
 ### Learning and data
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U97 | Machining formula library | done | `formulas` | Searchable library of 151 formulas from 85 tools with variables, units, tool link and source key, built from the registry in `app/formulas.js` (`claude/cnc-guide`) |
-| U98 | Machinist tip of the day | missing | | |
-| U99 | Machinist knowledge test / quiz | out of scope | | Jacob dropped quizzes |
-| U100 | Tolerance stack mini game | out of scope | | Jacob dropped games (a stack calculator exists: `gdtstack`) |
-| U101 | Virtual machining assistant (AI) | missing | | |
-| U102 | Community cut library / shared machining data | missing | | |
-| U103 | Indexable insert catalogue (decode/build ISO designations) | missing | | In progress (`claude/ref-data-3`) |
+| U97 | Machining formula library | done | `formulas` |  |
+| U98 | Machinist tip of the day | done | `tips.js` (Home tip of the day widget) |  |
+| U99 | Machinist knowledge test / quiz | out of scope |  | Jacob dropped quizzes |
+| U100 | Tolerance stack mini game | out of scope |  | Jacob dropped games (a stack calculator exists: `gdtstack`) |
+| U101 | Virtual machining assistant (AI) | missing |  |  |
+| U102 | Community cut library / shared machining data | missing |  |  |
+| U103 | Indexable insert catalogue (decode/build ISO designations) | done | `insertcode`, `holdercode`, `iso513` |  |
 
 ### Platform and UI
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U104 | Inch/metric toggle | done | `app.js` | |
-| U105 | Adjustable decimal precision | missing | | |
-| U106 | Favourites | done | side list, title button | Branch `claude/dxf-toollib` |
-| U107 | Home dashboard | missing | | |
-| U108 | Arrange menu (reorder) | missing | | |
-| U109 | Tool library (save tools, one-tap fill) | done | `toollib` | Branch `claude/dxf-toollib`: fill into the nine calculators that take a tool diameter, flutes or lengths |
-| U110 | Offline use | partial | | Runs from local files with no network calls; no installable offline build (no manifest or service worker) |
-| U111 | Web app / link to desktop | partial | | BenchMate is a web app; no phone-to-desktop link |
-| U112 | iOS and Android apps | missing | | Later phase |
-| U113 | 23 languages | missing | | English only |
+| U104 | Inch/metric toggle | done | `app.js` |  |
+| U105 | Adjustable decimal precision | partial | `app.js` | More and fewer decimal places on each calculator (remembered per tool); no single global precision setting |
+| U106 | Favourites | done | `app.js` (star button, Home widget) |  |
+| U107 | Home dashboard | done | `dashboard.js` |  |
+| U108 | Arrange menu (reorder) | partial | `dashboard.js` | Home widgets can be reordered and resized; the tool lists and the rail cannot be rearranged |
+| U109 | Tool library (save tools, one-tap fill) | done | `toollib` |  |
+| U110 | Offline use | partial |  | Runs from local files with no network calls, and the desktop app (Tauri) bundles it; no browser install (no manifest or service worker) |
+| U111 | Web app / link to desktop | partial |  | BenchMate is a web app and a desktop app; no phone-to-desktop link |
+| U112 | iOS and Android apps | missing |  | Later phase |
+| U113 | 23 languages | missing |  | English only |
 
 ## 2. Machinery's Handbook, 31st edition
 
