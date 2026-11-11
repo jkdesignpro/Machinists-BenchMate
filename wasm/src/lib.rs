@@ -614,3 +614,18 @@ pub extern "C" fn gsim_run(len: f64, lathe: f64, ctrl: f64, metric_out: f64, def
 #[no_mangle] pub extern "C" fn gsim_stat(i: f64) -> f64 { unsafe { (&*core::ptr::addr_of!(GSIM_STATS)).get(i as usize).copied().unwrap_or(f64::NAN) } }
 /// Messages ("line TAB level TAB text" per line) into the text buffer; returns the length (text at `text_ptr`).
 #[no_mangle] pub extern "C" fn gsim_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GSIM_MSGS)).clone() }) }
+
+// Inspection round 2 (core/src/inspect.rs)
+f1!(iso286_it_formula_large, c::iso286_it_formula_large_f, d_mean, grade);
+f1!(iso286_shaft_fd_formula_large, c::iso286_shaft_fd_formula_large_f, letter, d, it7, p_dev);
+f1!(iso286_j_limit, c::iso286_j_limit_f, dev, it, hole, which);
+f1!(ansi_fit, c::ansi_fit_f, interference_print, hole_plus, hole_minus, shaft_plus, shaft_minus, which);
+f1!(renard_theoretical, c::renard_theoretical, r, i);
+f1!(renard_index, c::renard_index, r, x);
+f1!(spc_constant_computed, c::spc_constant_computed_f, n, which);
+f1!(spc_constant_table, c::spc_constant_table_f, n, which);
+f1!(sampling, c::sampling_f, n, ac, p, lot, which);
+/// X-bar/R chart of the first `n` buffer values in subgroups of `sg`; `which` as in `spc_xbar_r`.
+#[no_mangle] pub extern "C" fn spc_xbar_r_buf(n: f64, sg: f64, which: f64) -> f64 { c::spc_xbar_r(buf(n), sg.max(0.0) as usize, which.max(0.0) as u32) }
+/// Individuals/moving range chart of the first `n` buffer values; `which` as in `spc_imr`.
+#[no_mangle] pub extern "C" fn spc_imr_buf(n: f64, which: f64) -> f64 { c::spc_imr(buf(n), which.max(0.0) as u32) }

@@ -12,7 +12,8 @@ async function loadRef(el) {
   return REF;
 }
 const rEsc = x => String(x ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const RSTATUS = { confirmed: ['confirmed', 'Confirmed'], confirmed_with_outlier: ['differs', 'One source differs'], differs: ['differs', 'Sources differ'], review: ['review', 'One source'], listed: ['review', 'One source'], exact: ['confirmed', 'Exact'] };
+const RSTATUS = { confirmed: ['confirmed', 'Confirmed'], confirmed_with_outlier: ['differs', 'One source differs'], differs: ['differs', 'Sources differ'], review: ['review', 'One source'], listed: ['review', 'One source'], exact: ['confirmed', 'Exact'],
+  table_formula: ['review', 'One table, formula agrees'], rule: ['confirmed', 'By rule'] };
 const badge = s => { const b = RSTATUS[s] || ['review', s]; return '<span class="badge ' + b[0] + '">' + b[1] + '</span>'; };
 const pubName = (srcs, k) => (srcs[k] || {}).publisher || k;
 // Shared per-tool input memory (values kept in mm so the unit toggle does not lose them).
@@ -223,7 +224,7 @@ async function renderThreadData(el) {
 }
 
 // ------------------------------------------------------------------ ISO limits and fits
-const SHAFT_LETTERS = ['a', 'b', 'c', 'cd', 'd', 'e', 'ef', 'f', 'fg', 'g', 'h', 'js', 'k', 'm', 'n', 'p', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'za', 'zb', 'zc'];
+const SHAFT_LETTERS = ['a', 'b', 'c', 'cd', 'd', 'e', 'ef', 'f', 'fg', 'g', 'h', 'j', 'js', 'k', 'm', 'n', 'p', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'za', 'zb', 'zc'];
 const LETTER_CODE = Object.fromEntries(['', 'a', 'b', 'c', 'cd', 'd', 'e', 'ef', 'f', 'fg', 'g', 'h', 'js', 'k', 'm', 'n', 'p', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 'za', 'zb', 'zc'].map((l, i) => [l, i]));
 
 function iso286Step(I, sizeMm, sub) {
@@ -237,13 +238,26 @@ function iso286It(I, sizeMm, grade) {
 }
 function iso286ShaftFd(I, sizeMm, letter) {
   if (letter === 'h' || letter === 'js') { const st = iso286Step(I, sizeMm, false); return st ? { v: 0, c: { status: 'exact', groups: [] }, st } : null; }
+  // ISO 286-1: k is 0 above 500 mm (its formula 0.6 D^(1/3) applies up to 500 mm only)
+  if (letter === 'k' && sizeMm > 500) { const st = iso286Step(I, sizeMm, false); return st ? { v: 0, c: { status: 'rule', groups: [] }, st } : null; }
   const sub = I.sub_letters.includes(letter);
   const st = iso286Step(I, sizeMm, sub); if (!st) return null;
   const c = (I.shaft[letter] || {})[st.key]; return c ? { v: c.value, c, st } : null;
 }
+// j and J are tabulated per class (j5, j6, j7; J6, J7, J8 in ISO 286-2), no fundamental deviation rule.
+function iso286JClass(I, W, sizeMm, grade, hole, it) {
+  const name = (hole ? 'J' : 'j') + grade, tab = (hole ? I.j_hole : I.j_shaft)[name];
+  if (!tab) return { err: name + ' is not tabulated: ISO 286-2 gives ' + (hole ? 'J6, J7 and J8' : 'j5, j6 and j7') + ' (use JS/js for other grades).' };
+  const st = iso286Step(I, sizeMm, false), c = st && tab[st.key];
+  if (!c) return { err: name + ' is not tabulated for ' + rEsc(fx(sizeMm, 1)) + ' mm in the sources read (j/J are not defined above 500 mm).' };
+  const h = hole ? 1 : 0;
+  return { up: W.iso286_j_limit(c.value, it.v, h, 0), lo: W.iso286_j_limit(c.value, it.v, h, 1), it, fd: { v: c.value, c, st } };
+}
 function iso286Class(I, W, sizeMm, letter, grade, hole) {
   const l = letter.toLowerCase(), code = LETTER_CODE[l];
-  const it = iso286It(I, sizeMm, grade); if (!it) return { err: 'No IT' + grade + ' value for this size.' };
+  const it = iso286It(I, sizeMm, grade); if (!it) return { err: 'No IT' + grade + ' value for this size' + (sizeMm > 500 && grade < 1 ? ' (IT01 and IT0 are not defined above 500 mm).' : '.') };
+  if (l === 'j') return iso286JClass(I, W, sizeMm, grade, hole, it);
+  if (hole && sizeMm > 500 && ['k', 'm', 'n'].includes(l) && grade > 8) return { err: letter.toUpperCase() + grade + ': above 500 mm BenchMate shows K, M and N only up to IT8 (the hole table column read).' };
   const fd = iso286ShaftFd(I, sizeMm, l); if (!fd) return { err: (hole ? letter.toUpperCase() : l) + ' is not defined for ' + sizeMm + ' mm (ISO 286-1 leaves it out for this size step).' };
   let up, lo;
   if (!hole) { up = W.iso286_shaft_limit(code, grade, fd.v, it.v, 0); lo = W.iso286_shaft_limit(code, grade, fd.v, it.v, 1); }
@@ -262,13 +276,13 @@ async function renderFits(el) {
   const gradeOpts = cur => Array.from({ length: 18 }, (_, i) => i + 1).map(g => '<option' + (g === cur ? ' selected' : '') + '>' + g + '</option>').join('');
   const letterOpts = (cur, up) => SHAFT_LETTERS.map(l => { const t = up ? l.toUpperCase() : l; return '<option value="' + l + '"' + (l === cur.toLowerCase() ? ' selected' : '') + '>' + (up && l === 'js' ? 'JS' : t) + '</option>'; }).join('');
   el.innerHTML = '<div class="grid" style="max-width:760px">' +
-    '<label class="f"><span>Nominal size (up to 500 mm)</span><div class="row"><input id="fs" type="number" step="any"><span class="u">' + uLen() + '</span></div></label>' +
+    '<label class="f"><span>Nominal size (up to 3150 mm)</span><div class="row"><input id="fs" type="number" step="any"><span class="u">' + uLen() + '</span></div></label>' +
     '<label class="f"><span>Hole: letter and grade</span><div class="row"><select id="fhl">' + letterOpts(m.hl, true) + '</select><select id="fhg">' + gradeOpts(m.hg) + '</select></div></label>' +
     '<label class="f"><span>Shaft: letter and grade</span><div class="row"><select id="fsl">' + letterOpts(m.sl, false) + '</select><select id="fsg">' + gradeOpts(m.sg) + '</select></div></label>' +
     '<label class="f"><span>Common fits</span><div class="row"><select id="fpre"><option value="">Choose...</option>' +
     ['H11/c11', 'H9/d9', 'H8/f7', 'H7/g6', 'H7/h6', 'H7/k6', 'H7/n6', 'H7/p6', 'H7/s6', 'H7/u6', 'C11/h11', 'F8/h7', 'G7/h6', 'K7/h6', 'N7/h6', 'P7/h6', 'S7/h6'].map(f => '<option>' + f + '</option>').join('') + '</select></div></label></div>' +
     '<div id="fres"></div><div class="note"><b>Working:</b> Limits of a class = fundamental deviation and the IT value of the grade. Shafts a to h: es = deviation, ei = es - IT; k to zc: ei = deviation, es = ei + IT; js: +/- IT/2. k uses its IT4 to IT7 value for grades 4 to 7 and 0 otherwise. Holes (ISO 286-1): A to H: EI = -es of the same shaft letter; K, M, N up to IT8 and P to ZC up to IT7: ES = -ei + delta, delta = IT(n) - IT(n-1) for the size step (no delta up to 3 mm); K above IT8: ES = 0; M above IT8: ES = -ei; N above IT8: ES = 0; M6 over 250 to 315 mm: ES = -9 um (the standard\'s exception). Fit: maximum clearance = ES - ei, minimum clearance = EI - es; negative clearance is interference. ' +
-    'The IT values and shaft deviations come from published tables (two or more publishers), not from the formulas: ISO 286-1:2010 tabulates them, and its tables depart from the annex formulas in places (sizes to 3 mm, IT1 to IT4, letters a, b, c and t to zc in small sizes, and 10 IT5 to IT10 cells). The formula value is shown alongside for comparison. js7 to js11: older practice (ISO 286-1:1988, still printed in JIS tables) allowed rounding an odd IT to the even number below; BenchMate shows the exact +/- IT/2 as ISO 286-2:2010 prints it. Letters j and J (tabulated only, no formula) are not included.<br><b>Sources:</b> ISO 286-1:2010 (Cor 1:2013) rules, clause on holes; tables as listed below.</div><div class="note" id="fsrc"></div>';
+    'The IT values and shaft deviations come from published tables (two or more publishers), not from the formulas: ISO 286-1:2010 tabulates them, and its tables depart from the annex formulas in places (sizes to 3 mm, IT1 to IT4, letters a, b, c and t to zc in small sizes, and 10 IT5 to IT10 cells). The formula value is shown alongside for comparison. Over 500 to 3150 mm: IT1 to IT18 = multiplier x I, I = 0.004 D + 2.1 um (IT1 2, IT2 2.7, IT3 3.7, IT4 5, then as below 500 mm); shaft d, e, f, g, h, js, k (0), m, n, p, r, s, t, u only; holes follow the general rule with no delta (ES = -ei for K to U); one table each was read (Wikipedia for IT, GOST 25346 for deviations), and the annex formulas reproduce every value within the rounding (marked "One table, formula agrees"). j and J have no formula: j5, j6, j7 (lower deviation ei) and J6, J7, J8 (upper deviation ES) are tabulated per class (ISO 286-2), es = ei + IT and EI = ES - IT; read from Simply Bearings, RoyMech (compared, not republished) and GOST 25346. js7 to js11: older practice (ISO 286-1:1988, still printed in JIS tables) allowed rounding an odd IT to the even number below; BenchMate shows the exact +/- IT/2 as ISO 286-2:2010 prints it.<br><b>Sources:</b> ISO 286-1:2010 (Cor 1:2013) rules, clause on holes; tables as listed below.</div><div class="note" id="fsrc"></div>';
   const fs = $('#fs', el), fhl = $('#fhl', el), fhg = $('#fhg', el), fsl = $('#fsl', el), fsg = $('#fsg', el), fpre = $('#fpre', el);
   const fs0 = String(+toUser(m.size).toFixed(inMode() ? 4 : 3)); fs.value = fs0;
   const um = v => fx(v, Number.isInteger(v) ? 0 : 1);
@@ -283,7 +297,7 @@ async function renderFits(el) {
     m.hl = fhl.value; m.hg = +fhg.value; m.sl = fsl.value; m.sg = +fsg.value;
     if (!(v > 0)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter a nominal size.</td></tr></table></div>'; return; }
     const size = fs.value === fs0 ? m.size : fromUser(v); m.size = size;
-    if (size > 500) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Sizes above 500 mm are not covered yet.</td></tr></table></div>'; return; }
+    if (size > 3150) { out.innerHTML = '<div class="res"><table><tr><td class="warn">ISO 286-1 covers sizes up to 3150 mm.</td></tr></table></div>'; return; }
     const hn = (fhl.value === 'js' ? 'JS' : fhl.value.toUpperCase()) + fhg.value, sn = fsl.value + fsg.value;
     const H = iso286Class(I, W, size, fhl.value, +fhg.value, true), S = iso286Class(I, W, size, fsl.value, +fsg.value, false);
     let h = '<div class="res"><div class="h">' + rEsc(hn) + '/' + rEsc(sn) + ' at ' + fBoth(size) + '</div><table><tr><td class="ms">Class</td><td class="ms" style="text-align:right">Upper / lower deviation</td><td class="ms" style="text-align:right">Limits of size</td><td></td></tr>' + classRows(hn, H, size) + classRows(sn, S, size);
@@ -303,20 +317,22 @@ async function renderFits(el) {
     [[S, fsl.value, +fsg.value], [H, fhl.value, +fhg.value]].forEach(([c, l, g]) => {
       if (c.err || !c.it) return;
       const st = c.it.st; const dm = W.iso286_step_mean(st.lo, st.hi);
-      const itf = W.iso286_it_formula(dm, g);
+      const itf = size > 500 ? W.iso286_it_formula_large(dm, g) : W.iso286_it_formula(dm, g);
       cmp.push('IT' + g + ' (' + st.key + ' mm): table ' + um(c.it.v) + ' um, formula ' + fx(itf, 1) + ' um');
-      if (!['h', 'js'].includes(l)) {
+      if (!['h', 'js', 'j'].includes(l) && !(l === 'k' && size > 500)) {
         const fst = c.fd.st, fdm = W.iso286_step_mean(fst.lo, fst.hi);
         const gi = n => (iso286It(I, size, n) || {}).v;
-        const ff = W.iso286_shaft_fd_formula(LETTER_CODE[l], fdm, gi(6), gi(7), gi(8), gi(9), gi(10));
+        const pd = (iso286ShaftFd(I, size, 'p') || {}).v;
+        const ff = size > 500 ? W.iso286_shaft_fd_formula_large(LETTER_CODE[l], fdm, gi(7), pd) : W.iso286_shaft_fd_formula(LETTER_CODE[l], fdm, gi(6), gi(7), gi(8), gi(9), gi(10));
         if (isFinite(ff)) cmp.push('shaft ' + l + ' deviation (' + fst.key + ' mm): table ' + um(c.fd.v) + ' um, formula ' + fx(ff, 1) + ' um' + (['p', 's', 'r'].includes(l) && size <= 50 ? ' (formula gives a range here)' : ''));
       }
     });
     h += '<p class="desc">' + cmp.map(rEsc).join('; ') + '.</p>';
     // IT grade table for this size
     const st = iso286Step(I, size, false);
-    if (st) h += '<div class="res mtab" style="margin-top:12px"><div class="h">Standard tolerances for ' + st.key + ' mm (um)</div><table><tr>' + Object.keys(I.it).map(g => '<th>' + g + '</th>').join('') + '</tr><tr>' +
-      Object.keys(I.it).map(g => { const c = I.it[g][st.key]; return '<td class="mv" title="' + rEsc(groupsTitle(I.sources, c.groups)) + '">' + um(c.value) + (c.status === 'confirmed' ? '' : '<div>' + badge(c.status) + '</div>') + '</td>'; }).join('') + '</tr></table></div>';
+    const its = st ? Object.keys(I.it).filter(g => I.it[g][st.key]) : [];
+    if (st) h += '<div class="res mtab" style="margin-top:12px"><div class="h">Standard tolerances for ' + st.key + ' mm (um)</div><table><tr>' + its.map(g => '<th>' + g + '</th>').join('') + '</tr><tr>' +
+      its.map(g => { const c = I.it[g][st.key]; return '<td class="mv" title="' + rEsc(groupsTitle(I.sources, c.groups)) + '">' + um(c.value) + (c.status === 'confirmed' ? '' : '<div>' + badge(c.status) + '</div>') + '</td>'; }).join('') + '</tr></table></div>';
     out.innerHTML = h;
   }
   fpre.onchange = () => { const v = fpre.value; if (!v) return; const [a, b] = v.split('/'); const pa = a.match(/^([A-Z]+)(\d+)$/), pb = b.match(/^([a-z]+)(\d+)$/); fhl.value = pa[1].toLowerCase(); fhg.value = pa[2]; fsl.value = pb[1]; fsg.value = pb[2]; upd(); };

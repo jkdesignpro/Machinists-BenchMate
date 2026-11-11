@@ -134,6 +134,12 @@ def build_threads():
 MAIN = ['0-3', '3-6', '6-10', '10-18', '18-30', '30-50', '50-80', '80-120', '120-180', '180-250', '250-315', '315-400', '400-500']
 SUB = ['0-3', '3-6', '6-10', '10-14', '14-18', '18-24', '24-30', '30-40', '40-50', '50-65', '65-80', '80-100', '100-120',
        '120-140', '140-160', '160-180', '180-200', '200-225', '225-250', '250-280', '280-315', '315-355', '355-400', '400-450', '450-500']
+# Over 500 to 3150 mm (ISO 286-1:2010 Tables 1 to 3; added in inspection round 2).
+MAIN_LARGE = ['500-630', '630-800', '800-1000', '1000-1250', '1250-1600', '1600-2000', '2000-2500', '2500-3150']
+SUB_LARGE = ['500-560', '560-630', '630-710', '710-800', '800-900', '900-1000', '1000-1120', '1120-1250', '1250-1400',
+             '1400-1600', '1600-1800', '1800-2000', '2000-2240', '2240-2500', '2500-2800', '2800-3150']
+MAIN = MAIN + MAIN_LARGE
+SUB = SUB + SUB_LARGE
 SUB_LETTERS = set('a b c r s t u v x y z za zb zc'.split())
 
 
@@ -159,10 +165,27 @@ def build_iso286():
                 if v is None and l not in SUB_LETTERS: continue
                 if v is None and l in SUB_LETTERS: continue
                 printed[pub] = repr(v)
-            if 'GOST_25346' in printed and l in roy_letters and 'ROYMECH' not in printed:
+            if 'GOST_25346' in printed and l in roy_letters and 'ROYMECH' not in printed and r not in MAIN_LARGE + SUB_LARGE:
                 printed['ROYMECH'] = printed['GOST_25346']  # compared equal, not republished (see source note)
             if printed: shaft[l][r] = consensus(printed)
-    return {'sources': sources_of(ev), 'main_steps': MAIN, 'sub_steps': SUB, 'sub_letters': sorted(SUB_LETTERS), 'it': it, 'shaft': shaft}
+    # Over 500 mm only one table each was read (Wikipedia for IT, GOST 25346 for the shafts). The ISO 286-1
+    # formulas for that range (core/src/inspect.rs, tests iso286_large_*) reproduce every one of these values
+    # within the standard's rounding, so a single-table value there is marked 'table_formula', not 'confirmed'.
+    for sec in (it, shaft):
+        for rows in sec.values():
+            for r, c in rows.items():
+                if r in MAIN_LARGE + SUB_LARGE and c['status'] == 'review': c['status'] = 'table_formula'
+    # j and J: tabulated per tolerance class (no formula). Shafts: ei (es = ei + IT); holes: ES (EI = ES - IT).
+    j_shaft, j_hole = {}, {}
+    for key, out, dev in (('j_shaft', j_shaft, 'ei'), ('j_hole', j_hole, 'ES')):
+        for pub, classes in ev.get(key, {}).items():
+            for cls, rows in classes.items():
+                for r, v in rows.items():
+                    out.setdefault(cls, {}).setdefault(r, {})[pub] = repr(v[dev])
+        for cls, rows in out.items():
+            for r in list(rows): rows[r] = consensus(rows[r])
+    return {'sources': sources_of(ev), 'main_steps': MAIN, 'sub_steps': SUB, 'sub_letters': sorted(SUB_LETTERS), 'it': it, 'shaft': shaft,
+            'large_main_steps': MAIN_LARGE, 'j_shaft': j_shaft, 'j_hole': j_hole}
 
 
 # ---------------------------------------------------------------- other threads, tapers
@@ -499,12 +522,106 @@ def build_abbrev():
     return {'sources': sources_of(ev), 'rows': rows}
 
 
+# ---------------------------------------------------------------- ANSI B4.1 inch fits, preferred numbers (inspection round 2)
+ANSI_RANGES = ['0-0.12', '0.12-0.24', '0.24-0.40', '0.40-0.71', '0.71-1.19', '1.19-1.97', '1.97-3.15', '3.15-4.73',
+               '4.73-7.09', '7.09-9.85', '9.85-12.41', '12.41-15.75', '15.75-19.69']
+ANSI_FIELDS = ['a', 'b', 'hole_plus', 'hole_minus', 'shaft_plus', 'shaft_minus']
+
+
+def ansi_main_range(key):
+    lo, hi = (float(x) for x in key.split('-'))
+    for r in ANSI_RANGES:
+        a, b = (float(x) for x in r.split('-'))
+        if lo >= a - 1e-9 and hi <= b + 1e-9: return r
+    raise SystemExit('ANSI range ' + key + ' is not inside a standard size range')
+
+
+def ansi_expected_limits(fam, hp, hm, sp, sm):
+    """The two printed limits from the hole and shaft limits (thousandths): RC/LC/LT print (min clearance, max
+    clearance), a negative clearance being interference; LN/FN print (min interference, max interference)."""
+    if fam in ('LN', 'FN'): return (round(sm - hp, 4), round(sp - hm, 4))
+    return (round(hm - sp, 4), round(hp - sm, 4))
+
+
+def build_ansi_fits():
+    """ANSI B4.1 preferred inch fits: consensus per printed cell, plus two checks of each publisher's rows:
+    (1) the printed limits of clearance/interference must follow from the printed hole and shaft limits;
+    (2) every class that uses the same hole (or shaft) grade must show the same tolerance in a size range
+        (the grades come from the class symbols, e.g. RC3 = H7/f6)."""
+    ev = load_ev('ansi-fits-evidence.json')
+    if not ev: return None
+    sym = next(iter(ev['symbols'].values()))
+    desc = next(iter(ev['descriptions'].values()))
+    tol = collections.defaultdict(lambda: collections.defaultdict(list))  # (pub, grade, range) -> {tolerance: [classes]}
+    for pub, classes in ev['fits'].items():
+        for cls, rows in classes.items():
+            h, sh = sym[cls].split('/')
+            for key, v in rows.items():
+                hp, hm, sp, sm = (float(x) for x in v[2:])
+                mr = ansi_main_range(key)
+                tol[(pub, h, mr)][round(hp - hm, 4)].append(cls)
+                if sh != '-': tol[(pub, sh, mr)][round(sp - sm, 4)].append(cls)
+    grade_tol = {k: max(vals.items(), key=lambda kv: len(set(kv[1])))[0] for k, vals in tol.items()}
+    classes, problems = {}, []
+    for cls in sorted({c for v in ev['fits'].values() for c in v}, key=lambda c: (c[:2], int(c[2:]))):
+        fam = cls[:2]; h, sh = sym[cls].split('/')
+        keys = sorted({k for v in ev['fits'].values() for k in v.get(cls, {})}, key=lambda k: float(k.split('-')[0]))
+        rows = []
+        for key in keys:
+            row, notes = {'range': key}, []
+            for i, f in enumerate(ANSI_FIELDS):
+                row[f] = exact_consensus({pub: v[cls][key][i] for pub, v in ev['fits'].items() if key in v.get(cls, {})})
+            for pub, v in ev['fits'].items():
+                if key not in v.get(cls, {}): continue
+                a, b, hp, hm, sp, sm = (float(x) for x in v[cls][key])
+                ea, eb = ansi_expected_limits(fam, hp, hm, sp, sm)
+                if abs(ea - a) > 1e-9 or abs(eb - b) > 1e-9:
+                    notes.append(f'{pub} prints the fit limits {v[cls][key][0]} / {v[cls][key][1]}, but its hole and shaft limits give {ea:g} / {eb:g}')
+                mr = ansi_main_range(key)
+                for g, t in ((h, round(hp - hm, 4)), (sh, round(sp - sm, 4))):
+                    if g == '-' or (pub, g, mr) not in grade_tol: continue
+                    if abs(grade_tol[(pub, g, mr)] - t) > 1e-9:
+                        notes.append(f'{pub}: the {g} tolerance here is {t:g}; the other classes using {g} in {mr} in show {grade_tol[(pub, g, mr)]:g}')
+            row['notes'] = notes
+            if notes: problems.append((cls, key, notes))
+            rows.append(row)
+        classes[cls] = {'family': fam, 'symbol': sym[cls], 'desc': desc.get(cls, ''), 'rows': rows}
+    for cls, key, notes in problems: print('  ANSI check', cls, key, '; '.join(notes))
+    return {'sources': sources_of(ev), 'ranges': ANSI_RANGES, 'classes': classes}
+
+
+def build_preferred():
+    """Renard basic series. R40 is the finest basic series; R20, R10 and R5 take every 2nd, 4th and 8th term
+    (ISO 3). For each value: which independent publishers print it. Wikipedia's R40 column holds every R20,
+    R10 and R5 value at its nested position, so it counts for the coarser series too; WIKI_PREF is the same
+    publisher as WIKI_RENARD and is not counted twice."""
+    ev = load_ev('preferred-evidence.json')
+    if not ev: return None
+    pr, same = ev['printed'], ev.get('same_publisher', {})
+    r40 = pr['WIKI_RENARD']['R40']
+    out = {}
+    for name, step in (('R40', 1), ('R20', 2), ('R10', 4), ('R5', 8)):
+        lst = []
+        for i in range(0, 40, step):
+            v = r40[i]
+            # every basic-series value is an R40 value, so a value printed in any basic series counts
+            pubs = [pub for pub, ser in pr.items() if pub not in same and any(v in ser.get(s, []) for s in ('R5', 'R10', 'R20', 'R40'))]
+            lst.append({'i': i, 'value': v, 'publishers': pubs, 'status': 'confirmed' if len(pubs) >= 2 else 'review'})
+        out[name] = lst
+    r80 = []
+    for i, v in enumerate(r40):  # R80 index counts 80 steps per decade
+        r80.append({'i': 2 * i, 'value': v, 'publishers': out['R40'][i]['publishers'], 'status': out['R40'][i]['status']})
+        r80.append({'i': 2 * i + 1, 'value': pr['WIKI_RENARD']['R80_extra'][i], 'publishers': ['WIKI_RENARD'], 'status': 'review'})
+    out['R80'] = r80
+    return {'sources': sources_of(ev), 'series': out}
+
+
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
            'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes(),
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
-           'power_threads': build_power_threads()}
+           'power_threads': build_power_threads(), 'ansi_fits': build_ansi_fits(), 'preferred': build_preferred()}
     out['fasteners'] = build_fasteners(out['drills']['drills'])
     for sec in ('other_threads', 'tapers', 'power_threads'):
         if not out[sec]: continue
@@ -563,6 +680,12 @@ def main():
     i2 = out['iso2768']
     print('  iso2768', {k: dict(collections.Counter(c['status'] for r in i2[k] for f, c in r.items() if isinstance(c, dict))) for k in ('linear', 'edge', 'angle_min')})
     print('  abbreviations', dict(collections.Counter(r['status'] for r in out['abbrev']['rows'])))
+    pf = out['preferred']
+    print('  preferred numbers', {k: dict(collections.Counter(x['status'] for x in v)) for k, v in pf['series'].items()})
+    af = out['ansi_fits']
+    print('  ANSI fits', len(af['classes']), 'classes, cells', dict(collections.Counter(r[f]['status'] for c in af['classes'].values() for r in c['rows'] for f in ANSI_FIELDS)),
+          'rows with check notes:', sum(1 for c in af['classes'].values() for r in c['rows'] if r['notes']))
+    print('  ISO 286 j/J', {k: dict(collections.Counter(c['status'] for rows in iso[k].values() for c in rows.values())) for k in ('j_shaft', 'j_hole')})
     print('  knurl pitches', [(x['p'], x['status']) for x in out['knurl']['pitches_mm']])
 
 
