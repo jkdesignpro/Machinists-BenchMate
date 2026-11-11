@@ -119,9 +119,14 @@ jobs:
           echo "App bundle: $APP"
           # Ad hoc signature (no Apple Developer ID): free, but Gatekeeper still
           # asks the user to allow the app once (System Settings > Open Anyway).
-          codesign --force --deep --sign - "$APP"
+          # Same options as the Tauri bundler's own signature (hardened runtime
+          # plus desktop/Entitlements.plist), so the microphone entitlement for
+          # the chatter finder survives the re-sign.
+          codesign --force --deep --options runtime --entitlements desktop/Entitlements.plist --sign - "$APP"
           codesign --verify --deep --strict --verbose=2 "$APP"
-          codesign -dv "$APP" 2>&1 | grep -E 'Signature|Identifier|Format'
+          codesign -dv "$APP" 2>&1 | grep -E 'Signature|Identifier|Format|flags'
+          codesign -d --entitlements - "$APP" 2>&1 | grep -q 'com.apple.security.device.audio-input' || { echo "::error::audio-input entitlement missing"; exit 1; }
+          plutil -extract NSMicrophoneUsageDescription raw "$APP/Contents/Info.plist" || { echo "::error::NSMicrophoneUsageDescription missing from Info.plist"; exit 1; }
           mkdir -p dist
           ditto -c -k --keepParent "$APP" "dist/Machinists-BenchMate_${VERSION}_macos_${ARCH}.app.zip"
           DMG="$(ls "$B"/dmg/*.dmg | head -n1)"
@@ -129,6 +134,7 @@ jobs:
           MNT="$(mktemp -d)"
           hdiutil attach -nobrowse -readonly -mountpoint "$MNT" "$DMG"
           codesign --verify --deep --strict --verbose=2 "$MNT"/*.app
+          codesign -d --entitlements - "$MNT"/*.app 2>&1 | grep -q 'com.apple.security.device.audio-input' || { hdiutil detach "$MNT"; echo "::error::audio-input entitlement missing in the DMG app"; exit 1; }
           hdiutil detach "$MNT"
           cp "$DMG" "dist/Machinists-BenchMate_${VERSION}_macos_${ARCH}.dmg"
           ls -l dist

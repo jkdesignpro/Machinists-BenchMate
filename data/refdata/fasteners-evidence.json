@@ -1,0 +1,5563 @@
+{
+ "sources": {
+  "MUTUAL": {
+   "publisher": "Mutual Screw & Supply",
+   "title": "Bolt grade markings and strength chart",
+   "url": "https://mutualscrew.com/pages/bolt-grade-markings-strength-chart",
+   "accessed": "2026-11-10",
+   "note": "Distributor. SAE J429 grades 2/5/8 (Grade 2 printed as ranges, both size bands in one cell, so not recorded per band), ISO 898-1 classes without a size split (8.8 printed once: 800 / 640 / proof 600, recorded under d <= 16). No hardness, no A574."
+  },
+  "BOSSARD": {
+   "publisher": "Bossard",
+   "title": "Technical sheet F-013: marking and mechanical properties of hex head fasteners UNC/UNF according to SAE J429; marking according to ISO 898-1 (revision April 2009)",
+   "url": "https://media.bossard.com/-/media/bossard-group/website/documents/technical-resources/en/f-013-en.pdf",
+   "accessed": "2026-11-10",
+   "note": "Fastener maker and distributor. SAE J429 grades 1, 2, 5, 5.2, 8 with size ranges; proof, yield and tensile in psi and MPa. Grade 1 has no grade mark. Parts with reduced loadability are marked with a leading 0 (04.6, 010.9)."
+  },
+  "WESTFIELD": {
+   "publisher": "Westfield Fasteners",
+   "title": "Strength specifications of metric threaded fasteners",
+   "url": "https://www.westfieldfasteners.co.uk/Ref-Strength-Spec.html",
+   "accessed": "2026-11-10",
+   "note": "Distributor. Classes 4.6, 4.8, 5.8, 8.8 (16 mm and under / 17-72 mm), 9.8, 10.9, 12.9: proof strength, yield min, tensile min (MPa). Prints the 8.8 proof strengths as 660 (16 mm and under) and 580 (over 16), not in the order Optimas prints."
+  },
+  "OPTIMAS": {
+   "publisher": "Optimas Solutions",
+   "title": "Mechanical and physical properties of steel fasteners (EN ISO 898-1)",
+   "url": "https://optimas.com/technical-resources/mechanical-physical-properties-steel-fasteners/",
+   "accessed": "2026-11-10",
+   "note": "Fastener distributor. ISO 898-1 property table: Sp, ReL / Rp0.2 / Rpf, Rm, HV, HB, HR. The 8.8 columns are not labelled on the page; the split is read as d <= 16 / d > 16 from the value order."
+  },
+  "MSC": {
+   "publisher": "MSC Industrial Supply",
+   "title": "Socket head cap screws (socket products handbook: inch 1960 series and metric, pp. 1-16)",
+   "url": "https://www1.mscdirect.com/PDF/FASTENERS/SocketHeadCapScrews.pdf",
+   "accessed": "2026-11-10",
+   "note": "Distributor PDF, maker not named. Inch: ASME B18.3 and ASTM A574 (tensile 180,000 psi #2 to 1/2, 170,000 psi over 1/2; yield 162,000 / 153,000; HRC 39 / 37 min). Metric: ASME B18.3.1M and ASTM A574M head and key sizes and minimum tensile loads; drill and counterbore tables (inch p. 5, metric p. 12). The inch head columns came out garbled, so only the hex key column is used. Metric M3 row prints body diameter 2.50 (misprint)."
+  },
+  "AFT": {
+   "publisher": "AFT Fasteners",
+   "title": "Socket cap screws: dimensions and mechanical properties (ASME B18.3-2003)",
+   "url": "https://www.aftfasteners.com/socket-cap-screws-dimensions-and-mechanical-properties/",
+   "accessed": "2026-11-10",
+   "note": "Distributor. Inch socket head cap screws #0 to 1 1/2: head diameter and height max/min, hex socket. Alloy steel hardness HRC 39 min (0 to 1/2), HRC 37 min (5/8 and larger)."
+  },
+  "AMFAST": {
+   "publisher": "American Fastener",
+   "title": "Socket products: socket head cap screws",
+   "url": "https://www.americanfastener.com/sockets/",
+   "accessed": "2026-11-10",
+   "note": "Distributor. Inch socket head cap screws #0 to 1 1/2: head diameter max, head height max, hex socket size. No standard named."
+  },
+  "MISUMI": {
+   "publisher": "MISUMI",
+   "title": "Metric socket head cap screw dimensions (blog); counterboring and bolt holes for hexagon socket head cap screws (technical data p. 2847, from JIS B 1176); machine keys and key grooves (technical data, from JIS B 1301:1996)",
+   "url": "https://blog.misumiusa.com/metric-socket-head-cap-screws-dimensions/ ; https://id.misumi-ec.com/pdf/tech/mech/p2847.pdf ; https://mx.misumi-ec.com/es/pdf/tech/mech/US2010_fa_p3557_3558.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker and distributor. Head table follows \"ISO specifications\" (M1.6 to M48). Counterbore table: hole d', counterbore D', depth H' and H'' for M3 to M30. Key table: the PDF text extraction mixed the parallel-key and taper-key hub depths; the values used are the set that matches JIS B 1301 parallel keys (8 x 7: t2 = 3.3). Non-preferred sizes in brackets are left out."
+  },
+  "NBK": {
+   "publisher": "NBK (Nabeya Bi-tech)",
+   "title": "Diameter of clearance holes and counterbores for bolts and screws (excerpt from JIS B 1001:1985, refers to ISO 273)",
+   "url": "https://static.nbk1560.com/images/en-US/product/technical_data/boltana_zagurikei_NBK/boltana_zagurikei_NBK_1.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker. Grades 1, 2, 3 (= ISO 273 fine, medium, coarse) and grade 4 (cast holes, not in ISO 273, in brackets, not recorded). Its counterbore D' is a spot face for hex bolts and is not used."
+  },
+  "FRACTORY": {
+   "publisher": "Fractory",
+   "title": "Metric clearance hole sizes",
+   "url": "https://fractory.com/?p=21620",
+   "accessed": "2026-11-10",
+   "note": "Manufacturing service. Close / normal / loose fit, M1 to M150, no standard named. Prints M3 normal 3.35 and M6 normal 6.5; prints M30 twice (normal 32 and 33)."
+  },
+  "OPTIMAS_TAP": {
+   "publisher": "Optimas Solutions (tapping sizes page)",
+   "title": "Tapping sizes: ISO metric coarse with close, medium and free fit clearance holes",
+   "url": "https://optimas.com/technical-resources/tapping-sizes/",
+   "accessed": "2026-11-10",
+   "note": "Close / medium / free fit; no standard named."
+  },
+  "TRF": {
+   "publisher": "TR Fastenings",
+   "title": "Tapping sizes and clearance holes",
+   "url": "https://www.trfastenings.com/Knowledge-Base/Engineering-Data/tapping-sizes-and-clearance-holes",
+   "accessed": "2026-11-10",
+   "note": "Fastener maker. One metric clearance column (recorded as medium; it matches the NBK grade 2 values); Unified close and free fit as drill names. Stated as recommendations."
+  },
+  "WIKI_AF": {
+   "publisher": "Wikipedia",
+   "title": "Width across flats",
+   "url": "https://en.wikipedia.org/wiki/Width_across_flats",
+   "accessed": "2026-11-10",
+   "note": "Table of ISO widths across flats M2 to M42 (credits ISO 262:1998). Text: ISO 272 (1982) changed M10, M12, M14 and M22 from 17, 19, 22 and 32 mm."
+  },
+  "ACCU": {
+   "publisher": "Accu",
+   "title": "Across flats bolt size and spanner size chart",
+   "url": "https://accu.co.uk/p/464-across-flats-bolt-size-spanner-size-chart",
+   "accessed": "2026-11-10",
+   "note": "Distributor. Metric: separate ISO rows for M10, M12, M14 and M22 (other rows recorded as both ISO and DIN) and a JIS M8 row (12 mm). Inch rows are hex nut sizes (7/16 -> 11/16, 9/16 -> 7/8), not hex cap screw heads; machine-screw rows not recorded (#6 is printed 5/16 with decimal 0.2500)."
+  },
+  "SLS": {
+   "publisher": "SLS Bearings",
+   "title": "Spanner selection chart (hex head bolt)",
+   "url": "https://www.slsbearings.com/slsbnn/spanner.html",
+   "accessed": "2026-11-10",
+   "note": "Distributor. Metric DIN and ISO columns M1.6 to M160; inch ASME and BS columns 1/4 to 3 in."
+  },
+  "FASTENIT": {
+   "publisher": "fasten.it",
+   "title": "DIN 6885-1 standard dimensions for parallel keys (edition 08/1968, shown as withdrawn on the page)",
+   "url": "https://fasten.it/en/norms/norm/din_6885-1",
+   "accessed": "2026-11-10",
+   "note": "Fastener standards portal. b x h, shaft range, t1, t2; lengths from its form B weight tables."
+  },
+  "AIMS": {
+   "publisher": "AIMS Industrial",
+   "title": "What is a key and keyway? (keyway guide: ANSI B17.1-1967 (R2013), DIN 6885-1 / ISO 773, Woodruff)",
+   "url": "https://aimsindustrial.com.au/blogs/product-guides/keyway-guide",
+   "accessed": "2026-11-10",
+   "note": "Distributor. Metric table to 170-200 mm. Inch table with square and rectangular keys and shaft keyseat depth (half the key height). Woodruff list without keyseat depths (not used)."
+  },
+  "EE_KEY": {
+   "publisher": "Engineers Edge",
+   "title": "Shaft diameter vs key sizes (design per ANSI B17.1)",
+   "url": "https://ns1.engineersedge.com/gears/shaft_diameter_vs_key_sizes_14411.htm",
+   "accessed": "2026-11-10",
+   "note": "Engineering reference site. Square and rectangular key width and height, keyseat depth H/2, shafts 5/16 to 11 in."
+  },
+  "AMES_KEY": {
+   "publisher": "AMES Web",
+   "title": "Key size versus shaft diameter per ANSI B17.1-1967 (R1998)",
+   "url": "https://amesweb.info/Keys/Key-Size-Shaft-Diameter.aspx",
+   "accessed": "2026-11-10",
+   "note": "Engineering calculator site. Only the shaft diameter ranges are in the page text (key sizes are in an image), so it confirms the ranges only."
+  },
+  "EE_TSLOT": {
+   "publisher": "Engineers Edge",
+   "title": "Dimension table for T-slots, bolts and nuts (ANSI/ASME B5.1M-1985), mm columns",
+   "url": "https://engineersedge.com/hardware/dimension_table_for_tslots_bolts_and_nuts_13508.htm",
+   "accessed": "2026-11-10",
+   "note": "Engineering reference site. Throat width (= slot width a), headspace width and depth min-max in inch and mm; it prints the depth of the throat, not the total slot depth, so h is not taken from it."
+  },
+  "ITEH_299": {
+   "publisher": "iTeh Standards (free preview of ISO 299:1987)",
+   "title": "ISO 299:1987 Machine tool tables - T-slots and corresponding bolts (preview)",
+   "url": "https://cdn.standards.iteh.ai/samples/4229/42fffe9a850f46e9a81d5b0cadcdd408/ISO-299-1987.pdf",
+   "accessed": "2026-11-10",
+   "note": "Standards distributor preview. The OCR text is partly garbled; only the clearly readable b, c and h min-max, the bolt thread and the pitches are taken. Slot width tolerance H12 (fixing slots), H8 (reference slots)."
+  },
+  "GTWEED": {
+   "publisher": "Greene Tweed",
+   "title": "AS568 O-ring size chart (\"O-Ring Seals\")",
+   "url": "https://www.gtweed.com/wp-content/uploads/AS568-standard-o-ring-sizing.pdf",
+   "accessed": "2026-11-10",
+   "note": "Seal maker. Dash numbers -005 to -475 and -901 to -914: ID and CS with tolerances, inch. Prints -391 ID 21.995 where the -471 row of the same step prints 21.955."
+  },
+  "EFUNDA": {
+   "publisher": "eFunda",
+   "title": "O-ring AS568 sizes",
+   "url": "https://www.efunda.com/designstandards/oring/oring_as568.cfm",
+   "accessed": "2026-11-10",
+   "note": "Engineering reference site. Detailed rows only for -001 to -050 and -102 to -114."
+  },
+  "ORINGSINC": {
+   "publisher": "O-Rings, Inc.",
+   "title": "AS568A size chart (PDF)",
+   "url": "https://www.oringsusa.com/o/wp-content/uploads/2024/10/AS568A.pdf",
+   "accessed": "2026-11-10",
+   "note": "Distributor. The text extraction lost the alignment of most rows; only rows printed clearly with their dash number are used (about every tenth size)."
+  },
+  "BOSSARD_F044": {
+   "publisher": "Bossard",
+   "title": "Technical sheet TF.049 (F-en-2023.05): friction coefficient classes A to E for muG and muK, according to VDI 2230 (2015), room temperature",
+   "url": "https://www.bossard.com.cn/-/media/bossard-group/website/documents/technical-resources/en/f-044-en.pdf",
+   "accessed": "2026-11-10",
+   "note": "Fastener maker. The aim is class B for a high preload with little scatter. Descriptions are summarised in BenchMate's words."
+  },
+  "HAMEEDI": {
+   "publisher": "Hameedi and Völgyi (BME Budapest)",
+   "title": "Experimental determination of torque and friction coefficients in the torque-preload relationships of bolted connections, ÉPKO 2025",
+   "url": "https://ojs.emt.ro/EPKO/article/download/2030/2087/3136",
+   "accessed": "2026-11-10",
+   "note": "Conference paper. Eq. (3): T = Fv [0.16 p + 0.58 mu_t dm + 0.5 mu_h dh], attributed to Motosh and VDI 2230. Measured mean friction 0.13 to 0.44 on M16-M24 structural bolts (dry highest, oiled lowest)."
+  },
+  "FVA": {
+   "publisher": "FVA GmbH",
+   "title": "FVA-Workbench 9 documentation: bolt connection (VDI 2230-1:2015, eq. 229-231 and 259)",
+   "url": "https://doc.fva-service.de/90/en/root-bolt-connection.html",
+   "accessed": "2026-11-10",
+   "note": "Software maker. MA = FMzul (0.16 P + 0.58 d2 muGmin + DKm/2 muKmin); FMzul = A0 nu Rp0.2min / sqrt(1 + 3 [3/2 d2/d0 (P/(pi d2) + 1.155 muGmin)]^2), nu normally 0.9."
+  },
+  "BOSSARD_VDI": {
+   "publisher": "Bossard",
+   "title": "Approximate values for metric coarse threads, VDI 2230 (assumptions page)",
+   "url": "https://www.bossard.com/en/assembly-technology-expert/technical-information-and-tools/technical-resources/preload-and-tightening-torques/approximate-values-for-metric-coarse-threads-vdi-2230/",
+   "accessed": "2026-11-10",
+   "note": "Tables based on VDI 2230 (2015), 90 % utilisation of ReL / Rp0.2, clearance holes ISO 273 medium; values are maximums without a safety factor and higher than the 1986 edition."
+  },
+  "MAREK": {
+   "publisher": "marek.eu (catalogue technical pages, publisher not named)",
+   "title": "Technical information: screws and nuts, pp. 1287-1288 (VDI 2230 clamping forces and tightening torques)",
+   "url": "https://www.marek.eu/katalog-obrazku/produkt-24858/58479-technical-information-screws-nuts-en.pdf",
+   "accessed": "2026-11-10",
+   "note": "Torques computed with muG = muK. Used only as a worked-example check of the torque formula in core/src/fasteners.rs."
+  },
+  "GLOBAL_ORING": {
+   "publisher": "Global O-Ring and Seal",
+   "title": "O-ring groove design",
+   "url": "https://www.globaloring.com/o-ring-groove-design/",
+   "accessed": "2026-11-10",
+   "note": "Seal distributor. All compression values between 5 % and 30 % squeeze; static seals typically 15-30 %; dynamic less; design for roughly 60-85 % groove fill, never 100 %; installed stretch max 5 %; rod gland OD compression max 2 %; face seal OD up to 3 % over (internal pressure) or ID up to 5 % under (external pressure)."
+  },
+  "APPLE": {
+   "publisher": "Apple Rubber",
+   "title": "Seal design guide: O-ring installation",
+   "url": "https://applerubber.com/seal-design-guide/seal-types-and-gland-design/o-ring-installation",
+   "accessed": "2026-11-10",
+   "note": "Seal maker. Squeeze about 10-40 % static, no more than 30 % dynamic; O-ring volume not over 90 % of the minimum gland void; at least 75 % of the cross-section inside the groove; stretch not over 5 % in the application, not over 100 % while installing."
+  }
+ },
+ "iso898": {
+  "MUTUAL": {
+   "4.6": {
+    "sp": "225",
+    "yield_min": "240",
+    "rm_min": "400"
+   },
+   "4.8": {
+    "sp": "310",
+    "yield_min": "340",
+    "rm_min": "420"
+   },
+   "5.8": {
+    "sp": "380",
+    "yield_min": "420",
+    "rm_min": "520"
+   },
+   "8.8 d<=16": {
+    "sp": "600",
+    "yield_min": "640",
+    "rm_min": "800"
+   },
+   "9.8": {
+    "sp": "650",
+    "yield_min": "720",
+    "rm_min": "900"
+   },
+   "10.9": {
+    "sp": "830",
+    "yield_min": "940",
+    "rm_min": "1040"
+   },
+   "12.9": {
+    "sp": "970",
+    "yield_min": "1100",
+    "rm_min": "1220"
+   }
+  },
+  "WESTFIELD": {
+   "4.6": {
+    "sp": "225",
+    "yield_min": "240",
+    "rm_min": "400"
+   },
+   "4.8": {
+    "sp": "310",
+    "yield_min": "340",
+    "rm_min": "420"
+   },
+   "5.8": {
+    "sp": "380",
+    "yield_min": "420",
+    "rm_min": "520"
+   },
+   "8.8 d<=16": {
+    "sp": "660",
+    "yield_min": "640",
+    "rm_min": "800"
+   },
+   "8.8 d>16": {
+    "sp": "580",
+    "yield_min": "660",
+    "rm_min": "830"
+   },
+   "9.8": {
+    "sp": "650",
+    "yield_min": "720",
+    "rm_min": "900"
+   },
+   "10.9": {
+    "sp": "830",
+    "yield_min": "940",
+    "rm_min": "1040"
+   },
+   "12.9": {
+    "sp": "970",
+    "yield_min": "1100",
+    "rm_min": "1220"
+   }
+  },
+  "OPTIMAS": {
+   "4.6": {
+    "sp": "225",
+    "yield_min": "240",
+    "rm_min": "400",
+    "hv": "120-220"
+   },
+   "4.8": {
+    "sp": "310",
+    "yield_min": "340",
+    "rm_min": "420",
+    "hv": "130 min"
+   },
+   "5.6": {
+    "sp": "280",
+    "yield_min": "300",
+    "rm_min": "500",
+    "hv": "155 min"
+   },
+   "5.8": {
+    "sp": "380",
+    "yield_min": "420",
+    "rm_min": "520",
+    "hv": "160 min"
+   },
+   "6.8": {
+    "sp": "440",
+    "yield_min": "480",
+    "rm_min": "600",
+    "hv": "190-250"
+   },
+   "8.8 d<=16": {
+    "sp": "580",
+    "yield_min": "640",
+    "rm_min": "800",
+    "hv": "250-320"
+   },
+   "8.8 d>16": {
+    "sp": "600",
+    "yield_min": "660",
+    "rm_min": "830",
+    "hv": "255-335"
+   },
+   "9.8": {
+    "sp": "650",
+    "yield_min": "720",
+    "rm_min": "900",
+    "hv": "290-360"
+   },
+   "10.9": {
+    "sp": "830",
+    "yield_min": "940",
+    "rm_min": "1040",
+    "hv": "320-380"
+   },
+   "12.9": {
+    "sp": "970",
+    "yield_min": "1100",
+    "rm_min": "1220",
+    "hv": "385-435"
+   }
+  }
+ },
+ "iso898_order": [
+  "4.6",
+  "4.8",
+  "5.6",
+  "5.8",
+  "6.8",
+  "8.8 d<=16",
+  "8.8 d>16",
+  "9.8",
+  "10.9",
+  "12.9"
+ ],
+ "sae": {
+  "BOSSARD": {
+   "Grade 2, 1/4 to 3/4 in": {
+    "sp": "55000",
+    "yield_min": "57000",
+    "rm_min": "74000"
+   },
+   "Grade 2, over 3/4 to 1 1/2 in": {
+    "sp": "33000",
+    "yield_min": "36000",
+    "rm_min": "60000"
+   },
+   "Grade 5, 1/4 to 1 in": {
+    "sp": "85000",
+    "yield_min": "92000",
+    "rm_min": "120000"
+   },
+   "Grade 5, over 1 to 1 1/2 in": {
+    "sp": "74000",
+    "yield_min": "81000",
+    "rm_min": "105000"
+   },
+   "Grade 8, 1/4 to 1 1/2 in": {
+    "sp": "120000",
+    "yield_min": "130000",
+    "rm_min": "150000"
+   }
+  },
+  "MUTUAL": {
+   "Grade 5, 1/4 to 1 in": {
+    "sp": "85000",
+    "yield_min": "92000",
+    "rm_min": "120000"
+   },
+   "Grade 8, 1/4 to 1 1/2 in": {
+    "sp": "120000",
+    "yield_min": "130000",
+    "rm_min": "150000"
+   }
+  },
+  "MSC": {
+   "ASTM A574, #0 to 1/2 in": {
+    "yield_min": "162000",
+    "rm_min": "180000",
+    "hrc_min": "39"
+   },
+   "ASTM A574, over 1/2 in": {
+    "yield_min": "153000",
+    "rm_min": "170000",
+    "hrc_min": "37"
+   }
+  },
+  "AFT": {
+   "ASTM A574, #0 to 1/2 in": {
+    "hrc_min": "39"
+   },
+   "ASTM A574, over 1/2 in": {
+    "hrc_min": "37"
+   }
+  }
+ },
+ "sae_order": [
+  "Grade 2, 1/4 to 3/4 in",
+  "Grade 2, over 3/4 to 1 1/2 in",
+  "Grade 5, 1/4 to 1 in",
+  "Grade 5, over 1 to 1 1/2 in",
+  "Grade 8, 1/4 to 1 1/2 in",
+  "ASTM A574, #0 to 1/2 in",
+  "ASTM A574, over 1/2 in"
+ ],
+ "sae_note": "Mutual Screw prints Grade 2 as tensile 60,000-74,000, yield 36,000-57,000 and proof 33,000-55,000 psi in one row: the same two size bands Bossard prints separately.",
+ "shcs_inch": {
+  "AFT": {
+   "#0": {
+    "head_d_max": "0.096",
+    "head_d_min": "0.091",
+    "head_h_max": "0.060",
+    "head_h_min": "0.057",
+    "key": "0.050"
+   },
+   "#1": {
+    "head_d_max": "0.118",
+    "head_d_min": "0.112",
+    "head_h_max": "0.073",
+    "head_h_min": "0.070",
+    "key": "1/16"
+   },
+   "#2": {
+    "head_d_max": "0.140",
+    "head_d_min": "0.134",
+    "head_h_max": "0.086",
+    "head_h_min": "0.083",
+    "key": "5/64"
+   },
+   "#3": {
+    "head_d_max": "0.161",
+    "head_d_min": "0.154",
+    "head_h_max": "0.099",
+    "head_h_min": "0.095",
+    "key": "5/64"
+   },
+   "#4": {
+    "head_d_max": "0.183",
+    "head_d_min": "0.176",
+    "head_h_max": "0.112",
+    "head_h_min": "0.108",
+    "key": "3/32"
+   },
+   "#5": {
+    "head_d_max": "0.205",
+    "head_d_min": "0.198",
+    "head_h_max": "0.125",
+    "head_h_min": "0.121",
+    "key": "3/32"
+   },
+   "#6": {
+    "head_d_max": "0.226",
+    "head_d_min": "0.218",
+    "head_h_max": "0.138",
+    "head_h_min": "0.134",
+    "key": "7/64"
+   },
+   "#8": {
+    "head_d_max": "0.270",
+    "head_d_min": "0.262",
+    "head_h_max": "0.164",
+    "head_h_min": "0.159",
+    "key": "9/64"
+   },
+   "#10": {
+    "head_d_max": "0.312",
+    "head_d_min": "0.303",
+    "head_h_max": "0.190",
+    "head_h_min": "0.185",
+    "key": "5/32"
+   },
+   "1/4": {
+    "head_d_max": "0.375",
+    "head_d_min": "0.365",
+    "head_h_max": "0.250",
+    "head_h_min": "0.244",
+    "key": "3/16"
+   },
+   "5/16": {
+    "head_d_max": "0.469",
+    "head_d_min": "0.457",
+    "head_h_max": "0.312",
+    "head_h_min": "0.306",
+    "key": "1/4"
+   },
+   "3/8": {
+    "head_d_max": "0.562",
+    "head_d_min": "0.550",
+    "head_h_max": "0.375",
+    "head_h_min": "0.368",
+    "key": "5/16"
+   },
+   "7/16": {
+    "head_d_max": "0.656",
+    "head_d_min": "0.642",
+    "head_h_max": "0.438",
+    "head_h_min": "0.430",
+    "key": "3/8"
+   },
+   "1/2": {
+    "head_d_max": "0.750",
+    "head_d_min": "0.735",
+    "head_h_max": "0.500",
+    "head_h_min": "0.492",
+    "key": "3/8"
+   },
+   "5/8": {
+    "head_d_max": "0.938",
+    "head_d_min": "0.921",
+    "head_h_max": "0.625",
+    "head_h_min": "0.616",
+    "key": "1/2"
+   },
+   "3/4": {
+    "head_d_max": "1.125",
+    "head_d_min": "1.107",
+    "head_h_max": "0.750",
+    "head_h_min": "0.740",
+    "key": "5/8"
+   },
+   "7/8": {
+    "head_d_max": "1.312",
+    "head_d_min": "1.293",
+    "head_h_max": "0.875",
+    "head_h_min": "0.864",
+    "key": "3/4"
+   },
+   "1": {
+    "head_d_max": "1.500",
+    "head_d_min": "1.479",
+    "head_h_max": "1.000",
+    "head_h_min": "0.988",
+    "key": "3/4"
+   },
+   "1 1/4": {
+    "head_d_max": "1.875",
+    "head_d_min": "1.852",
+    "head_h_max": "1.250",
+    "head_h_min": "1.236",
+    "key": "7/8"
+   },
+   "1 1/2": {
+    "head_d_max": "2.250",
+    "head_d_min": "2.224",
+    "head_h_max": "1.500",
+    "head_h_min": "1.485",
+    "key": "1"
+   }
+  },
+  "AMFAST": {
+   "#0": {
+    "head_d_max": "0.096",
+    "head_h_max": "0.060",
+    "key": "0.050"
+   },
+   "#1": {
+    "head_d_max": "0.118",
+    "head_h_max": "0.073",
+    "key": "1/16"
+   },
+   "#2": {
+    "head_d_max": "0.140",
+    "head_h_max": "0.086",
+    "key": "5/64"
+   },
+   "#3": {
+    "head_d_max": "0.161",
+    "head_h_max": "0.099",
+    "key": "5/64"
+   },
+   "#4": {
+    "head_d_max": "0.183",
+    "head_h_max": "0.112",
+    "key": "3/32"
+   },
+   "#5": {
+    "head_d_max": "0.205",
+    "head_h_max": "0.125",
+    "key": "3/32"
+   },
+   "#6": {
+    "head_d_max": "0.226",
+    "head_h_max": "0.138",
+    "key": "7/64"
+   },
+   "#8": {
+    "head_d_max": "0.270",
+    "head_h_max": "0.164",
+    "key": "9/64"
+   },
+   "#10": {
+    "head_d_max": "0.312",
+    "head_h_max": "0.190",
+    "key": "5/32"
+   },
+   "1/4": {
+    "head_d_max": "0.375",
+    "head_h_max": "0.250",
+    "key": "3/16"
+   },
+   "5/16": {
+    "head_d_max": "0.469",
+    "head_h_max": "0.312",
+    "key": "1/4"
+   },
+   "3/8": {
+    "head_d_max": "0.562",
+    "head_h_max": "0.375",
+    "key": "5/16"
+   },
+   "7/16": {
+    "head_d_max": "0.656",
+    "head_h_max": "0.438",
+    "key": "3/8"
+   },
+   "1/2": {
+    "head_d_max": "0.750",
+    "head_h_max": "0.500",
+    "key": "3/8"
+   },
+   "5/8": {
+    "head_d_max": "0.938",
+    "head_h_max": "0.625",
+    "key": "1/2"
+   },
+   "3/4": {
+    "head_d_max": "1.125",
+    "head_h_max": "0.750",
+    "key": "5/8"
+   },
+   "7/8": {
+    "head_d_max": "1.312",
+    "head_h_max": "0.875",
+    "key": "3/4"
+   },
+   "1": {
+    "head_d_max": "1.500",
+    "head_h_max": "1.000",
+    "key": "3/4"
+   },
+   "1 1/4": {
+    "head_d_max": "1.875",
+    "head_h_max": "1.250",
+    "key": "7/8"
+   },
+   "1 1/2": {
+    "head_d_max": "2.250",
+    "head_h_max": "1.500",
+    "key": "1"
+   }
+  },
+  "MSC": {
+   "#2": {
+    "key": "5/64"
+   },
+   "#3": {
+    "key": "5/64"
+   },
+   "#4": {
+    "key": "3/32"
+   },
+   "#5": {
+    "key": "3/32"
+   },
+   "#6": {
+    "key": "7/64"
+   },
+   "#8": {
+    "key": "9/64"
+   },
+   "#10": {
+    "key": "5/32"
+   },
+   "1/4": {
+    "key": "3/16"
+   },
+   "5/16": {
+    "key": "1/4"
+   },
+   "3/8": {
+    "key": "5/16"
+   },
+   "7/16": {
+    "key": "3/8"
+   },
+   "1/2": {
+    "key": "3/8"
+   },
+   "5/8": {
+    "key": "1/2"
+   },
+   "3/4": {
+    "key": "5/8"
+   },
+   "7/8": {
+    "key": "3/4"
+   },
+   "1": {
+    "key": "3/4"
+   },
+   "1 1/4": {
+    "key": "7/8"
+   },
+   "1 1/2": {
+    "key": "1"
+   }
+  }
+ },
+ "shcs_metric": {
+  "MSC": {
+   "M2": {
+    "dk_max": "3.80",
+    "dk_min": "3.65",
+    "k_max": "2.00",
+    "k_min": "1.91",
+    "s_key": "1.5"
+   },
+   "M3": {
+    "dk_max": "5.50",
+    "dk_min": "5.32",
+    "k_max": "3.00",
+    "k_min": "2.89",
+    "s_key": "2.5"
+   },
+   "M4": {
+    "dk_max": "7.00",
+    "dk_min": "6.80",
+    "k_max": "4.00",
+    "k_min": "3.88",
+    "s_key": "3.0"
+   },
+   "M5": {
+    "dk_max": "8.50",
+    "dk_min": "8.27",
+    "k_max": "5.00",
+    "k_min": "4.86",
+    "s_key": "4.0"
+   },
+   "M6": {
+    "dk_max": "10.00",
+    "dk_min": "9.74",
+    "k_max": "6.00",
+    "k_min": "5.85",
+    "s_key": "5.0"
+   },
+   "M8": {
+    "dk_max": "13.00",
+    "dk_min": "12.70",
+    "k_max": "8.00",
+    "k_min": "7.83",
+    "s_key": "6.0"
+   },
+   "M10": {
+    "dk_max": "16.00",
+    "dk_min": "15.67",
+    "k_max": "10.00",
+    "k_min": "9.81",
+    "s_key": "8.0"
+   },
+   "M12": {
+    "dk_max": "18.00",
+    "dk_min": "17.63",
+    "k_max": "12.00",
+    "k_min": "11.79",
+    "s_key": "10.0"
+   },
+   "M16": {
+    "dk_max": "24.00",
+    "dk_min": "23.58",
+    "k_max": "16.00",
+    "k_min": "15.76",
+    "s_key": "14.0"
+   },
+   "M20": {
+    "dk_max": "30.00",
+    "dk_min": "29.53",
+    "k_max": "20.00",
+    "k_min": "19.73",
+    "s_key": "17.0"
+   },
+   "M24": {
+    "dk_max": "36.00",
+    "dk_min": "35.48",
+    "k_max": "24.00",
+    "k_min": "23.70",
+    "s_key": "19.0"
+   },
+   "M30": {
+    "dk_max": "45.00",
+    "dk_min": "44.42",
+    "k_max": "30.00",
+    "k_min": "29.67",
+    "s_key": "22.0"
+   },
+   "M36": {
+    "dk_max": "54.00",
+    "dk_min": "53.37",
+    "k_max": "36.00",
+    "k_min": "35.64",
+    "s_key": "27.0"
+   },
+   "M42": {
+    "dk_max": "63.00",
+    "dk_min": "62.31",
+    "k_max": "42.00",
+    "k_min": "41.61",
+    "s_key": "32.0"
+   },
+   "M48": {
+    "dk_max": "72.00",
+    "dk_min": "71.27",
+    "k_max": "48.00",
+    "k_min": "47.58",
+    "s_key": "36.0"
+   }
+  },
+  "MISUMI": {
+   "M1.6": {
+    "dk_max": "3.00",
+    "k_max": "1.60",
+    "s_key": "1.5"
+   },
+   "M2": {
+    "dk_max": "3.80",
+    "k_max": "2.00",
+    "s_key": "1.5"
+   },
+   "M2.5": {
+    "dk_max": "4.50",
+    "k_max": "2.50",
+    "s_key": "2.0"
+   },
+   "M3": {
+    "dk_max": "5.50",
+    "k_max": "3.00",
+    "s_key": "2.5"
+   },
+   "M4": {
+    "dk_max": "7.00",
+    "k_max": "4.00",
+    "s_key": "3.0"
+   },
+   "M5": {
+    "dk_max": "8.50",
+    "k_max": "5.00",
+    "s_key": "4.0"
+   },
+   "M6": {
+    "dk_max": "10.00",
+    "k_max": "6.00",
+    "s_key": "5.0"
+   },
+   "M8": {
+    "dk_max": "13.00",
+    "k_max": "8.00",
+    "s_key": "6.0"
+   },
+   "M10": {
+    "dk_max": "16.00",
+    "k_max": "10.00",
+    "s_key": "8.0"
+   },
+   "M12": {
+    "dk_max": "18.00",
+    "k_max": "12.00",
+    "s_key": "10.0"
+   },
+   "M14": {
+    "dk_max": "21.00",
+    "k_max": "14.00",
+    "s_key": "12.0"
+   },
+   "M16": {
+    "dk_max": "24.00",
+    "k_max": "16.00",
+    "s_key": "14.0"
+   },
+   "M20": {
+    "dk_max": "30.00",
+    "k_max": "20.00",
+    "s_key": "17.0"
+   },
+   "M24": {
+    "dk_max": "36.00",
+    "k_max": "24.00",
+    "s_key": "19.0"
+   },
+   "M30": {
+    "dk_max": "45.00",
+    "k_max": "30.00",
+    "s_key": "22.0"
+   },
+   "M36": {
+    "dk_max": "54.00",
+    "k_max": "36.00",
+    "s_key": "27.0"
+   },
+   "M42": {
+    "dk_max": "63.00",
+    "k_max": "42.00",
+    "s_key": "32.0"
+   },
+   "M48": {
+    "dk_max": "72.00",
+    "k_max": "48.00",
+    "s_key": "36.0"
+   }
+  }
+ },
+ "clearance_metric": {
+  "NBK": {
+   "M2": {
+    "fine": "2.2",
+    "medium": "2.4",
+    "coarse": "2.6"
+   },
+   "M3": {
+    "fine": "3.2",
+    "medium": "3.4",
+    "coarse": "3.6"
+   },
+   "M4": {
+    "fine": "4.3",
+    "medium": "4.5",
+    "coarse": "4.8"
+   },
+   "M5": {
+    "fine": "5.3",
+    "medium": "5.5",
+    "coarse": "5.8"
+   },
+   "M6": {
+    "fine": "6.4",
+    "medium": "6.6",
+    "coarse": "7"
+   },
+   "M8": {
+    "fine": "8.4",
+    "medium": "9",
+    "coarse": "10"
+   },
+   "M10": {
+    "fine": "10.5",
+    "medium": "11",
+    "coarse": "12"
+   },
+   "M12": {
+    "fine": "13",
+    "medium": "13.5",
+    "coarse": "14.5"
+   },
+   "M14": {
+    "fine": "15",
+    "medium": "15.5",
+    "coarse": "16.5"
+   },
+   "M16": {
+    "fine": "17",
+    "medium": "17.5",
+    "coarse": "18.5"
+   },
+   "M18": {
+    "fine": "19",
+    "medium": "20",
+    "coarse": "21"
+   },
+   "M20": {
+    "fine": "21",
+    "medium": "22",
+    "coarse": "24"
+   },
+   "M22": {
+    "fine": "23",
+    "medium": "24",
+    "coarse": "26"
+   },
+   "M24": {
+    "fine": "25",
+    "medium": "26",
+    "coarse": "28"
+   }
+  },
+  "FRACTORY": {
+   "M1.6": {
+    "fine": "1.7",
+    "medium": "1.8",
+    "coarse": "2"
+   },
+   "M2": {
+    "fine": "2.2",
+    "medium": "2.4",
+    "coarse": "2.6"
+   },
+   "M2.5": {
+    "fine": "2.7",
+    "medium": "2.8",
+    "coarse": "3.1"
+   },
+   "M3": {
+    "fine": "3.2",
+    "medium": "3.35",
+    "coarse": "3.6"
+   },
+   "M4": {
+    "fine": "4.3",
+    "medium": "4.5",
+    "coarse": "4.8"
+   },
+   "M5": {
+    "fine": "5.3",
+    "medium": "5.5",
+    "coarse": "5.8"
+   },
+   "M6": {
+    "fine": "6.4",
+    "medium": "6.5",
+    "coarse": "7"
+   },
+   "M8": {
+    "fine": "8.4",
+    "medium": "9",
+    "coarse": "10"
+   },
+   "M10": {
+    "fine": "10.5",
+    "medium": "11",
+    "coarse": "12"
+   },
+   "M12": {
+    "fine": "13",
+    "medium": "14",
+    "coarse": "15"
+   },
+   "M16": {
+    "fine": "17",
+    "medium": "18",
+    "coarse": "19"
+   },
+   "M20": {
+    "fine": "21",
+    "medium": "22",
+    "coarse": "24"
+   },
+   "M24": {
+    "fine": "25",
+    "medium": "26",
+    "coarse": "28"
+   },
+   "M30": {
+    "fine": "31",
+    "medium": "32",
+    "coarse": "35"
+   },
+   "M36": {
+    "fine": "37",
+    "medium": "39",
+    "coarse": "42"
+   },
+   "M42": {
+    "fine": "43",
+    "medium": "45",
+    "coarse": "48"
+   },
+   "M48": {
+    "fine": "50",
+    "medium": "52",
+    "coarse": "56"
+   }
+  },
+  "OPTIMAS_TAP": {
+   "M1.6": {
+    "fine": "1.7",
+    "medium": "1.8",
+    "coarse": "2"
+   },
+   "M2": {
+    "fine": "2.2",
+    "medium": "2.4",
+    "coarse": "2.6"
+   },
+   "M2.5": {
+    "fine": "2.7",
+    "medium": "2.9",
+    "coarse": "3.1"
+   },
+   "M3": {
+    "fine": "3.2",
+    "medium": "3.4",
+    "coarse": "3.6"
+   },
+   "M4": {
+    "fine": "4.3",
+    "medium": "4.5",
+    "coarse": "4.8"
+   },
+   "M5": {
+    "fine": "5.3",
+    "medium": "5.5",
+    "coarse": "5.8"
+   },
+   "M6": {
+    "fine": "6.4",
+    "medium": "6.6",
+    "coarse": "7"
+   },
+   "M8": {
+    "fine": "8.4",
+    "medium": "9",
+    "coarse": "10"
+   },
+   "M10": {
+    "fine": "10.5",
+    "medium": "11",
+    "coarse": "12"
+   },
+   "M12": {
+    "fine": "13",
+    "medium": "14",
+    "coarse": "15"
+   },
+   "M14": {
+    "fine": "15",
+    "medium": "16",
+    "coarse": "17"
+   },
+   "M16": {
+    "fine": "17",
+    "medium": "18",
+    "coarse": "19"
+   },
+   "M18": {
+    "fine": "19",
+    "medium": "20",
+    "coarse": "21"
+   },
+   "M20": {
+    "fine": "21",
+    "medium": "22",
+    "coarse": "24"
+   },
+   "M22": {
+    "fine": "23",
+    "medium": "24",
+    "coarse": "26"
+   },
+   "M24": {
+    "fine": "25",
+    "medium": "26",
+    "coarse": "28"
+   },
+   "M27": {
+    "fine": "28",
+    "medium": "30",
+    "coarse": "32"
+   },
+   "M30": {
+    "fine": "31",
+    "medium": "33",
+    "coarse": "35"
+   },
+   "M33": {
+    "fine": "34",
+    "medium": "36",
+    "coarse": "38"
+   },
+   "M36": {
+    "fine": "37",
+    "medium": "39",
+    "coarse": "42"
+   },
+   "M39": {
+    "fine": "40",
+    "medium": "42",
+    "coarse": "45"
+   },
+   "M42": {
+    "fine": "43",
+    "medium": "45",
+    "coarse": "48"
+   },
+   "M45": {
+    "fine": "46",
+    "medium": "48",
+    "coarse": "52"
+   },
+   "M48": {
+    "fine": "50",
+    "medium": "52",
+    "coarse": "56"
+   }
+  },
+  "TRF": {
+   "M1.6": {
+    "medium": "1.8"
+   },
+   "M2": {
+    "medium": "2.4"
+   },
+   "M2.5": {
+    "medium": "2.9"
+   },
+   "M3": {
+    "medium": "3.4"
+   },
+   "M3.5": {
+    "medium": "3.9"
+   },
+   "M4": {
+    "medium": "4.5"
+   },
+   "M5": {
+    "medium": "5.5"
+   },
+   "M6": {
+    "medium": "6.6"
+   },
+   "M8": {
+    "medium": "9"
+   },
+   "M10": {
+    "medium": "11"
+   },
+   "M12": {
+    "medium": "13.5"
+   },
+   "M14": {
+    "medium": "15.5"
+   },
+   "M16": {
+    "medium": "17.5"
+   },
+   "M18": {
+    "medium": "20"
+   },
+   "M20": {
+    "medium": "22"
+   },
+   "M22": {
+    "medium": "24"
+   },
+   "M24": {
+    "medium": "26"
+   },
+   "M27": {
+    "medium": "30"
+   },
+   "M30": {
+    "medium": "33"
+   }
+  }
+ },
+ "clearance_metric_note": "Fractory prints M30 twice, with normal fit 32 and 33; 32 (the first row) is recorded.",
+ "clearance_inch": {
+  "MSC": {
+   "#2": {
+    "close": "0.0937",
+    "normal": "0.1065"
+   },
+   "#3": {
+    "close": "0.1065",
+    "normal": "0.1200"
+   },
+   "#4": {
+    "close": "0.1250",
+    "normal": "0.1360"
+   },
+   "#5": {
+    "close": "0.1406",
+    "normal": "0.1540"
+   },
+   "#6": {
+    "close": "0.1540",
+    "normal": "0.1695"
+   },
+   "#8": {
+    "close": "0.1800",
+    "normal": "0.1935"
+   },
+   "#10": {
+    "close": "0.2055",
+    "normal": "0.2210"
+   },
+   "1/4": {
+    "close": "0.2656",
+    "normal": "0.2812"
+   },
+   "5/16": {
+    "close": "0.3281",
+    "normal": "0.3437"
+   },
+   "3/8": {
+    "close": "0.3906",
+    "normal": "0.4062"
+   },
+   "7/16": {
+    "close": "0.4531",
+    "normal": "0.4687"
+   },
+   "1/2": {
+    "close": "0.5156",
+    "normal": "0.5312"
+   },
+   "5/8": {
+    "close": "0.6406",
+    "normal": "0.6562"
+   },
+   "3/4": {
+    "close": "0.7656",
+    "normal": "0.7812"
+   },
+   "7/8": {
+    "close": "0.8906",
+    "normal": "0.9062"
+   },
+   "1": {
+    "close": "1.0156",
+    "normal": "1.0312"
+   },
+   "1 1/4": {
+    "close": "1.2812",
+    "normal": "1.3215"
+   },
+   "1 1/2": {
+    "close": "1.5312",
+    "normal": "1.5825"
+   }
+  },
+  "TRF": {
+   "#0": {
+    "close_drill": "#52",
+    "free_drill": "#50"
+   },
+   "#1": {
+    "close_drill": "#48",
+    "free_drill": "#46"
+   },
+   "#2": {
+    "close_drill": "#43",
+    "free_drill": "#41"
+   },
+   "#3": {
+    "close_drill": "#37",
+    "free_drill": "#35"
+   },
+   "#4": {
+    "close_drill": "#32",
+    "free_drill": "#30"
+   },
+   "#5": {
+    "close_drill": "#30",
+    "free_drill": "#29"
+   },
+   "#6": {
+    "close_drill": "#27",
+    "free_drill": "#25"
+   },
+   "#8": {
+    "close_drill": "#18",
+    "free_drill": "#16"
+   },
+   "#10": {
+    "close_drill": "#9",
+    "free_drill": "#7"
+   },
+   "#12": {
+    "close_drill": "#2",
+    "free_drill": "#1"
+   },
+   "1/4": {
+    "close_drill": "F",
+    "free_drill": "H"
+   },
+   "5/16": {
+    "close_drill": "P",
+    "free_drill": "Q"
+   },
+   "3/8": {
+    "close_drill": "W",
+    "free_drill": "X"
+   },
+   "7/16": {
+    "close_drill": "29/64",
+    "free_drill": "15/32"
+   },
+   "1/2": {
+    "close_drill": "33/64",
+    "free_drill": "17/32"
+   },
+   "9/16": {
+    "close_drill": "37/64",
+    "free_drill": "19/32"
+   },
+   "5/8": {
+    "close_drill": "41/64",
+    "free_drill": "21/32"
+   },
+   "3/4": {
+    "close_drill": "49/64",
+    "free_drill": "25/32"
+   },
+   "7/8": {
+    "close_drill": "57/64",
+    "free_drill": "29/32"
+   },
+   "1": {
+    "close_drill": "1 1/64",
+    "free_drill": "1 1/32"
+   },
+   "1 1/4": {
+    "close_drill": "1 17/64",
+    "free_drill": "1 9/32"
+   },
+   "1 1/2": {
+    "close_drill": "1 33/64",
+    "free_drill": "1 17/32"
+   }
+  }
+ },
+ "clearance_inch_note": "MSC prints close and normal fit as drill name and decimal (the decimal is recorded; its 1 1/4 normal 1.3215 and 1 1/2 normal 1.5825 do not equal the printed fractions 1 5/16 = 1.3125 and 1 9/16 = 1.5625). TR Fastenings prints close and free fit as drill names only; the build looks the decimal up in the drill chart evidence.",
+ "cbore_metric": {
+  "MSC": {
+   "M2": {
+    "cbore_d": "4.40"
+   },
+   "M3": {
+    "cbore_d": "6.50"
+   },
+   "M4": {
+    "cbore_d": "8.25"
+   },
+   "M5": {
+    "cbore_d": "9.75"
+   },
+   "M6": {
+    "cbore_d": "11.25"
+   },
+   "M8": {
+    "cbore_d": "14.25"
+   },
+   "M10": {
+    "cbore_d": "17.25"
+   },
+   "M12": {
+    "cbore_d": "19.25"
+   },
+   "M16": {
+    "cbore_d": "25.50"
+   },
+   "M20": {
+    "cbore_d": "31.50"
+   },
+   "M24": {
+    "cbore_d": "37.50"
+   },
+   "M30": {
+    "cbore_d": "47.50"
+   },
+   "M36": {
+    "cbore_d": "56.50"
+   }
+  },
+  "MISUMI": {
+   "M3": {
+    "hole": "3.4",
+    "cbore_d": "6.5",
+    "depth_min": "2.7",
+    "depth_max": "3.3",
+    "tap_drill": "2.6"
+   },
+   "M4": {
+    "hole": "4.5",
+    "cbore_d": "8",
+    "depth_min": "3.6",
+    "depth_max": "4.4",
+    "tap_drill": "3.4"
+   },
+   "M5": {
+    "hole": "5.5",
+    "cbore_d": "9.5",
+    "depth_min": "4.6",
+    "depth_max": "5.4",
+    "tap_drill": "4.3"
+   },
+   "M6": {
+    "hole": "6.6",
+    "cbore_d": "11",
+    "depth_min": "5.5",
+    "depth_max": "6.5",
+    "tap_drill": "5.1"
+   },
+   "M8": {
+    "hole": "9",
+    "cbore_d": "14",
+    "depth_min": "7.4",
+    "depth_max": "8.6",
+    "tap_drill": "6.9"
+   },
+   "M10": {
+    "hole": "11",
+    "cbore_d": "17.5",
+    "depth_min": "9.2",
+    "depth_max": "10.8",
+    "tap_drill": "8.6"
+   },
+   "M12": {
+    "hole": "14",
+    "cbore_d": "20",
+    "depth_min": "11",
+    "depth_max": "13",
+    "tap_drill": "10.4"
+   },
+   "M14": {
+    "hole": "16",
+    "cbore_d": "23",
+    "depth_min": "12.8",
+    "depth_max": "15.2",
+    "tap_drill": "12.2"
+   },
+   "M16": {
+    "hole": "18",
+    "cbore_d": "26",
+    "depth_min": "14.5",
+    "depth_max": "17.5",
+    "tap_drill": "14.2"
+   },
+   "M18": {
+    "hole": "20",
+    "cbore_d": "29",
+    "depth_min": "16.5",
+    "depth_max": "19.5",
+    "tap_drill": "15.7"
+   },
+   "M20": {
+    "hole": "22",
+    "cbore_d": "32",
+    "depth_min": "18.5",
+    "depth_max": "21.5",
+    "tap_drill": "17.7"
+   },
+   "M22": {
+    "hole": "24",
+    "cbore_d": "35",
+    "depth_min": "20.5",
+    "depth_max": "23.5",
+    "tap_drill": "19.7"
+   },
+   "M24": {
+    "hole": "26",
+    "cbore_d": "39",
+    "depth_min": "22.5",
+    "depth_max": "25.5",
+    "tap_drill": "21.2"
+   },
+   "M27": {
+    "hole": "30",
+    "cbore_d": "43",
+    "depth_min": "25",
+    "depth_max": "29",
+    "tap_drill": "24.2"
+   },
+   "M30": {
+    "hole": "33",
+    "cbore_d": "48",
+    "depth_min": "28",
+    "depth_max": "32",
+    "tap_drill": "26.7"
+   }
+  }
+ },
+ "cbore_inch": {
+  "MSC": {
+   "#2": {
+    "cbore_d": "3/16"
+   },
+   "#3": {
+    "cbore_d": "7/32"
+   },
+   "#4": {
+    "cbore_d": "7/32"
+   },
+   "#5": {
+    "cbore_d": "1/4"
+   },
+   "#6": {
+    "cbore_d": "9/32"
+   },
+   "#8": {
+    "cbore_d": "5/16"
+   },
+   "#10": {
+    "cbore_d": "3/8"
+   },
+   "1/4": {
+    "cbore_d": "7/16"
+   },
+   "5/16": {
+    "cbore_d": "17/32"
+   },
+   "3/8": {
+    "cbore_d": "5/8"
+   },
+   "7/16": {
+    "cbore_d": "23/32"
+   },
+   "1/2": {
+    "cbore_d": "13/16"
+   },
+   "5/8": {
+    "cbore_d": "1"
+   },
+   "3/4": {
+    "cbore_d": "1 3/16"
+   },
+   "7/8": {
+    "cbore_d": "1 3/8"
+   },
+   "1": {
+    "cbore_d": "1 5/8"
+   },
+   "1 1/4": {
+    "cbore_d": "2"
+   },
+   "1 1/2": {
+    "cbore_d": "2 3/8"
+   }
+  }
+ },
+ "af_metric": {
+  "WIKI_AF": {
+   "M2": {
+    "iso": "4"
+   },
+   "M4": {
+    "iso": "7"
+   },
+   "M5": {
+    "iso": "8"
+   },
+   "M6": {
+    "iso": "10"
+   },
+   "M8": {
+    "iso": "13"
+   },
+   "M10": {
+    "iso": "16"
+   },
+   "M12": {
+    "iso": "18"
+   },
+   "M16": {
+    "iso": "24"
+   },
+   "M20": {
+    "iso": "30"
+   },
+   "M24": {
+    "iso": "36"
+   },
+   "M30": {
+    "iso": "46"
+   },
+   "M36": {
+    "iso": "55"
+   },
+   "M42": {
+    "iso": "65"
+   }
+  },
+  "ACCU": {
+   "M1": {
+    "iso": "2.5",
+    "din": "2.5"
+   },
+   "M1.2": {
+    "iso": "3",
+    "din": "3"
+   },
+   "M1.4": {
+    "iso": "3",
+    "din": "3"
+   },
+   "M1.6": {
+    "iso": "3.2",
+    "din": "3.2"
+   },
+   "M2": {
+    "iso": "4",
+    "din": "4"
+   },
+   "M2.5": {
+    "iso": "5",
+    "din": "5"
+   },
+   "M3": {
+    "iso": "5.5",
+    "din": "5.5"
+   },
+   "M3.5": {
+    "iso": "6",
+    "din": "6"
+   },
+   "M4": {
+    "iso": "7",
+    "din": "7"
+   },
+   "M5": {
+    "iso": "8",
+    "din": "8"
+   },
+   "M6": {
+    "iso": "10",
+    "din": "10"
+   },
+   "M8": {
+    "iso": "13",
+    "din": "13",
+    "jis": "12"
+   },
+   "M16": {
+    "iso": "24",
+    "din": "24"
+   },
+   "M18": {
+    "iso": "27",
+    "din": "27"
+   },
+   "M20": {
+    "iso": "30",
+    "din": "30"
+   },
+   "M24": {
+    "iso": "36",
+    "din": "36"
+   },
+   "M10": {
+    "iso": "16",
+    "din": "17"
+   },
+   "M12": {
+    "iso": "18",
+    "din": "19"
+   },
+   "M14": {
+    "iso": "21",
+    "din": "22"
+   },
+   "M22": {
+    "iso": "34",
+    "din": "32"
+   }
+  },
+  "SLS": {
+   "M1.6": {
+    "iso": "3.2",
+    "din": "3.2"
+   },
+   "M2": {
+    "iso": "4",
+    "din": "4"
+   },
+   "M2.5": {
+    "iso": "5",
+    "din": "5"
+   },
+   "M3": {
+    "iso": "5.5",
+    "din": "5.5"
+   },
+   "M3.5": {
+    "iso": "6",
+    "din": "6"
+   },
+   "M4": {
+    "iso": "7",
+    "din": "7"
+   },
+   "M5": {
+    "iso": "8",
+    "din": "8"
+   },
+   "M6": {
+    "iso": "10",
+    "din": "10"
+   },
+   "M8": {
+    "iso": "13",
+    "din": "13"
+   },
+   "M10": {
+    "iso": "16",
+    "din": "17"
+   },
+   "M12": {
+    "iso": "18",
+    "din": "19"
+   },
+   "M14": {
+    "iso": "21",
+    "din": "22"
+   },
+   "M16": {
+    "iso": "24",
+    "din": "24"
+   },
+   "M18": {
+    "iso": "27",
+    "din": "27"
+   },
+   "M20": {
+    "iso": "30",
+    "din": "30"
+   },
+   "M22": {
+    "iso": "34",
+    "din": "32"
+   },
+   "M24": {
+    "iso": "36",
+    "din": "36"
+   },
+   "M27": {
+    "iso": "41",
+    "din": "41"
+   },
+   "M30": {
+    "iso": "46",
+    "din": "46"
+   },
+   "M33": {
+    "iso": "50",
+    "din": "50"
+   },
+   "M36": {
+    "iso": "55",
+    "din": "55"
+   },
+   "M39": {
+    "iso": "60",
+    "din": "60"
+   },
+   "M42": {
+    "iso": "65",
+    "din": "65"
+   },
+   "M45": {
+    "iso": "70",
+    "din": "70"
+   },
+   "M48": {
+    "iso": "75",
+    "din": "75"
+   },
+   "M52": {
+    "iso": "80",
+    "din": "80"
+   },
+   "M56": {
+    "iso": "85",
+    "din": "85"
+   },
+   "M60": {
+    "iso": "90",
+    "din": "90"
+   },
+   "M64": {
+    "iso": "95",
+    "din": "95"
+   },
+   "M7": {
+    "din": "11"
+   }
+  }
+ },
+ "af_metric_note": "Accu marks only the ISO M10, M12, M14 and M22 rows; its other metric rows are recorded as both ISO and DIN.",
+ "af_inch": {
+  "SLS": {
+   "1/4": {
+    "hex": "0.438",
+    "bs": "0.445"
+   },
+   "5/16": {
+    "hex": "0.500",
+    "bs": "0.525"
+   },
+   "3/8": {
+    "hex": "0.562",
+    "bs": "0.600"
+   },
+   "7/16": {
+    "hex": "0.625",
+    "bs": "0.710"
+   },
+   "1/2": {
+    "hex": "0.750",
+    "bs": "0.820"
+   },
+   "9/16": {
+    "hex": "0.812",
+    "bs": "0.920"
+   },
+   "5/8": {
+    "hex": "0.938",
+    "bs": "1.010"
+   },
+   "3/4": {
+    "hex": "1.125",
+    "bs": "1.200"
+   },
+   "7/8": {
+    "hex": "1.312",
+    "bs": "1.300"
+   },
+   "1": {
+    "hex": "1.500",
+    "bs": "1.480"
+   },
+   "1 1/8": {
+    "hex": "1.688",
+    "bs": "1.670"
+   },
+   "1 1/4": {
+    "hex": "1.875",
+    "bs": "1.860"
+   },
+   "1 3/8": {
+    "hex": "2.062",
+    "bs": "2.050"
+   },
+   "1 1/2": {
+    "hex": "2.250",
+    "bs": "2.220"
+   },
+   "1 3/4": {
+    "hex": "2.625",
+    "bs": "2.580"
+   },
+   "2": {
+    "hex": "3.000",
+    "bs": "2.760"
+   }
+  },
+  "ACCU": {
+   "1/4": {
+    "hex": "0.4380"
+   },
+   "5/16": {
+    "hex": "0.5000"
+   },
+   "3/8": {
+    "hex": "0.5625"
+   },
+   "7/16": {
+    "hex": "0.6880"
+   },
+   "1/2": {
+    "hex": "0.7500"
+   },
+   "9/16": {
+    "hex": "0.8750"
+   },
+   "5/8": {
+    "hex": "0.9375"
+   },
+   "3/4": {
+    "hex": "1.1250"
+   },
+   "7/8": {
+    "hex": "1.3125"
+   },
+   "1": {
+    "hex": "1.5"
+   }
+  }
+ },
+ "keys_metric": {
+  "FASTENIT": {
+   "2x2": {
+    "d_over": "6",
+    "d_to": "8",
+    "t1": "1.2",
+    "t2": "1.0",
+    "lengths": "6-20"
+   },
+   "3x3": {
+    "d_over": "8",
+    "d_to": "10",
+    "t1": "1.8",
+    "t2": "1.4",
+    "lengths": "6-36"
+   },
+   "4x4": {
+    "d_over": "10",
+    "d_to": "12",
+    "t1": "2.5",
+    "t2": "1.8",
+    "lengths": "8-45"
+   },
+   "5x5": {
+    "d_over": "12",
+    "d_to": "17",
+    "t1": "3.0",
+    "t2": "2.3",
+    "lengths": "10-56"
+   },
+   "6x6": {
+    "d_over": "17",
+    "d_to": "22",
+    "t1": "3.5",
+    "t2": "2.8",
+    "lengths": "14-70"
+   },
+   "8x7": {
+    "d_over": "22",
+    "d_to": "30",
+    "t1": "4.0",
+    "t2": "3.3",
+    "lengths": "18-90"
+   },
+   "10x8": {
+    "d_over": "30",
+    "d_to": "38",
+    "t1": "5.0",
+    "t2": "3.3",
+    "lengths": "22-110"
+   },
+   "12x8": {
+    "d_over": "38",
+    "d_to": "44",
+    "t1": "5.0",
+    "t2": "3.3",
+    "lengths": "28-140"
+   },
+   "14x9": {
+    "d_over": "44",
+    "d_to": "50",
+    "t1": "5.5",
+    "t2": "3.8",
+    "lengths": "36-160"
+   },
+   "16x10": {
+    "d_over": "50",
+    "d_to": "58",
+    "t1": "6.0",
+    "t2": "4.3",
+    "lengths": "45-180"
+   },
+   "18x11": {
+    "d_over": "58",
+    "d_to": "65",
+    "t1": "7.0",
+    "t2": "4.4",
+    "lengths": "50-200"
+   },
+   "20x12": {
+    "d_over": "65",
+    "d_to": "75",
+    "t1": "7.5",
+    "t2": "4.9",
+    "lengths": "56-220"
+   },
+   "22x14": {
+    "d_over": "75",
+    "d_to": "85",
+    "t1": "9.0",
+    "t2": "5.4",
+    "lengths": "63-250"
+   },
+   "25x14": {
+    "d_over": "85",
+    "d_to": "95",
+    "t1": "9.0",
+    "t2": "5.4",
+    "lengths": "70-280"
+   },
+   "28x16": {
+    "d_over": "95",
+    "d_to": "110",
+    "t1": "10.0",
+    "t2": "6.4",
+    "lengths": "80-315"
+   },
+   "32x18": {
+    "d_over": "110",
+    "d_to": "130",
+    "t1": "11.0",
+    "t2": "7.4",
+    "lengths": "90-355"
+   },
+   "36x20": {
+    "d_over": "130",
+    "d_to": "150",
+    "t1": "12.0",
+    "t2": "8.4",
+    "lengths": "100-400"
+   },
+   "40x22": {
+    "d_over": "150",
+    "d_to": "170",
+    "t1": "13.0",
+    "t2": "9.4",
+    "lengths": "110-400"
+   },
+   "45x25": {
+    "d_over": "170",
+    "d_to": "200",
+    "t1": "15.0",
+    "t2": "10.4",
+    "lengths": "125-400"
+   },
+   "50x28": {
+    "d_over": "200",
+    "d_to": "230",
+    "t1": "17.0",
+    "t2": "11.4"
+   },
+   "56x32": {
+    "d_over": "230",
+    "d_to": "260",
+    "t1": "20.0",
+    "t2": "12.4"
+   },
+   "63x32": {
+    "d_over": "260",
+    "d_to": "290",
+    "t1": "20.0",
+    "t2": "12.4"
+   },
+   "70x36": {
+    "d_over": "290",
+    "d_to": "330",
+    "t1": "22.0",
+    "t2": "14.4"
+   },
+   "80x40": {
+    "d_over": "330",
+    "d_to": "380",
+    "t1": "25.0",
+    "t2": "15.4"
+   },
+   "90x45": {
+    "d_over": "380",
+    "d_to": "440",
+    "t1": "28.0",
+    "t2": "17.4"
+   },
+   "100x50": {
+    "d_over": "440",
+    "d_to": "500",
+    "t1": "31.0",
+    "t2": "19.5"
+   }
+  },
+  "MISUMI": {
+   "2x2": {
+    "d_over": "6",
+    "d_to": "8",
+    "t1": "1.2",
+    "t2": "1.0"
+   },
+   "3x3": {
+    "d_over": "8",
+    "d_to": "10",
+    "t1": "1.8",
+    "t2": "1.4"
+   },
+   "4x4": {
+    "d_over": "10",
+    "d_to": "12",
+    "t1": "2.5",
+    "t2": "1.8"
+   },
+   "5x5": {
+    "d_over": "12",
+    "d_to": "17",
+    "t1": "3.0",
+    "t2": "2.3"
+   },
+   "6x6": {
+    "d_over": "17",
+    "d_to": "22",
+    "t1": "3.5",
+    "t2": "2.8"
+   },
+   "8x7": {
+    "d_over": "22",
+    "d_to": "30",
+    "t1": "4.0",
+    "t2": "3.3"
+   },
+   "10x8": {
+    "d_over": "30",
+    "d_to": "38",
+    "t1": "5.0",
+    "t2": "3.3"
+   },
+   "12x8": {
+    "d_over": "38",
+    "d_to": "44",
+    "t1": "5.0",
+    "t2": "3.3"
+   },
+   "14x9": {
+    "d_over": "44",
+    "d_to": "50",
+    "t1": "5.5",
+    "t2": "3.8"
+   },
+   "16x10": {
+    "d_over": "50",
+    "d_to": "58",
+    "t1": "6.0",
+    "t2": "4.3"
+   },
+   "18x11": {
+    "d_over": "58",
+    "d_to": "65",
+    "t1": "7.0",
+    "t2": "4.4"
+   },
+   "20x12": {
+    "d_over": "65",
+    "d_to": "75",
+    "t1": "7.5",
+    "t2": "4.9"
+   },
+   "22x14": {
+    "d_over": "75",
+    "d_to": "85",
+    "t1": "9.0",
+    "t2": "5.4"
+   },
+   "25x14": {
+    "d_over": "85",
+    "d_to": "95",
+    "t1": "9.0",
+    "t2": "5.4"
+   },
+   "28x16": {
+    "d_over": "95",
+    "d_to": "110",
+    "t1": "10.0",
+    "t2": "6.4"
+   },
+   "32x18": {
+    "d_over": "110",
+    "d_to": "130",
+    "t1": "11.0",
+    "t2": "7.4"
+   },
+   "36x20": {
+    "d_over": "130",
+    "d_to": "150",
+    "t1": "12.0",
+    "t2": "8.4"
+   },
+   "40x22": {
+    "d_over": "150",
+    "d_to": "170",
+    "t1": "13.0",
+    "t2": "9.4"
+   },
+   "45x25": {
+    "d_over": "170",
+    "d_to": "200",
+    "t1": "15.0",
+    "t2": "10.4"
+   },
+   "50x28": {
+    "d_over": "200",
+    "d_to": "230",
+    "t1": "17.0",
+    "t2": "11.4"
+   },
+   "56x32": {
+    "d_over": "230",
+    "d_to": "260",
+    "t1": "20.0",
+    "t2": "12.4"
+   },
+   "63x32": {
+    "d_over": "260",
+    "d_to": "290",
+    "t1": "20.0",
+    "t2": "12.4"
+   },
+   "70x36": {
+    "d_over": "290",
+    "d_to": "330",
+    "t1": "22.0",
+    "t2": "14.4"
+   },
+   "80x40": {
+    "d_over": "330",
+    "d_to": "380",
+    "t1": "25.0",
+    "t2": "15.4"
+   },
+   "90x45": {
+    "d_over": "380",
+    "d_to": "440",
+    "t1": "28.0",
+    "t2": "17.4"
+   },
+   "100x50": {
+    "d_over": "440",
+    "d_to": "500",
+    "t1": "31.0",
+    "t2": "19.5"
+   }
+  },
+  "AIMS": {
+   "2x2": {
+    "d_over": "6",
+    "d_to": "8",
+    "t1": "1.2",
+    "t2": "1.0",
+    "lengths": "6-20"
+   },
+   "3x3": {
+    "d_over": "8",
+    "d_to": "10",
+    "t1": "1.8",
+    "t2": "1.4",
+    "lengths": "6-36"
+   },
+   "4x4": {
+    "d_over": "10",
+    "d_to": "12",
+    "t1": "2.5",
+    "t2": "1.8",
+    "lengths": "8-45"
+   },
+   "5x5": {
+    "d_over": "12",
+    "d_to": "17",
+    "t1": "3.0",
+    "t2": "2.3",
+    "lengths": "10-56"
+   },
+   "6x6": {
+    "d_over": "17",
+    "d_to": "22",
+    "t1": "3.5",
+    "t2": "2.8",
+    "lengths": "14-70"
+   },
+   "8x7": {
+    "d_over": "22",
+    "d_to": "30",
+    "t1": "4.0",
+    "t2": "3.3",
+    "lengths": "18-90"
+   },
+   "10x8": {
+    "d_over": "30",
+    "d_to": "38",
+    "t1": "5.0",
+    "t2": "3.3",
+    "lengths": "22-110"
+   },
+   "12x8": {
+    "d_over": "38",
+    "d_to": "44",
+    "t1": "5.0",
+    "t2": "3.3",
+    "lengths": "28-140"
+   },
+   "14x9": {
+    "d_over": "44",
+    "d_to": "50",
+    "t1": "5.5",
+    "t2": "3.8",
+    "lengths": "36-160"
+   },
+   "16x10": {
+    "d_over": "50",
+    "d_to": "58",
+    "t1": "6.0",
+    "t2": "4.3",
+    "lengths": "45-180"
+   },
+   "18x11": {
+    "d_over": "58",
+    "d_to": "65",
+    "t1": "7.0",
+    "t2": "4.4",
+    "lengths": "50-200"
+   },
+   "20x12": {
+    "d_over": "65",
+    "d_to": "75",
+    "t1": "7.5",
+    "t2": "4.9",
+    "lengths": "56-220"
+   },
+   "22x14": {
+    "d_over": "75",
+    "d_to": "85",
+    "t1": "9.0",
+    "t2": "5.4",
+    "lengths": "63-250"
+   },
+   "25x14": {
+    "d_over": "85",
+    "d_to": "95",
+    "t1": "9.0",
+    "t2": "5.4",
+    "lengths": "70-280"
+   },
+   "28x16": {
+    "d_over": "95",
+    "d_to": "110",
+    "t1": "10.0",
+    "t2": "6.4",
+    "lengths": "80-320"
+   },
+   "32x18": {
+    "d_over": "110",
+    "d_to": "130",
+    "t1": "11.0",
+    "t2": "7.4",
+    "lengths": "90-360"
+   },
+   "36x20": {
+    "d_over": "130",
+    "d_to": "150",
+    "t1": "12.0",
+    "t2": "8.4",
+    "lengths": "100-400"
+   },
+   "40x22": {
+    "d_over": "150",
+    "d_to": "170",
+    "t1": "13.0",
+    "t2": "9.4",
+    "lengths": "110-400"
+   },
+   "45x25": {
+    "d_over": "170",
+    "d_to": "200",
+    "t1": "15.0",
+    "t2": "10.4",
+    "lengths": "125-400"
+   }
+  }
+ },
+ "keys_metric_order": [
+  "2x2",
+  "3x3",
+  "4x4",
+  "5x5",
+  "6x6",
+  "8x7",
+  "10x8",
+  "12x8",
+  "14x9",
+  "16x10",
+  "18x11",
+  "20x12",
+  "22x14",
+  "25x14",
+  "28x16",
+  "32x18",
+  "36x20",
+  "40x22",
+  "45x25",
+  "50x28",
+  "56x32",
+  "63x32",
+  "70x36",
+  "80x40",
+  "90x45",
+  "100x50"
+ ],
+ "keys_inch": {
+  "EE_KEY": {
+   "5/16-7/16": {
+    "width": "3/32",
+    "square_h": "3/32"
+   },
+   "7/16-9/16": {
+    "width": "1/8",
+    "square_h": "1/8",
+    "rect_h": "3/32"
+   },
+   "9/16-7/8": {
+    "width": "3/16",
+    "square_h": "3/16",
+    "rect_h": "1/8"
+   },
+   "7/8-1 1/4": {
+    "width": "1/4",
+    "square_h": "1/4",
+    "rect_h": "3/16"
+   },
+   "1 1/4-1 3/8": {
+    "width": "5/16",
+    "square_h": "5/16",
+    "rect_h": "1/4"
+   },
+   "1 3/8-1 3/4": {
+    "width": "3/8",
+    "square_h": "3/8",
+    "rect_h": "1/4"
+   },
+   "1 3/4-2 1/4": {
+    "width": "1/2",
+    "square_h": "1/2",
+    "rect_h": "3/8"
+   },
+   "2 1/4-2 3/4": {
+    "width": "5/8",
+    "square_h": "5/8",
+    "rect_h": "7/16"
+   },
+   "2 3/4-3 1/4": {
+    "width": "3/4",
+    "square_h": "3/4",
+    "rect_h": "1/2"
+   },
+   "3 1/4-3 3/4": {
+    "width": "7/8",
+    "square_h": "7/8",
+    "rect_h": "5/8"
+   },
+   "3 3/4-4 1/2": {
+    "width": "1",
+    "square_h": "1",
+    "rect_h": "3/4"
+   },
+   "4 1/2-5 1/2": {
+    "width": "1 1/4",
+    "square_h": "1 1/4",
+    "rect_h": "7/8"
+   },
+   "5 1/2-6 1/2": {
+    "width": "1 1/2",
+    "square_h": "1 1/2",
+    "rect_h": "1"
+   },
+   "6 1/2-7 1/2": {
+    "width": "1 3/4",
+    "square_h": "1 3/4",
+    "rect_h": "1 1/2"
+   },
+   "7 1/2-9": {
+    "width": "2",
+    "square_h": "2",
+    "rect_h": "1 1/2"
+   },
+   "9-11": {
+    "width": "2 1/2",
+    "square_h": "2 1/2",
+    "rect_h": "1 3/4"
+   }
+  },
+  "AIMS": {
+   "5/16-7/16": {
+    "width": "3/32",
+    "square_h": "3/32"
+   },
+   "7/16-9/16": {
+    "width": "1/8",
+    "square_h": "1/8"
+   },
+   "9/16-7/8": {
+    "width": "3/16",
+    "square_h": "3/16",
+    "rect_h": "1/8"
+   },
+   "7/8-1 1/4": {
+    "width": "1/4",
+    "square_h": "1/4",
+    "rect_h": "3/16"
+   },
+   "1 1/4-1 3/8": {
+    "width": "5/16",
+    "square_h": "5/16",
+    "rect_h": "1/4"
+   },
+   "1 3/8-1 3/4": {
+    "width": "3/8",
+    "square_h": "3/8",
+    "rect_h": "1/4"
+   },
+   "1 3/4-2 1/4": {
+    "width": "1/2",
+    "square_h": "1/2",
+    "rect_h": "3/8"
+   },
+   "2 1/4-2 3/4": {
+    "width": "5/8",
+    "square_h": "5/8",
+    "rect_h": "7/16"
+   },
+   "2 3/4-3 1/4": {
+    "width": "3/4",
+    "square_h": "3/4",
+    "rect_h": "1/2"
+   },
+   "3 1/4-3 3/4": {
+    "width": "7/8",
+    "square_h": "7/8",
+    "rect_h": "5/8"
+   },
+   "3 3/4-4 1/2": {
+    "width": "1",
+    "square_h": "1",
+    "rect_h": "3/4"
+   },
+   "4 1/2-5 1/2": {
+    "width": "1 1/4",
+    "square_h": "1 1/4",
+    "rect_h": "7/8"
+   },
+   "5 1/2-6 1/2": {
+    "width": "1 1/2",
+    "square_h": "1 1/2",
+    "rect_h": "1"
+   },
+   "6 1/2-7 1/2": {
+    "width": "1 3/4",
+    "rect_h": "1 1/2"
+   },
+   "7 1/2-9": {
+    "width": "2",
+    "rect_h": "1 1/2"
+   },
+   "9-11": {
+    "width": "2 1/2",
+    "rect_h": "1 3/4"
+   },
+   "11-13": {
+    "width": "3",
+    "rect_h": "2"
+   }
+  },
+  "AMES_KEY": {
+   "5/16-7/16": {
+    "range": "5/16-7/16"
+   },
+   "7/16-9/16": {
+    "range": "7/16-9/16"
+   },
+   "9/16-7/8": {
+    "range": "9/16-7/8"
+   },
+   "7/8-1 1/4": {
+    "range": "7/8-1 1/4"
+   },
+   "1 1/4-1 3/8": {
+    "range": "1 1/4-1 3/8"
+   },
+   "1 3/8-1 3/4": {
+    "range": "1 3/8-1 3/4"
+   },
+   "1 3/4-2 1/4": {
+    "range": "1 3/4-2 1/4"
+   },
+   "2 1/4-2 3/4": {
+    "range": "2 1/4-2 3/4"
+   },
+   "2 3/4-3 1/4": {
+    "range": "2 3/4-3 1/4"
+   },
+   "3 1/4-3 3/4": {
+    "range": "3 1/4-3 3/4"
+   },
+   "3 3/4-4 1/2": {
+    "range": "3 3/4-4 1/2"
+   },
+   "4 1/2-5 1/2": {
+    "range": "4 1/2-5 1/2"
+   },
+   "5 1/2-6 1/2": {
+    "range": "5 1/2-6 1/2"
+   },
+   "6 1/2-7 1/2": {
+    "range": "6 1/2-7 1/2"
+   },
+   "7 1/2-9": {
+    "range": "7 1/2-9"
+   },
+   "9-11": {
+    "range": "9-11"
+   },
+   "11-13": {
+    "range": "11-13"
+   },
+   "13-15": {
+    "range": "13-15"
+   },
+   "15-18": {
+    "range": "15-18"
+   },
+   "18-22": {
+    "range": "18-22"
+   },
+   "22-26": {
+    "range": "22-26"
+   },
+   "26-30": {
+    "range": "26-30"
+   }
+  }
+ },
+ "keys_inch_note": "AIMS lists square keys up to 6 1/2 in shafts only (\"not preferred\" above); Engineers Edge marks rectangular keys as preferred below that row and square above it, the reverse reading of the same boundary. Engineers Edge footnote: some key standards show 1 1/4 in for the 6 1/2 to 7 1/2 in rectangular height, preferred 1 1/2 in.",
+ "tslots": {
+  "EE_TSLOT": {
+   "8": {
+    "b_min": "14.5",
+    "b_max": "16",
+    "c_min": "7",
+    "c_max": "8",
+    "bolt": "M6"
+   },
+   "10": {
+    "b_min": "16",
+    "b_max": "18",
+    "c_min": "7",
+    "c_max": "8",
+    "bolt": "M8"
+   },
+   "12": {
+    "b_min": "19",
+    "b_max": "21",
+    "c_min": "8",
+    "c_max": "9",
+    "bolt": "M10"
+   },
+   "14": {
+    "b_min": "23",
+    "b_max": "25",
+    "c_min": "9",
+    "c_max": "11",
+    "bolt": "M12"
+   },
+   "18": {
+    "b_min": "30",
+    "b_max": "32",
+    "c_min": "12",
+    "c_max": "14",
+    "bolt": "M16"
+   },
+   "22": {
+    "b_min": "37",
+    "b_max": "40",
+    "c_min": "16",
+    "c_max": "18",
+    "bolt": "M20"
+   },
+   "28": {
+    "b_min": "46",
+    "b_max": "50",
+    "c_min": "20",
+    "c_max": "22",
+    "bolt": "M24"
+   },
+   "36": {
+    "b_min": "56",
+    "b_max": "60",
+    "c_min": "25",
+    "c_max": "28",
+    "bolt": "M30"
+   },
+   "42": {
+    "b_min": "68",
+    "b_max": "72",
+    "c_min": "32",
+    "c_max": "35",
+    "bolt": "M36"
+   }
+  },
+  "ITEH_299": {
+   "5": {
+    "b_min": "10",
+    "b_max": "11",
+    "c_min": "3.5",
+    "c_max": "4.5",
+    "h_min": "8",
+    "h_max": "10",
+    "bolt": "M4"
+   },
+   "6": {
+    "b_min": "11",
+    "b_max": "12.5",
+    "c_min": "5",
+    "c_max": "6",
+    "h_min": "11",
+    "h_max": "13",
+    "bolt": "M5"
+   },
+   "8": {
+    "b_min": "14.5",
+    "b_max": "16",
+    "c_min": "7",
+    "c_max": "8",
+    "h_min": "15",
+    "h_max": "18",
+    "bolt": "M6"
+   },
+   "10": {
+    "b_min": "16",
+    "b_max": "18",
+    "c_min": "7",
+    "c_max": "8",
+    "h_min": "17",
+    "h_max": "21",
+    "bolt": "M8"
+   },
+   "12": {
+    "b_min": "19",
+    "b_max": "21",
+    "c_min": "8",
+    "c_max": "9",
+    "h_min": "20",
+    "h_max": "25",
+    "bolt": "M10"
+   },
+   "14": {
+    "b_min": "23",
+    "b_max": "25",
+    "c_min": "9",
+    "c_max": "11",
+    "h_min": "23",
+    "h_max": "28",
+    "bolt": "M12"
+   },
+   "18": {
+    "b_min": "30",
+    "b_max": "32",
+    "c_min": "12",
+    "c_max": "14",
+    "h_min": "30",
+    "h_max": "36",
+    "bolt": "M16"
+   },
+   "22": {
+    "b_min": "37",
+    "b_max": "40",
+    "c_min": "16",
+    "c_max": "18",
+    "h_min": "38",
+    "h_max": "45",
+    "bolt": "M20"
+   },
+   "28": {
+    "b_min": "46",
+    "b_max": "50",
+    "c_min": "20",
+    "c_max": "22",
+    "h_min": "48",
+    "h_max": "56",
+    "bolt": "M24"
+   },
+   "36": {
+    "b_min": "56",
+    "b_max": "60",
+    "c_min": "25",
+    "c_max": "28",
+    "h_min": "61",
+    "h_max": "71",
+    "bolt": "M30"
+   },
+   "42": {
+    "b_min": "68",
+    "b_max": "72",
+    "c_min": "32",
+    "c_max": "35",
+    "h_min": "74",
+    "h_max": "85",
+    "bolt": "M36"
+   },
+   "48": {
+    "b_min": "80",
+    "b_max": "85",
+    "c_min": "36",
+    "c_max": "40",
+    "h_min": "84",
+    "h_max": "95",
+    "bolt": "M42"
+   },
+   "54": {
+    "b_min": "90",
+    "b_max": "95",
+    "c_min": "40",
+    "c_max": "44",
+    "h_min": "94",
+    "h_max": "106",
+    "bolt": "M48"
+   }
+  }
+ },
+ "tslot_pitch": {
+  "5": "20 25 32",
+  "6": "25 32 40",
+  "8": "32 40 50",
+  "10": "40 50 63",
+  "12": "(45) 50 63 80",
+  "14": "(50) 63 80 100",
+  "18": "(63) 80 100 125",
+  "22": "(80) 100 125 160",
+  "28": "100 125 160 200",
+  "36": "125 160 200 250",
+  "42": "160 200 250 320",
+  "48": "200 250 320 400",
+  "54": "250 320 400 500"
+ },
+ "tslot_pitch_source": "ITEH_299",
+ "as568": {
+  "GTWEED": {
+   "005": {
+    "id": "0.101",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "006": {
+    "id": "0.114",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "007": {
+    "id": "0.145",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "008": {
+    "id": "0.176",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "009": {
+    "id": "0.208",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "010": {
+    "id": "0.239",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "011": {
+    "id": "0.301",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "012": {
+    "id": "0.364",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "013": {
+    "id": "0.426",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "014": {
+    "id": "0.489",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "015": {
+    "id": "0.551",
+    "id_tol": "0.007",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "016": {
+    "id": "0.614",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "017": {
+    "id": "0.676",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "018": {
+    "id": "0.739",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "019": {
+    "id": "0.801",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "020": {
+    "id": "0.864",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "021": {
+    "id": "0.926",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "022": {
+    "id": "0.989",
+    "id_tol": "0.010",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "023": {
+    "id": "1.051",
+    "id_tol": "0.010",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "024": {
+    "id": "1.114",
+    "id_tol": "0.010",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "025": {
+    "id": "1.176",
+    "id_tol": "0.011",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "026": {
+    "id": "1.239",
+    "id_tol": "0.011",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "027": {
+    "id": "1.301",
+    "id_tol": "0.011",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "028": {
+    "id": "1.364",
+    "id_tol": "0.013",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "029": {
+    "id": "1.489",
+    "id_tol": "0.013",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "030": {
+    "id": "1.614",
+    "id_tol": "0.013",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "031": {
+    "id": "1.739",
+    "id_tol": "0.015",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "032": {
+    "id": "1.864",
+    "id_tol": "0.015",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "033": {
+    "id": "1.989",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "034": {
+    "id": "2.114",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "035": {
+    "id": "2.239",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "036": {
+    "id": "2.364",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "037": {
+    "id": "2.489",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "038": {
+    "id": "2.614",
+    "id_tol": "0.020",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "039": {
+    "id": "2.739",
+    "id_tol": "0.020",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "040": {
+    "id": "2.864",
+    "id_tol": "0.020",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "041": {
+    "id": "2.989",
+    "id_tol": "0.024",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "042": {
+    "id": "3.239",
+    "id_tol": "0.024",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "043": {
+    "id": "3.489",
+    "id_tol": "0.024",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "044": {
+    "id": "3.739",
+    "id_tol": "0.027",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "045": {
+    "id": "3.989",
+    "id_tol": "0.027",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "046": {
+    "id": "4.239",
+    "id_tol": "0.030",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "047": {
+    "id": "4.489",
+    "id_tol": "0.030",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "048": {
+    "id": "4.739",
+    "id_tol": "0.030",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "049": {
+    "id": "4.989",
+    "id_tol": "0.037",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "050": {
+    "id": "5.239",
+    "id_tol": "0.037",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "102": {
+    "id": "0.049",
+    "id_tol": "0.004",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "103": {
+    "id": "0.081",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "104": {
+    "id": "0.112",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "105": {
+    "id": "0.143",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "106": {
+    "id": "0.174",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "107": {
+    "id": "0.206",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "108": {
+    "id": "0.237",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "109": {
+    "id": "0.299",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "110": {
+    "id": "0.362",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "111": {
+    "id": "0.424",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "112": {
+    "id": "0.487",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "113": {
+    "id": "0.549",
+    "id_tol": "0.007",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "114": {
+    "id": "0.612",
+    "id_tol": "0.009",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "115": {
+    "id": "0.674",
+    "id_tol": "0.009",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "116": {
+    "id": "0.737",
+    "id_tol": "0.009",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "117": {
+    "id": "0.799",
+    "id_tol": "0.010",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "118": {
+    "id": "0.862",
+    "id_tol": "0.010",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "119": {
+    "id": "0.924",
+    "id_tol": "0.010",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "120": {
+    "id": "0.987",
+    "id_tol": "0.010",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "121": {
+    "id": "1.049",
+    "id_tol": "0.010",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "122": {
+    "id": "1.112",
+    "id_tol": "0.010",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "123": {
+    "id": "1.174",
+    "id_tol": "0.012",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "124": {
+    "id": "1.237",
+    "id_tol": "0.012",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "125": {
+    "id": "1.299",
+    "id_tol": "0.012",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "126": {
+    "id": "1.362",
+    "id_tol": "0.012",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "127": {
+    "id": "1.424",
+    "id_tol": "0.012",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "128": {
+    "id": "1.487",
+    "id_tol": "0.012",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "129": {
+    "id": "1.549",
+    "id_tol": "0.015",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "130": {
+    "id": "1.612",
+    "id_tol": "0.015",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "131": {
+    "id": "1.674",
+    "id_tol": "0.015",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "132": {
+    "id": "1.737",
+    "id_tol": "0.015",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "133": {
+    "id": "1.799",
+    "id_tol": "0.015",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "134": {
+    "id": "1.862",
+    "id_tol": "0.015",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "135": {
+    "id": "1.925",
+    "id_tol": "0.017",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "136": {
+    "id": "1.987",
+    "id_tol": "0.017",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "137": {
+    "id": "2.050",
+    "id_tol": "0.017",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "138": {
+    "id": "2.112",
+    "id_tol": "0.017",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "139": {
+    "id": "2.175",
+    "id_tol": "0.017",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "140": {
+    "id": "2.237",
+    "id_tol": "0.017",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "141": {
+    "id": "2.300",
+    "id_tol": "0.020",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "142": {
+    "id": "2.362",
+    "id_tol": "0.020",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "143": {
+    "id": "2.425",
+    "id_tol": "0.020",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "144": {
+    "id": "2.487",
+    "id_tol": "0.020",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "145": {
+    "id": "2.550",
+    "id_tol": "0.020",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "146": {
+    "id": "2.612",
+    "id_tol": "0.020",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "147": {
+    "id": "2.675",
+    "id_tol": "0.022",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "148": {
+    "id": "2.737",
+    "id_tol": "0.022",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "149": {
+    "id": "2.800",
+    "id_tol": "0.022",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "150": {
+    "id": "2.862",
+    "id_tol": "0.022",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "151": {
+    "id": "2.987",
+    "id_tol": "0.024",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "152": {
+    "id": "3.237",
+    "id_tol": "0.024",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "153": {
+    "id": "3.487",
+    "id_tol": "0.024",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "154": {
+    "id": "3.737",
+    "id_tol": "0.028",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "155": {
+    "id": "3.987",
+    "id_tol": "0.028",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "156": {
+    "id": "4.237",
+    "id_tol": "0.030",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "157": {
+    "id": "4.487",
+    "id_tol": "0.030",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "158": {
+    "id": "4.737",
+    "id_tol": "0.030",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "159": {
+    "id": "4.987",
+    "id_tol": "0.035",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "160": {
+    "id": "5.237",
+    "id_tol": "0.035",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "161": {
+    "id": "5.487",
+    "id_tol": "0.035",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "162": {
+    "id": "5.737",
+    "id_tol": "0.035",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "163": {
+    "id": "5.987",
+    "id_tol": "0.035",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "164": {
+    "id": "6.237",
+    "id_tol": "0.040",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "165": {
+    "id": "6.487",
+    "id_tol": "0.040",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "166": {
+    "id": "6.737",
+    "id_tol": "0.040",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "167": {
+    "id": "6.987",
+    "id_tol": "0.040",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "168": {
+    "id": "7.237",
+    "id_tol": "0.045",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "169": {
+    "id": "7.487",
+    "id_tol": "0.045",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "170": {
+    "id": "7.737",
+    "id_tol": "0.045",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "171": {
+    "id": "7.987",
+    "id_tol": "0.045",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "172": {
+    "id": "8.237",
+    "id_tol": "0.050",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "173": {
+    "id": "8.487",
+    "id_tol": "0.050",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "174": {
+    "id": "8.737",
+    "id_tol": "0.050",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "175": {
+    "id": "8.987",
+    "id_tol": "0.050",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "176": {
+    "id": "9.237",
+    "id_tol": "0.055",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "177": {
+    "id": "9.487",
+    "id_tol": "0.055",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "178": {
+    "id": "9.737",
+    "id_tol": "0.055",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "201": {
+    "id": "0.171",
+    "id_tol": "0.005",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "202": {
+    "id": "0.234",
+    "id_tol": "0.005",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "203": {
+    "id": "0.296",
+    "id_tol": "0.005",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "204": {
+    "id": "0.359",
+    "id_tol": "0.005",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "205": {
+    "id": "0.421",
+    "id_tol": "0.005",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "206": {
+    "id": "0.484",
+    "id_tol": "0.005",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "207": {
+    "id": "0.546",
+    "id_tol": "0.007",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "208": {
+    "id": "0.609",
+    "id_tol": "0.009",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "209": {
+    "id": "0.671",
+    "id_tol": "0.009",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "210": {
+    "id": "0.734",
+    "id_tol": "0.010",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "211": {
+    "id": "0.796",
+    "id_tol": "0.010",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "212": {
+    "id": "0.859",
+    "id_tol": "0.010",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "213": {
+    "id": "0.921",
+    "id_tol": "0.010",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "214": {
+    "id": "0.984",
+    "id_tol": "0.010",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "215": {
+    "id": "1.046",
+    "id_tol": "0.010",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "216": {
+    "id": "1.109",
+    "id_tol": "0.012",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "217": {
+    "id": "1.171",
+    "id_tol": "0.012",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "218": {
+    "id": "1.234",
+    "id_tol": "0.012",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "219": {
+    "id": "1.296",
+    "id_tol": "0.012",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "220": {
+    "id": "1.359",
+    "id_tol": "0.012",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "221": {
+    "id": "1.421",
+    "id_tol": "0.012",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "222": {
+    "id": "1.484",
+    "id_tol": "0.015",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "223": {
+    "id": "1.609",
+    "id_tol": "0.015",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "224": {
+    "id": "1.734",
+    "id_tol": "0.015",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "225": {
+    "id": "1.859",
+    "id_tol": "0.018",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "226": {
+    "id": "1.984",
+    "id_tol": "0.018",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "227": {
+    "id": "2.109",
+    "id_tol": "0.018",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "228": {
+    "id": "2.234",
+    "id_tol": "0.020",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "229": {
+    "id": "2.359",
+    "id_tol": "0.020",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "230": {
+    "id": "2.484",
+    "id_tol": "0.020",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "231": {
+    "id": "2.609",
+    "id_tol": "0.020",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "232": {
+    "id": "2.734",
+    "id_tol": "0.024",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "233": {
+    "id": "2.859",
+    "id_tol": "0.024",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "234": {
+    "id": "2.984",
+    "id_tol": "0.024",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "235": {
+    "id": "3.109",
+    "id_tol": "0.024",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "236": {
+    "id": "3.234",
+    "id_tol": "0.024",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "237": {
+    "id": "3.359",
+    "id_tol": "0.024",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "238": {
+    "id": "3.484",
+    "id_tol": "0.024",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "239": {
+    "id": "3.609",
+    "id_tol": "0.028",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "240": {
+    "id": "3.734",
+    "id_tol": "0.028",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "241": {
+    "id": "3.859",
+    "id_tol": "0.028",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "242": {
+    "id": "3.984",
+    "id_tol": "0.028",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "243": {
+    "id": "4.109",
+    "id_tol": "0.028",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "244": {
+    "id": "4.234",
+    "id_tol": "0.030",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "245": {
+    "id": "4.359",
+    "id_tol": "0.030",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "246": {
+    "id": "4.484",
+    "id_tol": "0.030",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "247": {
+    "id": "4.609",
+    "id_tol": "0.030",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "248": {
+    "id": "4.734",
+    "id_tol": "0.030",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "249": {
+    "id": "4.859",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "250": {
+    "id": "4.984",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "251": {
+    "id": "5.109",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "252": {
+    "id": "5.234",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "253": {
+    "id": "5.359",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "254": {
+    "id": "5.484",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "255": {
+    "id": "5.609",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "256": {
+    "id": "5.734",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "257": {
+    "id": "5.859",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "258": {
+    "id": "5.984",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "259": {
+    "id": "6.234",
+    "id_tol": "0.040",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "260": {
+    "id": "6.484",
+    "id_tol": "0.040",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "261": {
+    "id": "6.734",
+    "id_tol": "0.040",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "262": {
+    "id": "6.984",
+    "id_tol": "0.040",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "263": {
+    "id": "7.234",
+    "id_tol": "0.045",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "264": {
+    "id": "7.484",
+    "id_tol": "0.045",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "265": {
+    "id": "7.734",
+    "id_tol": "0.045",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "266": {
+    "id": "7.984",
+    "id_tol": "0.045",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "267": {
+    "id": "8.234",
+    "id_tol": "0.050",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "268": {
+    "id": "8.484",
+    "id_tol": "0.050",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "269": {
+    "id": "8.734",
+    "id_tol": "0.050",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "270": {
+    "id": "8.984",
+    "id_tol": "0.050",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "271": {
+    "id": "9.234",
+    "id_tol": "0.055",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "272": {
+    "id": "9.484",
+    "id_tol": "0.055",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "273": {
+    "id": "9.734",
+    "id_tol": "0.055",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "274": {
+    "id": "9.984",
+    "id_tol": "0.055",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "275": {
+    "id": "10.484",
+    "id_tol": "0.055",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "276": {
+    "id": "10.984",
+    "id_tol": "0.065",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "277": {
+    "id": "11.484",
+    "id_tol": "0.065",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "278": {
+    "id": "11.984",
+    "id_tol": "0.065",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "279": {
+    "id": "12.984",
+    "id_tol": "0.065",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "280": {
+    "id": "13.984",
+    "id_tol": "0.065",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "281": {
+    "id": "14.984",
+    "id_tol": "0.065",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "282": {
+    "id": "15.955",
+    "id_tol": "0.075",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "283": {
+    "id": "16.955",
+    "id_tol": "0.080",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "284": {
+    "id": "17.955",
+    "id_tol": "0.085",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "309": {
+    "id": "0.412",
+    "id_tol": "0.005",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "310": {
+    "id": "0.475",
+    "id_tol": "0.005",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "311": {
+    "id": "0.537",
+    "id_tol": "0.007",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "312": {
+    "id": "0.600",
+    "id_tol": "0.009",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "313": {
+    "id": "0.662",
+    "id_tol": "0.009",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "314": {
+    "id": "0.725",
+    "id_tol": "0.010",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "315": {
+    "id": "0.787",
+    "id_tol": "0.010",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "316": {
+    "id": "0.850",
+    "id_tol": "0.010",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "317": {
+    "id": "0.912",
+    "id_tol": "0.010",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "318": {
+    "id": "0.975",
+    "id_tol": "0.010",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "319": {
+    "id": "1.037",
+    "id_tol": "0.010",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "320": {
+    "id": "1.100",
+    "id_tol": "0.012",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "321": {
+    "id": "1.162",
+    "id_tol": "0.012",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "322": {
+    "id": "1.225",
+    "id_tol": "0.012",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "323": {
+    "id": "1.287",
+    "id_tol": "0.012",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "324": {
+    "id": "1.350",
+    "id_tol": "0.012",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "325": {
+    "id": "1.475",
+    "id_tol": "0.015",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "326": {
+    "id": "1.600",
+    "id_tol": "0.015",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "327": {
+    "id": "1.725",
+    "id_tol": "0.015",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "328": {
+    "id": "1.850",
+    "id_tol": "0.015",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "329": {
+    "id": "1.975",
+    "id_tol": "0.018",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "330": {
+    "id": "2.100",
+    "id_tol": "0.018",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "331": {
+    "id": "2.225",
+    "id_tol": "0.018",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "332": {
+    "id": "2.350",
+    "id_tol": "0.018",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "333": {
+    "id": "2.475",
+    "id_tol": "0.020",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "334": {
+    "id": "2.600",
+    "id_tol": "0.020",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "335": {
+    "id": "2.725",
+    "id_tol": "0.020",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "336": {
+    "id": "2.850",
+    "id_tol": "0.020",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "337": {
+    "id": "2.975",
+    "id_tol": "0.024",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "338": {
+    "id": "3.100",
+    "id_tol": "0.024",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "339": {
+    "id": "3.225",
+    "id_tol": "0.024",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "340": {
+    "id": "3.350",
+    "id_tol": "0.024",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "341": {
+    "id": "3.475",
+    "id_tol": "0.024",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "342": {
+    "id": "3.600",
+    "id_tol": "0.028",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "343": {
+    "id": "3.725",
+    "id_tol": "0.028",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "344": {
+    "id": "3.850",
+    "id_tol": "0.028",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "345": {
+    "id": "3.975",
+    "id_tol": "0.028",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "346": {
+    "id": "4.100",
+    "id_tol": "0.028",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "347": {
+    "id": "4.225",
+    "id_tol": "0.030",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "348": {
+    "id": "4.350",
+    "id_tol": "0.030",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "349": {
+    "id": "4.475",
+    "id_tol": "0.030",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "350": {
+    "id": "4.600",
+    "id_tol": "0.030",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "351": {
+    "id": "4.725",
+    "id_tol": "0.030",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "352": {
+    "id": "4.850",
+    "id_tol": "0.030",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "353": {
+    "id": "4.975",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "354": {
+    "id": "5.100",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "355": {
+    "id": "5.225",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "356": {
+    "id": "5.350",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "357": {
+    "id": "5.475",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "358": {
+    "id": "5.600",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "359": {
+    "id": "5.725",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "360": {
+    "id": "5.850",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "361": {
+    "id": "5.975",
+    "id_tol": "0.037",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "362": {
+    "id": "6.225",
+    "id_tol": "0.040",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "363": {
+    "id": "6.475",
+    "id_tol": "0.040",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "364": {
+    "id": "6.725",
+    "id_tol": "0.040",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "365": {
+    "id": "6.975",
+    "id_tol": "0.040",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "366": {
+    "id": "7.225",
+    "id_tol": "0.045",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "367": {
+    "id": "7.475",
+    "id_tol": "0.045",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "368": {
+    "id": "7.725",
+    "id_tol": "0.045",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "369": {
+    "id": "7.975",
+    "id_tol": "0.045",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "370": {
+    "id": "8.225",
+    "id_tol": "0.050",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "371": {
+    "id": "8.475",
+    "id_tol": "0.050",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "372": {
+    "id": "8.725",
+    "id_tol": "0.050",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "373": {
+    "id": "8.975",
+    "id_tol": "0.050",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "374": {
+    "id": "9.225",
+    "id_tol": "0.055",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "375": {
+    "id": "9.475",
+    "id_tol": "0.055",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "376": {
+    "id": "9.725",
+    "id_tol": "0.055",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "377": {
+    "id": "9.975",
+    "id_tol": "0.055",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "378": {
+    "id": "10.475",
+    "id_tol": "0.060",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "379": {
+    "id": "10.975",
+    "id_tol": "0.060",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "380": {
+    "id": "11.475",
+    "id_tol": "0.065",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "381": {
+    "id": "11.975",
+    "id_tol": "0.065",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "382": {
+    "id": "12.975",
+    "id_tol": "0.065",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "383": {
+    "id": "13.975",
+    "id_tol": "0.070",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "384": {
+    "id": "14.975",
+    "id_tol": "0.070",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "385": {
+    "id": "15.955",
+    "id_tol": "0.075",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "386": {
+    "id": "16.955",
+    "id_tol": "0.080",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "387": {
+    "id": "17.955",
+    "id_tol": "0.085",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "388": {
+    "id": "18.955",
+    "id_tol": "0.090",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "389": {
+    "id": "19.955",
+    "id_tol": "0.095",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "390": {
+    "id": "20.955",
+    "id_tol": "0.095",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "391": {
+    "id": "21.995",
+    "id_tol": "0.100",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "392": {
+    "id": "22.940",
+    "id_tol": "0.105",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "393": {
+    "id": "23.940",
+    "id_tol": "0.110",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "394": {
+    "id": "24.940",
+    "id_tol": "0.115",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "395": {
+    "id": "25.940",
+    "id_tol": "0.120",
+    "cs": "0.210",
+    "cs_tol": "0.005"
+   },
+   "425": {
+    "id": "4.475",
+    "id_tol": "0.033",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "426": {
+    "id": "4.600",
+    "id_tol": "0.033",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "427": {
+    "id": "4.725",
+    "id_tol": "0.033",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "428": {
+    "id": "4.850",
+    "id_tol": "0.033",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "429": {
+    "id": "4.975",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "430": {
+    "id": "5.100",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "431": {
+    "id": "5.225",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "432": {
+    "id": "5.350",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "433": {
+    "id": "5.475",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "434": {
+    "id": "5.600",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "435": {
+    "id": "5.725",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "436": {
+    "id": "5.850",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "437": {
+    "id": "5.975",
+    "id_tol": "0.037",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "438": {
+    "id": "6.225",
+    "id_tol": "0.040",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "439": {
+    "id": "6.475",
+    "id_tol": "0.040",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "440": {
+    "id": "6.725",
+    "id_tol": "0.040",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "441": {
+    "id": "6.975",
+    "id_tol": "0.040",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "442": {
+    "id": "7.225",
+    "id_tol": "0.045",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "443": {
+    "id": "7.475",
+    "id_tol": "0.045",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "444": {
+    "id": "7.725",
+    "id_tol": "0.045",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "445": {
+    "id": "7.975",
+    "id_tol": "0.045",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "446": {
+    "id": "8.475",
+    "id_tol": "0.055",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "447": {
+    "id": "8.975",
+    "id_tol": "0.055",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "448": {
+    "id": "9.475",
+    "id_tol": "0.055",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "449": {
+    "id": "9.975",
+    "id_tol": "0.055",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "450": {
+    "id": "10.475",
+    "id_tol": "0.060",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "451": {
+    "id": "10.975",
+    "id_tol": "0.060",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "452": {
+    "id": "11.475",
+    "id_tol": "0.060",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "453": {
+    "id": "11.975",
+    "id_tol": "0.060",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "454": {
+    "id": "12.475",
+    "id_tol": "0.060",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "455": {
+    "id": "12.975",
+    "id_tol": "0.060",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "456": {
+    "id": "13.475",
+    "id_tol": "0.070",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "457": {
+    "id": "13.975",
+    "id_tol": "0.070",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "458": {
+    "id": "14.475",
+    "id_tol": "0.070",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "459": {
+    "id": "14.975",
+    "id_tol": "0.070",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "460": {
+    "id": "15.475",
+    "id_tol": "0.070",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "461": {
+    "id": "15.955",
+    "id_tol": "0.075",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "462": {
+    "id": "16.455",
+    "id_tol": "0.075",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "463": {
+    "id": "16.955",
+    "id_tol": "0.080",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "464": {
+    "id": "17.455",
+    "id_tol": "0.085",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "465": {
+    "id": "17.955",
+    "id_tol": "0.085",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "466": {
+    "id": "18.455",
+    "id_tol": "0.085",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "467": {
+    "id": "18.955",
+    "id_tol": "0.090",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "468": {
+    "id": "19.455",
+    "id_tol": "0.090",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "469": {
+    "id": "19.955",
+    "id_tol": "0.095",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "470": {
+    "id": "20.955",
+    "id_tol": "0.095",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "471": {
+    "id": "21.955",
+    "id_tol": "0.100",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "472": {
+    "id": "22.940",
+    "id_tol": "0.105",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "473": {
+    "id": "23.940",
+    "id_tol": "0.110",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "474": {
+    "id": "24.940",
+    "id_tol": "0.115",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   },
+   "475": {
+    "id": "25.940",
+    "id_tol": "0.120",
+    "cs": "0.275",
+    "cs_tol": "0.006"
+   }
+  },
+  "EFUNDA": {
+   "001": {
+    "id": "0.029",
+    "id_tol": "0.004",
+    "cs": "0.040",
+    "cs_tol": "0.003"
+   },
+   "002": {
+    "id": "0.042",
+    "id_tol": "0.004",
+    "cs": "0.050",
+    "cs_tol": "0.003"
+   },
+   "003": {
+    "id": "0.056",
+    "id_tol": "0.004",
+    "cs": "0.060",
+    "cs_tol": "0.003"
+   },
+   "004": {
+    "id": "0.070",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "005": {
+    "id": "0.101",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "006": {
+    "id": "0.114",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "007": {
+    "id": "0.145",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "008": {
+    "id": "0.176",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "009": {
+    "id": "0.208",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "010": {
+    "id": "0.239",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "011": {
+    "id": "0.301",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "012": {
+    "id": "0.364",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "013": {
+    "id": "0.426",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "014": {
+    "id": "0.489",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "015": {
+    "id": "0.551",
+    "id_tol": "0.007",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "016": {
+    "id": "0.614",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "017": {
+    "id": "0.676",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "018": {
+    "id": "0.739",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "019": {
+    "id": "0.801",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "020": {
+    "id": "0.864",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "021": {
+    "id": "0.926",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "022": {
+    "id": "0.989",
+    "id_tol": "0.010",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "023": {
+    "id": "1.051",
+    "id_tol": "0.010",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "024": {
+    "id": "1.114",
+    "id_tol": "0.010",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "025": {
+    "id": "1.176",
+    "id_tol": "0.011",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "026": {
+    "id": "1.239",
+    "id_tol": "0.011",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "027": {
+    "id": "1.301",
+    "id_tol": "0.011",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "028": {
+    "id": "1.364",
+    "id_tol": "0.013",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "029": {
+    "id": "1.489",
+    "id_tol": "0.013",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "030": {
+    "id": "1.614",
+    "id_tol": "0.013",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "031": {
+    "id": "1.739",
+    "id_tol": "0.015",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "032": {
+    "id": "1.864",
+    "id_tol": "0.015",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "033": {
+    "id": "1.989",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "034": {
+    "id": "2.114",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "035": {
+    "id": "2.239",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "036": {
+    "id": "2.364",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "037": {
+    "id": "2.489",
+    "id_tol": "0.018",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "038": {
+    "id": "2.614",
+    "id_tol": "0.020",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "039": {
+    "id": "2.739",
+    "id_tol": "0.020",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "040": {
+    "id": "2.864",
+    "id_tol": "0.020",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "041": {
+    "id": "2.989",
+    "id_tol": "0.024",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "042": {
+    "id": "3.239",
+    "id_tol": "0.024",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "043": {
+    "id": "3.489",
+    "id_tol": "0.024",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "044": {
+    "id": "3.739",
+    "id_tol": "0.027",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "045": {
+    "id": "3.989",
+    "id_tol": "0.027",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "046": {
+    "id": "4.239",
+    "id_tol": "0.030",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "047": {
+    "id": "4.489",
+    "id_tol": "0.030",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "048": {
+    "id": "4.739",
+    "id_tol": "0.030",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "049": {
+    "id": "4.989",
+    "id_tol": "0.037",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "050": {
+    "id": "5.239",
+    "id_tol": "0.037",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "102": {
+    "id": "0.049",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "103": {
+    "id": "0.081",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "104": {
+    "id": "0.112",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "105": {
+    "id": "0.143",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "106": {
+    "id": "0.174",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "107": {
+    "id": "0.206",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "108": {
+    "id": "0.237",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "109": {
+    "id": "0.299",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "110": {
+    "id": "0.362",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "111": {
+    "id": "0.424",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "112": {
+    "id": "0.487",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "113": {
+    "id": "0.549",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "114": {
+    "id": "0.612",
+    "id_tol": "0.009",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   }
+  },
+  "ORINGSINC": {
+   "001": {
+    "id": "0.029",
+    "id_tol": "0.004",
+    "cs": "0.040",
+    "cs_tol": "0.003"
+   },
+   "011": {
+    "id": "0.301",
+    "id_tol": "0.005",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "021": {
+    "id": "0.926",
+    "id_tol": "0.009",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "041": {
+    "id": "02.989",
+    "id_tol": "0.024",
+    "cs": "0.070",
+    "cs_tol": "0.003"
+   },
+   "111": {
+    "id": "0.424",
+    "id_tol": "0.005",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "121": {
+    "id": "01.049",
+    "id_tol": "0.010",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "131": {
+    "id": "01.674",
+    "id_tol": "0.015",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "141": {
+    "id": "02.300",
+    "id_tol": "0.020",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "151": {
+    "id": "02.987",
+    "id_tol": "0.024",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "161": {
+    "id": "05.487",
+    "id_tol": "0.035",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "171": {
+    "id": "07.987",
+    "id_tol": "0.045",
+    "cs": "0.103",
+    "cs_tol": "0.003"
+   },
+   "221": {
+    "id": "01.421",
+    "id_tol": "0.012",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "231": {
+    "id": "02.609",
+    "id_tol": "0.020",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "241": {
+    "id": "03.859",
+    "id_tol": "0.028",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "251": {
+    "id": "05.109",
+    "id_tol": "0.035",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "261": {
+    "id": "06.734",
+    "id_tol": "0.040",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "271": {
+    "id": "09.234",
+    "id_tol": "0.055",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   },
+   "281": {
+    "id": "014.984",
+    "id_tol": "0.065",
+    "cs": "0.139",
+    "cs_tol": "0.004"
+   }
+  }
+ },
+ "torque_friction": {
+  "source": "BOSSARD_F044",
+  "classes": [
+   [
+    "A",
+    "0.04-0.10",
+    "Bright-polished or treated steel, black oxide, phosphated or galvanised coatings, with solid lubricants, waxes or pastes"
+   ],
+   [
+    "B",
+    "0.08-0.16",
+    "Most metallic and coated surfaces including Al/Mg alloys, austenitic stainless and hot-dip galvanised parts, with greases, oils or other lubricants"
+   ],
+   [
+    "C",
+    "0.14-0.24",
+    "Austenitic stainless and metallic or galvanic coatings with wax dispersions or pastes, or lightly oiled as delivered"
+   ],
+   [
+    "D",
+    "0.20-0.35",
+    "Austenitic stainless and galvanic or hot-dip galvanised coatings, oiled or dry"
+   ],
+   [
+    "E",
+    "0.30 and up",
+    "Galvanised coatings (Zn/Fe, Zn/Ni), austenitic stainless, Al/Mg alloys, no lubricant"
+   ]
+  ]
+ },
+ "oring_rules": {
+  "squeeze_static": {
+   "GLOBAL_ORING": "15-30",
+   "APPLE": "10-40"
+  },
+  "squeeze_dynamic": {
+   "GLOBAL_ORING": "5-30 (less than static)",
+   "APPLE": "up to 30"
+  },
+  "fill_max": {
+   "GLOBAL_ORING": "85 (design 60-85)",
+   "APPLE": "90"
+  },
+  "stretch_max": {
+   "GLOBAL_ORING": "5",
+   "APPLE": "5"
+  }
+ }
+}

@@ -247,3 +247,20 @@ svg.geo .gacc{fill:color-mix(in srgb,var(--accent) 22%,var(--panel));stroke:var(
 .gmcmp td{width:44%}
 .gmcmp td:first-child{width:12%}
 .gmnc{font-weight:600}
+
+/* CNC guide, TNRC and formula library */
+svg.geo.cng{max-width:440px}
+.cntips{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;max-width:980px;margin-bottom:12px}
+.cntipc{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:6px;line-height:1.45}
+svg.geo.cntip{width:72px;max-width:72px;flex:none;margin:0}
+svg.geo.cnw{width:150px;max-width:150px;flex:none;margin:0}
+.flib-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.flib-bar input{flex:1;min-width:0;max-width:520px}
+.flib-bar select{max-width:100%}
+.frow{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:8px 10px;margin-bottom:8px;max-width:980px}
+.fh{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;justify-content:space-between}
+.fh .btn{height:auto;min-height:22px;padding:1px 8px;color:var(--accent);text-align:left}
+.fx{font-family:var(--mono);font-size:12.5px;margin:6px 0;overflow-wrap:anywhere}
+.fv{color:var(--muted);font-size:11.5px;line-height:1.5}
+.fs{margin-top:4px}
+.res td.v.txt{white-space:normal;overflow-wrap:anywhere}

@@ -569,12 +569,21 @@ pub mod dxf;
 pub mod cad;
 pub mod tooling;
 pub use tooling::*;
+pub mod fasteners;
+pub use fasteners::*;
 pub mod millturn;
 pub use millturn::*;
 pub mod chatter;
 pub use chatter::*;
 pub mod grinding;
 pub use grinding::*;
+pub mod tnrc;
+pub mod measure;
+pub mod power_threads;
+pub use power_threads::*;
+pub use measure::*;
+pub mod units;
+pub mod expr;
 
 #[cfg(test)]
 mod tests {

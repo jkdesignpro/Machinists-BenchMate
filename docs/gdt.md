@@ -36,11 +36,11 @@ how it was checked, and what is still open. It goes with:
 |---|---|---|
 | ASME Y14.5-2018 | Current; shown as "Y14.5 - 2018 (R2024)", i.e. reaffirmed 2024; on stabilized maintenance; replaces Y14.5-2009 | https://www.asme.org/codes-standards/find-codes-standards/y14-5-dimensioning-tolerancing/2018 |
 | ISO 1101:2017 | Published, edition 4 (2017-02); last reviewed and confirmed 2022; remains current | https://www.iso.org/standard/66777.html |
-| ISO 5459:2024 | Listed in the ISO catalogue as "ISO 5459:2024 - Geometrical product specifications (GPS) - Geometrical tolerancing - Datums and datum systems" (search listing on iso.org). The detail page returned an error twice, so the edition number and date could not be read. ISO 5459:2011 (edition 2) shows as **withdrawn** | https://www.iso.org/standard/87855.html ; https://www.iso.org/standard/40358.html |
+| ISO 5459:2024 | Published, edition 3 (2024-10, stage 60.60 on 2024-10-04), 115 pages, ISO/TC 213; ISO 5459:2011 listed under "Previously" as **withdrawn** (round 3, read on committee.iso.org, the ISO committee mirror of the catalogue page). BSI's page for BS EN ISO 5459:2024 agrees (published 2024-10-31 as the British adoption, current, supersedes the 2011 edition) and summarises the changes: surface classes beyond planes, cylinders and spheres (Annex B), new definitions, some symbols and modifiers added or clarified | https://committee.iso.org/standard/87855.html ; https://knowledge.bsigroup.com/products/geometrical-product-specifications-gps-geometrical-tolerancing-datums-and-datum-systems-2 ; https://www.iso.org/standard/40358.html |
 | ISO 2692:2021 | Published, edition 4 (2021-06); under systematic review (90.20), no newer edition listed | https://www.iso.org/standard/74592.html |
 | ISO 8015:2011 | Published, edition 2 (2011-06); last reviewed and confirmed 2021; remains current | https://www.iso.org/standard/55979.html |
 | ISO 22081:2021 | Published, edition 1 (2021-02); last reviewed and confirmed 2026; remains current. Refers to ISO 8015:2011 clause 5.12 for general specifications | https://www.iso.org/standard/72514.html |
-| ISO 2768-2:1989 | **Withdrawn** (status 95.99). The catalogue page does not name a replacement | https://www.iso.org/standard/7749.html |
+| ISO 2768-2:1989 | **Withdrawn** (status 95.99). The ISO page does not name a replacement; SIS (Swedish standards body) lists "Replaced by: ISO 22081:2021" and Genorma gives withdrawal 2021-02-04 and "revised by ISO 22081:2021" (round 3) | https://www.iso.org/standard/7749.html |
 
 Superseded practice noted in the UI:
 
@@ -52,12 +52,16 @@ Superseded practice noted in the UI:
   geometrical specifications. Whether ISO formally names 22081 as the
   replacement could not be confirmed on iso.org (the 22081 page does not
   mention 2768-2). Round 2: the Genorma catalogue [GEN] gives the withdrawal
-  date 2021-02-04 and lists ISO 22081:2021 under "revised by". That is one
-  source, so the UI states it as such and keeps the flag.
-- **Circled S (RFS symbol)** appears on older drawings (UIUC notes, SKL);
-  current ASME practice shows no symbol. KEY says it was removed in
-  Y14.5-2009; other sources put it earlier. The edition is left
-  "to be verified".
+  date 2021-02-04 and lists ISO 22081:2021 under "revised by". Round 3: the
+  Swedish standards body SIS [SIS] lists ISO 2768-2:1989 as withdrawn and
+  "Replaced by: ISO 22081:2021". Two sources: **confirmed**, flag removed.
+- **Circled S (RFS symbol)** appears on older drawings (UIUC notes, SKL).
+  Round 3: the 2012 GLS/Stolter edition chart [GLS12] gives the symbol as
+  required for RFS position in ANSI Y14.5M-1982, "OK for position, legacy"
+  in Y14.5M-1994 and "default condition; no symbol" in Y14.5-2009. That
+  reconciles OEP (dropped as a requirement in 1994) and KEY (gone in 2009):
+  1994 made RFS the default and kept the symbol only as a legacy option;
+  2009 removed it. **Confirmed** in that form.
 - **ISO 5459:2011, ISO 2692:2014, ISO 8015:1985** are superseded by the
   editions above.
 - Several public sources (e.g. GD&T Basics' standard overview, 2020-2022)
@@ -169,8 +173,70 @@ Independent public explanations (each counts as one source):
 - **[GEN]** Genorma standards catalogue, ISO 2768-2:1989 page
   https://genorma.com/en/standards/iso-2768-2-1989
   Used for: withdrawal date 2021-02-04 and "revised by ISO 22081:2021".
+- **[PTC]** PTC Creo Parametric 13 help, model-based definition (round 3):
+  "Optional modifiers (ASME)"
+  (https://support.ptc.com/help/creo/creo_pma/r13/usascii/model-based_definition/optional_modifiers.html)
+  and "Datum feature label has syntax errors (ASME)"
+  (https://support.ptc.com/help/creo/creo_pma/r13/usascii/model-based_definition/gdt_datum_label_invalid.html).
+  Used for: statistical tolerance note and use; projected zone (minimum
+  height, feature of size, limits tilt, fixed fasteners); tangent plane
+  applies to the contacting plane of a surface; datum labels exclude I, O, Q.
+- **[GLS12]** Stolter LLC and Geometric Learning Systems, edition comparison
+  chart (ASME Y14.5-2009, Y14.5M-1994, ANSI Y14.5M-1982, ISO), 2012, hosted
+  on the ZEISS Quality Forum.
+  https://qualityforum.zeiss.com/migration/images/164_7dbf6b039a080958cc59411c619ac190.pdf
+  Used for: RFS symbol by edition; composite profile defined in 1994 and 2009.
+  GLS is the same company as [GLS]; the two are not counted as two
+  sources for the same statement.
+- **[HEX]** Hexagon Manufacturing Intelligence, PC-DMIS 2023.1 help,
+  "Profile of a line".
+  https://docs.hexagonmi.com/pcdmis/2023.1/en/helpcenter/mergedprojects/core/geometric_tolerances/Profile_of_a_Line.htm
+  Used for: composite profile lower segments unlocked in translation from the
+  datum reference frame, still located and oriented to each other; lower
+  segment datums: same datums, same order, same modifiers, may drop trailing
+  ones.
+- **[SIS]** SIS Swedish Institute for Standards, ISO 2768-2:1989 page.
+  https://www.sis.se/en/produkter/metrology-and-measurement-physical-phenomena/linear-and-angular-measurements/limits-and-fits/iso276821989
+  Used for: withdrawn, "Replaced by: ISO 22081:2021".
+- **[QM]** E. Morse, "Tolerancing standards: a comparison", Quality
+  Magazine, 2016-08-01. https://www.qualitymag.com/articles/93437-tolerancing-standards-a-comparison
+  Used for: ISO allows position on a single plane; ASME does not (a plane is
+  not a feature of size), profile of a surface instead. (Written against
+  Y14.5-2009; this rule is unchanged in 2018 per HZ.)
+- **[PMPA]** Precision Machined Products Association, "pseudo-round" parts
+  article (about 2010). https://www.pmpa.org/tag/pseudoround/
+  Used for: odd-lobed parts read round on a two-point gauge; V-block
+  included angle chosen from the lobe count.
+- **[MMS]** G. Schuetz (Director of Precision Gages, Mahr Inc.), "Approximating
+  geometry measurement", Modern Machine Shop, 2008-08-20.
+  https://mmsonline.com/columns/approximating-geometry-measurement
+  Used for: a two-point gauge cannot detect three-lobed out-of-roundness; odd
+  lobing from three-jaw chucks, even lobing in precision boring.
+- **[OEP]** (round 3 additions): statistical tolerancing, citing Y14.5 2.17
+  (https://open-exam-prep.com/study-guides/asme-gdtp-technologist/ch3/threads-tapers-radius-statistical);
+  composite profile, citing Y14.5-2009 8.6
+  (https://open-exam-prep.com/study-guides/asme-gdtp-technologist/ch10/composite-profile-patterns);
+  Appendix B position calculations
+  (https://open-exam-prep.com/study-guides/asme-gdtp-senior/location-2/position-coordinate-conversion);
+  virtual and resultant condition (senior)
+  (https://open-exam-prep.com/study-guides/asme-gdtp-senior/location-1/virtual-resultant-condition).
+- **[GDTB]** (round 3 addition) "Datum" article, author's replies in the
+  comments (M. Derr): letters I, O, Q prohibited; AA, AB ... after Z.
+  https://www.gdandtbasics.com/datum/
 - **[FF]** W. Burke, "Introduction to root sum squared (RSS) tolerance
   analysis", Five Flute. https://fiveflute.com/guide/introduction-to-root-sum-squared-rss-tolerance-analysis
+
+Read in round 3 but not used to confirm anything: GLS "What is resultant
+condition?" (https://gdtseminars.com/?p=71, gives the MMC hole case only);
+WASY Research, "Wall-thickness analysis and LMC modifiers" (LMC virtual
+condition only, no resultant condition); GD&T Basics LMC article
+(https://www.gdandtbasics.com/?p=2590, no boundary formulas); GLS "The new
+ASME Y14.5-2018 standard" (2019, lists dynamic profile, nothing on profile
+at MMC); Effective Training / geotol.com "2018 standards" page (list of 2018
+changes, nothing on the open items); OEP senior "coaxial feature controls"
+page (single requirement for coaxial features, but datums not discussed).
+Not used: a copy of the ASME standard found by search on a third-party site
+(copyright); eng-tips and Reddit threads (forums).
 
 Read but not used to confirm anything (did not cover the points): MMS
 (Modern Machine Shop), G. Schuetz, "Determining out-of-roundness at the point
@@ -191,11 +257,11 @@ tutorial on Y14.5-2018 terms; ZEISS Quality Forum thread on ISO 8015
 | Virtual condition: MMC hole = MMC - t, MMC pin = MMC + t, LMC hole = LMC + t, LMC pin = LMC - t | GDTB, SKL, JLC, OEP |
 | Inner/outer boundary at RFS has the same arithmetic but is not a virtual condition | GDTB (one source; shown as RFS boundary only) |
 | Resultant condition at MMC: hole = LMC + t + size tol., pin = LMC - t - size tol. | OEP, OWN (follows from the confirmed bonus and VC rules) |
-| Resultant condition at LMC | OWN only (OEP's LMC page gives only the virtual condition): **to be verified** |
+| Resultant condition at LMC | OWN only. Round 3 read GLS, OEP (senior), WASY and GDTB LMC pages: none gives the LMC case. **to be verified** |
 | Functional gauge pin = hole MMC - position tolerance, at basic locations | GDTB, SKL (pin VC example) |
 | Floating fastener T = H - F each part | OEP, SKL |
 | Fixed fastener t1 + t2 = H - F; equal split (H - F)/2 | OEP, SKL |
-| Fastener formulas are in a Y14.5 nonmandatory appendix (B in 2009) | GDTB (appendix B), OEP (formulas): appendix letter for 2018 not confirmed, so the UI says "nonmandatory appendix" |
+| Fastener formulas are in a Y14.5 nonmandatory appendix (B in 2009) | GDTB (appendix B, 2009), OEP senior ("Appendix B, Formulas for Positional Tolerancing", "for every revision"): 2018 letter has one source, **to be verified**; UI names B for 2009 |
 | Worst case = sum of tolerances; RSS = sqrt(sum of squares), assumes independent, normal, centred, tolerance = 3 sigma | ACC, FF, OWN |
 | Form tolerances never take datums | GLS, UIUC, GDTB |
 | Orientation and runout always need a datum | GLS, UIUC, GDTB |
@@ -223,7 +289,7 @@ tutorial on Y14.5-2018 terms; ZEISS Quality Forum thread on ISO 8015
 | Concentricity and symmetry removed in Y14.5-2018 | MIT, GLS |
 | ISO coaxiality zone: cylinder of the tolerance diameter about the datum axis; concentricity: circle about the datum point in a section | KEY, UIUC: confirmed (round 2) |
 | ISO symmetry zone: two parallel planes symmetric about the datum centre plane | KEY, UIUC: confirmed (round 2) |
-| Circled S (RFS) no longer used in ASME | OEP (dropped 1994), KEY (dropped 2009), GDTB: the fact agrees, the edition differs: edition **to be verified** |
+| Circled S (RFS): required for RFS position in 1982; legacy option only in 1994; no symbol from 2009 | GLS12 (all three editions), OEP (1994), KEY (2009): confirmed (round 3) |
 | Composite position: one symbol, two rows; upper row (PLTZF) locates the pattern to the datums | FARO, DCS, GDTB |
 | Lower row (FRTZF): tighter, controls the features relative to each other; its zones move as a group; its datums orient only | FARO, DCS, GDTB |
 | Multiple single-segment (two symbols) differs: the lower row's datums also locate | GDTB, DCS |
@@ -232,9 +298,17 @@ tutorial on Y14.5-2018 terms; ZEISS Quality Forum thread on ISO 8015
 | Free state, tangent plane, CF | KEY, GDTB, GLS |
 | Unequal profile: U in ASME, UZ in ISO | KEY, GDTB |
 | Second value after U = part of the zone on the material-adding side (outside the material); 0 = all inside, equal to total = all outside | GDTB (cites 2018 6.3.22), OEP (cites 2009 8.3.1.2): confirmed (round 2) |
-| Statistical tolerance (ST), ASME only, SPC | KEY only: **to be verified** (fetch budget ran out before a second source could be read) |
-| Position applies to plane surfaces in ISO, not in ASME | HZ only (UI marked) |
-| Datum letters I, O, Q avoided | no source read: **to be verified** (builder note only) |
+| Statistical tolerance (ST): assigned by a statistical stack; drawing note requires SPC; ASME only | KEY, OEP (cites 2.17), PTC: confirmed (round 3) |
+| Position applies to plane surfaces in ISO, not in ASME | HZ, QM: confirmed (round 3) |
+| ISO invocation principle | HZ only: **to be verified** |
+| Datum letters I, O, Q not used; AA, AB ... after Z | PTC, GDTB (author's comments): confirmed (round 3); the builder now marks I, O, Q invalid (its letter list already leaves them out) |
+| Composite profile: upper row locates and orients; lower row smaller, zone unlocked in translation, lower datums orient only; same datums in the same order, trailing ones may be dropped | OEP, HEX: confirmed (round 3); defined in 1994 and 2009 per GLS12, OEP |
+| Projected zone: feature of size, limits tilt, fixed fasteners; minimum height stated | UIUC, KEY, GDTB, PTC: confirmed (round 3), builder warning no longer flagged |
+| Tangent plane applies to a surface (contacting plane), not an axis | KEY, PTC: confirmed. "Normally with orientation tolerances": not stated by either, the builder note stays flagged |
+| Spherical diameter zone normally for position of a sphere | GDTB only: **to be verified** |
+| Two-point gauge can read odd-lobed parts (three lobes from a three-jaw chuck, five...) as round, so it is not a roundness check | PMPA, MMS (Schuetz, Mahr, 2008): confirmed (round 3) |
+| V-block shows lobing; V included angle chosen from the lobe count | PMPA only: **to be verified** |
+| Position without datums for coaxial features | GLS only; OEP senior page describes a single requirement for coaxial features but not the missing datums: **to be verified** |
 
 ## Items left "to be verified" (round 2 outcome)
 
@@ -278,6 +352,69 @@ Creo help "Optional modifiers (ASME)" and an ETS (Montreal) paper on profile
 and ST for item 6; the OEP projected zone and fastener chapter for items 12
 and 14; the Mitutoyo RA-10 roundness brochure for item 10.
 
+## Round 3 outcome (2026-11-10/11)
+
+Each open item from round 2, plus the two additions asked for:
+
+1. Resultant condition with the LMC modifier: **still flagged.** GLS's
+   resultant condition article, OEP's senior virtual/resultant page, WASY
+   Research's LMC wall-thickness article and GD&T Basics' LMC article were
+   read; none states the LMC case. The calculator keeps "(derived, see
+   note)".
+2. Position without datums for coaxial features: **still flagged.** OEP's
+   senior coaxial page describes one position requirement for coaxial
+   features but does not say the datums are left out.
+3. Statistical tolerance (ST): **confirmed** (KEY, OEP citing 2.17, PTC).
+   The guide now says what it is (a tolerance from a statistical stack) and
+   that the drawing must carry the SPC note; the builder note is no longer
+   flagged.
+4. ISO invocation principle: **still flagged** (HZ only). ISO position on
+   planes: **confirmed** (HZ, QM); flag removed in the comparison table.
+5. Lobing: **partly confirmed.** A two-point gauge can read an odd-lobed part
+   as round (PMPA, MMS). The V-block angle rule has one source (PMPA) and
+   keeps its flag. The Mitutoyo RA-10 brochure could not be read (the site
+   refuses automated reads).
+6. Datum letters I, O, Q: **confirmed** (PTC; GD&T Basics author's replies),
+   plus double letters after Z. The builder now marks I, O, Q invalid (its
+   letter list already leaves them out) and the guide has a "Datum letters"
+   paragraph.
+7. Tangent plane / projected zone / spherical diameter limits: projected
+   zone **confirmed** (UIUC, KEY, GDTB, PTC: feature of size, limits tilt,
+   fixed fasteners, minimum height), warnings no longer flagged. Tangent
+   plane on a surface, not an axis: confirmed (KEY, PTC); "normally with
+   orientation tolerances" **still flagged**. Spherical diameter "normally
+   for position of a sphere": **still flagged** (GDTB only).
+8. ISO 5459:2024 details: **confirmed** (ISO committee page: edition 3,
+   2024-10, 115 pages; BSI: published 2024-10-31, supersedes 2011, what
+   changed). Editions table and comparison row updated.
+9. Y14.5-2018 fastener appendix letter: **still flagged, narrowed.** GDTB
+   gives Appendix B for 2009; OEP's senior guide calls it "Nonmandatory
+   Appendix B, Formulas for Positional Tolerancing" and says the body of
+   knowledge names it for every revision. One source for 2018; the UI says
+   B for 2009 and flags the 2018 letter. The ANSI webstore preview of
+   Y14.5-2018 (which would show the contents) failed to load.
+10. ISO 22081 as replacement of ISO 2768-2: **confirmed** (SIS, GEN).
+11. MMC/LMC on profile in Y14.5-2018: **still flagged.** No public source
+    read in this round addresses the 2018 rule (GLS 2019 article and the
+    geotol.com list of 2018 changes do not mention it).
+12. Edition that dropped the circled S: **confirmed and corrected**
+    (GLS12: required for RFS position in 1982, legacy option in 1994, no
+    symbol from 2009; agrees with OEP for 1994 and KEY for 2009).
+13. Composite profile: **added** to the guide (OEP, HEX; defined since
+    1994 per GLS12 and OEP). No checker: a CMM best fit constrained per row
+    is needed.
+14. Letter-address table (parity BB73): not present elsewhere (checked
+    `app/` on this branch and on `claude/fasteners`, `claude/qa-audit`,
+    `claude/ref-data-3`, `claude/calcs-3`, `claude/parity-audit`), so it was
+    added to the G and M codes screen. See `docs/gm-codes.md`.
+
+The shared fetch budget ran out several times in this round, so each read was
+paced. Candidate pages for round 4: the ANSI webstore preview of Y14.5-2018
+(contents list, for the appendix letter and the profile clauses); Mahr or
+Taylor Hobson roundness guides (V-block angles); a university GD&T course on
+resultant condition with LMC; ISO 8015:2011 preview pages on iso.org OBP
+(invocation principle); KEYENCE pages on profile and spherical zones.
+
 ## Decisions
 
 - **RFS has no virtual condition.** `virtual_condition` returns NaN at RFS;
@@ -311,5 +448,8 @@ and 14; the Mitutoyo RA-10 roundness brochure for item 10.
 - **Degrees of freedom explainer** uses a three-plane frame: A (removes Tz, Rx, Ry),
   B square to A (Tx, Rz), C square to both (Ty).
   The axis names are BenchMate's choice; sources describe the 3-2-1 counts.
+- **Composite profile** is explained in the guide only; there is no
+  checker. Its lower row is a best fit with translation free and rotation
+  held by the repeated datums, which a CMM does better than a calculator.
 - **ASME is the default** in the builder (US shop drawings); switching to
   ISO 1101:2017 allows concentricity and symmetry.

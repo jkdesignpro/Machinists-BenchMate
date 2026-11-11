@@ -223,6 +223,16 @@ f1!(whitworth_value, c::whitworth_value_f, d, p, what);
 f1!(ba_value, c::ba_value_f, n, what);
 f1!(npt_value, c::npt_value_f, d, p, l1, what);
 f1!(round_sig, c::round_sig_f, x, sig);
+// Threads round 3 (core/src/power_threads.rs)
+f1!(acme_limit, c::acme_limit_f, d, p, class, internal, which);
+f1!(stub_acme_limit, c::stub_acme_limit_f, d, p, internal, which);
+f1!(trap_value, c::trap_value_f, d, p, what);
+f1!(sti_value, c::sti_value_f, d, p, what);
+f1!(unj_value, c::unj_value_f, d, p, class, what);
+f1!(buttress_value, c::buttress_value_f, d, p, what);
+f1!(unm_value, c::unm_value_f, d, p, what);
+f1!(thread_misc, c::thread_misc_f, a, b, what);
+f1!(wire_measurement, c::wire_measurement_f, x, w, p, angle, inverse);
 
 // Cycle generators (core/src/cycles.rs, core/src/gcode.rs)
 f1!(css_rpm, c::css_rpm_f, v, dia, max_rpm, metric);
@@ -323,6 +333,30 @@ f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
 f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
 f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);
 
+// Fasteners and machine elements (core/src/fasteners.rs)
+f1!(stress_area, c::stress_area_f, d, p, system);
+f1!(stress_dia, c::stress_dia_f, d, p, system);
+f1!(bearing_mean_dia, c::bearing_mean_dia, dw, dh);
+f1!(tightening_torque, c::tightening_torque, f, p, d2, mu_g, dkm, mu_k);
+f1!(tightening_torque_part, c::tightening_torque_part, f, p, d2, mu_g, dkm, mu_k, part);
+f1!(preload_from_torque, c::preload_from_torque, t, p, d2, mu_g, dkm, mu_k);
+f1!(assembly_equiv_stress, c::assembly_equiv_stress, f, as_, d0, p, d2, mu_g);
+f1!(preload_permitted, c::preload_permitted, as_, d0, d2, p, mu_g, nu, rp02);
+f1!(preload_from_proof, c::preload_from_proof, as_, sp, pct);
+f1!(nut_factor, c::nut_factor, t, f, d);
+f1!(oring_squeeze_pct, c::oring_squeeze_pct, cs, depth);
+f1!(oring_stretch_pct, c::oring_stretch_pct, id, seat);
+f1!(oring_cs_stretched, c::oring_cs_stretched, cs, id, seat);
+f1!(oring_fill_pct, c::oring_fill_pct, cs, ring_dm, w, h, groove_dm);
+f1!(oring_depth_for_squeeze, c::oring_depth_for_squeeze, cs, squeeze);
+f1!(oring_width_for_fill, c::oring_width_for_fill, cs, h, fill);
+f1!(bearing_l10, c::bearing_l10, c, p, roller);
+f1!(bearing_l10h, c::bearing_l10h, c, p, roller, rpm);
+f1!(bearing_c_required, c::bearing_c_required, p, roller, rpm, hours);
+f1!(bearing_equiv_load, c::bearing_equiv_load, x, fr, y, fa);
+f1!(keyseat_shaft_dim, c::keyseat_shaft_dim, d, t1);
+f1!(keyway_hub_dim, c::keyway_hub_dim, d, t2);
+f1!(keyseat_chordal_height, c::keyseat_chordal_height, d, b);
 // Small milling and turning calculators (core/src/millturn.rs)
 f1!(mt_engagement_deg, c::engagement_deg_f, ae, d);
 f1!(rctf, c::rctf, ae, d);
@@ -409,3 +443,91 @@ f1!(over_marked_max, c::over_marked_max, vs, vmax);
 #[no_mangle] #[allow(clippy::too_many_arguments)]
 pub extern "C" fn surface_grind(len: f64, over: f64, cross_travel: f64, cross: f64, vt: f64, stock: f64, down: f64, spark: f64, both: f64, which: f64) -> f64 {
     c::surface_grind(len, over, cross_travel, cross, vt, stock, down, spark, both, which as u32) }
+
+// Tool nose radius compensation by hand (core/src/tnrc.rs). X values are diameters.
+f1!(tnrc_chamfer_dz, c::tnrc::chamfer_dz, r, theta);
+f1!(tnrc_chamfer_dx, c::tnrc::chamfer_dx, r, theta);
+f1!(tnrc_chamfer_error, c::tnrc::chamfer_error, r, theta);
+f1!(tnrc_corner_arc_error, c::tnrc::corner_arc_error, r);
+/// Tip vector component: which 0 = Z, 1 = X (NaN for a bad tip number).
+#[no_mangle] pub extern "C" fn tnrc_tip(tip: f64, which: f64) -> f64 {
+    match c::tnrc::tip_vector(tip.max(0.0) as u32) { Some((z, x)) => if which > 0.5 { x } else { z }, None => f64::NAN } }
+/// Straight element into list_out as [z1', x1', z2', x2', nz, nx]; returns 6.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn tnrc_line(r: f64, tip: f64, z1: f64, x1: f64, z2: f64, x2: f64, side: f64, end1: f64, end2: f64) -> f64 {
+    set_out(c::tnrc::line_path(r, tip.max(0.0) as u32, z1, x1, z2, x2, side, end1.max(0.0) as u32, end2.max(0.0) as u32).to_vec()) }
+/// Arc into list_out as [z1', x1', z2', x2', R', cz', cx', convex]; returns 8.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn tnrc_arc(r: f64, tip: f64, z1: f64, x1: f64, z2: f64, x2: f64, rp: f64, ccw: f64, side: f64) -> f64 {
+    set_out(c::tnrc::arc_path(r, tip.max(0.0) as u32, z1, x1, z2, x2, rp, ccw, side).to_vec()) }
+// Measurement and shop maths (core/src/measure.rs)
+fn pick<const N: usize>(a: [f64; N], which: f64) -> f64 { a.get(which as usize).copied().unwrap_or(f64::NAN) }
+f1!(ball_height_in_cone, c::ball_height_in_cone, ball_d, face_d, included);
+f1!(cone_face_dia_from_ball, c::cone_face_dia_from_ball, ball_d, height, included);
+/// Two balls in a tapered bore: which 0 included angle, 1 face diameter.
+#[no_mangle] pub extern "C" fn cone_two_balls(d1: f64, h1: f64, d2: f64, h2: f64, which: f64) -> f64 { pick(c::cone_from_two_balls(d1, h1, d2, h2), which) }
+f1!(taper_over_rolls, c::taper_over_rolls, dia0, included, d, h);
+/// External taper from two roll measurements: which 0 included angle, 1 diameter at the plate.
+#[no_mangle] pub extern "C" fn taper_from_rolls(d: f64, m1: f64, h1: f64, m2: f64, h2: f64, which: f64) -> f64 { pick(c::taper_from_rolls(d, m1, h1, m2, h2), which) }
+f1!(shrink_fit_dt, c::shrink_fit_dt, d, interference, clearance, alpha);
+f1!(shrink_fit_hub_temp, c::shrink_fit_hub_temp, d, interference, clearance, alpha_hub, alpha_shaft, t0, t_shaft);
+f1!(press_fit_pressure, c::press_fit_pressure, d, delta, d_out, d_in, e_hub, nu_hub, e_shaft, nu_shaft);
+f1!(press_fit_compliance, c::press_fit_compliance, d, d_out, d_in, e_hub, nu_hub, e_shaft, nu_shaft);
+f1!(press_fit_hub_stress, c::press_fit_hub_stress, p, d, d_out);
+f1!(press_fit_torque, c::press_fit_torque, p, d, len, mu);
+f1!(press_fit_axial_force, c::press_fit_axial_force, p, d, len, mu);
+/// Compound angles: which 0 true angle, 1 direction.
+#[no_mangle] pub extern "C" fn compound_apparent(ax: f64, ay: f64, which: f64) -> f64 { pick(c::compound_from_apparent(ax, ay), which) }
+#[no_mangle] pub extern "C" fn compound_sequential(a1: f64, a2: f64, which: f64) -> f64 { pick(c::compound_from_sequential(a1, a2), which) }
+/// Settings for a true angle: which 0 apparent X, 1 apparent Y, 2 first tilt (about X), 3 second tilt.
+#[no_mangle] pub extern "C" fn compound_settings(cc: f64, dir: f64, which: f64) -> f64 { pick(c::compound_settings(cc, dir), which) }
+f1!(angle_between_faces, c::angle_between_faces, c1, dir1, c2, dir2);
+f1!(change_gear_ratio, c::change_gear_ratio, target, leadscrew, fixed);
+/// Change-gear trains from the first `n` buffer values (tooth counts) into
+/// list_out as (a, b, c, d, ratio) per train, c = d = 0 for a simple train;
+/// returns the train count.
+#[no_mangle] pub extern "C" fn change_gears(n: f64, target: f64, compound: f64, max: f64) -> f64 {
+    let g: Vec<u32> = buf(n).iter().filter(|x| **x >= 1.0 && **x <= 1000.0).map(|x| x.round() as u32).collect();
+    let t = c::change_gear_trains(&g, target, compound != 0.0, max.clamp(1.0, 200.0) as usize);
+    let k = t.len();
+    set_out(t.iter().flat_map(|t| [t.a as f64, t.b as f64, t.c as f64, t.d as f64, t.ratio]).collect()); k as f64 }
+f1!(capital_recovery_factor, c::capital_recovery_factor, i, n);
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn machine_hourly_rate(price: f64, resale: f64, years: f64, interest: f64, hours: f64, fixed: f64, kw: f64, load: f64, kwh: f64, labour: f64, which: f64) -> f64 {
+    c::machine_hourly_rate(price, resale, years, interest, hours, fixed, kw, load, kwh, labour, which as u32) }
+f1!(break_even_qty, c::break_even_qty, fixed, price, variable);
+f1!(payback_years, c::payback_years, investment, saving);
+f1!(discounted_payback_years, c::discounted_payback_years, investment, saving, i);
+f1!(npv, c::npv, investment, saving, n, i, resale);
+/// Plane figure `kind`: which 0 area, 1 perimeter, 2-3 extra values (see core).
+#[no_mangle] pub extern "C" fn plane_figure(kind: f64, a: f64, b: f64, cc: f64, which: f64) -> f64 { pick(c::plane_figure(kind as u32, a, b, cc), which) }
+/// Solid `kind`: which 0 volume, 1 total surface, 2 lateral surface, 3 extra.
+#[no_mangle] pub extern "C" fn solid_figure(kind: f64, a: f64, b: f64, cc: f64, which: f64) -> f64 { pick(c::solid_figure(kind as u32, a, b, cc), which) }
+#[no_mangle] pub extern "C" fn scale_spec(kind: f64, which: f64) -> f64 { pick(c::scale_spec(kind as u32), which) }
+#[no_mangle] pub extern "C" fn scale_reading(kind: f64, value: f64, which: f64) -> f64 { pick(c::scale_reading(kind as u32, value), which) }
+
+// Unit converter (core/src/units.rs)
+/// Quantity names, one per line, into the string buffer; returns the length.
+#[no_mangle] pub extern "C" fn unit_quantities() -> f64 { set_str(&c::units::QUANTITIES.join("\n")) }
+/// Units of quantity `q` as text (`symbol|name|exact|factor` lines) into the string buffer.
+#[no_mangle] pub extern "C" fn unit_list(q: f64) -> f64 { set_str(&c::units::units_text(q as u32)) }
+#[no_mangle] pub extern "C" fn unit_convert(q: f64, from: f64, to: f64, x: f64) -> f64 { c::units::convert(q as u32, from as u32, to as u32, x) }
+
+// Expression calculator (core/src/expr.rs)
+static mut EXPR_POS: f64 = 0.0;
+/// Evaluate the expression whose character codes are the first `n` buffer
+/// values. Returns the value, or NaN with the error message in the string
+/// buffer (its length from `expr_err_len`) and its position from `expr_err_pos`.
+#[no_mangle] pub extern "C" fn expr_eval(n: f64, deg: f64, ans: f64) -> f64 {
+    let s: String = buf(n).iter().map(|c| char::from_u32(*c as u32).unwrap_or('?')).collect();
+    match c::expr::eval(&s, deg != 0.0, ans) {
+        c::expr::Eval::Ok(v) => { set_str(""); v }
+        c::expr::Eval::Err(m, i) => { set_str(&m); unsafe { *core::ptr::addr_of_mut!(EXPR_POS) = i as f64; } f64::NAN }
+    } }
+#[no_mangle] pub extern "C" fn expr_err_len() -> f64 { let s: &String = unsafe { &*core::ptr::addr_of!(STR) }; s.len() as f64 }
+#[no_mangle] pub extern "C" fn expr_err_pos() -> f64 { unsafe { *core::ptr::addr_of!(EXPR_POS) } }
+/// Decimal degrees to degrees, minutes, seconds: which 0, 1, 2.
+#[no_mangle] pub extern "C" fn deg_to_dms(x: f64, which: f64) -> f64 { pick(c::expr::deg_to_dms(x), which) }
+/// Prime factors of `n` into list_out; returns the count.
+#[no_mangle] pub extern "C" fn prime_factors(n: f64) -> f64 { set_out(c::expr::prime_factors(n)) }
+f1!(interpolate, c::expr::interpolate, x1, y1, x2, y2, x);

@@ -63,6 +63,47 @@ function gmSourceList(G, ids) {
     '<b>' + rEsc(k) + '</b> ' + rEsc(s.publisher) + ', <i>' + rEsc(s.title) + '</i>' + (s.edition ? ', ' + rEsc(s.edition) : '') +
     ' (' + rEsc(GM_KIND[s.kind] || s.kind) + '). <a href="' + rEsc(s.url) + '" target="_blank" rel="noopener">' + rEsc(s.url) + '</a>, accessed ' + rEsc(s.accessed) + '. ' + rEsc(s.note || '')).join('<br>');
 }
+// Letter addresses (word letters). Each column is one document's own table, in
+// BenchMate's words: NIST RS274NGC (generic RS-274 / ISO 6983 base, Table 3,
+// section 3.3.2, p. 16) and the Haas mill programming workbook (pp. 24-28).
+// A letter a document does not list is shown as "not listed", never filled from
+// the other column. Meanings depend on the G code in force (arcs, cycles).
+const GM_ADDR = [
+  ['A', 'A rotary axis', '4th axis (rotary)'],
+  ['B', 'B rotary axis', '5th axis (rotary)'],
+  ['C', 'C rotary axis', 'Auxiliary external rotary axis'],
+  ['D', 'Tool radius compensation (offset) number', 'Tool diameter offset number'],
+  ['E', '', 'Engraving feed rate; contouring accuracy'],
+  ['F', 'Feed rate', 'Feed rate'],
+  ['G', 'Preparatory (general) function', 'Preparatory function (G code)'],
+  ['H', 'Tool length offset number', 'Tool length offset number'],
+  ['I', 'Arc centre offset in X; X offset in the G87 cycle', 'Arc and canned cycle data'],
+  ['J', 'Arc centre offset in Y; Y offset in the G87 cycle', 'Arc and canned cycle data'],
+  ['K', 'Arc centre offset in Z; Z offset in the G87 cycle', 'Arc and canned cycle data'],
+  ['L', 'Repeat count for canned cycles', 'Loop (repeat) count for the block'],
+  ['M', 'Miscellaneous function', 'Miscellaneous function (M code)'],
+  ['N', 'Line (sequence) number', 'Block (sequence) number'],
+  ['O', '', 'Program number'],
+  ['P', 'Dwell time (G4, canned cycles); key with G10', 'Dwell time; program number for M98, sequence number for M97; G103 look-ahead'],
+  ['Q', 'Feed increment (peck) in G83', 'Optional canned cycle data'],
+  ['R', 'Arc radius; canned cycle retract (R) plane', 'Arc and canned cycle data'],
+  ['S', 'Spindle speed', 'Spindle speed'],
+  ['T', 'Tool selection', 'Tool selection'],
+  ['U', '', 'Auxiliary external linear axis'],
+  ['V', '', 'Auxiliary external linear axis'],
+  ['W', '', 'Auxiliary external linear axis'],
+  ['X', 'X axis', 'X axis motion'],
+  ['Y', 'Y axis', 'Y axis motion'],
+  ['Z', 'Z axis', 'Z axis motion'],
+];
+function gmAddrTable(G) {
+  const cell = t => t ? rEsc(t) : '<span class="ms">not listed</span>';
+  return '<details class="gmbox" id="gmaddr"><summary><b>Letter addresses (what each word letter means)</b></summary>' +
+    '<div class="res mtab"><table><tr><th>Letter</th><th>Generic RS-274 (NIST RS274NGC)</th><th>Haas mill</th></tr>' +
+    GM_ADDR.map(([l, a, b]) => '<tr><td class="mv"><b>' + l + '</b></td><td>' + cell(a) + '</td><td>' + cell(b) + '</td></tr>').join('') + '</table></div>' +
+    '<p class="desc">A word is a letter followed by a number (G01, X25.4, F0.2). I, J, K, L, P and R change meaning with the G code in force (NIST notes this), so read them with the arc or cycle they belong to. Other controls, and lathes, use some letters differently: check the control&#39;s own manual. Each column is that document&#39;s own list, in our words; "not listed" means that document does not define the letter.</p>' +
+    '<div class="note">' + gmSrc(G, { src: [{ s: 'NIST', at: 'Table 3, section 3.3.2, p. 16' }, { s: 'HAAS_MWB', at: 'address codes, pp. 24-28' }] }) + '</div></details>';
+}
 function gmNotes(G, ctrl, sec) {
   const dis = G.disagreements.filter(d => d.ctrl === ctrl && (sec === 'macro' ? /macro|variable/i.test(d.topic) : !/macro|variable/i.test(d.topic)));
   const gaps = G.gaps[ctrl] || [];
@@ -83,7 +124,7 @@ async function renderGmCodes(el) {
     '<label class="gml"><span class="ms">Search code or word</span><input id="gmq" type="search" placeholder="G76, M98, thread, tap ..."></label>' +
     '<label class="gml"><span class="ms">Codes</span><select id="gmk"><option value="">G and M</option><option value="G">G only</option><option value="M">M only</option></select></label>' +
     '<label class="gml"><span class="ms">Machine</span><select id="gmm"><option value="">Mill and lathe</option><option value="M">Mill</option><option value="L">Lathe</option></select></label></div>' +
-    '<p class="desc" id="gmprof"></p><div id="gmctl" class="note"></div><div id="gmres"></div><div id="gmnotes"></div><div id="gmsrc" class="note"></div>';
+    '<p class="desc" id="gmprof"></p><div id="gmctl" class="note"></div><div id="gmres"></div><div id="gmnotes"></div><div id="gmsrc" class="note"></div>' + gmAddrTable(G);
   const c = $('#gmc', el), x = $('#gmx', el), q = $('#gmq', el), k = $('#gmk', el), mm = $('#gmm', el);
   q.value = GMUI.q; k.value = GMUI.kind; mm.value = GMUI.mach;
   function rowsOf(ctrl) {

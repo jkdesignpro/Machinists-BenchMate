@@ -18,6 +18,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Turning | Boring bar deflection | done (bar materials, coolant bore, cutting force, overhang guidance per maker) | `boringbar` | U9 |
 | Turning | C-axis feed converter | done (deg/min, circumference feed, inverse time F) | `caxis` | U10 |
 | Turning | Surface finish from nose radius | done | `finish` | U12 |
+| Turning | Tool nose radius compensation (hand shifts, tip 0-9, G41/G42) | done (ours) | `tnrc` | |
 | Turning | Bar stock planner (parts per bar, weight, cost) | done (ours) | `bar` | |
 | Milling | Speeds and feeds with chip thinning, deflection, power check | partial (checks a cut you enter; no starting data, kc by hand) | `cutopt` | U13, U18 |
 | Milling | Spindle speed and table feed | done | `rpm`, `feed` | U14, U15 |
@@ -37,28 +38,40 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Reference | Drill chart (fraction, number, letter, metric) | done | `drillchart` | U30 |
 | Reference | Tap drill sizes (cut and form) | done | `tapdrill` | U31 |
 | Reference | Thread data and limits: UNC/UNF/UNEF, metric M | done | `threaddata` | U38, U43, U52 |
-| Reference | Thread data: UN constant pitch / UNS | partial (custom size only) | `threaddata` | U39 |
-| Reference | NPT, BSPP, BSW, BSF, BA | done (basic dimensions; no tolerances, no NPTF) | `pipethreads`, `whitworth` | U47, U48, U50 |
-| Reference | Thread measurement over wires | done (60 degree only) | `wires` | U51 |
-| Threads | UNJ, UNR, UNM, ACME, Stub ACME, STI, plating allowance | missing | | U40-U46, U49 |
+| Reference | Thread data: UN constant pitch / UNS | done (8, 12, 16-UN lists to 2 in; any UNS size through the custom size) | `unseries`, `threaddata` | U39 |
+| Reference | NPT, BSPP, BSW, BSF, BA | done (basic dimensions, NPTF notes; no tolerances) | `pipethreads`, `whitworth` | U47, U48, U50 |
+| Reference | Thread measurement over wires | done (60, 55, 30, 29 degree; lead angle neglected) | `wires` | U51 |
+| Threads | UNJ, UNR | done (UNJ radius and minor limits; UNR rule, no UNR minor limits) / partial | `unjunr` | U40, U41 |
+| Threads | UNM | done | `unm` | U42 |
+| Threads | ACME, Stub ACME | done (2G-4G, 2C-4C, Stub; single start) | `acme` | U45, U46 |
+| Threads | STI | done (tapped-hole sizes, three makers) | `sti` | U49 |
+| Threads | Plating and anodize allowance | partial (allowance and before-coating limits; no special-size tables) | `coating` | U44 |
+| Threads | Trapezoidal, buttress, multi-start | done (basic dimensions; no tolerances) | `trapezoidal`, `buttress`, `multistart` | |
 | Reference | ISO fits and tolerances | partial (no j/J, up to 500 mm) | `fits` | U61 |
 | Reference | G-code and M-code reference per control dialect, custom macros | done (G/M codes, ten controls with sources and compare) / partial (macros: Mitsubishi and Heidenhain thin) | `gmcodes`, `macroref` | U92-U94 |
 | Reference | Material properties | partial (properties, no SFM/machinability data; round 2 in progress) | `materials` | U82 |
 | Reference | Material weight | partial (bar only; full tool in progress on `claude/geometry`) | `bar` | U81 |
 | Reference | Hardness conversion | missing (in progress, `claude/ref-data-3`) | | U67 |
-| Reference | Thermal expansion | partial (measurement correction only) | `tempcomp` | U68 |
-| Reference | Socket head cap screw holes, knurling, reaming | missing | | U71, U87, U33 |
+| Reference | Thermal expansion | done (measurement correction, growth, shrink-fit temperatures, press-fit pressure) | `tempcomp`, `shrinkfit` | U68 |
+| Reference | Socket head cap screw holes (counterbore and clearance) | done (metric and inch; publisher disagreements shown) | `shcs`, `clearance` | U71 |
+| Reference | Knurling, reaming | missing | | U87, U33 |
+| Fasteners | Bolt grades, torque and preload (VDI 2230), spanner sizes, T-slots | done (beyond Ultra; friction always user-entered) | `boltgrade`, `bolttorque`, `spanner`, `tslots` | MH198-MH212 (section 2) |
+| Machine elements | Keys and keyways, O-ring glands, bearing L10 | partial (no Woodruff, no ISO 3601 G series, no bearing fits) | `keys`, `oring`, `bearinglife` | MH285, MH288, MH294 (section 2) |
 | Geometry | Bolt circle | done | `bolt` | U72 |
 | Geometry | Rectangular hole pattern, coordinate export | done (grid, bolt circle, pasted list; CSV and G-code) | `cycdrill` | U73, U74 |
 | Geometry | Triangle solver, arc calculator, geometry, angles | missing (in progress, `claude/geometry`) | | U75-U78 |
 | Geometry | Sine bar, gauge block stack | missing (in progress, `claude/geometry`) | | U69, U65 |
-| Geometry | Height over ball (countersinks, tapered bores) | missing | | U70 |
+| Geometry | Height over ball (countersinks, tapered bores) | done (one or two balls; tapers over rolls too) | `ballcone`, `taperrolls` | U70 |
+| Geometry | Areas and volumes, compound angles (ours) | done | `figures`, `compound` | |
+| Turning | Lathe change gears (ours) | done (simple and compound trains from your gears) | `changegears` | |
+| Reference | ISO 2768-1 general tolerances, micrometer reading aid, drawing abbreviations (ours) | done | `gentol`, `scales`, `abbrev` | |
+| Economics | Machine hourly rate, break-even, payback (ours) | done | `economics` | |
 | GD&T | True position with MMC/LMC bonus | done | `gdttp`, `gdtbonus` | U62 |
 | GD&T | Learning centre (no quiz), frame builder | done | `gdtguide`, `gdtfcf`, `gdtdof` and others | U63, U64 |
 | Finish | Surface finish (lathe, mill, conversions) | partial (lathe only; conversions in progress) | `finish` | U66 |
 | Tools | Keyway broach G-code, G76, G84, G81/82/83/73 generators | done (generic Fanuc-style and Haas; other controls not yet supported, see `cycles.md`) | `cycbroach`, `cycthread`, `cycdrill` | U36, U37, U53, U54, U88 |
-| Tools | Unit conversions | partial (length only) | `fraction` | U79 |
-| Tools | Scientific calculator | missing | | U80 |
+| Tools | Unit conversions | done (17 quantities, NIST SP 811) | `units`, `fraction` | U79 |
+| Tools | Scientific calculator | done (typed expressions, own parser; no RPN or graphing) | `calc` | U80 |
 | Tools | Bandsaw cut time | done (cut rate or down-feed, chip per tooth) | `bandsaw` | U90 |
 | Tools | G-code simulator | missing | | U95 |
 | Tools | 2D CAD / DXF generator | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` (parametric shapes, live preview, DXF R2000/R12 export; no free sketching, snapping or angle measure) | U96 |
@@ -69,8 +82,10 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Grinding | Wheel marking decoder | done (marking only; no shapes or selection) | `wheelcode` | MH163, BB60 (partial) |
 | Grinding | Cylindricity error from RPM | missing | | U58 |
 | Gears/splines | Spur gear data, ISO 4156, ANSI B92.1, SAE J499a | missing | | U83-U86 |
-| Library | Formula library | partial (working shown per tool; no library view) | all tools | U97 |
-| Library | Tips, tool wear info, assistant, community cut data | missing | | U91, U98, U101, U102 |
+| Library | Formula library | done (151 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
+| Library | Tool wear information | done (seven wear types, causes and remedies from two makers) | `cncguide` | U91 |
+| Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
+| Library | Tips, assistant, community cut data | missing | | U98, U101, U102 |
 | Library | Indexable insert catalogue | missing (in progress, `claude/ref-data-3`) | | U103 |
 | Shop | Tool library and favourites | done | `toollib` (fill into rpm, feed, arcfeed, helix, deflection, cutopt, drillpoint, tapdrill, finish); star in the side list or by the title | U106, U109 |
 | Shop | Decimal precision, home dashboard, reorderable menu | missing | | U105, U107, U108 |
@@ -78,7 +93,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Platform | Offline, web/desktop link | partial (local web app; no installable offline build) | | U110, U111 |
 | Platform | Mobile apps, languages | missing (later phase) | | U112, U113 |
 
-Count against Ultra (from `parity-audit.md`): 113 rows, 54 done, 16 partial, 41 missing (8 of them in progress), 2 out of scope. The build order is in `parity-audit.md` section 6.
+Count against Ultra (from `parity-audit.md`): 113 rows, 61 done, 13 partial, 37 missing (8 of them in progress), 2 out of scope. The build order is in `parity-audit.md` section 6.
 
 Beyond parity (ours): manufacturer speeds and feeds with PDF import, an adaptive per-machine learning profile (see `vendor-data-and-learning.md`), Swiss-lathe helpers, "show the working" steps for every result, AMW link-up.
 

@@ -723,6 +723,20 @@ const TOOLS = [
   source: 'Circle geometry; inverse time feed: NIST RS274NGC Interpreter, version 3 (Kramer, Proctor, Messina, NISTIR 6556, 2000). Check your control manual.',
 },
 {
+  id: 'tnrc', group: 'Turning', title: 'Tool nose radius compensation (TNRC)',
+  desc: 'Where to program the imaginary tool tip so a chamfer, taper or corner radius comes out to size without G41/G42: Z and X shifts, the tip path for any element and tip number 0 to 9 (each drawn), and what G41/G42 does instead.',
+  render: el => renderTnrc(el),
+  working: 'Chamfer at angle θ to Z, tip 3 or 2: dz = r (1 - tan(θ/2)) where it meets a diameter, dx = r (1 - tan((90° - θ)/2)) radial where it meets a face (2 dx on diameter). General element: the tip path is the part line moved by r n + r t (n = unit normal toward the tool, t = tip direction), ended where it meets the moved neighbour line; arcs: radius R + r convex, R - r concave, centre moved by r t. All in the Rust core (core/src/tnrc.rs).',
+  source: 'Kentech Inc. / TWI Press (2000, reprinted by Florida International University) and the Industry Arena forum formulas; Haas operator manual (tip 3 OD, tip 2 boring); Haas lathe programming manual (G41/G42, approach move); NIST RS274NGC. See docs/sources.md.',
+},
+{
+  id: 'changegears', group: 'Turning', title: 'Lathe change gears',
+  desc: 'Gear trains from your own change gears for a thread (TPI, mm pitch, module or diametral pitch worm) on your leadscrew: simple and compound trains, closest first, with the pitch error.',
+  render: el => renderChangeGears(el),
+  working: 'Ratio needed = thread lead / (leadscrew lead x fixed ratio). Simple train a/b (any idler); compound (a/b) x (c/d). Error = ratio found / ratio needed - 1. Every pair (and every four) of different gears from your list is tried.',
+  source: "Gear-train ratio arithmetic; Machinery's Handbook 'Lathe change gears' (by name). 127 = 5 x 25.4 (inch defined as 25.4 mm, NIST SP 811). See docs/sources.md.",
+},
+{
   id: 'slitsaw', group: 'Sawing', title: 'Slitting saw speeds and feeds',
   pick: { map: { D: 'dia', z: 'flutes' } },
   desc: 'Spindle speed, table feed, chip thickness and cut time for a slitting or slotting saw from the saw maker\'s cutting speed and feed per tooth. A slot shallower than half the saw diameter thins the chip; the screen shows how much.',
@@ -973,26 +987,29 @@ const TOOLS = [
 },
 {
   id: 'wires', group: 'Threads', title: 'Thread measurement over wires',
-  desc: 'Pitch diameter, best wire size and the measurement over three wires for 60 degree threads.',
+  desc: 'Pitch diameter, best wire size and the measurement over three wires for 60 degree (UN, metric), 55 degree (Whitworth), 29 degree (ACME) and 30 degree (trapezoidal) threads.',
   fields: s => [
+    { id: 'form', label: 'Thread form', unit: '', def: 60, options: [[60, '60 deg: UN, ISO metric'], [55, '55 deg: Whitworth, BSP'], [29, '29 deg: ACME'], [30, '30 deg: trapezoidal'], [291, '29 deg: Stub ACME']] },
     { id: 'major', label: 'Major diameter', unit: lenU(s), def: s === 'inch' ? 0.5 : 10 },
     { id: 'pitch', label: s === 'inch' ? 'Threads per inch (TPI)' : 'Pitch', unit: s === 'inch' ? 'TPI' : 'mm', def: s === 'inch' ? 13 : 1.5 },
     { id: 'wire', label: 'Wire diameter (blank = best size)', unit: lenU(s), def: '' },
+    { id: 'pd', label: 'Or known pitch diameter (wins over the basic)', unit: lenU(s), def: '' },
   ],
   calc: (v, W, s) => {
     if (!(v.major > 0 && v.pitch > 0)) return [];
-    const p = s === 'inch' ? 1 / v.pitch : v.pitch;
-    const e = W.thread_pitch_dia_basic(v.major, p);
-    const best = W.thread_best_wire(p);
+    const p = s === 'inch' ? 1 / v.pitch : v.pitch, f = v.form || 60, a = f === 291 ? 29 : f;
+    // Basic pitch diameter of each form: D - 0.649519 P (60), D - 0.640327 P (55), D - 0.5 P (ACME, Tr), D - 0.3 P (Stub ACME).
+    const e = v.pd > 0 ? v.pd : f === 60 ? W.thread_pitch_dia_basic(v.major, p) : f === 55 ? W.whitworth_value(v.major, p, 0) : f === 291 ? v.major - 0.3 * p : v.major - 0.5 * p;
+    const best = W.thread_misc(p, a, 1);
     const w = v.wire > 0 ? v.wire : best;
     return [
-      R('Basic pitch diameter', e, lenU(s), 5),
+      R(v.pd > 0 ? 'Pitch diameter (entered)' : 'Basic pitch diameter', e, lenU(s), 5),
       R('Best wire size', best, lenU(s), 5),
-      R('Measurement over three wires', W.thread_three_wire_m(e, w, p), lenU(s), 5),
+      R('Measurement over three wires', W.wire_measurement(e, w, p, a, 0), lenU(s), 5),
     ];
   },
-  working: 'E = D - 0.649519 P. Best wire w = 0.57735 P. M = E + 3w - 0.866025 P. Lead-angle correction neglected.',
-  source: "Machinery's Handbook (screw thread measurement)",
+  working: 'Best wire w = P / (2 cos(a/2)): 0.57735 P (60 deg), 0.56368 P (55), 0.51645 P (29), 0.51764 P (30). M = E + w (1 + 1 / sin(a/2)) - (P/2) cot(a/2): for 60 deg M = E + 3w - 0.866025 P; 55 deg E + 3.1657 w - 0.9605 P; 29 deg E + 4.9939 w - 1.9334 P. Basic E = D - 0.649519 P (60), D - 0.640327 P (55), D - 0.5 P (ACME, trapezoidal), D - 0.3 P (Stub ACME). Lead-angle correction neglected: on ACME and other coarse or multi-start threads it is not small, and the measurement should be corrected as the standard (or the wire maker) describes.',
+  source: "Machinery's Handbook (screw thread measurement), NBS Handbook H28 (wire method); the general angle form is geometry (docs/sources.md, Threads round 3).",
 },
 {
   id: 'threaddata', group: 'Threads', title: 'Thread data and limits',
@@ -1014,6 +1031,85 @@ const TOOLS = [
   render: el => renderWhitworth(el),
   working: 'See the note under the tool.',
   source: 'BS 84:2007, BS 93:2008; series values from the publishers listed under the tool.',
+},
+{
+  id: 'acme', group: 'Threads', title: 'ACME and Stub ACME threads',
+  desc: 'ACME general purpose (2G, 3G, 4G) and centralizing (2C, 3C, 4C) threads to ASME B1.5, and Stub ACME to ASME B1.8: basic dimensions, limits of size for screw and nut, lead angle and best wire.',
+  render: el => renderAcme(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.5-1997 (R2024), ASME B1.8-1988 (R2021); formulas confirmed in NBS Handbook H28 (1957) and the publishers listed under the tool.',
+},
+{
+  id: 'trapezoidal', group: 'Threads', title: 'Metric trapezoidal threads (Tr)',
+  desc: 'ISO metric trapezoidal threads: clearance, pitch, minor and major diameters of screw and nut from the ISO 2904 basic profile, with lead for multi-start threads and best wire.',
+  render: el => renderTrapezoidal(el),
+  working: 'See the note under the tool.',
+  source: 'ISO 2904:2020 (confirmed 2025), ISO 2901:2016, ISO 2903 (tolerances; BS ISO 2903:2016) (cited by name); published rows from the publishers listed under the tool.',
+},
+{
+  id: 'buttress', group: 'Threads', title: 'Buttress threads (7/45)',
+  desc: 'ASME B1.9 inch buttress threads, 7 degree load flank and 45 degree clearance flank: basic thread heights, crest and root, pitch, minor and major diameters at maximum material.',
+  render: el => renderButtress(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.9-1973 (R2025), cited by name; constants as printed by AMESweb and derived from the geometry.',
+},
+{
+  id: 'unseries', group: 'Threads', title: 'Constant-pitch UN series and UNS',
+  desc: '8-UN, 12-UN and 16-UN constant-pitch series up to 2 in, with basic pitch and minor diameters, and how UNS (special) threads are designated.',
+  render: el => renderUnSeries(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.1-2024 (cited by name); series lists from AMESweb and Torqbolt.',
+},
+{
+  id: 'unm', group: 'Threads', title: 'Unified miniature threads (UNM)',
+  desc: 'UNM threads 0.30 to 1.40 mm (ASME B1.10M): pitch, basic and design diameters, root radii and published limits of size.',
+  render: el => renderUnm(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.10M-2004 (cited by name); Thread Check Inc. and AMESweb.',
+},
+{
+  id: 'unjunr', group: 'Threads', title: 'UNJ and UNR threads',
+  desc: 'UNJ controlled root radius and increased internal minor diameter (ASME B1.15), and the UNR rounded-root rule for external Unified threads (ASME B1.1).',
+  render: el => renderUnjUnr(el),
+  working: 'See the note under the tool.',
+  source: 'ASME B1.15-1995, ASME B1.1-2024 (cited by name); publishers listed under the tool.',
+},
+{
+  id: 'sti', group: 'Threads', title: 'Helical insert (STI) tapped holes',
+  desc: 'Tapped-hole thread for helical coil (wire) inserts: STI major, pitch and minor diameters from the nominal thread, with the insert makers\' published limits side by side.',
+  render: el => renderSti(el),
+  working: 'See the note under the tool.',
+  source: 'Recoil (Alcoa Fastening Systems), Kato Fastening Systems and Heli-Coil data as reprinted by Vargus; NASM33537 and MA1567 cited by name.',
+},
+{
+  id: 'coating', group: 'Threads', title: 'Plating and coating allowance on threads',
+  desc: 'Pitch diameter change from a coating on the flanks (4 x thickness for 60 degree threads) and the before-coating pitch diameter limits, for screws, nuts and helical inserts.',
+  render: el => renderCoating(el),
+  working: 'See the note under the tool.',
+  source: 'Thread Check Inc. and Kato Fastening Systems (4 x thickness rule); geometry for other thread angles.',
+},
+{
+  id: 'multistart', group: 'Threads', title: 'Multi-start thread lead and pitch',
+  desc: 'Lead from pitch and number of starts (or pitch from lead), lead angle at the pitch diameter, and how far to index or shift the tool between starts.',
+  fields: s => [
+    { id: 'pitch', label: s === 'inch' ? 'Pitch (distance between adjacent threads)' : 'Pitch P', unit: lenU(s), def: s === 'inch' ? 0.1 : 2 },
+    { id: 'n', label: 'Number of starts', unit: '', def: 2 },
+    { id: 'lead', label: 'Or known lead (wins over pitch)', unit: lenU(s), def: '' },
+    { id: 'e', label: 'Pitch diameter (for the lead angle)', unit: lenU(s), def: s === 'inch' ? 0.9 : 18 },
+  ],
+  calc: (v, W, s) => {
+    const n = Math.round(v.n);
+    if (!(n >= 1)) return [];
+    const lead = v.lead > 0 ? v.lead : v.pitch * n, p = lead / n;
+    if (!(lead > 0)) return [];
+    const r = [R('Lead L (axial advance per turn)', lead, lenU(s), 4), R('Pitch P = L / starts', p, lenU(s), 4),
+      R(s === 'inch' ? 'Threads per inch (1 / P)' : 'Leads per 25.4 mm', s === 'inch' ? 1 / p : 25.4 / lead, s === 'inch' ? 'TPI' : '', 3),
+      R('Index between starts (rotate the work)', 360 / n, 'deg', 2), R('Or shift the tool axially between starts', p, lenU(s), 4)];
+    if (v.e > 0) r.push(R('Lead angle at the pitch diameter', W.thread_misc(lead, v.e, 2), 'deg', 3));
+    return r;
+  },
+  working: 'L = n x P (n starts). Lead angle = atan(L / (pi E)). To cut the next start, either rotate the work 360 / n degrees with the tool where it is, or move the tool one pitch P along the axis (a G76 or G92 cycle started one pitch later in Z). Feed per revolution on the lathe is the lead, not the pitch.',
+  source: 'Thread geometry (lead, pitch and helix angle); see docs/sources.md, Threads round 3.',
 },
 {
   id: 'machinetapers', group: 'Setup', title: 'Machine tapers',
@@ -1042,6 +1138,20 @@ const TOOLS = [
   render: el => renderHardness(el),
   working: 'Linear interpolation between adjacent rows of the ISO 18265 steel table. See the caveats under the tool.',
   source: 'ISO 18265:2013, ASTM E140-26; table as printed by Optimas and Bossard.',
+},
+{
+  id: 'shrinkfit', group: 'Limits and fits', title: 'Shrink and press fits',
+  desc: "Temperature to heat a hub (or cool a shaft) to assemble an interference fit with a clearance, and the press-fit contact pressure, hub stress and holding torque. Expansion coefficient, E, Poisson's ratio and friction are your entries.",
+  render: el => renderShrinkFit(el),
+  working: 'Shrink: dT = (interference + clearance) / (alpha d). Hub with a cooled shaft: T_hub = T0 + (i + c - alpha_s d (T0 - T_s)) / (alpha_h d). Press fit (Lame): p = delta / (d/Eo ((do²+d²)/(do²-d²) + nu_o) + d/Ei ((d²+di²)/(d²-di²) - nu_i)); hub hoop stress p (do²+d²)/(do²-d²); torque mu p pi d² L / 2.',
+  source: "Linear expansion dL = alpha L dT; Lame thick-cylinder interference fit as in Shigley's Mechanical Engineering Design (by name). See docs/sources.md.",
+},
+{
+  id: 'gentol', group: 'Limits and fits', title: 'General tolerances (ISO 2768-1)',
+  desc: 'Tolerance of a dimension with no tolerance of its own on an ISO 2768-f, m, c or v drawing: linear sizes, outside radii and chamfers, and angles.',
+  render: el => renderGenTol(el),
+  working: 'Table lookup by range (over the lower size, up to and including the upper). Angle offset = shorter side x tan(tolerance).',
+  source: 'ISO 2768-1:1989 (by name; confirmed current on iso.org). Values from AmesWeb, Star Rapid, Modulus Metal, CamCut and Wevolver.',
 },
 {
   id: 'bolt', group: 'Geometry', title: 'Bolt circle',
@@ -1093,6 +1203,20 @@ const TOOLS = [
   render: el => renderDovetail(el),
   working: 'A pin in a corner of angle α touches base and flank; its centre is (d/2) cot(α/2) from the sharp corner along the base. Male: M = W + d (1 + cot(α/2)). Female: M = W - d (1 + cot(α/2)). W from the other face: W = top ∓ 2h cot α. V-groove: pin top above face = (d/2)/sin(β/2) + d/2 - (W/2)/tan(β/2).',
   source: 'Plane geometry (BenchMate derivation, checked in tests by constructing the pin position). See docs/geometry.md.',
+},
+{
+  id: 'figures', group: 'Geometry', title: 'Areas and volumes',
+  desc: 'Area and perimeter of plane figures (squares, rectangles, trapezoids, circles, rings, ellipses, regular polygons by across flats or corners, sectors) and volume and surface of solids (box, cylinder, tube, cone, frustum, sphere, cap, pyramid, torus, hex bar), with a drawing.',
+  render: el => renderFigures(el),
+  working: 'Standard mensuration formulas (listed in docs/sources.md). Polygon: side = AF tan(180°/n), AC = AF / cos(180°/n), area = n side AF / 4. Ellipse perimeter: Ramanujan II approximation.',
+  source: "Machinery's Handbook 'areas and volumes' (by name); see docs/sources.md.",
+},
+{
+  id: 'compound', group: 'Geometry', title: 'Compound angles',
+  desc: 'True angle and slope direction of a face tilted two ways, from the two drawing (apparent) angles or two successive tilts, and the settings for a swivel and tilt, a compound sine plate or the two views.',
+  render: el => renderCompound(el),
+  working: 'Face normal n = (sin C cos b, sin C sin b, cos C). Apparent angles: tan ax = tan C cos b, tan ay = tan C sin b, so tan C = sqrt(tan² ax + tan² ay). Two tilts (about X, then the tilted Y): cos C = cos a1 cos a2, sin a2 = sin C cos b, tan a1 = tan C sin b.',
+  source: "Vector geometry (rotation of the face normal), BenchMate derivation with round-trip tests; Machinery's Handbook 'compound angles' (by name). See docs/sources.md.",
 },
 {
   id: 'cycdrill', group: 'G-code cycles', title: 'Drilling and tapping cycles',
@@ -1382,6 +1506,13 @@ const TOOLS = [
   source: 'Accendo Reliability (F. Schenkelberg) and Five Flute RSS tolerance analysis guides; BenchMate arithmetic with tests in core/src/gdt.rs.',
 },
 {
+  id: 'abbrev', group: 'Drawings', title: 'Drawing abbreviations',
+  desc: 'Common abbreviations on engineering drawings (CSK, CBORE, THRU, PCD, TYP, MMC...) in plain words, with how many free publishers list each.',
+  render: el => renderAbbrev(el),
+  working: "No calculation: BenchMate's own list and wording.",
+  source: 'ASME Y14.38 and ISO 128 (by name only); Wikipedia and IS 11670:1993 (Public.Resource.Org). See docs/sources.md.',
+},
+{
   id: 'weight', group: 'Stock and sheet metal', title: 'Stock weight',
   desc: 'Weight of round, hex, square, tube, flat bar, plate and sheet stock, per piece, per batch and per metre or foot.',
   render: el => renderWeight(el),
@@ -1428,6 +1559,27 @@ const TOOLS = [
   render: el => renderTempComp(el),
   working: 'L20 = reading x (1 + a_gauge x (T_gauge - 20)) / (1 + a_part x (T_part - 20)), temperatures in °C, a in 1/K. The gauge graduations grow with its temperature; the part grows with its own. Inverse for the reading a to-size part gives. Coefficient uncertainty: L x u(a) x |T_part - 20|.',
   source: 'ISO 1:2022 (reference temperature 20 °C, cited only); T. Doiron, J. Res. NIST 112(1), 2007 (history and use of 20 °C); expansion formula dL = L a dT. See docs/shop-helpers.md.',
+},
+{
+  id: 'ballcone', group: 'Inspection and quality', title: 'Ball in a countersink or tapered bore',
+  desc: 'Height of a gauge ball over the face of a countersink or tapered bore, the face diameter from a ball reading, and the angle and diameter of a tapered bore from two balls.',
+  render: el => renderBallCone(el),
+  working: 'a = half the included angle, r = ball radius, D = diameter at the face, h = height of the ball top over the face. h = r + r / sin a - D / (2 tan a); D = 2 (r / cos a - (h - r) tan a). Two balls: sin a = (r2 - r1) / ((h2 - r2) - (h1 - r1)).',
+  source: "Plane geometry (circle tangent to two lines), BenchMate derivation checked in tests by round trips; method as in Machinery's Handbook 'measuring tapers with balls' (by name). See docs/sources.md.",
+},
+{
+  id: 'taperrolls', group: 'Inspection and quality', title: 'Taper over rolls',
+  desc: 'External taper measured over a pair of rolls on gauge blocks: the measurement for a known taper, or the included angle and small-end diameter from two readings at two block heights.',
+  render: el => renderTaperRolls(el),
+  working: 'M = D_H + d (1 + tan(45° + a/2)), D_H = D0 + 2 H tan a (a = half angle, d = roll diameter, H = block height). Two readings: tan a = (M2 - M1) / (2 (H2 - H1)).',
+  source: "Plane geometry; the same relation as Machinery's Handbook 'measuring tapers with rolls' (by name); 1 + tan(45° + a/2) = 1 + tan a + sec a checked in tests. See docs/sources.md.",
+},
+{
+  id: 'scales', group: 'Inspection and quality', title: 'Micrometer and vernier reading',
+  desc: 'A reading aid: shows a micrometer (0.01 mm, 0.001 mm, 0.001 in, 0.0001 in) or vernier caliper (0.02 mm, 0.05 mm, 0.001 in) scale at a value, and how the reading is made up.',
+  render: el => renderScales(el),
+  working: 'Micrometer: sleeve value + thimble division x (pitch / divisions) + vernier line x resolution. Caliper: main scale value + coinciding vernier line x resolution.',
+  source: "Instrument makers' reading guides (see docs/sources.md); Machinery's Handbook 'reading verniers and micrometers' (by name).",
 },
 {
   id: 'coolconc', group: 'Shop helpers', title: 'Coolant concentration (refractometer)',
@@ -1491,6 +1643,27 @@ const TOOLS = [
   source: 'NIST SP 811, appendix B: inch = 0.0254 m exactly (1959 definition). See docs/shop-helpers.md.',
 },
 {
+  id: 'units', group: 'Shop helpers', title: 'Unit converter',
+  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once.',
+  render: el => renderUnits(el),
+  working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9).',
+  source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. See docs/sources.md.',
+},
+{
+  id: 'calc', group: 'Shop helpers', title: 'Calculator',
+  desc: 'Type an expression with brackets, powers, trig (degrees or radians), roots, logs and factorials. Also degrees-minutes-seconds, prime factors and linear interpolation.',
+  render: el => renderCalc(el),
+  working: "BenchMate's own recursive-descent parser in the Rust core (no eval): + - * / % ^ ! and functions. Powers bind right to left and above unary minus. Involute inv a = tan a - a.",
+  source: 'Operator precedence as in common mathematical convention; functions from the Rust standard library (IEEE 754 double precision). See docs/sources.md.',
+},
+{
+  id: 'economics', group: 'Shop helpers', title: 'Shop economics',
+  desc: 'Machine hourly rate from price, resale, life, interest and running costs; break-even quantity for a job; simple and discounted payback and net present value. All inputs are yours.',
+  render: el => renderEconomics(el),
+  working: 'CRF = i(1+i)^n / ((1+i)^n - 1); capital per year = (P - S) CRF + S i. Break-even = fixed / (price - variable). Payback = I / A; discounted n = -ln(1 - I i / A) / ln(1 + i); NPV = A (1 - (1+i)^-n) / i + S (1+i)^-n - I.',
+  source: "Engineering economy interest formulas (Machinery's Handbook 'engineering economics', by name); see docs/sources.md.",
+},
+{
   id: 'machines', group: 'Setup', title: 'Machine profiles',
   desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
   render: el => renderMachines(el),
@@ -1531,5 +1704,82 @@ const TOOLS = [
   render: el => renderMaterials(el),
   working: 'Equivalents are comparable grades, not identical: chemistry and properties differ between standards. Check the actual standard or mill certificate before substituting.',
   source: 'Listed under the table and in docs/sources.md. Confirmed = two or more independent publishers agree on the key designation and none disagree with equal support.',
+},
+{
+  id: 'boltgrade', group: 'Fasteners', title: 'Bolt grades and property classes',
+  desc: 'ISO 898-1 property classes 4.6 to 12.9, SAE J429 grades 2, 5 and 8 and ASTM A574 socket head cap screws: proof, yield and tensile minimums with the publishers that print them, and how to read the head marks.',
+  render: el => renderBoltGrades(el),
+  working: 'No calculation: minimum values as printed, with the number of independent publishers that agree. Inch mode shows MPa values in ksi (1 ksi = 6.894757 MPa).',
+  source: 'ISO 898-1:2013 and SAE J429, ASTM A574 (by name only); Optimas, Westfield Fasteners, Mutual Screw, Bossard, MSC, AFT Fasteners. See docs/sources.md.',
+},
+{
+  id: 'bolttorque', group: 'Fasteners', title: 'Bolt torque and preload',
+  desc: 'Tightening torque from preload with the VDI 2230 relation, preload from yield utilisation or percent of proof load. Thread and head friction are yours to enter; BenchMate shows the cited typical ranges but never fills them in.',
+  render: el => renderBoltTorque(el),
+  working: 'MA = F (0.16 P + 0.58 d2 muG + DKm/2 muK); FM = As nu Rp0.2 / sqrt(1 + 3 [3/2 d2/d0 (P/(pi d2) + 1.155 muG)]^2). See the note under the tool.',
+  source: 'VDI 2230 Part 1:2015 (R7, R13), by name only; formula also printed by FVA and by Hameedi and Völgyi (2025); friction classes from Bossard. See docs/sources.md.',
+},
+{
+  id: 'shcs', group: 'Fasteners', title: 'Socket head cap screws',
+  desc: 'Head diameter, head height and hex key of metric (ISO 4762) and inch (ASME B18.3) socket head cap screws, with clearance holes and counterbores.',
+  render: el => renderShcs(el),
+  working: 'No calculation: values as printed, each with its publisher count. Counterbores are maker recommendations and differ between publishers; both are shown.',
+  source: 'ISO 4762:2004, ASME B18.3 (by name only); MSC, MISUMI, AFT Fasteners, American Fastener, NBK, TR Fastenings, Optimas, Fractory.',
+},
+{
+  id: 'clearance', group: 'Fasteners', title: 'Clearance holes',
+  desc: 'Clearance holes for bolts and screws: ISO 273 fine, medium and coarse (M1.6 to M48) and inch close, normal and free fits, with every publisher disagreement shown.',
+  render: el => renderClearance(el),
+  working: 'No calculation: values as printed. Inch drill names are converted with the drill chart.',
+  source: 'ISO 273:1979, ASME B18.2.8 (by name only); NBK (JIS B 1001), TR Fastenings, Optimas, Fractory, MSC.',
+},
+{
+  id: 'spanner', group: 'Fasteners', title: 'Spanner and hex key sizes',
+  desc: 'Width across flats for metric (ISO 272, old DIN, JIS) and inch hex heads, and the hex key for socket head cap screws. Type a spanner size to see which threads it fits.',
+  render: el => renderSpanner(el),
+  working: 'No calculation: values as printed. The lookup matches within 0.05 mm or 0.001 in.',
+  source: 'ISO 272:1982, ASME B18.2.1, ASME B18.3 (by name only); Wikipedia, Accu, SLS Bearings and the socket screw publishers.',
+},
+{
+  id: 'tslots', group: 'Fasteners', title: 'T-slots',
+  desc: 'T-slot dimensions for machine tool tables (ISO 299 / DIN 650): head space width and height, total depth, bolt size and slot pitch, with a section drawing.',
+  render: el => renderTslots(el),
+  working: 'No calculation: values as printed (min to max).',
+  source: 'ISO 299:1987, DIN 650 (by name only); Engineers Edge (ASME B5.1M mm columns), iTeh preview of ISO 299.',
+},
+{
+  id: 'keys', group: 'Machine elements', title: 'Keys and keyways',
+  desc: 'Parallel key size, shaft and hub keyway depths and check dimensions from the shaft diameter: metric (DIN 6885-1 / ISO 773) and inch (ASME B17.1).',
+  render: el => renderKeys(el),
+  working: 'Metric: d - t1 and d + t2. Inch: Y = (D - sqrt(D^2 - W^2))/2, shaft D - Y - H/2, hub D - Y + H/2. See the note under the tool.',
+  source: 'DIN 6885-1, ISO 773, JIS B 1301, ASME B17.1 (by name only); fasten.it, AIMS Industrial, MISUMI, Engineers Edge, AMES.',
+},
+{
+  id: 'oring', group: 'Machine elements', title: 'O-ring glands',
+  desc: 'AS568 O-ring sizes and a gland check for piston, rod and face seals: gland depth, squeeze, stretch and gland fill against two seal makers\' guidance, and a groove suggested from your own targets.',
+  render: el => renderOring(el),
+  working: 'Squeeze = (CS - depth)/CS; stretch = (seat - ID)/ID; fill = ring volume / groove volume. See the note under the tool.',
+  source: 'SAE AS568, ISO 3601-1:2012 (by name only); Parker ORD 5700 (cited); Global O-Ring and Seal, Apple Rubber; sizes from Greene Tweed, eFunda, O-Rings Inc.',
+},
+{
+  id: 'bearinglife', group: 'Machine elements', title: 'Bearing rating life (L10)',
+  desc: 'Basic rating life of a rolling bearing in revolutions and hours from its dynamic load rating C and the equivalent load P, and the C needed for a life.',
+  render: el => renderBearingLife(el),
+  working: 'L10 = (C/P)^p, p = 3 ball, 10/3 roller; L10h = 10^6 L10 / (60 n); P = X Fr + Y Fa.',
+  source: 'ISO 281:2007 clause 6 (by name only). See docs/sources.md.',
+},
+{
+  id: 'cncguide', group: 'Guides', title: 'CNC knowledge guide',
+  desc: 'Machine axes and the right-hand rule, machine, work and tool coordinates, work, length, radius and wear offsets, program structure, climb and conventional milling, chip formation, tool wear with causes and remedies, turning and milling troubleshooting, workholding and shop safety.',
+  render: el => renderCncGuide(el),
+  working: 'Reference only. Your machine and control manuals govern. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
+  source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'formulas', group: 'Guides', title: 'Formula library',
+  desc: 'Every formula BenchMate uses, searchable: the formula, its variables and units, the tool that uses it and its source. Click a tool name to open it.',
+  render: el => renderFormulaLibrary(el),
+  working: 'Built from the formula registry in app/formulas.js. The Rust core does the arithmetic in every tool; this list is for reading.',
+  source: 'Source keys as listed under the library and in docs/sources.md.',
 },
 ];
