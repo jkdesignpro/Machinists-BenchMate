@@ -1973,6 +1973,33 @@ const TOOLS = [
   source: 'Binomial and Poisson distributions; NIST/SEMATECH e-Handbook 6.2.3 (by name); ISO 2859-1:1999 and ANSI/ASQ Z1.4-2003 described by name only. See docs/inspection.md.',
 },
 {
+  id: 'tolmid', level: 'advanced', group: 'Inspection and quality', title: 'Limits and middle of a tolerance',
+  desc: 'Type a toleranced size the way the drawing gives it: a size with two deviations, a size with an equal plus and minus, or two limits. It gives both limits and the middle, which is the size to program or aim for so the same tolerance is left on both sides.',
+  fields: s => [
+    { id: 'form', label: 'The drawing gives', unit: '', def: 1, options: [[1, 'Size, two deviations'], [2, 'Size, equal + and -'], [3, 'Two limits']] },
+    { id: 'nom', label: 'Size', unit: lenU(s), def: s === 'inch' ? 1 : 25, when: v => v.form !== 3 },
+    { id: 'up', label: 'First deviation, with its sign', unit: lenU(s), def: s === 'inch' ? 0.002 : 0.05, when: v => v.form === 1 },
+    { id: 'lo', label: 'Second deviation, with its sign', unit: lenU(s), def: s === 'inch' ? -0.001 : -0.02, when: v => v.form === 1 },
+    { id: 'pm', label: 'Plus and minus', unit: lenU(s), def: s === 'inch' ? 0.002 : 0.05, when: v => v.form === 2 },
+    { id: 'l1', label: 'One limit', unit: lenU(s), def: s === 'inch' ? 1.002 : 25.05, when: v => v.form === 3 },
+    { id: 'l2', label: 'Other limit', unit: lenU(s), def: s === 'inch' ? 0.999 : 24.98, when: v => v.form === 3 },
+  ],
+  calc: (v, W, s) => {
+    const a = v.form === 3 ? [0, v.l1, v.l2] : v.form === 2 ? [v.nom, Math.abs(v.pm), -Math.abs(v.pm)] : [v.nom, v.up, v.lo];
+    if (!a.every(isFinite)) return [];
+    const t = k => W.tol_limits(a[0], a[1], a[2], k), dp = s === 'inch' ? 5 : 4, inch = s === 'inch';
+    const other = x => W.unit_convert(0, inch ? 5 : 1, inch ? 1 : 5, x);
+    const rows = [R('Middle of the tolerance (program this)', t(2), lenU(s), dp), R('Upper limit', t(0), lenU(s), dp), R('Lower limit', t(1), lenU(s), dp),
+      R('Tolerance (upper limit minus lower limit)', t(3), lenU(s), dp), R('Equal plus and minus about the middle', t(4), lenU(s), dp)];
+    if (v.form !== 3) rows.push(R('Middle minus the drawing size', t(5), lenU(s), dp));
+    rows.push(R('Middle in ' + (inch ? 'mm' : 'inches'), other(t(2)), inch ? 'mm' : 'in', inch ? 4 : 5),
+      R('Limits in ' + (inch ? 'mm' : 'inches'), DK.n(other(t(1)), inch ? 4 : 5) + ' to ' + DK.n(other(t(0)), inch ? 4 : 5), inch ? 'mm' : 'in', 0));
+    return rows;
+  },
+  working: 'upper limit = size + larger deviation; lower limit = size + smaller deviation; middle = (upper limit + lower limit) / 2; tolerance = upper limit - lower limit. 1 in = 25.4 mm exactly.',
+  source: 'Definitions of limits of size, deviations and tolerance as in ISO 286-1:2010 clause 3 and ASME Y14.5-2018 (cited by name; nothing reproduced). The middle is plain arithmetic; worked examples in the core tests.',
+},
+{
   id: 'tempcomp', level: 'expert', group: 'Inspection and quality', title: 'Temperature compensation',
   desc: 'Correct a measurement taken away from the 20 °C (68 °F) reference temperature to the length at 20 °C, allowing for both the part and the gauge expanding.',
   render: el => renderTempComp(el),

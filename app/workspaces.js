@@ -75,7 +75,7 @@ const WORKSPACES = [
   ] },
   { id: 'inspect', name: 'Measure and inspect', icon: 'inspection', blurb: 'GD&T, fits, surface finish, gauge blocks and quality checks.', sections: [
     ['GD&T', ['gdtguide', 'gdtfcf', 'gdtpos', 'gdtprofu', 'gdtdof', 'gdtstack'], 'frame'],
-    ['Fits and finish', ['fitlookup', 'shrinkfit', 'surfacefin', 'prefnum'], 'fit'],
+    ['Fits and finish', ['fitlookup', 'tolmid', 'shrinkfit', 'surfacefin', 'prefnum'], 'fit'],
     ['Measuring', ['sinebar', 'scales', 'wires', 'tapergauge', 'dovetail', 'hardness', 'tempcomp'], 'caliper'],
     ['Quality', ['capability', 'ctrlchart', 'sampling'], 'chart'],
   ] },

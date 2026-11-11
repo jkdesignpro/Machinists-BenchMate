@@ -916,6 +916,33 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h + lab, 'Beam with loads, deflected shape and moment diagram');
   },
 
+  // Limits and middle of a tolerance: the tolerance zone on a size line, with the middle marked and
+  // the drawing size where it falls. The zone has a fixed width; only the labels carry numbers.
+  tolmid(v, sys, rows) {
+    const W = 520, H = 250, xa = 150, xb = 370, y = 92, h = 40, u = deU(sys);
+    const hi = deV(rows, 'Upper limit'), lo = deV(rows, 'Lower limit'), live = deFin(hi) && deFin(lo) && hi > lo;
+    const xm = (xa + xb) / 2;
+    let s = DK.line(40, y + h / 2, W - 40, y + h / 2, 'thin');
+    s += DK.rect(xa, y, xb - xa, h, 'tool');
+    s += DK.line(xa, y - 14, xa, y + h + 14, 'ln') + DK.line(xb, y - 14, xb, y + h + 14, 'ln');
+    s += DK.line(xm, y - 26, xm, y + h + 8, 'hot') + DK.circle(xm, y + h / 2, 3.5, 'hotf');
+    s += DK.text(xm, y - 46, 'middle: program this', { cls: 'hott', anchor: 'middle' });
+    s += DK.text(xm, y - 32, live ? deT(rows, 'Middle of the tolerance') : '(upper + lower) / 2', { cls: 'hott', anchor: 'middle' });
+    s += DK.text(xa, y - 34, 'lower limit', { cls: 'mut', anchor: 'middle' }) + DK.text(xa, y - 20, live ? deT(rows, 'Lower limit') : '', { anchor: 'middle' });
+    s += DK.text(xb, y - 34, 'upper limit', { cls: 'mut', anchor: 'middle' }) + DK.text(xb, y - 20, live ? deT(rows, 'Upper limit') : '', { anchor: 'middle' });
+    s += DK.dimH(xa, xb, y + h + 34, live ? 'tolerance ' + deT(rows, /^Tolerance/) : 'tolerance', { from: y + h + 14, below: true });
+    // The drawing size, placed in proportion and held inside the frame when it lies far outside the zone.
+    if (v.form !== 3 && deFin(v.nom) && live) {
+      const t = (v.nom - lo) / (hi - lo), xn = deClamp(xa + t * (xb - xa), 56, W - 56), out = t < -0.43 || t > 1.43;
+      if (Math.abs(xn - xm) > 3) {
+        s += DK.cl(xn, y - 8, xn, y + h + 56);
+        s += DK.text(xn, y + h + 72, 'drawing size ' + deIn(v.nom, deDp(sys) + 1, u) + (out ? ' (not to scale)' : ''), { cls: 'mut', anchor: xn < 130 ? 'start' : xn > W - 130 ? 'end' : 'middle' });
+      } else s += DK.text(xm, y + h + 72, 'the drawing size is the middle', { cls: 'mut', anchor: 'middle' });
+    }
+    s += deLines(40, H - 14, ['Aim for the middle: the same amount of tolerance is then left on both sides.']);
+    return DK.svg(W, H, s, 'Tolerance zone between the lower and upper limit with the middle marked');
+  },
+
   // Torsion: the shaft with the torque at both ends, the twist of a surface line and the shear stress across the section.
   torsion(v, sys, rows) {
     const W = 520, H = 270, u = mku(sys), inch = sys === 'inch';

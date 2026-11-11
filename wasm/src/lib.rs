@@ -478,6 +478,8 @@ pub extern "C" fn tnrc_arc(r: f64, tip: f64, z1: f64, x1: f64, z2: f64, x2: f64,
 // Measurement and shop maths (core/src/measure.rs)
 fn pick<const N: usize>(a: [f64; N], which: f64) -> f64 { a.get(which as usize).copied().unwrap_or(f64::NAN) }
 f1!(ball_height_in_cone, c::ball_height_in_cone, ball_d, face_d, included);
+/// Limits and middle of a tolerance: which 0 upper limit, 1 lower limit, 2 middle, 3 tolerance, 4 half the tolerance, 5 middle - nominal.
+#[no_mangle] pub extern "C" fn tol_limits(nominal: f64, dev_a: f64, dev_b: f64, which: f64) -> f64 { pick(c::tol_limits(nominal, dev_a, dev_b), which) }
 f1!(cone_face_dia_from_ball, c::cone_face_dia_from_ball, ball_d, height, included);
 /// Two balls in a tapered bore: which 0 included angle, 1 face diameter.
 #[no_mangle] pub extern "C" fn cone_two_balls(d1: f64, h1: f64, d2: f64, h2: f64, which: f64) -> f64 { pick(c::cone_from_two_balls(d1, h1, d2, h2), which) }

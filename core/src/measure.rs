@@ -417,6 +417,22 @@ pub fn scale_reading(kind: u32, value: f64) -> [f64; 5] {
     }
 }
 
+// ---------- Limits of size and the middle of a tolerance ----------
+
+/// Limits of size from a nominal size and two deviations, given in either
+/// order and with their signs (for example +0.002 and -0.001, or +0.05 and
+/// +0.02). For two limits, pass nominal 0 and the limits as the deviations.
+/// Returns `[upper limit, lower limit, middle, tolerance (upper - lower),
+/// half the tolerance, middle - nominal]`. The middle is the size to aim
+/// for so the same amount of tolerance is left on both sides.
+pub fn tol_limits(nominal: f64, dev_a: f64, dev_b: f64) -> [f64; 6] {
+    if !(nominal.is_finite() && dev_a.is_finite() && dev_b.is_finite()) { return [f64::NAN; 6]; }
+    let hi = nominal + dev_a.max(dev_b);
+    let lo = nominal + dev_a.min(dev_b);
+    let mid = (hi + lo) / 2.0;
+    [hi, lo, mid, hi - lo, (hi - lo) / 2.0, mid - nominal]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -610,6 +626,27 @@ mod tests {
         // Same, with vernier: .2262 = .225 + .001 + .0002.
         let r = scale_reading(3, 0.2262);
         close(r[1], 0.225, 1e-12); close(r[3], 1.0, 1e-12); close(r[4], 2.0, 1e-12);
+    }
+
+    #[test]
+    fn tolerance_limits_and_middle() {
+        // 1.000 +0.002 / -0.001: limits 1.002 and 0.999, middle 1.0005, band 0.003.
+        let r = tol_limits(1.0, 0.002, -0.001);
+        close(r[0], 1.002, 1e-12); close(r[1], 0.999, 1e-12); close(r[2], 1.0005, 1e-12);
+        close(r[3], 0.003, 1e-12); close(r[4], 0.0015, 1e-12); close(r[5], 0.0005, 1e-12);
+        // The order of the deviations does not matter.
+        assert_eq!(tol_limits(1.0, -0.001, 0.002), r);
+        // Both deviations on one side, as for an ISO 286 shaft 25 g6 (-0.007 / -0.020):
+        // limits 24.993 and 24.980, middle 24.9865.
+        let r = tol_limits(25.0, -0.007, -0.020);
+        close(r[0], 24.993, 1e-12); close(r[1], 24.980, 1e-12); close(r[2], 24.9865, 1e-12); close(r[5], -0.0135, 1e-12);
+        // Equal plus and minus: the middle is the nominal.
+        let r = tol_limits(10.0, 0.05, -0.05);
+        close(r[2], 10.0, 1e-12); close(r[5], 0.0, 1e-12); close(r[4], 0.05, 1e-12);
+        // Two limits (nominal 0): 25.05 and 24.98 give 25.015.
+        let r = tol_limits(0.0, 25.05, 24.98);
+        close(r[0], 25.05, 1e-12); close(r[1], 24.98, 1e-12); close(r[2], 25.015, 1e-12);
+        assert!(tol_limits(f64::NAN, 0.1, 0.1)[2].is_nan());
     }
 
     #[test]

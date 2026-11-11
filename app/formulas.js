@@ -217,6 +217,7 @@ const FORMULAS = [
   F('bend', 'Outside setback and bend deduction', 'OSSB = tan(angle/2) · (R + t);  BD = 2 · OSSB − BA', '', ['KETIV', 'AST']),
   F('capability', 'Process capability', 'Cp = (USL − LSL) / 6σ;  Cpk = min(USL − x̄, x̄ − LSL) / 3σ', 'σ: within sigma (moving range / d2)', ['NISTSEM', 'MINITAB']),
   F('capability', 'Within sigma from moving ranges', 'σ = MR̄ / d2,  d2 = 1.128', 'MR̄: average moving range of two', ['NISTSEM']),
+  F('tolmid', 'Middle of a tolerance', 'middle = (upper limit + lower limit) / 2', 'upper limit = size + larger deviation; lower limit = size + smaller deviation', ['OWN']),
   F('tempcomp', 'Measurement at 20 °C', 'L20 = reading · (1 + αg (Tg − 20)) / (1 + αp (Tp − 20))', 'α: expansion coefficient [1/K]; T: temperature [°C]', ['DOIRON', 'OWN']),
   F('coolconc', 'Coolant concentration', 'c = Brix reading · refractometer factor', 'c: [%]; factor from the fluid data sheet', ['FASTENAL']),
   F('coolmix', 'Concentrate to raise strength', 'x = V · (c_target − c_now) / (c_conc − c_target)', 'V: sump volume; c: concentrations [%]', ['OWN', 'FASTENAL']),
