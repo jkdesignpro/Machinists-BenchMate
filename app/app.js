@@ -268,6 +268,8 @@ function renderPage(main, page, tabId) {
     act('copy', 'Copy the results', () => api.copy());
     act('pin', 'Pin this result to Home', () => api.pin());
   }
+  const ub = document.createElement('button'); ub.className = 'ib unitb'; ub.textContent = state.sys === 'inch' ? 'in' : 'mm'; ub.title = 'Units: ' + (state.sys === 'inch' ? 'inch. Switch to mm' : 'mm. Switch to inch'); ub.setAttribute('aria-label', ub.title);
+  ub.onclick = () => setUnits(state.sys === 'inch' ? 'mm' : 'inch'); acts.appendChild(ub);
   act('info', 'Formula and sources', () => { why.hidden = false; why.open = !why.open || why.hidden; if (why.open) why.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
   acts.appendChild(starBtn(page.id, 'ib'));
   body.appendChild(why);
@@ -284,7 +286,7 @@ function mountTool(host, t, opts) {
   const key = t.id + ':' + sys;
   const saved = state.vals[key] || (state.vals[key] = {});
   const dpKey = 'bm.dp.' + t.id; let dpAdj = +lsGet(dpKey) || 0;
-  host.innerHTML = '<div class="tg' + (mini ? ' mini' : '') + '"><section class="pane inputs">' + (mini ? '' : '<h2>Inputs</h2>') + (!mini && t.pick ? toolPickRow(t.pick) : '') +
+  host.innerHTML = '<div class="tg' + (mini ? ' mini' : '') + '"><section class="pane inputs">' + (mini ? '' : '<h2>Inputs</h2>') + (!mini && t.pick && (state.mode !== 'simple' || ToolLib.all().length) ? toolPickRow(t.pick) : '') +
     '<div class="grid"></div></section><section class="pane results"><div class="res" id="' + (mini ? '' : 'res') + '"></div><div class="tdia"></div></section></div>';
   const grid = $('.grid', host), res = $('.res', host), dia = $('.tdia', host);
   const pairs = (t.pairs || []).map(p => ({ a: p[0], b: p[1], ab: p[2], ba: p[3], both: p[4] === 'both' }));
@@ -347,7 +349,7 @@ function mountTool(host, t, opts) {
       const hero = rows[0], w0 = warn(hero), rest = rows.slice(1, mini ? 3 : rows.length);
       const longTxt = typeof hero.value === 'string' && hero.value.length > 24;
       res.innerHTML = '<div class="hero rrow' + (w0 ? ' over' : '') + (longTxt ? ' txt' : '') + '"><div class="hl">' + hero.label + '</div><div class="hv"><b>' + fmt(hero.value, dp(hero)) + '</b><span>' + hero.unit + '</span></div>' + (w0 ? '<div class="wmsg">' + icon('info') + w0 + '</div>' : '') + '</div>' +
-        (rest.length ? '<table>' + rest.map(r => { const w = warn(r); return '<tr class="rrow' + (w ? ' over' : '') + '"><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v' + (typeof r.value === 'string' && r.value.length > 24 ? ' txt' : '') + '">' + fmt(r.value, dp(r)) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>' : '');
+        (rest.length ? '<table>' + rest.map(r => { const w = warn(r); return '<tr class="rrow' + (w ? ' over' : '') + '"><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v' + (typeof r.value === 'string' && r.value.length > 24 ? ' txt' : '') + (r.value === 'PASS' || r.value === 'OK' ? ' good' : r.value === 'FAIL' ? ' fail' : '') + '">' + fmt(r.value, dp(r)) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>' : '');
     }
     if (!mini) { const d = t.diagram || (typeof DIAGRAMS !== 'undefined' && DIAGRAMS[t.id]); let h = ''; if (d) { try { h = d(v, sys, rows) || ''; } catch (e) { h = ''; } } dia.innerHTML = h; dia.hidden = !h; }
   }

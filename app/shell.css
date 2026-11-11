@@ -280,3 +280,21 @@ svg.dk{font:11.5px var(--sans);overflow:visible}
 .dk .mut{fill:var(--muted)}
 .dk .dimt{fill:var(--accent);font:600 12px var(--mono)}
 .dk .hott{fill:var(--hot);font:600 12px var(--mono)}
+
+/* ---- Unit button in the tool header; Simple mode: bigger boxes and results ---- */
+.unitb{font:700 11.5px var(--mono);color:var(--accent);width:auto;min-width:32px;padding:0 6px}
+[data-mode="simple"] label.f{font-size:13px}
+[data-mode="simple"] label.f input,[data-mode="simple"] label.f select{height:40px;font-size:16px}
+[data-mode="simple"] .pair .swap{height:40px}
+[data-mode="simple"] label.f .fx{top:8px}
+[data-mode="simple"] .hero .hv b{font-size:42px}
+[data-mode="simple"] .tg .res td{padding:9px 18px;font-size:14px}
+[data-mode="simple"] .tg .res td.v{font-size:16px}
+[data-mode="simple"] .wd .hero .hv b{font-size:26px}
+[data-mode="simple"] .wd label.f input,[data-mode="simple"] .wd label.f select{height:34px;font-size:14px}
+.res td.v.good{color:var(--ok)}
+.res td.v.fail{color:var(--err)}
+.res td.v.good::before,.res td.v.fail::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;margin-right:7px}
+.wd .tg.mini .hero.txt .hv b{font:600 13px/1.4 var(--sans);letter-spacing:0}
+.editing .wdh{padding-right:124px}
+.editing .wdh a{display:none}
