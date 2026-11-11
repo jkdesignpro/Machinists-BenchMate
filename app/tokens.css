@@ -1,0 +1,25 @@
+/* Shared design tokens, same family as Alkart Mega Wizard (Jacob's apps). Light/dark, JetBrains/Fusion-style tool look. */
+:root{
+  --bg:#e9ebee; --panel:#ffffff; --head:#f4f5f7; --raise:#f7f8fa; --ink:#1f2328; --muted:#636a74; --line:#d3d7dd; --soft:#eef0f3;
+  --accent:#2f6fde; --accent-ink:#ffffff; --accent2:#e3ecfb; --sel:#d6e4fa;
+  --g:#0b4fb3; --m:#86198f; --t:#9a4d00; --c:#7b8189; --q:#11793f;
+  --err:#c42b2b; --warn:#9a6200; --ok:#1d7a3e; --hl:#fff4c2; --gut:#9aa1aa;
+  --r:4px; --mono:"JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
+  --sans:"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#1b1c1f;--panel:#1e1f22;--head:#2b2d30;--raise:#26282b;--ink:#dfe1e5;--muted:#8b8f96;--line:#393b40;--soft:#2f3134;
+  --accent:#3d7ef0;--accent-ink:#ffffff;--accent2:#25324a;--sel:#2e436e;--g:#56a8f5;--m:#c77dbb;--t:#e3a54a;--c:#7a7e85;--q:#5fb97d;
+  --err:#f26d6d;--warn:#e0b44e;--ok:#5fb97d;--hl:#3b3520;--gut:#5f636a}
+}
+:root[data-theme="dark"]{--bg:#1b1c1f;--panel:#1e1f22;--head:#2b2d30;--raise:#26282b;--ink:#dfe1e5;--muted:#8b8f96;--line:#393b40;--soft:#2f3134;
+  --accent:#3d7ef0;--accent-ink:#ffffff;--accent2:#25324a;--sel:#2e436e;--g:#56a8f5;--m:#c77dbb;--t:#e3a54a;--c:#7a7e85;--q:#5fb97d;
+  --err:#f26d6d;--warn:#e0b44e;--ok:#5fb97d;--hl:#3b3520;--gut:#5f636a}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:12.5px/1.4 var(--sans);display:flex;flex-direction:column;overflow:hidden}
+button,select,input,textarea{font:inherit;color:inherit}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+:focus-visible{outline:1px solid var(--accent);outline-offset:0}
+input,select{border:1px solid var(--line);border-radius:var(--r);padding:3px 7px;background:var(--panel);min-width:0;height:26px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}

@@ -1,0 +1,10 @@
+[workspace]
+members = ["core", "wasm"]
+# desktop/ (Tauri) is its own workspace so core tests need no GUI toolkit.
+exclude = ["desktop"]
+resolver = "2"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true

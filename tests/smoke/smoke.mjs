@@ -1,0 +1,107 @@
+// Headless smoke test of the web UI in app/ (Chromium via Playwright).
+// Opens every tool in the side list, in inch and in mm, and fails on any
+// console error, uncaught exception, failed request or empty tool screen.
+// The page is served by a small built-in static server that sends the same
+// Content-Security-Policy as the desktop app (desktop/tauri.conf.json), so a
+// CSP violation shows up here as a console error.
+// Usage: node tests/smoke/smoke.mjs        (run scripts/build-web.sh first)
+import { chromium } from 'playwright';
+import http from 'node:http';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const appDir = path.join(root, 'app');
+const conf = JSON.parse(await readFile(path.join(root, 'desktop/tauri.conf.json'), 'utf8'));
+const csp = Object.entries(conf.app.security.csp).map(([k, v]) => `${k} ${v}`).join('; ');
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.wasm': 'application/wasm', '.svg': 'image/svg+xml', '.png': 'image/png' };
+const server = http.createServer(async (req, res) => {
+  const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/^\/+/, '') || 'index.html';
+  const file = path.join(appDir, rel);
+  if (!file.startsWith(appDir)) { res.writeHead(403).end(); return; }
+  try {
+    const body = await readFile(file);
+    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Content-Security-Policy': csp });
+    res.end(body);
+  } catch { res.writeHead(404).end(); }
+});
+await new Promise(r => server.listen(0, '127.0.0.1', r));
+const base = `http://127.0.0.1:${server.address().port}/`;
+console.log(`serving app/ at ${base} with CSP: ${csp}`);
+const problems = [];
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+let where = 'load';
+page.on('console', m => { if (m.type() === 'error') problems.push(`[${where}] console error: ${m.text()}`); });
+page.on('pageerror', e => problems.push(`[${where}] uncaught: ${e.message}`));
+page.on('requestfailed', r => problems.push(`[${where}] request failed: ${r.url()} ${r.failure()?.errorText}`));
+page.on('response', r => { if (r.status() >= 400) problems.push(`[${where}] HTTP ${r.status()}: ${r.url()}`); });
+// Dialogs (confirm/alert) would block; accept them and note them.
+page.on('dialog', d => { problems.push(`[${where}] unexpected dialog: ${d.message()}`); d.dismiss(); });
+
+await page.goto(base, { waitUntil: 'load' });
+await page.waitForSelector('#list button.t');
+const ver = await page.textContent('#ver');
+if (!/^v\d+\.\d+\.\d+/.test(ver || '')) problems.push(`version label missing: "${ver}"`);
+
+const ids = await page.$$eval('#list button.t', bs => [...new Set(bs.map(b => b.dataset.id))]);
+console.log(`${ids.length} tools`);
+for (const sys of ['inch', 'mm']) {
+  await page.click(`#units button[data-u="${sys}"]`);
+  for (const id of ids) {
+    where = `${sys}/${id}`;
+    await page.click(`#list button.t[data-id="${id}"]`);
+    await page.waitForTimeout(60);
+    const text = (await page.textContent('#main')) || '';
+    if (text.trim().length < 20) problems.push(`[${where}] tool screen is empty`);
+    if (/Could not load|not found \(run scripts\/build-web\.sh\)/.test(text)) problems.push(`[${where}] ${text.slice(0, 120)}`);
+  }
+}
+// Theme toggle and search should not throw either.
+where = 'theme';
+await page.click('#theme');
+where = 'search';
+await page.fill('#search', 'thread');
+await page.waitForTimeout(50);
+
+// Drill chart: "#7" (the placeholder's own example) must find number drill 7 only.
+where = 'drillchart #7';
+await page.fill('#search', '');
+await page.dispatchEvent('#search', 'input');
+await page.click('#list button.t[data-id="drillchart"]');
+await page.fill('#dq', '#7');
+await page.dispatchEvent('#dq', 'input');
+const drillRows = await page.$$eval('#dres tr', trs => trs.slice(1).map(tr => tr.querySelector('td').textContent.trim()));
+if (drillRows.length !== 1 || drillRows[0] !== '#7') problems.push(`[${where}] expected only #7, got ${drillRows.length} rows: ${drillRows.slice(0, 5).join(', ')}`);
+
+// Surface finish in mm: Ra 0.33 um must not be rounded to 0.3 (10 % low).
+where = 'finish mm';
+await page.click('#units button[data-u="mm"]');
+await page.click('#list button.t[data-id="finish"]');
+for (const [k, v] of [['f', '0.092'], ['r', '0.8']]) { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); }
+const raRow = await page.$eval('#res', e => [...e.querySelectorAll('tr')].map(t => t.innerText.replace(/\s+/g, ' ')).find(t => /Theoretical Ra/.test(t)) || '');
+if (!/0\.33\b/.test(raRow)) problems.push(`[${where}] expected Ra 0.33 um, got "${raRow}"`);
+
+// Morse taper angle is the included angle and must say so (the cited table prints the half angle).
+where = 'machinetapers morse';
+await page.click('#list button.t[data-id="machinetapers"]');
+await page.waitForSelector('#tres table');
+const mtText = await page.textContent('#tres');
+if (!/included angle 2\.98/.test(mtText)) problems.push(`[${where}] Morse angle not labelled as included angle`);
+
+// Material data: a designation a publisher prints must not also be listed as "unsourced".
+where = 'materials data';
+const mat = JSON.parse(await readFile(path.join(appDir, 'data/materials.json'), 'utf8'));
+const mnorm = v => String(v).replace(/^UNS\s*/i, '').replace(/\s*\([^)]*\)/g, '').replace(/^(EN\s*)?AW\s*-?\s*/i, '').replace(/[\s-]/g, '').toUpperCase();
+for (const m of mat.materials) for (const [k, u] of Object.entries(m.unsourced || {}))
+  if (u && (m.fields[k] || []).some(v => mnorm(v.value) === mnorm(u))) problems.push(`[${where}] ${m.grade} ${k}: "${u}" is printed by a source but listed as unsourced`);
+
+await browser.close();
+server.close();
+if (problems.length) {
+  console.error(problems.join('\n'));
+  console.error(`FAILED: ${problems.length} problem(s)`);
+  process.exit(1);
+}
+console.log(`OK: ${ids.length} tools opened in inch and mm with no console errors`);

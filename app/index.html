@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Machinists BenchMate</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="titlebar">
+  <div class="brand"><span class="mark">BM</span>Machinists BenchMate <small id="ver"></small></div>
+  <div class="sp"></div>
+  <select id="machine" title="Active machine: results are checked against its limits" style="max-width:220px"></select>
+  <div class="seg" id="units"><button data-u="inch" class="on">inch</button><button data-u="mm">mm</button></div>
+  <button class="btn" id="theme">Theme</button>
+</div>
+<div id="shell">
+  <nav id="side"><input id="search" type="search" placeholder="Search tools" aria-label="Search tools"><div id="list"></div></nav>
+  <main id="main"></main>
+</div>
+<div id="status">Formulas run in Rust (WebAssembly). Results are for guidance; verify before cutting.</div>
+<script src="profiles.js"></script>
+<script src="toollib.js"></script>
+<script src="tools.js"></script>
+<script src="gdt.js"></script>
+<script src="shop.js"></script>
+<script src="geometry.js"></script>
+<script src="cycles.js"></script>
+<script src="gsim.js"></script>
+<script src="cad.js"></script>
+<script src="refdata.js"></script>
+<script src="refdata2.js"></script>
+<script src="refdata3.js"></script>
+<script src="matref.js"></script>
+<script src="threads3.js"></script>
+<script src="gmcodes.js"></script>
+<script src="fasteners.js"></script>
+<script src="millturn.js"></script>
+<script src="chatter.js"></script>
+<script src="grinding.js"></script>
+<script src="cncguide.js"></script>
+<script src="tooling.js"></script>
+<script src="formulas.js"></script>
+<script src="maths.js"></script>
+<script src="inspect.js"></script>
+<script src="gears.js"></script>
+<script src="mechanics.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

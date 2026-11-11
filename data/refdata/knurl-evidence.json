@@ -1,0 +1,62 @@
+{
+ "sources": {
+  "DORIAN": {
+   "publisher": "Dorian Tool",
+   "title": "Knurling catalogue (technical section)",
+   "url": "https://www.productivity.com/wp-content/uploads/2015/05/Dorian-Knurling.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker. Teeth = pi D / P (P = 1/TPI); diametral pitch: teeth = D x DP; 30 deg diagonal: teeth = D x DP x cos 30; blank by trial, change by +/- 0.005 in if the knurl double tracks."
+  },
+  "HOMMEL_KELLER": {
+   "publisher": "Hommel+Keller (Zeus)",
+   "title": "Zeus knurling catalogue 2021, technical pages 35-46",
+   "url": "https://cdn.shopify.com/s/files/1/0564/9065/5778/files/HOMMEL_KELLER_ZEUS_kataloog_2021.pdf",
+   "accessed": "2026-11-10",
+   "note": "Maker. CP pitch = 25.4 / TPI mm; DP pitch = pi x 25.4 / DP mm; DIN 403 pitches; form knurling enlarges the diameter (empirical table by material and pitch); cut knurling barely changes it."
+  }
+ },
+ "pitches_mm": {
+  "DORIAN": [
+   "0.3",
+   "0.5",
+   "0.6",
+   "0.7",
+   "0.8",
+   "1.0",
+   "1.2",
+   "1.6",
+   "2.1",
+   "2.5",
+   "3.2"
+  ],
+  "HOMMEL_KELLER": [
+   "0.3",
+   "0.4",
+   "0.5",
+   "0.6",
+   "0.7",
+   "0.8",
+   "1.0",
+   "1.2",
+   "1.5",
+   "1.6",
+   "2.0"
+  ]
+ },
+ "pitches_dp": {
+  "DORIAN": [
+   "64",
+   "96",
+   "128",
+   "160"
+  ]
+ },
+ "din403_mm": [
+  "0.5",
+  "0.6",
+  "0.8",
+  "1.0",
+  "1.2",
+  "1.6"
+ ]
+}

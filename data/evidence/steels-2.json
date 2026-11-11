@@ -1,0 +1,3249 @@
+{
+ "sources": {
+  "AALCO_1.4571": {
+   "title": "Stainless Steel 1.4571 (316Ti) Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14571-316Ti-Bar_40.ashx",
+   "publisher": "Aalco (Amari Metals)",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_S34700": {
+   "title": "Stainless Steel S34700 Sheet datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-S34700-Sheet_270.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_1.4000": {
+   "title": "Stainless Steel 1.4000 Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14000-Bar_349.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_1.4512": {
+   "title": "Stainless Steel 1.4512 Sheet datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14512-Sheet_313.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_1.4125": {
+   "title": "Stainless Steel 1.4125 (440C) Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14125-440C-Bar_312.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_1.4542": {
+   "title": "Stainless Steel 1.4542 (17/4 & 630) Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14542-174--630-Bar_100.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_15-5": {
+   "title": "Stainless Steel 15/5 PH datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-155-PH_310.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_1.4462": {
+   "title": "Stainless Steel 1.4462 (2205) Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14462-2205-Bar_347.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_1.4021": {
+   "title": "Stainless Steel 1.4021 (420) Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Stainless-Steel-14021-420-Bar_311.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_INDEX": {
+   "title": "Aalco stainless datasheet index (titles only)",
+   "url": "https://www.aalco.co.uk/datasheets/?gId=5",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "OUTOKUMPU": {
+   "title": "Outokumpu steel grades, properties and global standards (PDF)",
+   "url": "https://www.outokumpu.com/-/media/from-sharepoint/documents/product/outokumpu-steel-grades-properties-global-standards.pdf",
+   "publisher": "Outokumpu",
+   "accessed": "2026-11-10"
+  },
+  "ISSF_ISO15510": {
+   "title": "Stainless steel grades listed in the international standard ISO 15510:2010",
+   "url": "https://extranet.worldstainless.org/media/um0fv1ua/stainless-steel-grades-listed-in-the-international-standard-iso-155102010.pdf",
+   "publisher": "International Stainless Steel Forum (worldstainless)",
+   "accessed": "2026-11-10"
+  },
+  "ATLAS": {
+   "title": "Atlas Steels Product Reference Manual, Section 9 (July 2020) - equivalent grades table",
+   "url": "https://atlassteels.com.au/wp-content/uploads/2021/08/Atlas-Steels-Product-Manual-Section-9.pdf",
+   "publisher": "Atlas Steels (Australia)",
+   "accessed": "2026-11-10"
+  },
+  "KENNAMETAL": {
+   "title": "Kennametal Material Data Base (catalogue pages M464-M479), hosted by MSC",
+   "url": "https://www1.mscdirect.com/images/solutions/kennametal/materialDataBase.pdf",
+   "publisher": "Kennametal",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_1.4571": {
+   "title": "Lucefin technical card 1.4571 / 316Ti",
+   "url": "https://www.lucefin.com/oaleekso/files_mf/15235431681.4571Tp316Ti.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_1.4310": {
+   "title": "Lucefin technical card 1.4310 / 301",
+   "url": "https://lucefin.com/eeloavys/2024/09/1.4310-A301.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_1.4845": {
+   "title": "Lucefin technical card 1.4845 / 310S",
+   "url": "https://lucefin.com/oaleekso/files_mf/15235433611.4845A310S.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_1.4362": {
+   "title": "Lucefin technical card 1.4362 / 2304",
+   "url": "https://lucefin.com/oaleekso/files_mf/15235421441.4362Tp2304.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_C40E": {
+   "title": "Lucefin technical card C40E/C40R",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/C40E.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_C45E": {
+   "title": "Lucefin technical card C45E/C45R",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/C45E.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_11SMn30": {
+   "title": "Lucefin technical card 11SMn30",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/11SMn30.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_11SMnPb30": {
+   "title": "Lucefin technical card 11SMnPb30",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/11SMnPb30.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_11SMn37": {
+   "title": "Lucefin technical card 11SMn37",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/11SMn37.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_11SMnPb37": {
+   "title": "Lucefin technical card 11SMnPb37",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/11SMnPb37.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_25CrMo4": {
+   "title": "Lucefin technical card 25CrMo4",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/25CrMo4.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_42CrMo4": {
+   "title": "Lucefin technical card 42CrMo4",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/42CrMo4.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_34CrNiMo6": {
+   "title": "Lucefin technical card 34CrNiMo6",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/34CrNiMo6.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_20NiCrMo2-2": {
+   "title": "Lucefin technical card 20NiCrMo2-2",
+   "url": "https://lucefin.com/wp-content/uploads/2025/01/20NiCrMo2-2.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_100Cr6": {
+   "title": "Lucefin technical card 100Cr6",
+   "url": "https://www.lucefin.com/wp-content/files_mf/1523536900100Cr6.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_1.2842": {
+   "title": "Lucefin technical card 1.2842 90MnCrV8",
+   "url": "https://www.lucefin.com/wp-content/files_mf/15236081011.284290MnCrV8.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_1.2379": {
+   "title": "Lucefin technical card 1.2379 X153CrMoV12",
+   "url": "https://www.lucefin.com/wp-content/files_mf/15236079321.2379X153CrMoV12.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_1.2311": {
+   "title": "Lucefin technical card 1.2311 40CrMnMo7",
+   "url": "https://www.lucefin.com/wp-content/files_mf/15236072151.231140CrMnMo7.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "LUCEFIN_1.3247": {
+   "title": "Lucefin technical card 1.3247 HS 2-9-1-8",
+   "url": "https://lucefin.com/oaleekso/files_mf/15294196641.3247HS2918.pdf",
+   "publisher": "Lucefin Group",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN1A": {
+   "title": "Smiths Metal Centres EN1A datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en1a.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN3B": {
+   "title": "Smiths Metal Centres EN3B datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en3b.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN8": {
+   "title": "Smiths Metal Centres EN8 datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en8.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN16": {
+   "title": "Smiths Metal Centres EN16 datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en16.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN19": {
+   "title": "Smiths Metal Centres EN19 datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en19.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN24": {
+   "title": "Smiths Metal Centres EN24 datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en24.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN36": {
+   "title": "Smiths Metal Centres EN36 datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en36.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN40B": {
+   "title": "Smiths Metal Centres EN40B datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en40b.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_EN41": {
+   "title": "Smiths Metal Centres EN41 datasheet",
+   "url": "https://www.smithmetal.com/pdf/engineering/en41.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_BO1": {
+   "title": "Smiths Metal Centres BO1 tool steel page",
+   "url": "https://www.smithmetal.com/bo1-tool-steel.htm",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_D2": {
+   "title": "Smiths Metal Centres D2 tool steel page",
+   "url": "https://www.smithmetal.com/d2-tool-steel.htm",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_P20": {
+   "title": "Smiths Metal Centres P20 tool steel page / datasheet",
+   "url": "https://www.smithmetal.com/p20-tool-steel.htm",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_17-4": {
+   "title": "Smiths Metal Centres 17-4PH datasheet",
+   "url": "https://www.smithmetal.com/pdf/stainless/ph/17-4ph.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_15-5": {
+   "title": "Smiths Metal Centres 15-5PH datasheet",
+   "url": "https://www.smithmetal.com/pdf/stainless/ph/15-5ph.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "OVAKO_C45": {
+   "title": "Ovako Steel Navigator - C45",
+   "url": "https://steelnavigator.ovako.com/steel-grades/c45/",
+   "publisher": "Ovako",
+   "accessed": "2026-11-10"
+  },
+  "OVAKO_42CrMo4": {
+   "title": "Ovako Steel Navigator - 42CrMo4",
+   "url": "https://steelnavigator.ovako.com/steel-grades/42crmo4",
+   "publisher": "Ovako",
+   "accessed": "2026-11-10"
+  },
+  "OVAKO_34CrNiMo6": {
+   "title": "Ovako Steel Navigator - 34CrNiMo6",
+   "url": "https://steelnavigator.ovako.com/steel-grades/34crnimo6/",
+   "publisher": "Ovako",
+   "accessed": "2026-11-10"
+  },
+  "OVAKO_100Cr6": {
+   "title": "Ovako Steel Navigator - 100Cr6",
+   "url": "https://steelnavigator.ovako.com/steel-grades/100cr6/",
+   "publisher": "Ovako",
+   "accessed": "2026-11-10"
+  },
+  "OVAKO_20NiCrMo2-2": {
+   "title": "Ovako Steel Navigator - 20NiCrMo2-2",
+   "url": "https://steelnavigator.ovako.com/steel-grades/20nicrmo2-2/",
+   "publisher": "Ovako",
+   "accessed": "2026-11-10"
+  },
+  "OVAKO_25CrMo4": {
+   "title": "Ovako Steel Navigator - 25CrMo4",
+   "url": "https://steelnavigator.ovako.com/steel-grades/25crmo4/",
+   "publisher": "Ovako",
+   "accessed": "2026-11-10"
+  },
+  "ROYMECH": {
+   "title": "Roymech - Strength of steels, 'BS970 1955 EN steel Equivalent' table",
+   "url": "https://roymech.org/Useful_Tables/Matter/Strength_st.html",
+   "publisher": "Roymech (engineering reference site)",
+   "accessed": "2026-11-10"
+  },
+  "PARKER": {
+   "title": "Parker Steel colour chart (bright & black carbon alloy bars, stainless bars, aluminium bars)",
+   "url": "https://parkersteel.co.uk/sharedupgrade/media/pdf/doc/BS/ColourChart.pdf",
+   "publisher": "Parker Steel (UK stockholder)",
+   "accessed": "2026-11-10"
+  },
+  "CGTK": {
+   "title": "Material Equivalents (hobby metalwork notes) - THIRD OPINION ONLY",
+   "url": "https://www.cgtk.co.uk/metalwork/data/materials",
+   "publisher": "cgtk.co.uk (personal site)",
+   "accessed": "2026-11-10"
+  },
+  "DOERRENBERG_1.2842": {
+   "title": "Doerrenberg 1.2842 datasheet",
+   "url": "https://doerrenberg.com/fileadmin/special_steel/files/pdf_en_products_neues_Design/1.2842_en.pdf",
+   "publisher": "Doerrenberg Edelstahl",
+   "accessed": "2026-11-10"
+  },
+  "DOERRENBERG_1.2510": {
+   "title": "Doerrenberg 1.2510 datasheet",
+   "url": "https://doerrenberg.com/fileadmin/special_steel/files/pdf_en_products_neues_Design/1.2510_en.pdf",
+   "publisher": "Doerrenberg Edelstahl",
+   "accessed": "2026-11-10"
+  },
+  "DOERRENBERG_1.2379": {
+   "title": "Doerrenberg 1.2379 datasheet",
+   "url": "https://doerrenberg.com/fileadmin/special_steel/files/pdf_en_products_neues_Design/1.2379_en.pdf",
+   "publisher": "Doerrenberg Edelstahl",
+   "accessed": "2026-11-10"
+  },
+  "DOERRENBERG_1.2311": {
+   "title": "Doerrenberg 1.2311 datasheet",
+   "url": "https://doerrenberg.com/fileadmin/special_steel/files/pdf_en_products_neues_Design/1.2311_en.pdf",
+   "publisher": "Doerrenberg Edelstahl",
+   "accessed": "2026-11-10"
+  },
+  "ERASTEEL_M42": {
+   "title": "Erasteel Evoloop M42 datasheet",
+   "url": "https://www.erasteel.com/?p=627",
+   "publisher": "Erasteel",
+   "accessed": "2026-11-10"
+  },
+  "BGH_1.4545": {
+   "title": "BGH Edelstahl 1.4545 datasheet",
+   "url": "https://bgh.de/media/45/dd/35/1747826478/14545_BGH_en.pdf",
+   "publisher": "BGH Edelstahlwerke",
+   "accessed": "2026-11-10"
+  },
+  "AUBERTDUVAL_15-5": {
+   "title": "Aubert & Duval 15-5PH alloy page",
+   "url": "https://www.aubertduval.com/alloy/765",
+   "publisher": "Aubert & Duval",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "301",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "301",
+      "uns": "S30100",
+      "en_number": "1.4310",
+      "en_name": null,
+      "bs970": "301S21",
+      "uk_en": null,
+      "jis": "SUS 301",
+      "gb": "1Cr17Ni7",
+      "other": "ISO 4310-301-00-I; NF Z11 CN 18-08; SS 2331; KS STS 301; GOST 07X16H6"
+     },
+     "verbatim_row": "T2: 4310 1.4310 301 S30100 SUS 301 0.10 17 7 H C B R S | T3: 4310 4310-301-00-I 301S21 1.4310 Z11 CN 18-08 2331 1Cr17Ni7 STS 301 07X16H6"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "301",
+      "uns": "S30100",
+      "en_number": "1.4310",
+      "en_name": "X10CrNi18-8",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": "S30110",
+      "other": "ISO 4310-301-00-I; JIS column empty in extracted row; GB value is the GB/T 20878 numeric code"
+     },
+     "verbatim_row": "A 4310-301-00-I X10CrNi18-8 1.4310 S30100 301 S30110"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "301",
+      "uns": "S30100",
+      "en_number": "1.4310",
+      "en_name": "X10CrNi18-8",
+      "bs970": "301S21",
+      "uk_en": null,
+      "jis": "SUS 301",
+      "gb": null,
+      "other": "SS 2331"
+     },
+     "verbatim_row": "301 S30100 301S21 - 1.4310 X10CrNi18-8 2331 SUS 301"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "301",
+      "uns": null,
+      "en_number": "1.4310",
+      "en_name": "X 10 CrNi 18-8",
+      "bs970": "301S21",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z 11 CN 17-08"
+     },
+     "verbatim_row": "210-290 301 1.4310 X 10 CrNi 18-8 301S21 Z 11 CN 17-08"
+    },
+    {
+     "source": "LUCEFIN_1.4310",
+     "values": {
+      "aisi": "301",
+      "uns": "S30100",
+      "en_number": "1.4310",
+      "en_name": "X10CrNi18-8",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS 302",
+      "gb": "1Cr17Ni7",
+      "other": "GOST 07Ch16N6; IS X07Cr18Ni9; KS STS 302"
+     },
+     "verbatim_row": "Europe EN USA UNS USA ASTM China GB Russia GOST Japan JIS India IS Republic of Korea KS / X10CrNi18-8 S30100 301 1Cr17Ni7 07Ch16N6 SUS 302 X07Cr18Ni9 STS 302"
+    }
+   ],
+   "disagreements": "Lucefin prints JIS 'SUS 302' and KS 'STS 302' for 1.4310/301; Outokumpu and Atlas print SUS 301 / STS 301. Likely Lucefin error (or a looser 'nearest' match). AFNOR: Outokumpu 'Z11 CN 18-08' vs Kennametal 'Z 11 CN 17-08'."
+  },
+  {
+   "grade": "310S",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "310S",
+      "uns": "S31008",
+      "en_number": "1.4845",
+      "en_name": null,
+      "bs970": "310S16",
+      "uk_en": null,
+      "jis": "SUS 310S",
+      "gb": "0Cr25Ni20",
+      "other": "Trailing '2' on 1.48452 and 310S2 is footnote 2 run into the text. ISO 4845-310-08-E; NF Z8 CN 25-20; SS 2361; GOST 10X23H18"
+     },
+     "verbatim_row": "T2: 4845 1.48452 310S2 S31008 SUS 310S 0.05 25 20 ... | T3: 4845 4845-310-08-E 310S16 1.4845 Z8 CN 25-20 2361 0Cr25Ni20 – 10X23H18"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "310S",
+      "uns": "S31008",
+      "en_number": "1.4845",
+      "en_name": "X8CrNi25-21",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS310S",
+      "gb": "S31008",
+      "other": "Second ISO row X23CrNi25-21 also mapped to 1.4845 with JIS SUH310, GB S31020"
+     },
+     "verbatim_row": "A 4845-310-08-E X8CrNi25-21 1.4845 S31008 \"310S\" SUS310S S31008 / A 4845-310-09-X X23CrNi25-21 1.4845 S31008 \"310S\" SUH310 S31020"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "310S",
+      "uns": "S31008",
+      "en_number": "1.4845",
+      "en_name": "X8CrNi25-21",
+      "bs970": "310S16",
+      "uk_en": null,
+      "jis": "SUS 310S",
+      "gb": null,
+      "other": "SS 2361"
+     },
+     "verbatim_row": "310S S31008 310S16 - 1.4845 X8CrNi25-21 2361 SUS 310S"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "310S",
+      "uns": null,
+      "en_number": "1.4845",
+      "en_name": "X12CrNi25 21",
+      "bs970": "310S24",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z12CN25 20"
+     },
+     "verbatim_row": "150-230 310S 1.4845 X12CrNi25 21 310S24 Z12CN25 20"
+    },
+    {
+     "source": "LUCEFIN_1.4845",
+     "values": {
+      "aisi": "310S",
+      "uns": "S31008",
+      "en_number": "1.4845",
+      "en_name": "X8CrNi25-21",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUH 310",
+      "gb": "0Cr25Ni20",
+      "other": "GOST 10Ch23N18; IS 10Cr25Ni18; KS STS 310S"
+     },
+     "verbatim_row": "X8CrNi25-21   S31008 310S  0Cr25Ni20 10Ch23N18 SUH 310 10Cr25Ni18 ~ STS 310S"
+    },
+    {
+     "source": "AALCO_INDEX",
+     "values": {
+      "aisi": "310S",
+      "uns": "S31008",
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "S31008 Sheet and Plate S31008 Grade 310S Stainless Steel for high temperature oxidation resistance"
+    }
+   ],
+   "disagreements": "BS970: Outokumpu and Atlas print 310S16; Kennametal prints 310S24 (Atlas assigns 310S24 to 310H). EN name: Kennametal uses old DIN name X12CrNi25 21 vs X8CrNi25-21 elsewhere. JIS: Lucefin prints SUH 310 vs SUS 310S (ISSF lists both via two ISO rows)."
+  },
+  {
+   "grade": "316Ti",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "AALCO_1.4571",
+     "values": {
+      "aisi": "316Ti",
+      "uns": "S31625",
+      "en_number": "1.4571",
+      "en_name": null,
+      "bs970": "320S31",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Stainless Steel Grade 1.4571/316Ti also corresponds to the following designations but may not be a direct equivalent: UNS S31625 320S31"
+    },
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "316Ti",
+      "uns": "S32100",
+      "en_number": "1.4571",
+      "en_name": null,
+      "bs970": "320S31",
+      "uk_en": null,
+      "jis": "SUS 316Ti",
+      "gb": "0Cr18Ni12Mo2Ti",
+      "other": "ISO 4571-316-35-I; NF Z6 CNDT 17-12; SS 2350; KS STS 316Ti"
+     },
+     "verbatim_row": "T2: 4571 1.4571 316Ti S32100 SUS 316Ti 0.04 16.8 10.9 2.1 Ti ... | T3: 4571 4571-316-35-I 320S31 1.4571 Z6 CNDT 17-12 2350 0Cr18Ni12Mo2Ti STS 316Ti 08X17H13M2T"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": null,
+      "uns": "S31635",
+      "en_number": "1.4571",
+      "en_name": "X6CrNiMoTi17-12-2",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS316Ti",
+      "gb": "S31668",
+      "other": null
+     },
+     "verbatim_row": "A 4571-316-35-I X6CrNiMoTi17-12-2 1.4571 S31635 SUS316Ti    S31668"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "316Ti",
+      "uns": "S31635",
+      "en_number": "1.4571",
+      "en_name": "X10CrNiMoTi18-10",
+      "bs970": "320S31",
+      "uk_en": null,
+      "jis": "SUS 316Ti",
+      "gb": null,
+      "other": "SS 2350"
+     },
+     "verbatim_row": "316Ti S31635 320S31 - 1.4571 X10CrNiMoTi18-10 2350 SUS 316Ti"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "316Ti",
+      "uns": null,
+      "en_number": "1.4571",
+      "en_name": "X6CrNiMoTi17 12 2",
+      "bs970": "320S18",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z6NDT17.12"
+     },
+     "verbatim_row": "150-220 316Ti 1.4571 X6CrNiMoTi17 12 2 320S18 Z6NDT17.12"
+    },
+    {
+     "source": "LUCEFIN_1.4571",
+     "values": {
+      "aisi": "316Ti",
+      "uns": "S31635",
+      "en_number": "1.4571",
+      "en_name": "X6CrNiMoTi17-12-2",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS 316Ti",
+      "gb": "06Cr17Ni12Mo2Ti",
+      "other": "GOST 08Ch17N13M2T; IS X04Cr17Ni12Mo2Ti; KS STS 316Ti"
+     },
+     "verbatim_row": "X6CrNiMoTi17-12-2 S31635 Type 316Ti 06Cr17Ni12Mo2Ti 08Ch17N13M2T SUS 316Ti X04Cr17Ni12Mo2Ti STS 316Ti"
+    }
+   ],
+   "disagreements": "UNS DISAGREES THREE WAYS: ISSF, Atlas and Lucefin print S31635; Aalco prints S31625; Outokumpu prints S32100 (which is the UNS for 321 - clear Outokumpu typo). Aalco S31625 is also suspect. BS970: 320S31 (Aalco, Outokumpu, Atlas) vs 320S18 (Kennametal). EN name: Atlas prints old DIN-style 'X10CrNiMoTi18-10' (not the EN 10088 name). GB: old name 0Cr18Ni12Mo2Ti (Outokumpu) vs new 06Cr17Ni12Mo2Ti (Lucefin) - both GB systems."
+  },
+  {
+   "grade": "317L",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "317L",
+      "uns": "S31703",
+      "en_number": "1.4438",
+      "en_name": null,
+      "bs970": "317S12",
+      "uk_en": null,
+      "jis": "SUS 317L",
+      "gb": "00Cr19Ni13Mo3",
+      "other": "'6' after 317L is footnote 6: '317L with 11.7% Ni is not consistent with 1.4438' (paraphrased). NF Z3 CND 19-15-04; SS 2367"
+     },
+     "verbatim_row": "T2: 4438 1.4438 317L6 S31703 SUS 317L ... | T3: 4438 4438-317-03-I 317S12 1.4438 Z3 CND 19-15-04 2367 00Cr19Ni13Mo3 STS 317L –"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": null,
+      "uns": "S31703",
+      "en_number": "1.4438",
+      "en_name": "X2CrNiMo19-14-4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS317L",
+      "gb": "S31703",
+      "other": "ISO name; EN 10088 name for 1.4438 is not printed here"
+     },
+     "verbatim_row": "A 4438-317-03-I X2CrNiMo19-14-4 1.4438 S31703 SUS317L S31703"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "317L",
+      "uns": "S31703",
+      "en_number": "1.4438",
+      "en_name": "X2CrNiMo18-16",
+      "bs970": "317S12",
+      "uk_en": null,
+      "jis": "SUS 317L",
+      "gb": null,
+      "other": "SS 2367"
+     },
+     "verbatim_row": "317L S31703 317S12 - 1.4438 X2CrNiMo18-16 2367 SUS 317L"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "317L",
+      "uns": null,
+      "en_number": "1.4438",
+      "en_name": "X 2 CrNiMo 18-15-4",
+      "bs970": "317S12",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z 2 CND 19-15-04"
+     },
+     "verbatim_row": "150-210 317L 1.4438 X 2 CrNiMo 18-15-4 317S12 Z 2 CND 19-15-04"
+    },
+    {
+     "source": "AALCO_INDEX",
+     "values": {
+      "aisi": "317L",
+      "uns": "S31703",
+      "en_number": "1.4438",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "S31703 Sheet and Plate Grade 317L / 1.4438 / S31703 Stainless Steel"
+    }
+   ],
+   "disagreements": "EN name differs: Kennametal X2CrNiMo18-15-4; Atlas X2CrNiMo18-16 (old DIN); ISSF ISO name X2CrNiMo19-14-4. AFNOR Z3 vs Z2 prefix (Outokumpu vs Kennametal). Outokumpu footnote warns that commercial 317L may not meet 1.4438 Ni range."
+  },
+  {
+   "grade": "347",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "AALCO_S34700",
+     "values": {
+      "aisi": "347",
+      "uns": "S34700",
+      "en_number": "1.4550",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 347 Stainless Steel S34700 EN 1.4550"
+    },
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "347",
+      "uns": "S34700",
+      "en_number": "1.4550",
+      "en_name": null,
+      "bs970": "347S31",
+      "uk_en": null,
+      "jis": "SUS 347",
+      "gb": "0Cr18Ni11Nb",
+      "other": "SS 2338; NF Z6 CNNb 18-10"
+     },
+     "verbatim_row": "T2: 4550 1.4550 347 S34700 SUS 347 ... | T3: 4550 4550-347-00-I 347S31 1.4550 Z6 CNNb 18-10 2338 0Cr18Ni11Nb STS 347 08X18H12Б"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "347",
+      "uns": "S34700",
+      "en_number": "1.4550",
+      "en_name": "X6CrNiNb18-10",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS347",
+      "gb": "S34778",
+      "other": null
+     },
+     "verbatim_row": "A 4550-347-00-I X6CrNiNb18-10 1.4550 S34700 347 SUS347 S34778"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "347",
+      "uns": "S34700",
+      "en_number": "1.4550",
+      "en_name": "X6CrNiNb18-10",
+      "bs970": "347S31",
+      "uk_en": "58G",
+      "jis": "SUS 347",
+      "gb": null,
+      "other": "SS 2338"
+     },
+     "verbatim_row": "347 S34700 347S31 58G 1.4550 X6CrNiNb18-10 2338 SUS 347"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "347",
+      "uns": null,
+      "en_number": "1.4550",
+      "en_name": "X6CrNiNb18 10",
+      "bs970": "314S20",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z6CNNb18.10"
+     },
+     "verbatim_row": "160-230 347 1.4550 X6CrNiNb18 10 314S20 Z6CNNb18.10"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.4550",
+      "en_name": null,
+      "bs970": "347S17",
+      "uk_en": "58F/58G",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "58F/58G | 347S17 | Cr/Ni 18/9/Nb/C 0,08 ..Aus | 1.4550"
+    }
+   ],
+   "disagreements": "BS970: 347S31 (Outokumpu, Atlas) vs 347S17 (Roymech) vs 314S20 (Kennametal - 314S20 looks wrong, probably a typo; '314' is a different alloy type). Old En: Atlas 58G; Roymech 58F/58G."
+  },
+  {
+   "grade": "904L",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "904L",
+      "uns": "N08904",
+      "en_number": "1.4539",
+      "en_name": null,
+      "bs970": "904S13",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "SS 2562; NF Z2 NCDU 25-20; KS STS 317J5L; JIS column '–'"
+     },
+     "verbatim_row": "T2: 904L 1.4539 904L N08904 – 0.01 20 25 4.3 1.5Cu ... | T3: 904L 4539-089-04-I 904S13 1.4539 Z2 NCDU 25-20 2562 – STS 317J5L –"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "904L",
+      "uns": "N08904",
+      "en_number": "1.4539",
+      "en_name": "X1NiCrMoCu25-20-5",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS890L",
+      "gb": "S39042",
+      "other": null
+     },
+     "verbatim_row": "A 4539-089-04-I X1NiCrMoCu25-20-5 1.4539 N08904 \"904L\" SUS890L S39042"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "904L",
+      "uns": "N08904",
+      "en_number": "1.4539",
+      "en_name": "X1NiCrMoCuN25-20-5",
+      "bs970": "904S13",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "SS 2562"
+     },
+     "verbatim_row": "904L N08904 904S13 - 1.4539 X1NiCrMoCuN25-20-5 2562 -"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": null,
+      "uns": "N 08904",
+      "en_number": "1.4539",
+      "en_name": "X 1 NiCrMoCuN25-20-5",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z 2 NCDU 25-20"
+     },
+     "verbatim_row": "150-230 UNS N 08904 1.4539 X 1 NiCrMoCuN25-20-5 Z 2 NCDU 25-20"
+    }
+   ],
+   "disagreements": "EN name: ISSF X1NiCrMoCu25-20-5 vs Atlas/Kennametal X1NiCrMoCuN25-20-5 (with N). JIS: ISSF prints SUS890L; Outokumpu and Atlas print none. EN 10088 current name should be checked against the standard."
+  },
+  {
+   "grade": "405",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "405",
+      "uns": "S40500",
+      "en_number": "1.4002",
+      "en_name": "X6CrAl13",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS405",
+      "gb": "S11348",
+      "other": null
+     },
+     "verbatim_row": "F 4002-405-00-I X6CrAl13 1.4002 S40500 405 SUS405 S11348"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "405",
+      "uns": null,
+      "en_number": "1.4002",
+      "en_name": "X 6 CrAl 13",
+      "bs970": "405S17",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z 8 CA 12. Kennametal ALSO prints a second '405' row: 1.4724 X10CrAI13 (sic, 'AI' for Al) 403S17 Z 13 C 13"
+     },
+     "verbatim_row": "<185 405 1.4002 X 6 CrAl 13 405S17 Z 8 CA 12 / 140-200 405 1.4724 X10CrAI13 403S17 Z 13 C 13"
+    }
+   ],
+   "disagreements": "Only two sources. Kennametal's second 405 row maps to 1.4724 (a heat-resisting grade) and BS 403S17 (which Aalco/Outokumpu give for 410S/1.4000) - treat as unreliable. Outokumpu and Atlas do not list 405."
+  },
+  {
+   "grade": "409",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "AALCO_1.4512",
+     "values": {
+      "aisi": "409",
+      "uns": null,
+      "en_number": "1.4512",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 409 / 1.4512 titanium stabilised ferritic stainless steel is often referred to as 'muffler grade stainless steel'"
+    },
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "409",
+      "uns": null,
+      "en_number": "1.4512",
+      "en_name": null,
+      "bs970": "409S19",
+      "uk_en": null,
+      "jis": "SUS409",
+      "gb": null,
+      "other": "BS printed '409S 19' (stray space). NF Z3 CT12"
+     },
+     "verbatim_row": "T2: 4512 1.4512 409 – SUS409 0.02 11.5 0.2 Ti H C S | T3: 4512 – 409S 19 1.4512 Z3 CT12 – – – –"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "409",
+      "uns": "S40900",
+      "en_number": "1.4720",
+      "en_name": "X2CrTi12",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUH409L",
+      "gb": "S11163",
+      "other": "ISSF ISO row ties 409 to 1.4720, NOT 1.4512"
+     },
+     "verbatim_row": "F 4720-409-00-I X2CrTi12 1.4720 S40900 409 SUH409L S11163"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "409",
+      "uns": "S40910",
+      "en_number": "1.4512",
+      "en_name": "X6CrTi12",
+      "bs970": "409S19",
+      "uk_en": null,
+      "jis": "SUH 409",
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "409 S40910 409S19 - 1.4512 X6CrTi12 - SUH 409"
+    }
+   ],
+   "disagreements": "EN number: Aalco/Outokumpu/Atlas 1.4512 vs ISSF ISO 15510 row 1.4720 (X2CrTi12). UNS: Atlas S40910 vs ISSF S40900. EN name: Atlas X6CrTi12 (old) vs X2CrTi12 (ISSF; and EN 10088 name of 1.4512 is X2CrTi12 per standard, not printed by Atlas). JIS: SUS409 (Outokumpu) vs SUH 409 (Atlas) vs SUH409L (ISSF). Kennametal does not list 409."
+  },
+  {
+   "grade": "410S",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "AALCO_1.4000",
+     "values": {
+      "aisi": "410S",
+      "uns": "S41008",
+      "en_number": "1.4000",
+      "en_name": null,
+      "bs970": "403S17",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 1.4000 has similarities to the following grades but may not be a direct equivalent: 410S 1.4000 UNS S41008 403S17"
+    },
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "410S",
+      "uns": "S41008",
+      "en_number": "1.4000",
+      "en_name": null,
+      "bs970": "403S17",
+      "uk_en": null,
+      "jis": "SUS 403",
+      "gb": null,
+      "other": "SS 2301; NF Z8 C12; GOST 08X13"
+     },
+     "verbatim_row": "T2: 4000 1.4000 410S S41008 SUS 403 0.03 12.5 P H C S | T3: 4000 4000-410-08-I 403S17 1.4000 Z8 C12 2301 – – 08X13"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "410S",
+      "uns": "S41008",
+      "en_number": "1.4000",
+      "en_name": "X6Cr13",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS410S",
+      "gb": "S41008",
+      "other": null
+     },
+     "verbatim_row": "F 4000-410-08-I X6Cr13 1.4000 S41008 SUS410S S41008"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "410 S",
+      "uns": null,
+      "en_number": "1.4001",
+      "en_name": "X7Cr14",
+      "bs970": "403S17",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z 8 C 13 FF"
+     },
+     "verbatim_row": "130-180 410 S 1.4001 X7Cr14 403S17 Z 8 C 13 FF"
+    }
+   ],
+   "disagreements": "EN number: Kennametal maps 410S to 1.4001 X7Cr14; Aalco/Outokumpu/ISSF use 1.4000. JIS: Outokumpu SUS 403 vs ISSF SUS410S. BS 403S17 is consistent across Aalco, Outokumpu, Kennametal."
+  },
+  {
+   "grade": "420 (1.4028 X30Cr13 / 1.4021 X20Cr13)",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "420",
+      "uns": "S42000",
+      "en_number": "1.4028",
+      "en_name": null,
+      "bs970": "420S45",
+      "uk_en": null,
+      "jis": "SUS 420J2",
+      "gb": "3Cr13",
+      "other": "SS 2304; NF Z33 C13. Outokumpu also prints row '4031 1.4031 420 S42000' (another 420 variant)"
+     },
+     "verbatim_row": "T2: 4028 1.4028 420 S42000 SUS 420J2 0.30 12.5 H C B S | T3: 4028 4028-420-00-I 420S45 1.4028 Z33 C13 2304 3Cr13 STS 420J2 30X13"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "420",
+      "uns": "S42000",
+      "en_number": "1.4028",
+      "en_name": "X30Cr1 3",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS420J2",
+      "gb": "S42030",
+      "other": "'X30Cr1 3' printed with stray space. Same table: 1.4021 X20Cr13 -> SUS420J1, GB S42020"
+     },
+     "verbatim_row": "M 4028-420-00-I X30Cr1 3 1.4028 S42000 420 SUS420J2 S42030 / M 4021-420-00-I X20Cr13 1.4021 S42000 420 SUS420J1 S42020"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "420",
+      "uns": "S42000",
+      "en_number": "1.4021",
+      "en_name": "X20Cr13",
+      "bs970": "420S37",
+      "uk_en": "56C",
+      "jis": "SUS 420J1",
+      "gb": null,
+      "other": "SS 2303 (Atlas maps 420 to 1.4021, not 1.4028)"
+     },
+     "verbatim_row": "420 S42000 420S37 56C 1.4021 X20Cr13 2303 SUS 420J1"
+    },
+    {
+     "source": "AALCO_1.4021",
+     "values": {
+      "aisi": "420",
+      "uns": "UNS42000",
+      "en_number": "1.4021",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "Aalco lists 1.4021, 1.4024, 1.4028, 1.4029, 1.4030, 1.4034 as similar"
+     },
+     "verbatim_row": "1.4021 is similar, but may not be a direct equivalent to: 420 UNS42000 1.4021, 1.4024, 1.4028, 1.4029, 1.4030, 1.4034"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "420",
+      "uns": null,
+      "en_number": "1.4021",
+      "en_name": "X20Cr13",
+      "bs970": "420S37",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z 20 C 13"
+     },
+     "verbatim_row": "230-290 420 1.4021 X20Cr13 420S37 Z 20 C 13"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.4028",
+      "en_name": null,
+      "bs970": "420S45",
+      "uk_en": "56D",
+      "jis": null,
+      "gb": null,
+      "other": "Roymech also: 56C=420S37=1.4021; 56B=420S29=1.4024"
+     },
+     "verbatim_row": "56D | 420S45 | 13Cr C 0,32..Mart | 1.4028 ; 56C | 420S37 | 13Cr C 0,24 ..Mart | 1.4021 ; 56B | 420S29 | 13Cr C 0,17..Mart | 1.4024"
+    }
+   ],
+   "disagreements": "'420' is a family. 1.4028 X30Cr13 pairs with BS 420S45 / En56D / JIS SUS420J2 (Outokumpu, ISSF, Roymech). 1.4021 X20Cr13 pairs with 420S37 / En56C / SUS420J1 (Atlas, Kennametal, ISSF, Roymech). Aalco UNS printed 'UNS42000' (missing 'S' - typo for S42000)."
+  },
+  {
+   "grade": "440C",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "AALCO_1.4125",
+     "values": {
+      "aisi": "440C",
+      "uns": "UNS44004",
+      "en_number": "1.4125",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "440C UNS44004 1.4125"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "440C",
+      "uns": "S44004",
+      "en_number": "1.4125",
+      "en_name": "X105CrMo17",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS 440C",
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "440C S44004 - - 1.4125 X105CrMo17 - SUS 440C"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "440C",
+      "uns": "S44004",
+      "en_number": "1.4023()",
+      "en_name": "X110Cr17",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS440C",
+      "gb": "S44096",
+      "other": "ISO X110Cr17 row; the EN column prints '1.4023()' - EN 10088 has no 1.4023; appears to be an ISO-only grade"
+     },
+     "verbatim_row": "M 4023-440-04-I X110Cr17 1.4023() S44004 440C SUS440C S44096"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": "440C",
+      "uns": null,
+      "en_number": "1.4125",
+      "en_name": "X105CrMo17",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "8 1.4125 X105CrMo17 440C Blue"
+    }
+   ],
+   "disagreements": "Aalco prints 'UNS44004' (missing 'S'; typo for S44004). ISSF ISO 15510 aligns 440C with ISO X110Cr17 / '1.4023()' rather than 1.4125 X105CrMo17 - ISO grade is not identical to EN 1.4125. Outokumpu and Kennametal do not list 440C."
+  },
+  {
+   "grade": "17-4PH (630)",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "AALCO_1.4542",
+     "values": {
+      "aisi": "630",
+      "uns": "S17400",
+      "en_number": "1.4542",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "17/4"
+     },
+     "verbatim_row": "Stainless 1.4542 is similar to, but may not be a direct equivalent: 17/4 UNS S17400 Grade 630"
+    },
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": "630",
+      "uns": "S17400",
+      "en_number": "1.4542",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS 630",
+      "gb": null,
+      "other": "'S174003' = S17400 + footnote 3 ('1.4542 also available as S15500', paraphrased). NF Z7 CNU 16-04"
+     },
+     "verbatim_row": "T2: 4542 1.4542 630 S174003 SUS 630 0.02 15.5 4.8 3.4Cu Nb B R S | T3: 4542 – – 1.4542 Z7 CNU 16-04 – – – –"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": "630",
+      "uns": "S17400",
+      "en_number": "1.4542",
+      "en_name": "X5CrNiCuNb16-4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS630",
+      "gb": "S51740",
+      "other": null
+     },
+     "verbatim_row": "M-PH 4542-174-00-I X5CrNiCuNb16-4 1.4542 S17400 \"630\" SUS630 S51740"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "630",
+      "uns": "S17400",
+      "en_number": "1.4542",
+      "en_name": "X5CrNiCuNb16-4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS 630",
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "630 S17400 - - 1.4542 X5CrNiCuNb16-4 - SUS 630"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "630",
+      "uns": null,
+      "en_number": "1.4542",
+      "en_name": "X5CrNiCuNb164",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z7CNU16.04; EN name printed without hyphen"
+     },
+     "verbatim_row": "275-360 630 1.4542 X5CrNiCuNb164 Z7CNU16.04"
+    },
+    {
+     "source": "SMITHS_17-4",
+     "values": {
+      "aisi": "630",
+      "uns": "S17400",
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AMS 5643 (page title)"
+     },
+     "verbatim_row": "AISI 630 / UNS S17400 / ASME SA-564 Type 630"
+    }
+   ],
+   "disagreements": "Consistent. Note Outokumpu footnote: its 1.4542 is also offered as S15500 (15-5PH) - do not read that as equivalence."
+  },
+  {
+   "grade": "15-5PH",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "AALCO_15-5",
+     "values": {
+      "aisi": null,
+      "uns": "S15500",
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AMS 5659"
+     },
+     "verbatim_row": "15/5 PH UNS S15500 AMS 5659"
+    },
+    {
+     "source": "SMITHS_15-5",
+     "values": {
+      "aisi": "XM-12",
+      "uns": "S15500",
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AMS 5659 (page title)"
+     },
+     "verbatim_row": "ASTM SA-564 Type XM - 12 / UNS S15500"
+    },
+    {
+     "source": "BGH_1.4545",
+     "values": {
+      "aisi": "XM-12",
+      "uns": "S15500",
+      "en_number": "1.4545",
+      "en_name": "X5CrNiCuNb15-5",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "1.4545 X5CrNiCuNb15-5 (15-5PH) ... S15500 XM-12 15-5 PH"
+    },
+    {
+     "source": "AUBERTDUVAL_15-5",
+     "values": {
+      "aisi": "XM12",
+      "uns": "S15500",
+      "en_number": "1.4545",
+      "en_name": "X5CrNiCu15-5",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AMS 5659"
+     },
+     "verbatim_row": "15-5PH XM12; EU X5CrNiCu15-5; WL 1.4545; USA S15500; AMS 5659; ASTM A564 XM12"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.4540",
+      "en_name": "X4CrNiCuNb164",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z6CNU15.05"
+     },
+     "verbatim_row": "280-400 15-5 PH 1.4540 X4CrNiCuNb164 Z6CNU15.05"
+    }
+   ],
+   "disagreements": "EN number: BGH and Aubert & Duval print 1.4545; Kennametal prints 1.4540 X4CrNiCuNb164 (likely error / different DIN grade). EN name: BGH X5CrNiCuNb15-5 vs Aubert & Duval X5CrNiCu15-5 (no Nb)."
+  },
+  {
+   "grade": "2205",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "AALCO_1.4462",
+     "values": {
+      "aisi": "2205",
+      "uns": "S31803 / S32205",
+      "en_number": "1.4462",
+      "en_name": null,
+      "bs970": "318S13",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Grade 1.4462/2205 is similar to but may not be a direct equivalent: UNS S31803 UNS S32205 BS 318S13"
+    },
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": null,
+      "uns": "S32205",
+      "en_number": "1.4462",
+      "en_name": null,
+      "bs970": "318S13",
+      "uk_en": null,
+      "jis": "SUS 329J3L",
+      "gb": "00Cr22Ni5Mo3N",
+      "other": "'S322052' = S32205 + footnote 2 ('also available as S31803'). SS 2377"
+     },
+     "verbatim_row": "T2: 2205 1.4462 – S322052 SUS 329J3L ... | T3: 2205 4462-318-03-I 318S13 1.4462 Z3 CND 22-05 Az 2377 00Cr22Ni5Mo3N STS 329J3L –"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": null,
+      "uns": "S32205,S3",
+      "en_number": "1.4462",
+      "en_name": "X2CrNiMoN22-5-3",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUS329J3L",
+      "gb": "S22053",
+      "other": "UNS cell truncated 'S32205,S3' (presumably S31803); AISI cell 'F51,F60' (ASTM A182 forging grades)"
+     },
+     "verbatim_row": "AF 4462-318-03-I X2CrNiMoN22-5-3 1.4462 S32205,S3 F51,F60 SUS329J3L S22053"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "2205",
+      "uns": "S32250",
+      "en_number": "1.4462",
+      "en_name": "X2CrNiMoN22-5-3",
+      "bs970": "318S13",
+      "uk_en": null,
+      "jis": "SUS 329J3L",
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "2205 S32250 318S13 - 1.4462 X2CrNiMoN22-5-3 2377 SUS 329J3L"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": null,
+      "uns": "S31803",
+      "en_number": "1.4462",
+      "en_name": "X 2 CrNiMoN 22-5-3",
+      "bs970": "318S13",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "<270 S31803 1.4462 X 2 CrNiMoN 22-5-3 318S13 Z 3 CND 22-05 Az"
+    }
+   ],
+   "disagreements": "Atlas prints UNS 'S32250' - transposition typo for S32205 (S32250 would be a different alloy). Otherwise consistent: 1.4462 / 318S13 / SUS 329J3L."
+  },
+  {
+   "grade": "2304",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "OUTOKUMPU",
+     "values": {
+      "aisi": null,
+      "uns": "S32304",
+      "en_number": "1.4362",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "SS 2327; NF Z3 CN 23-04 Az"
+     },
+     "verbatim_row": "T2 (2304 row) ... S32304 ... | T3: 2304 4362-323-04-I – 1.4362 Z3 CN 23-04 Az 2327 – – –"
+    },
+    {
+     "source": "ISSF_ISO15510",
+     "values": {
+      "aisi": null,
+      "uns": "S32304",
+      "en_number": "1.4362",
+      "en_name": "X2CrNiN23-4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": "S23043",
+      "other": null
+     },
+     "verbatim_row": "AF 4362-323-04-I X2CrNiN23-4 1.4362 S32304 S23043"
+    },
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "2304",
+      "uns": "S32304",
+      "en_number": "1.4362",
+      "en_name": "X2CrNiN23-4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "SS 2327"
+     },
+     "verbatim_row": "2304 S32304 - - 1.4362 X2CrNiN23-4 2327 -"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": null,
+      "uns": "S32304",
+      "en_number": "1.4362",
+      "en_name": "X 2CrNiN 23-4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "<260 S32304 1.4362 X 2CrNiN 23-4"
+    },
+    {
+     "source": "LUCEFIN_1.4362",
+     "values": {
+      "aisi": "2304",
+      "uns": "S32304",
+      "en_number": "1.4362",
+      "en_name": "X2CrNiN23-4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": "022Cr23Ni5Mo3N",
+      "other": "GOST 03Ch23N6"
+     },
+     "verbatim_row": "X2CrNiN23-4    S32304 Type 2304 022Cr23Ni5Mo3N 03Ch23N6"
+    }
+   ],
+   "disagreements": "Lucefin GB '022Cr23Ni5Mo3N' is the GB name normally associated with 2205 (contains Mo3, while 2304 is ~0.3% Mo) - likely Lucefin error."
+  },
+  {
+   "grade": "1040",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_C40E",
+     "values": {
+      "aisi": "1040",
+      "uns": null,
+      "en_number": "1.1186",
+      "en_name": "C40E",
+      "bs970": "080M40",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "Card covers C40E/C40R (1.1186/1.1189). Positional alignment ambiguous: value line has fewer cells than headers; DIN Ck40, AFNOR XC42H1, UNE F1141"
+     },
+     "verbatim_row": "EUROPA EN ITALIA UNI SPAGNA UNE GERMANIA DIN FRANCIA AFNOR UK B.S. SVEZIA SS USA AISI/SAE / C40E R C40 F1141 Ck40 XC42H1 080M40 1040"
+    },
+    {
+     "source": "SMITHS_EN8",
+     "values": {
+      "aisi": "1039/1040/1042/1043/1045",
+      "uns": null,
+      "en_number": "1.0511/1.1186/1.1189",
+      "en_name": "C40/C45/Ck40/Ck45/Cm40/Cm45",
+      "bs970": "080M40",
+      "uk_en": "EN8",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BS970:1955 EN8; BS970/PD970 080M40; C40, C45, Ck40, Ck45, Cm40, Cm45; 1.0511, 1.1186, 1.1189; SAE/AISI 1039, 1040, 1042, 1043, 1045 [reconstructed list: fetch tool would not quote the block verbatim; items and order as printed]"
+    },
+    {
+     "source": "CGTK",
+     "values": {
+      "aisi": "1040",
+      "uns": null,
+      "en_number": "1.1186",
+      "en_name": "C40",
+      "bs970": "080M40",
+      "uk_en": "EN8",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Steel | EN8 | 080M40 | 1.1186 | C40 | 1040"
+    }
+   ],
+   "disagreements": "Smiths lists a broad family for EN8 (1039-1045, C40/C45). cgtk pairs 1.1186 with name C40 (1.1186 is C40E per Lucefin card)."
+  },
+  {
+   "grade": "1045",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_C45E",
+     "values": {
+      "aisi": "1045",
+      "uns": null,
+      "en_number": "1.1191",
+      "en_name": "C45E",
+      "bs970": "080M46",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "UNI C45; UNE F1140; DIN Ck45; AFNOR XC48; SS 1672"
+     },
+     "verbatim_row": "C45E C45 F1140 Ck45 XC48 080M46 1672 1045"
+    },
+    {
+     "source": "OVAKO_C45",
+     "values": {
+      "aisi": "1045",
+      "uns": null,
+      "en_number": "1.0503 / 1.1191 / 1.1201",
+      "en_name": "C45 / C45E / C45R",
+      "bs970": "080A42",
+      "uk_en": null,
+      "jis": "S 45 C",
+      "gb": null,
+      "other": "SS 1672; XC 48; GOST 45"
+     },
+     "verbatim_row": "C43, C44, C45R - 1.1201, C45E - 1.1191, Ck45, St70-2, SAE 1045, 080A42, SS 1672, XC 48, C 45, S 45 C, GOST 45, AISI/SAE/ASTM 1045, 1.0503"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "1045",
+      "uns": null,
+      "en_number": "1.1191 / 1.0503",
+      "en_name": "Ck45 / C45",
+      "bs970": "080M46",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR XC45"
+     },
+     "verbatim_row": "190-240 1045 1.1191 Ck45 080M46 XC45 ; 190-240 1045 1.0503 C45 080M46 C 45"
+    },
+    {
+     "source": "SMITHS_EN8",
+     "values": {
+      "aisi": "1045",
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "080M40",
+      "uk_en": "EN8",
+      "jis": null,
+      "gb": null,
+      "other": "Smiths lists 1045 among EN8 equivalents"
+     },
+     "verbatim_row": "BS970:1955 EN8 ... SAE/AISI 1039, 1040, 1042, 1043, 1045 [reconstructed list: fetch tool would not quote the block verbatim; items and order as printed]"
+    }
+   ],
+   "disagreements": "BS970: 080M46 (Lucefin, Kennametal) vs 080A42 (Ovako). AFNOR XC48 (Lucefin, Ovako) vs XC45 (Kennametal). Old UK En number for 080M46 is not printed by these sources; Smiths groups 1045 under EN8."
+  },
+  {
+   "grade": "1215",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_11SMn30",
+     "values": {
+      "aisi": "1215",
+      "uns": null,
+      "en_number": "1.0715",
+      "en_name": "11SMn30",
+      "bs970": "230M07",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "UNI CF 9SMn28; UNE F2111; DIN 9SMn28; AFNOR S250; SS 1912 (positional mapping)"
+     },
+     "verbatim_row": "11SMn30 CF 9SMn28 F2111 9SMn28 S250 230M07 1912 1215"
+    },
+    {
+     "source": "LUCEFIN_11SMn37",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": "11SMn37",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "No BS / SS / AISI value printed for 11SMn37"
+     },
+     "verbatim_row": "11SMn37 CF 9SMn36 F2113 9SMn36 S300"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "1215",
+      "uns": null,
+      "en_number": "1.0736",
+      "en_name": "9SMn36",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR S300"
+     },
+     "verbatim_row": "130-230 1215 1.0736 9SMn36 S300"
+    },
+    {
+     "source": "SMITHS_EN1A",
+     "values": {
+      "aisi": "1213/1215",
+      "uns": null,
+      "en_number": "1.0715",
+      "en_name": "11SMn30",
+      "bs970": "230M07",
+      "uk_en": "EN1A",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BS970 (1955) EN1A; 230M07; 9SMn28; BS EN 11SMn30; Werkstoff 1.0715; SAE/AISI 1213 and 1215 [reconstructed list: fetch tool would not quote the block verbatim; items and order as printed]"
+    },
+    {
+     "source": "CGTK",
+     "values": {
+      "aisi": "1214",
+      "uns": null,
+      "en_number": "1.0715",
+      "en_name": "11SMn37",
+      "bs970": "230M07",
+      "uk_en": "EN1A",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Steel | EN1A | 230M07 | 1.0715 | 11SMn37 | 1214"
+    }
+   ],
+   "disagreements": "Which EN grade is 1215? Lucefin and Smiths: 11SMn30 (1.0715). Kennametal: 1.0736 9SMn36 (i.e. the 11SMn37 family). cgtk pairs 1.0715 with name 11SMn37 and SAE 1214 - internally inconsistent (1.0715 is 11SMn30 per Lucefin/Parker)."
+  },
+  {
+   "grade": "12L14",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_11SMnPb30",
+     "values": {
+      "aisi": "12L14",
+      "uns": null,
+      "en_number": "1.0718",
+      "en_name": "11SMnPb30",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "UNI CF 9SMnPb28; UNE F2112; DIN 9SMnPb28; AFNOR S250Pb; SS 1914 (positional; no BS value printed). 1.0718 printed elsewhere on card"
+     },
+     "verbatim_row": "11SMnPb30 CF 9SMnPb28 F2112 9SMnPb28 S250Pb 1914 12L14"
+    },
+    {
+     "source": "LUCEFIN_11SMnPb37",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": "11SMnPb37",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "No AISI value printed"
+     },
+     "verbatim_row": "11SMnPb37 CF 9SMnPb36 F2114 9SMnPb36 S300Pb 1926"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "12L14",
+      "uns": null,
+      "en_number": "1.0737",
+      "en_name": "9SMnPb36",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "Kennametal maps 1.0718 to '12L13'"
+     },
+     "verbatim_row": "130-230 12L14 1.0737 9SMnPb36 S300Pb ; 130-230 12L13 1.0718 9SMnPb28 S250Pb"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0718",
+      "en_name": "11SMn30Pb",
+      "bs970": "230M07Pb",
+      "uk_en": "EN 1A Leaded",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "3 1.0718 11SMn30Pb 230M07Pb EN 1A Leaded Magenta"
+    },
+    {
+     "source": "CGTK",
+     "values": {
+      "aisi": "12L14",
+      "uns": null,
+      "en_number": "1.0718",
+      "en_name": "11SMnPb30",
+      "bs970": "230M07 Pb",
+      "uk_en": "EN1A Leaded",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Steel | EN1A Leaded | 230M07 Pb | 1.0718 | 11SMnPb30 | 12L14"
+    }
+   ],
+   "disagreements": "Lucefin & cgtk: 12L14 = 11SMnPb30 / 1.0718. Kennametal: 12L14 = 1.0737 9SMnPb36, and 1.0718 = '12L13'. Parker prints name '11SMn30Pb' (non-standard order; EN 10087 name is 11SMnPb30)."
+  },
+  {
+   "grade": "4130",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_25CrMo4",
+     "values": {
+      "aisi": "4130",
+      "uns": null,
+      "en_number": "1.7218",
+      "en_name": "25CrMo4",
+      "bs970": "708M25",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "UNE F222; AFNOR 25CD4; SS 2225"
+     },
+     "verbatim_row": "25CrMo4 25CrMo4 F222 25CrMo4 25CD4 708M25 2225 4130"
+    },
+    {
+     "source": "OVAKO_25CrMo4",
+     "values": {
+      "aisi": "4130",
+      "uns": null,
+      "en_number": "1.7218",
+      "en_name": "25CrMo4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "SS2225, 4130, 1.7218"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "4130",
+      "uns": null,
+      "en_number": "1.7218",
+      "en_name": "25CrMo4",
+      "bs970": "708 A 25",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR 25CD4"
+     },
+     "verbatim_row": "200-290 4130 1.7218 25CrMo4 708 A 25 25CD4"
+    }
+   ],
+   "disagreements": "BS970: 708M25 (Lucefin) vs 708A25 (Kennametal, printed '708 A 25')."
+  },
+  {
+   "grade": "4140",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_42CrMo4",
+     "values": {
+      "aisi": "4140",
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": "42CrMo4",
+      "bs970": "708M40",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "UNE F1252; AFNOR 42CD4; SS 2244"
+     },
+     "verbatim_row": "42CrMo4 42CrMo4 F1252 42CrMo4 42CD4 708M40 2244 4140"
+    },
+    {
+     "source": "OVAKO_42CrMo4",
+     "values": {
+      "aisi": "4140",
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": "42CrMo4",
+      "bs970": "708M40",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "AISI 4140, 42CD4(AFNOR), 708M40(B.S.), SS 2244, SS142244, SAE 4140H, ASTM A193 B7, 41Cr4, 42CrMoS4, 1.7225"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "4140",
+      "uns": null,
+      "en_number": "1.7225 / 1.7223",
+      "en_name": "42CrMo4 / 41CrMo4",
+      "bs970": "708M40",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "230-330 4140 1.7223 41CrMo4 708M40 42CD4TS ; 240-360 4140 1.7225 42CrMo4 708M40 42CD4"
+    },
+    {
+     "source": "SMITHS_EN19",
+     "values": {
+      "aisi": "4140",
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": "42CrMo4",
+      "bs970": "709M40",
+      "uk_en": "EN19",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BS 970:1991 709M40T; BS 970:1955 EN19T; DIN 42CrMo4; AFNOR 42CD4; SS 2244; SAE 4140; 1.7225; 42CrMo4; EN10277-5 [reconstructed list: fetch tool would not quote the block verbatim; items and order as printed]"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": null,
+      "bs970": "709M40",
+      "uk_en": "EN19",
+      "jis": null,
+      "gb": null,
+      "other": "Roymech: EN19A = 708M40 = 1.7223"
+     },
+     "verbatim_row": "19A | 708M40 | 1.0% Cr/Mo | 1.7223 ; 19 | 709M40 | 1.0% Cr/Mo (Higher Mo) | 1.7225"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": "42CrMo4",
+      "bs970": "709M40",
+      "uk_en": "EN 19",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "14 1.7225 42CrMo4 C EN 19T ; 15 1.7225 42CrMo4 709M40 Annealed EN 19 Annealed"
+    }
+   ],
+   "disagreements": "BS970 for 4140/42CrMo4: 708M40 (Lucefin, Ovako, Kennametal) vs 709M40 (Smiths EN19, Roymech, Parker). Roymech distinguishes EN19A=708M40 and EN19=709M40. Parker row 14 BS970 cell printed just 'C' (truncated)."
+  },
+  {
+   "grade": "8620",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_20NiCrMo2-2",
+     "values": {
+      "aisi": "8620 appr.",
+      "uns": null,
+      "en_number": "1.6523",
+      "en_name": "20NiCrMo2-2",
+      "bs970": "805M20",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "UNI 20NiCrMo2; UNE F1522; DIN 21NiCrMo2; AFNOR 20NCD2; SS 2506"
+     },
+     "verbatim_row": "20NiCrMo2-2 20NiCrMo2 F1522 21NiCrMo2 20NCD2 805M20 2506 8620 appr."
+    },
+    {
+     "source": "OVAKO_20NiCrMo2-2",
+     "values": {
+      "aisi": "8620",
+      "uns": "H 86200",
+      "en_number": "1.6523",
+      "en_name": "20NiCrMo2-2",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "20NiCrMo2, 20NiCrMoS2, 8620, 8620H, 1.6522, 1.6523, 1.6526, SS2506, UNS H 86200"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "8620",
+      "uns": null,
+      "en_number": "1.6523",
+      "en_name": "21NiCrMo2",
+      "bs970": "805M20",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "210-330 8620 1.6523 21NiCrMo2 805M20 20NCD2"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": "8620",
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": "EN 362",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "21 - - AISI/SAE8620 EN 362 Purple/Yellow"
+    }
+   ],
+   "disagreements": "Consistent: 1.6523 / 805M20. Parker gives old UK 'EN 362'."
+  },
+  {
+   "grade": "52100",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "OVAKO_100Cr6",
+     "values": {
+      "aisi": "52100",
+      "uns": null,
+      "en_number": "1.3505",
+      "en_name": "100Cr6",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SUJ2S / SUJ2Z",
+      "gb": "GCr15",
+      "other": "SS 2258; AFNOR 100C6"
+     },
+     "verbatim_row": "SS 2258, SAE 52100, 1.3505 , 100 Cr 6 , SUJ2S, SUJ2Z, 100C6, GCr15, B00150"
+    },
+    {
+     "source": "LUCEFIN_100Cr6",
+     "values": {
+      "aisi": "52100",
+      "uns": null,
+      "en_number": "1.3505",
+      "en_name": "100Cr6",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": "GCr15",
+      "other": "AFNOR 100C6; GOST 9Ch1 (inferred from token)"
+     },
+     "verbatim_row": "100Cr6 100Cr6 GCr15 1.3505 100C6 9Ch1 52100 (header printed as EN/UNI/UNE/DIN/AFNOR/BS/SS/AISI, values do not align)"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "52100",
+      "uns": null,
+      "en_number": "1.3505",
+      "en_name": "100Cr6",
+      "bs970": "535A99",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "200-230 52100 1.3505 100Cr6 535A99 100C6"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.3505",
+      "en_name": "100Cr6",
+      "bs970": "534/535A99",
+      "uk_en": "EN 31",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "22 1.3505 100Cr6 534/535A99 EN 31 Purple/White"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "534A99 / 535A99",
+      "uk_en": "EN31",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "31 | 534A99 | 1.5% Cr ; 31 | 535A99 | 1.5% Cr"
+    }
+   ],
+   "disagreements": "Consistent. JIS: Ovako prints SUJ2S/SUJ2Z (Ovako variants) rather than plain SUJ2."
+  },
+  {
+   "grade": "O1",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "O1",
+      "uns": null,
+      "en_number": "1.2510",
+      "en_name": "100MnCrW4",
+      "bs970": "BO1",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "BS 4659 BO1; AFNOR 90MnWCrV5"
+     },
+     "verbatim_row": "200-210 O1 1.2510 100MnCrW4 BO1 90MnWCrV5"
+    },
+    {
+     "source": "DOERRENBERG_1.2510",
+     "values": {
+      "aisi": "O1 (similar)",
+      "uns": null,
+      "en_number": "1.2510",
+      "en_name": "100MnCrW4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "1.2510 100MnCrW4 Z3C ... Similar to AISI O1."
+    },
+    {
+     "source": "SMITHS_BO1",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "BO1 (BS 4659)",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BO1 (BS4659)"
+    }
+   ],
+   "disagreements": "Consistent. Smiths page gives only BO1 (BS4659) with no other cross-reference."
+  },
+  {
+   "grade": "O2",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "DOERRENBERG_1.2842",
+     "values": {
+      "aisi": "O2 (similar)",
+      "uns": null,
+      "en_number": "1.2842",
+      "en_name": "90MnCrV8",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "1.2842 90MnCrV8 ... Similar to AISI O2"
+    },
+    {
+     "source": "LUCEFIN_1.2842",
+     "values": {
+      "aisi": "O2",
+      "uns": null,
+      "en_number": "1.2842",
+      "en_name": "90MnCrV8",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": "9Mn2V",
+      "other": "GOST 9G2F; no JIS printed"
+     },
+     "verbatim_row": "EUROPA EN GERMANIA DIN CINA GB GIAPPONE JIS INDIA IS R. COREA KS RUSSIA GOST USA AISI/SAE / 90MnCrV8 90MnCrV8 9Mn2V 9G2F O2"
+    }
+   ],
+   "disagreements": "Consistent on 1.2842 / 90MnCrV8 / O2. No source found printing BS 4659 BO2 for 1.2842 in this pass."
+  },
+  {
+   "grade": "D2",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "D2",
+      "uns": null,
+      "en_number": "1.2379",
+      "en_name": "X155CrVMo12-1",
+      "bs970": "BD2",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR Z160CDV12"
+     },
+     "verbatim_row": "260-270 D2 1.2379 X155CrVMo12-1 BD2 Z160CDV12"
+    },
+    {
+     "source": "DOERRENBERG_1.2379",
+     "values": {
+      "aisi": "D2 (similar)",
+      "uns": null,
+      "en_number": "1.2379",
+      "en_name": "X153CrMoV12",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "1.2379 X153CrMoV12 CPPU ... Similar to AISI D2."
+    },
+    {
+     "source": "LUCEFIN_1.2379",
+     "values": {
+      "aisi": "D 2 (ASTM A681)",
+      "uns": null,
+      "en_number": "1.2379",
+      "en_name": "X153CrMoV12",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": "Cr12MoV",
+      "other": "DIN column X155CrVMo12-1; GOST Ch12MF; JIS/IS/KS tokens garbled ('SK 10 STD 10')"
+     },
+     "verbatim_row": "EUROPA EN GERMANIA DIN CINA GB GIAPPONE JIS INDIA IS R. COREA KS RUSSIA GOST USA AISI/SAE / X153CrMoV12 X155CrVMo12-1 Cr12MoV SK 10 STD 10 Ch12MF A681 D 2"
+    },
+    {
+     "source": "SMITHS_D2",
+     "values": {
+      "aisi": "D2",
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "BD2",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "D2 Tool Steel [BD2]"
+    }
+   ],
+   "disagreements": "EN name: X153CrMoV12 (current EN ISO 4957 per Lucefin/Doerrenberg) vs X155CrVMo12-1 (older DIN 17350, printed by Kennametal and in Lucefin's DIN column). GB: Lucefin Cr12MoV. JIS not reliably extracted."
+  },
+  {
+   "grade": "S1",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "S1",
+      "uns": null,
+      "en_number": "1.2542",
+      "en_name": "45WCrV7",
+      "bs970": "BS1",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR 45 WCV 20"
+     },
+     "verbatim_row": "230-240 S1 1.2542 45WCrV7 BS1 45 WCV 20"
+    }
+   ],
+   "disagreements": "Only one new source found (Kennametal). Doerrenberg 1.2542 datasheet URL failed to load."
+  },
+  {
+   "grade": "P20",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "DOERRENBERG_1.2311",
+     "values": {
+      "aisi": "P20",
+      "uns": null,
+      "en_number": "1.2311",
+      "en_name": "40CrMnNiMo8-6-4",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "Doerrenberg states 1.2312 (P20+S) and 1.2738 (P20+Ni) were amalgamated with 1.2311 in DIN EN ISO 4957"
+     },
+     "verbatim_row": "1.2311 40CrMnNiMo8-6-4 MCM ... AISI P20 ... 1.2312 (AISI P20+S) and 1.2738 (AISI P20+Ni) ... amalgamated with 1.2311 in DIN EN ISO 4957"
+    },
+    {
+     "source": "LUCEFIN_1.2311",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.2311",
+      "en_name": "40CrMnMo7",
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": "5CrMnMo",
+      "other": "Lucefin prints no AISI value ('~')"
+     },
+     "verbatim_row": "EUROPA EN GERMANIA DIN CINA GB ... / 40CrMnMo7 5CrMnMo ~"
+    },
+    {
+     "source": "SMITHS_P20",
+     "values": {
+      "aisi": "P20",
+      "uns": "T51620",
+      "en_number": "1.2311",
+      "en_name": null,
+      "bs970": null,
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "P20 (1.2311) ... P20 (T51620)"
+    }
+   ],
+   "disagreements": "EN name for 1.2311: Lucefin '40CrMnMo7' vs Doerrenberg '40CrMnNiMo8-6-4' (the latter is traditionally 1.2738; Doerrenberg says the grades were merged in DIN EN ISO 4957). GB 5CrMnMo (Lucefin) - other references often use 3Cr2Mo for P20; not verified here."
+  },
+  {
+   "grade": "M42",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "LUCEFIN_1.3247",
+     "values": {
+      "aisi": "M42",
+      "uns": null,
+      "en_number": "1.3247",
+      "en_name": "HS 2-9-1-8",
+      "bs970": "BM42",
+      "uk_en": null,
+      "jis": null,
+      "gb": "W2Mo9Cr4VCo8",
+      "other": "DIN HS 2-10-1-8; AFNOR Z110DKCWV09-08-04-02-01 (positional mapping, 7 values for 8 headers)"
+     },
+     "verbatim_row": "EUROPA EN | ITALIA UNI | CHINA GB | GERMANY DIN | FRANCE AFNOR | U.K. B.S. | RUSSIA GOST | USA AISI/SAE / HS 2-9-1-8 HS 2-9-1-8 W2Mo9Cr4VCo8 HS 2-10-1-8 Z110DKCWV09-08-04-02-01 BM42 M42"
+    },
+    {
+     "source": "ERASTEEL_M42",
+     "values": {
+      "aisi": "M42",
+      "uns": null,
+      "en_number": "1.3247",
+      "en_name": "HS 2-9-1-8",
+      "bs970": null,
+      "uk_en": null,
+      "jis": "SKH59",
+      "gb": null,
+      "other": "SS 2723"
+     },
+     "verbatim_row": "Europe HS 2-9-1-8; Sweden SS 2723; Japan SKH59; Germany 1.3247; USA AISI M42"
+    }
+   ],
+   "disagreements": "EN name HS 2-9-1-8 (EN ISO 4957) vs HS 2-10-1-8 (DIN). Kennametal catalogue has no M42 row."
+  },
+  {
+   "grade": "EN1A",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN1A",
+     "values": {
+      "aisi": "1213/1215",
+      "uns": null,
+      "en_number": "1.0715",
+      "en_name": "11SMn30",
+      "bs970": "230M07",
+      "uk_en": "EN1A",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "EN1A; 230M07; 9SMn28; BS EN 11SMn30; 1.0715; SAE/AISI 1213 and 1215 [reconstructed list: fetch tool would not quote the block verbatim; items and order as printed]"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0715",
+      "en_name": null,
+      "bs970": "230M07 (also 220M07)",
+      "uk_en": "1A",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "1A | 230M07 | Low Carbon Free Cutting C | 1.0715 ; 1A | 220M07 | Low Carbon FC** |"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0715",
+      "en_name": "11SMn30",
+      "bs970": "230M07",
+      "uk_en": "EN 1A",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "2 1.0715 11SMn30 230M07 EN 1A Freecutting Green"
+    },
+    {
+     "source": "CGTK",
+     "values": {
+      "aisi": "1214",
+      "uns": null,
+      "en_number": "1.0715",
+      "en_name": "11SMn37",
+      "bs970": "230M07",
+      "uk_en": "EN1A",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Steel | EN1A | 230M07 | 1.0715 | 11SMn37 | 1214"
+    }
+   ],
+   "disagreements": "cgtk name '11SMn37' conflicts with its own 1.0715 (others: 11SMn30)."
+  },
+  {
+   "grade": "EN3B",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN3B",
+     "values": {
+      "aisi": "1021",
+      "uns": null,
+      "en_number": "1.1151",
+      "en_name": "C22E",
+      "bs970": "070M20",
+      "uk_en": "EN3B",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "British BS 970:1991 070M20; Swedish SS 1370; German DIN CK20; American SAE 1021; French AFNOR XC18; European Standard EN10083-1; European Steel No. 1.1151; European Steel Name C22E"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0402/1.1151",
+      "en_name": "C22/C22E",
+      "bs970": "070M20",
+      "uk_en": "EN 3B",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "5 1.0402/1.1151 C22/C22E 070M20 EN 3B Blue/Red ; 1 1.0401 C15 080A15 EN 3B / EN 32B Blue"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0402",
+      "en_name": null,
+      "bs970": "070M20",
+      "uk_en": "3A",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "3A | 070M20 | '20' C | 1.0402"
+    },
+    {
+     "source": "CGTK",
+     "values": {
+      "aisi": "1021",
+      "uns": null,
+      "en_number": "1.1151",
+      "en_name": "C22E",
+      "bs970": "070M20",
+      "uk_en": "EN3B",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Steel | EN3B | 070M20 | 1.1151 | C22E | 1021"
+    }
+   ],
+   "disagreements": "Roymech labels 070M20 as En3A (not 3B). Parker also links EN3B/EN32B to 080A15 / 1.0401 C15."
+  },
+  {
+   "grade": "EN8",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN8",
+     "values": {
+      "aisi": "1039-1045",
+      "uns": null,
+      "en_number": "1.0511/1.1186/1.1189",
+      "en_name": null,
+      "bs970": "080M40",
+      "uk_en": "EN8",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BS970:1955 EN8; BS970/PD970 080M40; C40, C45, Ck40, Ck45, Cm40, Cm45; 1.0511, 1.1186, 1.1189; SAE/AISI 1039, 1040, 1042, 1043, 1045 [reconstructed list: fetch tool would not quote the block verbatim; items and order as printed]"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0503/1.0511",
+      "en_name": null,
+      "bs970": "080M40",
+      "uk_en": "8",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "8 | 080M40 | '40'C | 1.0503/1.0511 ; 8A 080A35; 8B 080A37; 8C 080A40 1.1186; 8D 080A42"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0511/1.1186",
+      "en_name": "C40/C40E",
+      "bs970": "080M40/080A42",
+      "uk_en": "EN 8/EN8D",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "7 1.0511/1.1186 C40/C40E 080M40/080A42 EN 8/EN8D Yellow"
+    },
+    {
+     "source": "CGTK",
+     "values": {
+      "aisi": "1040",
+      "uns": null,
+      "en_number": "1.1186",
+      "en_name": "C40",
+      "bs970": "080M40",
+      "uk_en": "EN8",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Steel | EN8 | 080M40 | 1.1186 | C40 | 1040"
+    }
+   ],
+   "disagreements": "Roymech lists 1.0503 (C45) for EN8 alongside 1.0511."
+  },
+  {
+   "grade": "EN9",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.1209/1.0535",
+      "en_name": null,
+      "bs970": "070M55",
+      "uk_en": "9",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "9 | 070M55 | '50'C | 1.1209/1.0535"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0535/1.1203",
+      "en_name": "C55/C55E",
+      "bs970": "070M55",
+      "uk_en": "EN 9",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "8 1.0535/1.1203 C55/C55E 070M55 EN 9 Yellow/Blue"
+    }
+   ],
+   "disagreements": "Second EN number: Roymech 1.1209 (C55R) vs Parker 1.1203 (C55E). Both may be valid variants; neither source names AISI."
+  },
+  {
+   "grade": "EN16",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN16",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "605M36T",
+      "uk_en": "EN16T",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BRITISH BS 970:1991 605M36T BRITISH BS 970:1955 EN16T"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7006",
+      "en_name": null,
+      "bs970": "605M36",
+      "uk_en": "16",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "16 | 605M36 | 1.0% Mn/Mo | 1.7006 ; 16B 605A32; 16C 605A37 1.5432; 16D 605M30; 16M 605A32"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "605M36T",
+      "uk_en": "EN 16T",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "13 - - 605M36T EN 16T White ; 12 - - 606M36T EN 16MT White/Brown"
+    }
+   ],
+   "disagreements": "Roymech's 1.7006 for EN16 is unusual (1.7006 is a Cr steel 46Cr2 in EN numbering) - treat with caution."
+  },
+  {
+   "grade": "EN19",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN19",
+     "values": {
+      "aisi": "4140",
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": "42CrMo4",
+      "bs970": "709M40T",
+      "uk_en": "EN19T",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BS 970:1991 709M40T; BS 970:1955 EN19T; DIN 42CrMo4; AFNOR 42CD4; SS 2244; SAE 4140; 1.7225 42CrMo4 EN10277-5 [reconstructed list: fetch tool would not quote the block verbatim; items and order as printed]"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": null,
+      "bs970": "709M40",
+      "uk_en": "19",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "19 | 709M40 | 1.0% Cr/Mo (Higher Mo) | 1.7225 ; 19A | 708M40 | 1.7223 ; 19B 708A37 1.7220 ; 19C 708A42"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": "42CrMo4",
+      "bs970": "709M40",
+      "uk_en": "EN 19",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "15 1.7225 42CrMo4 709M40 Annealed EN 19 Annealed"
+    },
+    {
+     "source": "OVAKO_42CrMo4",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7225",
+      "en_name": null,
+      "bs970": "708M40",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "Ovako maps 42CrMo4 to 708M40, not 709M40"
+     },
+     "verbatim_row": "... 708M40(B.S.) ... 1.7225"
+    }
+   ],
+   "disagreements": "EN19 = 709M40 (Smiths/Roymech/Parker); EN19A = 708M40 (Roymech). Several stockholders/catalogues pair 42CrMo4 with 708M40 instead."
+  },
+  {
+   "grade": "EN24",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN24",
+     "values": {
+      "aisi": "4340",
+      "uns": null,
+      "en_number": "1.6582",
+      "en_name": "34CrNiMo6",
+      "bs970": "817M40T",
+      "uk_en": "EN24T",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BS 970:1955 EN24T; BS 970:1991 817M40T; DIN 34CrNiMo6; AFNOR 35NCD6; AISI/SAE 4340; Werkstoff No. 1.6582; EN10277-5"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.6582/1.6565",
+      "en_name": null,
+      "bs970": "817M40",
+      "uk_en": "24",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "24 | 817M40 | 1.0% Ni/Cr/Mo | 1.6582/1.6565"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.6582",
+      "en_name": "34CrNiMo6",
+      "bs970": "817M40T",
+      "uk_en": "EN 24T",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "16 1.6582 34CrNiMo6 817M40T EN 24T Brown ; 17 1.652 34CrNiMo6 817M40 Annealed EN 24 Annealed Brown/Green"
+    },
+    {
+     "source": "OVAKO_34CrNiMo6",
+     "values": {
+      "aisi": "4340 / 4337",
+      "uns": null,
+      "en_number": "1.6582",
+      "en_name": "34CrNiMo6",
+      "bs970": "816M40 / 817M40",
+      "uk_en": "EN24",
+      "jis": "SNCM447",
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "34CrNiMo6M, SS2541, MoCN315, MoCN315M, 1.6582, 35NCD6, 816M40, 817M40, 35NiCrMo6, SNCM447, 30Ch2N2MA, F.1272, 40NiCrMo7, 4337, 4340, 92541, VSQT..., SS2541, EN24, 1.6582, EN 10083-3, SS142541"
+    },
+    {
+     "source": "LUCEFIN_34CrNiMo6",
+     "values": {
+      "aisi": "4340",
+      "uns": null,
+      "en_number": "1.6582",
+      "en_name": null,
+      "bs970": "817M40",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": "Token order garbled: first token '36CrNiMo6', GOST 38Ch2N2MA"
+     },
+     "verbatim_row": "36CrNiMo6 35NiCrMo6 34CrNiMo6 35NCD6 817M40 38Ch2N2MA 4340"
+    },
+    {
+     "source": "CGTK",
+     "values": {
+      "aisi": "4340",
+      "uns": null,
+      "en_number": "1.6582",
+      "en_name": "34CrNiMo6",
+      "bs970": "817M40T",
+      "uk_en": "EN24T",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Steel | EN24T | 817M40T | 1.6582 | 34CrNiMo6 | 4340"
+    }
+   ],
+   "disagreements": "Parker row 17 prints '1.652' (truncated; typo for 1.6582). Ovako also lists 816M40. Lucefin's first token '36CrNiMo6' is odd."
+  },
+  {
+   "grade": "EN30B",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.6747",
+      "en_name": null,
+      "bs970": "835M30",
+      "uk_en": "30B",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "30B | 835M30 | 4.0% Ni/Cr/Mo | 1.6747"
+    }
+   ],
+   "disagreements": "Only one new source (Roymech). No EN name printed; not found at Smiths/Parker."
+  },
+  {
+   "grade": "EN31",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "534A99 / 535A99",
+      "uk_en": "31",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "31 | 534A99 | 1.5% Cr ; 31 | 535A99 | 1.5% Cr"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.3505",
+      "en_name": "100Cr6",
+      "bs970": "534/535A99",
+      "uk_en": "EN 31",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "22 1.3505 100Cr6 534/535A99 EN 31 Purple/White"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aisi": "52100",
+      "uns": null,
+      "en_number": "1.3505",
+      "en_name": null,
+      "bs970": "535A99",
+      "uk_en": null,
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "200-230 52100 1.3505 100Cr6 535A99 100C6"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "EN32",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.0407/1.1148",
+      "en_name": "C16/C16E",
+      "bs970": "080M15",
+      "uk_en": "EN 32",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "11 1.0407/1.1148 C16/C16E 080M15 EN 32 Red ; 1 1.0401 C15 080A15 EN 3B / EN 32B Blue ; 10 1.0721 10S20 210M15 EN 32M Red/Brown"
+    },
+    {
+     "source": "CGTK",
+     "values": {
+      "aisi": "1016",
+      "uns": null,
+      "en_number": "1.0407",
+      "en_name": "C18",
+      "bs970": "080A15",
+      "uk_en": "EN32B",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "Steel | EN32B | 080A15 | 1.0407 | C18 | 1016"
+    }
+   ],
+   "disagreements": "EN32 vs EN32B: Parker EN32 = 080M15 (1.0407/1.1148 C16/C16E), EN32B = 080A15 (1.0401 C15); cgtk EN32B = 080A15 but 1.0407 'C18' - EN number/name pairing differs from Parker. Smiths EN32 datasheet had no equivalents section."
+  },
+  {
+   "grade": "EN36",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN36",
+     "values": {
+      "aisi": "3310/9310",
+      "uns": null,
+      "en_number": "1.5752",
+      "en_name": "14NiCr14",
+      "bs970": "655M13",
+      "uk_en": "EN36A",
+      "jis": "SNC815",
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "AS 1444 X3312/X3312H; W.Nr 1.5752 / DIN 14NiCr14; BS970 Part 3 655 M13; BS970 (1955) EN36A; JIS G 4052 SNC815H, JIS G 4102 SNC815; SAE 3310 and 9310 [reconstructed list: fetch tool would not quote the block verbatim; items and order as printed]"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.5752",
+      "en_name": null,
+      "bs970": "655M13",
+      "uk_en": "36A",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "36A | 655M13 | 3.25% Ni/Cr | 1.5752 ; 36C | 832M13 | 3.0% Ni/Cr/Mo | 1.6657"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.5752",
+      "en_name": "15NiCr13",
+      "bs970": "655M13",
+      "uk_en": "EN 36",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "18 1.5752 15NiCr13 655M13 EN 36 Red/White"
+    }
+   ],
+   "disagreements": "EN name for 1.5752: Smiths '14NiCr14' (DIN) vs Parker '15NiCr13' (EN 10084). EN36C = 832M13 / 1.6657 (Roymech)."
+  },
+  {
+   "grade": "EN40B",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN40B",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7361",
+      "en_name": "32CrMo12",
+      "bs970": "722M24",
+      "uk_en": "EN40B",
+      "jis": null,
+      "gb": null,
+      "other": "AFNOR 30CD12"
+     },
+     "verbatim_row": "Related material specifications • EN40B • 722M24 • 1.7361 • 32CrMo12 • 30CD12"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7361",
+      "en_name": null,
+      "bs970": "722M24",
+      "uk_en": "40B",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "40B | 722M24 | 3.0% Cr/Mo (Nitriding) | 1.7361"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.7361",
+      "en_name": "32CrMo12",
+      "bs970": "722M24",
+      "uk_en": "EN 40B",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "20 1.7361 32CrMo12 722M24 EN 40B Brown/Silver"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "EN41B",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SMITHS_EN41",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "905M39",
+      "uk_en": "EN41B",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "BRITISH BS 970:1991 905M39 BRITISH BS 970:1955 EN41B"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": "905M39",
+      "uk_en": "41B",
+      "jis": null,
+      "gb": null,
+      "other": "Roymech gives 1.8509 only against 41A/905M31"
+     },
+     "verbatim_row": "41B | 905M39 | 1.5% Cr/Al/Mo (Nitriding)(High C) | ; 41A | 905M31 | ... | 1.8509"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "EN56 (A-D)",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": "56A / 56AM / 56C",
+      "jis": null,
+      "gb": null,
+      "other": "56A=410/410S21/1.4006; 56AM=416/416S21/1.4005; 56C=420/420S37/1.4021"
+     },
+     "verbatim_row": "410 S41000 410S21 56A 1.4006 X12Cr13 2302 SUS 410 ; 416 S41600 416S21 56AM 1.4005 X12CrS13 2380 SUS 416 ; 420 S42000 420S37 56C 1.4021 X20Cr13 2303 SUS 420J1"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": "56A-56D",
+      "jis": null,
+      "gb": null,
+      "other": "56A=410S21; 56B=420S29; 56C=420S37 (and 416S37); 56D=420S45"
+     },
+     "verbatim_row": "56A 410S21 1.4006; 56AM 416S21 1.4005; 56AM 416S41; 56BM 416S29; 56C 416S37; 56B 420S29 1.4024; 56C 420S37 1.4021; 56D 420S45 1.4028"
+    }
+   ],
+   "disagreements": "Roymech assigns 56C to both 416S37 and 420S37 (likely 56CM for the free-machining one)."
+  },
+  {
+   "grade": "EN57",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": "431",
+      "uns": "S43100",
+      "en_number": "1.4057",
+      "en_name": "X17CrNi16-2",
+      "bs970": "431S29",
+      "uk_en": "57",
+      "jis": "SUS 431",
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "431 S43100 431S29 57 1.4057 X17CrNi16-2 2321 SUS 431"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": "1.4057",
+      "en_name": null,
+      "bs970": "431S29",
+      "uk_en": "57",
+      "jis": null,
+      "gb": null,
+      "other": null
+     },
+     "verbatim_row": "57 | 431S29 | 17Cr 2,5NI C 0,10....Mart | 1.4057"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "EN58 (A-J, M)",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ATLAS",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": "58E/58H,58J/58B,58C/58G/58M",
+      "jis": null,
+      "gb": null,
+      "other": "58E=304 (304S31); 58H,58J=316 (316S31); 58B,58C=321 (321S31); 58G=347 (347S31); 58M=303 (303S31)"
+     },
+     "verbatim_row": "303 ... 303S31 58M 1.4305 ; 304 ... 304S31 58E 1.4301 ; 316 ... 316S31 58H,58J 1.4401 ; 321 ... 321S31 58B,58C 1.4541 ; 347 ... 347S31 58G 1.4550"
+    },
+    {
+     "source": "ROYMECH",
+     "values": {
+      "aisi": null,
+      "uns": null,
+      "en_number": null,
+      "en_name": null,
+      "bs970": null,
+      "uk_en": "58A-58J, 58M",
+      "jis": null,
+      "gb": null,
+      "other": "58A=302S25 (Roymech prints 1.4828 against it); 58E=304S15; 58H=315S16; 58J=316S16/316S17; 58B/C=321S12/321S20; 58F/G=347S17; 58M=303S41/325S21"
+     },
+     "verbatim_row": "58A 302S25 1.4828; 58M 303S41; 58E 304S15 1.4301; 58H 315S16; 58J 316S16 1.4401; 58J 316S17 1.4401; 58B/58C 321S12 1.4541; 58B/58C 321S20; 58M 325S21 1.4305; 58F/58G 347S17 1.4550"
+    }
+   ],
+   "disagreements": "BS970 numbers differ between sources: Atlas uses the 1991 S31-series (304S31, 316S31, 321S31, 347S31) whereas Roymech uses older/alternative (304S15, 316S16/S17, 321S12/S20, 347S17). Roymech prints 1.4828 against 58A/302S25 (1.4828 is a heat-resisting grade - suspect) and '18/19' in the 58E description (typo for 18/9). Roymech 58J/316S17 note '+Ti' looks wrong (Ti grade is 320S17)."
+  }
+ ]
+}

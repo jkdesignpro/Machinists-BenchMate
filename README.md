@@ -1,1 +1,114 @@
-# Machinists-BenchMate
+# Machinists BenchMate
+
+A free, open-source (AGPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. For all machinists and all machines: mills, lathes, Swiss-type and more.
+
+**Status:** early (v0.1.0). The Rust formula core and the app UI (AMW look) work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
+
+## Download and install
+Get the files from the [Releases page](https://github.com/jkdesignpro/Machinists-BenchMate/releases). The app is fully offline and has no account or updater; everything you save stays on your computer.
+
+- **Windows 10/11 (x64):** run `Machinists-BenchMate_<version>_windows_x64-setup.exe` (installs for your user, no admin) or the `.msi`. Until the installers are code signed, **SmartScreen** says "Windows protected your PC": click **More info**, then **Run anyway**.
+- **macOS (Apple Silicon, macOS 11+):** open the `.dmg` and drag the app to Applications, or unzip the `.app.zip`. The app is ad hoc signed but not notarised by Apple, so the first launch is blocked: open it once, then go to **System Settings > Privacy & Security**, scroll down and click **Open Anyway** (then confirm). After that it opens normally.
+- **Linux (x86_64):** `chmod +x Machinists-BenchMate_<version>_linux_x86_64.AppImage` and run it, or on Debian/Ubuntu `sudo apt install ./machinists-benchmate_<version>_amd64.deb`.
+
+Check a download against `SHA256SUMS.txt` on the release page if you like (`sha256sum -c`, or `certutil -hashfile <file> SHA256` on Windows).
+
+## Principles
+- **Accuracy first.** Every formula cites a standard reference (Machinery's Handbook, ISO, manufacturer-published formulas) in its doc comment, and has a unit test against a worked example.
+- **Original work.** Our own UI, code and data tables. Not derived from any other calculator's code, artwork or data.
+- **Offline.** Works on air-gapped shop PCs.
+- **Honest inputs.** Material-dependent numbers (e.g. specific cutting force kc) are user inputs or clearly sourced table entries, never silent guesses.
+
+## Layout
+- `core/` - `benchmate-core`, pure Rust formulas (no dependencies)
+- `wasm/` - plain C-ABI WebAssembly wrapper so the UI calls the same Rust formulas (no JS copies)
+- `app/` - the UI: `index.html`, `tools.js` (declarative tool registry, one entry per calculator), `gdt.js` (GD&T guide, frame builder, stack), `shop.js` (capability, temperature compensation, fractions, setup sheet), `geometry.js` (triangles, arcs, fillets, dovetails, weight, sine bar, indexing), `cad.js` (DXF generator screens), `toollib.js` (tool library), `cycles.js` (G-code cycle generators), `gmcodes.js` (G/M-code and macro reference), `millturn.js` (drawings for the small mill and lathe calculators), `chatter.js` (chatter finder), `grinding.js` (grit conversion, wheel marking decoder, grinding drawings), `cncguide.js` (CNC knowledge guide and the tool nose radius compensation screen), `tooling.js` (tooling guide, tap pitch diameter limits, forming tap makers' comparison), `formulas.js` (formula registry and library), `fasteners.js` (bolt grades and torque, screws, clearance holes, spanners, T-slots, keys, O-rings, bearing life), `gears.js` (gear tooth drawing), `mechanics.js` (unit helpers and drawings for the mechanics tools), `inspect.js` (ANSI inch fits, preferred numbers, control charts, sampling plan OC curves), `matref.js` (temper colours, heat treatment, galvanic check, machining plastics, metal identification), `gsim.js` (G-code backplot), `maths.js` (ball and roll measurement, shrink and press fits, unit converter, calculator, areas and volumes, compound angles, change gears, shop economics, ISO 2768-1, micrometer reading, drawing abbreviations), `app.js` (shell, favourites), `tokens.css`
+- `desktop/` - the Tauri 2 desktop wrapper: serves `app/` from the app bundle (no network), native save dialog for exports, icons in `desktop/icons/` (from `icon.svg`)
+- `tests/smoke/` - headless Chromium smoke test of `app/`; `scripts/check-versions.py` - checks the version is the same everywhere
+- `.github/workflows/` - CI (`ci.yml`) and release builds (`release.yml`); see `docs/release.md`
+- `scripts/build-web.sh` - builds the WebAssembly module; `scripts/check_dxf.py` - checks generated DXF files with the independent ezdxf reader
+- `data/` - reference data (material equivalents), generated from `scripts/materials_seed.py`
+- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions; `docs/shop-helpers.md` - shop helper sources and decisions; `docs/geometry.md` - geometry sources and decisions; `docs/cad-dxf.md` - DXF format, shapes, validation, tool library and favourites; `docs/cycles.md` - G-code cycle syntax sources, dialect support and decisions; `docs/gm-codes.md` - G/M-code and macro reference sources, coverage and gaps; `docs/mechanics.md` - mechanics sources, checks and what is not included; `docs/tooling.md` - tooling reference evidence and decisions
+- `docs/sources.md` - every source referenced; `docs/gdt.md` - GD&T sources and decisions; `docs/shop-helpers.md` - shop helper sources and decisions; `docs/geometry.md` - geometry sources and decisions; `docs/cad-dxf.md` - DXF format, shapes, validation, tool library and favourites; `docs/cycles.md` - G-code cycle syntax sources, dialect support and decisions; `docs/gm-codes.md` - G/M-code and macro reference sources, coverage and gaps; `docs/inspection.md` - inspection round 2 sources, counts and disagreements
+- `CHANGELOG.md` - every change, per version
+
+## Build, test and run
+```
+cargo test                      # formula tests
+rustup target add wasm32-unknown-unknown
+scripts/build-web.sh            # builds app/benchmate.wasm
+cd app && python3 -m http.server 8765   # then open http://localhost:8765
+```
+Desktop app (needs the Tauri prerequisites, see `docs/release.md`):
+```
+scripts/build-web.sh
+cargo install tauri-cli --version "^2" --locked
+cd desktop && cargo tauri build      # installers in desktop/target/release/bundle/
+```
+Smoke test of the UI: `cd tests/smoke && npm ci && npx playwright install chromium && cd ../.. && node tests/smoke/smoke.mjs`.
+
+Adding a calculator means adding one entry to `app/tools.js` and, if needed, a formula to `core/` with a cited source and a test.
+
+## GD&T
+A GD&T reference guide (datums, Rule #1 vs ISO independency, every characteristic, modifiers, ASME/ISO comparison), a feature control frame builder with plain-English explanation and validity checks, and calculators for true position, bonus/virtual/resultant condition, position/plus-minus conversion, fastener tolerances, worst-case/RSS stacks, a composite position (PLTZF/FRTZF) checker, an unequal profile (U) zone calculator, and a datum reference frame / degrees-of-freedom explainer. Written for ASME Y14.5-2018 and current ISO GPS editions; see `docs/gdt.md`.
+
+## Geometry
+Triangle solver (right and oblique, incl. the two-solution case) with a drawing; chord, arc, sagitta and three-point circle; corner and line-to-arc fillets with tangent points; dovetail and V-groove measurement over pins; stock weight for bar, tube, flat, plate and sheet; sheet-metal bend allowance and deduction; sine bar with a fewest-block gauge stack; dividing head and rotary table indexing (simple, angular, differential) with your own plates and gears. See `docs/geometry.md`.
+
+## Shop helpers
+Process capability (Cp, Cpk, Pp, Ppk, expected ppm, histogram with normal fit) from pasted measurements or a mean and sigma; temperature compensation of measurements to 20 °C for part and gauge expansion; coolant concentration from a refractometer reading and the fluid's own factor, plus mix and top-up amounts; fraction / decimal inch / mm converter with nearest fraction and error; a printable setup sheet (job, machine, tools, work offsets, notes) saved in the browser with JSON export and import. See `docs/shop-helpers.md`.
+
+## G-code cycles
+Program generators for drilling and tapping (G81, G82, G83, G73, G84 rigid or floating) on a bolt circle, grid or pasted holes with CSV export; thread milling (internal/external, climb/conventional, arc-in/out, optional G41/G42, several passes); lathe threading with G76 or G92 passes and an infeed table (constant volume, constant depth, custom, minimum cut, spring passes); taper turning and boring; groove and cut-off with CSS; keyway broaching; G71/G70 from a simple profile. Output for a generic ISO 6983 / Fanuc-style control and for Haas; other controls are shown as not yet supported until their syntax is confirmed. Each program has a backplot, an estimated cycle time and a check against the active machine. Always prove out a generated program in single block. See `docs/cycles.md`.
+
+**G-code backplot**: paste or load a mill or lathe program (Generic ISO / Fanuc-style or Haas) and see the programmed path in 2D (XY, XZ, YZ; lathe Z against X radius), rapids dashed and feeds solid, stepping block by block with the line highlighted; feed and rapid distance, extents, an estimated cycle time (acceleration ignored) and every error with its line number, including arcs whose end radius does not match. Mill drilling cycles and lathe G70/G90/G92/G94 are drawn; G71-G76 roughing and threading are reported as not simulated yet. A backplot, not a machine verification. See `docs/gsim.md`.
+
+## G and M code reference
+G and M codes for ten controls: a generic ISO 6983 / RS-274 base (NIST RS274NGC), Fanuc (machining centre, and lathe with G-code systems A, B and C), Haas mill and lathe, Mitsubishi M70/M80 and the legacy MELDAS 60, Siemens SINUMERIK 840D sl in native and ISO mode, Heidenhain TNC DIN/ISO, Okuma OSP lathe and Mazak EIA/ISO turning. The control defaults to the active machine profile; search by code (G1 finds G01) or word, filter mill or lathe, and compare two controls side by side. Each row shows its source with section or page; a code a control's sources do not list is shown as not confirmed for that control, never borrowed from another. A macro reference covers Fanuc Custom Macro B, Haas macros, Siemens R parameters and control structures, Heidenhain Q-parameter jumps and Okuma variables. Where sources disagree, both are shown. See `docs/gm-codes.md`.
+
+## CAD / DXF
+Parametric 2D shapes exported as DXF for CAM: bolt circle (with outside diameter and centre bore), rectangular hole grid on an optional plate, straight and arc slots, rectangle with corner radii and corner holes, regular polygon from across flats or corners, circle and ring, keyhole, D-flat and double-D. Live SVG preview with overall dimensions, hole callouts and a hole position table. Inch or mm (`$INSUNITS` set), layers OUTLINE / HOLES / CENTRE, optional centre marks, origin at the centre or lower-left, DXF R2000 (LWPOLYLINE with bulges) or R12 (POLYLINE/VERTEX). The writer is in the Rust core, tested by reading its own output back, and the files load and audit cleanly in ezdxf. See `docs/cad-dxf.md`.
+
+## Small mill and lathe calculators
+Radial chip thinning, corner and boss engagement, ball-nose cusp height and effective diameter (with tool tilt), runout and chip load, lathe feed, multi-pass roughing time, boring bar deflection with overhang guidance from three makers, C-axis feed and inverse time F, slitting saw, bandsaw chip per tooth and cut time, spot and centre drill depth. Formulas in `core/src/millturn.rs`; sources in `docs/sources.md`.
+
+## Chatter finder
+Type the chatter frequency or record a few seconds with the microphone. BenchMate draws the spectrum, marks the peaks that are only spindle or tooth-passing harmonics, and lists stable spindle speeds (the tooth-passing rule of thumb, not a full stability lobe diagram), checked against the active machine. The sound stays on your computer. Formulas and FFT in `core/src/chatter.rs`.
+
+## Grinding
+Wheel speed, cylindrical and surface grinding (equivalent diameter, contact length, speed ratio, removal rate, equivalent chip thickness, cycle times), grit size conversion between ANSI, FEPA F and FEPA P, and a wheel marking decoder. The maximum wheel speed is never filled in for you: always obey the speed marked on the wheel. Grit and marking data show each publisher's value and where they disagree (`data/refdata/grinding-evidence.json`).
+
+## Fasteners and machine elements
+Bolt property classes and grades (ISO 898-1, SAE J429, ASTM A574) with head marks; bolt tightening torque and preload with the VDI 2230 relation, where thread and head friction are always your own entry (cited friction classes are shown, never filled in); socket head cap screw heads, keys and counterbores; ISO 273 and inch clearance holes; spanner and hex key sizes with a lookup by spanner size; ISO 299 T-slots; metric and inch parallel keys with keyseat check dimensions; AS568 O-rings with a piston, rod and face gland check (squeeze, stretch, fill); ISO 281 bearing rating life. Every table value shows how many independent publishers print it, and disagreements are listed rather than hidden. See the fasteners section of `docs/sources.md`.
+
+## CNC guide, nose radius compensation and formula library
+A **CNC knowledge guide** in our own words and drawings: machine axes (ISO 841), machine, work and tool coordinates, work, length, radius and wear offsets, program structure, climb and conventional milling, chip formation, tool wear types with causes and remedies from two tool makers, turning and milling troubleshooting, workholding and shop safety. Each statement shows its sources, and anything without two independent public sources is marked "to be verified". A **tool nose radius compensation** calculator gives the Z and X shifts for chamfers and the imaginary-tip path for any chamfer, taper or corner radius and tip number 0 to 9, with what G41/G42 does instead (formulas in `core/src/tnrc.rs`). The **formula library** lists every formula BenchMate uses, with variables, units and source, and opens the tool that uses it.
+
+## Tooling reference
+A **tooling guide** in our own words and drawings: tool geometry terms (rake, clearance, entering and lead angle, helix, nose radius, chip breaker, edge hone), tool materials and grade groups (linked to ISO 513), ten coatings with typical use and every maximum temperature the makers and coaters print (confirmed only where two agree), end mills, drills and point angles, reamers, tap types and chamfers, tap H, L and D limits, saw blade pitch and broken tap removal. Each statement shows its sources, and anything without two independent public sources is marked "needs 2nd source". **Tap pitch diameter limits** gives the band of any inch H or metric D number, checks it against classes 1B, 2B, 3B and 6H, 5H, 7H, 6G, suggests a number by the 40 % rule and shows OSG's printed recommendation where one is in hand. **Saw blade pitch** gives the coarsest pitch for three teeth in the thinnest wall and the teeth in the longest cut against two makers' upper rules. The Tap drill size tool now compares what each publisher prints for forming tap holes. See `docs/tooling.md`.
+
+## Measurement and shop maths
+Height over a ball in a countersink or tapered bore (and the angle from two balls), external tapers over rolls, thermal growth and shrink-fit temperatures with Lame press-fit pressure and torque (expansion coefficient, modulus and friction are always yours), a unit converter for 17 quantities built on NIST SP 811 exact definitions, a typed-expression calculator (own parser, no eval) with DMS, prime factors and interpolation, areas and volumes with drawings, compound angles with sine-plate settings, lathe change gears from your own gear set, shop economics (hourly rate, break-even, payback), ISO 2768-1 general tolerances, a micrometer and vernier reading aid, and drawing abbreviations. See the measurement section of `docs/sources.md`.
+
+## Threads round 3
+ACME general purpose and centralizing (ASME B1.5) and Stub ACME (ASME B1.8) with limits of size for screw and nut; metric trapezoidal Tr basic profile (ISO 2904); 7/45 buttress (ASME B1.9) at maximum material; UNJ root radius and minor limits and the UNR root rule; unified miniature UNM; 8-UN, 12-UN and 16-UN constant-pitch series; helical insert (STI) tapped-hole sizes with three makers' limits side by side; plating and coating allowance with before-coating limits; multi-start lead; measurement over wires for 60, 55, 30 and 29 degree threads; NPTF notes. Formulas are in `core/src/power_threads.rs` with tests against published rows; series and maker limits are in `data/refdata/threads-power-evidence.json`. See the threads round 3 section of `docs/sources.md`.
+
+## Gears and splines
+Spur and helical gear data from the module or diametral pitch (diameters, pitches, tooth thickness, profile shift, centre distance, contact ratio), span measurement over k teeth, over pins or balls with the ideal pin, chordal tooth thickness, simple and compound gear trains with a change-gear finder, planetary sets, worm basics, and ANSI B92.1 / ISO 4156 involute spline basic dimensions with measurement over pins. See `docs/gears.md`.
+
+## Mechanics for the shop
+Section properties (rectangle, box tube, round, tube, I-beam, channel, angle, tee: area, centroid, Ix, Iy, principal axes, section moduli, radii of gyration); beam deflection and bending stress for cantilever, simply supported and fixed-both-ends beams with a point load anywhere and a uniform load, with a drawing of the deflected shape and moment; torsion of round shafts and tubes with power, torque and speed; Euler and Johnson column buckling with the switch-over and end-condition factors; stress concentration at holes in plates (only closed forms printed by a free source; stepped shafts are marked "not included"); fatigue with an estimated endurance limit, Marin factors and the Goodman, Soderberg and Gerber lines (estimates labelled as such); centrifugal force on chuck jaws and grip loss at speed; ISO 21940-11 balance grade G permissible unbalance with a two-plane split; first critical speed of a shaft with discs (Rayleigh and Dunkerley, assumptions on screen). Formulas in `core/src/mechanics.rs`; see `docs/mechanics.md`.
+## Materials reference
+**Temper and heat-tint colours** of plain carbon steel and stainless steel against temperature (approximate: time, alloy and atmosphere change them); a **heat treatment reference** with the terms in plain words and annealing, hardening, quench and tempering temperatures for 1045, 4140, 4340, O1, A2, D2, S7, H13, M2, 416, 420, 440C and 17-4PH H900 to H1150 from the steel makers, side by side; the **galvanic series in seawater** and an anodic index table with a **two-metal check** (potential difference, which metal corrodes, the 0.20 V seawater and 0.15 / 0.25 / 0.50 V rules); **machining plastics** (acetal, nylon, PEEK, UHMW-PE, PTFE, PC, acrylic, PVC, PP, ABS, PEI: service temperature, expansion, annealing and each plastics maker's starting turning data); and **metal identification** (spark, magnet, chip and file tests). Every value shows each publisher's printing; two independent publishers are needed for "confirmed", and where makers disagree all values are shown. See `docs/materials-reference.md`.
+
+## Tool library and favourites
+Save end mills, drills, taps, reamers and inserts (type, diameter, shank, flutes, flute length, overall length, stick-out, corner radius, point angle, pitch, material, coating, maker, part number, notes) in the browser, with JSON export and import that never overwrites. "Fill from tool library" on spindle speed, milling feed, arc feed, helical interpolation, tool deflection, cut optimiser, drill point, tap drill and surface finish, converting inch and mm. Star any tool to put it in a Favourites group at the top of the list.
+
+## Inspection round 2
+**ANSI inch fits** (ANSI B4.1 RC, LC, LT, LN and FN classes, 0 to 19.69 in) with hole and shaft limits and the fit; only one full table could be read, so the rows are marked "needs 2nd source" and every row is checked for internal consistency. **ISO fits** now include the j5-j7 and J6-J8 classes and sizes up to 3150 mm (checked against the ISO 286-1 formulas). **Preferred numbers** (ISO 3 Renard R5 to R80). **Control charts** (individuals and moving range, X-bar and R) with constants checked against NIST, York and our own integration. **Sampling plan OC curves** for any single sampling plan, with an own-words outline of ISO 2859-1 / ANSI Z1.4 (their tables are not included). See `docs/inspection.md`.
+
+## Planned
+Speeds and feeds, turning/finish, drilling and tapping, threads (UN, metric, NPT), taper and trig, bolt circles, drill/tap/fit charts, materials table, Swiss-lathe helpers, second-opinion feeds from published manufacturer data, link-up with Alkart Mega Wizard.
+
+## Licence
+GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). See `LICENSE`. If you run a modified version for others over a network, you must offer them its source.

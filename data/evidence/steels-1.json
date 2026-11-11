@@ -1,0 +1,1736 @@
+{
+ "sources": {
+  "TWI": {
+   "title": "FAQ: equivalent European and American standards for common stainless steels",
+   "url": "https://www.twi-global.com/technical-knowledge/faqs/faq-what-are-the-equivalent-european-and-american-standards-for-common-stainless-steels",
+   "publisher": "TWI Ltd",
+   "accessed": "2026-11-10"
+  },
+  "WYS": {
+   "title": "International standards cross-reference tables (stainless, carbon and alloy, tool steel)",
+   "url": "https://www.westyorkssteel.com/steel-specifications/international-standards/",
+   "publisher": "West Yorkshire Steel",
+   "accessed": "2026-11-10"
+  },
+  "MMC": {
+   "title": "Cutting tools catalogue, material cross reference (N028-N031)",
+   "url": "https://www.mitsubishicarbide.net/contents/mhg/ru/manual/material_cross_reference.pdf",
+   "publisher": "Mitsubishi Materials",
+   "accessed": "2026-11-10"
+  },
+  "WIKI": {
+   "title": "SAE steel grades (stainless SAE to UNS table)",
+   "url": "https://en.wikipedia.org/wiki/SAE_steel_grades",
+   "publisher": "Wikipedia",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "301",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "301",
+      "uns": "S30100",
+      "en_number": "1.4310",
+      "en_name": "X10CrNi18-8"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "aisi": "301",
+      "uns": "S30100"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "jis": "SUS301",
+    "bs970": "301S21"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "303",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "303",
+      "uns": "S30300",
+      "en_number": "1.4305"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "303",
+      "en_number": "1.4305",
+      "bs970": "303S31",
+      "jis": "SUS303"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "303",
+      "en_number": "1.4305",
+      "jis": "SUS303"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S30300"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "en_name": "X8CrNiS18-9",
+    "uk_en": "EN58M"
+   },
+   "disagreements": "Free-machining 18/8. Names printed by sources: X8CrNi18-9 (TWI), X10CrNiS18-9 (WYS), X12CrNiS18-8 (MMC, old DIN)."
+  },
+  {
+   "grade": "304",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "304",
+      "uns": "S30400",
+      "en_number": "1.4301",
+      "en_name": "X5CrNi18-10"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "304",
+      "en_number": "1.4301",
+      "en_name": "X5CrNi18-10",
+      "bs970": "304S15",
+      "jis": "SUS304"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "304",
+      "jis": "SUS304"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S30400"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "bs970": "304S31",
+    "uk_en": "EN58E"
+   },
+   "disagreements": "MMC prints 1.4350 for 304; TWI and WYS give 1.4301, the standard 304 grade. WYS gives BS 304S15 (also a sheet designation); 304S31 is commonly quoted for bar but not yet sourced."
+  },
+  {
+   "grade": "304L",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "304L",
+      "uns": "S30403",
+      "en_number": "1.4306 / 1.4307",
+      "en_name": "X2CrNi19-11 (1.4306)"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "304L",
+      "en_number": "1.4306 / 1.4307",
+      "bs970": "304S11",
+      "jis": "SUS304L"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "304L",
+      "en_number": "1.4306 / 1.4307",
+      "jis": "SUS304L"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S30403"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {},
+   "disagreements": "1.4306 is printed by all three sources; WYS also lists 1.4307 (X2CrNi18-9), the common bar grade."
+  },
+  {
+   "grade": "310S",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "310 / 310S",
+      "en_number": "1.4845",
+      "en_name": "X12CrNi25-21",
+      "jis": "SUS310S"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S31008"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {},
+   "disagreements": "TWI pairs 310 with 1.4951 (a pressure-vessel grade) and its own footnote disagrees on that grade's name."
+  },
+  {
+   "grade": "316",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "316",
+      "uns": "S31600",
+      "en_number": "1.4401",
+      "en_name": "X5CrNiMo17-12-2"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "316",
+      "bs970": "316S31",
+      "jis": "SUS316"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "316",
+      "en_number": "1.4401",
+      "jis": "SUS316"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S31600"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN58J"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "316L",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "316L",
+      "uns": "S31603",
+      "en_number": "1.4404",
+      "en_name": "X2CrNiMo17-12-2"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "316L",
+      "en_number": "1.4404",
+      "bs970": "316S11",
+      "jis": "SUS316L"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "316L",
+      "jis": "SUS316L"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S31603"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {},
+   "disagreements": "MMC pairs 316L with 1.4435 (higher Ni/Mo variant)."
+  },
+  {
+   "grade": "316Ti",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "316Ti",
+      "uns": "S31635",
+      "en_number": "1.4571",
+      "en_name": "X6CrNiMoTi17-12-2"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "bs970": "320S31",
+    "jis": "SUS316Ti"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "317L",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S31703"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "TWI",
+     "values": {
+      "en_number": "1.4438",
+      "en_name": "X2CrNiMo18-15-4"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "aisi": "317L"
+   },
+   "disagreements": "TWI pairs 1.4438 with 317 (S31700); the X2 name means low carbon, i.e. 317L-type. Needs a second source."
+  },
+  {
+   "grade": "321",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "321",
+      "uns": "S32100",
+      "en_number": "1.4541",
+      "en_name": "X6CrNiTi18-10"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "321",
+      "en_number": "1.4541",
+      "en_name": "X6CrNiTi18-10",
+      "bs970": "321S31",
+      "jis": "SUS321"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S32100"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN58B"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "347",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "347",
+      "uns": "S34700",
+      "en_number": "1.4550",
+      "en_name": "X6CrNiNb18-10"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "aisi": "347",
+      "uns": "S34700"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "bs970": "347S31",
+    "jis": "SUS347"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "904L",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [],
+   "unsourced": {
+    "aisi": "904L",
+    "uns": "N08904",
+    "en_number": "1.4539",
+    "en_name": "X1NiCrMoCu25-20-5"
+   },
+   "disagreements": "Not yet sourced."
+  },
+  {
+   "grade": "405",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "405",
+      "uns": "S40500",
+      "en_number": "1.4002",
+      "en_name": "X6CrAl13"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "aisi": "405",
+      "uns": "S40500"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {},
+   "disagreements": ""
+  },
+  {
+   "grade": "409",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "409",
+      "uns": "S40900",
+      "en_number": "1.4512",
+      "en_name": "X2CrTi12"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "aisi": "409",
+      "uns": "S40900"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {},
+   "disagreements": ""
+  },
+  {
+   "grade": "410",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "410",
+      "uns": "S41000",
+      "en_number": "1.4006",
+      "en_name": "X12Cr13"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "410",
+      "en_number": "1.4006",
+      "en_name": "X12Cr13",
+      "bs970": "410S21",
+      "jis": "SUS410"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "410",
+      "en_number": "1.4006",
+      "jis": "SUS410"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S41000"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN56A"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "410S",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "410S",
+      "uns": "S41008",
+      "en_number": "1.4000",
+      "en_name": "X6Cr13"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {},
+   "disagreements": ""
+  },
+  {
+   "grade": "416",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "416",
+      "uns": "S41600",
+      "en_number": "1.4005",
+      "en_name": "X12CrS13"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "416",
+      "en_number": "1.4005",
+      "en_name": "X12CrS13",
+      "bs970": "416S21",
+      "jis": "SUS416"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "416",
+      "en_number": "1.4005",
+      "en_name": "X12CrS13",
+      "jis": "SUS416"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S41600"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {},
+   "disagreements": ""
+  },
+  {
+   "grade": "420",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "420",
+      "uns": "S42000",
+      "en_number": "1.4021",
+      "en_name": "X20Cr13"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "420",
+      "en_number": "1.4021",
+      "en_name": "X20Cr13",
+      "bs970": "420S37",
+      "jis": "SUS420J1"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "420",
+      "en_number": "1.4021"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S42000"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN56C"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "420-highC",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "en_number": "1.4028",
+      "en_name": "X30Cr13",
+      "bs970": "420S45",
+      "jis": "SUS420J2"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "aisi": "420 (higher carbon)"
+   },
+   "disagreements": "WYS labels this 420F; 420F is a free-machining variant (UNS S42020), so treat as higher-carbon 420."
+  },
+  {
+   "grade": "430",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "430",
+      "uns": "S43000",
+      "en_number": "1.4016",
+      "en_name": "X6Cr17"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "430",
+      "en_number": "1.4016",
+      "jis": "SUS430"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "uns": "S43000"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "bs970": "430S17",
+    "uk_en": "EN60"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "431",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "431",
+      "uns": "S43100",
+      "en_number": "1.4057",
+      "en_name": "X17CrNi16-2"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "431",
+      "en_number": "1.4057",
+      "bs970": "431S29",
+      "jis": "SUS431"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "431",
+      "en_number": "1.4057",
+      "jis": "SUS431"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN57"
+   },
+   "disagreements": "Wikipedia prints S41623 for 431 (the 416Se number), a typo there; TWI gives S43100."
+  },
+  {
+   "grade": "440C",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "WIKI",
+     "values": {
+      "aisi": "440C",
+      "uns": "S44004"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "en_number": "1.4125",
+    "en_name": "X105CrMo17",
+    "jis": "SUS440C"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "17-4PH",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "630 (17-4PH)",
+      "en_number": "1.4542"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "630 (17-4PH)",
+      "en_number": "1.4542"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "WIKI",
+     "values": {
+      "aisi": "630 (17-4PH)",
+      "uns": "S17400"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "en_name": "X5CrNiCuNb16-4",
+    "jis": "SUS630"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "15-5PH",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [],
+   "unsourced": {
+    "aisi": "15-5PH",
+    "uns": "S15500",
+    "en_number": "1.4545",
+    "en_name": "X5CrNiCu15-5"
+   },
+   "disagreements": "Not yet sourced."
+  },
+  {
+   "grade": "2205",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "2205 (common name)",
+      "uns": "S31803",
+      "en_number": "1.4462",
+      "en_name": "X2CrNiMoN22-5-3"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "S32205"
+   },
+   "disagreements": "'2205' is a common name, not a true AISI number (TWI)."
+  },
+  {
+   "grade": "2304",
+   "family": "Steel",
+   "subfamily": "Stainless steel",
+   "iso_group": "M",
+   "printed": [
+    {
+     "source": "TWI",
+     "values": {
+      "aisi": "2304 (common name)",
+      "uns": "S32304",
+      "en_number": "1.4362",
+      "en_name": "X2CrNiN23-4"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {},
+   "disagreements": ""
+  },
+  {
+   "grade": "1015",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "1015",
+      "en_number": "1.0401",
+      "en_name": "C15",
+      "bs970": "080A15 / 080M13",
+      "jis": "S15C"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "1015",
+      "en_number": "1.0401",
+      "en_name": "C15",
+      "gb": "15"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G10150",
+    "uk_en": "EN32"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "1020",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "1020",
+      "en_number": "1.0402",
+      "en_name": "C22",
+      "bs970": "070M20",
+      "jis": "S20C / S22C"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "1020",
+      "en_number": "1.0402",
+      "en_name": "C22",
+      "gb": "20"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G10200",
+    "uk_en": "EN3B"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "1040",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "1040",
+      "en_number": "1.0511",
+      "en_name": "C40",
+      "bs970": "080M40"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G10400",
+    "uk_en": "EN8",
+    "jis": "S40C"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "1045",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "1045",
+      "en_number": "1.0503 (C45) / 1.1191 (C45E, Ck45)",
+      "bs970": "080M46",
+      "jis": "S45C",
+      "gb": "45"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G10450"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "1055",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "1055",
+      "en_number": "1.0535",
+      "en_name": "C55",
+      "bs970": "070M55",
+      "jis": "S55C"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "1055",
+      "en_number": "1.0535",
+      "en_name": "C55",
+      "bs970": "070M55",
+      "gb": "55"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G10550",
+    "uk_en": "EN9"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "1213",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "1213",
+      "en_number": "1.0715",
+      "en_name": "9SMn28 (old DIN)",
+      "bs970": "230M07",
+      "jis": "SUM22"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "1213",
+      "en_number": "1.0715",
+      "en_name": "9SMn28 (old DIN)",
+      "bs970": "230M07",
+      "jis": "SUM22",
+      "gb": "Y15"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "en_name": "11SMn30 (EN 10087)",
+    "uk_en": "EN1A"
+   },
+   "disagreements": "WYS prints the number as 1.07159 (typo)."
+  },
+  {
+   "grade": "1215",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "1215",
+      "en_number": "1.0736",
+      "en_name": "9SMn36 (old DIN)",
+      "gb": "Y13"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "en_name": "11SMn37 (EN 10087)",
+    "jis": "SUM25"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "12L14",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "12L14",
+      "en_number": "1.0737",
+      "en_name": "9SMnPb36 (old DIN)"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "en_number": "1.0718 (11SMnPb30) is also widely quoted",
+    "jis": "SUM24L"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "4130",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "4130",
+      "en_number": "1.7218",
+      "en_name": "25CrMo4",
+      "jis": "SCM420 / SCM430"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G41300"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "4140",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "4140 / 4142",
+      "en_number": "1.7225",
+      "en_name": "42CrMo4",
+      "bs970": "708M40 / 709M40"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "4140 / 4142",
+      "bs970": "708M40 / 709M40",
+      "jis": "SCM440",
+      "gb": "40CrMoA"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G41400",
+    "uk_en": "EN19"
+   },
+   "disagreements": "MMC pairs 4140 with 1.7223 41CrMo4 (a close sister grade). WYS prints JIS 'SCN440' (typo for SCM440)."
+  },
+  {
+   "grade": "4340",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "4340",
+      "en_number": "1.6582",
+      "en_name": "34CrNiMo6",
+      "bs970": "817M40"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "4340",
+      "en_number": "1.6582",
+      "en_name": "34CrNiMo6",
+      "bs970": "817M40",
+      "gb": "40CrNiMoA"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G43400",
+    "uk_en": "EN24",
+    "jis": "SNCM439"
+   },
+   "disagreements": "WYS prints JIS 'SNcM447'; MMC gives none. SNCM439 is commonly quoted but not yet sourced."
+  },
+  {
+   "grade": "8620",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "8620",
+      "en_number": "1.6523",
+      "en_name": "21NiCrMo2",
+      "bs970": "805M20",
+      "jis": "SNCM220"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "G86200",
+    "uk_en": "EN362"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "52100",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "52100",
+      "en_number": "1.3505",
+      "en_name": "100Cr6",
+      "bs970": "534A99",
+      "jis": "SUJ2"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN31",
+    "bs970": "535A99 also quoted"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "EN40B",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "en_number": "1.7361",
+      "en_name": "32CrMo12",
+      "bs970": "722M24"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN40B"
+   },
+   "disagreements": "Nitriding steel."
+  },
+  {
+   "grade": "EN41B",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "en_number": "1.8509",
+      "en_name": "41CrAlMo7",
+      "bs970": "905M31 / 905M39",
+      "jis": "SACM645"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN41B"
+   },
+   "disagreements": "Nitriding steel."
+  },
+  {
+   "grade": "EN36",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "3310 / 9314",
+      "en_number": "1.5752",
+      "en_name": "14NiCr14",
+      "bs970": "655M13 / 655H13",
+      "jis": "SNC815"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN36"
+   },
+   "disagreements": "Case-hardening steel."
+  },
+  {
+   "grade": "EN30B",
+   "family": "Steel",
+   "subfamily": "Carbon and alloy steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "en_number": "1.6747",
+      "en_name": "30NiCrMo16-6",
+      "bs970": "835M30"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uk_en": "EN30B"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "O1",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "O1",
+      "en_number": "1.2510",
+      "en_name": "100MnCrW4",
+      "bs970": "BO1 (BS 4659)",
+      "jis": "SKS3 (approx.)"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T31501"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "O2",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "O2",
+      "en_number": "1.2842",
+      "en_name": "90MnCrV8",
+      "bs970": "BO2 (BS 4659)"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T31502"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "A2",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "A2",
+      "en_number": "1.2363",
+      "bs970": "BA2 (BS 4659)",
+      "jis": "SKD12"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "A2",
+      "en_number": "1.2363",
+      "en_name": "X100CrMoV5",
+      "jis": "SKD12",
+      "gb": "Cr5Mo1V"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T30102"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "D2",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "D2",
+      "en_number": "1.2379",
+      "bs970": "BD2 (BS 4659)",
+      "jis": "SKD11"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "D2",
+      "jis": "SKD11",
+      "gb": "Cr12MoV"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T30402",
+    "en_name": "X153CrMoV12"
+   },
+   "disagreements": "MMC pairs D2 with 1.2601 (a close sister grade); WYS with 1.2379, the usual D2 equivalent. Names printed: X155CrVMo12-1 (WYS), X153CrMoV12 (MMC, for 1.2601)."
+  },
+  {
+   "grade": "D3",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "D3",
+      "en_number": "1.2080",
+      "en_name": "X210Cr12",
+      "bs970": "BD3 (BS 4659)",
+      "jis": "SKD1"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "D3",
+      "en_number": "1.2080",
+      "en_name": "X210Cr12",
+      "jis": "SKD1"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T30403"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "H13",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "H13",
+      "en_number": "1.2344",
+      "en_name": "X40CrMoV5-1",
+      "bs970": "BH13 (BS 4659)",
+      "jis": "SKD61"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "H13",
+      "en_number": "1.2344",
+      "en_name": "X40CrMoV5-1",
+      "jis": "SKD61",
+      "gb": "40CrMoV5"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T20813"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "S1",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "S1",
+      "en_number": "1.2550",
+      "en_name": "60WCrV7 / 60WCrV8",
+      "bs970": "BS1 (BS 4659)"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "S1"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T41901"
+   },
+   "disagreements": "MMC pairs S1 with 1.2542 45WCrV7 (lower carbon sister grade)."
+  },
+  {
+   "grade": "P20",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "P20",
+      "en_number": "1.2311",
+      "en_name": "40CrMnMo7",
+      "bs970": "BP20 (BS 4659)"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T51620"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "M2",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "M2",
+      "en_number": "1.3343",
+      "bs970": "BM2 (BS 4659)"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    },
+    {
+     "source": "MMC",
+     "values": {
+      "aisi": "M2",
+      "en_number": "1.3343",
+      "en_name": "S6-5-2 (old DIN)",
+      "jis": "SKH51"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T11302",
+    "en_name": "HS6-5-2C (EN ISO 4957)"
+   },
+   "disagreements": ""
+  },
+  {
+   "grade": "M42",
+   "family": "Steel",
+   "subfamily": "Tool steel",
+   "iso_group": "P",
+   "printed": [
+    {
+     "source": "WYS",
+     "values": {
+      "aisi": "M42",
+      "en_number": "1.3247",
+      "bs970": "BM42 (BS 4659)",
+      "jis": "SKH59"
+     },
+     "verbatim_row": null,
+     "transcription": "values transcribed by hand from the source; see notes"
+    }
+   ],
+   "unsourced": {
+    "uns": "T11342",
+    "en_name": "HS2-10-1-8"
+   },
+   "disagreements": "WYS prints the name as S2-1-1-8 (typo)."
+  }
+ ]
+}

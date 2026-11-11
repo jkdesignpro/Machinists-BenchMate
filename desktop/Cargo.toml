@@ -1,0 +1,29 @@
+[package]
+name = "benchmate-desktop"
+version = "0.1.0"
+edition = "2021"
+license = "AGPL-3.0-or-later"
+description = "Native desktop wrapper (Tauri 2) for Machinists BenchMate"
+publish = false
+
+# Own workspace: the Rust core and WebAssembly crates build and test without
+# the desktop toolkits (WebKitGTK, WebView2, WKWebView) installed.
+[workspace]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+
+# Linux only: switch on WebKitGTK's media stream setting for the microphone.
+# Same version as the one Tauri (wry) uses, so no second copy is built.
+[target.'cfg(target_os = "linux")'.dependencies]
+webkit2gtk = "2.0"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+codegen-units = 1

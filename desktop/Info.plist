@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- The Tauri CLI merges this file into the app's Info.plist (macOS).
+	     macOS shows this text when the chatter finder first asks for the
+	     microphone; without it the app may not record and getUserMedia fails. -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The chatter finder listens to the cut to find the chatter frequency. Audio is analysed on this computer only; nothing is recorded, saved or sent.</string>
+</dict>
+</plist>

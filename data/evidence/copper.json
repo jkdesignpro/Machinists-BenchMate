@@ -1,0 +1,555 @@
+{
+ "sources": {
+  "AALCO_ENSTD": {
+   "title": "Copper and Copper Alloys - EN Standards for Copper Alloys (Old BS Alloy to EN Alloy table)",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-EN-Standards-for-Copper-Alloys_245.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_CW614N": {
+   "title": "CW614N Brass Rod datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW614N-Brass-Rod_31.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_CW712R": {
+   "title": "CW712R Naval Brass Rod datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW712R--Naval-Brass-Rod_177.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_CW004A": {
+   "title": "CW004A Sheet, Plate and Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW004A-Sheet-Plate-and-Bar_32.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_CW024A": {
+   "title": "CW024A Sheet and Plate datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW024A-Sheet-and-Plate_122.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_CW451K": {
+   "title": "CW451K Sheet and Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW451K--Sheet-and-Bar_120.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_CW721R": {
+   "title": "CW721R High Tensile Brass datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW721R-High-Tensile-Brass--Manganese-Bronze_115.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_CW508L": {
+   "title": "CW508L Sheet datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW508L-Sheet_114.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "RIGHTON_CW614N": {
+   "title": "CW614N CZ121 Bar datasheet (same text as Aalco - NOT independent)",
+   "url": "https://www.rightonblackburns.co.uk/datasheets/view/Righton-Blackburns-Ltd_Copper-and-Copper-Alloys-CW614N-CZ121-Bar_31.pdf",
+   "publisher": "Righton Blackburns",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_CZ121": {
+   "title": "Smiths Metal Centres CZ121 datasheet",
+   "url": "https://www.smithmetal.com/pdf/brass/cz121.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_CZ122": {
+   "title": "Smiths Metal Centres CZ122 datasheet",
+   "url": "https://www.smithmetal.com/pdf/brass/cz122.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_CZ112": {
+   "title": "Smiths Metal Centres CZ112 datasheet",
+   "url": "https://www.smithmetal.com/pdf/brass/cz112.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_LEADEDBRONZE": {
+   "title": "Smiths Metal Centres leaded bronze index page (names only)",
+   "url": "https://www.smithmetal.com/leaded-bronze.htm",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "DIEHL_002": {
+   "title": "Diehl Brass Solutions Material Datasheet 002",
+   "url": "https://www.diehl.com/cms/files/Diehl_Brass_Solutions_Material_Datasheet_002.pdf",
+   "publisher": "Diehl Brass Solutions (brass mill)",
+   "accessed": "2026-11-10"
+  },
+  "DIEHL_003": {
+   "title": "Diehl Brass Solutions Material Datasheet 003",
+   "url": "https://www.diehl.com/cms/files/Diehl_Brass_Solutions_Material_Datasheet_003.pdf",
+   "publisher": "Diehl Brass Solutions (brass mill)",
+   "accessed": "2026-11-10"
+  },
+  "ALUMECO_CW617N": {
+   "title": "CW617N data sheet",
+   "url": "https://www.metalcentergroup.fi/media/14ghwxgo/cw617n_version1.pdf",
+   "publisher": "Alumeco A/S",
+   "accessed": "2026-11-10"
+  },
+  "CDA_BRASSES": {
+   "title": "Standard Designation for Wrought Copper Alloys - wrought brasses (C2xxxx-C4xxxx)",
+   "url": "https://datasheets.copper.org/wrought-brasses.pdf",
+   "publisher": "datasheets.copper.org (Copper Development Association US domain; publisher not named on page)",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "CW614N CuZn39Pb3 (CZ121, free-cutting brass)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW614N",
+     "values": {
+      "en_number": "CW614N",
+      "en_name": "CuZn39Pb3",
+      "uns": "C38500",
+      "bs_old": "CZ121",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ121/CW614N corresponds to the following designations but may not be a direct equivalent: UNS C38500 CuZn39Pb3"
+    },
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CW614N",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "CZ121",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ121 | CW614N | Free Machining Brass"
+    },
+    {
+     "source": "RIGHTON_CW614N",
+     "values": {
+      "en_number": "CW614N",
+      "en_name": "CuZn39Pb3",
+      "uns": "C38500",
+      "bs_old": "CZ121",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": "Identical to Aalco text - not independent"
+     },
+     "verbatim_row": "CZ121/CW614N corresponds to the following designations but may not be a direct equivalent: UNS C38500 CuZn39Pb3"
+    },
+    {
+     "source": "SMITHS_CZ121",
+     "values": {
+      "en_number": "CW614N",
+      "en_name": "CuZn39Pb3",
+      "uns": "C38500",
+      "bs_old": "CZ121 (BS2874)",
+      "jis": null,
+      "iso": null,
+      "din_wnr": "2.0401",
+      "other": "France: CuZn40Pb3 (NF A51-105)"
+     },
+     "verbatim_row": "C38500 / CW614N / BS2874 / 2.0401 / NF A51-105 / CuZn39Pb3 / CuZn40Pb3 (FR)"
+    },
+    {
+     "source": "DIEHL_002",
+     "values": {
+      "en_number": "CW614N",
+      "en_name": "CuZn39Pb3",
+      "uns": "C38500",
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "DIN EN symbol CuZn39Pb3; DIN EN number CW614N; UNS C38500"
+    },
+    {
+     "source": "CDA_BRASSES",
+     "values": {
+      "en_number": null,
+      "en_name": null,
+      "uns": "C38500",
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": "CDA calls C38500 'Architectural Bronze'; C36000 is the US 'Free-Cutting Brass' (no EN number given)"
+     },
+     "verbatim_row": "C38500 Architectural Bronze 55.0 (3) 59.0 2.5 3.5 Rem 0.35 active ; C36000 Free-Cutting Brass 60.0 63.0 (3) 2.5 3.0 Rem 0.35 active"
+    }
+   ],
+   "disagreements": "All sources agree CW614N = CuZn39Pb3 = C38500 = CZ121. Note for US users: the US 'free-cutting brass' is C36000, which the CDA sheet does not tie to CW614N. No JIS found in this pass."
+  },
+  {
+   "grade": "CW617N CuZn40Pb2 (CZ122)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "DIEHL_003",
+     "values": {
+      "en_number": "CW617N",
+      "en_name": "CuZn40Pb2",
+      "uns": "C38000",
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "DIN EN symbol CuZn40Pb2; DIN EN number CW617N; UNS C38000"
+    },
+    {
+     "source": "ALUMECO_CW617N",
+     "values": {
+      "en_number": "CW617N",
+      "en_name": "CuZn40Pb2",
+      "uns": null,
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": "2.0402",
+      "other": null
+     },
+     "verbatim_row": "Internal alloy name CW617N; International alloy name CuZn40Pb2; DIN-Werkstoff no. 2.0402"
+    },
+    {
+     "source": "SMITHS_CZ122",
+     "values": {
+      "en_number": "CW617N",
+      "en_name": "CuZn39Pb2",
+      "uns": "C37700",
+      "bs_old": "CZ122",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ122 / CW617N / C37700 / CuZn39Pb2"
+    }
+   ],
+   "disagreements": "DISAGREEMENT: Diehl and Alumeco print CW617N = CuZn40Pb2 (Diehl UNS C38000). Smiths prints CW617N alongside 'CuZn39Pb2' and UNS C37700 - CuZn39Pb2 is a different EN alloy (CW612N per EN 12164), so Smiths is likely mixing two alloys. UNS C38000 vs C37700 also differs."
+  },
+  {
+   "grade": "CW712R CuZn36Sn1Pb (CZ112, naval brass)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW712R",
+     "values": {
+      "en_number": "CW712R",
+      "en_name": "CuZn36Sn1Pb",
+      "uns": null,
+      "bs_old": "CZ112",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ112/CW712R corresponds to the following designation but may not be a direct equivalent: CuZn36Sn1Pb"
+    },
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CW712R",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "CZ112",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ112 | CW712R | Naval Brass"
+    },
+    {
+     "source": "SMITHS_CZ112",
+     "values": {
+      "en_number": "CW712R",
+      "en_name": "CuZn36Sn1Pb",
+      "uns": null,
+      "bs_old": "CZ112",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ112/CW712R correspond to CuZn36Sn1Pb but may not be a direct equivalent"
+    },
+    {
+     "source": "CDA_BRASSES",
+     "values": {
+      "en_number": null,
+      "en_name": null,
+      "uns": "C46400",
+      "bs_old": null,
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": "CDA names C46400 'Naval Brass'; no EN cross-reference printed"
+     },
+     "verbatim_row": "C46400 Naval Brass, Uninhibited 59.0 (8) 62.0 0.20 0.50 1.0 Rem 0.10 active"
+    }
+   ],
+   "disagreements": "No source printed a UNS number against CW712R; C46400 is the US 'naval brass' but no source in this pass links the two."
+  },
+  {
+   "grade": "CW721R (CZ114, high tensile brass / 'manganese bronze')",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW721R",
+     "values": {
+      "en_number": "CW721R",
+      "en_name": null,
+      "uns": "C67500",
+      "bs_old": "CZ114",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CW721R/CZ114 Brass corresponds to the following designations but may not be a direct equivalent: UNS C67500 ... CZ114 is also sometimes called Manganese Bronze."
+    },
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CW721R & CW722R",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "CZ114",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ114 | CW721R & CW722R | High Tensile Brass / Manganese Bronze"
+    }
+   ],
+   "disagreements": "Only Aalco (one publisher)."
+  },
+  {
+   "grade": "CW508L CuZn37 (CZ108)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW508L",
+     "values": {
+      "en_number": "CW508L",
+      "en_name": null,
+      "uns": "C27200",
+      "bs_old": "CZ108",
+      "jis": null,
+      "iso": "CuZn37",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ108 / CW508L corresponds to the following designations but may not be a direct equivalent: UNS C27200 ISO CuZn37"
+    },
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CW508L",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "CZ108",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CZ108 | CW508L |"
+    }
+   ],
+   "disagreements": "Only Aalco."
+  },
+  {
+   "grade": "CW451K CuSn5 (PB102, phosphor bronze)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW451K",
+     "values": {
+      "en_number": "CW451K",
+      "en_name": null,
+      "uns": "C51000",
+      "bs_old": "PB102",
+      "jis": null,
+      "iso": "CuSn5",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CW451K/PB102 Bronze corresponds to the following designations but may not be a direct equivalent: UNS C51000 ISO CuSn5"
+    },
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CW451K",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "PB102",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "PB102 | CW451K | Phosphor Bronze"
+    }
+   ],
+   "disagreements": "Only Aalco. Smiths phosphor-bronze page could not be fetched (fetch budget exhausted)."
+  },
+  {
+   "grade": "CW307G (CA104, aluminium bronze)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CW307G",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "CA104",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "CA104 | CW307G | Aluminium Bronze"
+    }
+   ],
+   "disagreements": "Only Aalco; its CW307G datasheet has no designations section. EN name (CuAl10Ni5Fe4) and UNS not printed by any fetched source."
+  },
+  {
+   "grade": "CW004A Cu-ETP (C101)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW004A",
+     "values": {
+      "en_number": "CW004A",
+      "en_name": null,
+      "uns": "C11000",
+      "bs_old": "C101",
+      "jis": null,
+      "iso": "Cu-ETP",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "C101/CW004A HC Copper corresponds to the following designations but may not be a direct equivalent: UNS C11000 ISO Cu-ETP"
+    },
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CR004A",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "C101",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "C101 | CR004A |"
+    }
+   ],
+   "disagreements": "Aalco is internally inconsistent: its conversion table prints C101 -> 'CR004A' (and C104 -> CR008A, C106 -> CR024A) while its datasheet prints CW004A. CR-prefix numbers are refinery-shape designations; the wrought product number is CW004A. Treat 'CR004A' as an error for a wrought-bar lookup."
+  },
+  {
+   "grade": "CW024A Cu-DHP (C106)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW024A",
+     "values": {
+      "en_number": "CW024A",
+      "en_name": null,
+      "uns": "C12200",
+      "bs_old": "C106",
+      "jis": null,
+      "iso": "Cu-DHP",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "C106/CW024A Copper corresponds to the following designations but may not be a direct equivalent: UNS C12200 ISO Cu-DHP"
+    },
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CR024A",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "C106",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "C106 | CR024A |"
+    }
+   ],
+   "disagreements": "Same CR/CW inconsistency as C101."
+  },
+  {
+   "grade": "CW008A Cu-OF (C103?)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_ENSTD",
+     "values": {
+      "en_number": "CR008A",
+      "en_name": null,
+      "uns": null,
+      "bs_old": "C104",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "C104 | CR008A |"
+    }
+   ],
+   "disagreements": "Aalco maps old BS C104 (not C103) to CR008A. Commonly C103 = Cu-OF = CW008A, but no fetched source printed that; flag for verification. OF copper UNS (C10200) not printed by any fetched source."
+  },
+  {
+   "grade": "LG2 leaded gunmetal (CC491K)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "SMITHS_LEADEDBRONZE",
+     "values": {
+      "en_number": null,
+      "en_name": null,
+      "uns": null,
+      "bs_old": "LG2",
+      "jis": null,
+      "iso": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "LG2 Leaded Bronze: https://www.smithmetal.com/lg2.htm"
+    }
+   ],
+   "disagreements": "Not researched to completion: fetch budget exhausted before LG2 / CC491K / C83600 cross-reference could be read. No equivalence data recorded."
+  },
+  {
+   "grade": "Beryllium copper CW101C (CuBe2)",
+   "family": "Copper alloy",
+   "printed": [],
+   "disagreements": "Not researched: Smiths CW101C page fetch failed (budget exhausted). No values recorded."
+  }
+ ]
+}

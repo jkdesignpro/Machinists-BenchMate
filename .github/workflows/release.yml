@@ -1,0 +1,105 @@
+name: Release
+
+# Builds the desktop installers and creates a DRAFT GitHub Release.
+# Run it from the Actions tab (Run workflow, enter e.g. v0.1.0) or push a tag v*.
+# Nothing is published until the owner presses "Publish release" on the draft.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. v0.1.0 (must match tauri.conf.json and the Cargo.toml files)"
+        required: true
+        type: string
+      macos_intel:
+        description: "Also build macOS Intel (x86_64)"
+        required: false
+        type: boolean
+        default: false
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prep:
+    name: Check version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      tag: ${{ steps.v.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        name: Work out the version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then TAG="${GITHUB_REF_NAME}"; else TAG="${INPUT_VERSION}"; fi
+          case "$TAG" in v*) ;; *) TAG="v$TAG" ;; esac
+          if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "::error::Version '$TAG' is not like v1.2.3"; exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+      - name: Versions in the code match the release
+        run: python3 scripts/check-versions.py "${{ steps.v.outputs.tag }}"
+
+  build:
+    name: Build
+    needs: prep
+    uses: ./.github/workflows/build-desktop.yml
+    with:
+      version: ${{ needs.prep.outputs.version }}
+      macos_intel: ${{ inputs.macos_intel == true }}
+    secrets:
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+
+  release:
+    name: Create draft release
+    needs: [prep, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.prep.outputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          python3 scripts/changelog-section.py "$TAG" > notes.md
+          cat >> notes.md <<'EOF'
+
+          ---
+          **Installing:** see the README (Download and install). Windows may show a SmartScreen warning
+          (More info > Run anyway) while the installers are unsigned; on macOS, open the app once, then
+          System Settings > Privacy & Security > Open Anyway.
+          EOF
+          cat notes.md
+
+      - name: Create or update the draft release
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG exists; replacing its files."
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* --draft --target "$GITHUB_SHA" \
+              --title "Machinists BenchMate $TAG" --notes-file notes.md
+          fi

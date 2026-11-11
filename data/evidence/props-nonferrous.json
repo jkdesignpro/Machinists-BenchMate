@@ -1,0 +1,1110 @@
+{
+ "note": "Material properties printed by each source for aluminium and copper alloys. See docs/material-equivalents.md.",
+ "sources": {
+  "AALCO_6082": {
+   "title": "Aluminium Alloy 6082 T6 Extrusions datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-6082-T6-Extrusions_338.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10",
+   "revision": "no datasheet date printed (page copyright 2026)"
+  },
+  "MIF_6082-T6": {
+   "title": "MakeItFrom: 6082-T6 Aluminum",
+   "url": "https://www.makeitfrom.com/material-properties/6082-T6-Aluminum",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10",
+   "revision": "no date printed"
+  },
+  "MIF_6061-T6": {
+   "title": "MakeItFrom: 6061-T6 Aluminum",
+   "url": "https://www.makeitfrom.com/material-properties/6061-T6-Aluminum",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10",
+   "revision": "no date printed"
+  },
+  "MIF_7075-T6": {
+   "title": "MakeItFrom: 7075-T6 Aluminum",
+   "url": "https://www.makeitfrom.com/material-properties/7075-T6-Aluminum",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10",
+   "revision": "no date printed"
+  },
+  "MIF_2011-T3": {
+   "title": "MakeItFrom: 2011-T3 Aluminum",
+   "url": "https://www.makeitfrom.com/material-properties/2011-T3-Aluminum",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10",
+   "revision": "no date printed"
+  },
+  "MIF_5083-O": {
+   "title": "MakeItFrom: 5083-O Aluminum",
+   "url": "https://www.makeitfrom.com/material-properties/5083-O-Aluminum",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10",
+   "revision": "no date printed"
+  },
+  "AALCO_2011": {
+   "title": "Aluminium Alloy 2011 T3 Rod and Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-2011-T3-Rod-and-Bar_3.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10",
+   "revision": "no datasheet date printed (page copyright 2026)"
+  },
+  "AALCO_5083": {
+   "title": "Aluminium Alloy 5083 O/H111 Sheet and Plate datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-5083-0-H111-Sheet-and-Plate_149.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10",
+   "revision": "no datasheet date printed (page copyright 2026)"
+  },
+  "AALCO_CW614N": {
+   "title": "CW614N Brass Rod datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW614N-Brass-Rod_31.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10",
+   "revision": "no datasheet date printed (page copyright 2026)",
+   "notes": "Mechanical values are ranges across all tempers of EN 12164 bar 6-80 mm with no temper stated: not recorded."
+  },
+  "SMITHS_CZ121": {
+   "title": "Smiths Metal Centres CZ121 data sheet",
+   "url": "https://www.smithmetal.com/pdf/brass/cz121.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10",
+   "revision": "© 2023; no issue date printed",
+   "notes": "Tensile 360-580 MPa and elongation 15-25 % printed without temper or size: not recorded."
+  },
+  "AALCO_CW451K": {
+   "title": "CW451K Sheet and Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Copper-and-Copper-Alloys-CW451K--Sheet-and-Bar_120.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10",
+   "revision": "no datasheet date printed (page copyright 2026)",
+   "notes": "Mechanical values are ranges across all tempers of EN 1652 sheet with no temper stated: not recorded."
+  },
+  "AIRCRAFTMATERIALS_PB102": {
+   "title": "Aircraft Materials: Phosphor bronze PB102",
+   "url": "https://aircraftmaterials.com/data/copper/pb102.html",
+   "publisher": "Aircraft Materials (UK stockist)",
+   "accessed": "2026-11-10",
+   "revision": "no date printed; cites BS 2870/2873/2874 (superseded by BS EN 1652/12166/12164 etc.)"
+  },
+  "DIEHL_002": {
+   "title": "Diehl Brass Solutions material data sheet 002 (CuZn39Pb3, CW614N, C38500)",
+   "url": "https://www.diehl.com/cms/files/Diehl_Brass_Solutions_Material_Datasheet_002.pdf",
+   "publisher": "Diehl Brass Solutions",
+   "accessed": "2026-11-10",
+   "revision": "no date printed; 'not subject to any revision service'",
+   "notes": "States strength and hardness are specified in EN 12164/12165/12167/12168 by product, condition and size; prints no mechanical values."
+  }
+ },
+ "grades": [
+  {
+   "grade": "6082",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_6082",
+     "printed_as": "6082 T6",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 2.7,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Density 2.7 g/cm³"
+      },
+      {
+       "prop": "cte",
+       "value": 24,
+       "unit": "x10^-6 /K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 24 x10^-6 /K"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 70,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Modulus of Elasticity 70 GPa"
+      },
+      {
+       "prop": "k",
+       "value": 180,
+       "unit": "W/m.K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 180 W/m.K"
+      },
+      {
+       "prop": "rp02",
+       "value": 250,
+       "unit": "MPa",
+       "cond": "T6 bar <=20 mm",
+       "condition": "T6, Rod & Bar - Up to 20mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Rod & Bar - Up to 20mm Dia. & A/F | Proof Stress 250 Min MPa | Tensile Strength 295 Min MPa | Elongation A 8 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "rm",
+       "value": 295,
+       "unit": "MPa",
+       "cond": "T6 bar <=20 mm",
+       "condition": "T6, Rod & Bar - Up to 20mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Rod & Bar - Up to 20mm Dia. & A/F | Proof Stress 250 Min MPa | Tensile Strength 295 Min MPa | Elongation A 8 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "elongation",
+       "value": 8,
+       "unit": "%",
+       "cond": "T6 bar <=20 mm, A",
+       "condition": "T6, Rod & Bar - Up to 20mm Dia. & A/F (BS EN 755-2:2008), elongation A",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Rod & Bar - Up to 20mm Dia. & A/F | Proof Stress 250 Min MPa | Tensile Strength 295 Min MPa | Elongation A 8 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "hardness",
+       "value": 95,
+       "unit": "HB",
+       "cond": "T6 bar <=20 mm",
+       "condition": "T6, Rod & Bar - Up to 20mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "unstated",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Rod & Bar - Up to 20mm Dia. & A/F | Proof Stress 250 Min MPa | Tensile Strength 295 Min MPa | Elongation A 8 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "rp02",
+       "value": 260,
+       "unit": "MPa",
+       "cond": "T6 bar 20-150 mm",
+       "condition": "T6, Rod & Bar - 20mm to 150mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Rod & Bar - 20mm to 150mm Dia. & A/F | Proof Stress 260 Min MPa | Tensile Strength 310 Min MPa | Elongation A 8 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "rm",
+       "value": 310,
+       "unit": "MPa",
+       "cond": "T6 bar 20-150 mm",
+       "condition": "T6, Rod & Bar - 20mm to 150mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Rod & Bar - 20mm to 150mm Dia. & A/F | Proof Stress 260 Min MPa | Tensile Strength 310 Min MPa | Elongation A 8 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "elongation",
+       "value": 8,
+       "unit": "%",
+       "cond": "T6 bar 20-150 mm, A",
+       "condition": "T6, Rod & Bar - 20mm to 150mm Dia. & A/F (BS EN 755-2:2008), elongation A",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Rod & Bar - 20mm to 150mm Dia. & A/F | Proof Stress 260 Min MPa | Tensile Strength 310 Min MPa | Elongation A 8 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "hardness",
+       "value": 95,
+       "unit": "HB",
+       "cond": "T6 bar 20-150 mm",
+       "condition": "T6, Rod & Bar - 20mm to 150mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "unstated",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Rod & Bar - 20mm to 150mm Dia. & A/F | Proof Stress 260 Min MPa | Tensile Strength 310 Min MPa | Elongation A 8 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "rp02",
+       "value": 240,
+       "unit": "MPa",
+       "cond": "T6 bar 150-200 mm",
+       "condition": "T6, Bar - 150mm to 200mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Bar - 150mm to 200mm Dia. & A/F | Proof Stress 240 Min MPa | Tensile Strength 280 Min MPa | Elongation A 6 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "rm",
+       "value": 280,
+       "unit": "MPa",
+       "cond": "T6 bar 150-200 mm",
+       "condition": "T6, Bar - 150mm to 200mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Bar - 150mm to 200mm Dia. & A/F | Proof Stress 240 Min MPa | Tensile Strength 280 Min MPa | Elongation A 6 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "elongation",
+       "value": 6,
+       "unit": "%",
+       "cond": "T6 bar 150-200 mm, A",
+       "condition": "T6, Bar - 150mm to 200mm Dia. & A/F (BS EN 755-2:2008), elongation A",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Bar - 150mm to 200mm Dia. & A/F | Proof Stress 240 Min MPa | Tensile Strength 280 Min MPa | Elongation A 6 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "hardness",
+       "value": 95,
+       "unit": "HB",
+       "cond": "T6 bar 150-200 mm",
+       "condition": "T6, Bar - 150mm to 200mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "unstated",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Bar - 150mm to 200mm Dia. & A/F | Proof Stress 240 Min MPa | Tensile Strength 280 Min MPa | Elongation A 6 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "rp02",
+       "value": 200,
+       "unit": "MPa",
+       "cond": "T6 bar 200-250 mm",
+       "condition": "T6, Bar - 200mm to 250mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Bar - 200mm to 250mm Dia. & A/F | Proof Stress 200 Min MPa | Tensile Strength 270 Min MPa | Elongation A 6 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "rm",
+       "value": 270,
+       "unit": "MPa",
+       "cond": "T6 bar 200-250 mm",
+       "condition": "T6, Bar - 200mm to 250mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Bar - 200mm to 250mm Dia. & A/F | Proof Stress 200 Min MPa | Tensile Strength 270 Min MPa | Elongation A 6 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "elongation",
+       "value": 6,
+       "unit": "%",
+       "cond": "T6 bar 200-250 mm, A",
+       "condition": "T6, Bar - 200mm to 250mm Dia. & A/F (BS EN 755-2:2008), elongation A",
+       "basis": "min",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Bar - 200mm to 250mm Dia. & A/F | Proof Stress 200 Min MPa | Tensile Strength 270 Min MPa | Elongation A 6 Min % | Hardness Brinell 95 HB"
+      },
+      {
+       "prop": "hardness",
+       "value": 95,
+       "unit": "HB",
+       "cond": "T6 bar 200-250 mm",
+       "condition": "T6, Bar - 200mm to 250mm Dia. & A/F (BS EN 755-2:2008)",
+       "basis": "unstated",
+       "verbatim": "Mechanical Properties: BS EN 755-2:2008 | Bar - 200mm to 250mm Dia. & A/F | Proof Stress 200 Min MPa | Tensile Strength 270 Min MPa | Elongation A 6 Min % | Hardness Brinell 95 HB"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "MIF_6082-T6",
+     "printed_as": "6082-T6 Aluminum",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 2.7,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 2.7 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 69,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic (Young's, Tensile) Modulus 69 GPa"
+      },
+      {
+       "prop": "rm",
+       "value": 330,
+       "unit": "MPa",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6 (solution heat-treated and artificially aged), product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Ultimate (UTS) 330 MPa"
+      },
+      {
+       "prop": "rp02",
+       "value": 270,
+       "unit": "MPa",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6 (solution heat-treated and artificially aged), product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Yield (Proof) 270 MPa"
+      },
+      {
+       "prop": "elongation",
+       "value": 9.8,
+       "unit": "%",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6 (solution heat-treated and artificially aged), product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Elongation at Break 9.8 %"
+      },
+      {
+       "prop": "hardness",
+       "value": 93,
+       "unit": "HB",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6 (solution heat-treated and artificially aged), product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Brinell Hardness 93"
+      },
+      {
+       "prop": "cte",
+       "value": 23,
+       "unit": "µm/m-K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 23 µm/m-K"
+      },
+      {
+       "prop": "k",
+       "value": 160,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 160 W/m-K"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "6061",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "MIF_6061-T6",
+     "printed_as": "6061-T6 Aluminum",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 2.7,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 2.7 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 69,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic (Young's, Tensile) Modulus 69 GPa"
+      },
+      {
+       "prop": "rm",
+       "value": 310,
+       "unit": "MPa",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Ultimate (UTS) 310 MPa"
+      },
+      {
+       "prop": "rp02",
+       "value": 270,
+       "unit": "MPa",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Yield (Proof) 270 MPa"
+      },
+      {
+       "prop": "elongation",
+       "value": 10,
+       "unit": "%",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Elongation at Break 10 %"
+      },
+      {
+       "prop": "hardness",
+       "value": 93,
+       "unit": "HB",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Brinell Hardness 93"
+      },
+      {
+       "prop": "cte",
+       "value": 24,
+       "unit": "µm/m-K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 24 µm/m-K"
+      },
+      {
+       "prop": "k",
+       "value": 170,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 170 W/m-K"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "7075",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "MIF_7075-T6",
+     "printed_as": "7075-T6 Aluminum",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 3.0,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 3.0 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 70,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic (Young's, Tensile) Modulus 70 GPa"
+      },
+      {
+       "prop": "rm",
+       "value": 560,
+       "unit": "MPa",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Ultimate (UTS) 560 MPa"
+      },
+      {
+       "prop": "rp02",
+       "value": 480,
+       "unit": "MPa",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Yield (Proof) 480 MPa"
+      },
+      {
+       "prop": "elongation",
+       "value": 7.9,
+       "unit": "%",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Elongation at Break 7.9 %"
+      },
+      {
+       "prop": "hardness",
+       "value": 150,
+       "unit": "HB",
+       "cond": "T6 (MakeItFrom)",
+       "condition": "T6, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Brinell Hardness 150"
+      },
+      {
+       "prop": "cte",
+       "value": 23,
+       "unit": "µm/m-K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 23 µm/m-K"
+      },
+      {
+       "prop": "k",
+       "value": 130,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 130 W/m-K"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "2011",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "MIF_2011-T3",
+     "printed_as": "2011-T3 Aluminum",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 3.1,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 3.1 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 71,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic (Young's, Tensile) Modulus 71 GPa"
+      },
+      {
+       "prop": "rm",
+       "value": 360,
+       "unit": "MPa",
+       "cond": "T3 (MakeItFrom)",
+       "condition": "T3, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Ultimate (UTS) 360 MPa"
+      },
+      {
+       "prop": "rp02",
+       "value": 280,
+       "unit": "MPa",
+       "cond": "T3 (MakeItFrom)",
+       "condition": "T3, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Yield (Proof) 280 MPa"
+      },
+      {
+       "prop": "elongation",
+       "value": 12,
+       "unit": "%",
+       "cond": "T3 (MakeItFrom)",
+       "condition": "T3, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Elongation at Break 12 %"
+      },
+      {
+       "prop": "hardness",
+       "value": 95,
+       "unit": "HB",
+       "cond": "T3 (MakeItFrom)",
+       "condition": "T3, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Brinell Hardness 95"
+      },
+      {
+       "prop": "cte",
+       "value": 23,
+       "unit": "µm/m-K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 23 µm/m-K"
+      },
+      {
+       "prop": "k",
+       "value": 150,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 150 W/m-K"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "AALCO_2011",
+     "printed_as": "2011 T3",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 2.83,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Density 2.83 g/cm³"
+      },
+      {
+       "prop": "cte",
+       "value": 22.9,
+       "unit": "x10^-6 /K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 22.9 x10^-6 /K"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 70,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Modulus of Elasticity 70 GPa"
+      },
+      {
+       "prop": "k",
+       "value": 151,
+       "unit": "W/m.K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 151 W/m.K"
+      },
+      {
+       "prop": "rp02",
+       "value": 270,
+       "unit": "MPa",
+       "cond": "T3 bar <=200 mm",
+       "condition": "T3, extruded and drawn bar up to 200 mm dia. or 60 mm A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "BS EN 755-2:2008 | Extruded and Drawn Bar, up to 200mm Dia. or 60mm A/F | T3 | Proof Stress 270 Min MPa | Tensile Strength 320 Min MPa | Hardness Brinell 90 Min HB | Elongation A 10 Min %"
+      },
+      {
+       "prop": "rm",
+       "value": 320,
+       "unit": "MPa",
+       "cond": "T3 bar <=200 mm",
+       "condition": "T3, extruded and drawn bar up to 200 mm dia. or 60 mm A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "BS EN 755-2:2008 | Extruded and Drawn Bar, up to 200mm Dia. or 60mm A/F | T3 | Proof Stress 270 Min MPa | Tensile Strength 320 Min MPa | Hardness Brinell 90 Min HB | Elongation A 10 Min %"
+      },
+      {
+       "prop": "hardness",
+       "value": 90,
+       "unit": "HB",
+       "cond": "T3 bar <=200 mm",
+       "condition": "T3, extruded and drawn bar up to 200 mm dia. or 60 mm A/F (BS EN 755-2:2008)",
+       "basis": "min",
+       "verbatim": "BS EN 755-2:2008 | Extruded and Drawn Bar, up to 200mm Dia. or 60mm A/F | T3 | Proof Stress 270 Min MPa | Tensile Strength 320 Min MPa | Hardness Brinell 90 Min HB | Elongation A 10 Min %"
+      },
+      {
+       "prop": "elongation",
+       "value": 10,
+       "unit": "%",
+       "cond": "T3 bar <=200 mm, A",
+       "condition": "T3, extruded and drawn bar up to 200 mm dia. or 60 mm A/F (BS EN 755-2:2008), elongation A",
+       "basis": "min",
+       "verbatim": "BS EN 755-2:2008 | Extruded and Drawn Bar, up to 200mm Dia. or 60mm A/F | T3 | Proof Stress 270 Min MPa | Tensile Strength 320 Min MPa | Hardness Brinell 90 Min HB | Elongation A 10 Min %"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "5083",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "MIF_5083-O",
+     "printed_as": "5083-O Aluminum",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 2.7,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 2.7 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 68,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic (Young's, Tensile) Modulus 68 GPa"
+      },
+      {
+       "prop": "rm",
+       "value": 300,
+       "unit": "MPa",
+       "cond": "O annealed (MakeItFrom)",
+       "condition": "O (annealed), product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Ultimate (UTS) 300 MPa"
+      },
+      {
+       "prop": "rp02",
+       "value": 140,
+       "unit": "MPa",
+       "cond": "O annealed (MakeItFrom)",
+       "condition": "O (annealed), product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Yield (Proof) 140 MPa"
+      },
+      {
+       "prop": "elongation",
+       "value": 17,
+       "unit": "%",
+       "cond": "O annealed (MakeItFrom)",
+       "condition": "O (annealed), product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Elongation at Break 17 %"
+      },
+      {
+       "prop": "hardness",
+       "value": 75,
+       "unit": "HB",
+       "cond": "O annealed (MakeItFrom)",
+       "condition": "O (annealed), product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Brinell Hardness 75"
+      },
+      {
+       "prop": "cte",
+       "value": 24,
+       "unit": "µm/m-K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 24 µm/m-K"
+      },
+      {
+       "prop": "k",
+       "value": 120,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 120 W/m-K"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "AALCO_5083",
+     "printed_as": "5083 O/H111",
+     "values": {},
+     "properties": [
+      {
+       "prop": "cte",
+       "value": 25,
+       "unit": "x10^-6 /K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 25 x10^-6 /K"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 72,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Modulus of Elasticity 72 GPa"
+      },
+      {
+       "prop": "k",
+       "value": 121,
+       "unit": "W/m.K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 121 W/m.K"
+      },
+      {
+       "prop": "density",
+       "value": 265,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Density | 265 g/cm³",
+       "note": "Printed exactly so on the page (re-checked 2026-11-10): no decimal point. Almost certainly a misprint for 2.65; kept as printed."
+      },
+      {
+       "prop": "rp02",
+       "value": 125,
+       "unit": "MPa",
+       "cond": "O/H111 sheet 0.2-6.3 mm",
+       "condition": "O/H111, Sheet 0.2 - 6.3mm thick (BS EN 485-2:2008)",
+       "basis": "min",
+       "verbatim": "BS EN 485-2:2008 | Sheet 0.2 - 6.3mm thick | Proof Stress 125 Min MPa | Tensile Strength 275 - 350 MPa | Hardness 75 HB"
+      },
+      {
+       "prop": "rm",
+       "value": 275,
+       "max": 350,
+       "unit": "MPa",
+       "cond": "O/H111 sheet 0.2-6.3 mm",
+       "condition": "O/H111, Sheet 0.2 - 6.3mm thick (BS EN 485-2:2008)",
+       "basis": "range",
+       "verbatim": "BS EN 485-2:2008 | Sheet 0.2 - 6.3mm thick | Proof Stress 125 Min MPa | Tensile Strength 275 - 350 MPa | Hardness 75 HB"
+      },
+      {
+       "prop": "hardness",
+       "value": 75,
+       "unit": "HB",
+       "cond": "O/H111 sheet 0.2-6.3 mm",
+       "condition": "O/H111, Sheet 0.2 - 6.3mm thick (BS EN 485-2:2008)",
+       "basis": "unstated",
+       "verbatim": "BS EN 485-2:2008 | Sheet 0.2 - 6.3mm thick | Proof Stress 125 Min MPa | Tensile Strength 275 - 350 MPa | Hardness 75 HB"
+      },
+      {
+       "prop": "rp02",
+       "value": 115,
+       "unit": "MPa",
+       "cond": "O/H111 plate 6.3-80 mm",
+       "condition": "O/H111, Plate 6.3mm to 80mm (BS EN 485-2:2008)",
+       "basis": "min",
+       "verbatim": "BS EN 485-2:2008 | Plate 6.3mm to 80mm | Proof Stress 115 Min MPa | Tensile Strength 270 - 345 MPa | Hardness 75 HB"
+      },
+      {
+       "prop": "rm",
+       "value": 270,
+       "max": 345,
+       "unit": "MPa",
+       "cond": "O/H111 plate 6.3-80 mm",
+       "condition": "O/H111, Plate 6.3mm to 80mm (BS EN 485-2:2008)",
+       "basis": "range",
+       "verbatim": "BS EN 485-2:2008 | Plate 6.3mm to 80mm | Proof Stress 115 Min MPa | Tensile Strength 270 - 345 MPa | Hardness 75 HB"
+      },
+      {
+       "prop": "hardness",
+       "value": 75,
+       "unit": "HB",
+       "cond": "O/H111 plate 6.3-80 mm",
+       "condition": "O/H111, Plate 6.3mm to 80mm (BS EN 485-2:2008)",
+       "basis": "unstated",
+       "verbatim": "BS EN 485-2:2008 | Plate 6.3mm to 80mm | Proof Stress 115 Min MPa | Tensile Strength 270 - 345 MPa | Hardness 75 HB"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "CW614N CuZn39Pb3 (CZ121, free-cutting brass)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW614N",
+     "printed_as": "CW614N (CZ121)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8.47,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Density 8.47 g/cm³"
+      },
+      {
+       "prop": "cte",
+       "value": 20.9,
+       "unit": "x10^-6 /K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 20.9 x10^-6 /K"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 97,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Modulus of Elasticity 97 GPa"
+      },
+      {
+       "prop": "k",
+       "value": 123,
+       "unit": "W/m.K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 123 W/m.K"
+      },
+      {
+       "prop": "machinability",
+       "value": 100,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "Condition not stated",
+       "basis": "typical",
+       "verbatim": "Machinability rating 100 (the standard against which other alloys are measured)",
+       "ref": "% of free-cutting brass CW614N / CZ121 (= 100)"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "SMITHS_CZ121",
+     "printed_as": "CZ121",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 100,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "Condition not stated",
+       "basis": "typical",
+       "verbatim": "With a machinability rating of 100%, CZ121 is the standard by which all other copper based alloys are rated.",
+       "ref": "% of free-cutting brass CW614N / CZ121 (= 100)"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "DIEHL_002",
+     "printed_as": "Diehl 002 / CuZn39Pb3",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8.5,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 8.5 g/cm³"
+      },
+      {
+       "prop": "cte",
+       "value": 19.97,
+       "unit": "10-6/K",
+       "cond": "20-200C",
+       "condition": "Mean, 20-200 °C",
+       "basis": "typical",
+       "verbatim": "Coefficient of linear thermal expansion 20-200 °C 19.97 10-6/K"
+      },
+      {
+       "prop": "machinability",
+       "value": 100,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "Condition not stated",
+       "basis": "typical",
+       "verbatim": "Machinability very good (CuZn39Pb3 = 100%)",
+       "ref": "% of free-cutting brass CW614N / CZ121 (= 100)"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "CW451K CuSn5 (PB102, phosphor bronze)",
+   "family": "Copper alloy",
+   "printed": [
+    {
+     "source": "AALCO_CW451K",
+     "printed_as": "CW451K",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 8.85,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Density 8.85 g/cm³"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 121,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated (physical property table)",
+       "basis": "typical",
+       "verbatim": "Modulus of Elasticity 121 GPa"
+      },
+      {
+       "prop": "k",
+       "value": 63,
+       "unit": "W/m.K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 63 W/m.K"
+      },
+      {
+       "prop": "machinability",
+       "value": 20,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "Condition not stated",
+       "basis": "typical",
+       "verbatim": "rated as poor at 20 compared to Brass CZ121/CW614N which is rated as 100",
+       "ref": "% of free-cutting brass CW614N / CZ121 (= 100)"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "AIRCRAFTMATERIALS_PB102",
+     "printed_as": "PB102",
+     "values": {},
+     "properties": [
+      {
+       "prop": "rp02",
+       "value": 520,
+       "unit": "N/mm²",
+       "cond": "Cold rolled extra hard (typical)",
+       "condition": "Cold rolled, extra hard; product form and size not stated",
+       "basis": "typical",
+       "verbatim": "Typical Mechanical Properties | Pb102 | 0.2 % Proof Stress 520 N/mm² | Tensile Strength 570 N/mm² | Elongation 50mm 4 % | Hardness 180 HV ('The table shows material as cold rolled, extra hard')"
+      },
+      {
+       "prop": "rm",
+       "value": 570,
+       "unit": "N/mm²",
+       "cond": "Cold rolled extra hard (typical)",
+       "condition": "Cold rolled, extra hard; product form and size not stated",
+       "basis": "typical",
+       "verbatim": "Typical Mechanical Properties | Pb102 | 0.2 % Proof Stress 520 N/mm² | Tensile Strength 570 N/mm² | Elongation 50mm 4 % | Hardness 180 HV ('The table shows material as cold rolled, extra hard')"
+      },
+      {
+       "prop": "elongation",
+       "value": 4,
+       "unit": "%",
+       "cond": "Cold rolled extra hard (typical), A 50 mm",
+       "condition": "Cold rolled, extra hard; product form and size not stated, elongation on 50 mm",
+       "basis": "typical",
+       "verbatim": "Typical Mechanical Properties | Pb102 | 0.2 % Proof Stress 520 N/mm² | Tensile Strength 570 N/mm² | Elongation 50mm 4 % | Hardness 180 HV ('The table shows material as cold rolled, extra hard')"
+      },
+      {
+       "prop": "hardness",
+       "value": 180,
+       "unit": "HV",
+       "cond": "Cold rolled extra hard (typical)",
+       "condition": "Cold rolled, extra hard; product form and size not stated",
+       "basis": "typical",
+       "verbatim": "Typical Mechanical Properties | Pb102 | 0.2 % Proof Stress 520 N/mm² | Tensile Strength 570 N/mm² | Elongation 50mm 4 % | Hardness 180 HV ('The table shows material as cold rolled, extra hard')"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,65 @@
+{
+  "_note": "Tooling reference (parity B3). What each free publisher prints, transcribed by BenchMate with URL and access date. Values are as printed; a value is confirmed only when two independent publishers print it. Nothing is typed in from memory. Text statements in the tooling guide carry the same source keys (app/tooling.js).",
+  "sources": {
+    "OSG": {"publisher": "OSG USA", "title": "Tap drill size and pitch diameter limit chart, vol. 3, 2024", "url": "https://res.cloudinary.com/osg-usa-inc/image/upload/v1717093846/Literature/03%20-%20Charts%20and%20Guides/OSG_-_Chart_-_Tap_Drill_Size_and_Pitch_Diameter_Limit_-_Vol_3_-_2024_-_IA.pdf", "accessed": "2026-11-11", "note": "Tap maker. H1 to H6 through 1 in (each 0.0005 in wide, max = basic + n x 0.0005); over 1 in to 1-1/2 in H4 = basic + 0.0010 to + 0.0020; D3 to D9 as inch offsets over basic; recommended H and D numbers per size and class."},
+    "USCTI": {"publisher": "US Cutting Tool Institute (information from GWS Tool Group)", "title": "Tapping tips: How H-limits relate to class of fit (part 1) and Finding the perfect tap", "url": "https://www.uscti.com/uscti-pages/Tapping Tip-Finding the Perfect Tap.pdf", "accessed": "2026-11-11", "note": "Trade association page, written by a tap maker group. H and L numbers 0.0005 in each; D and DU numbers 0.013 mm each; minimum of H (and maximum of L) from the tap standards (ASME B94.9). Its M6 x 1 example uses a basic pitch diameter of 5.530 mm in the sums and 5.350 mm in the text (ISO 724 gives 5.350); the sums are kept as printed, the slip is noted."},
+    "MSC": {"publisher": "MSC Industrial Supply", "title": "Taps buying guide; Thread forming taps buying guide", "url": "https://www.mscdirect.com/resources/buying-guides/taps", "accessed": "2026-11-11", "note": "Distributor. H numbers 0.0005 in each through 1 in, e.g. H3 = basic + 0.0010 to + 0.0015; choose the largest H number that still gives the class of fit. Forming taps: drill = D - (0.0068 x %)/TPI; a metric line printed with an extra 0.0068 factor (see form_tap); and the shortcut D - P/2."},
+    "CTS": {"publisher": "Cutting Tool Supply (Addison, IL)", "title": "Manufacturing tips: H limits and class of fit", "url": "https://cutting-tool-supply.com/tech-tips/tapping/h-limits-class/h-limits-class.htm", "accessed": "2026-11-11", "note": "Distributor. H steps of 0.0005 in above the minimum (go gauge); the 40 % rule: put the tap about 40 % of the part tolerance above the minimum."},
+    "NAT": {"publisher": "North American Tool Corporation", "title": "TRU-FLO thread forming taps, engineering data (spec sheet 19000)", "url": "https://cdn.dgisupply.ca/img/product-images/Asset_URL/North_American_Tool_19000_Specification_Sheet.pdf", "accessed": "2026-11-11", "note": "Tap maker. Hole = D - 0.0068 x % / TPI; metric hole = D - % x P / 147.06; 55 % for the largest and 75 % for the smallest hole as a guide."},
+    "BESLY": {"publisher": "Besly Products Corp. (D. Gajdosik), in Cutting Tool Engineering", "title": "Threads will roll, Cutting Tool Engineering, 1 Aug 1995", "url": "https://ctemag.com/articles/threads-will-roll/", "accessed": "2026-11-11", "note": "Tap maker's engineer. Hole = tap OD - 0.0068 x % / TPI; 65 to 75 % is enough for general work; forming not recommended above 75 %. Old (1995) but matches the current makers."},
+    "FMC": {"publisher": "FM Carbide", "title": "TechTips: tapping formulas", "url": "https://fmcarbide.com/pages/tapping-formulas", "accessed": "2026-11-10", "note": "Tool seller. Forming tap constants 0.68 (as % / 100) and 147.06 (metric). Already used by the Tap drill size tool."},
+    "EE": {"publisher": "Engineers Edge", "title": "Theoretical tapping hole size, cold form threads", "url": "https://www.engineersedge.com/calculators/theoretical_tapping_hole_size_16209.htm", "accessed": "2026-11-10", "note": "Engineering reference site. Forming tap hole with 0.0068. Already used by the Tap drill size tool."},
+    "BALZERS": {"publisher": "Oerlikon Balzers", "title": "Cutting tools coating overview HQ189EN (2509)", "url": "https://www.oerlikon.com/ecoma/files/HQ189EN_CUTTING-TOOLS_Overview.pdf?download=1", "accessed": "2026-11-11", "note": "Coating maker. Max service temperature per coating: BALINIT A (TiN) 600, B (TiCN) 400, LATUMA and BALIQ ALTINOS (AlTiN based) 1000, OPTURA (TiAlN based) 1100, ALCRONA EVO and BALIQ ALCRONOS (AlCrN based) 1100, BALDIA COMPOSITE (CVD diamond) 600 deg C. Brand coatings: one value per chemistry family taken from the base coating named."},
+    "HARTNER": {"publisher": "Hartner GmbH", "title": "Coatings (HARTNER_Beschichtungen_EN)", "url": "https://www.hartner.de/wp-content/uploads/2017/08/HARTNER_Beschichtungen_EN.pdf", "accessed": "2026-11-11", "note": "Drill and tool maker. Max application temperature (printed as < value): TiN 600, TiAlN 800, AlTiN 900, TiCN 450, DLC 500, CVD diamond 600, ZrN 700 deg C."},
+    "GWS": {"publisher": "GWS Tool Group", "title": "Tool coatings", "url": "https://www.gwstoolgroup.com/tool-coatings/", "accessed": "2026-11-11", "note": "Tool maker. TiN 500 deg C; AlTiN 800 deg C, printed as an oxidation temperature. No temperature for TiCN, TiAlN or DLC."},
+    "BRYCOAT": {"publisher": "Brycoat", "title": "PVD coating properties", "url": "https://brycoat.com/surface-engineering/brycoat-pvd-coating-solutions/pvd-coating-properties/", "accessed": "2026-11-11", "note": "Coating service. Max service temperature: TiN 600, TiCN 400, TiAlN 800, AlTiN 800, CrN 700, ZrN 600 deg C."},
+    "IJS": {"publisher": "Jozef Stefan Institute, Department F3 (thin films)", "title": "Coating types", "url": "https://www.ijs.si/ijs/dept/f3/TrdePrevleke_A.htm", "accessed": "2026-11-11", "note": "Research institute. Max temperature: TiN 500, CrN 750, TiAlN 900, AlTiN (nano-layer AlTiN/TiN) 1100 deg C."},
+    "PRODINC": {"publisher": "Productivity Inc (S. Hudis)", "title": "Selecting the right end mill for your machining set up, 21 Apr 2026", "url": "https://productivity.com/blog/selecting-the-right-end-mill-for-your-machining-set-up/", "accessed": "2026-11-11", "note": "Distributor. Flutes by material, end shapes, roughers, variable pitch and helix, coatings by work material."},
+    "BROTHER": {"publisher": "Brother Industries (machine tools)", "title": "What is an end mill? (Speedio navi article a0046), 11 Jun 2024", "url": "https://machinetool.global.brother/en-us/speedio-navi/articles/a0046", "accessed": "2026-11-11", "note": "Machine tool maker. Flute count trade-offs, square, ball and radius ends, roughing end mills."},
+    "REGAL": {"publisher": "Regal Cutting Tools", "title": "Which drill point angle should I be using?, 30 Oct 2024", "url": "https://regalcuttingtools.com/which-drill-point-angle-should-i-be-using/", "accessed": "2026-11-11", "note": "Drill maker. 118 deg general purpose; 135 deg for harder materials such as stainless; point styles."},
+    "TRAVERS": {"publisher": "Travers Tool Co.", "title": "How to choose the right drill (2025); Tapping right (2021)", "url": "https://solutions.travers.com/how-to-choose-the-right-drill-in-depth-guide-travers-tool", "accessed": "2026-11-11", "note": "Distributor. Drill types, 118 and 135 deg split points, over 140 deg for very hard alloys, spot drill angle at least the drill's; tap types and chamfers (taper about 9, plug about 4, bottoming 1 to 2 threads)."},
+    "GAMMONS": {"publisher": "Gammons Hoaglund", "title": "Reaming FAQ", "url": "https://gammons.com/reaming-faq", "accessed": "2026-11-11", "note": "Reamer maker. Left-hand spiral for through holes, right-hand spiral for blind holes, straight flute general; stock about 3 % of diameter, typically 0.004 to 0.012 in; about two thirds of drilling speed."},
+    "CUTWEL": {"publisher": "Cutwel", "title": "Types of reamers", "url": "https://www.cutwel.co.uk/blog/types-of-reamers.html", "accessed": "2026-11-11", "note": "Distributor. Straight flute for blind and through holes, left-hand spiral pushes chips ahead (through holes), right-hand spiral pulls them back (blind holes); machine, hand, adjustable, taper pin reamers."},
+    "STARRETT": {"publisher": "L.S. Starrett (J. Gordon)", "title": "Sawing starts with the material, 4 May 2023", "url": "https://www.starrett.com/news-events/sawing-starts-with-the-material", "accessed": "2026-11-11", "note": "Saw blade maker. No fewer than 3 and no more than about 10 to 14 teeth in the material (rule of thumb for soft materials); larger work, coarser pitch."},
+    "RMT": {"publisher": "Revolution Machine Tools (RMT)", "title": "Do I have the right TPI and tooth pitch for my cut?", "url": "https://rmtus.com/?p=27937", "accessed": "2026-11-11", "note": "Saw machine dealer. Minimum 3 teeth in contact, preferably 6 to 12."},
+    "RAPID": {"publisher": "RapidDirect", "title": "How to remove broken taps (2022, updated 2026)", "url": "https://www.rapiddirect.com/blog/how-to-remove-broken-taps/", "accessed": "2026-11-11", "note": "Machining service. Extractors, punch and pliers, chisel, EDM, redrilling or grinding, chemical dissolving, welding a nut; prevention tips."},
+    "RS": {"publisher": "RS Components (L. Little)", "title": "How to use thread-forming taps, 2026", "url": "https://uk.rs-online.com/web/content/discovery/ideas-and-advice/how-to-use-thread-forming-taps", "accessed": "2026-11-11", "note": "Distributor. Forming taps suit soft materials such as aluminium and soft steel; no chips and no flutes; formed threads generally stronger than cut."}
+  },
+  "tap_limits": {
+    "OSG": {"h_step_in": "0.0005", "h_band_to_1in": "0.0005", "h_band_over_1in": "0.0010", "d_step_in": "0.0005"},
+    "USCTI": {"h_step_in": "0.0005", "l_step_in": "0.0005", "d_step_in": "0.000512"},
+    "MSC": {"h_step_in": "0.0005", "h_band_to_1in": "0.0005"},
+    "CTS": {"h_step_in": "0.0005", "rule_fraction": "0.4"}
+  },
+  "_tap_limits_note": "USCTI prints the D step as 0.013 mm; stored here converted to inch (0.013 / 25.4 = 0.000512) so it can be compared with OSG's inch offsets. MSC and OSG are independent (distributor and maker); USCTI is GWS Tool Group's text and CTS is a distributor.",
+  "osg_d_bands_in": {"D3": ["0.0009", "0.0015"], "D4": ["0.0012", "0.0020"], "D5": ["0.0015", "0.0025"], "D6": ["0.0018", "0.0030"], "D7": ["0.0019", "0.0035"], "D8": ["0.0024", "0.0040"], "D9": ["0.0025", "0.0045"]},
+  "osg_recommended": {
+    "1/4-20 UNC": {"2B": "H5", "3B": "H3"},
+    "3/8-16 UNC": {"2B": "H5", "3B": "H3"},
+    "1/2-13 UNC": {"2B": "H5", "3B": "H3"},
+    "M3x0.5": {"6H": "D3"},
+    "M6x1": {"6H": "D5"},
+    "M8x1.25": {"6H": "D5"},
+    "M10x1.5": {"6H": "D6"},
+    "M12x1.75": {"6H": "D6"}
+  },
+  "form_tap": {
+    "BESLY": {"inch_k": "0.0068"},
+    "NAT": {"inch_k": "0.0068", "metric_div": "147.06"},
+    "MSC": {"inch_k": "0.0068", "metric_div": "MSC prints (0.0068 x % x P) / 147.06: the 0.0068 is applied twice, which gives a hole almost at the major diameter. Read it as % x P / 147.06.", "shortcut": "D - P/2"},
+    "FMC": {"inch_k": "0.0068", "metric_div": "147.06"},
+    "EE": {"inch_k": "0.0068"}
+  },
+  "_form_tap_note": "147.06 = 1 / 0.0068, so the inch and metric forms are the same rule. MSC's shortcut D - P/2 equals the rule at 73.5 % thread. Balax (forming tap maker) prints hole sizes 0 to 0.0016 in larger than the rule for miniature sizes (see docs/sources.md, Tap drills).",
+  "coating_max_c": {
+    "BALZERS": {"TiN": "600", "TiCN": "400", "TiAlN": "1100", "AlTiN": "1000", "AlCrN": "1100", "Diamond": "600"},
+    "HARTNER": {"TiN": "600", "TiCN": "450", "TiAlN": "800", "AlTiN": "900", "DLC": "500", "Diamond": "600", "ZrN": "700"},
+    "GWS": {"TiN": "500", "AlTiN": "800"},
+    "BRYCOAT": {"TiN": "600", "TiCN": "400", "TiAlN": "800", "AlTiN": "800", "CrN": "700", "ZrN": "600"},
+    "IJS": {"TiN": "500", "TiAlN": "900", "AlTiN": "1100", "CrN": "750"}
+  },
+  "saw_teeth": {
+    "STARRETT": {"min_teeth": "3", "max_teeth": "10-14"},
+    "RMT": {"min_teeth": "3", "preferred_teeth": "6-12"}
+  }
+}

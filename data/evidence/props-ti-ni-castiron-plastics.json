@@ -1,0 +1,823 @@
+{
+ "note": "Material properties printed by each source for titanium, nickel alloys, cast irons and plastics. See docs/material-equivalents.md.",
+ "sources": {
+  "TIMET_6-4": {
+   "title": "TIMETAL 6-4, 6-4 ELI & 6-4-.1Ru datasheet (TMC-0150)",
+   "url": "https://www.timet.com/documents/datasheets/alpha-and-beta-alloys/timetal-6-4.pdf",
+   "publisher": "TIMET",
+   "accessed": "2026-11-10",
+   "revision": "©2000 (old edition; spec tables cite Mil-T-9047G, a cancelled military spec)"
+  },
+  "AEROSPACEMETALS_TI64_ANN": {
+   "title": "Titanium Ti 6Al 4V Grade 5 Annealed data sheet",
+   "url": "https://www.aerospacemetals.com/wp-content/uploads/2023/07/Titanium-Ti-6Al-4V-Grade-5-Annealed.pdf",
+   "publisher": "Aerospace Metals (sheet credits 'Allvac and the references')",
+   "accessed": "2026-11-10",
+   "revision": "no date printed",
+   "notes": "MatWeb-style sheet. Brinell, Knoop and Vickers values are printed as 'Estimated from Rockwell C' with no conversion standard cited: not recorded."
+  },
+  "MIF_TI64": {
+   "title": "MakeItFrom: Grade 5 (Ti-6Al-4V, 3.7165, R56400) Titanium",
+   "url": "https://www.makeitfrom.com/material-properties/Grade-5-Ti-6Al-4V-3.7165-R56400-Titanium",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10",
+   "revision": "no date printed",
+   "notes": "Mechanical values printed as ranges with no condition stated: not recorded."
+  },
+  "SMC_718": {
+   "title": "INCONEL alloy 718 technical bulletin (SMC-045)",
+   "url": "https://www.specialmetals.com/documents/technical-bulletins/inconel/inconel-alloy-718.pdf",
+   "publisher": "Special Metals",
+   "accessed": "2026-11-10",
+   "revision": "SMC-045, Sept 2007"
+  },
+  "KIPP_GJL250": {
+   "title": "KIPP material overview: cast iron with lamellar graphite (EN-GJL-250 / GG-25)",
+   "url": "https://sk.kipp.sk/sk/en/Service/Material-overview/Casting/pid.1097.1108.1244.9811.9815/Cast-iron-with-lamellar-graphite.html",
+   "publisher": "KIPP",
+   "accessed": "2026-11-10",
+   "revision": "no date printed; cites DIN 1561 (withdrawn, replaced by EN 1561)"
+  },
+  "WSHAMPSHIRE_PROPS": {
+   "title": "W.S. Hampshire thermoplastic properties chart",
+   "url": "https://catalog.wshampshire.com/Asset/Plastic-Properties.pdf",
+   "publisher": "W.S. Hampshire",
+   "accessed": "2026-11-10",
+   "revision": "no date printed",
+   "notes": "'The values shown in these charts are typically, average properties ... should not be used for specification or design purposes.' Elongation and thermal expansion columns not recorded: the column order and the expansion exponent ('x105') are ambiguous in the text extraction."
+  },
+  "MIF_UHMW_PEEK": {
+   "title": "MakeItFrom: PEEK vs. UHMW-PE",
+   "url": "https://www.makeitfrom.com/compare/Polyetheretherketone-PEEK/Ultra-High-Molecular-Weight-Polyethylene-UHMW-PE",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10",
+   "revision": "no date printed",
+   "notes": "PEEK values are wide ranges spanning filled and unfilled grades: not recorded."
+  },
+  "MIF_PTFE_UHMW": {
+   "title": "MakeItFrom: PTFE vs. UHMW-PE",
+   "url": "https://makeitfrom.com/compare/Polytetrafluoroethylene-PTFE/Ultra-High-Molecular-Weight-Polyethylene-UHMW-PE",
+   "publisher": "MakeItFrom",
+   "accessed": "2026-11-10",
+   "revision": "no date printed"
+  }
+ },
+ "grades": [
+  {
+   "grade": "Ti-6Al-4V (Grade 5)",
+   "family": "Titanium",
+   "printed": [
+    {
+     "source": "TIMET_6-4",
+     "printed_as": "TIMETAL 6-4",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 4.42,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "72 °F (22 °C)",
+       "basis": "typical",
+       "verbatim": "Density 72 °F (22 °C) 0.160 lb in-3; 4.42 g cm-3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 107,
+       "max": 122,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "68 °F (20 °C); 'Dependent on texture and heat treatment'",
+       "basis": "typical",
+       "verbatim": "Young's Modulus 68 °F (20 °C) 15.5-17.7 Msi; 107-122 GPa"
+      },
+      {
+       "prop": "cte",
+       "value": 9.0,
+       "unit": "10-6/C",
+       "cond": "0-100C",
+       "condition": "Mean, 32-212 °F (0-100 °C)",
+       "basis": "typical",
+       "verbatim": "Mean CTE 32-212 °F (0-100 °C) 5.0 x 10-6 in in-1 °F-1; 9.0 x 10-6 m m-1 °C-1"
+      },
+      {
+       "prop": "cte",
+       "value": 9.4,
+       "unit": "10-6/C",
+       "cond": "20-425C",
+       "condition": "Mean, 70-800 °F (20-425 °C)",
+       "basis": "typical",
+       "verbatim": "Mean CTE 70-800 °F (20-425 °C) 5.2 x 10-6 in in-1 °F-1; 9.4 x 10-6 m m-1 °C-1"
+      },
+      {
+       "prop": "k",
+       "value": 6.6,
+       "unit": "W/m.K",
+       "cond": "RT",
+       "condition": "68 °F (20 °C), mill annealed",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 68 °F (20 °C) 3.8 Btu hr-1 ft-1 °F-1; 6.6 W m-1 K-1 (Mil Annealed)"
+      },
+      {
+       "prop": "rm",
+       "value": 895,
+       "unit": "MPa",
+       "cond": "Annealed bar <3 in (ASTM B348)",
+       "condition": "Annealed, <3.00 RD or Thk. in, ASTM B348, 20 °C, minimum",
+       "basis": "min",
+       "verbatim": "<3.00 RD or Thk. | Annealed | ASTM B348 | ... | 130 (895) | 120 (828) | 10 | Table 3 Minimum | Product size (in) | Condition | Spec. | Dir. | UTS ksi (MPa) | 0.2% YS ksi (MPa) | Elong. % | RA %"
+      },
+      {
+       "prop": "rp02",
+       "value": 828,
+       "unit": "MPa",
+       "cond": "Annealed bar <3 in (ASTM B348)",
+       "condition": "Annealed, <3.00 RD or Thk. in, ASTM B348, 20 °C, minimum",
+       "basis": "min",
+       "verbatim": "<3.00 RD or Thk. | Annealed | ASTM B348 | ... | 130 (895) | 120 (828) | 10 | Table 3 Minimum | Product size (in) | Condition | Spec. | Dir. | UTS ksi (MPa) | 0.2% YS ksi (MPa) | Elong. % | RA %"
+      },
+      {
+       "prop": "elongation",
+       "value": 10,
+       "unit": "%",
+       "cond": "Annealed bar <3 in (ASTM B348)",
+       "condition": "Annealed, <3.00 RD or Thk. in, ASTM B348, 20 °C, minimum",
+       "basis": "min",
+       "verbatim": "<3.00 RD or Thk. | Annealed | ASTM B348 | ... | 130 (895) | 120 (828) | 10 | Table 3 Minimum | Product size (in) | Condition | Spec. | Dir. | UTS ksi (MPa) | 0.2% YS ksi (MPa) | Elong. % | RA %"
+      },
+      {
+       "prop": "rm",
+       "value": 895,
+       "unit": "MPa",
+       "cond": "Annealed sheet/plate 0.025-1 in (ASTM B265)",
+       "condition": "Annealed, 0.025-1.000 in, ASTM B265, 20 °C, minimum",
+       "basis": "min",
+       "verbatim": "0.025-1.000 | Annealed | ASTM B265 | ... | 130 (895) | 120 (828) | 10 | Table 3 Minimum | Product size (in) | Condition | Spec. | Dir. | UTS ksi (MPa) | 0.2% YS ksi (MPa) | Elong. % | RA %"
+      },
+      {
+       "prop": "rp02",
+       "value": 828,
+       "unit": "MPa",
+       "cond": "Annealed sheet/plate 0.025-1 in (ASTM B265)",
+       "condition": "Annealed, 0.025-1.000 in, ASTM B265, 20 °C, minimum",
+       "basis": "min",
+       "verbatim": "0.025-1.000 | Annealed | ASTM B265 | ... | 130 (895) | 120 (828) | 10 | Table 3 Minimum | Product size (in) | Condition | Spec. | Dir. | UTS ksi (MPa) | 0.2% YS ksi (MPa) | Elong. % | RA %"
+      },
+      {
+       "prop": "elongation",
+       "value": 10,
+       "unit": "%",
+       "cond": "Annealed sheet/plate 0.025-1 in (ASTM B265)",
+       "condition": "Annealed, 0.025-1.000 in, ASTM B265, 20 °C, minimum",
+       "basis": "min",
+       "verbatim": "0.025-1.000 | Annealed | ASTM B265 | ... | 130 (895) | 120 (828) | 10 | Table 3 Minimum | Product size (in) | Condition | Spec. | Dir. | UTS ksi (MPa) | 0.2% YS ksi (MPa) | Elong. % | RA %"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "AEROSPACEMETALS_TI64_ANN",
+     "printed_as": "Ti 6Al-4V Grade 5, annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 4.43,
+       "unit": "g/cc",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 4.43 g/cc 0.16 lb/in³"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 113.8,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Modulus of Elasticity 113.8 GPa 16500 ksi"
+      },
+      {
+       "prop": "cte",
+       "value": 8.6,
+       "unit": "µm/m-°C",
+       "cond": "20-100C",
+       "condition": "20-100 °C",
+       "basis": "typical",
+       "verbatim": "CTE, linear 20°C 8.6 µm/m-°C 4.78 µin/in-°F 20-100ºC"
+      },
+      {
+       "prop": "k",
+       "value": 6.7,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 6.7 W/m-K 46.5 BTU-in/hr-ft²-°F"
+      },
+      {
+       "prop": "rm",
+       "value": 950,
+       "unit": "MPa",
+       "cond": "Annealed (form not stated)",
+       "condition": "Annealed, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength, Ultimate 950 MPa 138000 psi"
+      },
+      {
+       "prop": "rp02",
+       "value": 880,
+       "unit": "MPa",
+       "cond": "Annealed (form not stated)",
+       "condition": "Annealed, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength, Yield 880 MPa 128000 psi"
+      },
+      {
+       "prop": "elongation",
+       "value": 14,
+       "unit": "%",
+       "cond": "Annealed (form not stated)",
+       "condition": "Annealed, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Elongation at Break 14 %"
+      },
+      {
+       "prop": "hardness",
+       "value": 36,
+       "unit": "HRC",
+       "cond": "Annealed (form not stated)",
+       "condition": "Annealed, product form and size not stated",
+       "basis": "unstated",
+       "verbatim": "Hardness, Rockwell C 36"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "MIF_TI64",
+     "printed_as": "Grade 5 Ti-6Al-4V",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 4.4,
+       "unit": "g/cm3",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 4.4 g/cm3"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 110,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic (Young's, Tensile) Modulus 110 GPa"
+      },
+      {
+       "prop": "cte",
+       "value": 8.9,
+       "unit": "µm/m-K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 8.9 µm/m-K"
+      },
+      {
+       "prop": "k",
+       "value": 6.8,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 6.8 W/m-K"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Inconel 718",
+   "family": "Nickel alloy",
+   "printed": [
+    {
+     "source": "SMC_718",
+     "printed_as": "INCONEL alloy 718",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 0.296,
+       "unit": "lb/in3",
+       "cond": "RT, annealed",
+       "condition": "Annealed",
+       "basis": "typical",
+       "verbatim": "Table 2 Density, lb/in3: Annealed 0.296"
+      },
+      {
+       "prop": "density",
+       "value": 0.297,
+       "unit": "lb/in3",
+       "cond": "RT, annealed and aged",
+       "condition": "Annealed and aged",
+       "basis": "typical",
+       "verbatim": "Table 2 Density, lb/in3: Annealed and Aged 0.297"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 29.0,
+       "unit": "Msi",
+       "cond": "RT",
+       "condition": "70 °F",
+       "basis": "typical",
+       "verbatim": "Table 4, 70°F: Young's Modulus 29.0 (ksi x 10^3)"
+      },
+      {
+       "prop": "k",
+       "value": 77,
+       "unit": "BTU.in/h.ft2.F",
+       "cond": "RT, annealed",
+       "condition": "70 °F, annealed",
+       "basis": "typical",
+       "verbatim": "Table 5, 70°F Thermal Conductivity BTU•in/ft2•h•°F: Annealed 77; Annealed + Aged 79"
+      },
+      {
+       "prop": "k",
+       "value": 79,
+       "unit": "BTU.in/h.ft2.F",
+       "cond": "RT, annealed and aged",
+       "condition": "70 °F, annealed and aged",
+       "basis": "typical",
+       "verbatim": "Table 5, 70°F Thermal Conductivity BTU•in/ft2•h•°F: Annealed 77; Annealed + Aged 79"
+      },
+      {
+       "prop": "rm",
+       "value": 180,
+       "unit": "ksi",
+       "cond": "Aged sheet/plate AMS 5596",
+       "condition": "Precipitation hardened (solution 1700-1850 °F, age 1325 °F/8 h, FC to 1150 °F, 18 h total, AC); sheet, strip and plate, AMS 5596",
+       "basis": "min",
+       "verbatim": "Minimum requirements, AMS 5596 sheet, strip & plate: Tensile Strength 180 ksi | Yield Strength (0.2% Offset) 150 ksi | Elongation in 2 in. 12 % | Hardness Rc 36 (or equivalent)"
+      },
+      {
+       "prop": "rp02",
+       "value": 150,
+       "unit": "ksi",
+       "cond": "Aged sheet/plate AMS 5596",
+       "condition": "Precipitation hardened (solution 1700-1850 °F, age 1325 °F/8 h, FC to 1150 °F, 18 h total, AC); sheet, strip and plate, AMS 5596",
+       "basis": "min",
+       "verbatim": "Minimum requirements, AMS 5596 sheet, strip & plate: Tensile Strength 180 ksi | Yield Strength (0.2% Offset) 150 ksi | Elongation in 2 in. 12 % | Hardness Rc 36 (or equivalent)"
+      },
+      {
+       "prop": "elongation",
+       "value": 12,
+       "unit": "%",
+       "cond": "Aged sheet/plate AMS 5596, in 2 in",
+       "condition": "Precipitation hardened (solution 1700-1850 °F, age 1325 °F/8 h, FC to 1150 °F, 18 h total, AC); sheet, strip and plate, AMS 5596, elongation in 2 in",
+       "basis": "min",
+       "verbatim": "Minimum requirements, AMS 5596 sheet, strip & plate: Tensile Strength 180 ksi | Yield Strength (0.2% Offset) 150 ksi | Elongation in 2 in. 12 % | Hardness Rc 36 (or equivalent)"
+      },
+      {
+       "prop": "hardness",
+       "value": 36,
+       "unit": "HRC",
+       "cond": "Aged sheet/plate AMS 5596",
+       "condition": "Precipitation hardened (solution 1700-1850 °F, age 1325 °F/8 h, FC to 1150 °F, 18 h total, AC); sheet, strip and plate, AMS 5596",
+       "basis": "min",
+       "verbatim": "Minimum requirements, AMS 5596 sheet, strip & plate: Tensile Strength 180 ksi | Yield Strength (0.2% Offset) 150 ksi | Elongation in 2 in. 12 % | Hardness Rc 36 (or equivalent)",
+       "note": "Printed 'Rc 36 (or equivalent)'."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Grey iron GG 25",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "KIPP_GJL250",
+     "printed_as": "EN-GJL-250 (GG-25)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 7.2,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density [g/cm³] 7.20"
+      },
+      {
+       "prop": "rm",
+       "value": 250,
+       "max": 350,
+       "unit": "N/mm²",
+       "cond": "As cast (DIN 1561 / EN-GJL-250)",
+       "condition": "EN-GJL-250 / GG-25 as cast; values from DIN 1561 (withdrawn; now EN 1561); test piece size not stated",
+       "basis": "range",
+       "verbatim": "Tensile strength Rm [N/mm²] 250 – 350"
+      },
+      {
+       "prop": "hardness",
+       "value": 190,
+       "max": 230,
+       "unit": "HB",
+       "cond": "As cast, sample <30 mm",
+       "condition": "EN-GJL-250 / GG-25 as cast, sample < 30 mm; DIN 1561 (withdrawn)",
+       "basis": "range",
+       "verbatim": "Brinell hardness HB30 Sample <30 mm 190 – 230"
+      },
+      {
+       "prop": "elongation",
+       "value": 0.3,
+       "max": 0.8,
+       "unit": "%",
+       "cond": "As cast (DIN 1561 / EN-GJL-250)",
+       "condition": "EN-GJL-250 / GG-25 as cast; values from DIN 1561 (withdrawn; now EN 1561); test piece size not stated",
+       "basis": "range",
+       "verbatim": "Elongation after fracture A% 0.8 – 0.3",
+       "note": "Printed high-to-low: '0.8 – 0.3'."
+      },
+      {
+       "prop": "e_modulus",
+       "value": 103,
+       "max": 118,
+       "unit": "kN/mm²",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic modulus E kN/mm² 103 – 118"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Acetal (POM)",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "WSHAMPSHIRE_PROPS",
+     "printed_as": "Acetal",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.43,
+       "unit": "SG",
+       "cond": "RT",
+       "condition": "Specific gravity, Acetal",
+       "basis": "typical",
+       "verbatim": "Acetal 9.70 16.0 380 0.90 500 13.0 200˚ 5.80 M-94 1.430 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "rm",
+       "value": 9.7,
+       "unit": "ksi",
+       "cond": "Acetal (W.S. Hampshire chart)",
+       "condition": "Acetal, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Acetal 9.70 16.0 380 0.90 500 13.0 200˚ 5.80 M-94 1.430 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "hardness",
+       "value": 94,
+       "unit": "HRM",
+       "cond": "Acetal (W.S. Hampshire chart)",
+       "condition": "Acetal, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Acetal 9.70 16.0 380 0.90 500 13.0 200˚ 5.80 M-94 1.430 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity",
+       "note": "Printed 'M-94' under the heading 'Rc Hardness'; the letter is the Rockwell scale."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "Nylon (PA)",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "WSHAMPSHIRE_PROPS",
+     "printed_as": "Nylon 6/6 Extruded",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.14,
+       "unit": "SG",
+       "cond": "RT, Nylon 6/6 Extruded",
+       "condition": "Specific gravity, Nylon 6/6 Extruded",
+       "basis": "typical",
+       "verbatim": "Nylon 6/6 Extruded 12.50 14.0 435 1.50 280.0 240.0 230˚ 4.50 R-118 1.140 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "rm",
+       "value": 12.5,
+       "unit": "ksi",
+       "cond": "Nylon 6/6 Extruded (W.S. Hampshire chart)",
+       "condition": "Nylon 6/6 Extruded, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Nylon 6/6 Extruded 12.50 14.0 435 1.50 280.0 240.0 230˚ 4.50 R-118 1.140 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "hardness",
+       "value": 118,
+       "unit": "HRR",
+       "cond": "Nylon 6/6 Extruded (W.S. Hampshire chart)",
+       "condition": "Nylon 6/6 Extruded, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Nylon 6/6 Extruded 12.50 14.0 435 1.50 280.0 240.0 230˚ 4.50 R-118 1.140 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity",
+       "note": "Printed 'R-118' under the heading 'Rc Hardness'; the letter is the Rockwell scale."
+      },
+      {
+       "prop": "density",
+       "value": 1.15,
+       "unit": "SG",
+       "cond": "RT, Nylon 6 Cast",
+       "condition": "Specific gravity, Nylon 6 Cast",
+       "basis": "typical",
+       "verbatim": "Nylon 6 Cast 12.00 15.0 350 1.40 295.0 20.0 210˚ 4.50 R-100 1.150 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "rm",
+       "value": 12.0,
+       "unit": "ksi",
+       "cond": "Nylon 6 Cast (W.S. Hampshire chart)",
+       "condition": "Nylon 6 Cast, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Nylon 6 Cast 12.00 15.0 350 1.40 295.0 20.0 210˚ 4.50 R-100 1.150 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "hardness",
+       "value": 100,
+       "unit": "HRR",
+       "cond": "Nylon 6 Cast (W.S. Hampshire chart)",
+       "condition": "Nylon 6 Cast, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Nylon 6 Cast 12.00 15.0 350 1.40 295.0 20.0 210˚ 4.50 R-100 1.150 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity",
+       "note": "Printed 'R-100' under the heading 'Rc Hardness'; the letter is the Rockwell scale."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "PEEK",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "WSHAMPSHIRE_PROPS",
+     "printed_as": "PEEK",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 1.32,
+       "unit": "SG",
+       "cond": "RT",
+       "condition": "Specific gravity, PEEK",
+       "basis": "typical",
+       "verbatim": "PEEK 13.30 18.0 531 1.55 190.0 50.0 480˚ 4.70 R-126 1.320 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "rm",
+       "value": 13.3,
+       "unit": "ksi",
+       "cond": "PEEK (W.S. Hampshire chart)",
+       "condition": "PEEK, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "PEEK 13.30 18.0 531 1.55 190.0 50.0 480˚ 4.70 R-126 1.320 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "hardness",
+       "value": 126,
+       "unit": "HRR",
+       "cond": "PEEK (W.S. Hampshire chart)",
+       "condition": "PEEK, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "PEEK 13.30 18.0 531 1.55 190.0 50.0 480˚ 4.70 R-126 1.320 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity",
+       "note": "Printed 'R-126' under the heading 'Rc Hardness'; the letter is the Rockwell scale."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "PTFE",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "WSHAMPSHIRE_PROPS",
+     "printed_as": "Teflon Virgin Grade",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 2.16,
+       "unit": "SG",
+       "cond": "RT",
+       "condition": "Specific gravity, Teflon Virgin Grade",
+       "basis": "typical",
+       "verbatim": "Teflon Virgin Grade 3.50 1.7 80 3.00 480 350.0 500˚ 5.00 R-58 2.160 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "rm",
+       "value": 3.5,
+       "unit": "ksi",
+       "cond": "Teflon Virgin Grade (W.S. Hampshire chart)",
+       "condition": "Teflon Virgin Grade, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Teflon Virgin Grade 3.50 1.7 80 3.00 480 350.0 500˚ 5.00 R-58 2.160 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "hardness",
+       "value": 58,
+       "unit": "HRR",
+       "cond": "Teflon Virgin Grade (W.S. Hampshire chart)",
+       "condition": "Teflon Virgin Grade, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Teflon Virgin Grade 3.50 1.7 80 3.00 480 350.0 500˚ 5.00 R-58 2.160 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity",
+       "note": "Printed 'R-58' under the heading 'Rc Hardness'; the letter is the Rockwell scale."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "MIF_PTFE_UHMW",
+     "printed_as": "PTFE",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 2.1,
+       "max": 2.3,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 2.1 to 2.3 g/cm3"
+      },
+      {
+       "prop": "rm",
+       "value": 13,
+       "max": 25,
+       "unit": "MPa",
+       "cond": "PTFE (MakeItFrom)",
+       "condition": "PTFE, grade and product form not stated (range)",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Ultimate (UTS) 13 to 25 MPa"
+      },
+      {
+       "prop": "elongation",
+       "value": 75,
+       "max": 300,
+       "unit": "%",
+       "cond": "PTFE (MakeItFrom)",
+       "condition": "PTFE, grade and product form not stated (range)",
+       "basis": "unstated",
+       "verbatim": "Elongation at Break 75 to 300 %"
+      },
+      {
+       "prop": "cte",
+       "value": 110,
+       "max": 120,
+       "unit": "µm/m-K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 110 to 120 µm/m-K"
+      },
+      {
+       "prop": "k",
+       "value": 0.24,
+       "max": 0.65,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 0.24 to 0.65 W/m-K"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  },
+  {
+   "grade": "UHMW-PE",
+   "family": "Plastic",
+   "printed": [
+    {
+     "source": "WSHAMPSHIRE_PROPS",
+     "printed_as": "Polyethylene 819 UHMW",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 0.94,
+       "unit": "SG",
+       "cond": "RT",
+       "condition": "Specific gravity, Polyethylene 819 UHMW",
+       "basis": "typical",
+       "verbatim": "Polyethylene 819 UHMW 6.80 N/A 110 No Break 710.0 450.0 176˚ 18.00 R-64 0.940 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "rm",
+       "value": 6.8,
+       "unit": "ksi",
+       "cond": "Polyethylene 819 UHMW (W.S. Hampshire chart)",
+       "condition": "Polyethylene 819 UHMW, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Polyethylene 819 UHMW 6.80 N/A 110 No Break 710.0 450.0 176˚ 18.00 R-64 0.940 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity"
+      },
+      {
+       "prop": "hardness",
+       "value": 64,
+       "unit": "HRR",
+       "cond": "Polyethylene 819 UHMW (W.S. Hampshire chart)",
+       "condition": "Polyethylene 819 UHMW, stock shape, typical average, test method not stated",
+       "basis": "typical",
+       "verbatim": "Polyethylene 819 UHMW 6.80 N/A 110 No Break 710.0 450.0 176˚ 18.00 R-64 0.940 | Header: Grade | Tensile KSI | Compressive KSI | Flexural Modulus PSI (10^6) | Impact | Dielectric | Elongation % | Max. Operating Temp | Thermal Expansion | Rc Hardness | Specific Gravity",
+       "note": "Printed 'R-64' under the heading 'Rc Hardness'; the letter is the Rockwell scale."
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    },
+    {
+     "source": "MIF_UHMW_PEEK",
+     "printed_as": "UHMW-PE",
+     "values": {},
+     "properties": [
+      {
+       "prop": "density",
+       "value": 0.94,
+       "unit": "g/cm³",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Density 0.94 g/cm³"
+      },
+      {
+       "prop": "e_modulus",
+       "value": 0.8,
+       "unit": "GPa",
+       "cond": "RT",
+       "condition": "Not stated",
+       "basis": "typical",
+       "verbatim": "Elastic (Young's, Tensile) Modulus 0.8 GPa"
+      },
+      {
+       "prop": "rm",
+       "value": 49,
+       "unit": "MPa",
+       "cond": "UHMW-PE (MakeItFrom)",
+       "condition": "Unfilled UHMW-PE, product form not stated",
+       "basis": "unstated",
+       "verbatim": "Tensile Strength: Ultimate (UTS) 49 MPa"
+      },
+      {
+       "prop": "elongation",
+       "value": 400,
+       "unit": "%",
+       "cond": "UHMW-PE (MakeItFrom)",
+       "condition": "Unfilled UHMW-PE, product form not stated",
+       "basis": "unstated",
+       "verbatim": "Elongation at Break 400 %"
+      },
+      {
+       "prop": "cte",
+       "value": 180,
+       "unit": "µm/m-K",
+       "cond": "range not stated",
+       "condition": "Temperature range not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Expansion 180 µm/m-K"
+      },
+      {
+       "prop": "k",
+       "value": 0.41,
+       "unit": "W/m-K",
+       "cond": "temperature not stated",
+       "condition": "Temperature not stated",
+       "basis": "typical",
+       "verbatim": "Thermal Conductivity 0.41 W/m-K"
+      }
+     ],
+     "transcription": "Values as printed; transcribed from a text extraction of the page/PDF made at access time. Table layout reconstructed, numbers and units not changed."
+    }
+   ]
+  }
+ ]
+}

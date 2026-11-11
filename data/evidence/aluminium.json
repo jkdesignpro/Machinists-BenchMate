@@ -1,0 +1,1059 @@
+{
+ "sources": {
+  "AALCO_1050A": {
+   "title": "Aluminium Alloy 1050A H14 Sheet datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-1050A-H14-Sheet_57.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_2011": {
+   "title": "Aluminium Alloy 2011 T3 Rod and Bar datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-2011-T3-Rod-and-Bar_3.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_5052": {
+   "title": "Aluminium Alloy 5052 H32 Sheet and Treadplate datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-5052-H32-Sheet-and-Treadplate_138.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_5083": {
+   "title": "Aluminium Alloy 5083 O/H111 Sheet and Plate datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-5083-0-H111-Sheet-and-Plate_149.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_5251": {
+   "title": "Aluminium Alloy 5251 H22 Sheet and Plate datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-5251-H22-Sheet-and-Plate_150.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_5754": {
+   "title": "Aluminium Alloy 5754 H22 Sheet and Plate datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-5754-H22-Sheet-and-Plate_153.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_6063": {
+   "title": "Aluminium Alloy 6063 T6 Extrusions datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-6063-T6-Extrusions_158.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_6082": {
+   "title": "Aluminium Alloy 6082 T6 Extrusions datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-6082-T6-Extrusions_338.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "AALCO_6262": {
+   "title": "Aluminium Alloy 6262 T6 Extrusions datasheet",
+   "url": "https://www.aalco.co.uk/datasheets/Aluminium-Alloy-6262-T6-Extrusions_156.ashx",
+   "publisher": "Aalco",
+   "accessed": "2026-11-10"
+  },
+  "SMITHS_6082": {
+   "title": "Smiths Metal Centres 6082 datasheet",
+   "url": "https://www.smithmetal.com/pdf/aluminium/6xxx/6082.pdf",
+   "publisher": "Smiths Metal Centres",
+   "accessed": "2026-11-10"
+  },
+  "AA_TABLE_1.2": {
+   "title": "Aluminum Standards and Data, Table 1.2 'Foreign Alloy Designations and Similar AA Alloys' (May 2009)",
+   "url": "https://www.aluminum.org/sites/default/files/2022-12/Table_1.2.pdf",
+   "publisher": "The Aluminum Association",
+   "accessed": "2026-11-10"
+  },
+  "KENNAMETAL": {
+   "title": "Kennametal Material Data Base (non-ferrous section), hosted by MSC",
+   "url": "https://www1.mscdirect.com/images/solutions/kennametal/materialDataBase.pdf",
+   "publisher": "Kennametal",
+   "accessed": "2026-11-10"
+  },
+  "PARKER": {
+   "title": "Parker Steel colour chart - aluminium bars (BS EN 755 vs BS 1474)",
+   "url": "https://parkersteel.co.uk/sharedupgrade/media/pdf/doc/BS/ColourChart.pdf",
+   "publisher": "Parker Steel",
+   "accessed": "2026-11-10"
+  },
+  "AIRCRAFTMATERIALS": {
+   "title": "Aluminium Alloys index with UK/US/European specifications",
+   "url": "https://aircraftmaterials.com/data/aluminium/alalu.html",
+   "publisher": "Aircraft Materials (UK stockist)",
+   "accessed": "2026-11-10"
+  },
+  "TI_XREF": {
+   "title": "Aluminum Alloys Cross Reference, Table 1",
+   "url": "https://titanium.com/technical-references/aluminum-alloys-cross-reference",
+   "publisher": "Titanium Industries Inc.",
+   "accessed": "2026-11-10"
+  },
+  "MES_CHART": {
+   "title": "Global Aluminum Alloy Conversion Chart (casting alloys)",
+   "url": "https://www.mesinc.net/wp-content/uploads/2025/03/Global-Aluminum-Alloy-Conversion-Chart.pdf",
+   "publisher": "MES Inc. (supply-chain firm) - lower-tier source",
+   "accessed": "2026-11-10"
+  },
+  "YAMAHA_JIS": {
+   "title": "Japanese Industrial Standards Data - Aluminum alloy castings: comparison table between JIS and related foreign standards",
+   "url": "https://global.yamaha-motor.com/business/cf/data/jis/",
+   "publisher": "Yamaha Motor (casting business)",
+   "accessed": "2026-11-10"
+  }
+ },
+ "grades": [
+  {
+   "grade": "1050 / 1050A",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_1050A",
+     "values": {
+      "aa": "1050 (page is for 1050A)",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "S1B",
+      "uns": "A91050",
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "Aluminium alloy 1050A also corresponds to the following standard designations and specifications but may not be a direct equivalent: AA1050 S1B A91050"
+    },
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "1050",
+      "en_aw": null,
+      "en_name": "Al99,5",
+      "bs_old": null,
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "Al99,5 1050"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "1050",
+      "en_aw": null,
+      "en_name": "Al99,5",
+      "bs_old": "1B",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.0255",
+      "other": "AFNOR A5"
+     },
+     "verbatim_row": "20 1050 3.0255 Al99,5 1B A5"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "1050A",
+      "en_aw": null,
+      "en_name": "Al99.5",
+      "bs_old": "1B",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.0255",
+      "other": "BS 5 L36 (rivet stock); AFNOR A5"
+     },
+     "verbatim_row": "1050A: WS 3.0255, EN AW-Al99.5; A5 - 1050A; BS 1B 1050A Sheet, plate; BS 5 L36 Rivet stock"
+    }
+   ],
+   "disagreements": "Aalco gives the UNS for 1050 (A91050) on a 1050A datasheet; 1050 and 1050A are distinct EN 573-3 alloys. Old BS: 'S1B' (Aalco, sheet form prefix) vs '1B' (Kennametal, Aircraft Materials)."
+  },
+  {
+   "grade": "1200",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "1200",
+      "en_aw": null,
+      "en_name": "Al99",
+      "bs_old": null,
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "Al99 1200"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "1200",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "1C",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.0205",
+      "other": "AFNOR A4; BS L16/L17/L34/L54/L116 aerospace specs"
+     },
+     "verbatim_row": "1200: WS 3.0205; A4 - 1200; BS 6 L16 ...; BS 6 L17 ...; BS 5 L34 ...; BS 4 L 54 ...; BS L116 ...; BS 1C"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "2011",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_2011",
+     "values": {
+      "aa": "2011",
+      "en_aw": null,
+      "en_name": "AlCu6BiPb",
+      "bs_old": "FC1",
+      "uns": "A92011",
+      "jis": null,
+      "din_wnr": "3.1655",
+      "other": "CB60 (Canadian); old DIN AlCuBiPb"
+     },
+     "verbatim_row": "Aluminium alloy 2011 also corresponds to the following standard designations and specifications but may not be a direct equivalent: AlCu6BiPb FC1 A92011 CB60 3.1655 AlCuBiPb:"
+    },
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "2011",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": null,
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.1655",
+      "other": "DIN AlCuBiPb; Canada CB60"
+     },
+     "verbatim_row": "AlCuBiPb R } 2011 3.1655 T ; CB60 2011"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "2011",
+      "en_aw": null,
+      "en_name": "AlCu6BiPb",
+      "bs_old": "FC1",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.1655",
+      "other": "AFNOR A-U5PbBi"
+     },
+     "verbatim_row": "80-160 2011 3.1655 AlCu6BiPb FC1 A-U5PbBi"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aa": null,
+      "en_aw": "AW-2011",
+      "en_name": "EN AW-AlCu6BiPb",
+      "bs_old": "FC1",
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "3 AW-2011 EN AW-AlCu6BiPb FC1 Orange"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "2011",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "FC1",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.1655",
+      "other": null
+     },
+     "verbatim_row": "2011: WS 3.1655; AlCu(Bi/Mg)Pb, A-U5PbBi; BS FC1 2011 Bar & Rod"
+    }
+   ],
+   "disagreements": "Consistent: FC1 / AlCu6BiPb / 3.1655."
+  },
+  {
+   "grade": "2014 / 2014A",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "2014 / 2014A",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "L.93, L.94 (-> 2014A)",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.1255",
+      "other": "ISO AlCu4SiMg; AFNOR A-U4SG"
+     },
+     "verbatim_row": "AlCuSiMn R } Germany 2014 3.1255 T ; ... AlCu4SiMg 2014 ; A-U4SG 2014 ; L.93, L.94 Great Britain 2014A"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aa": null,
+      "en_aw": "AW-2014",
+      "en_name": "EN AW-AlCu4SiMg",
+      "bs_old": "HE15",
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "4 AW-2014 EN AW-AlCu4SiMg HE15 Green"
+    },
+    {
+     "source": "TI_XREF",
+     "values": {
+      "aa": "2014",
+      "en_aw": "EN AW-2014",
+      "en_name": null,
+      "bs_old": "H 15",
+      "uns": "A92014",
+      "jis": "A2014",
+      "din_wnr": "3.1255",
+      "other": null
+     },
+     "verbatim_row": "A92014 | AA2014 | 3.1255 | EN AW-2014 | A-U4SG | A2014 | H 15"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "2014A",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "H15 / HE15 / HS15 / HP15 / HT15; L93 etc",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.1255",
+      "other": "AFNOR A-U4SG"
+     },
+     "verbatim_row": "2014A: WS 3.1255; A-U4SG, AlCu4SiMg, AECMA 2387; ... BS H15, HS15, HP15, HT15, HE15; BS 2 L93 2014A-T651 Plate ..."
+    }
+   ],
+   "disagreements": "Parker pairs EN AW-2014 with name 'AlCu4SiMg' - Aircraft Materials and the AA table attach AlCu4SiMg / 3.1255 to 2014A (2014 vs 2014A are distinct EN alloys; check EN 573-3). Aalco's 2014A datasheet has no designations section."
+  },
+  {
+   "grade": "2024",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "2024",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "L.97, L.98",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.1355",
+      "other": "ISO AlCu4Mg1; AFNOR A-U4G1; DIN AlCuMg2"
+     },
+     "verbatim_row": "AlCuMg2 R } 2024 3.1355 T ; L.97, L.98 2024 ; ... AlCu4Mg1 2024 ; A-U4G1 2024"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "2024",
+      "en_aw": null,
+      "en_name": "AlCu4Mg1",
+      "bs_old": "L97",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.1355",
+      "other": null
+     },
+     "verbatim_row": "45-135 2024 3.1355 AlCu4Mg1 L97 A-U4G1"
+    },
+    {
+     "source": "TI_XREF",
+     "values": {
+      "aa": "2024",
+      "en_aw": "EN AW-2024",
+      "en_name": null,
+      "bs_old": "L97/L98",
+      "uns": "A92024",
+      "jis": "A2024",
+      "din_wnr": "3.1355",
+      "other": null
+     },
+     "verbatim_row": "A92024 | AA2024 | 3.1355 | EN AW-2024 | A-U4G1 | A2024 | L97/L98"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "2024",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "L97 / L98",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.1355 / 3.1354 / 3.1364",
+      "other": null
+     },
+     "verbatim_row": "2024: WS 3.1354 (bare sheet), WS 3.1364 (Alclad sheet), WS 3.1355; BS 2 L97 2024-T351 Plate; BS 2 L98 2024-T4 Plate; BS L109; BS L110; DTD 5100A"
+    }
+   ],
+   "disagreements": "Consistent."
+  },
+  {
+   "grade": "5052",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_5052",
+     "values": {
+      "aa": "5052",
+      "en_aw": null,
+      "en_name": "Al Mg 2.5",
+      "bs_old": null,
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": "Al 2.5Mg Cr"
+     },
+     "verbatim_row": "Alloy 5052 corresponds to the following standard designations and specifications but may not be a direct equivalent: Al Mg 2.5 Al 2.5Mg Cr"
+    },
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "5052",
+      "en_aw": null,
+      "en_name": "AlMg2.5",
+      "bs_old": "2L.55, 2L.56, L.80, L.81",
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": "Canada GR20"
+     },
+     "verbatim_row": "2L.55, 2L.56 5052 ; L.80, L.81 5052 ; GR20 5052 ; AlMg2.5 5052 ; P-AlMg2.5 5052"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "5052",
+      "en_aw": null,
+      "en_name": "AlMg2,5",
+      "bs_old": "2L56",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3523",
+      "other": "AFNOR A-G2,5C"
+     },
+     "verbatim_row": "47-88 5052 3.3523 AlMg2,5 2L56 A-G2,5C"
+    }
+   ],
+   "disagreements": "AA table lists L.80/L.81 under 5052, whereas Aircraft Materials lists BS 3 L80 / 3 L81 under 5251 - conflicting."
+  },
+  {
+   "grade": "5083",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_5083",
+     "values": {
+      "aa": "5083",
+      "en_aw": null,
+      "en_name": "Al Mg4.5 Mn0.7",
+      "bs_old": null,
+      "uns": "A95083",
+      "jis": null,
+      "din_wnr": null,
+      "other": "'AlMG4.5Mn' (sic, capital G); Canada GM41"
+     },
+     "verbatim_row": "Alloy 5083 corresponds to the following standard designations and specifications but may not be a direct equivalent: GM41 A95083 AlMG4.5Mn Al Mg4.5 Mn0.7"
+    },
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "5083",
+      "en_aw": null,
+      "en_name": "AlMg4.5Mn",
+      "bs_old": "N8",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3547",
+      "other": null
+     },
+     "verbatim_row": "AlMg4.5Mn R } 5083 3.3547 T ; N8 5083 ; GM41 Canada 5083 ; AlMg4.5Mn 5083"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "5083",
+      "en_aw": null,
+      "en_name": "ASlMg4,5Mn",
+      "bs_old": "N8",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3547",
+      "other": "AFNOR A-G4,5MC"
+     },
+     "verbatim_row": "77-93 5083 3.3547 ASlMg4,5Mn N8 A-G4,5MC"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "5083",
+      "en_aw": null,
+      "en_name": "AlMg4.5Mn",
+      "bs_old": "N8",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3547",
+      "other": null
+     },
+     "verbatim_row": "5083: WS 3.3547; AlMg4.5Mn, A-G4.5MC; BS N8 Alloy 5083 Sheet and Plate"
+    }
+   ],
+   "disagreements": "Kennametal prints 'ASlMg4,5Mn' (typo for AlMg4,5Mn). Aalco prints 'AlMG4.5Mn'. Old BS printed as N8 by all three (form-prefixed NS8 = sheet is not printed by these sources)."
+  },
+  {
+   "grade": "5251",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_5251",
+     "values": {
+      "aa": "5251",
+      "en_aw": null,
+      "en_name": "Al Mg2",
+      "bs_old": null,
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": "Al 2.0Mg 0.3Mn"
+     },
+     "verbatim_row": "Alloy 5251 corresponds to the following standard designations and specifications, although may not be a direct equivalent: Al Mg2 Al 2.0Mg 0.3Mn"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "5251",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "N4",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3525",
+      "other": "AFNOR A-G2M; BS 3L80/3L81/3L56/5L44"
+     },
+     "verbatim_row": "5251: WS 3.3525; A-G2M; BS 5L44 ...; BS 3L56 ...; BS 3 L80 Alloy 5251-0 Sheet and Strip; BS 3 L81 Alloy 5251-H16/H26 ...; BS N4 Alloy 5251"
+    }
+   ],
+   "disagreements": "Not in AA Table 1.2 or Kennametal."
+  },
+  {
+   "grade": "5754",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_5754",
+     "values": {
+      "aa": "5754",
+      "en_aw": "AW-5754",
+      "en_name": "Al Mg3",
+      "bs_old": null,
+      "uns": "A95754",
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "Alloy 5754 also corresponds to the following standard designations and specifications but may not be a direct equivalent: A95754 Al Mg3 Al 3.1Mg Mn Cr AW-5754"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "5754",
+      "en_aw": null,
+      "en_name": "AlMg3",
+      "bs_old": "N5",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3535",
+      "other": "AFNOR A-G3M"
+     },
+     "verbatim_row": "60-95 5754 3.3535 AlMg3 N5 A-G3M"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "6060",
+   "family": "Aluminium",
+   "printed": [],
+   "disagreements": "No designation section found: Aalco 6060 datasheet has none; not in AA Table 1.2, Kennametal or Aircraft Materials (truncated). Kennametal maps old-DIN AlMgSi0,5 / 3.3206 to 6063 instead."
+  },
+  {
+   "grade": "6061",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "6061",
+      "en_aw": null,
+      "en_name": "AlMg1SiCu",
+      "bs_old": "H20",
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": "Canada GS11N"
+     },
+     "verbatim_row": "H20 6061 ; GS11N 6061 ; AlMg1SiCu 6061"
+    },
+    {
+     "source": "TI_XREF",
+     "values": {
+      "aa": "6061",
+      "en_aw": "EN AW-6061",
+      "en_name": null,
+      "bs_old": "H20",
+      "uns": "A96061",
+      "jis": "A6061",
+      "din_wnr": "3.3211",
+      "other": "AFNOR A-GSUC"
+     },
+     "verbatim_row": "A96061 | AA6061 | 3.3211 | EN AW-6061 | A-GSUC | A6061 | H20"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "6061",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "H20 / HE20 / HP20 / HS20",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3211",
+      "other": null
+     },
+     "verbatim_row": "6061: WS 3.3211, WS 3.3214; ... BS L117; BS L118; H20; HE20 6061 Extrusions; HP20 6061 Plate; HS20 6061 Sheet"
+    }
+   ],
+   "disagreements": "Consistent: H20 / 3.3211. Aalco 6061 datasheet has no designations section."
+  },
+  {
+   "grade": "6063",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_6063",
+     "values": {
+      "aa": "6063",
+      "en_aw": null,
+      "en_name": "Al Mg0.7Si",
+      "bs_old": "HE19",
+      "uns": "A96063",
+      "jis": null,
+      "din_wnr": "3.32206",
+      "other": "Canada GS10; DIN AlMgSi0.5; AFNOR A-GS"
+     },
+     "verbatim_row": "AA6063, Al Mg0.7Si, GS10, AlMgSi0.5, A-GS, 3.32206, ASTM B210, ... UNS A96063, HE19 [list as printed]"
+    },
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "6063",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "H19",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3206",
+      "other": "DTD 372B"
+     },
+     "verbatim_row": "AlMgSi0.5 R } 6063 3.3206 T ; H19 6063 ; 372B 6063 ; AlMgSi0,5 6063 ; GS10 6063 ; A-GS 6063"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "6063",
+      "en_aw": null,
+      "en_name": "AlMg0,5Si",
+      "bs_old": "H9",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.3206",
+      "other": null
+     },
+     "verbatim_row": "25-105 6063 3.3206 AlMg0,5Si H9"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aa": null,
+      "en_aw": "AW-6063",
+      "en_name": "EN AW-AlMg0,7Si",
+      "bs_old": "HE9",
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "2 AW-6063 EN AW-AlMg0,7Si HE9 Blue"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "6063",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "H9",
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "6063: BS H9 Alloy 6063; DTD 372B 6063 Bars and Sections"
+    }
+   ],
+   "disagreements": "OLD BS DISAGREES: H9/HE9 (Kennametal, Parker, Aircraft Materials) vs H19 (AA Table 1.2) vs HE19 (Aalco). The '19' variants may be a different BS alloy or a long-propagated error - verify against BS 1474. Aalco DIN number '3.32206' has an extra digit (3.3206 elsewhere). EN name: AlMg0,7Si (Aalco, Parker) vs Kennametal 'AlMg0,5Si'."
+  },
+  {
+   "grade": "6082",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_6082",
+     "values": {
+      "aa": "6082",
+      "en_aw": "EN AW-6082",
+      "en_name": "Al Si1MgMn",
+      "bs_old": "HE30",
+      "uns": "A96082",
+      "jis": null,
+      "din_wnr": "3.2315",
+      "other": null
+     },
+     "verbatim_row": "Aluminium alloy 6082 also corresponds to the following standard designations and specifications but may not be a direct equivalent: AA6082 HE30 DIN 3.2315 EN AW-6082 ISO: Al Si1MgMn A96082"
+    },
+    {
+     "source": "SMITHS_6082",
+     "values": {
+      "aa": "6082",
+      "en_aw": "EN AW-6082",
+      "en_name": "Al Si1MgMn",
+      "bs_old": "HE30",
+      "uns": "A96082",
+      "jis": null,
+      "din_wnr": "3.2315",
+      "other": "Identical to Aalco text - NOT independent"
+     },
+     "verbatim_row": "AA6082 HE30 DIN 3.2315 EN AW-6082 ISO: Al Si1MgMn A96082"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aa": null,
+      "en_aw": "AW-6082",
+      "en_name": "EN AW-AlSilMgMn",
+      "bs_old": "HE30",
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "1 AW-6082 EN AW-AlSilMgMn HE30 Red"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "6351",
+      "en_aw": null,
+      "en_name": "AlSiMg0,5Mn",
+      "bs_old": "H30",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.2315",
+      "other": "Kennametal row is for AA 6351, not 6082, but uses 3.2315 and H30"
+     },
+     "verbatim_row": "58-95 6351 3.2315 AlSiMg0,5Mn H30"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "6082",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "HE30 / HP30 / HT30 / HG30 / HS30",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.2315",
+      "other": "old DIN AlMgSi1Mn; AFNOR A-SGM0.7"
+     },
+     "verbatim_row": "6082: WS 3.2315; AlMgSi1Mn, A-SGM0.7; BS HE30 6082 Extrusions; BS HP30 Plate; BS HT30 Tube; BS HG30 Wire; BS HS30 Sheet; BS L111-L115"
+    }
+   ],
+   "disagreements": "Parker prints 'AlSilMgMn' (lower-case L for digit 1 - typo). Kennametal attaches 3.2315/H30 to AA 6351 (no 6082 row) - a known 'nearest alloy' pairing, but 6351 and 6082 are different AA alloys. Not listed in AA Table 1.2."
+  },
+  {
+   "grade": "6262",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AALCO_6262",
+     "values": {
+      "aa": "6262",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": null,
+      "uns": "A96262",
+      "jis": null,
+      "din_wnr": null,
+      "other": "Al 1.0Mg 0.6Si Pb; Aalco notes replaced by 6026 (lower Pb)"
+     },
+     "verbatim_row": "Aluminium alloy 6262 also corresponds to the following standard designations and specifications but may not be a direct equivalent: AA6262 Al 1.0Mg 0.6Si Pb A96262"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aa": null,
+      "en_aw": "AW-6262",
+      "en_name": "AlMg1SiPb",
+      "bs_old": null,
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "8 AW-6262 AlMg1SiPb - Pink"
+    }
+   ],
+   "disagreements": null
+  },
+  {
+   "grade": "7020",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "7020",
+      "en_aw": null,
+      "en_name": "AlZn4.5Mg1",
+      "bs_old": "H17",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.4335",
+      "other": "AFNOR A-Z5G"
+     },
+     "verbatim_row": "7020: WS 3.4335; EN AW-AlZn4.5Mg1, A-Z5G; BS H17 Alloy 7020"
+    }
+   ],
+   "disagreements": "Only one source found in this pass."
+  },
+  {
+   "grade": "7075",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "AA_TABLE_1.2",
+     "values": {
+      "aa": "7075",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "L.95, L.96",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.4365",
+      "other": "'AIZn6MgCu' printed with capital I; AFNOR A-Z5GU"
+     },
+     "verbatim_row": "AlZnMgCu1.5 R } 7075 3.4365 T ; L.95, L.96 (BS) Y 7075 ; AlZnMgCu1,5 7075 ; ZG62 7075 ; ... AIZn6MgCu 7075 ; A-Z5GU 7075"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "7075",
+      "en_aw": null,
+      "en_name": "AlZn5,5MgCu",
+      "bs_old": "DTD5074",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.4365",
+      "other": null
+     },
+     "verbatim_row": "60-150 7075 3.4365 AlZn5,5MgCu DTD5074 A-Z5GU"
+    },
+    {
+     "source": "PARKER",
+     "values": {
+      "aa": null,
+      "en_aw": "AW-7075",
+      "en_name": "EN AW-AlZn5,5MgCu",
+      "bs_old": null,
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "7 AW-7075 EN AW-AlZn5,5MgCu - White"
+    },
+    {
+     "source": "TI_XREF",
+     "values": {
+      "aa": "7075",
+      "en_aw": "EN AW7075",
+      "en_name": null,
+      "bs_old": "2L95",
+      "uns": "A97075",
+      "jis": "A7075",
+      "din_wnr": "3.4365",
+      "other": null
+     },
+     "verbatim_row": "A97075 | AA7075 | 3.4365 | EN AW7075 | A-Z5GU | A7075 | 2L95"
+    },
+    {
+     "source": "AIRCRAFTMATERIALS",
+     "values": {
+      "aa": "7075",
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": "L95 / L88 / L160-L170; DTD 5110 / 5124",
+      "uns": null,
+      "jis": null,
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "7075: EN 2127; BS 2 L95 Alloy 7075-T651 Plate; BS 2 L88 ...; BS L160; L161; L162; L170; DTD 5110; DTD 5124"
+    }
+   ],
+   "disagreements": "Consistent on 3.4365 / L95. TI prints 'EN AW7075' (missing hyphen)."
+  },
+  {
+   "grade": "LM6 (AlSi12)",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "MES_CHART",
+     "values": {
+      "aa": "A413",
+      "en_aw": "44100 (EN AC)",
+      "en_name": "AL-Mg6",
+      "bs_old": "LM6",
+      "uns": null,
+      "jis": "AC3A",
+      "din_wnr": null,
+      "other": "AFNOR AS13; DIN G-AlSi12 (230); UNI 4514"
+     },
+     "verbatim_row": "LM6 AL-Mg6 44100 AS13 G-AlSi12 (230) 4514 A413 - AC3A Sand, gravity; thin sections, manifolds, etc"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "413.0",
+      "en_aw": null,
+      "en_name": "AlSi12",
+      "bs_old": null,
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.2582",
+      "other": "No BS LM value printed on this row"
+     },
+     "verbatim_row": "– 413.0 3.2582 R2147AlSi12"
+    }
+   ],
+   "disagreements": "MES prints ISO 'AL-Mg6' for LM6 (an Al-Si12 alloy) - clear error/misalignment. AA: A413 (MES) vs 413.0 (Kennametal, which gives no LM number)."
+  },
+  {
+   "grade": "LM25 (AlSi7Mg)",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "MES_CHART",
+     "values": {
+      "aa": "A356",
+      "en_aw": "42000 (EN AC)",
+      "en_name": "Al-Si7Mg",
+      "bs_old": "LM25",
+      "uns": null,
+      "jis": "AC4C",
+      "din_wnr": null,
+      "other": "AFNOR A-S7G; DIN G-AlSi7Mg; UNI 3599; SAE 323"
+     },
+     "verbatim_row": "LM25 Al-Si7Mg 42000 A-S7G G-AlSi7Mg 3599 A356 323 AC4C"
+    },
+    {
+     "source": "YAMAHA_JIS",
+     "values": {
+      "aa": null,
+      "en_aw": null,
+      "en_name": null,
+      "bs_old": null,
+      "uns": null,
+      "jis": "AC4C (-> 356 / 42000); AC4CH (-> A356 / 42100)",
+      "din_wnr": null,
+      "other": "Yamaha maps A356.2 to AC4CH and EN AB-42100, and 356.1 to AC4C / EN AB-42000"
+     },
+     "verbatim_row": "AC4C.1 | 356.1 | EN AB-42000 ; AC4CH.2 | A356.2 | EN AB-42100"
+    }
+   ],
+   "disagreements": "A356 vs 356: MES equates LM25 = 42000 = A356 = AC4C; Yamaha's JIS table pairs A356 with AC4CH / EN AB-42100 and plain 356 with AC4C / 42000. A356 is lower-Fe than 356, so an exact calculator mapping should keep them separate."
+  },
+  {
+   "grade": "LM9 (AlSi10Mg)",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "MES_CHART",
+     "values": {
+      "aa": "A360",
+      "en_aw": "43100 (EN AC)",
+      "en_name": "Al-Si10Mg",
+      "bs_old": "LM9",
+      "uns": null,
+      "jis": "AC4A",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "LM9 Al-Si10Mg 43100 A-S10G G-AlSi10Mg (233) 3049 A360 309 AC4A"
+    },
+    {
+     "source": "KENNAMETAL",
+     "values": {
+      "aa": "360.0",
+      "en_aw": null,
+      "en_name": "AlSi10Mg",
+      "bs_old": "LM 9",
+      "uns": null,
+      "jis": null,
+      "din_wnr": "3.2383",
+      "other": null
+     },
+     "verbatim_row": "– 360.0 3.2383 R2147AlSi10Mg LM 9"
+    }
+   ],
+   "disagreements": "AA: A360 (MES) vs 360.0 (Kennametal)."
+  },
+  {
+   "grade": "LM24 (AlSi8Cu3Fe)",
+   "family": "Aluminium",
+   "printed": [
+    {
+     "source": "MES_CHART",
+     "values": {
+      "aa": "A380",
+      "en_aw": "46500 (EN AC)",
+      "en_name": null,
+      "bs_old": "LM24",
+      "uns": null,
+      "jis": "AC4B / ADC10",
+      "din_wnr": null,
+      "other": null
+     },
+     "verbatim_row": "LM24 Al-Si8Cu3Fe 46500 A-S9U3A-Y4 G-AlSi8Cu3(226) 5075 / 3601 A380 306 AC4B / ADC10"
+    }
+   ],
+   "disagreements": "Single (lower-tier) source."
+  }
+ ]
+}

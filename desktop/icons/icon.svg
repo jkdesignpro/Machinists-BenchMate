@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Machinists BenchMate app icon: a vernier caliper, flat, two colours. -->
+  <rect x="32" y="32" width="960" height="960" rx="200" fill="#1d2731"/>
+  <g fill="#dfe4e8">
+    <!-- beam -->
+    <rect x="120" y="360" width="790" height="96" rx="10"/>
+    <!-- fixed outside jaw: measuring edge at x=300, tip at the bottom -->
+    <path d="M150 456 H300 V800 L286 800 L150 640 Z"/>
+    <!-- fixed inside jaw -->
+    <path d="M250 360 V240 L300 210 V360 Z"/>
+    <!-- sliding head -->
+    <rect x="404" y="328" width="230" height="160" rx="14"/>
+    <!-- sliding outside jaw: measuring edge at x=420 -->
+    <path d="M420 488 H570 L570 640 L434 800 L420 800 Z"/>
+    <!-- sliding inside jaw -->
+    <path d="M420 328 V210 L470 240 V328 Z"/>
+    <!-- thumb wheel -->
+    <circle cx="610" cy="520" r="30"/>
+  </g>
+  <!-- main scale -->
+  <g stroke="#1d2731" stroke-width="9">
+    <line x1="660" y1="360" x2="660" y2="410"/>
+    <line x1="690" y1="360" x2="690" y2="390"/>
+    <line x1="720" y1="360" x2="720" y2="390"/>
+    <line x1="750" y1="360" x2="750" y2="410"/>
+    <line x1="780" y1="360" x2="780" y2="390"/>
+    <line x1="810" y1="360" x2="810" y2="390"/>
+    <line x1="840" y1="360" x2="840" y2="410"/>
+    <line x1="870" y1="360" x2="870" y2="390"/>
+  </g>
+  <!-- vernier window on the slider -->
+  <rect x="434" y="356" width="170" height="66" rx="6" fill="#1d2731"/>
+  <g stroke="#dfe4e8" stroke-width="7">
+    <line x1="458" y1="356" x2="458" y2="396"/>
+    <line x1="485" y1="356" x2="485" y2="380"/>
+    <line x1="512" y1="356" x2="512" y2="380"/>
+    <line x1="539" y1="356" x2="539" y2="396"/>
+    <line x1="566" y1="356" x2="566" y2="380"/>
+  </g>
+</svg>
