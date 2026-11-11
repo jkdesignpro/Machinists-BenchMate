@@ -548,3 +548,20 @@ Main sources: KHK Gear Technical Reference (khkgears.us, Tables 4.3 and 4.9, and
 over-pin and chordal articles from Gear Solutions 2020); SDP/SI Elements of Metric Gear
 Technology; MESYS AG online gear calculation (calc.mesys.ch); ISO 53, ISO 21771-1, DIN 3960,
 ANSI B92.1 and ISO 4156-1 (cited by name); Engineers Edge involute spline formulas.
+
+## Mechanics (`core/src/mechanics.rs`, `app/mechanics.js`, tools in `app/tools.js`)
+
+Full list of formulas, decisions, checks and what is not verified in `docs/mechanics.md`.
+Textbooks cited by name for the relations only (nothing copied): Gere and Goodno, Mechanics of
+Materials (sections, torsion, beams, columns); Young, Budynas and Sadegh, Roark's Formulas for
+Stress and Strain, 8th ed., Table 8.1 (beam cases); Budynas and Nisbett, Shigley's Mechanical
+Engineering Design (Johnson, Goodman, Soderberg, Gerber, Langer, Marin); W. T. Thomson, Theory of
+Vibration with Applications (Rayleigh, Dunkerley). Free sources used for numbers and tests:
+- American Wood Council, Design Aid No. 6, Beam Design Formulas with Shear and Moment Diagrams (awc.org): beam maxima.
+- AISC 360-16, Commentary Table C-A-7.1 (aisc.org): effective length factors (shown as text; values not re-fetched, see docs/mechanics.md).
+- Engineers Edge, Marin endurance limit calculator (engineersedge.com/calculators/marin_endurance_limit_15637.htm), after T. H. Brown, Marks' Calculations for Machine Design: Se' = 0.504 Sut, surface factor table, size factor, Kf.
+- Penn State ME 360 notes n06_fatigue (me.psu.edu/sommer/me360/n06_fatigue.pdf), after Norton: Goodman worked example.
+- B. McGinty, Stress Concentrations at Holes (fracturemechanics.org/hole.html): Kirsch Kt = 3, finite-width fit on net section. Inglis 1913 (by name) for the elliptical hole.
+- IRD Balancing, Technical Paper 1, Balance Quality Requirements of Rigid Rotors: ISO 1940 / 21940-11 formula, plane allocation, worked example. ISO 21940-11:2016 cited by name.
+- OpenStax, University Physics Vol. 1, 6.3 (F = m r omega^2). VDI 3106 (by name); Optimum Optiturn manual 4.23.8 (manualslib.de) for Fsp0 = Ssp (Fsp +- Fc); Berg Spanntechnik speed notes (backup.berg-spanntechnik.de, drehzahlhinweise.pdf) for the one-third rule.
+- NIST SP 811 appendix B: exact unit factors (lbf, lb, hp, oz).

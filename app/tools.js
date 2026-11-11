@@ -2047,6 +2047,392 @@ const TOOLS = [
   source: 'ISO 281:2007 clause 6 (by name only). See docs/sources.md.',
 },
 {
+  id: 'section', group: 'Mechanics', title: 'Section properties',
+  desc: 'Area, centroid, second moments (Ix, Iy, product and principal), section moduli and radii of gyration of a rectangle, box tube, round bar, tube, I-beam, channel, angle or tee, built up from rectangles (sharp corners).',
+  fields: s => mkSecFields(s),
+  calc: (v, W, s) => {
+    const a = mkSecArgs(v), u = mku(s), q = i => mkSec(W, a, i);
+    if (!(q(0) > 0)) return [];
+    const rows = [R('Area A', q(0), u.A, u.adp), R('Centroid x (from the left edge)', q(1), u.L, u.dp), R('Centroid y (from the bottom)', q(2), u.L, u.dp),
+      R('Ix (about the horizontal centroidal axis)', q(3), u.I, u.idp), R('Iy (about the vertical centroidal axis)', q(4), u.I, u.idp)];
+    if (Math.abs(q(5)) > 1e-9 * q(3)) rows.push(R('Product of inertia Ixy', q(5), u.I, u.idp), R('Principal I1 (largest)', q(6), u.I, u.idp), R('Principal I2 (smallest)', q(7), u.I, u.idp), R('Angle of the I1 axis from x', q(8), 'deg', 2));
+    rows.push(R('Section modulus Sx, top fibre', q(9), u.Z, u.idp), R('Section modulus Sx, bottom fibre', q(10), u.Z, u.idp),
+      R('Section modulus Sy, left fibre', q(11), u.Z, u.idp), R('Section modulus Sy, right fibre', q(12), u.Z, u.idp),
+      R('Radius of gyration rx', q(13), u.L, u.dp), R('Radius of gyration ry', q(14), u.L, u.dp), R('Least radius of gyration (for buckling)', q(15), u.L, u.dp));
+    if (v.sec === 2 || v.sec === 3) rows.push(R('Polar moment J (torsion)', q(16), u.I, u.idp), R('Torsion section modulus J / (D/2)', q(19), u.Z, u.idp));
+    if (v.sec >= 4) rows.push(mkNote('Sharp corners: the root fillets of rolled sections are ignored, so catalogue values differ slightly. Use the maker\'s table for a rolled section.'));
+    if (v.sec === 6) rows.push(mkNote('An angle bends about its principal axes: a load parallel to a leg also bends it sideways. Use I2 and the least radius of gyration for buckling.'));
+    return rows;
+  },
+  diagram: (v, s) => typeof mkSectionSvg === 'function' ? mkSectionSvg(v, state.W) : '',
+  working: 'Built up from rectangles: A = sum Ai; centroid = sum(Ai ci) / A; I = sum(Ii + Ai d^2) (parallel-axis theorem), rectangle Ii = b h^3 / 12; round I = pi (D^4 - d^4) / 64, J = 2 I. Principal I1,2 = (Ix + Iy)/2 +- sqrt(((Ix - Iy)/2)^2 + Ixy^2), tan 2 theta = -2 Ixy / (Ix - Iy). S = I / c (c = distance from the centroid to the fibre); r = sqrt(I / A). Origin at the lower-left corner of the bounding box; the angle has its corner at the lower left, the channel its web on the left, the tee its flange on top.',
+  source: 'Gere and Goodno, Mechanics of Materials, ch. 12 (relations, by name); checked against closed forms and the AISC Manual area of L4x4x1/2. See docs/mechanics.md.',
+},
+{
+  id: 'beam', group: 'Mechanics', title: 'Beam deflection and bending stress',
+  desc: 'Cantilever, simply supported or fixed-both-ends beam with a point load anywhere and a uniform load over the whole span (either or both): deflection, slope, reactions, shear, bending moment and bending stress, with a drawing.',
+  fields: s => {
+    const u = mku(s), inch = s === 'inch';
+    return [
+      { id: 'sup', label: 'Supports', unit: '', def: 1, options: [[1, 'Simply supported (pinned both ends)'], [0, 'Cantilever (fixed at the left)'], [2, 'Fixed both ends']] },
+      { id: 'L', label: 'Span L', unit: u.L, def: inch ? 24 : 600 },
+      { id: 'P', label: 'Point load P (blank = none)', unit: u.F, def: inch ? 500 : 2000 },
+      { id: 'a', label: 'Load position a from the left end (blank = mid-span, cantilever: free end)', unit: u.L, def: '' },
+      { id: 'w', label: 'Uniform load w over the span (blank = none)', unit: u.w, def: '' },
+      { id: 'E', label: "Young's modulus E", unit: u.E, def: '' },
+    ].concat(mkSecFields(s, [[8, 'Enter I and c yourself']]), [
+      { id: 'I', label: 'Second moment I about the bending axis', unit: u.I, def: '', when: v => v.sec === 8 },
+      { id: 'c', label: 'Distance c from the neutral axis to the outer fibre', unit: u.L, def: '', when: v => v.sec === 8 },
+    ]);
+  },
+  calc: (v, W, s) => {
+    const u = mku(s), L = v.L, P = v.P > 0 || v.P < 0 ? v.P : 0, wl = v.w > 0 || v.w < 0 ? v.w : 0, sup = v.sup;
+    if (!(L > 0) || !(P || wl)) return [];
+    const a = P ? (v.a >= 0 && v.a <= L ? v.a : (sup === 0 ? L : L / 2)) : 0;
+    let I, c;
+    if (v.sec === 8) { I = v.I; c = v.c; } else { const g = mkSecArgs(v); I = mkSec(W, g, 3); const yc = mkSec(W, g, 2); c = Math.max(yc, mkSec(W, g, 18) - yc); }
+    const rows = [];
+    if (I > 0) rows.push(R('Second moment I used', I, u.I, u.idp));
+    if (!(v.E > 0 && I > 0)) { rows.push(mkNote('Enter E and the section to get deflection and stress. Reactions and moments below do not need them.')); }
+    const ei = v.E > 0 && I > 0 ? v.E * u.eK * I : 1, b = i => W.mech_beam(sup, L, a, P, wl, ei, i);
+    if (P) rows.push(R('Point load at a', a, u.L, u.dp));
+    rows.push(R('Left reaction (force)', b(7), u.F, 1));
+    if (sup !== 1) rows.push(R('Left end moment', b(8) * u.mK, u.M, 2));
+    if (sup !== 0) rows.push(R('Right reaction (force)', b(9), u.F, 1));
+    if (sup === 2) rows.push(R('Right end moment', b(10) * u.mK, u.M, 2));
+    rows.push(R('Largest shear force', b(6), u.F, 1), R('Largest bending moment (sagging +, hogging -)', b(4) * u.mK, u.M, 2), R('at x from the left end', b(5), u.L, u.dp));
+    if (v.E > 0 && I > 0) {
+      const y = Math.abs(b(0));
+      rows.push(R('Largest deflection', y, u.L, s === 'inch' ? 5 : 4), R('at x from the left end', b(1), u.L, u.dp), R('Span / deflection', L / y, '', 0),
+        R('Largest slope', Math.abs(b(2)) * 180 / Math.PI, 'deg', 4), R('at x from the left end', b(3), u.L, u.dp));
+      if (c > 0) rows.push(R('Largest bending stress M c / I', Math.abs(W.mech_bending_stress(b(4), I, c)) / u.sK, u.S, u.sdp));
+    }
+    rows.push(mkNote('Linear elastic, small deflection, shear deformation ignored (it adds noticeably when the span is under about 10 times the depth). Self-weight only if you include it in w. Supports are taken as ideal: real clamps and fixtures give a little, so a "fixed" end deflects more.'));
+    return rows;
+  },
+  diagram: (v, s) => {
+    if (typeof mkBeamSvg !== 'function') return '';
+    const W = state.W, L = v.L, P = v.P || 0, wl = v.w || 0, a = P ? (v.a >= 0 && v.a <= L ? v.a : (v.sup === 0 ? L : L / 2)) : 0;
+    return mkBeamSvg(v.sup, L, a, isFinite(P) ? P : 0, isFinite(wl) ? wl : 0, 1);
+  },
+  working: 'Sign convention E I y\'\' = -M, deflection positive in the direction of the load. Simply supported, point load at a (b = L - a): y = P b x (L^2 - b^2 - x^2) / (6 E I L) for x <= a; uniform: y = w x (L^3 - 2 L x^2 + x^3) / (24 E I). Cantilever fixed at x = 0: y = P x^2 (3a - x) / (6 E I) for x <= a; uniform: y = w x^2 (6 L^2 - 4 L x + x^2) / (24 E I). Fixed both ends: y = P b^2 x^2 (3 a L - 3 a x - b x) / (6 E I L^3) for x <= a; uniform: y = w x^2 (L - x)^2 / (24 E I). Mirror image beyond the load; both loads add (superposition). Maxima found along the span. Stress = M c / I. Checks: centre load P L^3/48EI, uniform 5wL^4/384EI, cantilever PL^3/3EI and wL^4/8EI, fixed wL^4/384EI and PL^3/192EI.',
+  source: "Roark's Formulas for Stress and Strain, Table 8.1, and Gere and Goodno, ch. 9 (relations, by name); maxima checked against American Wood Council Design Aid No. 6, Beam Design Formulas (free). See docs/mechanics.md.",
+},
+{
+  id: 'torsion', group: 'Mechanics', title: 'Shaft torsion and power',
+  desc: 'Shear stress and angle of twist of a solid or hollow round shaft, torque from power and speed (or power from torque), and the solid diameter for an allowable shear stress.',
+  fields: s => {
+    const u = mku(s), inch = s === 'inch';
+    return [
+      { id: 'D', label: 'Outside diameter D', unit: u.L, def: inch ? 1 : 25 },
+      { id: 'd', label: 'Bore d (blank = solid)', unit: u.L, def: '' },
+      { id: 'L', label: 'Length between the torque points (for twist)', unit: u.L, def: inch ? 12 : 300 },
+      { id: 'T', label: 'Torque T', unit: inch ? 'lbf·in' : 'N·m', def: inch ? 1000 : 100 },
+      { id: 'P', label: 'Or power transmitted', unit: inch ? 'hp' : 'kW', def: '' },
+      { id: 'n', label: 'Speed (for power or torque)', unit: 'rpm', def: '' },
+      { id: 'G', label: 'Shear modulus G', unit: u.E, def: '' },
+      { id: 'E', label: "Or Young's modulus E", unit: u.E, def: '' },
+      { id: 'nu', label: "with Poisson's ratio", unit: '', def: '' },
+      { id: 'tau', label: 'Allowable shear stress (for the diameter needed)', unit: u.S, def: '' },
+    ];
+  },
+  calc: (v, W, s) => {
+    const u = mku(s), inch = s === 'inch', di = v.d > 0 ? v.d : 0, rows = [];
+    // Torque in the core's units: lbf·in (inch) or N·mm (mm).
+    let T = v.T, tSrc = 'as entered';
+    if (!(T > 0) && v.P > 0 && v.n > 0) { const tnm = W.mech_shaft_torque_nm(v.P * (inch ? MK_HP_W : 1000), v.n); T = inch ? tnm / MK_LBFIN_NM : tnm; tSrc = 'from power and speed'; }
+    if (!(T > 0)) return [];
+    const Tc = inch ? T : T * 1000, Tnm = inch ? T * MK_LBFIN_NM : T;
+    rows.push(R('Torque (' + tSrc + ')', T, inch ? 'lbf·in' : 'N·m', 2));
+    if (v.n > 0) { const pw = W.mech_shaft_power_w(Tnm, v.n); rows.push(R('Power at ' + v.n + ' rpm', inch ? pw / MK_HP_W : pw / 1000, inch ? 'hp' : 'kW', 3)); }
+    if (v.D > 0 && di < v.D) {
+      rows.push(R('Polar moment J', W.mech_polar_moment(v.D, di), u.I, u.idp));
+      rows.push(R('Largest shear stress (outside)', W.mech_torsion_stress(Tc, v.D, di, v.D / 2) / u.sK, u.S, u.sdp));
+      if (di > 0) rows.push(R('Shear stress at the bore', W.mech_torsion_stress(Tc, v.D, di, di / 2) / u.sK, u.S, u.sdp));
+      let G = v.G > 0 ? v.G : (v.E > 0 && v.nu >= 0 && v.nu < 0.5 ? W.mech_shear_modulus(v.E, v.nu) : NaN);
+      if (!(v.G > 0) && G > 0) rows.push(R('Shear modulus G = E / (2 (1 + nu))', G, u.E, inch ? 2 : 1));
+      if (G > 0 && v.L > 0) {
+        const phi = W.mech_torsion_angle(Tc, v.L, G * u.eK, v.D, di);
+        rows.push(R('Angle of twist', phi * 180 / Math.PI, 'deg', 4), R('Angle of twist', phi, 'rad', 6),
+          R(inch ? 'Twist per foot' : 'Twist per metre', phi * 180 / Math.PI / v.L * (inch ? 12 : 1000), 'deg', 4),
+          R('Torsional stiffness T / angle', T / phi * Math.PI / 180, (inch ? 'lbf·in' : 'N·m') + '/deg', 2));
+      } else rows.push(mkNote('Enter G (or E and Poisson\'s ratio) and the length for the angle of twist.'));
+    }
+    if (v.tau > 0) rows.push(R('Solid diameter for the allowable stress', W.mech_torsion_solid_dia(Tc, v.tau * u.sK), u.L, u.dp));
+    rows.push(mkNote('Round shafts only, elastic, no keyway or shoulder (both raise the stress: see Stress concentration). Combined bending and torsion is not included.'));
+    return rows;
+  },
+  working: 'J = pi (D^4 - d^4) / 32; tau = T r / J (largest at r = D/2); angle phi = T L / (G J) in radians; G = E / (2 (1 + nu)). P = T omega, omega = 2 pi n / 60, so kW = N·m x rpm / 9549.3 and hp = lbf·in x rpm / 63 025. Solid shaft for an allowable stress: d = (16 T / (pi tau))^(1/3). 1 hp = 550 ft·lbf/s = 745.700 W.',
+  source: 'Gere and Goodno, Mechanics of Materials, ch. 3 (torsion of circular bars, power transmission; relations by name). NIST SP 811 (unit factors). See docs/mechanics.md.',
+},
+{
+  id: 'column', group: 'Mechanics', title: 'Column buckling (Euler and Johnson)',
+  desc: 'Critical buckling load of a straight column from its length, end conditions, section and material: Euler for slender columns, the Johnson parabola for intermediate ones, switching at the transition slenderness.',
+  fields: s => {
+    const u = mku(s), inch = s === 'inch';
+    return [
+      { id: 'end', label: 'End conditions (theoretical K)', unit: '', def: 1, options: [[1, 'Pinned - pinned, K = 1.0'], [0.5, 'Fixed - fixed, K = 0.5'], [0.7, 'Fixed - pinned, K = 0.7'], [2, 'Fixed - free (flagpole), K = 2.0'], [0, 'Own K (enter below)']] },
+      { id: 'K', label: 'Effective length factor K', unit: '', def: '', when: v => v.end === 0 },
+      { id: 'L', label: 'Unsupported length L', unit: u.L, def: inch ? 24 : 600 },
+      { id: 'E', label: "Young's modulus E", unit: u.E, def: '' },
+      { id: 'Sy', label: 'Yield strength Sy', unit: u.S, def: '' },
+      { id: 'n', label: 'Factor of safety (optional)', unit: '', def: '' },
+      { id: 'F', label: 'Applied axial load (optional)', unit: u.F, def: '' },
+    ].concat(mkSecFields(s, [[8, 'Enter A and r yourself']], 2), [
+      { id: 'A', label: 'Area A', unit: u.A, def: '', when: v => v.sec === 8 },
+      { id: 'r', label: 'Least radius of gyration r', unit: u.L, def: '', when: v => v.sec === 8 },
+    ]);
+  },
+  calc: (v, W, s) => {
+    const u = mku(s), K = v.end > 0 ? v.end : v.K;
+    let A, r;
+    if (v.sec === 8) { A = v.A; r = v.r; } else { const g = mkSecArgs(v); A = mkSec(W, g, 0); r = mkSec(W, g, 15); }
+    if (!(K > 0 && v.L > 0 && A > 0 && r > 0)) return [];
+    const rows = [R('Effective length K L', K * v.L, u.L, u.dp), R('Least radius of gyration r', r, u.L, u.dp), R('Slenderness K L / r', K * v.L / r, '', 1)];
+    if (!(v.E > 0 && v.Sy > 0)) { rows.push(mkNote('Enter E and Sy for the buckling load.')); return rows; }
+    const E = v.E * u.eK, Sy = v.Sy * u.sK, c = i => W.mech_column(E, Sy, K, v.L, A, r, i);
+    rows.push(R('Transition slenderness sqrt(2 pi^2 E / Sy)', c(1), '', 1), R('Method', c(2) === 1 ? 'Euler (slender)' : 'Johnson (intermediate)', ''),
+      R('Critical stress', c(3) / u.sK, u.S, u.sdp), R('Critical load', c(4), u.F, 0));
+    if (c(2) === 2) rows.push(R('Euler alone would give (not valid here)', c(5) / u.sK, u.S, u.sdp));
+    if (v.n > 0) rows.push(R('Allowable load (critical / factor of safety)', c(4) / v.n, u.F, 0));
+    if (v.F > 0) rows.push(R('Factor of safety at the applied load', c(4) / v.F, '', 2));
+    if (K * v.L / r < 10) rows.push(mkNote('Very short (K L / r under about 10): this is a compression block; crushing, not buckling, governs.'));
+    rows.push(mkNote('Ideal straight column, load on the centroid. Real columns are a little crooked and loaded off-centre, and theoretical K values are hard to achieve: AISC recommends design K of 0.65 (fixed-fixed), 0.80 (fixed-pinned), 1.0 (pinned-pinned) and 2.1 (fixed-free). Use a design code for structures.'));
+    return rows;
+  },
+  diagram: (v, s) => {
+    if (typeof mkColumnSvg !== 'function') return '';
+    const u = mku(s), K = v.end > 0 ? v.end : v.K, W = state.W;
+    const r = v.sec === 8 ? v.r : mkSec(W, mkSecArgs(v), 15);
+    return mkColumnSvg(v.E * u.eK, v.Sy * u.sK, K * v.L / r);
+  },
+  working: 'Slenderness lambda = K L / r, r = sqrt(I_min / A). Euler: sigma_cr = pi^2 E / lambda^2, P_cr = pi^2 E I / (K L)^2. Johnson: sigma_cr = Sy - (Sy lambda / (2 pi))^2 / E. They meet, with the same slope, at lambda_1 = sqrt(2 pi^2 E / Sy), where sigma_cr = Sy / 2; below it Johnson is used, above it Euler. K: 1.0 pinned-pinned, 0.5 fixed-fixed, 0.7 fixed-pinned, 2.0 fixed-free (theoretical).',
+  source: "Euler and Johnson relations: Gere and Goodno ch. 11; Shigley's Mechanical Engineering Design, columns (by name). Effective length factors: AISC 360-16 Commentary Table C-A-7.1 (free). See docs/mechanics.md.",
+},
+{
+  id: 'stressconc', group: 'Mechanics', title: 'Stress concentration (holes)',
+  desc: 'Peak stress at a round hole in a plate under tension (finite width) and at an elliptical hole in a wide plate, with the fatigue notch factor from your notch sensitivity. Only closed forms printed by a free source are included; shoulder fillets and grooves are not.',
+  fields: s => {
+    const u = mku(s), inch = s === 'inch';
+    return [
+      { id: 'case', label: 'Case', unit: '', def: 1, options: [[1, 'Round hole in a plate, tension (finite width)'], [2, 'Elliptical hole in a wide plate, tension'], [3, 'Stepped shaft, groove, keyway (not included)']] },
+      { id: 'W', label: 'Plate width W', unit: u.L, def: inch ? 2 : 50, when: v => v.case === 1 },
+      { id: 'd', label: 'Hole diameter d', unit: u.L, def: inch ? 0.5 : 12, when: v => v.case === 1 },
+      { id: 't', label: 'Plate thickness t', unit: u.L, def: inch ? 0.25 : 6, when: v => v.case === 1 },
+      { id: 'F', label: 'Tensile force F', unit: u.F, def: inch ? 2000 : 10000, when: v => v.case === 1 },
+      { id: 'ea', label: 'Half-axis a across the load', unit: u.L, def: inch ? 0.25 : 6, when: v => v.case === 2 },
+      { id: 'eb', label: 'Half-axis b along the load', unit: u.L, def: inch ? 0.125 : 3, when: v => v.case === 2 },
+      { id: 'sg', label: 'Remote (nominal) stress', unit: u.S, def: '', when: v => v.case === 2 },
+      { id: 'q', label: 'Notch sensitivity q, 0 to 1 (yours, for Kf)', unit: '', def: '', when: v => v.case !== 3 },
+    ];
+  },
+  calc: (v, W, s) => {
+    const u = mku(s), rows = [];
+    if (v.case === 3) return [R('Stepped shafts, shoulder fillets, grooves, keyways', 'not included', ''), mkNote('No free public source prints a curve fit for these that we could check, so BenchMate does not give one and does not invent one. Use the charts in Peterson\'s Stress Concentration Factors, Roark (Table 17.1) or Shigley (Appendix A-15).')];
+    let kt = NaN;
+    if (v.case === 1) {
+      if (!(v.W > 0 && v.d > 0 && v.d < v.W)) return [];
+      const r = v.d / v.W; kt = W.mech_kt_plate_hole(r);
+      rows.push(R('d / W', r, '', 4), R('Kt (on the net-section stress)', kt, '', 3));
+      if (v.t > 0 && v.F > 0) {
+        const sn = v.F / ((v.W - v.d) * v.t), sgross = v.F / (v.W * v.t);
+        rows.push(R('Gross stress F / (W t)', sgross / u.sK, u.S, u.sdp), R('Net-section stress F / ((W - d) t)', sn / u.sK, u.S, u.sdp), R('Peak stress at the hole Kt x net', kt * sn / u.sK, u.S, u.sdp), R('Peak / gross stress', kt * sn / sgross, '', 3));
+      }
+      if (r > 0.65) rows.push(mkNote('Wide hole: the ligaments are narrow; check net-section yield as well as the peak.'));
+    } else {
+      if (!(v.ea > 0 && v.eb > 0)) return [];
+      kt = W.mech_kt_ellipse(v.ea, v.eb);
+      rows.push(R('Kt = 1 + 2 a / b (on the remote stress)', kt, '', 3));
+      if (v.sg > 0) rows.push(R('Peak stress at the end of the a axis', kt * v.sg, u.S, u.sdp));
+      rows.push(mkNote('Wide plate (hole small against the width). A sharp slot (b small) makes Kt very large: treat a crack-like slot as a crack.'));
+    }
+    if (v.q >= 0 && v.q <= 1 && isFinite(kt)) rows.push(R('Fatigue notch factor Kf = 1 + q (Kt - 1)', W.mech_notch_kf(kt, v.q), '', 3));
+    rows.push(mkNote('Elastic peak stress. Ductile parts under steady load yield locally and are less sensitive; in fatigue use Kf.'));
+    return rows;
+  },
+  working: 'Round hole, finite width, net-section basis: Kt = 3 - 3.14 (d/W) + 3.667 (d/W)^2 - 1.527 (d/W)^3, sigma_nom = F / ((W - d) t); Kt = 3 for a small hole in a wide plate (Kirsch, 1898). Elliptical hole, wide plate: Kt = 1 + 2 a / b (Inglis, 1913), a across the load. Kf = 1 + q (Kt - 1), q from your notch sensitivity data (0 = no notch effect, 1 = full Kt).',
+  source: 'B. McGinty, Stress concentrations at holes, fracturemechanics.org (Kirsch solution and the finite-width fit, net-section basis); Inglis 1913 (by name); Kf relation as printed by Engineers Edge (after Marks\' Calculations for Machine Design). See docs/mechanics.md.',
+},
+{
+  id: 'fatigue', group: 'Mechanics', title: 'Fatigue: endurance limit and Goodman',
+  desc: 'Estimated endurance limit of a steel part with Marin factors, then the fatigue factor of safety by the modified Goodman, Soderberg and Gerber lines and the first-cycle yield check, with a diagram. The endurance limit here is an estimate: use test data when you have it.',
+  fields: s => {
+    const u = mku(s), inch = s === 'inch';
+    return [
+      { id: 'sut', label: 'Ultimate tensile strength Sut', unit: u.S, def: inch ? 90 : 620 },
+      { id: 'sy', label: 'Yield strength Sy', unit: u.S, def: inch ? 60 : 415 },
+      { id: 'sep', label: "Rotating-beam endurance limit Se' (blank = estimate for steel)", unit: u.S, def: '' },
+      { id: 'fin', label: 'Surface finish (surface factor ka)', unit: '', def: 1, options: [[1, 'Machined or cold-drawn'], [0, 'Ground'], [2, 'Hot-rolled'], [3, 'As forged'], [9, 'Own ka (enter below)']] },
+      { id: 'ka', label: 'Own surface factor ka', unit: '', def: '', when: v => v.fin === 9 },
+      { id: 'dia', label: 'Diameter, bending or torsion (for size factor kb)', unit: u.L, def: '' },
+      { id: 'kb', label: 'Or own size factor kb (axial load: 1)', unit: '', def: '' },
+      { id: 'kc', label: 'Load factor kc (yours; bending 1)', unit: '', def: 1 },
+      { id: 'kd', label: 'Temperature factor kd (yours)', unit: '', def: 1 },
+      { id: 'ke', label: 'Reliability factor ke (yours)', unit: '', def: 1 },
+      { id: 'kf', label: 'Fatigue notch factor Kf on the stresses', unit: '', def: 1 },
+      { id: 'smax', label: 'Largest stress in the cycle', unit: u.S, def: inch ? 30 : 200 },
+      { id: 'smin', label: 'Smallest stress in the cycle', unit: u.S, def: inch ? 5 : 40 },
+    ];
+  },
+  calc: (v, W, s) => {
+    const u = mku(s), inch = s === 'inch', rows = [];
+    if (!(v.sut > 0)) return [];
+    let sep = v.sep, sepEst = false;
+    if (!(sep > 0)) { sep = W.mech_endurance_estimate(v.sut, inch ? 1 : 0); sepEst = true; }
+    rows.push(R(sepEst ? mkWarn("Se' estimated for steel = 0.504 Sut (estimate)") : "Se' as entered", sep, u.S, u.sdp));
+    const ka = v.fin === 9 ? v.ka : W.mech_marin_surface(v.fin, v.sut, inch ? 1 : 0);
+    let kb = v.kb > 0 ? v.kb : NaN, kbSrc = 'as entered';
+    if (!(kb > 0) && v.dia > 0) { kb = W.mech_marin_size_mm(v.dia * (inch ? 25.4 : 1)); kbSrc = '(d / 7.62 mm)^-0.1133'; if (!(kb > 0)) rows.push(mkNote('Diameter outside 2.79 to 51 mm (0.11 to 2 in): the size fit does not apply. Enter your own kb.')); }
+    if (!(kb > 0) && !(v.dia > 0)) { kb = 1; kbSrc = 'no size effect (axial, or not given)'; }
+    rows.push(R('Surface factor ka' + (v.fin === 9 ? ' (yours)' : ' = a Sut^b (estimate)'), ka, '', 3), R('Size factor kb ' + kbSrc, kb, '', 3));
+    const kc = v.kc > 0 ? v.kc : 1, kd = v.kd > 0 ? v.kd : 1, ke = v.ke > 0 ? v.ke : 1;
+    const se = ka * kb * kc * kd * ke * sep;
+    if (!(se > 0)) return rows;
+    rows.push(R('Endurance limit Se = ka kb kc kd ke Se\'', se, u.S, u.sdp));
+    if (!(isFinite(v.smax) && isFinite(v.smin))) return rows;
+    const kf = v.kf > 0 ? v.kf : 1, sa = kf * W.mech_stress_alt(v.smax, v.smin), sm = kf * W.mech_stress_mean(v.smax, v.smin);
+    rows.push(R('Alternating stress Kf (max - min) / 2', sa, u.S, u.sdp), R('Mean stress Kf (max + min) / 2', sm, u.S, u.sdp));
+    const n = i => W.mech_fatigue_factor(i, sa, sm, se, v.sut, v.sy);
+    rows.push(R('Factor of safety, modified Goodman', n(0), '', 2), R('Factor of safety, Gerber', n(2), '', 2));
+    if (v.sy > 0) rows.push(R('Factor of safety, Soderberg', n(1), '', 2), R('First-cycle yield (Langer) Sy / (sa + |sm|)', n(3), '', 2));
+    if (sm <= 0) rows.push(mkNote('Compressive (or zero) mean stress: the factor shown is Se / sa, the usual conservative choice.'));
+    rows.push(mkNote('Estimate for infinite life of steel. Se\' and ka are fits to scattered test data (ka differs by a few percent between published fits); kc, kd and ke are yours to enter because published values differ (axial kc is 0.7 in Norton\'s text, 0.85 in Shigley\'s). Kf is applied to the stresses. Not for welded parts or corrosive service.'));
+    return rows;
+  },
+  diagram: (v, s) => {
+    if (typeof mkFatigueSvg !== 'function' || !(v.sut > 0 && v.sy > 0)) return '';
+    const W = state.W, inch = s === 'inch';
+    const sep = v.sep > 0 ? v.sep : W.mech_endurance_estimate(v.sut, inch ? 1 : 0);
+    const ka = v.fin === 9 ? v.ka : W.mech_marin_surface(v.fin, v.sut, inch ? 1 : 0);
+    let kb = v.kb > 0 ? v.kb : (v.dia > 0 ? W.mech_marin_size_mm(v.dia * (inch ? 25.4 : 1)) : 1);
+    const se = ka * kb * (v.kc > 0 ? v.kc : 1) * (v.kd > 0 ? v.kd : 1) * (v.ke > 0 ? v.ke : 1) * sep, kf = v.kf > 0 ? v.kf : 1;
+    return mkFatigueSvg(se, v.sut, v.sy, kf * W.mech_stress_alt(v.smax, v.smin), kf * W.mech_stress_mean(v.smax, v.smin));
+  },
+  working: "Se' = 0.504 Sut for Sut up to 1400 MPa (200 kpsi), 700 MPa (100 kpsi) above. Se = ka kb kc kd ke Se'. ka = a Sut^b: ground 1.58, -0.085; machined or cold-drawn 4.51, -0.265; hot-rolled 57.7, -0.718; as forged 272, -0.995 (MPa; kpsi a: 1.34, 2.70, 14.4, 39.9), capped at 1. kb = (d / 7.62)^-0.1133, d in mm, 2.79 to 51 mm. sa = (max - min)/2, sm = (max + min)/2, both times Kf. Goodman 1/n = sa/Se + sm/Sut; Soderberg 1/n = sa/Se + sm/Sy; Gerber n sa/Se + (n sm/Sut)^2 = 1, n = 1/2 (Sut/sm)^2 (sa/Se) [-1 + sqrt(1 + (2 sm Se/(Sut sa))^2)]; Langer n = Sy/(sa + |sm|).",
+  source: "Engineers Edge, Marin endurance limit calculator (after T. H. Brown, Marks' Calculations for Machine Design): Se', ka table, kb fit. Goodman, Soderberg, Gerber and Langer lines: Shigley's Mechanical Engineering Design, ch. 6 (by name); Goodman checked against the Penn State ME 360 fatigue notes (Norton example 6-5). See docs/mechanics.md.",
+},
+{
+  id: 'chuckforce', group: 'Mechanics', title: 'Centrifugal force and chuck grip',
+  desc: 'Centrifugal force on chuck jaws and how much grip is left at speed, or the force on any rotating mass. Jaws gripping an outside diameter are flung outward and lose grip as speed rises; jaws gripping a bore gain grip. Your chuck maker\'s speed and grip data govern.',
+  fields: s => {
+    const u = mku(s), inch = s === 'inch';
+    return [
+      { id: 'mode', label: 'Calculate', unit: '', def: 1, options: [[1, 'Chuck jaws: grip at speed'], [2, 'Any rotating mass']] },
+      { id: 'z', label: 'Number of jaws', unit: '', def: 3, when: v => v.mode === 1 },
+      { id: 'mj', label: 'Mass of one jaw (base jaw + top jaw + screws)', unit: u.m, def: inch ? 2.5 : 1.2, when: v => v.mode === 1 },
+      { id: 'rj', label: 'Radius of the jaw\'s centre of gravity', unit: u.L, def: inch ? 3 : 75, when: v => v.mode === 1 },
+      { id: 'f0', label: 'Total grip at standstill (all jaws)', unit: u.F, def: inch ? 12000 : 55000, when: v => v.mode === 1 },
+      { id: 'grip', label: 'Gripping', unit: '', def: 0, options: [[0, 'An outside diameter (jaws close in)'], [1, 'A bore (jaws open out)']], when: v => v.mode === 1 },
+      { id: 'freq', label: 'Grip you need for the cut (optional)', unit: u.F, def: '', when: v => v.mode === 1 },
+      { id: 'm', label: 'Mass', unit: u.m, def: inch ? 1 : 0.5, when: v => v.mode === 2 },
+      { id: 'r', label: 'Radius of its centre of gravity', unit: u.L, def: inch ? 4 : 100, when: v => v.mode === 2 },
+      { id: 'n', label: 'Spindle speed', unit: 'rpm', def: 2500 },
+    ];
+  },
+  calc: (v, W, s) => {
+    const u = mku(s), inch = s === 'inch', mk = inch ? MK_LB_KG : 1, rk = inch ? 0.0254 : 0.001, fk = inch ? MK_LBF_N : 1;
+    if (!(v.n >= 0)) return [];
+    const rows = [R('Angular speed omega = pi n / 30', Math.PI * v.n / 30, 'rad/s', 2)];
+    if (v.mode === 2) {
+      if (!(v.m > 0 && v.r > 0)) return [];
+      const F = W.mech_centrifugal_n(v.m * mk, v.r * rk, v.n);
+      rows.push(R('Centrifugal force m r omega^2', F / fk, u.F, 1), R('As a multiple of its weight', F / (v.m * mk * 9.80665), 'g', 1));
+      return rows;
+    }
+    if (!(v.z >= 1 && v.mj > 0 && v.rj > 0)) return [];
+    const smr = v.z * v.mj * mk * v.rj * rk, fc1 = W.mech_centrifugal_n(v.mj * mk, v.rj * rk, v.n);
+    rows.push(R('Centrifugal force, one jaw', fc1 / fk, u.F, 0), R('Centrifugal force, all jaws', v.z * fc1 / fk, u.F, 0));
+    if (v.f0 > 0) {
+      const f0 = v.f0 * fk, g = W.mech_chuck_grip_n(f0, smr, v.n, v.grip);
+      rows.push(R('Grip at ' + v.n + ' rpm', g / fk, u.F, 0), R('Change from standstill', 100 * (g - f0) / f0, '%', 1));
+      if (v.grip === 0) {
+        if (g <= 0) rows.push(mkNote('No grip left at this speed: the jaws would release the part. Slow down.'));
+        rows.push(R('Speed where one third of the standstill grip is left', W.mech_chuck_speed_for_grip(f0, f0 / 3, smr), 'rpm', 0), R('Speed where the grip reaches zero', W.mech_chuck_speed_for_grip(f0, 0, smr), 'rpm', 0));
+        if (v.freq > 0) { const nreq = W.mech_chuck_speed_for_grip(f0, v.freq * fk, smr); rows.push(R('Highest speed that keeps the grip you need', nreq, 'rpm', 0)); if (g < v.freq * fk) rows.push(mkNote('Below the grip you need at this speed.')); }
+      }
+    }
+    rows.push(mkNote('Rigid jaws assumed. Real chucks lose grip faster: the body and jaws flex and the actuator has limits (VDI 3106 adds factors for this). Never run above the chuck\'s marked maximum speed, and check grip with the maker\'s data and a grip-force gauge.'));
+    return rows;
+  },
+  working: 'F = m r omega^2, omega = pi n / 30 (n in rpm, m in kg, r in m, F in N). Chuck: Fc = sum(m_jaw r_jaw) omega^2 for all jaws. Gripping an outside diameter the jaws are pulled away from the part: Fsp(n) = Fsp0 - Fc; gripping a bore: Fsp0 + Fc. Speed at which the grip falls to F: n = (30/pi) sqrt((Fsp0 - F) / sum(m r)). Chuck makers rate speed so that about one third of the standstill grip remains (Berg Spanntechnik speed notes). Moving top jaws outward, using heavier jaws, or worn and unlubricated chucks all lower the grip at speed.',
+  source: 'F = m r omega^2: OpenStax University Physics Vol. 1, ch. 6.3 (by name). Grip at speed and the sign rule: VDI 3106 (by name), Optimum lathe manual section 4.23.8 (Fsp0 = Ssp (Fsp +- Fc)); one-third rule: Berg Spanntechnik speed notes (free PDF). See docs/mechanics.md.',
+},
+{
+  id: 'balance', group: 'Mechanics', title: 'Balancing (ISO 21940-11 grade G)',
+  desc: 'Permissible residual unbalance of a rigid rotor for a balance grade G (ISO 21940-11, formerly ISO 1940-1), split over two correction planes, the correction mass at a radius, the force the unbalance makes at speed, and the grade a measured unbalance reaches.',
+  fields: s => {
+    const u = mku(s), inch = s === 'inch';
+    return [
+      { id: 'm', label: 'Rotor mass', unit: u.m, def: inch ? 22 : 10 },
+      { id: 'n', label: 'Maximum service speed', unit: 'rpm', def: 3000 },
+      { id: 'G', label: 'Balance grade', unit: 'mm/s', def: 2.5, options: [[0.4, 'G 0.4'], [1, 'G 1'], [2.5, 'G 2.5'], [6.3, 'G 6.3'], [16, 'G 16'], [40, 'G 40'], [0, 'Own G (enter below)']] },
+      { id: 'Gx', label: 'Own grade G', unit: 'mm/s', def: '', when: v => v.G === 0 },
+      { id: 'hl', label: 'Distance from the centre of gravity to plane L (optional)', unit: u.L, def: '' },
+      { id: 'hr', label: 'Distance from the centre of gravity to plane R', unit: u.L, def: '' },
+      { id: 'rc', label: 'Correction radius (optional)', unit: u.L, def: '' },
+      { id: 'um', label: 'Measured residual unbalance (optional)', unit: 'g·mm', def: '' },
+    ];
+  },
+  calc: (v, W, s) => {
+    const inch = s === 'inch', m = v.m * (inch ? MK_LB_KG : 1), G = v.G > 0 ? v.G : v.Gx, lk = inch ? 25.4 : 1;
+    if (!(m > 0 && v.n > 0 && G > 0)) return [];
+    const U = W.mech_iso_uper_gmm(G, m, v.n), rows = [R('Permissible residual unbalance U_per', U, 'g·mm', 1)];
+    if (inch) rows.push(R('U_per', U / MK_OZIN_GMM, 'oz·in', 4), R('U_per', U / 25.4, 'g·in', 3));
+    rows.push(R('Permissible centre-of-mass offset e_per', W.mech_iso_eper_um(G, v.n), 'µm', 3), R('Force from U_per at this speed', W.mech_unbalance_force_n(U, v.n) / (inch ? MK_LBF_N : 1), mku(s).F, 2));
+    if (v.hl > 0 && v.hr > 0) {
+      const ul = W.mech_plane_share(U, v.hl, v.hr), ur = W.mech_plane_share(U, v.hr, v.hl);
+      rows.push(R('Share for plane L = U hR / b', ul, 'g·mm', 1), R('Share for plane R = U hL / b', ur, 'g·mm', 1));
+      if (ul < 0.3 * U || ul > 0.7 * U) rows.push(mkNote('A plane share is outside 30-70 % of U_per: the centre of gravity is close to one plane. Use the narrow or overhung rotor rules of ISO 21940-11.'));
+      if (v.rc > 0) rows.push(R('Correction mass in plane L at the radius', ul / (v.rc * lk), 'g', 3), R('Correction mass in plane R at the radius', ur / (v.rc * lk), 'g', 3));
+    } else if (v.rc > 0) rows.push(R('Correction mass for U_per at the radius (one plane)', U / (v.rc * lk), 'g', 3));
+    if (v.um > 0) { const g = W.mech_iso_grade_from_u(v.um, m, v.n); rows.push(R('Grade reached by the measured unbalance', g, 'mm/s', 2), R(g <= G ? 'Measured unbalance' : mkWarn('Measured unbalance'), g <= G ? 'within the grade' : 'over the grade', '')); }
+    rows.push(mkNote('Rigid rotors only (running well below the first critical speed). Both planes between the bearings with their spacing more than a third of the bearing span for the simple split. One plane (static) balance is enough for narrow discs; long rotors need two planes (dynamic). The grade for a machine comes from its maker or ISO 21940-11; tool holders are commonly specified as G 2.5 at a stated speed.'));
+    return rows;
+  },
+  working: 'U_per = 1000 G m / omega = 9549 G m / n (U in g·mm, G in mm/s, m in kg, n in rpm); e_per = U_per / m in g·mm/kg = µm. Two planes between the bearings: U_L = U_per hR / b, U_R = U_per hL / b, h = distance from the centre of gravity, b = hL + hR; each should be 30 to 70 % of U_per. Correction mass = U / r. Force = U omega^2 (U in kg·m). Grade reached G = U omega / (1000 m).',
+  source: 'ISO 21940-11:2016 (formerly ISO 1940-1:2003), by name; formula, plane allocation and worked example (1000 lb rotor, 900 rpm, G 6.3: 21 oz·in per plane) from IRD Balancing Technical Paper 1, Balance quality requirements of rigid rotors (free). See docs/mechanics.md.',
+},
+{
+  id: 'critspeed', group: 'Mechanics', title: 'Critical speed of a shaft',
+  desc: 'First critical (whirling) speed of a round shaft between bearings or overhung, with up to three discs (pulleys, wheels, chucks) and its own mass: Rayleigh (upper estimate) and Dunkerley (lower estimate), and the exact value for the plain shaft.',
+  fields: s => {
+    const u = mku(s), inch = s === 'inch';
+    return [
+      { id: 'sup', label: 'Mounting', unit: '', def: 1, options: [[1, 'Between two bearings (simply supported)'], [0, 'Overhung from a rigid mount (cantilever)']] },
+      { id: 'L', label: 'Bearing span (or overhang) L', unit: u.L, def: inch ? 30 : 800 },
+      { id: 'D', label: 'Shaft diameter D', unit: u.L, def: inch ? 1.5 : 40 },
+      { id: 'd', label: 'Bore (blank = solid)', unit: u.L, def: '' },
+      { id: 'E', label: "Young's modulus E", unit: u.E, def: '' },
+      { id: 'rho', label: 'Shaft density (blank = massless shaft)', unit: u.rho, def: '' },
+      { id: 'm1', label: 'Disc 1 mass', unit: u.m, def: inch ? 20 : 10 },
+      { id: 'x1', label: 'Disc 1 position from the left bearing (overhung: from the mount)', unit: u.L, def: inch ? 15 : 400 },
+      { id: 'm2', label: 'Disc 2 mass (optional)', unit: u.m, def: '' },
+      { id: 'x2', label: 'Disc 2 position', unit: u.L, def: '' },
+      { id: 'm3', label: 'Disc 3 mass (optional)', unit: u.m, def: '' },
+      { id: 'x3', label: 'Disc 3 position', unit: u.L, def: '' },
+    ];
+  },
+  calc: (v, W, s) => {
+    const inch = s === 'inch', lk = inch ? 0.0254 : 0.001, di = v.d > 0 ? v.d : 0;
+    if (!(v.L > 0 && v.D > 0 && di < v.D)) return [];
+    if (!(v.E > 0)) return [mkNote('Enter E.')];
+    const sec = [3, v.D * lk, di * lk, 0, 0], I = mkSec(W, sec, 3), A = mkSec(W, sec, 0); // metres, for the SI call
+    const E = v.E * (inch ? MK_MPSI_GPA * 1e9 : 1e9);
+    const mu = v.rho > 0 ? v.rho * (inch ? MK_LB_KG / Math.pow(0.0254, 3) : 1000) * A : 0;
+    const bad = [1, 2, 3].some(i => v['m' + i] > 0 && !(v['x' + i] >= 0 && v['x' + i] <= v.L));
+    if (bad) return [mkNote('Every disc position must lie on the shaft, 0 to L.')];
+    const n = mkCritDiscs(v, s), c = i => W.mech_critical_speed(n, v.sup, v.L * lk, E * I, mu, i);
+    if (!(n > 0 || mu > 0)) return [mkNote('Enter a disc mass or the shaft density.')];
+    const rows = [R('First critical speed, Rayleigh (upper estimate)', c(0), 'rpm', 0), R('First critical speed, Dunkerley (lower estimate)', c(1), 'rpm', 0)];
+    if (mu > 0) rows.push(R('Plain shaft alone (exact)', c(2), 'rpm', 0), R('Shaft mass per length', mu * (inch ? 0.0254 / MK_LB_KG : 0.001), inch ? 'lb/in' : 'kg/mm', inch ? 4 : 5));
+    rows.push(R('Largest static sag under its own weight and the discs', c(3) / lk, mku(s).L, inch ? 5 : 4));
+    rows.push(mkNote('Assumptions: uniform round shaft, rigid bearings (real bearings and housings lower the critical speed), discs as point masses (no gyroscopic effect), no damping. The true first critical speed lies between the two estimates. Keep running speeds well away from it and confirm with the machine maker or a run-up test.'));
+    return rows;
+  },
+  working: 'Influence coefficients from the beam formulas (simply supported or cantilever, point load). Rayleigh: static deflections y_i under the weights, omega^2 = g sum(m_i y_i) / sum(m_i y_i^2), with the shaft lumped into 100 pieces. Dunkerley: 1/omega^2 = 1/omega_shaft^2 + sum(m_i a_ii), a_ii = deflection at disc i from a unit load there. Plain shaft (Euler-Bernoulli): omega = (beta L)^2 sqrt(E I / (mu L^4)), beta L = pi between bearings, 1.8751 overhung. n = 30 omega / pi. g = 9.80665 m/s^2.',
+  source: 'Rayleigh and Dunkerley methods and beam frequencies: W. T. Thomson, Theory of Vibration with Applications (by name); checks: single disc sqrt(48 E I / m L^3) and the Rayleigh static-curve result sqrt(3024/31) for a plain shaft (derived in docs/mechanics.md).',
+},
+{
   id: 'cncguide', group: 'Guides', title: 'CNC knowledge guide',
   desc: 'Machine axes and the right-hand rule, machine, work and tool coordinates, work, length, radius and wear offsets, program structure, climb and conventional milling, chip formation, tool wear with causes and remedies, turning and milling troubleshooting, workholding and shop safety.',
   render: el => renderCncGuide(el),

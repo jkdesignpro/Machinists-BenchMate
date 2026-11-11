@@ -98,6 +98,8 @@ function renderTool() {
     inp.oninput = inp.onchange = () => { saved[f.id] = inp.value; update(); };
     const u = document.createElement('span'); u.className = 'u'; u.textContent = f.unit;
     row.append(inp, u); lab.append(span, row); grid.appendChild(lab);
+    // `when(v)`: show the field only when it applies (e.g. to the chosen shape).
+    if (f.when) lab.dataset.when = f.id;
   });
   const res = document.createElement('div'); res.className = 'res'; res.id = 'res';
   const note = document.createElement('div'); note.className = 'note';
@@ -108,6 +110,7 @@ function renderTool() {
   main.append(card, res, dia, note);
   function update() {
     const v = {}; fields.forEach(f => { const e = grid.querySelector('[data-id="' + f.id + '"]'); v[f.id] = e.value === '' ? NaN : parseFloat(e.value); });
+    fields.forEach(f => { if (f.when) { const l = grid.querySelector('[data-when="' + f.id + '"]'); let on = true; try { on = !!f.when(v); } catch (e) {} l.hidden = !on; } });
     let rows = [];
     try { rows = t.calc(v, state.W, state.sys); } catch (e) { rows = []; }
     rows = rows.filter(r => typeof r.value === 'string' || isFinite(r.value));

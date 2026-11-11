@@ -30,12 +30,12 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 67 | 14 | 30 (8) | 2 | 0 | 60 % |
-| Machinery's Handbook 31 | 306 | 40 | 77 | 155 (12) | 6 | 28 | 15 % |
-| Engineers' Data Book | 94 | 5 | 24 | 27 (0) | 12 | 26 | 9 % |
+| CNC Machinist Calculator Ultra | 113 | 67 | 15 | 29 (8) | 2 | 0 | 60 % |
+| Machinery's Handbook 31 | 306 | 44 | 80 | 148 (12) | 6 | 28 | 16 % |
+| Engineers' Data Book | 94 | 9 | 26 | 21 (0) | 12 | 26 | 16 % |
 | Engineers Black Book | 80 | 20 | 18 | 41 (9) | 1 | 0 | 25 % |
 | CNC Machining handbook | 83 | 13 | 16 | 50 (0) | 0 | 4 | 16 % |
-| **All** | **676** | **145** | **149** | **303 (29)** | **21** | **58** | **24 %** |
+| **All** | **676** | **153** | **155** | **289 (29)** | **21** | **58** | **26 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -52,6 +52,8 @@ features are names only.
 **Update (branch `claude/cnc-guide`, 2026-11-11):** batch B6 (first part) and the rest of A15 except tips: tool nose radius compensation calculator (`tnrc`), CNC knowledge guide (`cncguide`: axes, coordinate systems, offsets, program structure, climb/conventional, chip formation, tool wear, troubleshooting, workholding, safety) and the formula library (`formulas`). U91, U97, MH131, MH176, MH178, MH183, CN8, CN10, CN12, CN13, CN15, CN16, CN20, CN24, CN48 done; MH100, MH137, MH174, CN4, CN5, CN23, CN41, CN49, CN62, CN63, CN64 partial. Not built: tip of the day (U98), toolpath strategies, CSS explainer, operator procedures (CN25-CN34), 3D toolpaths, glossary. Summary counts recounted from all rows.
 
 **Update (branch `claude/threads-3`, 2026-11-11):** batch A12 (threads round 3) is built except Whitworth tolerances, taper and buttress wire measurement and the trapezoidal tolerances. U39, U40, U42, U45, U46, U49, MH222, MH224, MH225, MH232 done; U41, U44, MH207, MH220, MH221, MH228, MH230, MH233, MH234, MH238, MH247 partial (U47, U51, MH246, BB7 notes updated). Summary counts recounted from all rows by script after merging `claude/cnc-guide` (the in-progress column kept as it was).
+
+**Update (branch `claude/mechanics`, 2026-11-11):** batch B8 (mechanics for the shop) is built: section properties, beams, torsion, columns, stress concentration at holes, fatigue, centrifugal force and chuck grip, balancing, critical speed. MH30, MH35, MH36, MH37, ED30, ED31, ED32, ED36 done; MH31, MH32, MH33, MH39, ED23, ED38, ED42, ED43 partial. Not built: stepped-shaft and groove stress concentration (no free source prints a checkable fit), combined stresses (MH34), springs (MH40, MH41), vibration severity (ED24, ED25), stress-strain basics (ED29, ED39). Summary counts recounted from all rows by script (the Ultra row was one partial/missing off before this change; the in-progress column kept as it was).
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -309,16 +311,16 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH27 | Simple mechanisms: levers, wedge, pulleys, screw, Geneva, toggle | out of scope? | | Toggle/screw clamps could matter for fixtures |
 | MH28 | Pendulums | out of scope? | | |
 | MH29 | Velocity, acceleration, work, energy, momentum, power | out of scope? | | |
-| MH30 | Centrifugal force | missing | | Chuck grip loss at speed |
-| MH31 | Balancing rotating parts, balancing lathe fixtures | missing | | |
-| MH32 | Critical speeds | missing | | |
-| MH33 | Mechanical properties, stress and strain, factor of safety, stress concentration | missing | | |
+| MH30 | Centrifugal force | done | `chuckforce` | F = m r omega^2, jaw centrifugal force and grip left at speed, OD and ID gripping (`claude/mechanics`) |
+| MH31 | Balancing rotating parts, balancing lathe fixtures | partial | `balance` | ISO 21940-11 permissible unbalance, two-plane split, correction mass; no trial-weight balancing procedure or lathe fixture counterweight layout (`claude/mechanics`) |
+| MH32 | Critical speeds | partial | `critspeed` | Uniform shaft with up to three discs, Rayleigh and Dunkerley; no stepped shafts or flexible bearings (`claude/mechanics`) |
+| MH33 | Mechanical properties, stress and strain, factor of safety, stress concentration | partial | `stressconc`, `fatigue` | Holes in plates, fatigue factors of safety; no stress-strain basics, no stepped-shaft or groove Kt (no free source) (`claude/mechanics`) |
 | MH34 | Combined and 3D stresses, loaded rings, strength of taper pins | missing | | |
-| MH35 | Centre of gravity, radius of gyration, moment of inertia, section modulus | missing | | `second_moment_round` exists in core, used only inside `deflection` |
-| MH36 | Beams: stresses and deflections | partial | `deflection` | Round cantilever under end load only |
-| MH37 | Columns | missing | | |
+| MH35 | Centre of gravity, radius of gyration, moment of inertia, section modulus | done | `section` | Eight shapes built up from rectangles, principal axes, S, r, J (`claude/mechanics`) |
+| MH36 | Beams: stresses and deflections | done | `beam`, `deflection` | Cantilever, simply supported, fixed-fixed; point and uniform loads; no overhangs or partial loads (`claude/mechanics`) |
+| MH37 | Columns | done | `column` | Euler and Johnson, end-condition K (`claude/mechanics`) |
 | MH38 | Plates, shells and cylinders | out of scope | | Pressure vessels |
-| MH39 | Shafts: torsion, deflection, design, keyway effect | missing | | |
+| MH39 | Shafts: torsion, deflection, design, keyway effect | partial | `torsion`, `critspeed` | Torsion, power, twist, critical speed; no keyway effect or combined bending and torsion design (`claude/mechanics`) |
 | MH40 | Springs: materials, stresses, compression/extension/torsion design | missing | | |
 | MH41 | Disc springs | missing | | |
 
@@ -663,27 +665,27 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED20 | 5.3 Newton's laws | out of scope? | | |
 | ED21 | 5.4 Simple harmonic motion | out of scope? | | |
 | ED22 | 5.5 Understanding acceleration | out of scope? | | |
-| ED23 | 5.6 Dynamic balancing | missing | | |
+| ED23 | 5.6 Dynamic balancing | partial | `balance` | Permissible unbalance and two-plane split; no balancing procedure (`claude/mechanics`) |
 | ED24 | 5.7 Vibration | missing | | Basis for chatter tools |
 | ED25 | 5.8 Machine vibration | missing | | Severity limits |
 | ED26 | 5.9 Machinery noise | out of scope? | | |
 | ED27 | 6.1 Mechanical notation | out of scope? | | |
 | ED28 | 6.2 Engineering structures, pin joints | out of scope? | | |
 | ED29 | 6.3 Simple stress and strain | missing | | |
-| ED30 | 6.4 Simple elastic bending | partial | `deflection` | |
-| ED31 | 6.5 Slope and deflection of beams | partial | `deflection` | Cantilever only |
-| ED32 | 6.6 Torsion | missing | | |
+| ED30 | 6.4 Simple elastic bending | done | `beam` | M c / I for eight sections (`claude/mechanics`) |
+| ED31 | 6.5 Slope and deflection of beams | done | `beam` | Three support cases, point and uniform loads (`claude/mechanics`) |
+| ED32 | 6.6 Torsion | done | `torsion` | Round shafts and tubes (`claude/mechanics`) |
 | ED33 | 6.7 Thin cylinders | out of scope | | Pressure vessels |
 | ED34 | 6.8 Cylindrical vessels with hemispherical ends | out of scope | | |
 | ED35 | 6.9 Thick cylinders | out of scope | | Note: Lamé equations would serve a press-fit pressure tool |
-| ED36 | 6.10 Buckling of struts | missing | | |
+| ED36 | 6.10 Buckling of struts | done | `column` | Euler and Johnson (`claude/mechanics`) |
 | ED37 | 6.11 Flat circular plates | out of scope? | | |
-| ED38 | 6.12 Stress concentration factors | missing | | |
+| ED38 | 6.12 Stress concentration factors | partial | `stressconc` | Holes in plates only (`claude/mechanics`) |
 | ED39 | 7.1 How materials fail | missing | | |
 | ED40 | 7.2 LEFM method | out of scope? | | |
 | ED41 | 7.3 Multi-axis stress states | out of scope? | | |
-| ED42 | 7.4 Fatigue | missing | | |
-| ED43 | 7.5 Factors of safety | missing | | |
+| ED42 | 7.4 Fatigue | partial | `fatigue` | Infinite life (Goodman, Soderberg, Gerber, Marin); no finite-life S-N (`claude/mechanics`) |
+| ED43 | 7.5 Factors of safety | partial | `fatigue`, `column` | Factors of safety for fatigue and buckling; no general guidance (`claude/mechanics`) |
 | ED44 | 7.6 United States practice | out of scope? | | |
 | ED45 | 7.7 What everything is made of | partial | `materials` | |
 | ED46 | 8 Thermodynamics and cycles (10 entries) | out of scope | | |
@@ -956,7 +958,7 @@ U65, U67, U69, U75-U78, U81 and U103 move to done or partial.
 | B5 | **Inspection round 2**: ANSI fits (RC/LC/LT/LN/FN), ISO 2768 general tolerances, j/J classes and over 500 mm, preferred numbers, measurement over pins/rolls and radius, micrometer and vernier reading, thread gauges, control charts, sampling | MH75-95, MH245, MH248, ED13, ED79, ED81 | mixed: maths/UI plus moderate research |
 | B6 | **CNC knowledge guide**: coordinate systems, work and tool offsets, TNRC and cutter compensation, program structure, 2D/3D and lathe toolpath strategies, CSS, workholding and vise practice, operator procedures, shop safety, glossary; plus a TNRC calculator | MH174-185, CN3-CN82 | writing in our own words, some maths; light research |
 | B7 | **Shop maths**: plane and solid figures beyond the geometry branch, across corners, angle conversion, compound angles, interpolation, involute function, prime factors, lathe change gears, engineering economics | MH1-24, MH256, BB29-34, BB79 | maths/UI |
-| B8 | **Mechanics for the shop**: beam, torsion, column and section properties, stress concentration, fatigue basics, centrifugal force on chucks, balancing, critical speed | MH25-41, ED23-25, ED29-43 | maths/UI |
+| B8 | **Mechanics for the shop** (built on `claude/mechanics`; no stepped-shaft Kt, springs or combined stresses): beam, torsion, column and section properties, stress concentration, fatigue basics, centrifugal force on chucks, balancing, critical speed | MH25-41, ED23-25, ED29-43 | maths/UI |
 | B9 | **Grinding and abrasive processes, depth**: wheel selection, dressing, cylindrical/centerless/surface practice, honing, lapping, EDM basics, micromachining notes | MH150, MH161-173, MH189 | heavy research |
 | B10 | **Gears, depth**: helical, bevel, worm, internal gears, gear cutting and cutter numbers, cams | MH264-273, MH280 | heavy research; low priority |
 | B11 | **Units and symbols**: Greek alphabet, abbreviations, drawing abbreviations and standards, weld symbols, elements table | MH300-306, BB70-71, BB53, ED2-3, ED10, ED86, ED94 | light research |

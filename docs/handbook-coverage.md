@@ -153,7 +153,9 @@ current practice and says so in the tool's notes.
 
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
-| Beams, deflection, stress, torsion, columns | MH31 EDB | missing | [GERE] [ROARK]; public-domain MIL-HDBK-5 era formulas |
+| Beams, deflection, stress, torsion, columns | MH31 EDB | built (`section`, `beam`, `torsion`, `column`: eight section shapes, three beam support cases with point and uniform loads, round-shaft torsion and power, Euler and Johnson buckling) | [GERE] [ROARK] relations by name; AWC Design Aid 6, AISC 360-16 commentary (docs/mechanics.md) |
+| Stress concentration, fatigue | MH31 EDB | partial (`stressconc`, `fatigue`: holes in plates only, stepped shafts not included for want of a free checkable fit; infinite-life Goodman, Soderberg, Gerber with Marin factors) | fracturemechanics.org, Engineers Edge (Marks'), Penn State notes |
+| Centrifugal force, balancing, critical speed | MH31 EDB | built (`chuckforce`, `balance`, `critspeed`: chuck grip at speed, ISO 21940-11 grade G with two-plane split, Rayleigh and Dunkerley) | OpenStax, VDI 3106 by name, IRD Balancing paper, Thomson by name |
 | Bolt torque and preload, grade marks | EBB MH31 EDB | built (`bolttorque`, `boltgrade`: VDI 2230 torque and permitted preload, friction user-entered; ISO 898-1, SAE J429, ASTM A574 minimums and head marks; no torque-angle, no engagement length) | VDI 2230-1:2015 (cited), FVA, Hameedi and Völgyi, Bossard; three to four publishers per grade table |
 | Spanner and socket sizes | EBB | built (`spanner`: ISO 272, old DIN, JIS and inch across flats, hex keys, lookup by spanner size) | ISO 272:1982, ASME B18.2.1 (cited); Wikipedia, Accu, SLS Bearings |
 | Screw heads, drives, cap and set screws | EBB MH31 | partial (`shcs`, `clearance`: socket head cap screws metric and inch with counterbores and clearance holes; no set screws, other heads or drives) | ISO 4762:2004, ISO 273:1979, ASME B18.3 (cited); eight publishers |

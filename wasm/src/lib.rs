@@ -614,3 +614,47 @@ pub extern "C" fn gsim_run(len: f64, lathe: f64, ctrl: f64, metric_out: f64, def
 #[no_mangle] pub extern "C" fn gsim_stat(i: f64) -> f64 { unsafe { (&*core::ptr::addr_of!(GSIM_STATS)).get(i as usize).copied().unwrap_or(f64::NAN) } }
 /// Messages ("line TAB level TAB text" per line) into the text buffer; returns the length (text at `text_ptr`).
 #[no_mangle] pub extern "C" fn gsim_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GSIM_MSGS)).clone() }) }
+
+// Mechanics (core/src/mechanics.rs): unit-consistent unless named.
+use c::mechanics as mech;
+#[no_mangle] pub extern "C" fn mech_section(shape: f64, p1: f64, p2: f64, p3: f64, p4: f64, which: f64) -> f64 { mech::section_flat(shape, p1, p2, p3, p4, which as u32) }
+/// Beam summary; `which` as in `beam_flat`.
+#[no_mangle] pub extern "C" fn mech_beam(support: f64, l: f64, a: f64, p: f64, w: f64, ei: f64, which: f64) -> f64 { mech::beam_flat(support, l, a, p, w, ei, which as u32) }
+/// Beam value at x: which 0 deflection, 1 slope, 2 moment, 3 shear.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn mech_beam_at(support: f64, l: f64, a: f64, p: f64, w: f64, ei: f64, x: f64, which: f64) -> f64 {
+    mech::beam_at(support as u32, l, a, p, w, ei, x).get(which as usize).copied().unwrap_or(f64::NAN) }
+f1!(mech_bending_stress, mech::bending_stress, m, i, cc);
+f1!(mech_polar_moment, mech::polar_moment, d_out, d_in);
+f1!(mech_torsion_stress, mech::torsion_stress, t, d_out, d_in, r);
+f1!(mech_torsion_angle, mech::torsion_angle, t, l, g, d_out, d_in);
+f1!(mech_torsion_solid_dia, mech::torsion_solid_dia, t, tau);
+f1!(mech_shear_modulus, mech::shear_modulus, e, nu);
+f1!(mech_shaft_power_w, mech::shaft_power_w, t_nm, rpm);
+f1!(mech_shaft_torque_nm, mech::shaft_torque_nm, p_w, rpm);
+#[no_mangle] pub extern "C" fn mech_column(e: f64, sy: f64, k: f64, l: f64, area: f64, r: f64, which: f64) -> f64 { mech::column_flat(e, sy, k, l, area, r, which as u32) }
+f1!(mech_euler_stress, mech::euler_stress, e, slenderness);
+f1!(mech_johnson_stress, mech::johnson_stress, e, sy, slenderness);
+f1!(mech_kt_plate_hole, mech::kt_plate_hole, d_over_w);
+f1!(mech_kt_ellipse, mech::kt_ellipse, a, b);
+f1!(mech_notch_kf, mech::notch_kf, kt, q);
+f1!(mech_endurance_estimate, mech::endurance_estimate, sut, inch);
+f1!(mech_marin_surface, mech::marin_surface, finish, sut, inch);
+f1!(mech_marin_size_mm, mech::marin_size_mm, d_mm);
+f1!(mech_stress_alt, mech::stress_alt, smax, smin);
+f1!(mech_stress_mean, mech::stress_mean, smax, smin);
+/// line 0 Goodman, 1 Soderberg, 2 Gerber, 3 Langer yield.
+#[no_mangle] pub extern "C" fn mech_fatigue_factor(line: f64, sa: f64, sm: f64, se: f64, sut: f64, sy: f64) -> f64 { mech::fatigue_factor(line as u32, sa, sm, se, sut, sy) }
+f1!(mech_centrifugal_n, mech::centrifugal_n, m_kg, r_m, rpm);
+f1!(mech_chuck_grip_n, mech::chuck_grip_n, f0, sum_mr, rpm, internal);
+f1!(mech_chuck_speed_for_grip, mech::chuck_speed_for_grip, f0, f_req, sum_mr);
+f1!(mech_unbalance_force_n, mech::unbalance_force_n, u_gmm, rpm);
+f1!(mech_iso_uper_gmm, mech::iso_uper_gmm, g, m_kg, rpm);
+f1!(mech_iso_eper_um, mech::iso_eper_um, g, rpm);
+f1!(mech_iso_grade_from_u, mech::iso_grade_from_u, u_gmm, m_kg, rpm);
+f1!(mech_plane_share, mech::plane_share, u, h_this, h_other);
+/// Critical speed with `n` discs in the shared buffer as (x m, mass kg) pairs; SI units; `which` as in `critical_speed`.
+#[no_mangle] pub extern "C" fn mech_critical_speed(n: f64, support: f64, l: f64, ei: f64, mu: f64, which: f64) -> f64 {
+    let b = buf(2.0 * n.max(0.0));
+    let discs: Vec<(f64, f64)> = b.chunks_exact(2).map(|p| (p[0], p[1])).collect();
+    mech::critical_speed(support as u32, l, ei, mu, &discs, which as u32) }
