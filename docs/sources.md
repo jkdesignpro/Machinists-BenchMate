@@ -18,7 +18,7 @@ These are standard machining formulas, published in many references. Each functi
 
 ## GD&T (`core/src/gdt.rs`, `app/gdt.js`)
 Full list with URLs, access dates (2026-11-10), the per-statement check table and the items still "to be verified" is in **`docs/gdt.md`**. Summary:
-- **Standards (cited by name, year and clause only; status checked on the standards bodies' catalogue pages):** ASME Y14.5-2018 (R2024); ISO 1101:2017; ISO 5459:2024 (ISO 5459:2011 withdrawn); ISO 2692:2021; ISO 8015:2011; ISO 14405-1 (envelope requirement); ISO 22081:2021 (ISO 2768-2:1989 withdrawn). No text, figures or tables from them were copied.
+- **Standards (cited by name, year and clause only; status checked on the standards bodies' catalogue pages):** ASME Y14.5-2018 (R2024); ISO 1101:2017; ISO 5459:2024, edition 3, 2024-10 (ISO 5459:2011 withdrawn); ISO 2692:2021; ISO 8015:2011; ISO 14405-1 (envelope requirement); ISO 22081:2021 (ISO 2768-2:1989 withdrawn). No text, figures or tables from them were copied.
 - **[MIT]** J. Salsbury, "GD&T and the new ASME Y14.5-2018", Mitutoyo America, 2019.
 - **[GLS]** Geometric Learning Systems, GD&T reference chart for ASME Y14.5-2018, 2019.
 - **[GDTB]** GD&T Basics, educational articles (gdandtbasics.com).
@@ -29,6 +29,7 @@ Full list with URLs, access dates (2026-11-10), the per-statement check table an
 - **[ACC]** Accendo Reliability and **[FF]** Five Flute, RSS tolerance analysis (stack helpers).
 - **[FARO]** O. Ekinci, composite positional tolerances, FARO; **[DCS]** 3DCS help manual, Composite GD&T (composite position checker).
 - **[GEN]** Genorma catalogue, ISO 2768-2:1989 status (withdrawn 2021-02-04, revised by ISO 22081:2021).
+- Round 3 (accessed 2026-11-10/11): **[PTC]** PTC Creo help (ASME optional modifiers; datum label rules); **[GLS12]** Stolter / Geometric Learning Systems edition comparison chart, 2012 (RFS symbol by edition, composite profile); **[HEX]** Hexagon PC-DMIS help, profile of a line (composite segments); **[SIS]** Swedish Institute for Standards, ISO 2768-2:1989 replaced by ISO 22081:2021; **[BSI]** BSI Knowledge, BS EN ISO 5459:2024 (published 2024-10-31, supersedes 2011); **[QM]** E. Morse, "Tolerancing standards: a comparison", Quality Magazine, 2016 (position on planes, ISO vs ASME); **[MMS]** G. Schuetz (Mahr), Modern Machine Shop, 2008, and **[PMPA]** Precision Machined Products Association (lobed parts and two-point gauges). ISO 5459:2024 edition 3 (2024-10) read on committee.iso.org.
 
 ## Shop helpers (`core/src/shop.rs`, `app/shop.js`)
 Full list with URLs, the statement check table and open items: **`docs/shop-helpers.md`**. Summary:

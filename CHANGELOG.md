@@ -3,6 +3,11 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (GD&T round 3, desktop microphone, letter addresses)
+- **GD&T guide:** composite profile section (upper row locates, lower row floats with orientation-only datums; same datums in the same order); datum letters (no I, O, Q; AA, AB after Z); statistical tolerance (ST) explained with its SPC note; projected zone and tangent plane wording sharpened; RFS circled S history by edition (required 1982, legacy option 1994, gone from 2009); ISO 5459:2024 edition 3 (2024-10) and ISO 22081:2021 as the replacement of ISO 2768-2:1989; position on planes (ISO yes, ASME no); two-point gauges and odd lobing. Each now has two independent public sources (new: PTC Creo help, GLS 2012 edition chart, Hexagon PC-DMIS help, SIS, BSI, Quality Magazine, Modern Machine Shop, PMPA). Still flagged "to be verified": resultant condition at LMC, position without datums on coaxial features, ISO invocation principle, MMC on profile in Y14.5-2018, the 2018 fastener appendix letter, V-block angle rule, spherical-zone and tangent-plane usage notes. Details in `docs/gdt.md`.
+- **Feature control frame builder:** I, O, Q datum letters are now invalid (confirmed rule); projected zone, statistical tolerance and tangent plane notes no longer flagged.
+- **G and M codes:** "Letter addresses" table A to Z, with a NIST RS274NGC column and a Haas mill column, each from its own document (parity BB73).
+- **Desktop microphone** for the chatter finder: the app grants microphone requests from its own page (camera and screen capture denied), switches on WebKitGTK's media stream setting on Linux, and ships `desktop/Info.plist` (NSMicrophoneUsageDescription) and `desktop/Entitlements.plist` (audio-input entitlement for the hardened runtime). The release workflow re-signs macOS builds with the same entitlements and checks them. Verified on Linux (built app, virtual display, PulseAudio test tone found at 1233.4 Hz); macOS and Windows are set up but not tested here (see `docs/release.md`).
 ### Fixed
 - Grinding wheel marking and grit conversion screens failed to load (unescaped quote in `app/grinding.js`); `scripts/build-web.sh` now syntax-checks every UI script.
 ### Added (calculators batch 3: small mill and lathe, chatter, grinding)

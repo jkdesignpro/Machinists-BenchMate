@@ -33,15 +33,17 @@ features are names only.
 | CNC Machinist Calculator Ultra | 113 | 54 | 16 | 41 (8) | 2 | 0 | 49 % |
 | Machinery's Handbook 31 | 306 | 16 | 48 | 208 (14) | 6 | 28 | 6 % |
 | Engineers' Data Book | 94 | 3 | 20 | 33 (1) | 12 | 26 | 5 % |
-| Engineers Black Book | 80 | 9 | 16 | 54 (10) | 1 | 0 | 11 % |
+| Engineers Black Book | 80 | 10 | 15 | 54 (10) | 1 | 0 | 13 % |
 | CNC Machining handbook | 83 | 4 | 9 | 66 (0) | 0 | 4 | 5 % |
-| **All** | **676** | **86** | **109** | **402 (32)** | **21** | **58** | **14 %** |
+| **All** | **676** | **87** | **108** | **402 (32)** | **21** | **58** | **15 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
 
 **Update (branch `claude/calcs-3`, 2026-11-10):** batches A7, A8 and A9 are built: U4, U5, U9, U10, U16, U19-U23, U26, U55, U56, U57, U59, U60, U90 and MH149 done; U32, MH163, MH166, MH167, MH169 and BB60 partial. Not built: U58 (cylindricity from RPM) and U27 (vibration sensor). Summary counts recounted from section 1.
+
+**Update (branch `claude/gdt-3`, 2026-11-11):** BB73 done (letter-address table added to the G and M codes screen). GD&T round 3 (composite profile added to the guide) changes no row status. Summary counts updated for BB73.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -128,7 +130,7 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U26 | Chatter listener (microphone, stable speeds from lobes, mill and lathe) | done | `chatter` | Microphone (Web Audio, FFT in Rust) or typed frequency; harmonics of spindle and tooth passing marked; stable speeds per lobe; mill (teeth) and lathe (one); on-device only (`claude/calcs-3`) |
+| U26 | Chatter listener (microphone, stable speeds from lobes, mill and lathe) | done | `chatter` | Microphone (Web Audio, FFT in Rust) or typed frequency; harmonics of spindle and tooth passing marked; stable speeds per lobe; mill (teeth) and lathe (one); on-device only (`claude/calcs-3`); microphone also enabled in the desktop app (`claude/gdt-3`: verified on Linux, macOS and Windows set up but not run) |
 | U27 | Vibration check (device sensor) | missing | | Desktop first; needs a phone build or a USB sensor |
 
 ### Drilling and tapping
@@ -802,7 +804,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB70 | Abbreviations used in drawings | missing | | |
 | BB71 | Standards for engineering drawings | missing | | |
 | BB72 | Human physical dimensions | out of scope | | |
-| BB73 | G-codes, letter addresses, miscellaneous function words | partial | `gmcodes` | G and M words per control; no letter-address table yet |
+| BB73 | G-codes, letter addresses, miscellaneous function words | done | `gmcodes` | G and M words per control; letter-address table A-Z (NIST RS274NGC and Haas mill columns, each from its own document) under the code list (`claude/gdt-3`) |
 | BB74 | Surface roughness tables | partial | `finish` | Conversions in progress (`claude/ref-data-3`) |
 | BB75 | Surface finish expected from manufacturing processes | missing | | In progress (`claude/ref-data-3`) |
 | BB76 | Terms used in heat treatment of steel | missing | | |

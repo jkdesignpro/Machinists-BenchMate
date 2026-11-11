@@ -3,7 +3,7 @@
 Screens: **G and M codes** (`gmcodes`) and **Macro reference** (`macroref`), group
 "G-code reference", code in `app/gmcodes.js`. Data: `data/refdata/gcodes-evidence.json`,
 built into `data/refdata.json` (key `gcodes`) by `scripts/build_refdata.py`.
-Parity batch A4 (`docs/parity-audit.md`): U92, U93, CN21, CN22, CN81 done; U94, BB73 partial.
+Parity batch A4 (`docs/parity-audit.md`): U92, U93, CN21, CN22, CN81 done; U94 partial. BB73 done (letter-address table, branch `claude/gdt-3`).
 
 ## Rules
 
@@ -178,7 +178,19 @@ Listed per control in the evidence file (`gaps`) and on screen. The main ones:
 - Okuma: OSP mill; G90/G91, LAP cycles, threading cycles and M08/M09 (third-party
   lists only); CALL/RTS/MODIN syntax (one source).
 - Mazak: machining centre EIA codes; M codes; rows the extraction left unclear.
-- Not built: letter-address table (BB73), program characters and layout (CN23, CN24).
+- Not built: program characters and layout (CN23, CN24).
+
+## Letter addresses (BB73)
+
+A collapsible table under the code list, "Letter addresses", gives A to Z in two
+columns, each taken only from its own document and written in our words: NIST
+RS274NGC v3 (NISTIR 6556, Table 3 "word-starting letters", section 3.3.2, p. 16)
+and the Haas mill programming workbook (address codes, pp. 24-28; page numbers
+read from extracted text, may be off by one). A letter a document does not
+define is shown as "not listed" (E, O, U, V, W are Haas only), never filled in
+from the other column. Lathe meanings (for example U and W as incremental axes)
+are not shown: no lathe source was read for them in this round. The data is a
+small constant in `app/gmcodes.js` (`GM_ADDR`), not in the evidence file.
 
 ## Tests
 
