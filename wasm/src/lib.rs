@@ -155,6 +155,9 @@ f1!(coolant_topup_mix, c::coolant_topup_mix, v_now, c_now, v_full, c_target);
 f1!(coolant_concentrate_in, c::coolant_concentrate_in, vol, c, c_conc);
 f1!(frac_nearest_num, c::frac_nearest_num, x, den);
 f1!(mixed_to_decimal, c::mixed_to_decimal, whole, num, den);
+/// Nearest fraction of `x` to 1/`den`: which 0 sign, 1 whole, 2 numerator,
+/// 3 denominator (reduced), 4 error (fraction minus x).
+#[no_mangle] pub extern "C" fn frac_nearest(x: f64, den: f64, which: f64) -> f64 { pick(c::nearest_fraction(x, den), which) }
 #[no_mangle] pub extern "C" fn frac_reduce(num: f64, den: f64, which: f64) -> f64 {
     let (a, b) = c::frac_reduce(num, den); if which == 0.0 { a } else { b } }
 

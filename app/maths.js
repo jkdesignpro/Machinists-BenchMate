@@ -240,45 +240,31 @@ function renderUnits(el) {
   draw();
 }
 
-// ---------- Expression calculator ----------
-const CALC_STATE = { e: '2 * (3.5 + 1) ^ 2', deg: 1, ans: 0, hist: [], dd: 29.5, dm: '', ds: '', dx: '', pf: 360, x1: 0, y1: 0, x2: 10, y2: 100, x: 2.5 };
+// ---------- Calculator tool page ----------
+// The calculator itself is app/calc.js (BenchCalc), rendered inline here;
+// below it: degrees-minutes-seconds, prime factors and interpolation.
+const CALC_STATE = { dd: 29.5, dm: '', ds: '', dx: '', pf: 360, x1: 0, y1: 0, x2: 10, y2: 100, x: 2.5 };
 function renderCalc(el) {
   const s = CALC_STATE, W = state.W;
-  el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f" style="grid-column:1/-1"><span>Expression</span><div class="row">' + mtxt('e', s.e, 420, 'e.g. sqrt(3)/2 * 25.4') +
-    '<button class="btn" id="cgo">=</button></div></label></div><div class="mfilter"><span>Angles in:</span>' + gseg('cdeg', [[1, 'Degrees'], [0, 'Radians']], s.deg) + '</div><div id="cres"></div><div id="chist"></div>' +
-    mNote('Operators + − * / % ^ (power, right to left: 2^3^2 = 512; −2^2 = −4), ! (factorial) and brackets. Constants pi, e, ans (last result). Functions: sin cos tan asin acos atan atan2(y, x), sinh cosh tanh, sqrt cbrt abs, ln, log (base 10), log2, exp, floor ceil round, min max hypot pow, fact ncr npr, dms(d, m, s) to decimal degrees, inv(a) involute (tan a − a, in radians). Multiplication must be written: 2*pi, not 2pi. The expression is parsed by BenchMate\'s own parser in the Rust core; nothing is run as code.') +
+  el.innerHTML = '';
+  if (window.BenchCalc) BenchCalc.render(el);
+  const x = document.createElement('div'); el.appendChild(x);
+  x.innerHTML = mNote('Typing: operators + − * / ^ (power, right to left: 2^3^2 = 512; −2^2 = −4), % (percent when nothing follows it: 200*15% = 30; remainder between two numbers: 7 % 3 = 1), ! (factorial) and brackets. Mixed numbers: 3 7/16 or 3-7/16 (no spaces); write 3 - 7/16 with spaces to subtract. Constants pi, e, ans (last result). Functions: sin cos tan asin acos atan atan2(y, x), sinh cosh tanh, sqrt cbrt abs, ln, log (base 10), log2, exp, floor ceil round, min max hypot pow mod, fact ncr npr, dms(d, m, s) to decimal degrees, inv(a) involute (tan a − a, in radians). Multiplication must be written: 2*pi, not 2pi. Enter evaluates, Ctrl+Enter uses the result in the field the calculator was opened from. The expression is parsed by BenchMate\'s own parser in the Rust core; nothing is run as code.') +
     '<h2>Degrees, minutes and seconds</h2><div class="grid">' + sfield('Degrees', sinp('dd', s.dd), '°') + sfield('Minutes', sinp('dm', s.dm), '′') + sfield('Seconds', sinp('ds', s.ds), '″') + sfield('Or decimal degrees', sinp('dx', s.dx), '°') + '</div><div id="cdms"></div>' +
     '<h2>Prime factors</h2><div class="grid">' + sfield('Whole number', sinp('pf', s.pf), '') + '</div><div id="cpf"></div>' +
     '<h2>Linear interpolation</h2><p class="desc">Read a value between two table rows.</p><div class="grid">' + sfield('x1', sinp('x1', s.x1), '') + sfield('y1', sinp('y1', s.y1), '') + sfield('x2', sinp('x2', s.x2), '') + sfield('y2', sinp('y2', s.y2), '') + sfield('x', sinp('x', s.x), '') + '</div><div id="cint"></div>';
-  const ev = (commit) => {
-    const txt = String(s.e || ''), codes = Array.from(txt).map(ch => ch.codePointAt(0));
-    const n = toBuf(W, codes), v = W.expr_eval(n, +s.deg, s.ans), out = el.querySelector('#cres');
-    if (isFinite(v)) {
-      out.innerHTML = mRes('Result', [['= ', (+v.toPrecision(12)).toLocaleString('en-GB', { maximumFractionDigits: 12, useGrouping: false }), '']]);
-      if (commit) { s.ans = v; s.hist.unshift([txt, v]); s.hist = s.hist.slice(0, 12); hist(); }
-    } else {
-      const msg = mStr(W, W.expr_err_len()), pos = W.expr_err_pos();
-      out.innerHTML = mRes('Result', [[sesc(msg) + (txt.trim() ? '<div class="ms" style="font-family:var(--mono);white-space:pre">' + sesc(txt) + '\n' + ' '.repeat(Math.min(pos, txt.length)) + '^</div>' : ''), '', '']]);
-    }
-  };
-  const hist = () => { el.querySelector('#chist').innerHTML = s.hist.length ? mRes('This session (ans = last result)', s.hist.map(([t, v]) => [sesc(t), (+v.toPrecision(12)).toLocaleString('en-GB', { maximumFractionDigits: 12, useGrouping: false }), ''])) : ''; };
-  const inp = el.querySelector('[data-k="e"]');
-  inp.oninput = () => { s.e = inp.value; ev(false); };
-  inp.onkeydown = e => { if (e.key === 'Enter') ev(true); };
-  el.querySelector('#cgo').onclick = () => ev(true);
-  el.querySelectorAll('#cdeg button').forEach(b => b.onclick = () => { s.deg = +b.dataset.v; el.querySelectorAll('#cdeg button').forEach(x => x.classList.toggle('on', x === b)); ev(false); });
-  el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k === 'e') return; i.oninput = () => { s[i.dataset.k] = i.value; if (i.dataset.k === 'dx') ['dd', 'dm', 'ds'].forEach(k => s[k] = ''); else if (['dd', 'dm', 'ds'].includes(i.dataset.k)) s.dx = ''; side(); }; });
+  x.querySelectorAll('[data-k]').forEach(i => { i.oninput = () => { s[i.dataset.k] = i.value; if (i.dataset.k === 'dx') ['dd', 'dm', 'ds'].forEach(k => s[k] = ''); else if (['dd', 'dm', 'ds'].includes(i.dataset.k)) s.dx = ''; side(); }; });
   function side() {
     const dx = snum(s.dx);
     let deg;
     if (isFinite(dx)) deg = dx; else { const d = snum(s.dd) || 0, m = snum(s.dm) || 0, sc = snum(s.ds) || 0; deg = (d < 0 ? -1 : 1) * (Math.abs(d) + m / 60 + sc / 3600); }
-    el.querySelector('#cdms').innerHTML = mRes('Angle', [['Decimal degrees', fmt(deg, 8), '°'], ['Degrees, minutes, seconds', mdms(W, deg), ''], ['Radians', fmt(deg * Math.PI / 180, 10), 'rad'], ['Minutes', fmt(deg * 60, 6), '′']]);
+    x.querySelector('#cdms').innerHTML = mRes('Angle', [['Decimal degrees', fmt(deg, 8), '°'], ['Degrees, minutes, seconds', mdms(W, deg), ''], ['Radians', fmt(deg * Math.PI / 180, 10), 'rad'], ['Minutes', fmt(deg * 60, 6), '′']]);
     const n = snum(s.pf), c = W.prime_factors(n), f = listOut(W, c);
-    el.querySelector('#cpf').innerHTML = mRes('Prime factors', [[c ? (c === 1 ? sesc(String(n)) + ' is prime' : sesc(String(n)) + ' =') : 'Enter a whole number from 2 to 10¹²', c > 1 ? f.join(' × ') : '', '']]);
+    x.querySelector('#cpf').innerHTML = mRes('Prime factors', [[c ? (c === 1 ? sesc(String(n)) + ' is prime' : sesc(String(n)) + ' =') : 'Enter a whole number from 2 to 10¹²', c > 1 ? f.join(' × ') : '', '']]);
     const y = W.interpolate(snum(s.x1), snum(s.y1), snum(s.x2), snum(s.y2), snum(s.x));
-    el.querySelector('#cint').innerHTML = mRes('Interpolated', [['y at x', isFinite(y) ? fmt(y, 6) : 'enter two different x values', '', snum(s.x) < Math.min(snum(s.x1), snum(s.x2)) || snum(s.x) > Math.max(snum(s.x1), snum(s.x2)) ? 'x is outside the two rows: this is extrapolation.' : '']]);
+    x.querySelector('#cint').innerHTML = mRes('Interpolated', [['y at x', isFinite(y) ? fmt(y, 6) : 'enter two different x values', '', snum(s.x) < Math.min(snum(s.x1), snum(s.x2)) || snum(s.x) > Math.max(snum(s.x1), snum(s.x2)) ? 'x is outside the two rows: this is extrapolation.' : '']]);
   }
-  ev(false); hist(); side();
+  side();
 }
 
 // ---------- Plane figures and solids ----------

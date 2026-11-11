@@ -262,10 +262,43 @@ pub fn mixed_to_decimal(whole: f64, num: f64, den: f64) -> f64 {
     if whole < 0.0 || (whole == 0.0 && whole.is_sign_negative()) { whole - f } else { whole + f }
 }
 
+/// Nearest fraction of `x` in steps of 1/`den` (e.g. 64), reduced:
+/// [sign (1 or -1), whole, numerator, denominator, error], where error is
+/// the fraction's value minus `x` (positive = the fraction is larger).
+/// A value that rounds to a whole number has numerator 0 and denominator 1.
+pub fn nearest_fraction(x: f64, den: f64) -> [f64; 5] {
+    if !(den >= 1.0 && den <= 1e6) || !x.is_finite() || x.abs() > 1e12 { return [f64::NAN; 5]; }
+    let den = den.round();
+    let sign = if x < 0.0 { -1.0 } else { 1.0 };
+    let n = (x.abs() * den).round();
+    let whole = (n / den).floor();
+    let (num, d) = frac_reduce(n - whole * den, den);
+    let (num, d) = if num == 0.0 { (0.0, 1.0) } else { (num, d) };
+    let value = sign * (whole + num / d);
+    [if n == 0.0 { 1.0 } else { sign }, whole, num, d, value - x]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     fn close(a: f64, b: f64, tol: f64) { assert!((a - b).abs() <= tol, "{a} vs {b}"); }
+
+    #[test]
+    fn nearest_fraction_64ths() {
+        // 0.4375 = 7/16 exactly.
+        assert_eq!(nearest_fraction(3.4375, 64.0), [1.0, 3.0, 7.0, 16.0, 0.0]);
+        // 0.3 -> 19/64 = 0.296875, 0.003125 small.
+        let f = nearest_fraction(0.3, 64.0);
+        assert_eq!(&f[..4], &[1.0, 0.0, 19.0, 64.0]); close(f[4], -0.003125, 1e-12);
+        // Negative: -1.2 -> -(1 13/64) = -1.203125, fraction 0.003125 below.
+        let f = nearest_fraction(-1.2, 64.0);
+        assert_eq!(&f[..4], &[-1.0, 1.0, 13.0, 64.0]); close(f[4], -0.003125, 1e-12);
+        // Rounds up to the next whole number.
+        assert_eq!(&nearest_fraction(1.999, 64.0)[..4], &[1.0, 2.0, 0.0, 1.0]);
+        assert_eq!(&nearest_fraction(0.001, 64.0)[..4], &[1.0, 0.0, 0.0, 1.0]);
+        assert!(nearest_fraction(f64::NAN, 64.0)[0].is_nan());
+        assert!(nearest_fraction(1.0, 0.0)[0].is_nan());
+    }
 
     #[test]
     fn capability_hand_example() {

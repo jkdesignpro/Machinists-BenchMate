@@ -90,6 +90,48 @@ await page.waitForSelector('#tres table');
 const mtText = await page.textContent('#tres');
 if (!/included angle 2\.98/.test(mtText)) problems.push(`[${where}] Morse angle not labelled as included angle`);
 
+// Calculator (app/calc.js): typed expression with a mixed number, keypad,
+// fraction readout, history tape; then open it from a field and Use.
+where = 'calc typed';
+await page.click('#units button[data-u="inch"]');
+await page.click('#list button.t[data-id="calc"]');
+const ce = '#main .bcalc .bc-expr';
+await page.fill(ce, '3-7/16 * 2');
+const cres = (await page.textContent('#main .bcalc .bc-res')) || '';
+if (!/^= 6\.875$/.test(cres.trim())) problems.push(`[${where}] 3-7/16 * 2: expected "= 6.875", got "${cres}"`);
+const calt = (await page.textContent('#main .bcalc .bc-alt')) || '';
+if (!/= 6 7\/8/.test(calt) || !/in→mm 174\.625/.test(calt)) problems.push(`[${where}] fraction/mm readout wrong: "${calt}"`);
+await page.press(ce, 'Enter');
+const tape0 = (await page.textContent('#main .bcalc .bc-tape .bc-hv')) || '';
+if (tape0.trim() !== '6.875') problems.push(`[${where}] history tape: expected 6.875, got "${tape0}"`);
+where = 'calc keypad';
+for (const a of ['x:ac', 'i:2', 'o:+', 'i:3', 'o:*', 'i:4', 'x:eq']) await page.click(`#main .bcalc .bc-keys button[data-a="${a}"]`);
+const kres = (await page.textContent('#main .bcalc .bc-res')) || '';
+if (kres.trim() !== '= 14') problems.push(`[${where}] 2 + 3 * 4: expected "= 14", got "${kres}"`);
+where = 'calc bolt circle';
+const bolt = (await page.textContent('#main .bcalc .bc-fout')) || '';
+if (!/Hole 6/.test(bolt)) problems.push(`[${where}] bolt circle list missing: "${bolt.slice(0, 80)}"`);
+where = 'calc use';
+await page.click('#list button.t[data-id="rpm"]');
+await page.evaluate(() => { const i = document.querySelector('#main input'); window.__calcIn = 0; i.addEventListener('input', () => window.__calcIn++); window.BenchCalc.open(i); });
+if (!(await page.isVisible('#bcalc-panel.bc-float'))) problems.push(`[${where}] floating panel not shown`);
+await page.fill('#bcalc-panel .bc-expr', '1/2 + 1/4');
+await page.click('#bcalc-panel .bc-usebtn');
+const used = await page.evaluate(() => [document.querySelector('#main input').value, window.__calcIn, window.BenchCalc.isOpen]);
+if (used[0] !== '0.75' || used[1] < 1 || used[2]) problems.push(`[${where}] Use: expected value 0.75, an input event and a closed panel, got ${JSON.stringify(used)}`);
+where = 'calc esc';
+await page.evaluate(() => window.BenchCalc.open());
+await page.keyboard.press('Escape');
+if (await page.evaluate(() => window.BenchCalc.isOpen)) problems.push(`[${where}] Esc did not close the panel`);
+where = 'calc phone';
+await page.setViewportSize({ width: 390, height: 800 });
+await page.evaluate(() => window.BenchCalc.open(document.querySelector('#main input')));
+if (!(await page.isVisible('#bcalc-panel.bc-modal'))) problems.push(`[${where}] modal sheet not shown at phone width`);
+const over = await page.evaluate(() => document.getElementById('bcalc-panel').scrollWidth - window.innerWidth);
+if (over > 0) problems.push(`[${where}] panel wider than the screen by ${over}px`);
+await page.evaluate(() => window.BenchCalc.close());
+await page.setViewportSize({ width: 1280, height: 900 });
+
 // Material data: a designation a publisher prints must not also be listed as "unsourced".
 where = 'materials data';
 const mat = JSON.parse(await readFile(path.join(appDir, 'data/materials.json'), 'utf8'));

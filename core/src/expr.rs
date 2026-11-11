@@ -13,7 +13,17 @@
 //! Functions: sin cos tan asin acos atan atan2(y,x) sinh cosh tanh sqrt cbrt
 //! abs ln log (base 10) log2 exp floor ceil round min(a,b) max(a,b)
 //! hypot(a,b) fact(n) ncr(n,r) npr(n,r) dms(d,m,s) (to decimal degrees)
-//! inv(x) (involute, inv a = tan a - a). Trig angles in degrees or radians.
+//! inv(x) (involute, inv a = tan a - a) mod(a,b). Trig angles in degrees or radians.
+//!
+//! Shop forms (for a machinist's calculator):
+//! - Mixed numbers: `3 7/16` (space) and `3-7/16` (hyphen, no spaces) are
+//!   3.4375. The fraction must be proper (numerator < denominator, both whole
+//!   numbers). The hyphen form is only read as a mixed number at the start of
+//!   an operand list (start, after `(`, `,`, `+` or `-`); after `*`, `/`, `^`
+//!   or `%` it is plain subtraction, and `3 - 7/16` with spaces always is.
+//! - Percent: `%` followed by the end, `)`, `,` or an operator is a postfix
+//!   percent (`15%` = 0.15, `200*15%` = 30); between two operands it is the
+//!   remainder (`7 % 3` = 1).
 
 use std::f64::consts::{E, PI};
 
@@ -69,8 +79,46 @@ impl<'a> P<'a> {
     }
     fn postfix(&mut self) -> R {
         let mut v = self.primary()?;
-        while self.eat(b'!') { v = fact(v).ok_or_else(|| ("Factorial needs a whole number from 0 to 170".to_string(), self.i))?; }
+        loop {
+            if self.eat(b'!') { v = fact(v).ok_or_else(|| ("Factorial needs a whole number from 0 to 170".to_string(), self.i))?; }
+            else if self.peek() == Some(b'%') && self.percent_postfix() { self.i += 1; v /= 100.0; }
+            else { break; }
+        }
         Ok(v)
+    }
+    /// The `%` at `self.i` is a postfix percent (not the remainder operator)
+    /// when nothing that can start an operand follows it.
+    fn percent_postfix(&self) -> bool {
+        let mut k = self.i + 1;
+        while k < self.s.len() && self.s[k].is_ascii_whitespace() { k += 1; }
+        match self.s.get(k) { None => true, Some(c) => matches!(c, b')' | b',' | b'+' | b'-' | b'*' | b'/' | b'^' | b'%' | b'!') }
+    }
+    /// Whole number at `k..`: (value, end), or None if there is no digit.
+    fn whole(&self, mut k: usize) -> Option<(f64, usize)> {
+        let st = k;
+        while k < self.s.len() && self.s[k].is_ascii_digit() { k += 1; }
+        if k == st { return None; }
+        std::str::from_utf8(&self.s[st..k]).ok()?.parse::<f64>().ok().map(|v| (v, k))
+    }
+    /// Mixed number after the whole number `w` at `st..j`: `w n/d` or `w-n/d`.
+    fn mixed(&self, st: usize, j: usize, w: f64) -> Option<(f64, usize)> {
+        let s = self.s;
+        let k = if s.get(j) == Some(&b'-') {
+            let prev = s[..st].iter().rev().find(|c| !c.is_ascii_whitespace());
+            if !matches!(prev, None | Some(b'(') | Some(b',') | Some(b'+') | Some(b'-')) { return None; }
+            j + 1
+        } else {
+            let mut k = j;
+            while k < s.len() && s[k].is_ascii_whitespace() { k += 1; }
+            if k == j { return None; }
+            k
+        };
+        let (n, k) = self.whole(k)?;
+        if s.get(k) != Some(&b'/') { return None; }
+        let (d, k) = self.whole(k + 1)?;
+        if let Some(c) = s.get(k) { if *c == b'.' || *c == b'(' || c.is_ascii_alphabetic() { return None; } }
+        if !(d > 0.0 && n < d) { return None; }
+        Some((w + n / d, k))
     }
     fn number(&mut self) -> R {
         let st = self.i;
@@ -83,7 +131,15 @@ impl<'a> P<'a> {
             if k < s.len() && s[k].is_ascii_digit() { while k < s.len() && s[k].is_ascii_digit() { k += 1; } j = k; }
         }
         let t = std::str::from_utf8(&s[st..j]).unwrap_or("");
-        match t.parse::<f64>() { Ok(v) => { self.i = j; Ok(v) } Err(_) => self.err("Not a number") }
+        match t.parse::<f64>() {
+            Ok(v) => {
+                if s[st..j].iter().all(|c| c.is_ascii_digit()) {
+                    if let Some((m, end)) = self.mixed(st, j, v) { self.i = end; return Ok(m); }
+                }
+                self.i = j; Ok(v)
+            }
+            Err(_) => self.err("Not a number")
+        }
     }
     fn primary(&mut self) -> R {
         match self.peek() {
@@ -128,11 +184,12 @@ impl<'a> P<'a> {
                     _ => { let r = to_r(x); r.tan() - r } // involute, in radians
                 }
             }
-            "atan2" | "min" | "max" | "hypot" | "ncr" | "npr" | "pow" => {
+            "atan2" | "min" | "max" | "hypot" | "ncr" | "npr" | "pow" | "mod" => {
                 need(2)?;
                 let (x, y) = (a[0], a[1]);
                 match f {
                     "atan2" => from_r(x.atan2(y)), "min" => x.min(y), "max" => x.max(y), "hypot" => x.hypot(y), "pow" => x.powf(y),
+                    "mod" => { if y == 0.0 { return Err(("Division by zero".to_string(), at)); } x % y }
                     _ => {
                         let (n, r) = (x, y);
                         if !(n >= 0.0 && r >= 0.0 && n.fract() == 0.0 && r.fract() == 0.0 && r <= n && n <= 1000.0) {
@@ -248,6 +305,39 @@ mod tests {
         let deep = "(".repeat(200) + "1" + &")".repeat(200);
         assert!(matches!(eval(&deep, true, 0.0), Eval::Err(_, _)));
         assert!(matches!(eval("system(1)", true, 0.0), Eval::Err(_, _)));
+    }
+
+    #[test]
+    fn mixed_numbers() {
+        close(ok("3 7/16", true), 3.4375, 0.0);
+        close(ok("3-7/16", true), 3.4375, 0.0);
+        close(ok("-3-7/16", true), -3.4375, 0.0);
+        close(ok("1-1/2 + 2-3/4", true), 4.25, 0.0);
+        close(ok("(1-1/2) * 2", true), 3.0, 0.0);
+        close(ok("max(1-1/2, 0)", true), 1.5, 0.0);
+        // Spaces around the minus: subtraction.
+        close(ok("3 - 7/16", true), 2.5625, 0.0);
+        // After * / ^ the hyphen is subtraction (1/3 - 1/4, 2*3 - 1/4).
+        close(ok("1/3-1/4", true), 1.0 / 3.0 - 0.25, 1e-15);
+        close(ok("2*3-1/4", true), 5.75, 0.0);
+        // Improper fraction part is not a mixed number.
+        close(ok("3-9/8", true), 3.0 - 9.0 / 8.0, 0.0);
+        close(ok("2 1/2 * 2", true), 5.0, 0.0);
+        close(ok("1-1/2-1/4", true), 1.25, 0.0);
+        // A decimal is never the whole part.
+        assert!(matches!(eval("2.5 1/2", true, 0.0), Eval::Err(_, _)));
+        close(ok("2.5-1/2", true), 2.0, 0.0);
+    }
+
+    #[test]
+    fn percent_and_mod() {
+        close(ok("15%", true), 0.15, 1e-15);
+        close(ok("200*15%", true), 30.0, 1e-12);
+        close(ok("(50)% + 1", true), 1.5, 1e-15);
+        close(ok("7 % 3", true), 1.0, 0.0);
+        close(ok("7%3", true), 1.0, 0.0);
+        close(ok("mod(7.5, 2)", true), 1.5, 0.0);
+        assert!(matches!(eval("mod(1, 0)", true, 0.0), Eval::Err(_, _)));
     }
 
     #[test]
