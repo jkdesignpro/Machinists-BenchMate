@@ -92,7 +92,7 @@ const WORKSPACES = [
   { id: 'program', name: 'Programming', icon: 'programming', blurb: 'G and M codes, macros, cycle generators, backplot and DXF.', sections: [
     ['Codes', ['gmcodes', 'macroref'], 'code'],
     ['Cycle generators', ['cycdrill', 'threadprog', 'cyctaper', 'cycgroove', 'cycg71', 'cycbroach'], 'code'],
-    ['Simulate and draw', ['gsim', 'holepattern', 'dxfshapes'], 'play'],
+    ['Simulate and draw', ['gsim', 'sketch', 'holepattern', 'dxfshapes'], 'play'],
     ['Setup', ['setupsheet', 'tnrc', 'offsetadj'], 'sheet'],
   ] },
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
@@ -113,7 +113,7 @@ const SIMPLE_PAGES = ['calc', 'rpm', 'feeds', 'drills', 'threaddata', 'wires', '
 // Icon for a page when the section icon is not specific enough.
 const PAGE_ICON = {
   calc: 'calc', rpm: 'gauge', threaddata: 'thread', wires: 'thread', triangle: 'triangle', weight: 'material', hardness: 'bars',
-  sinebar: 'angle', machines: 'machine', toollib: 'toollib', gsim: 'play', chatter: 'wave', boringbar: 'beam', deflection: 'beam',
+  sinebar: 'angle', machines: 'machine', toollib: 'toollib', gsim: 'play', sketch: 'dxf', chatter: 'wave', boringbar: 'beam', deflection: 'beam',
   taper: 'angle', knurl: 'surface', formulas: 'book', gmcodes: 'code', materials: 'material', bolttorque: 'nut', oring: 'bearing',
   setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart',
   spline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',

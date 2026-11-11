@@ -276,6 +276,11 @@ svg.geo.cnw{width:150px;max-width:150px;flex:none;margin:0}
 .gschk label{display:flex;align-items:center;gap:6px}
 .gswhy{margin:0 0 8px;max-width:900px}
 .gsscrub select{height:26px}
+.skcv{height:520px;cursor:crosshair}
+.sktools{flex-wrap:wrap}
+.skhint{margin:8px 0 4px;color:var(--ink)}
+.skstat{font-family:var(--mono)}
+@media (max-width:760px){.skcv{height:360px}}
 .gsmsg{max-width:900px}
 .gsmsg tr[data-l]{cursor:pointer}
 .gsmsg td.gml{white-space:nowrap;font-family:var(--mono);width:80px}

@@ -74,7 +74,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Tools | Scientific calculator | done (typed expressions, own parser; no RPN or graphing) | `calc` | U80 |
 | Tools | Bandsaw cut time | done (cut rate or down-feed, chip per tooth) | `bandsaw` | U90 |
 | Tools | G-code simulator | partial | `gsim` | U95: editor (undo, insert and delete line, tidy, inch/mm), 2D and 3D backplot with view cube, cycle time, errors by line; no stock removal, G71-G76 not simulated |
-| Tools | 2D CAD / DXF generator | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` (parametric shapes, live preview, DXF R2000/R12 export; no free sketching, snapping or angle measure) | U96 |
+| Tools | 2D CAD / DXF generator | yes | `sketch` (2D sketcher: point, line, arc, circle, rectangle, text, layers, snaps incl. tangent and square, measure, angle between lines, undo, DXF in and out, R2000/R12), `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` (parametric shapes, live preview, open in the sketcher) | U96 |
 | Shop | Coolant concentration and mix | done | `coolconc`, `coolmix` | U89 |
 | Shop | Chatter finder (mic, stable-speed lobes) | done (microphone or typed frequency, mill and lathe, on-device) | `chatter` | U26 |
 | Shop | Vibration check (device sensor) | missing | | U27 |

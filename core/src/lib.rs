@@ -602,6 +602,7 @@ pub use cycles::*;
 pub mod gcode;
 pub mod gsim;
 pub mod gtidy;
+pub mod sketch;
 pub mod dxf;
 pub mod cad;
 pub mod tooling;

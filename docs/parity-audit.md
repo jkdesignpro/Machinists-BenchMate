@@ -251,7 +251,7 @@ Store list is the fuller of the two store lists.
 | U93 | M-code reference | done | `gmcodes` | Heidenhain, Mazak and Siemens ISO M codes are gaps; builder-specific M codes are flagged |
 | U94 | Custom macro information | partial | `macroref` | Mitsubishi variable ranges and IF/WHILE not yet confirmed |
 | U95 | G-code simulator (2D/3D, cycle time) | partial | `gsim` | Editor with undo, line insert and delete, renumber, strip and inch/mm conversion; 2D and 3D wire backplot with a view cube, step playback, lathe or mill told from the program, cycle time. G71 to G76 are reported, not drawn; no stock removal |
-| U96 | 2D CAD and DXF generator (snapping, angle measure) | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | Parametric shapes with DXF export; no free sketching, snapping or angle measure |
+| U96 | 2D CAD and DXF generator (snapping, angle measure) | yes | `sketch`, `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | 0.4.0: 2D sketcher with points, lines, arcs, circles, rectangles and text on layers, nine snaps including tangent and square, typed points, measure, angle between two lines, undo, DXF in and out; plus the parametric shapes. No trim, fillet, offset or DIMENSION entities (left out on purpose, docs/cad-dxf.md) |
 
 ### Learning and data
 
@@ -936,7 +936,7 @@ mostly formulas, drawing and screens from knowledge we already have.
 |---|---|---|---|
 | A1 | **Canned-cycle generators, mill** (built on `claude/cycles`): G81/G82/G83/G73 drilling, G84 tapping, rectangular hole pattern, bolt-circle and pattern coordinate export (CSV and G-code), thread mill program. Generic Fanuc-style output first, then per control profile | U36, U37, U73, U74, U24, U25 | maths/UI; light research (control manuals for syntax) |
 | A2 | **Canned-cycle generators, lathe** (built on `claude/cycles`): G76 threading with infeed/pass table, lathe taper program, groove/cut-off with CSS time, keyway broach program, G71/G70 profile cycle | U53, U54, U8, U6, U88, U11 | maths/UI; light research |
-| A3 | **2D CAD and DXF generator**: sketch lines/arcs/circles, snapping (end, mid, intersection, tangent), dimensions and angle measure, DXF export; reuse for A2 profile input | U96 | maths/UI (large; may take two sessions) |
+| A3 | **2D CAD and DXF generator** (parametric shapes built on `claude/cad`; the sketcher built in 0.4.0 with DXF in and out, measured read-outs instead of dimension entities): sketch lines/arcs/circles, snapping (end, mid, intersection, tangent), dimensions and angle measure, DXF export; reuse for A2 profile input | U96 | maths/UI (large; may take two sessions) |
 | A4 | **G-code and M-code reference, custom macro reference** per control profile (generic ISO 6983 set, then Fanuc-style, Haas, Siemens, Mitsubishi, Citizen) | U92, U93, U94, BB73, CN21-24, CN81 | heavy research |
 | A5 | **G-code simulator**: 2D backplot of G0-G3, canned cycles from A1/A2, cycle-time estimate; 3D later | U95 | maths/UI |
 | A6 | **Tool library and app shell**: saved tools (end mills, drills, taps, reamers) with one-click fill into any tool; favourites; decimal precision; home dashboard; reorderable menu | U109, U105, U106, U107, U108 | maths/UI |

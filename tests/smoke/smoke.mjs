@@ -125,7 +125,7 @@ await mode('advanced');
 where = 'drawings';
 const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'calc', 'formulas',
   'machines', 'toollib', 'setupsheet', 'materials', 'tempercolours', 'heattreat', 'plastics', 'metalid',
-  'gsim', 'insertcode', 'gdtfcf', 'boltgrade']);
+  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade']);
 await units('inch');
 const noDrawing = [];
 for (const id of meta.tools) {
@@ -598,6 +598,100 @@ await open('gsim');
   await page.click('#gsundo'); await page.waitForTimeout(100);
   if ((await text()) !== before) problems.push(`[${where}] undo after the conversion`);
   await page.click('#gsexm'); await page.waitForTimeout(100);
+}
+
+// 2D sketcher. Typed points: a plate 80 x 50 with two holes of 12 at (20, 25) and (60, 25), a diagonal. With the mouse: a line
+// from centre to centre (snap to centre) is 40 long at 0 degrees; the two holes selected together are 40 apart; a line from
+// (100, 25) tangent to the second hole (d = 40, r = 6) is sqrt(40^2 - 6^2) = 39.547 long. Measure (0,0) to (30,40): 50 at 53.130
+// degrees (picked at x = 90, where it is at y = 25 + 10 x 5.93 / 39.1 = 26.52, clear of the plate). The saved DXF is read back by the sketcher itself; in inches the plate is 80 / 25.4 = 3.1496 wide.
+where = 'sketch';
+await units('mm');
+await open('sketch', 120);
+{
+  const q = sel => page.$eval(sel, e => e.innerText);
+  const tool = t => page.click(`#sktool button[data-v="${t}"]`);
+  const type = async (...vals) => { for (const v of vals) { await page.fill('#skin', v); await page.press('#skin', 'Enter'); } };
+  const at = async (x, y) => { const b = await page.$eval('#skcv', e => { e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return [r.left, r.top]; }); const p = await page.evaluate(([x, y]) => SK.px([x, y]), [x, y]); return [b[0] + p[0], b[1] + p[1]]; };
+  const move = async (x, y) => { const p = await at(x, y); await page.mouse.move(p[0], p[1]); };
+  const click = async (x, y, shift) => { const p = await at(x, y); await page.mouse.move(p[0], p[1]); if (shift) await page.keyboard.down('Shift'); await page.mouse.click(p[0], p[1]); if (shift) await page.keyboard.up('Shift'); };
+  const count = () => page.evaluate(() => state.W.sk_count());
+  if (await count()) problems.push(`[${where}] a new profile should start with an empty sketch`);
+  await tool('rect'); await type('0,0', '@80,50');
+  await tool('circle'); await type('20,25', 'd12', '60,25', 'r6');
+  await tool('line'); await type('0,0', '@80,50'); await page.press('#skin', 'Escape');
+  let sum = await q('#sksum');
+  if ((await count()) !== 4 || !/Width \(X\)\s+80\.000\s+mm/.test(sum) || !/Height \(Y\)\s+50\.000\s+mm/.test(sum)) problems.push(`[${where}] typed plate: ${await count()} entities, "${sum.replace(/\s+/g, ' ').slice(0, 200)}"`);
+  await page.click('#skfit');
+  // centre to centre with the mouse: the pointer is a little off both centres, the snap puts it on them
+  await tool('line');
+  await move(20.4, 25.3);
+  if (!/X 20\.000\s+Y 25\.000 mm/.test(await q('#skstat'))) problems.push(`[${where}] no snap to the centre of the first hole: "${await q('#skstat')}"`);
+  await click(20.4, 25.3); await click(59.7, 24.8);
+  await page.keyboard.press('Escape');
+  if ((await count()) !== 5) problems.push(`[${where}] the line drawn with the mouse was not added (${await count()} entities)`);
+  await tool('select');
+  await click(30, 25.2);
+  let info = await q('#skinfo');
+  if (!/Selected: Line/i.test(info) || !/Length\s+40\.000\s+mm/.test(info) || !/Direction\s+0\.000\s+deg/.test(info)) problems.push(`[${where}] centre to centre line: "${info.replace(/\s+/g, ' ').slice(0, 300)}"`);
+  await click(20, 31); await click(60, 31, true);
+  info = await q('#skinfo');
+  if (!/Two centres/i.test(info) || !/Centre distance\s+40\.000\s+mm/.test(info)) problems.push(`[${where}] two holes selected: "${info.replace(/\s+/g, ' ').slice(0, 300)}"`);
+  // tangent from (100, 25) to the second hole
+  await tool('line'); await type('100,25');
+  await move(60.9, 30.93);
+  await click(60.9, 30.93);
+  await page.keyboard.press('Escape');
+  await tool('select'); await click(90, 26.52);
+  info = await q('#skinfo');
+  if (!/Length\s+39\.547\s+mm/.test(info)) problems.push(`[${where}] tangent line should be 39.547 long: "${info.replace(/\s+/g, ' ').slice(0, 300)}"`);
+  // measure, undo, redo, delete
+  await tool('measure'); await type('0,0', '30,40');
+  const meas = await q('#skmeas');
+  if (!/Distance\s+50\.000\s+mm/.test(meas) || !/53\.130\s+deg/.test(meas)) problems.push(`[${where}] measure: "${meas.replace(/\s+/g, ' ').slice(0, 300)}"`);
+  await page.click('#skundo');
+  if ((await count()) !== 5) problems.push(`[${where}] undo should remove the tangent line (${await count()} entities)`);
+  await page.click('#skredo');
+  if ((await count()) !== 6) problems.push(`[${where}] redo should bring the tangent line back (${await count()} entities)`);
+  await tool('select'); await click(90, 26.52); await page.click('#skdel');
+  if ((await count()) !== 5) problems.push(`[${where}] delete should remove the selected line (${await count()} entities)`);
+  // text on its own layer
+  await page.fill('#sklnew', 'NOTES'); await page.click('#skladd'); await page.selectOption('#sklcol', '3');
+  await tool('text'); await page.fill('#sktext', 'PLATE Ø12'); await type('5,-8');
+  if ((await count()) !== 6 || !/NOTES/.test(await q('#sksum'))) problems.push(`[${where}] text on the layer NOTES was not added`);
+  // save as DXF (R2000, R12, lines and arcs) and open the R12 file again
+  await page.evaluate(() => { window.__saved = []; window.BenchMateSave = (name, data) => window.__saved.push([name, data]); });
+  await page.click('#sksave');
+  await page.selectOption('#skver', '12'); await page.click('#sksave');
+  await page.check('#skexpl'); await page.click('#sksave');
+  const saved = await page.evaluate(() => window.__saved);
+  if (saved.length !== 3 || !/\.dxf$/.test(saved[0][0])) problems.push(`[${where}] save DXF gave ${saved.length} files`);
+  else {
+    if (!/AC1015/.test(saved[0][1]) || !/\$INSUNITS\r\n\s*70\r\n\s*4\r\n/.test(saved[0][1]) || !/LWPOLYLINE/.test(saved[0][1]) || !/\r\nTEXT\r\n/.test(saved[0][1]) || !/PLATE %%c12/.test(saved[0][1])) problems.push(`[${where}] the R2000 file misses its version, units, polyline or text`);
+    if (!/AC1009/.test(saved[1][1]) || /LWPOLYLINE/.test(saved[1][1]) || !/\r\nPOLYLINE\r\n/.test(saved[1][1])) problems.push(`[${where}] the R12 file should use POLYLINE`);
+    if (/POLYLINE/.test(saved[2][1]) || (saved[2][1].match(/\r\nLINE\r\n/g) || []).length !== 6) problems.push(`[${where}] the lines-and-arcs file should have 6 lines and no polyline`);
+    await page.click('#skclr');
+    await page.setInputFiles('#skfile', { name: 'plate-r12.dxf', mimeType: 'application/dxf', buffer: Buffer.from(saved[1][1]) });
+    await page.waitForTimeout(200);
+    const rep = await q('#skrep');
+    sum = await q('#sksum');
+    if ((await count()) !== 6 || !/Read 6 entities on 2 layers, taken as millimetres/.test(rep) || !/does not say/.test(rep) || !/Width \(X\)\s+80\.000\s+mm/.test(sum)) problems.push(`[${where}] reading the saved R12 file back: ${await count()} entities, "${rep.replace(/\s+/g, ' ').slice(0, 300)}"`);
+    await page.setInputFiles('#skfile', { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('this is not a drawing\n') });
+    await page.waitForTimeout(200);
+    if (!/notes\.txt/.test(await q('#skerr')) || (await count()) !== 6) problems.push(`[${where}] a file that is not a DXF should be refused and the sketch kept: "${await q('#skerr')}"`);
+  }
+  await page.evaluate(() => { delete window.BenchMateSave; });
+  // inches: the plate keeps its real size
+  await page.selectOption('#skunits', '1');
+  sum = await q('#sksum');
+  if (!/Width \(X\)\s+3\.1496\s+in/.test(sum)) problems.push(`[${where}] in inches the plate should be 3.1496 wide: "${sum.replace(/\s+/g, ' ').slice(0, 200)}"`);
+  await page.click('#skundo');
+  if (!/Width \(X\)\s+80\.000\s+mm/.test(await q('#sksum'))) problems.push(`[${where}] undo should bring the millimetres back`);
+  // a generator shape opened in the sketcher: the straight slot 40 between centres, 12 wide, with its centre marks
+  await open('dxfslot', 80);
+  await page.click('#cadsk'); await page.waitForTimeout(200);
+  sum = await q('#sksum');
+  if (!/2D sketcher/i.test(await page.textContent('#main')) || !/OUTLINE/.test(sum) || !/CENTRE/.test(sum) || (await count()) < 3) problems.push(`[${where}] Open in the sketcher from the slot page: "${sum.replace(/\s+/g, ' ').slice(0, 300)}"`);
+  await page.click('#skclr');
 }
 
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).

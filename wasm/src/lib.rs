@@ -319,7 +319,8 @@ fn set_text(s: String) -> f64 { let n = s.len(); unsafe { *core::ptr::addr_of_mu
 /// On success returns the DXF text length (text at `text_ptr`) and puts the
 /// drawing in `list_out` (`Drawing::flatten`). On bad input returns minus the
 /// length of an error message held at `text_ptr`.
-#[no_mangle] pub extern "C" fn dxf_build(shape: f64, n: f64, inch: f64, r12: f64, marks: f64, lower_left: f64) -> f64 {
+/// `explode` 1 writes the outlines as separate lines and arcs instead of polylines.
+#[no_mangle] pub extern "C" fn dxf_build(shape: f64, n: f64, inch: f64, r12: f64, marks: f64, lower_left: f64, explode: f64) -> f64 {
     let p = buf(n).to_vec();
     match c::cad::build(shape as u32, &p, marks != 0.0) {
         Ok(mut d) => {
@@ -327,7 +328,8 @@ fn set_text(s: String) -> f64 { let n = s.len(); unsafe { *core::ptr::addr_of_mu
             set_out(d.flatten());
             let u = if inch != 0.0 { c::dxf::Units::Inch } else { c::dxf::Units::Mm };
             let v = if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 };
-            set_text(c::dxf::write_dxf(&d, u, v))
+            let doc = c::dxf::Doc::from_drawing(&d);
+            set_text(c::dxf::write_doc(&if explode != 0.0 { doc.exploded() } else { doc }, u, v))
         }
         Err(e) => { set_out(vec![]); -set_text(e) }
     } }
@@ -714,6 +716,119 @@ pub extern "C" fn gtidy_run(len: f64, numbers: f64, start: f64, step: f64, all: 
 }
 #[no_mangle] pub extern "C" fn gtidy_text() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GT_TEXT)).clone() }) }
 #[no_mangle] pub extern "C" fn gtidy_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GT_MSGS)).clone() }) }
+
+// 2D sketcher (core/src/sketch.rs). One sketch lives here; text goes in
+// through `gsim_in` and comes out through `text_ptr`.
+use c::dxf::Geo as SkGeo;
+static mut SK: Option<c::sketch::Sketch> = None;
+static mut SK_MSG: String = String::new();
+static mut SK_SEL: Vec<usize> = Vec::new();
+static mut SK_PT: (f64, f64) = (0.0, 0.0);
+fn sk() -> &'static mut c::sketch::Sketch {
+    // SAFETY: single-threaded wasm; the sketch is only reached through these wrappers.
+    unsafe { (*core::ptr::addr_of_mut!(SK)).get_or_insert_with(|| c::sketch::Sketch::new(false)) }
+}
+fn sk_say(m: String) { unsafe { *core::ptr::addr_of_mut!(SK_MSG) = m; } }
+fn sk_res(r: Result<usize, String>) -> f64 { match r { Ok(i) => { sk_say(String::new()); i as f64 } Err(e) => { sk_say(e); -1.0 } } }
+fn sk_li(layer: f64) -> usize { if layer >= 0.0 { layer as usize } else { 0 } }
+/// Start a new empty sketch in inch (1) or mm (0); the undo history is dropped.
+#[no_mangle] pub extern "C" fn sk_new(inch: f64) -> f64 { unsafe { *core::ptr::addr_of_mut!(SK) = Some(c::sketch::Sketch::new(inch != 0.0)); } 0.0 }
+/// Load a sketch from its text form (see `Sketch::to_text`); returns the entity count.
+#[no_mangle] pub extern "C" fn sk_load(len: f64) -> f64 {
+    let s = c::sketch::Sketch::from_text(&gt_src(len));
+    let n = s.doc.items.len();
+    unsafe { *core::ptr::addr_of_mut!(SK) = Some(s); }
+    n as f64
+}
+#[no_mangle] pub extern "C" fn sk_text() -> f64 { set_text(sk().to_text()) }
+/// What to draw (see `Sketch::display`).
+#[no_mangle] pub extern "C" fn sk_draw() -> f64 { set_text(sk().display()) }
+#[no_mangle] pub extern "C" fn sk_count() -> f64 { sk().doc.items.len() as f64 }
+#[no_mangle] pub extern "C" fn sk_inch() -> f64 { if sk().inch { 1.0 } else { 0.0 } }
+/// The last error or report (lines separated by new lines).
+#[no_mangle] pub extern "C" fn sk_msg() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(SK_MSG)).clone() }) }
+#[no_mangle] pub extern "C" fn sk_set_units(inch: f64, convert: f64) -> f64 { if sk().set_units(inch != 0.0, convert != 0.0) { 1.0 } else { 0.0 } }
+/// Replace the sketch with a DXF file; returns the entity count or -1 (reason in `sk_msg`).
+#[no_mangle] pub extern "C" fn sk_import(len: f64, default_inch: f64) -> f64 {
+    match sk().import_dxf(&gt_src(len), default_inch != 0.0) {
+        Ok(rep) => { sk_say(rep.join("\n")); sk().doc.items.len() as f64 }
+        Err(e) => { sk_say(e); -1.0 }
+    }
+}
+/// The sketch as a DXF file: r12 1 = R12, 0 = R2000; explode 1 = polylines as separate lines and arcs.
+#[no_mangle] pub extern "C" fn sk_export(r12: f64, explode: f64) -> f64 { set_text(sk().export_dxf(r12 != 0.0, explode != 0.0)) }
+#[no_mangle] pub extern "C" fn sk_point(layer: f64, x: f64, y: f64) -> f64 { sk_res(sk().add(sk_li(layer), SkGeo::Point { p: (x, y) })) }
+#[no_mangle] pub extern "C" fn sk_line(layer: f64, x1: f64, y1: f64, x2: f64, y2: f64) -> f64 { sk_res(sk().add(sk_li(layer), SkGeo::Line { a: (x1, y1), b: (x2, y2) })) }
+#[no_mangle] pub extern "C" fn sk_circle(layer: f64, cx: f64, cy: f64, r: f64) -> f64 { sk_res(sk().add(sk_li(layer), SkGeo::Circle { c: (cx, cy), r })) }
+/// A circle from its centre and diameter.
+#[no_mangle] pub extern "C" fn sk_circle_dia(layer: f64, cx: f64, cy: f64, d: f64) -> f64 { sk_res(sk().add(sk_li(layer), SkGeo::Circle { c: (cx, cy), r: d / 2.0 })) }
+#[no_mangle] pub extern "C" fn sk_arc3(layer: f64, x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64) -> f64 {
+    sk_res(c::sketch::arc3((x1, y1), (x2, y2), (x3, y3)).and_then(|g| sk().add(sk_li(layer), g)))
+}
+/// The arc through three points without adding it: which 0 centre x, 1 centre y, 2 radius, 3 start angle, 4 end angle (NaN if there is none).
+#[no_mangle] pub extern "C" fn sk_arc3_at(x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64, which: f64) -> f64 {
+    match c::sketch::arc3((x1, y1), (x2, y2), (x3, y3)) {
+        Ok(SkGeo::Arc { c, r, start, end }) => pick([c.0, c.1, r, start, end], which),
+        _ => f64::NAN,
+    }
+}
+#[no_mangle] pub extern "C" fn sk_rect(layer: f64, x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
+    sk_res(c::sketch::rect((x1, y1), (x2, y2)).and_then(|g| sk().add(sk_li(layer), g)))
+}
+/// Add a single line of text (the text is read from the input buffer).
+#[no_mangle] pub extern "C" fn sk_text_add(len: f64, layer: f64, x: f64, y: f64, h: f64, rot: f64) -> f64 {
+    sk_res(sk().add(sk_li(layer), SkGeo::Text { p: (x, y), h, rot, text: gt_src(len).trim().to_string() }))
+}
+/// Index of the layer named in the input buffer, added with this colour if new.
+#[no_mangle] pub extern "C" fn sk_layer(len: f64, colour: f64) -> f64 { sk().layer_named(&gt_src(len), colour as i32) as f64 }
+#[no_mangle] pub extern "C" fn sk_layer_colour(i: f64, colour: f64) -> f64 { if i >= 0.0 && sk().set_layer_colour(i as usize, colour as i32) { 1.0 } else { 0.0 } }
+// The selection the next delete or move works on.
+#[no_mangle] pub extern "C" fn sk_sel_clear() -> f64 { unsafe { (&mut *core::ptr::addr_of_mut!(SK_SEL)).clear(); } 0.0 }
+#[no_mangle] pub extern "C" fn sk_sel_add(i: f64) -> f64 { if i >= 0.0 { unsafe { (&mut *core::ptr::addr_of_mut!(SK_SEL)).push(i as usize); } } 0.0 }
+#[no_mangle] pub extern "C" fn sk_delete_sel() -> f64 { let n = sk().delete(unsafe { &*core::ptr::addr_of!(SK_SEL) }); sk_sel_clear(); n as f64 }
+/// Move (copy 0) or copy (copy 1) the selection by dx, dy. The selection becomes the moved or new entities; returns how many.
+#[no_mangle] pub extern "C" fn sk_move_sel(dx: f64, dy: f64, copy: f64) -> f64 {
+    let out = sk().move_by(unsafe { &*core::ptr::addr_of!(SK_SEL) }, dx, dy, copy != 0.0);
+    let n = out.len();
+    if n > 0 { unsafe { *core::ptr::addr_of_mut!(SK_SEL) = out; } }
+    n as f64
+}
+#[no_mangle] pub extern "C" fn sk_sel_len() -> f64 { unsafe { (&*core::ptr::addr_of!(SK_SEL)).len() as f64 } }
+#[no_mangle] pub extern "C" fn sk_sel_at(i: f64) -> f64 { unsafe { (&*core::ptr::addr_of!(SK_SEL)).get(i.max(0.0) as usize).map(|x| *x as f64).unwrap_or(-1.0) } }
+#[no_mangle] pub extern "C" fn sk_clear() -> f64 { if sk().clear() { 1.0 } else { 0.0 } }
+#[no_mangle] pub extern "C" fn sk_undo() -> f64 { sk_sel_clear(); if sk().undo() { 1.0 } else { 0.0 } }
+#[no_mangle] pub extern "C" fn sk_redo() -> f64 { sk_sel_clear(); if sk().redo() { 1.0 } else { 0.0 } }
+#[no_mangle] pub extern "C" fn sk_can_undo() -> f64 { if sk().can_undo() { 1.0 } else { 0.0 } }
+#[no_mangle] pub extern "C" fn sk_can_redo() -> f64 { if sk().can_redo() { 1.0 } else { 0.0 } }
+/// Object snap (see `Sketch::snap`): returns the kind found (0 none); the point is read with `sk_sx` and `sk_sy`.
+/// With `has_from` 1 the tangent and square snaps work from the point (fx, fy), the last one placed.
+#[no_mangle] pub extern "C" fn sk_snap(x: f64, y: f64, tol: f64, modes: f64, grid: f64, has_from: f64, fx: f64, fy: f64) -> f64 {
+    let (p, k) = sk().snap_from((x, y), tol, modes.max(0.0) as u32, grid, if has_from != 0.0 { Some((fx, fy)) } else { None });
+    unsafe { *core::ptr::addr_of_mut!(SK_PT) = p; }
+    k as f64
+}
+#[no_mangle] pub extern "C" fn sk_sx() -> f64 { unsafe { (*core::ptr::addr_of!(SK_PT)).0 } }
+#[no_mangle] pub extern "C" fn sk_sy() -> f64 { unsafe { (*core::ptr::addr_of!(SK_PT)).1 } }
+/// Index of the entity nearest to the point within tol, or -1.
+#[no_mangle] pub extern "C" fn sk_pick(x: f64, y: f64, tol: f64) -> f64 { sk().pick((x, y), tol).map(|i| i as f64).unwrap_or(-1.0) }
+/// From point 1 to point 2: which 0 distance, 1 along X, 2 along Y, 3 direction in degrees.
+#[no_mangle] pub extern "C" fn sk_measure(x1: f64, y1: f64, x2: f64, y2: f64, which: f64) -> f64 { let m = c::sketch::measure((x1, y1), (x2, y2)); pick([m.0, m.1, m.2, m.3], which) }
+/// The point at a length and direction from a point: which 0 x, 1 y.
+#[no_mangle] pub extern "C" fn sk_polar(x: f64, y: f64, len: f64, deg: f64, which: f64) -> f64 { let p = c::sketch::polar((x, y), len, deg); pick([p.0, p.1], which) }
+/// A point moved onto the horizontal or vertical through another: which 0 x, 1 y.
+#[no_mangle] pub extern "C" fn sk_ortho(x0: f64, y0: f64, x: f64, y: f64, which: f64) -> f64 { let p = c::sketch::ortho((x0, y0), (x, y)); pick([p.0, p.1], which) }
+/// Rows of `label, value, kind` for one entity (tab separated, one per line).
+#[no_mangle] pub extern "C" fn sk_info(i: f64) -> f64 {
+    if i < 0.0 { return set_text(String::new()); }
+    set_text(sk().info(i as usize).iter().map(|r| format!("{}\t{}\t{}", r.0.replace(['\t', '\n'], " "), r.1, r.2)).collect::<Vec<_>>().join("\n"))
+}
+/// Rows for a pair of entities (see `Sketch::between`).
+#[no_mangle] pub extern "C" fn sk_between(i: f64, j: f64) -> f64 {
+    if i < 0.0 || j < 0.0 { return set_text(String::new()); }
+    set_text(sk().between(i as usize, j as usize).iter().map(|r| format!("{}\t{}\t{}", r.0, r.1, r.2)).collect::<Vec<_>>().join("\n"))
+}
+/// Extents of the sketch: which 0 x min, 1 y min, 2 x max, 3 y max (NaN when empty).
+#[no_mangle] pub extern "C" fn sk_ext(which: f64) -> f64 { match sk().doc.extents() { Some(e) => pick([e.0, e.1, e.2, e.3], which), None => f64::NAN } }
 
 // Mechanics (core/src/mechanics.rs): unit-consistent unless named.
 use c::mechanics as mech;
