@@ -237,7 +237,7 @@ Store list is the fuller of the two store lists.
 | U92 | G-code reference | done | `gmcodes` | Ten controls (generic RS274NGC, Fanuc mill and lathe A/B/C, Haas mill and lathe, Mitsubishi M70/M80, MELDAS 60, Siemens native and ISO, Heidenhain ISO, Okuma OSP lathe, Mazak EIA turning), search, mill/lathe filter, side-by-side compare, source per row (`claude/gmcodes`) |
 | U93 | M-code reference | done | `gmcodes` | Program-control and builder M codes where the maker prints them; builder-specific codes are flagged; Heidenhain, Mazak and Siemens ISO M codes are gaps (`claude/gmcodes`) |
 | U94 | Custom macro information | partial | `macroref` | Fanuc Macro B, Haas, Siemens R parameters and control structures, Okuma VC/IF, Heidenhain Q jumps; Mitsubishi variable ranges and IF/WHILE not yet confirmed (`claude/gmcodes`) |
-| U95 | G-code simulator (2D/3D, cycle time) | missing | | |
+| U95 | G-code simulator (2D/3D, cycle time) | partial | `gsim` | 2D backplot (XY/XZ/YZ, lathe XZ), step through, distances, extents, cycle time, arc check; mill drilling cycles and lathe G70/G90/G92/G94 drawn; G71-G76 reported, no 3D. See docs/gsim.md |
 | U96 | 2D CAD and DXF generator (snapping, angle measure) | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | Parametric shapes with DXF export (branch `claude/dxf-toollib`); no free sketching, snapping or angle measure |
 
 ### Learning and data

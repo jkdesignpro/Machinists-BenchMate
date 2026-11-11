@@ -1525,6 +1525,13 @@ const TOOLS = [
   source: 'CSS rpm: Sandvik Coromant turning formulas [SAN]. Time: BenchMate integration of dr / (f n), checked against numerical integration in core tests. G50/G96/G97: Haas Factory Outlet lathe programming; Fanuc G-code system A article (industrialmonitordirect). See docs/cycles.md.',
 },
 {
+  id: 'gsim', group: 'G-code cycles', title: 'G-code backplot (simulator)',
+  desc: 'Paste or load a G-code program (mill or lathe, Generic ISO / Fanuc-style or Haas) and see the programmed path in 2D: rapids dashed, feeds solid, step through it block by block. Distances, extents, an estimated cycle time and every error with its line number. A backplot, not a machine verification.',
+  render: el => renderGsim(el),
+  working: 'Parsed and run in the Rust core (core/src/gsim.rs). G0/G1/G2/G3 with I/J/K or R (helical arcs too), G17/G18/G19, G20/G21, G90/G91 on the mill, G94/G95 (mill) and G98/G99 (lathe) feed modes, G96/G97 with the G50 clamp, G4, G28 to the intermediate point, F/S/T/M/N words and comments. An arc whose start and end radius differ by more than the tolerance is an error. Mill G73, G74, G81-G86 and G89 are drawn hole by hole (G83/G73 re-entry 0.5 mm or 0.02 in, as in the cycle generators); lathe G70 runs its P..Q contour, G90/G92/G94 are drawn as single cycles. G71-G76 roughing and threading, mill G76/G87/G88, macros and subprograms are listed as not simulated. Lathe X is a diameter, plotted as a radius. Time = length / F (per rev: / (F x rpm)); acceleration is ignored. Other controls are not yet supported.',
+  source: 'FANUC Series 0i-F Plus Operator\'s Manual B-64694EN (interpolation, canned cycles, G-code system A for lathes, helical feed along the arc); Haas Mill and Lathe Operator\'s Manuals (G-code chapters); NIST RS274NGC interpreter version 3 report (arc radius check, word order). See docs/gsim.md.',
+},
+{
   id: 'cycbroach', group: 'G-code cycles', title: 'Keyway broaching program',
   desc: 'Keyway broaching (slotting) strokes on a lathe or a mill with the spindle locked: stroke, depth per stroke, lift on the return stroke and spring strokes.',
   render: el => renderBroachCycle(el),

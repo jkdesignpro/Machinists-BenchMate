@@ -10,6 +10,24 @@ fn golden(name: &str, p: &Program) {
     let want = std::fs::read_to_string(&path).unwrap_or_else(|_| panic!("missing golden file {path}; run with BLESS=1"));
     assert_eq!(p.text, want, "{name} differs from its golden file");
     check_words(name, &p.text);
+    backplot_agrees(name, p);
+}
+
+/// The backplot (core/src/gsim.rs) reads the generated text back: no errors,
+/// and the same feed distance (end point bounding box) and feed time as the
+/// generator's own move list. G76 and G71 are skipped: the backplot reports
+/// those cycles instead of simulating them.
+fn backplot_agrees(name: &str, p: &Program) {
+    use crate::gsim::{simulate, Opts};
+    let lathe = ["g71", "g76", "g92", "taper", "groove", "cutoff", "broach_lathe"].iter().any(|k| name.starts_with(k));
+    let metric = p.text.contains("G21");
+    let s = simulate(&p.text, &Opts { lathe, metric_out: metric, default_metric: metric, ..Opts::default() });
+    assert_eq!(s.error_count(), 0, "{name}: {:?}", s.msgs);
+    // With G41/G42 the generator times the tool-centre path; the backplot shows the programmed contour.
+    if name.starts_with("g76") || name.starts_with("g71") || p.text.contains("G41") || p.text.contains("G42") { return; }
+    let (tf, _, td) = p.time(1.0);
+    assert!((s.feed_time - tf).abs() <= 0.01 * tf + 0.01, "{name}: backplot feed time {} s, generator {} s", s.feed_time, tf);
+    assert!((s.dwell_time - td).abs() <= 1e-6, "{name}: backplot dwell {} s, generator {} s", s.dwell_time, td);
 }
 
 /// Structural checks every program must pass: warning header, units, and a
