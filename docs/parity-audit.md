@@ -30,7 +30,7 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 82 | 16 | 13 (0) | 2 | 0 | 74 % |
+| CNC Machinist Calculator Ultra | 113 | 83 | 15 | 13 (0) | 2 | 0 | 75 % |
 | Machinery's Handbook 31 | 306 | 47 | 95 | 130 (12) | 6 | 28 | 17 % |
 | Engineers' Data Book | 94 | 10 | 27 | 19 (1) | 12 | 26 | 18 % |
 | Engineers Black Book | 80 | 23 | 26 | 30 (9) | 1 | 0 | 29 % |
@@ -60,7 +60,7 @@ features are names only.
 **Update (branch `claude/tooling-ref`, 2026-11-11):** batch B3 (tooling reference) is built: tooling guide (`toolguide`), tap pitch diameter limits (`taplimits`), saw blade pitch (`sawtpi`) and a forming-tap makers' comparison in `tapdrill`. BB63 done; MH96, MH101, MH103, MH107, MH109, MH114, MH115, MH156, BB8, BB13, BB19, BB22, BB25, BB26, BB64, BB65, CN6 partial. MH97 (done, `insertcode`) and MH98 (partial, `holdercode`) corrected: those tools were merged earlier but the rows still said missing. Not built: hole saw speeds (BB24: no two independent charts compared), broaching, burrs, mounted points, files, drill and toolbit sharpening, colour-coded taps. Summary counts recounted from all rows by script (the in-progress column changed only for MH97).
 **Update (branch `claude/inspection-2`, 2026-11-11):** batch B5 (inspection round 2) is built except thread gauges and measurement over pins for a radius: ANSI B4.1 inch fits (`ansifits`, one full source, so its rows are marked "needs 2nd source"), ISO 286 j/J and sizes up to 3150 mm (`fits`), preferred numbers (`prefnum`), control charts (`ctrlchart`) and sampling plan OC curves (`sampling`; ISO 2859-1 / Z1.4 tables not included). U61, MH79, ED79 done; MH77, MH81, ED81 partial. Summary counts updated for these six rows. Details in `docs/inspection.md`.
 
-**Update (branch `claude/overhaul`, 2026-11-11):** section 1 was re-judged row by row against the 0.2.0 code: Ultra is now 82 done, 16 partial, 13 missing (0 in progress), 2 out of scope, 74 % done of in-scope rows (was 68, 14, 29, 61 %), and the **All** line is re-added with the book lines unchanged. Status changes: U32, U65, U67, U69, U75, U76, U77, U78, U81, U83, U87, U98, U103, U107 missing or partial -> done; U84, U85, U105, U108 missing -> partial. Tool ids and "What's missing" were rewritten for every U row. Cutting-data engines (U1, U2, U28) are still missing.
+**Update (branch `claude/overhaul`, 2026-11-11):** section 1 was re-judged row by row against the 0.2.0 code: Ultra is now 82 done, 16 partial, 13 missing (0 in progress), 2 out of scope, 74 % done of in-scope rows (was 68, 14, 29, 61 %), and the **All** line is re-added with the book lines unchanged. Status changes: U32, U65, U67, U69, U75, U76, U77, U78, U81, U83, U87, U98, U103, U107 missing or partial -> done; U84, U85, U105, U108 missing -> partial. Tool ids and "What's missing" were rewritten for every U row. Cutting-data engines (U1, U2, U28) are still missing. Later on the same branch: U66 partial -> done (milling surface finish and RMS added), so Ultra is 83 done, 15 partial, 13 missing, 75 %.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -209,7 +209,7 @@ Store list is the fuller of the two store lists.
 | U63 | GD&T learning centre (without quizzes) | done | `gdtguide`, `gdtdof` | Quiz part is out of scope |
 | U64 | Feature control frame builder | done | `gdtfcf` |  |
 | U65 | Gauge block stack | done | `sinebar` |  |
-| U66 | Surface finish (lathe, mill, conversions) | partial | `surface`, `finish` | Ra, microinch and N-grade conversions and symbols exist (Ra and Rz are deliberately not converted); the lathe finish is from nose radius and feed only; no milling finish (flat end mill or face mill) and no RMS conversion |
+| U66 | Surface finish (lathe, mill, conversions) | done | `surface`, `finish`, `millfinish` | Ra and Rz are deliberately not converted; RMS (Rq) is given for a sine profile with the measured ranges; milling finish covers a floor with a corner radius and a wall, not a sharp-cornered end mill floor or wiper flats |
 | U67 | Hardness conversions | done | `hardness` | Unalloyed and low alloy steels only, approximate |
 | U68 | Thermal expansion calculator | done | `tempcomp`, `shrinkfit` |  |
 | U69 | Sine bar | done | `sinebar` |  |

@@ -75,6 +75,23 @@ pub fn cusp_height(r: f64, s: f64) -> f64 {
     r - (r * r - s * s / 4.0).sqrt()
 }
 
+/// Theoretical (kinematic) roughness left by a milling cutter whose cutting
+/// edge is an arc of radius `r` where it makes the surface: the corner radius
+/// on a floor, the cutter radius D/2 on a wall. `fz` feed per tooth, `z`
+/// teeth, all in one length unit. The feed marks are arcs a feed apart, so
+/// Rt = r - sqrt(r^2 - (f/2)^2) (close to f^2 / (8 r)) and Ra = f^2 / (32 r),
+/// as for a turned surface. With every tooth cutting alike the marks are a
+/// feed per tooth apart; when runout leaves one tooth cutting the finished
+/// surface they are a feed per revolution (fz x z) apart.
+/// Returns `[Rt per tooth, Ra per tooth, Rt per rev, Ra per rev, feed per
+/// rev]`; a value is NaN where the feed is more than 2 r.
+pub fn mill_finish(fz: f64, z: f64, r: f64) -> [f64; 5] {
+    if !(fz > 0.0 && z >= 1.0 && r > 0.0) || !(fz + z + r).is_finite() { return [f64::NAN; 5]; }
+    let frev = fz * z;
+    let ra = |f: f64| if f <= 2.0 * r { crate::ra_theoretical(f, r) } else { f64::NAN };
+    [cusp_height(r, fz), ra(fz), cusp_height(r, frev), ra(frev), frev]
+}
+
 /// Stepover for a scallop height `h` with ball radius `r`: s = 2 sqrt(2 r h - h^2) (h <= r).
 pub fn stepover_for_cusp(r: f64, h: f64) -> f64 {
     if !(r > 0.0 && h >= 0.0) || h > r { return f64::NAN; }
@@ -331,6 +348,26 @@ mod tests {
         for i in 0..=200000 { let t = PI * i as f64 / 200000.0; let x = a + r * t.cos(); let y = r * t.sin(); if (x * x + y * y).sqrt() > rw - ae { last = t; } }
         assert!(close(engagement_arc_rad(ae, 2.0 * r, rw, true), last, 2e-5));
         assert!(engagement_arc_rad(2.0, 10.0, 5.0, true).is_nan());
+    }
+
+    #[test]
+    fn milling_finish() {
+        // Floor, corner radius 0.8 mm, 0.1 mm per tooth, 4 teeth: Rth = fz^2 / (8 r) = 1.5625 um
+        // (Soltan 2008; JM CNC); the exact arc gives 1.5640 um. Ra = fz^2 / (32 r) = 0.3906 um.
+        let r = mill_finish(0.1, 4.0, 0.8);
+        assert!((r[0] - 0.0015640).abs() < 1e-7 && (r[0] - 0.01 / 6.4).abs() < 2e-6);
+        assert!((r[1] - 0.01 / 25.6).abs() < 1e-12);
+        // One tooth marking: the marks are 0.4 mm apart, 16 times the Ra.
+        assert!((r[4] - 0.4).abs() < 1e-12 && (r[3] - 16.0 * r[1]).abs() < 1e-12);
+        assert!((r[2] - (0.8 - (0.64f64 - 0.04).sqrt())).abs() < 1e-12);
+        // Wall of a 10 mm end mill at 0.05 mm per tooth: Rt0 = R - sqrt(R^2 - fz^2/4) (Wojciechowski 2011),
+        // close to fz^2 / (4 D) = 0.0625 um.
+        let w = mill_finish(0.05, 4.0, 5.0);
+        assert!((w[0] - 0.0000625).abs() < 1e-9);
+        // Feed per rev above 2 r: no per-rev value, the per-tooth value stays.
+        let n = mill_finish(0.3, 6.0, 0.4);
+        assert!(n[0].is_finite() && n[2].is_nan() && n[3].is_nan());
+        assert!(mill_finish(0.0, 4.0, 0.8)[0].is_nan());
     }
 
     #[test]

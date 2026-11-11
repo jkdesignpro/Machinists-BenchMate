@@ -475,6 +475,26 @@ const dcTurnSpin = (x, cy, R, cls) => dcSpin(x, cy, 9, R + 10, 115, 245, cls || 
 
 Object.assign(DIAGRAMS, {
   // ---------------- Turning ----------------
+  // Milling surface finish: feed marks as arcs of the corner radius (floor) or the cutter radius (wall),
+  // a feed per tooth apart. The arcs are drawn to the feed-to-radius ratio, held within a range that stays readable.
+  millfinish(v, sys, rows) {
+    const W = 520, H = 250, wall = v.surf === 2, r = wall ? v.d / 2 : v.r, mu = sys === 'inch' ? 'µin' : 'µm', fu = sys === 'inch' ? 'in' : 'mm';
+    const Rn = 60, ok = dcOk(r) && dcOk(v.fz), fp = ok ? dcClamp(v.fz / r * Rn, 70, 1.5 * Rn) : 70, held = ok && Math.abs(v.fz / r * Rn - fp) > 0.5;
+    const ys = 176, cy = ys - Rn, x0 = 70, x1 = 430, prof = [];
+    for (let x = x0; x <= x1; x += 1) { const i = Math.round((x - x0) / fp), dx = x - (x0 + i * fp); prof.push([x, cy + Math.sqrt(Math.max(0, Rn * Rn - dx * dx))]); }
+    const yp = cy + Math.sqrt(Rn * Rn - fp * fp / 4), xc = x0 + 2 * fp;
+    let h = DK.poly(prof.concat([[x1, ys + 34], [x0, ys + 34]]), 'hatch');
+    h += DK.circle(xc, cy, Rn, 'ghost') + DK.circle(xc, cy, 2, 'dimf') + DK.line(xc, cy, xc + Rn * 0.7071, cy - Rn * 0.7071, 'dim');
+    h += DK.text(xc + Rn * 0.7071 + 6, cy - Rn * 0.7071 - 4, (wall ? 'cutter radius D/2 ' : 'corner radius r ') + dcL(r, fu, ''), { cls: 'dimt', anchor: 'start' });
+    h += DK.dimH(xc + fp / 2, xc + 1.5 * fp, yp - 22, 'fz', { from: yp - 2 });
+    h += DK.line(x1 + 4, yp, x1 + 30, yp, 'dim ext') + DK.line(x1 + 4, ys, x1 + 30, ys, 'dim ext') + DK.dim(x1 + 22, ys, x1 + 22, yp, '', {}) + DK.text(x1 + 36, (ys + yp) / 2 + 4, 'Rt', { cls: 'hott', anchor: 'start' });
+    const ra = dcRow(rows, 'Theoretical Ra, every tooth'), rt = dcRow(rows, 'Theoretical Rt, every tooth'), ra1 = dcRow(rows, 'Theoretical Ra, one tooth');
+    h += DK.text(18, 22, wall ? 'Wall, seen from above: marks left by the side of the cutter' : 'Floor, seen from the side: marks left by the corner radius', { cls: 'mut', anchor: 'start' });
+    h += DK.text(18, H - 22, dcOk(ra) ? 'Every tooth alike: Ra ' + DK.n(ra, sys === 'inch' ? 1 : 3) + ' ' + mu + ', Rt ' + DK.n(rt, sys === 'inch' ? 1 : 3) + ' ' + mu + (dcOk(ra1) ? '.  One tooth marking: Ra ' + DK.n(ra1, sys === 'inch' ? 1 : 3) + ' ' + mu : '') : 'Rt = r - √(r² - (f/2)²)', { cls: 'mut', anchor: 'start' });
+    h += DK.text(18, H - 8, held ? 'Marks not to scale (the real ones are much flatter)' : 'Marks to scale', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, h, 'Milling surface finish: feed marks left by the cutter, a feed per tooth apart');
+  },
+
   // Surface finish: the nose radius leaving feed marks f apart (to scale), and the profile enlarged with Rt and the mean line.
   finish(v, sys, rows) {
     const W = 520, H = 270, u = dcU(sys), r = v.r, fr = dcOk(v.f) ? v.f : dcRow(rows, 'Feed for target Ra');

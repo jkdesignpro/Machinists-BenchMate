@@ -501,6 +501,30 @@ const TOOLS = [
   source: "Machinery's Handbook; Sandvik Coromant formulas",
 },
 {
+  id: 'millfinish', level: 'advanced', group: 'Milling', title: 'Milling surface finish',
+  pick: { map: { z: 'flutes', d: 'dia' } },
+  desc: 'Theoretical roughness a milling cutter leaves on a floor (from its corner radius) or on a wall (from its diameter), with every tooth cutting alike and with one tooth marking the surface because of runout. A geometric ideal: real finish is usually worse.',
+  fields: s => [
+    { id: 'surf', label: 'Surface', unit: '', def: 1, options: [[1, 'Floor: corner radius'], [2, 'Wall: side of the cutter']] },
+    { id: 'fz', label: 'Feed per tooth', unit: s === 'inch' ? 'in/tooth' : 'mm/tooth', def: s === 'inch' ? 0.002 : 0.05 },
+    { id: 'z', label: 'Teeth', unit: '', def: 4 },
+    { id: 'r', label: 'Corner radius of the end mill or insert', unit: lenU(s), def: s === 'inch' ? 0.03 : 0.8, when: v => v.surf !== 2 },
+    { id: 'd', label: 'Cutter diameter', unit: lenU(s), def: s === 'inch' ? 0.5 : 12, when: v => v.surf === 2 },
+  ],
+  calc: (v, W, s) => {
+    const r = v.surf === 2 ? v.d / 2 : v.r;
+    if (!(v.fz > 0 && v.z >= 1 && r > 0)) return [];
+    const k = s === 'inch' ? 1e6 : 1000, u = s === 'inch' ? 'uin' : 'um', dp = s === 'inch' ? 1 : 3, t = i => W.mill_finish(v.fz, v.z, r, i);
+    const rows = [R('Theoretical Ra, every tooth cutting alike', t(1) * k, u, dp), R('Theoretical Rt, every tooth cutting alike', t(0) * k, u, dp)];
+    if (isFinite(t(3))) rows.push(R('Theoretical Ra, one tooth marking (runout)', t(3) * k, u, dp), R('Theoretical Rt, one tooth marking (runout)', t(2) * k, u, dp));
+    else rows.push(R('One tooth marking (runout)', 'The feed per revolution is more than twice the radius: the marks no longer overlap', '', 0));
+    rows.push(R('Feed per revolution', t(4), feedRevU(s), s === 'inch' ? 4 : 3));
+    return rows;
+  },
+  working: 'The feed marks are arcs of radius r, a feed f apart: Rt = r - sqrt(r^2 - (f / 2)^2), close to f^2 / (8 r), and Ra = f^2 / (32 r). Floor: r is the corner radius. Wall: r is the cutter radius D / 2, so Rt is close to fz^2 / (4 D). Every tooth cutting alike: f = feed per tooth. One tooth marking: f = feed per revolution = fz x teeth, which is what runout or one long insert gives when a single tooth cuts the finished surface; the real surface lies between the two. Valid for f < 2 r. Not covered: a sharp-cornered end mill on a floor (the marks depend on the dish angle of the end teeth) and wiper flats (which wipe the marks out when the feed per revolution is under the flat width). Deflection, chatter and built-up edge make the real surface rougher.',
+  source: 'Floor: Rth = fz^2 / (8 r) in I. M. Soltan, "Surface roughness prediction in end-milling process", M.Sc. thesis, Assiut University, 2008, and in JM CNC, "What are milling cutter marks?". Wall: S. Wojciechowski, "Machined surface roughness including cutter displacements in milling of hardened steel", Metrology and Measurement Systems 18 (2011) no. 3, Rt0 = R - sqrt(R^2 - fz^2 / 4); the Martellotti form fz^2 / (8 (R - fz z / pi)), printed in J. Manuf. Mater. Process. 3 (2019) 70, differs by less than 1 % at finishing feeds and is not used. Ra = f^2 / (32 r) as for turning; the thesis prints fz^2 / (18 sqrt 3 r), the exact average for arc-shaped marks, 2.6 % higher. The one-tooth case is the same geometry with the marks a feed per revolution apart (BenchMate derivation; tests in core/src/millturn.rs).',
+},
+{
   id: 'insertcode', level: 'advanced', group: 'Turning', title: 'Insert designation (ISO 1832)',
   desc: 'Decode or build a metric turning insert code (shape, clearance, tolerance class, type, size, thickness, corner, edge, hand, maker chipbreaker), with the insert shape drawn and the size number computed from the inscribed circle.',
   render: el => renderInsertCode(el),

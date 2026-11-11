@@ -291,6 +291,22 @@ if (!(await page.$('#main .tpa button[title^="Print this page"]'))) problems.pus
 await page.click('#main .tpa button[title^="Reset"]');
 await units('mm');
 
+// Milling surface finish: 0.05 mm per tooth, 4 teeth, corner radius 0.8 mm: Ra 0.098 um, 16 times that for one tooth.
+where = 'millfinish';
+await units('mm');
+await open('millfinish');
+for (const [k, v] of [['fz', '0.05'], ['z', '4'], ['r', '0.8']]) { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); }
+const mfRows = await page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).join(' ; '));
+if (!/every tooth cutting alike 0\.098 um/i.test(mfRows) || !/Ra, one tooth marking \(runout\) 1\.563 um/.test(mfRows)) problems.push(`[${where}] got "${mfRows}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+// RMS on the conversions page: Ra 1.6 um is 1.78 um RMS for a sine profile.
+where = 'surface rms';
+await open('surface');
+await page.waitForSelector('#sr');
+await page.fill('#sr', '1.6'); await page.dispatchEvent('#sr', 'input');
+const rmsTxt = ((await page.textContent('#sres')) || '').replace(/\s+/g, ' ');
+if (!/RMS \(Rq\), if the profile were a pure sine wave\s*1\.78 um/.test(rmsTxt)) problems.push(`[${where}] got "${rmsTxt.slice(0, 200)}"`);
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

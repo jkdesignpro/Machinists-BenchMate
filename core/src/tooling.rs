@@ -113,6 +113,29 @@ pub fn profile_rz_over_ra(kind: f64) -> f64 {
     }
 }
 
+/// Ratio of the root-mean-square height Rq (RMS) to Ra for the same ideal
+/// periodic profiles as [`profile_rz_over_ra`]. kind 0: sine wave,
+/// pi / (2 sqrt 2) = 1.1107, the "1.11" of conversion charts; 1: triangular,
+/// 2 / sqrt 3 = 1.1547; 2: turned feed marks (parabolic arcs),
+/// 9 / sqrt 60 = 1.1619; 3: square wave, 1. Measured surfaces run higher.
+pub fn profile_rq_over_ra(kind: f64) -> f64 {
+    match kind as i32 {
+        0 => std::f64::consts::PI / (2.0 * 2f64.sqrt()),
+        1 => 2.0 / 3f64.sqrt(),
+        2 => 9.0 / 60f64.sqrt(),
+        3 => 1.0,
+        _ => f64::NAN,
+    }
+}
+
+/// Rq (RMS) from Ra for an ideal profile of that kind, or Ra from Rq when
+/// `inverse` is above 0.5. Only as good as the assumption about the profile.
+pub fn rq_ra_convert(x: f64, kind: f64, inverse: f64) -> f64 {
+    let k = profile_rq_over_ra(kind);
+    if !(x >= 0.0) || !k.is_finite() { return f64::NAN; }
+    if inverse > 0.5 { x / k } else { x * k }
+}
+
 // ---------------------------------------------------------------------------
 // Tables
 // ---------------------------------------------------------------------------
@@ -259,6 +282,27 @@ mod tests {
         close(ratio(&|x| x), profile_rz_over_ra(1.0), 1e-3);
         close(ratio(&|x| (x - 0.5) * (x - 0.5)), profile_rz_over_ra(2.0), 1e-3);
         close(ratio(&|x| if x < 0.5 { 1.0 } else { 0.0 }), profile_rz_over_ra(3.0), 1e-3);
+    }
+
+    /// Rq / Ra of each ideal profile, by sampling one period.
+    #[test] fn rq_over_ra_profiles() {
+        let n = 200_000;
+        let ratio = |f: &dyn Fn(f64) -> f64| {
+            let ys: Vec<f64> = (0..n).map(|i| f((i as f64 + 0.5) / n as f64)).collect();
+            let mean = ys.iter().sum::<f64>() / n as f64;
+            let ra = ys.iter().map(|y| (y - mean).abs()).sum::<f64>() / n as f64;
+            let rq = (ys.iter().map(|y| (y - mean) * (y - mean)).sum::<f64>() / n as f64).sqrt();
+            rq / ra
+        };
+        close(ratio(&|x| (2.0 * std::f64::consts::PI * x).sin()), profile_rq_over_ra(0.0), 1e-4);
+        close(ratio(&|x| x), profile_rq_over_ra(1.0), 1e-4);
+        close(ratio(&|x| (x - 0.5) * (x - 0.5)), profile_rq_over_ra(2.0), 1e-4);
+        close(ratio(&|x| if x < 0.5 { 1.0 } else { 0.0 }), profile_rq_over_ra(3.0), 1e-4);
+        // The chart factor: 1.11 for a sine wave (Quality Magazine; Wevolver). 63 uin Ra is about 70 RMS.
+        close(profile_rq_over_ra(0.0), 1.11, 0.001);
+        close(rq_ra_convert(63.0, 0.0, 0.0), 69.97, 0.01);
+        close(rq_ra_convert(rq_ra_convert(1.6, 0.0, 0.0), 0.0, 1.0), 1.6, 1e-12);
+        assert!(rq_ra_convert(1.0, 9.0, 0.0).is_nan());
     }
 
     #[test] fn interpolation() {

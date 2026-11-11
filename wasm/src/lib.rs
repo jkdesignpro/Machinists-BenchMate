@@ -17,6 +17,8 @@ f1!(mrr_turning_in3_min, c::mrr_turning_in3_min, sfm, doc, ipr);
 f1!(mrr_milling, c::mrr_milling, ae, ap, vf);
 f1!(power_kw, c::power_kw, q, kc, eta);
 f1!(rt_theoretical, c::rt_theoretical, feed, r);
+/// Milling finish: which 0 Rt per tooth, 1 Ra per tooth, 2 Rt per rev, 3 Ra per rev, 4 feed per rev.
+#[no_mangle] pub extern "C" fn mill_finish(fz: f64, z: f64, r: f64, which: f64) -> f64 { pick(c::mill_finish(fz, z, r), which) }
 f1!(ra_theoretical, c::ra_theoretical, feed, r);
 f1!(feed_for_ra, c::feed_for_ra, ra, r);
 f1!(pass_time_min, c::pass_time_min, length, feed, rpm);
@@ -339,6 +341,8 @@ f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
 f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
 f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
 f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);
+f1!(profile_rq_over_ra, c::profile_rq_over_ra, kind);
+f1!(rq_ra_convert, c::rq_ra_convert, x, kind, inverse);
 f1!(tap_h_limit, c::tap_h_limit, basic, n, major, which);
 f1!(tap_l_limit_min, c::tap_l_limit_min, basic, n);
 f1!(tap_d_limit, c::tap_d_limit, basic, n, step, sign);
