@@ -151,6 +151,8 @@ const FORMULAS = [
   F('cycgroove', 'Plunge time at constant surface speed', 't = (D0² − D1²) / (4 · f · k),  k = 1000 · Vc / π', 'D0, D1: start and end diameter; f: feed per rev; Vc: [m/min]', ['OWN', 'SAN']),
   F('cycbroach', 'Broaching strokes', 'strokes = ⌈depth / depth per stroke⌉ + spring strokes', 'depth: keyway depth; depth per stroke: chosen cut', ['OWN', 'HAAS']),
   F('cycg71', 'G71 roughing passes', 'passes = ⌈(stock radius − profile radius − U/2) / depth per pass⌉', 'U: finish allowance on diameter; depth per pass: radial', ['OWN', 'HAAS']),
+  F('gsim', 'Block feed time', 't = L / F;  per rev: t = L / (F · n);  helix: L = arc length in the plane', 'L: path length; F: feed per minute or per rev; n: [rpm], under G96 n = 1000 · Vc / (π · D) up to the G50 clamp', ['OWN']),
+  F('gsim', 'Arc end-point check', '| |S − C| − |E − C| | ≤ tolerance;  R form: C on the chord bisector at √(R² − (c/2)²)', 'S, E: start and end point; C: centre (start + I, J, K); c: chord length; R < 0: arc over 180°', ['OWN']),
   F('cyctaper', 'Taper half angle for the program', 'α/2 = atan((D − d) / (2 L))', 'D, d: diameters; L: length', ['MH']),
   F('dxfbolt', 'Polyline arc bulge', 'bulge = tan(included angle / 4)', 'included angle of the arc', ['DXF']),
   F('dxfpoly', 'Regular polygon across flats', 'AF = 2R · cos(180° / n)', 'R: circumradius; n: sides (even)', ['MH']),

@@ -531,3 +531,48 @@ static mut EXPR_POS: f64 = 0.0;
 /// Prime factors of `n` into list_out; returns the count.
 #[no_mangle] pub extern "C" fn prime_factors(n: f64) -> f64 { set_out(c::expr::prime_factors(n)) }
 f1!(interpolate, c::expr::interpolate, x1, y1, x2, y2, x);
+
+// G-code backplot (core/src/gsim.rs). JS writes the program's UTF-8 bytes
+// at `gsim_in(len)`, calls `gsim_run`, then reads the flat results through
+// the pointers below (valid until the next `gsim_in` or `gsim_run`).
+static mut GSIM_IN: Vec<u8> = Vec::new();
+static mut GSIM_SEGS: Vec<f64> = Vec::new();
+static mut GSIM_STEPS: Vec<f64> = Vec::new();
+static mut GSIM_STATS: Vec<f64> = Vec::new();
+static mut GSIM_MSGS: String = String::new();
+/// Make room for `len` bytes of program text and return where to write them.
+#[no_mangle] pub extern "C" fn gsim_in(len: f64) -> *mut u8 {
+    let n = len.clamp(0.0, 64.0e6) as usize;
+    // SAFETY: single-threaded wasm; JS writes the bytes before gsim_run reads them.
+    unsafe { let v = &mut *core::ptr::addr_of_mut!(GSIM_IN); *v = vec![0u8; n]; v.as_mut_ptr() } }
+/// Run the backplot on the first `len` bytes. lathe 0/1; ctrl as `gcode::Ctrl`;
+/// metric_out and default_metric 0/1; rapid (output units/min, 0 unknown);
+/// arc_tol (output units, 0 = default); max_rpm (G96 limit when no G50).
+/// Returns the number of steps (executed blocks).
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gsim_run(len: f64, lathe: f64, ctrl: f64, metric_out: f64, default_metric: f64, rapid: f64, arc_tol: f64, max_rpm: f64) -> f64 {
+    // SAFETY: single-threaded wasm; the statics are only touched here and by the readers below.
+    unsafe {
+        let src = &*core::ptr::addr_of!(GSIM_IN);
+        let n = (len.max(0.0) as usize).min(src.len());
+        let text = String::from_utf8_lossy(&src[..n]).into_owned();
+        let o = c::gsim::Opts { lathe: lathe != 0.0, ctrl: c::gcode::Ctrl::from_f(ctrl), metric_out: metric_out != 0.0, default_metric: default_metric != 0.0,
+            rapid: if rapid > 0.0 { rapid } else { 0.0 }, arc_tol: if arc_tol > 0.0 { arc_tol } else { 0.0 }, max_rpm: if max_rpm > 0.0 { max_rpm } else { 0.0 } };
+        let s = c::gsim::simulate(&text, &o);
+        *core::ptr::addr_of_mut!(GSIM_SEGS) = c::gsim::segs_flat(&s);
+        *core::ptr::addr_of_mut!(GSIM_STEPS) = c::gsim::steps_flat(&s);
+        *core::ptr::addr_of_mut!(GSIM_STATS) = c::gsim::stats_flat(&s);
+        *core::ptr::addr_of_mut!(GSIM_MSGS) = c::gsim::msgs_text(&s);
+        s.steps.len() as f64
+    } }
+/// Segments: 7 values each (rapid 1/0, x0, y0, z0, x1, y1, z1); count of values.
+#[no_mangle] pub extern "C" fn gsim_segs_ptr() -> *const f64 { unsafe { (&*core::ptr::addr_of!(GSIM_SEGS)).as_ptr() } }
+#[no_mangle] pub extern "C" fn gsim_segs_len() -> f64 { unsafe { (&*core::ptr::addr_of!(GSIM_SEGS)).len() as f64 } }
+/// Steps: `gsim::STEP_W` values each (line, seg0, seg1, x, y, z, feed, per_rev, rpm, tool, time).
+#[no_mangle] pub extern "C" fn gsim_steps_ptr() -> *const f64 { unsafe { (&*core::ptr::addr_of!(GSIM_STEPS)).as_ptr() } }
+#[no_mangle] pub extern "C" fn gsim_steps_len() -> f64 { unsafe { (&*core::ptr::addr_of!(GSIM_STEPS)).len() as f64 } }
+#[no_mangle] pub extern "C" fn gsim_step_w() -> f64 { c::gsim::STEP_W as f64 }
+/// Statistic `i` as in `gsim::stats_flat`.
+#[no_mangle] pub extern "C" fn gsim_stat(i: f64) -> f64 { unsafe { (&*core::ptr::addr_of!(GSIM_STATS)).get(i as usize).copied().unwrap_or(f64::NAN) } }
+/// Messages ("line TAB level TAB text" per line) into the text buffer; returns the length (text at `text_ptr`).
+#[no_mangle] pub extern "C" fn gsim_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GSIM_MSGS)).clone() }) }
