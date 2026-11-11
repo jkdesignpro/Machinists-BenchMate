@@ -288,7 +288,7 @@ Object.assign(DIAGRAMS, {
     h += DK.arrow(18, 40, 60, 40, 'dim') + DK.text(18, 32, 'feed', { cls: 'mut', anchor: 'start' });
     h += dcDimV(yp, yw, 278, '', { from: 262 }) + DK.text(284, (yp + yw) / 2 + 4, 'ae ' + dcL(v.ae, u, ''), { cls: 'dimt', anchor: 'start' });
     // Detail: the chip between the previous tooth and this one, fz apart (enlarged, not to scale).
-    const cd = 350, cyd = 34, rd = 100, f = 30, kd = dcClamp(k, 0.2, 1), ypd = cyd + rd - 2 * rd * kd, t1 = Math.asin(dcClamp((ypd - cyd) / rd, -1, 1));
+    const cd = 350, cyd = 34, rd = 100, f = 30, kd = dcClamp(k, 0.2, 0.45), ypd = cyd + rd - 2 * rd * kd, t1 = Math.asin(dcClamp((ypd - cyd) / rd, -1, 1));
     const cur = [], pre = [];
     for (let i = 0; i <= 30; i++) { const t = Math.PI / 2 - (Math.PI / 2 - t1) * i / 30; cur.push([cd + f + rd * Math.cos(t), cyd + rd * Math.sin(t)]); }
     for (let i = 0; i <= 30; i++) { const t = t1 + (Math.PI / 2 - t1) * i / 30; pre.push([cd + rd * Math.cos(t), cyd + rd * Math.sin(t)]); }
@@ -296,7 +296,7 @@ Object.assign(DIAGRAMS, {
     h += DK.poly([[cd - 14, cyd + rd + 26], [510, cyd + rd + 26], [510, ypd], [cd + f + rd * Math.cos(t1), ypd]].concat(cur.slice().reverse(), [[cd - 14, cyd + rd]]), 'hatch');
     h += DK.poly(cur.concat(pre), 'tool');
     const ext = []; for (let i = 0; i <= 30; i++) { const t = t1 - 0.35 + (Math.PI / 2 + 0.12 - t1 + 0.35) * i / 30; ext.push([cd + rd * Math.cos(t), cyd + rd * Math.sin(t)]); }
-    h += dcPl(ext, 'thin') + DK.text(cd + rd * Math.cos(t1 - 0.35) - 4, cyd + rd * Math.sin(t1 - 0.35) - 2, 'previous tooth', { cls: 'mut', anchor: 'end' });
+    h += dcPl(ext, 'thin') + DK.text(cd + rd * Math.cos(t1 - 0.35) - 4, Math.max(16, cyd + rd * Math.sin(t1 - 0.35) - 2), 'previous tooth', { cls: 'mut', anchor: 'end' });
     const tip = [cd + f + rd * Math.cos(t1), ypd];
     h += DK.leader(tip[0] - 2, tip[1] + 3, 506, ypd - 34, 'hex', { anchor: 'end' });
     h += DK.dimH(cd, cd + f, cyd + rd + 50, '', { hot: true, from: cyd + rd + 2 }) + DK.text(cd + f + 22, cyd + rd + 54, 'fz', { cls: 'hott', anchor: 'start' });
@@ -347,7 +347,7 @@ Object.assign(DIAGRAMS, {
     h += DK.text(x, 58, 'straight wall φ ' + (dcOk(p0) ? dcN(p0, 1) + '°' : '?'), { cls: 'dimt', anchor: 'start' });
     h += dcLines(x, 84, [dcOk(ratio) ? 'chip on the arc ' + dcN(ratio) + ' ×' : '', 'tool Ø ' + dcL(v.d, u, 'D') + ', ae ' + dcL(v.ae, u, 'ae')], { cls: 'txt' });
     let y = 128;
-    if (dcOk(fz1)) { h += DK.text(x, y, 'fz on the arc ' + dcN(fz1) + ' ' + u, { cls: 'hott', anchor: 'start' }); y += 16; }
+    if (dcOk(fz1)) { h += dcLines(x, y, ['feed per tooth on the arc']) + DK.text(x, y + 16, dcN(fz1) + ' ' + u, { cls: 'hott', anchor: 'start' }); y += 34; }
     if (dcOk(fc)) { h += dcLines(x, y, ['tool-centre feed ' + dcN(fc) + ' ' + dcFU(sys)]); y += 16; }
     const note = dcStr(rows, 'Note') || dcStr(rows, 'Corner');
     if (note) h += dcLines(x, y + 8, dcWrap(note, 30));
@@ -360,7 +360,7 @@ Object.assign(DIAGRAMS, {
     const W = 520, H = 270, u = dcU(sys), d = v.d, byStep = dcOk(v.st);
     const st = byStep ? v.st : dcRow(rows, 'Stepover for the target cusp');
     const hc = byStep ? dcRow(rows, 'Cusp height', u) : v.h, hmu = byStep ? dcRow(rows, 'Cusp height', sys === 'inch' ? 'uin' : 'um') : NaN;
-    const R = 52, k = dcOk(d) && dcOk(st) ? dcClamp(st / d, 0.14, 1) : 0.45, sp = k * 2 * R, cx = 150, base = 196, cyc = base - R, top = 54;
+    const k = dcOk(d) && dcOk(st) ? dcClamp(st / d, 0.14, 1) : 0.45, R = Math.min(52, 266 / (4 * k + 2)), sp = k * 2 * R, cx = 152, base = 196, cyc = base - R, top = 54;
     const prof = [];
     for (let x = 14; x <= 286; x += 1) { const i = Math.round((x - cx) / sp), dx = x - (cx + i * sp); prof.push([x, cyc + Math.sqrt(Math.max(0, R * R - dx * dx))]); }
     let h = DK.poly(prof.concat([[286, base + 30], [14, base + 30]]), 'hatch');
@@ -368,7 +368,7 @@ Object.assign(DIAGRAMS, {
     h += ball(cx - sp, 'ghost') + ball(cx + sp, 'ghost') + ball(cx, 'tool');
     [-1, 0, 1].forEach(i => { h += DK.cl(cx + i * sp, top - 8, cx + i * sp, base + 8); });
     h += DK.dimH(cx - sp, cx, top - 18, sp > 60 ? 'stepover ' + dcL(st, u, 's') : '', { from: top - 8 });
-    if (sp <= 60) h += DK.text(cx - sp - 6, top - 22, 'stepover ' + dcL(st, u, 's'), { cls: 'dimt', anchor: 'end' });
+    if (sp <= 60) h += DK.text(cx + 20, top - 14, 'stepover ' + dcL(st, u, 's'), { cls: 'dimt', anchor: 'start' });
     h += DK.dimH(cx - R, cx + R, top + 22, 'Ø ' + dcL(d, u, 'D'), {});
     h += DK.leader(cx + sp / 2, cyc + Math.sqrt(Math.max(0, R * R - sp * sp / 4)) + 1, cx + sp / 2 + 30, base + 22, 'cusp', { hot: true, anchor: 'start' });
     // Detail: profile with heights enlarged.
@@ -532,7 +532,7 @@ Object.assign(DIAGRAMS, {
   taper(v, sys, rows) {
     const W = 520, H = 270, u = dcU(sys), ok = dcOk(v.D) && dcOk(v.d) && dcOk(v.L) && v.D > v.d;
     const inc = dcRow(rows, 'Included angle'), half = dcRow(rows, 'Half angle'), tpl = dcRow(rows, 'Taper per unit length');
-    const s = ok ? Math.min(280 / v.L, 150 / v.D) : 1, Lp = ok ? v.L * s : 260, Dp = ok ? v.D * s : 140, dp = ok ? Math.max(6, v.d * s) : 70;
+    const s = ok ? Math.min(280 / v.L, 150 / v.D) : 1, Lp = ok ? Math.max(40, v.L * s) : 260, Dp = ok ? Math.max(20, v.D * s) : 140, dp = ok ? Math.max(6, v.d * s) : 70;
     const cy = 128, x0 = 60, x1 = x0 + Lp;
     let h = DK.poly([[x0, cy - Dp / 2], [x1, cy - dp / 2], [x1, cy + dp / 2], [x0, cy + Dp / 2]], 'part') + DK.cl(x0 - 16, cy, x1 + 70, cy);
     h += dcDimV(cy - Dp / 2, cy + Dp / 2, x0 - 24, 'Ø ' + dcL(v.D, u, 'D'), { from: x0 - 2 });
@@ -541,14 +541,14 @@ Object.assign(DIAGRAMS, {
     const tang = Math.atan2((Dp - dp) / 2, Lp) * 180 / Math.PI;
     const ra = Math.min(Lp - 10, 120), am = dcRad(180 - tang / 2);
     h += DK.line(x1, cy - dp / 2, x1 - ra - 12, cy - dp / 2, 'thin') + DK.angle(x1, cy - dp / 2, ra, 180 - tang, 180, '', { hot: true });
-    h += DK.leader(x1 + ra * Math.cos(am), cy - dp / 2 - ra * Math.sin(am), x1 - ra - 20, Math.max(20, cy - Dp / 2 - 20), 'half ' + (dcOk(half) ? dcN(half) + '°' : 'α/2') + ' (slide)', { hot: true, anchor: 'end' });
+    h += DK.leader(x1 + ra * Math.cos(am), cy - dp / 2 - ra * Math.sin(am), Math.max(150, x1 - ra - 20), Math.max(20, cy - Dp / 2 - 20), 'half ' + (dcOk(half) ? dcN(half) + '°' : 'α/2') + ' (slide)', { hot: true, anchor: 'end' });
     // Small diameter: dimension on the right with room for the apex lines.
     h += dcDimV(cy - dp / 2, cy + dp / 2, x1 + 26, dp > 50 ? 'Ø ' + dcL(v.d, u, 'd') : '', { from: x1 + 2 });
     if (dp <= 50) h += DK.text(x1 + 34, cy + dp / 2 + 18, 'Ø ' + dcL(v.d, u, 'd'), { cls: 'dimt', anchor: 'start' });
     const xa = x1 + (dp / 2) / Math.max(Math.tan(dcRad(tang)), 1e-6);
     if (xa < 500) { h += DK.line(x1, cy - dp / 2, xa, cy, 'ghost') + DK.line(x1, cy + dp / 2, xa, cy, 'ghost') + DK.text(Math.min(xa + 6, 506), cy + 4, '', { cls: 'mut' }); }
-    h += DK.text(380, 220, 'included ' + (dcOk(inc) ? dcN(inc) + '°' : 'α'), { cls: 'hott', anchor: 'start' });
-    h += dcLines(380, 238, [dcOk(tpl) ? 'taper ' + dcN(tpl) + ' ' + (sys === 'inch' ? 'in/in' : 'mm/mm') + ' on Ø' : '', ok ? 'drawn to scale' : '']);
+    h += DK.text(372, 214, 'included ' + (dcOk(inc) ? dcN(inc) + '°' : 'α'), { cls: 'hott', anchor: 'start' });
+    h += dcLines(372, 232, [dcOk(tpl) ? 'taper ' + dcN(tpl) + ' ' + (sys === 'inch' ? 'in/in' : 'mm/mm') : '', dcOk(tpl) ? '(on the diameter)' : '', ok ? 'drawn to scale' : '']);
     return DK.svg(W, H, h, 'Taper: diameters, length and angles');
   },
 
@@ -624,7 +624,7 @@ Object.assign(DIAGRAMS, {
     h += dcDimV(cy - R1, cy + R1, xe + 16, R1 > 30 ? 'Ø ' + dcL(v.d1, u, '') : '', { from: xe + 2 });
     h += dcDimV(cy - R0, cy + R0, xe + 40, 'Ø ' + dcL(v.d0, u, ''), { from: xe + 2 });
     h += DK.dimH(xc, xe, cy + R0 + 22, 'L ' + dcL(v.len, u, ''), { from: cy + R0 + 2, below: true });
-    const x = 400;
+    const x = 380;
     h += DK.text(x, 26, dcOk(tot) ? 'total ' + dcN(tot) + ' min' : 'total time', { cls: 'hott', anchor: 'start' });
     if (dcOk(tots)) h += DK.text(x, 42, '= ' + dcN(tots, 1) + ' s', { cls: 'hott', anchor: 'start' });
     h += dcLines(x, 66, [dcOk(n) ? dcN(n, 0) + ' passes of ' + dcN(dep) + ' ' + u : ''], { cls: 'txt' });
@@ -731,7 +731,7 @@ Object.assign(DIAGRAMS, {
     const rc = dcRow(rows, 'Chip thinning factor'), te = dcRow(rows, 'Teeth in the cut'), tc = dcRow(rows, 'Cut time');
     h += DK.arrow(266, 40, 310, 40, 'hot') + DK.text(262, 44, 'feed', { cls: 'mut', anchor: 'end' });
     const x = 376;
-    h += DK.text(x, 40, dcOk(vf) ? 'Vf ' + dcN(vf) + ' ' + dcFU(sys) : 'Vf: enter speed, z, fz', { cls: 'hott', anchor: 'start' });
+    h += DK.text(x, 40, dcOk(vf) ? 'Vf ' + dcN(vf) + ' ' + dcFU(sys) : 'Vf: enter speed, z, fz', { cls: dcOk(vf) ? 'hott' : 'mut', anchor: 'start' });
     h += dcLines(x, 62, [dcOk(n) ? dcN(n, 0) + ' RPM' : '', dcOk(hex) ? 'chip hex ' + dcN(hex) : '', dcOk(fz) ? 'fz ' + dcN(fz) + ' for that chip' : '', dcOk(rc) ? 'RCTF ' + dcN(rc) + ' ×' : '', dcOk(te) ? dcN(te, 2) + ' teeth in the cut' : ''], { cls: 'txt' });
     if (dcOk(tc)) h += DK.text(x, 160, 'cut time ' + dcN(tc) + ' min', { cls: 'hott', anchor: 'start' });
     h += DK.text(W - 6, H - 6, 'to scale; ' + (z > 72 ? '72 of ' + z + ' teeth drawn' : z + ' teeth'), { cls: 'mut', anchor: 'end' });
@@ -773,7 +773,7 @@ Object.assign(DIAGRAMS, {
       const y = 120, p = dcOk(n) && n > 0 ? w / n : w / 3;
       let g = DK.text(x0 + w / 2, 30, title, { cls: 'txt' });
       g += DK.rect(x0, y, w, 64, 'hatch');
-      const xL = x0 - Math.min(2.5 * p, 40), xR = x0 + w + Math.min(2.5 * p, 40);
+      const xL = Math.max(8, x0 - Math.min(2.5 * p, 40)), xR = Math.min(512, x0 + w + Math.min(2.5 * p, 40));
       const dd = Math.min(p * 0.5, 14), yT = y - dd;
       if (p >= 3) {
         g += DK.rect(xL, yT - 22, xR - xL, 22, 'tool') + dcTeeth(xL, xR, yT, p, 1, 'hot');
@@ -797,12 +797,12 @@ Object.assign(DIAGRAMS, {
     const lp = Math.min(r / Math.tan(dcRad(ang / 2)), 122), pl = dcRow(rows, 'Point length'), tip = ys + lp;
     let h = DK.poly([[cx - r, y0], [cx + r, y0], [cx + r, ys], [cx, tip], [cx - r, ys]], 'tool');
     for (let y = y0 + 8; y + 22 < ys - 4; y += 26) h += DK.line(cx - r + 1, y, cx + r - 1, y + 22, 'thin');
-    h += DK.cl(cx, y0 - 6, cx, tip + 22) + DK.line(cx - r, ys, cx + r, ys, 'thin');
+    h += DK.cl(cx, y0 - 6, cx, Math.min(tip + 14, H - 4)) + DK.line(cx - r, ys, cx + r, ys, 'thin');
     h += dcDimV(ys, tip, cx + r + 40, '', { hot: true, from: cx + 4 }) + DK.line(cx + r + 2, ys, cx + r + 44, ys, 'hot ext');
     h += DK.text(cx + r + 48, (ys + tip) / 2 + 4, 'point ' + dcL(pl, u, '?'), { cls: 'hott', anchor: 'start' });
     h += DK.dimH(cx - r, cx + r, y0 + 40, 'Ø ' + dcL(v.dia, u, 'D'), {});
-    const ex = (tip - ys + 34) * Math.tan(dcRad(ang / 2));
-    h += DK.line(cx, tip, cx - ex, ys - 34, 'thin') + DK.line(cx, tip, cx + ex, ys - 34, 'thin');
+    const ex = Math.min(150, (tip - ys + 34) * Math.tan(dcRad(ang / 2))), ey = ex / Math.tan(dcRad(ang / 2));
+    h += DK.line(cx, tip, cx - ex, tip - ey, 'thin') + DK.line(cx, tip, cx + ex, tip - ey, 'thin');
     h += DK.angle(cx, tip, Math.min(lp + 22, tip - y0 - 60), 90 - ang / 2, 90 + ang / 2, dcN(ang, 2) + '°', {});
     h += dcLines(350, 210, ['Add the point length to the', 'full-diameter depth for the', 'Z depth of a blind hole.']);
     if (lp >= 122) h += DK.text(cx, H - 6, 'point shortened to fit', { cls: 'mut' });
@@ -846,12 +846,12 @@ Object.assign(DIAGRAMS, {
     const cy = 150;
     let h = '', cxW, rW, cxS, rS, contact, k;
     if (mode === 2) {
-      rS = 92; cxS = 170; k = dcOk(ds) ? 2 * rS / ds : 1; contact = [cxS, cy - 40 + rS];
-      h += DK.rect(30, contact[1], 300, 40, 'hatch') + DK.circle(cxS, cy - 40, rS, 'tool') + DK.circle(cxS, cy - 40, rS * 0.3, 'thin');
+      rS = 86; cxS = 170; k = dcOk(ds) ? 2 * rS / ds : 1; contact = [cxS, cy - 30 + rS];
+      h += DK.rect(30, contact[1], 300, 40, 'hatch') + DK.circle(cxS, cy - 30, rS, 'tool') + DK.circle(cxS, cy - 30, rS * 0.3, 'thin') + dcSpin(cxS, cy - 30, rS * 0.55, rS * 0.55, 140, 40, 'dim');
       h += DK.arrow(250, contact[1] + 56, 310, contact[1] + 56, 'dim') + DK.text(246, contact[1] + 60, 'table', { cls: 'mut', anchor: 'end' });
       cxW = null;
     } else if (mode === 1) {
-      const ok = dcOk(ds) && dcOk(dw) && ds < dw; rW = 110; k = ok ? 2 * rW / dw : 1; rS = ok ? Math.max(6, ds * k / 2) : 50; cxW = 170; cxS = cxW + rW - rS; contact = [cxW + rW, cy];
+      const ok = dcOk(ds) && dcOk(dw) && ds < dw; rW = 104; k = ok ? 2 * rW / dw : 1; rS = ok ? Math.max(6, ds * k / 2) : 50; cxW = 170; cxS = cxW + rW - rS; contact = [cxW + rW, cy];
       h += dcRing(cxW, cy, rW, rW + 14) + DK.circle(cxS, cy, rS, 'tool') + DK.cl(cxW - rW - 20, cy, cxW + rW + 20, cy) + DK.cl(cxW, cy - rW - 20, cxW, cy + rW + 20);
     } else {
       const ok = dcOk(ds) && dcOk(dw), tot = ok ? ds + dw : 3; k = 300 / tot; rW = ok ? Math.max(8, dw * k / 2) : 50; rS = ok ? Math.max(8, ds * k / 2) : 100;
@@ -872,8 +872,8 @@ Object.assign(DIAGRAMS, {
     if (mode !== 2) h += DK.line(contact[0], contact[1] - 46, contact[0], contact[1] + 46, 'thin');
     h += DK.circle(contact[0], contact[1], 3, 'hotf');
     const sLab = 'wheel Ø ' + dcL(ds, u, 'ds'), wLab = mode === 2 ? 'flat work' : (mode === 1 ? 'bore Ø ' : 'work Ø ') + dcL(dw, u, 'dw');
-    h += DK.text(cxS, mode === 2 ? cy - 40 - rS - 10 : cy - rS - 10, sLab, { cls: 'dimt' });
-    h += DK.text(mode === 2 ? 180 : cxW, mode === 2 ? contact[1] + 26 : (mode === 1 ? cy + rW + 32 : cy + rW + 22), wLab, { cls: 'dimt' });
+    h += DK.text(cxS, mode === 2 ? cy - 30 - rS - 10 : cy - rS - 10, sLab, { cls: 'dimt' });
+    h += DK.text(mode === 2 ? 180 : Math.max(cxW, 74), mode === 2 ? contact[1] + 26 : (mode === 1 ? cy + rW + 30 : cy + rW + 22), wLab, { cls: 'dimt' });
     const x = 372, mU = vs.unit || '';
     h += DK.text(x, 40, dcOk(de) ? 'de ' + dcN(de) + ' ' + u : 'de', { cls: 'hott', anchor: 'start' });
     h += dcLines(x, 58, [mode === 0 ? 'de = dw ds / (dw + ds)' : mode === 1 ? 'de = dw ds / (dw − ds)' : 'surface: de = ds', 'dashed: equivalent wheel'], {});
@@ -894,21 +894,21 @@ Object.assign(DIAGRAMS, {
     const xw = plunge ? (x0 + x1) / 2 - bw / 2 : Math.min(x0 + 210, x1 - bw - 40);
     h += DK.rect(xw, cy - R - 70, bw, 70, 'tool') + DK.line(xw, cy - R - 35, xw + bw, cy - R - 35, 'thin');
     if (!plunge) {
-      const fp = dcOk(fa) && dcOk(v.bs) ? dcClamp(bw * fa / v.bs, 4, bw) : bw / 3;
+      const fp = dcOk(fa) && dcOk(v.bs) ? dcClamp(bw * fa / v.bs, 4, Math.min(bw, (xw - x0) / 3)) : bw / 3;
       for (let x = xw - fp; x > x0 + 4; x -= fp) h += DK.line(x + fp * 0.25, cy - R + 2, x - fp * 0.25, cy + R - 2, 'thin');
       h += DK.dimH(xw - 2 * fp, xw - fp, cy - R - 10, '', { from: cy - R - 2 }) + DK.text(xw - 2 * fp - 22, cy - R - 6, 'fa ' + dcL(fa, u, ''), { cls: 'dimt', anchor: 'end' });
       h += DK.arrow(xw + bw / 2 - 40, cy + R + 22, xw + bw / 2 + 40, cy + R + 22, 'hot') + DK.text(xw + bw / 2 - 46, cy + R + 26, dcOk(tr) ? dcN(tr) + ' ' + dcFU(sys) : 'traverse', { cls: 'hott', anchor: 'end' });
       if (dcOk(L)) h += DK.dimH(x0 + 10, x1 - 10, cy + R + 56, 'traverse L ' + dcN(L) + ' ' + u, { from: cy + R + 2, below: true });
     } else {
-      h += DK.arrow(xw + bw + 20, cy - R - 60, xw + bw + 20, cy - R - 4, 'hot') + DK.text(xw + bw + 26, cy - R - 30, 'plunge ' + dcL(v.vfr, dcFU(sys), ''), { cls: 'hott', anchor: 'start' });
+      h += DK.arrow(xw + bw + 20, cy - R - 60, xw + bw + 20, cy - R - 4, 'dim') + DK.text(xw + bw + 26, cy - R - 30, 'infeed ' + dcL(v.vfr, dcFU(sys), ''), { cls: 'dimt', anchor: 'start' });
       h += DK.rect(xw, cy - R, bw, 6, 'hatch');
     }
     h += DK.dimH(xw, xw + bw, cy - R - 82, 'bs ' + dcL(v.bs, u, ''), { from: cy - R - 72 });
     h += dcSpin(x1 - 24, cy, 8, R + 8, 115, 245, 'dim') + DK.text(x1, cy - R - 16, dcOk(v.nw) ? dcN(v.nw, 0) + ' RPM' : '', { cls: 'dimt', anchor: 'end' });
-    const x = 420;
+    const x = 416;
     h += dcLines(x, 40, [dcOk(ov) ? 'overlap ' + dcN(ov, 2) : '', dcOk(tt) ? 'traverse time' : '', ''], { cls: 'txt' });
     if (dcOk(tt)) h += DK.text(x, 72, dcN(tt) + ' min', { cls: 'hott', anchor: 'start' });
-    if (dcOk(tp)) h += DK.text(x, plunge ? 40 : 100, 'plunge ' + dcN(tp) + ' min', { cls: 'hott', anchor: 'start' }) + DK.text(x, plunge ? 56 : 116, dcOk(tps) ? '= ' + dcN(tps, 1) + ' s' : '', { cls: 'mut', anchor: 'start' });
+    if (dcOk(tp)) h += dcLines(x, plunge ? 40 : 100, ['plunge time']) + DK.text(x, plunge ? 56 : 116, dcN(tp) + ' min', { cls: 'hott', anchor: 'start' }) + DK.text(x, plunge ? 72 : 132, dcOk(tps) ? '= ' + dcN(tps, 1) + ' s' : '', { cls: 'mut', anchor: 'start' });
     if (!dcOk(fa) && !dcOk(tp)) h += dcLines(x - 10, 40, ['Enter fa (or the', 'fraction) and the', 'work speed.']);
     return DK.svg(W, H, h, 'Cylindrical traverse and plunge grinding');
   },
@@ -970,8 +970,9 @@ Object.assign(DIAGRAMS, {
       h += DK.text((X0 + X1) / 2, Y0 + 34, 'tool life T (min, log scale)', { cls: 'mut' }) + DK.text(14, Y1 - 12, su + ' (log)', { cls: 'mut', anchor: 'start' });
       h += '<path class="ln" d="M' + X(Math.pow(10, lo)).toFixed(1) + ' ' + Y(Vat(Math.pow(10, lo))).toFixed(1) + 'L' + X(Math.pow(10, hi)).toFixed(1) + ' ' + Y(Vat(Math.pow(10, hi))).toFixed(1) + '"/>';
       pts.slice().sort((a, b) => a.T - b.T).forEach((p, i) => {
-        const x = X(p.T), y = Y(p.V), up = i % 2 === 0, wide = x + 8 + p.lab.length * 7.3 > X1 + 16;
-        h += DK.circle(x, y, p.cls === 'hot' ? 4.5 : 3.5, p.cls + 'f') + DK.text(up && !wide ? x + 8 : x - 8, up ? y - 10 : y + 18, p.lab, { cls: p.cls === 'hot' ? 'hott' : 'dimt', anchor: up && !wide ? 'start' : 'end' });
+        const x = X(p.T), y = Y(p.V), up = i % 2 === 0 && Y(p.V) > 30, tw = p.lab.length * 7.3;
+        const right = x + 8 + tw <= X1 + 16 && (up || x - 8 - tw < 4);
+        h += DK.circle(x, y, p.cls === 'hot' ? 4.5 : 3.5, p.cls + 'f') + DK.text(right ? x + 8 : x - 8, up ? y - 10 : y + 18, p.lab, { cls: p.cls === 'hot' ? 'hott' : 'dimt', anchor: right ? 'start' : 'end' });
       });
       h += DK.text(X0 + 8, Y0 - 10, 'V × T^' + dcN(v.n) + ' = ' + dcN(v.c), { cls: 'mut', anchor: 'start' });
       const xr = 376;
