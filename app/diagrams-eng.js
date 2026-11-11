@@ -117,12 +117,19 @@ Object.assign(DIAGRAMS, {
     const P = sys === 'inch' ? 1 / v.pitch : v.pitch, E = deV(rows, /itch diameter/), best = deV(rows, 'Best wire'), M = deV(rows, 'over three wires');
     if (!(E > 0)) return '';
     const w = v.wire > 0 ? v.wire : best, hh = F[0] * Math.PI / 180, c = F[1] * P, d = F[2] * P;
-    const s = 74 / P, x0 = 64, x1 = 336, wd = deClamp(w, 0.05 * P, 1.3 * P);
+    const wd = deClamp(w, 0.05 * P, 1.3 * P), x0 = 64, x1 = 336;
     const hc = (wd / 2) / Math.sin(hh) - (P / 4) / Math.tan(hh); // wire centre above the pitch line
-    const top = Math.max(c, hc + wd / 2), gap = deClamp(E * s, 60, 120), broken = E * s > 120;
+    const s = Math.min(74 / P, 52 / Math.max(c, hc + wd / 2));
+    const top = Math.max(c, hc + wd / 2), gap = deClamp(E * s, 60, 104), broken = E * s > 104;
     const yT = 34 + top * s, yB = yT + gap; // pitch lines of the upper and lower flank
     // Profile: y offset (units, + outward) at axial position t (units), groove centres at t = k P.
-    const prof = t => { let q = ((t % P) + P) % P; q = Math.min(q, P - q); return deClamp((q - P / 4) / Math.tan(hh), -d, c); };
+    // Whitworth: crest and root arcs of radius 0.137329 P tangent to the flanks.
+    const rho = F[0] === 27.5 ? 0.137329 * P : 0, apex = P / (4 * Math.tan(hh)) - rho / Math.sin(hh), rq = rho * Math.cos(hh);
+    const prof = t => {
+      let q = ((t % P) + P) % P; q = Math.min(q, P - q);
+      if (rho > 0) { if (P / 2 - q < rq) return apex + Math.sqrt(rho * rho - (P / 2 - q) ** 2); if (q < rq) return -apex - Math.sqrt(rho * rho - q * q); return (q - P / 4) / Math.tan(hh); }
+      return deClamp((q - P / 4) / Math.tan(hh), -d, c);
+    };
     const edge = (yp, sg, ph) => { const pts = []; for (let X = x0; X <= x1 + 0.1; X += 1) pts.push([X, yp - sg * prof((X - x0) / s + ph) * s]); return pts; };
     const up = edge(yT, 1, 0), lo = edge(yB, -1, P / 2);
     let h = '';
@@ -130,7 +137,6 @@ Object.assign(DIAGRAMS, {
       const mid = (yT + yB) / 2;
       h += dePoly(up.concat(deCutPts(x0, x1, mid - 6)), 'hatch') + dePoly(lo.concat(deCutPts(x0, x1, mid + 6)), 'hatch');
     } else h += dePoly(up.concat(lo.slice().reverse()), 'hatch');
-    if (F[0] === 27.5) h += DK.text(x0, yT - c * s - 8, 'crests and roots rounded', { cls: 'mut', anchor: 'start' });
     h += DK.cl(x0 - 18, yT, x1 + 18, yT) + DK.cl(x0 - 18, yB, x1 + 18, yB);
     // Wires: two in adjacent grooves on top, one opposite.
     const gx = [1, 2].map(k => x0 + k * P * s), bx = x0 + 1.5 * P * s;
@@ -143,7 +149,7 @@ Object.assign(DIAGRAMS, {
     h += deDimV(ytop, ybot, xd, 'M ' + (deFin(M) ? DK.n(M, 4) + ' ' + u : ''), { hot: true, from: gx[1] + wd * s / 2 + 10 });
     h += deDimV(yT, yB, x0 - 34, 'E ' + DK.n(E, 4), { from: x0 - 18 });
     h += DK.dimH(x0 + 2.5 * P * s, x0 + 3.5 * P * s, Math.min(ytop, yT - c * s) - 14, 'P ' + DK.n(P, 4), { from: yT - c * s - 2 });
-    h += DK.leader(gx[0] - wd * s * 0.35, yT - hc * s - wd * s * 0.35, 8, Math.max(14, ytop - 16), 'wire Ø ' + DK.n(w, 4) + (v.wire > 0 ? '' : ' (best)'), { anchor: 'start' });
+    h += DK.leader(gx[0] - wd * s * 0.35, yT - hc * s - wd * s * 0.35, Math.max(150, gx[0] - wd * s * 0.35 - 24), Math.max(14, ytop - 16), 'wire Ø ' + DK.n(w, 4) + (v.wire > 0 ? '' : ' (best)'), { anchor: 'end' });
     h += deLines(x0 - 50, H - 30, [F[3] + ' thread, ' + (sys === 'inch' ? DK.n(v.pitch, 3) + ' TPI' : 'pitch ' + DK.n(P, 3) + ' mm') + ', major Ø ' + DK.n(v.major, 4) + ' ' + u,
       'E = pitch diameter (chain lines). M is read over the anvils.' + (broken ? ' Diameter shortened.' : '')]);
     return DK.svg(W, H, h, 'Three-wire thread measurement');
@@ -289,7 +295,7 @@ Object.assign(DIAGRAMS, {
         P.forEach(p => { h += DK.circle(p[0], p[1], pr, 'tool') + DK.circle(p[0], p[1], 1.6, 'hotf'); });
         const L = Math.hypot(P[0][0] - P[1][0], P[0][1] - P[1][1]), ux = (P[0][0] - P[1][0]) / L, uy = (P[0][1] - P[1][1]) / L;
         lab += DK.dim(P[1][0] + ux * pr, P[1][1] + uy * pr, P[0][0] - ux * pr, P[0][1] - uy * pr, 'M ' + (deFin(M) ? DK.n(M, dp) + ' ' + u : ''), { hot: true });
-        lab += DK.leader(P[0][0] - pr * 0.5, P[0][1] + pr * 0.8, 410, cy + 60, 'pin Ø ' + DK.n(dpin, dp), { anchor: 'start' });
+        lab += DK.leader(P[0][0] - pr * 0.5, P[0][1] - pr * 0.8, 410, cy - 70, 'pin Ø ' + DK.n(dpin, dp), { anchor: 'start' });
       }
       void rTip;
     }
@@ -298,57 +304,50 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h + lab, 'Gear measurement over pins and span');
   },
 
-  // Helical pair: plan view of the two gears with the helix lines of opposite hand, helix angle and centre distance.
+  // Helical pair: the transverse section in mesh (true involute in the transverse plane), and a plan view of gear 1 with the helix angle.
   helicalgear(v, sys, rows) {
-    const W = 520, H = 300, u = deU(sys), dp = deDp(sys);
-    const d1 = deV(rows, 'Gear 1: pitch'), d2 = deV(rows, 'Gear 2: pitch'), a = deV(rows, /^Centre distance$/), beta = v.beta;
-    if (!(d1 > 0 && beta >= 0 && beta < 60)) return '';
-    const bw = v.b > 0 ? v.b : d1 * 0.5, da1 = deV(rows, 'Gear 1: tip') || d1, da2 = deV(rows, 'Gear 2: tip') || d2;
-    const two = d2 > 0 && a > 0;
-    let s = two ? 240 / (da1 / 2 + a + da2 / 2) : 160 / da1;
-    s = deClamp(s, 100 / da1, 170 / da1); // keep the pinion readable; gear 2 is cut off when large
-    const bpx = deClamp(bw * s, 90, 200), x0 = 160 - bpx / 2, x1 = x0 + bpx;
-    const y1 = 30 + da1 / 2 * s, y2 = two ? y1 + a * s : 0;
+    const W = 520, H = 300, u = deU(sys), dp = deDp(sys), mn = gearMod(v.mp, sys), beta = v.beta;
+    const mt = deV(rows, /^Transverse module/), at = deV(rows, 'Transverse pressure angle'), a = deV(rows, /^Centre distance$/);
+    if (!(mn > 0 && mt > 0 && at > 0 && v.z1 >= 3 && v.z1 <= 400 && beta >= 0 && beta < 60)) return '';
+    const z1 = Math.round(v.z1), z2 = v.z2 >= 3 && v.z2 <= 600 && deFin(a) ? Math.round(v.z2) : 0, k = mn / mt;
+    const ha = (v.ha > 0 ? v.ha : 1) * k, hf = (v.hf > 0 ? v.hf : 1.25) * k, x1 = (deFin(v.x1) ? v.x1 : 0) * k, x2 = (deFin(v.x2) ? v.x2 : 0) * k;
+    const ra1 = mt * (z1 / 2 + ha + x1), ra2 = z2 ? mt * (z2 / 2 + ha + x2) : 0;
+    let s = z2 ? Math.min(300 / (ra1 + a + ra2), 230 / (2 * Math.max(ra1, ra2))) : 220 / (2 * ra1);
+    s = deClamp(s, 90 / (2 * ra1), 220 / (2 * ra1));
+    const cy = 136, c1x = 24 + ra1 * s, c2x = c1x + (z2 ? a * s : 0);
     let h = '';
-    const tb = Math.tan(beta * Math.PI / 180), pn = Math.PI * gearMod(v.mp, sys), pt = pn / Math.cos(beta * Math.PI / 180);
-    const body = (cy, R, hand, clipBottom) => {
-      const top = cy - R, bot = Math.min(cy + R, clipBottom);
-      let g = DK.rect(x0, top, bpx, bot - top, 'part');
-      // Tooth lines: on the visible face a tooth crosses the face width while moving b tan(beta) round the pitch circle.
-      const step = Math.max(pt * s, 7), shift = bpx * tb * hand;
-      for (let y = top - Math.abs(shift) - step; y < bot + Math.abs(shift) + step; y += step) {
-        let ya = y, yb = y + shift, xa = x0, xb = x1;
-        if (Math.abs(shift) > 0.01) {
-          const cl = yy => (yy - y) / shift; // param along the line for a given y
-          let t0 = 0, t1 = 1;
-          [top, bot].forEach(lim => { const t = cl(lim); if (shift > 0) { if (lim === top) t0 = Math.max(t0, t); else t1 = Math.min(t1, t); } else { if (lim === top) t1 = Math.min(t1, t); else t0 = Math.max(t0, t); } });
-          if (t1 <= t0) continue;
-          xa = x0 + bpx * t0; xb = x0 + bpx * t1; ya = y + shift * t0; yb = y + shift * t1;
-        } else if (y < top || y > bot) continue;
-        g += DK.line(xa, ya, xb, yb, 'thin');
-      }
-      return g + DK.line(x0, top, x1, top, 'ln') + DK.line(x0, bot, x1, bot, 'ln');
-    };
-    h += body(y1, da1 / 2 * s, 1, H + 400);
-    if (two) {
-      const cut = H - 6;
-      h += body(y2, da2 / 2 * s, -1, cut);
-      if (y2 + da2 / 2 * s > cut) h += deBreak(x0 - 6, x1 + 6, cut - 4);
-      h += DK.cl(x0 - 26, y2, x1 + 26, y2);
+    const g1 = deGear(c1x, cy, s, mt, z1, at, { x: x1, ha, hf, rot: 0 });
+    if (z2) h += deGearPath(deGear(c2x, cy, s, mt, z2, at, { x: x2, ha, hf, rot: Math.PI + Math.PI / z2 }));
+    h += deGearPath(g1) + DK.circle(c1x, cy, g1.r * s, 'cl') + deCross(c1x, cy, g1.ra * s + 10) + DK.circle(c1x, cy, 3, 'txt');
+    if (z2) h += DK.circle(c2x, cy, mt * z2 / 2 * s, 'cl') + DK.cl(c2x - ra2 * s - 10, cy, c2x + ra2 * s + 10, cy) + DK.cl(c2x, cy - ra2 * s - 10, c2x, cy + ra2 * s + 10) + DK.circle(c2x, cy, 3, 'txt');
+    h = deClip('declip-hel', 346, H, h);
+    let lab = DK.text(c1x, Math.max(14, cy - g1.ra * s - 14), 'z1 = ' + z1 + ' (RH)', { cls: 'txt' });
+    if (z2) {
+      lab += DK.text(deClamp(c2x, c1x + 80, 300), Math.max(14, cy - ra2 * s - 14), 'z2 = ' + z2 + ' (LH)', { cls: 'txt' });
+      lab += DK.dimH(c1x, c2x, Math.min(H - 34, cy + Math.max(g1.ra, Math.min(ra2, (H - cy) / s)) * s + 18), 'a ' + DK.n(a, dp) + ' ' + u, { hot: true, from: cy + 4 });
     }
-    h += DK.cl(x0 - 26, y1, x1 + 26, y1);
-    h = deClip('declip-hel', W, H, h);
-    // Helix angle on one tooth line of gear 1, at the middle.
-    const ym = y1 - da1 / 4 * s, xm = x0 + 12;
-    let lab = DK.line(xm, ym, xm + 50, ym + 50 * tb, 'hot') + DK.line(xm, ym, xm + 54, ym, 'dim ext');
-    if (beta > 0.5) lab += DK.angle(xm, ym, 38, -beta, 0, 'β ' + DK.n(beta, 2) + '°', { hot: true });
-    lab += DK.dimH(x0, x1, 14, 'b ' + deIn(v.b, 4, '', 'b'), { from: y1 - da1 / 2 * s - 2 });
-    if (two) lab += deDimV(y1, y2, x1 + 46, 'a ' + DK.n(a, dp) + ' ' + u, { hot: true, from: x1 + 26 });
-    lab += DK.text(x0 - 10, y1 + 4, 'gear 1', { cls: 'txt', anchor: 'end' }) + DK.text(x0 - 10, y1 + 19, 'z ' + Math.round(v.z1) + ', RH', { cls: 'mut', anchor: 'end' });
-    if (two) lab += DK.text(x0 - 10, Math.min(y2 + 4, H - 40), 'gear 2', { cls: 'txt', anchor: 'end' }) + DK.text(x0 - 10, Math.min(y2 + 19, H - 25), 'z ' + Math.round(v.z2) + ', LH', { cls: 'mut', anchor: 'end' });
-    const bb = deV(rows, 'Base helix angle'), at = deV(rows, 'Transverse pressure angle'), et = deV(rows, 'Total contact ratio');
-    lab += deLines(338, 160, ['Pitch Ø ' + DK.n(d1, dp) + (d2 > 0 ? ' / ' + DK.n(d2, dp) : '') + ' ' + u, deFin(at) ? 'transverse α ' + DK.n(at, 3) + '°' : '', deFin(bb) ? 'base helix ' + DK.n(bb, 3) + '°' : '', deFin(et) ? 'total contact ratio ' + DK.n(et, 3) : '', 'Hands shown for one choice;', 'an external pair has opposite hands.']);
-    return DK.svg(W, H, h + lab, 'Helical gear pair, plan view with helix angle');
+    lab += deLines(362, H - 24, ['Left: transverse section,', 'mt ' + DK.n(mt, dp) + ', αt ' + DK.n(at, 3) + '°']);
+    // Plan view of gear 1: face width across, tooth lines at the helix angle.
+    const px0 = 382, pw = 104, ph = 120, py0 = 40, tb = Math.tan(beta * Math.PI / 180);
+    lab += DK.rect(px0, py0, pw, ph, 'part');
+    const step = 14, sh = pw * tb;
+    let lines = '';
+    for (let y = py0 - sh - step; y < py0 + ph + step; y += step) {
+      const t0 = deClamp(sh > 0.01 ? (py0 - y) / sh : 0, 0, 1), t1 = deClamp(sh > 0.01 ? (py0 + ph - y) / sh : 1, 0, 1);
+      if (sh <= 0.01 && (y < py0 || y > py0 + ph)) continue;
+      if (t1 <= t0) continue;
+      lines += DK.line(px0 + pw * t0, y + sh * t0, px0 + pw * t1, y + sh * t1, 'thin');
+    }
+    lab += lines + DK.rect(px0, py0, pw, ph, 'ln') + DK.cl(px0 - 14, py0 + ph / 2, px0 + pw + 14, py0 + ph / 2);
+    if (beta > 0.5) {
+      const yy = py0 + ph / 2 - 4 - sh / 2, xs = px0;
+      lab += DK.line(xs, yy, xs + pw, yy + sh, 'hot') + DK.angle(xs, yy, 54, -Math.min(beta, 59), 0, '', { hot: true });
+    }
+    lab += DK.text(px0 + pw / 2, py0 - 8, 'gear 1 from above', { cls: 'mut' });
+    lab += DK.text(px0 + pw / 2, py0 + ph + 18, 'β ' + DK.n(beta, 2) + '°' + (v.b > 0 ? ', b ' + DK.n(v.b, dp) : ''), { cls: 'hott' });
+    const bb = deV(rows, 'Base helix angle'), et = deV(rows, 'Total contact ratio'), d1 = deV(rows, 'Gear 1: pitch');
+    lab += deLines(362, 200, [deFin(d1) ? 'pitch Ø ' + DK.n(d1, dp) + (z2 ? ' / ' + DK.n(deV(rows, 'Gear 2: pitch'), dp) : '') : '', deFin(bb) ? 'base helix ' + DK.n(bb, 3) + '°' : '', deFin(et) ? 'total contact ratio ' + DK.n(et, 3) : '', z2 ? 'external pair: opposite hands' : '']);
+    return DK.svg(W, H, h + lab, 'Helical gear pair: transverse section and helix angle');
   },
 
   // Gear train: the gears in a row, compound gears on one shaft, tooth counts, input and output speed and directions.
@@ -444,7 +443,7 @@ Object.assign(DIAGRAMS, {
       let g = ''; P.forEach(p => { g += DK.circle(p[0], p[1], pr, 'tool') + DK.circle(p[0], p[1], 1.4, 'hotf'); });
       const L = Math.hypot(P[0][0] - P[1][0], P[0][1] - P[1][1]), ux = (P[0][0] - P[1][0]) / L, uy = (P[0][1] - P[1][1]) / L, sg = inner ? -1 : 1;
       const A = [P[1][0] - sg * ux * pr, P[1][1] - sg * uy * pr], B = [P[0][0] + sg * ux * pr, P[0][1] + sg * uy * pr];
-      return { g, d: DK.dim(A[0], A[1], B[0], B[1], 'M ' + (deFin(M) ? DK.n(M, dp) : '?'), { hot: true, off: -(yd - A[1]), below: true }) };
+      return { g, d: DK.dim(A[0], A[1], B[0], B[1], 'M ' + (deFin(M) ? DK.n(M, dp) : '?'), { hot: true, off: -(yd - Math.max(A[1], B[1])), below: true }) };
     };
     // External.
     const ex = 128, ge = deGear(ex, cy, s, m, z, 30, { ra, rf, psi: st > 0 ? st / D : Math.PI / 2 / z, rot: Math.PI / z });
@@ -486,7 +485,7 @@ Object.assign(DIAGRAMS, {
     // Unrolled helix: one turn of the pitch diameter against the lead.
     const tx = 376, ty = 200, base = 130, hgt = deClamp(base * Math.tan((ga || 5) * Math.PI / 180), 6, 150);
     lab += dePoly([[tx, ty], [tx + base, ty], [tx + base, ty - hgt]], 'part') + DK.line(tx, ty, tx + base, ty - hgt, 'hot');
-    lab += DK.angle(tx, ty, 44, 0, Math.atan2(hgt, base) * 180 / Math.PI, '', { hot: true }) + DK.text(tx, ty - hgt / 2 - 14, 'lead angle γ ' + (deFin(ga) ? DK.n(ga, 2) + '°' : '?'), { cls: 'hott', anchor: 'start' });
+    lab += DK.angle(tx, ty, 44, 0, Math.atan2(hgt, base) * 180 / Math.PI, '', { hot: true }) + DK.text(tx, ty + 34, 'lead angle γ ' + (deFin(ga) ? DK.n(ga, 2) + '°' : '?'), { cls: 'hott', anchor: 'start' });
     lab += DK.text(tx + base / 2, ty + 16, 'π × pitch Ø', { cls: 'mut' }) + DK.text(tx + base + 6, ty - hgt / 2 + 4, 'L', { cls: 'dimt', anchor: 'start' });
     lab += deLines(372, 30, [Math.round(v.z1) + '-start worm, lead ' + (deFin(Ld) ? DK.n(Ld, dp + 1) : '?'), 'ratio ' + deT(rows, 'Ratio z2 / z1'), v.n > 0 ? 'wheel ' + deT(rows, 'Wheel speed') : '', 'one turn unrolled:']);
     return DK.svg(W, H, h + lab, 'Worm and wheel with centre distance and lead angle');
@@ -538,20 +537,22 @@ Object.assign(DIAGRAMS, {
     const sizes = [v.lo, v.hi, vc, act].filter(deFin), smin = Math.min(...sizes), smax = Math.max(...sizes), R = d => 38 + 62 * (smax > smin ? (d - smin) / (smax - smin) : 0.5);
     const cx = 120, cy = 140;
     let h = '';
+    const vok = mc > 0 && deFin(vc), gauge = mc === 1; // at MMC the virtual condition is the functional gauge
     if (inn) {
       h += DK.rect(cx - 112, cy - 112, 224, 224, 'hatch') + DK.circle(cx, cy, R(deFin(act) ? act : mmc), 'part');
       h += DK.circle(cx, cy, R(deFin(act) ? act : mmc), 'ln');
-      if (mc > 0 && deFin(vc)) h += DK.circle(cx, cy, R(vc), 'tool');
+      if (vok && gauge) h += DK.circle(cx, cy, R(vc), 'tool');
     } else {
-      if (mc > 0 && deFin(vc)) h += DK.circle(cx, cy, R(vc), 'tool');
+      if (vok && gauge) h += DK.circle(cx, cy, R(vc), 'tool');
       h += DK.circle(cx, cy, R(deFin(act) ? act : mmc), 'part');
     }
+    if (vok && !gauge) h += DK.circle(cx, cy, R(vc), 'hot');
     h += DK.circle(cx, cy, R(mmc), 'hid') + DK.circle(cx, cy, R(lmc), 'ghost') + deCross(cx, cy, inn ? 118 : 112);
     const lead = (r, a, ty, t, hot) => DK.leader(cx + r * Math.cos(a), cy - r * Math.sin(a), 248, ty, t, { anchor: 'start', hot });
     let lab = '';
     const big = R(lmc) > R(mmc);
     lab += lead(R(mmc), big ? 0.55 : 0.95, big ? 52 : 28, 'MMC ' + DK.n(mmc, dp)) + lead(R(lmc), big ? 0.95 : 0.55, big ? 28 : 52, 'LMC ' + DK.n(lmc, dp));
-    if (mc > 0 && deFin(vc)) lab += DK.leader(cx + R(vc) * Math.cos(-0.9), cy - R(vc) * Math.sin(-0.9), 236, 266, (inn ? 'gauge pin' : 'gauge ring') + ' = VC ' + DK.n(vc, dp) + ' ' + u, { anchor: 'start', hot: true });
+    if (mc > 0 && deFin(vc)) lab += DK.leader(cx + R(vc) * Math.cos(-0.9), cy - R(vc) * Math.sin(-0.9), 236, 266, (gauge ? (inn ? 'gauge pin' : 'gauge ring') : (inn ? 'outer boundary' : 'inner boundary')) + ' = VC ' + DK.n(vc, dp) + ' ' + u, { anchor: 'start', hot: true });
     if (deFin(act)) lab += DK.text(cx, cy + 4, 'actual ' + DK.n(act, dp), { cls: 'txt' });
     lab += DK.text(cx, 18, (inn ? 'Hole' : 'Pin') + ', sizes exaggerated', { cls: 'mut' });
     // Right: allowed tolerance against actual size.
@@ -617,13 +618,13 @@ Object.assign(DIAGRAMS, {
     h += DK.rect(bc - Fp / 2 - 18, top, Fp + 36, 22, 'tool') + DK.rect(bc - Fp / 2, yA, Fp, bot - yA, 'tool');
     if (!fixed) h += DK.rect(bc - Fp / 2 - 16, yC, Fp + 32, 20, 'tool');
     else for (let y = yB + 6; y < yC - 6; y += 6) h += DK.line(bc - Fp / 2 + 2, y, bc + Fp / 2 - 2, y, 'thin');
-    h += DK.cl(bc, top - 14, bc, bot + 14) + DK.line(bc + off, yA - 4, bc + off, yB + 4, 'hid');
+    h += DK.cl(fixed ? bc + off / 2 : bc, top - 14, fixed ? bc + off / 2 : bc, bot + 14) + DK.line(bc + off, yA - 4, bc + off, yB + 4, 'hid');
     if (!fixed) h += DK.line(bc - off, yB - 4, bc - off, yC + 4, 'hid');
     // Sizes.
     h += DK.dimH(bc + off - Hp / 2, bc + off + Hp / 2, top - 14, 'H ' + DK.n(v.H, dp), { from: yA });
     h += DK.dimH(bc - Fp / 2, bc + Fp / 2, Math.min(H - 30, bot + 22), 'F ' + DK.n(v.F, dp), { from: bot, below: true });
     let lab = '';
-    lab += DK.text(x0, yA - 6, fixed ? 'clearance hole part' : 'part 1', { cls: 'mut', anchor: 'start' }) + DK.text(x0, yC + 15, fixed ? 'threaded (fixed) part' : 'part 2', { cls: 'mut', anchor: 'start' });
+    lab += DK.text(x1 - 6, yA + 28, fixed ? 'clearance hole part' : 'part 1', { cls: 'txt', anchor: 'end' }) + DK.text(x1 - 6, yB + 28, fixed ? 'threaded part' : 'part 2', { cls: 'txt', anchor: 'end' });
     const tl = (t, y, cls, size) => DK.text(330, y, t, { cls: cls || 'txt', anchor: 'start', size });
     lab += tl(fixed ? 'Fixed fastener' : 'Floating fastener', 40);
     lab += tl(fixed ? 't1 + t2 = H − F = ' + DK.n(v.H - v.F, dp) : 'T = H − F', 60, 'mut');
@@ -703,8 +704,9 @@ Object.assign(DIAGRAMS, {
       h += DK.line(q0[0], q0[1], na[0][0], na[0][1], 'cl') + DK.line(na[na.length - 1][0], na[na.length - 1][1], q1[0], q1[1], 'cl');
       h += '<path class="hot" style="stroke-width:3" d="M' + na.map(p => deF(p[0]) + ' ' + deF(p[1])).join('L') + '"/>';
       const mid = X(P(a0 + a / 2, rn));
-      lab += DK.leader(mid[0], mid[1], 372, 170, 'BA ' + (deFin(BA) ? DK.n(BA, dp) + ' ' + u : '?'), { anchor: 'start', hot: true });
-      lab += DK.text(376, 186, 'neutral line at R + K t (chain line)', { cls: 'mut', anchor: 'start' });
+      const lx = Math.min(mid[0] + 60, 392), ly = Math.min(mid[1] + 56, H - 64);
+      lab += DK.leader(mid[0], mid[1], lx, ly, 'BA ' + (deFin(BA) ? DK.n(BA, dp) + ' ' + u : '?'), { anchor: 'start', hot: true });
+      lab += DK.text(lx + 4, ly + 16, 'neutral line, R + K t', { cls: 'mut', anchor: 'start' });
     }
     if (r > 0) { const q = X(P(a0 + a * 0.6, r)); lab += DK.leader(q[0], q[1], Math.max(60, C[0] - 50), Math.max(16, C[1] - 40), 'R ' + DK.n(r, dp), { anchor: 'end' }); }
     // Thickness, setback, flanges and angle.
@@ -715,7 +717,7 @@ Object.assign(DIAGRAMS, {
     if (v.f1 > 0) lab += DK.dimH(X([-L1, 0])[0], V[0], yo + 50, 'f1 ' + DK.n(v.f1, dp) + (brk1 ? ' (shortened)' : ''), { from: yo, below: true });
     lab += DK.angle(V[0], V[1], 26, 0, v.a, DK.n(v.a, 2) + '°');
     lab += deLines(340, 40, ['K ' + (deFin(K) ? DK.n(K, 3) : 'not entered'), deFin(BD) ? 'bend deduction ' + DK.n(BD, dp) : '', deFin(flat) ? 'flat length ' + DK.n(flat, dp) + ' ' + u : '', v.f2 > 0 ? 'f2 ' + DK.n(v.f2, dp) + (brk2 ? ' (shortened)' : '') : ''], { cls: 'txt' });
-    lab += deLines(340, H - 42, ['Mould lines dashed to the', 'virtual sharp (dot).']);
+    lab += deLines(340, 112, ['Mould lines dashed to the', 'virtual sharp (dot).']);
     return DK.svg(W, H, h + lab, 'Sheet-metal bend with neutral line and bend allowance');
   },
 
@@ -776,12 +778,12 @@ Object.assign(DIAGRAMS, {
     let h = '';
     if (fresh) {
       const kq = deV(rows, 'Fresh fill: concentrate'), wq = deV(rows, 'Fresh fill: water');
-      h += tank(150, 150, [{ q: kq, cls: 'tool', t: 'concentrate ' + DK.n(kq, 2) + ' ' + u }, { q: wq, cls: 'part', t: 'water ' + DK.n(wq, 2) + ' ' + u }], 0, 'Fresh fill to ' + DK.n(v.v, 1) + ' ' + u + ' at ' + DK.n(v.t, 2) + ' %');
+      h += tank(150, 150, [{ q: wq, cls: 'part', t: 'water ' + DK.n(wq, 2) + ' ' + u }, { q: kq, cls: 'tool', t: '+ concentrate ' + DK.n(kq, 2) + ' ' + u }], 0, 'Fresh fill to ' + DK.n(v.v, 1) + ' ' + u + ' at ' + DK.n(v.t, 2) + ' %');
       return DK.svg(W, H, h, 'Fresh coolant fill');
     }
     const two = deFin(mix) && deFin(tk);
     const x1 = two ? 36 : 160;
-    h += tank(x1, 140, [{ q: v.v, cls: 'part', t: 'now ' + DK.n(v.v, 1) + ' ' + u + ' at ' + DK.n(v.c, 2) + ' %' }, { q: add, cls: 'tool', t: '+ ' + DK.n(add, 2) + ' ' + (conc ? 'concentrate' : 'water') }], v.full, deFin(add) ? 'Adjust to ' + DK.n(v.t, 2) + ' %' + (deFin(after) ? ': ' + DK.n(after, 1) + ' ' + u : '') : 'Already at ' + DK.n(v.t, 2) + ' %');
+    h += tank(x1, 140, [{ q: v.v, cls: 'part', t: 'now ' + DK.n(v.v, 1) + ' ' + u + ' at ' + DK.n(v.c, 2) + ' %' }, { q: add, cls: 'tool', t: '+ ' + DK.n(add, 2) + ' ' + u + ' ' + (conc ? 'concentrate' : 'water') }], v.full, deFin(add) ? 'Adjust to ' + DK.n(v.t, 2) + ' %' + (deFin(after) ? ': ' + DK.n(after, 1) + ' ' + u : '') : 'Already at ' + DK.n(v.t, 2) + ' %');
     if (two) h += tank(326, 130, [{ q: v.v, cls: 'part', t: 'now ' + DK.n(v.v, 1) + ' ' + u }, { q: v.full - v.v, cls: 'tool', t: 'top up at ' + DK.n(mix, 2) + ' %' }], v.full, 'Or top up: ' + DK.n(tk, 2) + ' conc. + ' + DK.n(tw, 2) + ' water');
     return DK.svg(W, H, h, 'Coolant sump: adjust or top up');
   },
@@ -861,7 +863,7 @@ Object.assign(DIAGRAMS, {
     const P = deFin(v.P) ? v.P : 0, wl = deFin(v.w) ? v.w : 0;
     if (!(L > 0) || !(P || wl) || !state || !state.W) return '';
     const a = P ? (v.a >= 0 && v.a <= L ? v.a : (sup === 0 ? L : L / 2)) : 0, Wm = state.W;
-    const x0 = 60, x1 = 420, by = 104, X = x => x0 + (x1 - x0) * x / L, N = 80;
+    const x0 = 60, x1 = 420, by = 96, X = x => x0 + (x1 - x0) * x / L, N = 80;
     const ys = [], ms = [];
     for (let i = 0; i <= N; i++) { const x = L * i / N; ys.push(Wm.mech_beam_at(sup, L, a, P, wl, 1, x, 0)); ms.push(Wm.mech_beam_at(sup, L, a, P, wl, 1, x, 2)); }
     if (!ys.every(deFin) || !ms.every(deFin)) return '';
@@ -893,7 +895,7 @@ Object.assign(DIAGRAMS, {
     lab += DK.dimH(x0, x1, by + 64, 'L ' + DK.n(L, u.dp) + ' ' + u.L, { below: true });
     if (P && Math.abs(X(a) - x0) > 36 && Math.abs(X(a) - x1) > 1) lab += DK.dimH(x0, X(a), by - 66, 'a ' + DK.n(a, u.dp), { from: by - 54 });
     // Bending moment diagram.
-    const my = 262, mh = 34, mp = ms.map((m, i) => [X(L * i / N), my - mh * m / mmax]);
+    const my = 238, mh = 30, mp = ms.map((m, i) => [X(L * i / N), my - mh * m / mmax]);
     h += dePoly([[x0, my]].concat(mp, [[x1, my]]), 'tool') + DK.line(x0 - 6, my, x1 + 6, my, 'thin');
     const Mx = deV(rows, 'Largest bending moment'), xmRow = rows.filter(r => /^at x from the left end$/.test(r.label))[0];
     let jm = 0; ms.forEach((m, i) => { if (Math.abs(m) > Math.abs(ms[jm])) jm = i; });
@@ -903,7 +905,7 @@ Object.assign(DIAGRAMS, {
     const st = deV(rows, 'Largest bending stress');
     lab += deLines(434, 30, ['shape', 'exaggerated', deFin(st) ? '' : '', ''], {});
     if (deFin(st)) lab += DK.text(W - 6, 300, 'bending stress ' + DK.n(st, u.sdp) + ' ' + u.S, { cls: 'hott', anchor: 'end' });
-    lab += DK.text(x0 - 10, 300, 'Moment diagram (sagging up)', { cls: 'mut', anchor: 'start' });
+    lab += DK.text(x0 - 10, my - mh - 16, 'Bending moment (sagging up)', { cls: 'mut', anchor: 'start' });
     return DK.svg(W, H, h + lab, 'Beam with loads, deflected shape and moment diagram');
   },
 
@@ -983,7 +985,7 @@ Object.assign(DIAGRAMS, {
       lab += dePoly(cur(l => Wm.mech_johnson_stress(E, Sy, l), 0, lT).concat(cur(l => Wm.mech_euler_stress(E, l), lT, lmax)), 'ln', false);
       lab += DK.line(Xg(lT), gy0, Xg(lT), Yg(Sy / 2), 'hid') + DK.text(Xg(lT), gy0 + 14, 'λ₁ ' + DK.n(deFin(lt) ? lt : lT, 0), { cls: 'mut' });
       lab += DK.text(gx0 - 4, Yg(Sy) + 4, 'Sy', { cls: 'mut', anchor: 'end' }) + DK.line(gx0 - 2, Yg(Sy), gx0 + 4, Yg(Sy), 'thin');
-      lab += DK.text(Xg(lT * 0.35), Yg(Sy) - 8, 'Johnson', { cls: 'mut' }) + DK.text(Xg(Math.min(lT * 1.6, lmax * 0.85)), Yg(Wm.mech_euler_stress(E, Math.min(lT * 1.6, lmax * 0.85))) - 10, 'Euler', { cls: 'mut', anchor: 'start' });
+      lab += DK.text(Xg(lT * 0.4), Yg(Wm.mech_johnson_stress(E, Sy, lT * 0.4)) + 20, 'Johnson', { cls: 'mut' }) + DK.text(Xg(Math.min(lT * 1.6, lmax * 0.85)), Yg(Wm.mech_euler_stress(E, Math.min(lT * 1.6, lmax * 0.85))) + 20, 'Euler', { cls: 'mut', anchor: 'start' });
       const sc = deFin(scr) ? scr * u.sK : (lam < lT ? Wm.mech_johnson_stress(E, Sy, lam) : Wm.mech_euler_stress(E, lam));
       const px = Xg(Math.min(lam, lmax)), py = Yg(sc);
       lab += DK.line(px, gy0, px, py, 'hot ext') + DK.circle(px, py, 4.5, 'hotf');
@@ -1052,7 +1054,7 @@ Object.assign(DIAGRAMS, {
     const lbl = (m, a, t, dy) => DK.text(X(m) + 4, Y(a) + (dy || -6), t, { cls: 'mut', anchor: 'start' });
     h += lbl(sut * 0.62, se * 0.38, 'Goodman', -6);
     h += lbl(sut * 0.5, se * (1 - 0.25), 'Gerber', -6);
-    if (sy > 0) h += lbl(sy * 0.55, se * 0.45, 'Soderberg', 14) + lbl(sy * 0.2, sy * 0.8 + 0, 'yield', -8);
+    if (sy > 0) h += lbl(sy * 0.22, se * 0.62, 'Soderberg', 16) + lbl(sy * 0.2, sy * 0.8 + 0, 'yield', -8);
     // Working point.
     let lab = '';
     if (deFin(sa) && deFin(sm) && sa >= 0) {
@@ -1089,7 +1091,8 @@ Object.assign(DIAGRAMS, {
     const fc1 = deV(rows, 'Centrifugal force, one jaw'), grip = deV(rows, /^Grip at/), chg = deV(rows, 'Change from standstill');
     h += DK.circle(cx, cy, R, 'part') + DK.circle(cx, cy, R - 6, 'thin');
     // The work: a bar (outside grip) or a ring (bore grip).
-    if (bore) h += '<path class="hatch" fill-rule="evenodd" d="M' + (cx + R + 0) + ' ' + cy + 'A' + R + ' ' + R + ' 0 1 0 ' + (cx - R) + ' ' + cy + 'A' + R + ' ' + R + ' 0 1 0 ' + (cx + R) + ' ' + cy + 'ZM' + (cx + rp) + ' ' + cy + 'A' + rp + ' ' + rp + ' 0 1 0 ' + (cx - rp) + ' ' + cy + 'A' + rp + ' ' + rp + ' 0 1 0 ' + (cx + rp) + ' ' + cy + 'Z"/>';
+    const ro = rp + 30;
+    if (bore) h += '<path class="hatch" fill-rule="evenodd" d="M' + (cx + ro) + ' ' + cy + 'A' + ro + ' ' + ro + ' 0 1 0 ' + (cx - ro) + ' ' + cy + 'A' + ro + ' ' + ro + ' 0 1 0 ' + (cx + ro) + ' ' + cy + 'ZM' + (cx + rp) + ' ' + cy + 'A' + rp + ' ' + rp + ' 0 1 0 ' + (cx - rp) + ' ' + cy + 'A' + rp + ' ' + rp + ' 0 1 0 ' + (cx + rp) + ' ' + cy + 'Z"/>';
     else h += DK.circle(cx, cy, rp, 'hatch');
     const jw = 24, jl = bore ? 40 : 52;
     for (let i = 0; i < z; i++) {
@@ -1099,14 +1102,15 @@ Object.assign(DIAGRAMS, {
       const rg = (r0 + r1) / 2;
       h += DK.circle(cx + c * rg, cy + s * rg, 2.5, 'hotf') + deArrow(cx + c * (r1 + 4), cy + s * (r1 + 4), cx + c * (r1 + 34), cy + s * (r1 + 34), 'hot');
       // Grip on the work.
-      const gr = bore ? r0 : r0;
-      h += deArrow(cx + c * (gr + (bore ? -2 : 2) + (bore ? 0 : 0)), cy + s * gr, cx + c * (gr + (bore ? -16 : -16) * (bore ? -1 : 1)), cy + s * (gr + (bore ? 16 : -16)), 'dim');
+      // Grip on the work, at the contact face, pointing into the work.
+      const gc = bore ? r1 : r0, gd = bore ? 1 : -1;
+      h += deArrow(cx + c * (gc - gd * 12) + nx * 6, cy + s * (gc - gd * 12) + ny * 6, cx + c * (gc + gd * 4) + nx * 6, cy + s * (gc + gd * 4) + ny * 6, 'dim');
     }
     h += deCross(cx, cy, R + 14);
     const a0 = Math.PI / 2, rg0 = bore ? rp - jl / 2 : rp + jl / 2;
     lab += DK.dim(cx, cy, cx + Math.cos(a0 - 0.0) * 0, cy - rg0, '', {});
     lab += DK.text(cx + 8, cy - rg0 / 2, 'r ' + DK.n(v.rj, u.dp), { cls: 'dimt', anchor: 'start' });
-    lab += DK.text(cx, cy - (bore ? rp : rp + jl) - 42, 'Fc ' + (deFin(fc1) ? DK.n(fc1, 0) + ' ' + u.F : '') + ' each', { cls: 'hott' });
+    lab += DK.text(cx, 14, 'Fc ' + (deFin(fc1) ? DK.n(fc1, 0) + ' ' + u.F : '') + ' each', { cls: 'hott' });
     lab += deRot(cx, cy, R + 24, 300, 340, 'ln') + DK.text(cx + R * 0.93, cy + R * 0.7 + 20, DK.n(v.n, 0) + ' rpm', { cls: 'txt', anchor: 'start' });
     const L = [];
     if (deFin(grip)) L.push(['Grip at speed', DK.n(grip, 0) + ' ' + u.F, 'hott']);
