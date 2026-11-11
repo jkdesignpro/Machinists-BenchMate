@@ -1198,7 +1198,6 @@ const TOOLS = [
     }
     return rows;
   },
-  diagram: (v, s) => typeof gearToothSvg === 'function' ? gearToothSvg(gearMod(v.mp, s), v.z1, v.pa, isFinite(v.x1) ? v.x1 : 0, v.ha, v.hf, 'Gear 1 teeth, drawn from the true involute') : '',
   working: 'm = 1 / P in inch mode. d = z m; db = d cos α; p = π m; pb = p cos α; ha = (ha* + x) m; hf = (hf* − x) m; da = d + 2 ha; df = d − 2 hf; s = m (π/2 + 2 x tan α); thickness at diameter dy: sy = dy (s/d + inv α − inv αy), cos αy = db/dy. Undercut: z_min = 2 ha*/sin²α, x_min = ha* − z sin²α / 2. Pair: inv αw = 2 tan α (x1 + x2)/(z1 + z2) + inv α; y = (z1 + z2)/2 · (cos α / cos αw − 1); a = ((z1 + z2)/2 + y) m; dw = db / cos αw; tips for standard clearance: ha1 = (ha* + y − x2) m, ha2 = (ha* + y − x1) m. Contact ratio εα = [√(ra1² − rb1²) + √(ra2² − rb2²) − a sin αw] / pb. inv α = tan α − α (radians). The drawing below the root circle uses a radial flank instead of the real fillet, which depends on the cutter.',
   source: 'Basic rack: ISO 53:1998 and AGMA full-depth system (cited by name: addendum 1 m, dedendum 1.25 m). Formulas and the worked example in the tests (m 3, z 12 and 24, x 0.6 and 0.36: a = 56.4999, αw = 26.0886°) from the KHK Gear Technical Reference, calculation of gear dimensions; SDP/SI Elements of Metric Gear Technology; MESYS AG online helical gear calculation. See docs/gears.md.',
 },
