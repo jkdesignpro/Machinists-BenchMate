@@ -485,6 +485,33 @@ function advTurnRun(v, W, s) {
   return r;
 }
 
+// RedLine Tools, "Taps tech", general purpose taps: surface speed in ft/min by material, as printed. One publisher: no second open table was found.
+const ADV_TAP = { low: ['Low carbon steel', 20, 40], med: ['Medium carbon steel', 20, 30], tool: ['High strength tool steel (A2, D2, O1, H13 and others)', 15, 25], aust: ['Stainless steel, austenitic', 10, 20],
+  mart: ['Stainless steel, martensitic', 10, 20], grey: ['Gray cast iron', 15, 30], brass: ['Brass and bronze', 60, 100], al: ['Aluminium alloys', 70, 90], alsi: ['Aluminium, high silicon (A380, A390)', 60, 80],
+  ti: ['Titanium', 5, 15], ni: ['Nickel base alloys', 10, 25], plastic: ['Composites and plastics', 50, 70] };
+// Which printed row each BenchMate material reads. Heat treated alloy steel and W1 are not in the table. Cast aluminium reads the lower, high silicon row (own choice).
+const ADV_TAP_OF = { 3: 'low', 2: 'low', 1: 'low', 20: 'low', 21: 'med', 4: 'med', 5: 'med', 7: 'tool', 8: 'tool', 9: 'aust', 10: 'aust', 11: 'mart', 12: 'grey', 13: 'brass', 14: 'brass', 15: 'al', 16: 'alsi', 17: 'ti', 18: 'ni', 19: 'plastic' };
+// Material to pre-select in the tap torque tool (Guhring groups by tensile strength); 0 = the user picks.
+const ADV_TAP_KC = { 3: 1, 2: 2, 1: 2, 20: 2, 21: 3, 4: 3, 5: 4, 9: 7, 10: 7, 15: 8, 16: 9, 13: 11, 14: 10, 12: 12 };
+
+function advTapRun(v, W, s) {
+  const inch = s === 'inch', k = inch ? IN_MM : 1, m = advMat(v.mat), p = inch ? W.pitch_tpi(v.tpi) : v.p;
+  if (!m || !(v.d > 0) || !(p > 0)) return null;
+  const dmm = v.d * k, e = ADV_TAP[ADV_TAP_OF[m.id]] || null, tS = (isFinite(v.sp) ? v.sp : 50) / 100;
+  let vTab = e ? W.range_pick(e[1], e[2], tS) * FT_M : NaN;
+  if (v.vown > 0) vTab = inch ? v.vown * FT_M : v.vown;
+  if (!(vTab > 0)) return { m, e, none: true, k, inch, dmm, p };
+  const mach = advMachine(v, v.spn === 1), T = i => W.advise_tap(vTab, dmm, p, mach.n, mach.vf, i);
+  return { m, e, k, inch, mach, vTab, dmm, p, rpm: T(0), vcA: T(1), vf: T(2), rpmTab: T(3), limit: T(4), useP: NaN, pAv: NaN, hasForce: false };
+}
+function advTapCard(r, s) {
+  const inch = s === 'inch';
+  if (r.limit === 8) return advCard('Top feed rate', 'At the table speed the feed (pitch x speed) would be more than ' + r.mach.vf + ' mm/min, the top feed ' + advOf(r.mach.vfSrc) + ', so the spindle was slowed from ' + fmt(r.rpmTab, 0) + ' to ' + fmt(r.rpm, 0) + ' RPM.',
+    'Nothing more to do: a tap must feed one pitch per revolution, so only the speed can give way, and a tap cuts well below its table speed.');
+  if (r.limit === 7) return advCard('Top spindle speed', 'The table speed needs ' + fmt(r.rpmTab, 0) + ' RPM. The top speed is ' + fmt(r.mach.n, 0) + ' RPM, so the tap runs at ' + fmt(inch ? r.vcA / FT_M : r.vcA, 0) + ' ' + spdU(s) + '.', 'Nothing more to do: a tap cuts well below its table speed.');
+  return advCard('Nothing', r.mach.name ? 'The table speed and its feed fit ' + r.mach.name + '. Torque is not checked here: use the tap torque tool.' : 'No machine is picked, so top speed and top feed are not checked: pick one in the title bar.', '');
+}
+
 TOOLS.push(
 {
   id: 'advdrill', level: 'advanced', group: 'Drilling and tapping', title: 'Drilling advisor',
@@ -614,6 +641,62 @@ TOOLS.push(
   },
   working: 'Speed: the reaming column of the speed table, or the class table of a reamer maker, or a rule against the drilling speed for the same material (half, or two thirds). Feed: the reamer maker\'s class table where it prints one, otherwise 2 (to 3) times the feed per revolution a drill of that diameter would take. n = 1000 Vc / (pi D), held to the machine\'s top speed; feed rate = fn x n, held to its top feed. Stock to leave: the reamer maker\'s table by diameter, and about 3 % of the hole diameter; hole to drill first = reamer diameter - stock on the diameter. No force or power is worked out: a reamer removes very little.',
   source: 'LittleMachineShop, "Cutting Speeds" (reaming column); ICS Cutting Tools, "Reaming recommendations" (stock removal, feeds, speeds); Gammons Hoaglund, "Reaming guide" (about 3 % stock, two thirds of drilling speed, 200 to 300 % of drilling feed); University of Florida MAE design lab, "Speeds and Feeds" (reamers at half the drill speed and twice its feed; drill feeds by diameter). See docs/sources.md, "Advisor".',
+},
+{
+  id: 'advtap', level: 'advanced', group: 'Drilling and tapping', title: 'Tapping advisor',
+  pick: { map: { d: 'dia' }, types: ['Tap'] },
+  desc: 'Spindle speed and feed rate for a cutting tap from a published speed table for the material, held to your machine\'s top speed and top feed. The feed is always one pitch per revolution, so a limit slows the spindle, never the feed per revolution.',
+  fields: s => [
+    { id: 'mat', label: 'Work material', unit: '', def: 3, options: ADV_MAT_OPTIONS, wide: true },
+    { id: 'd', label: 'Thread nominal diameter', unit: lenU(s), def: s === 'inch' ? 0.375 : 10 },
+    s === 'inch' ? { id: 'tpi', label: 'Threads per inch', unit: 'tpi', def: 16 } : { id: 'p', label: 'Pitch', unit: 'mm', def: 1.5 },
+    { id: 'depth', label: 'Thread depth (optional)', unit: lenU(s), def: s === 'inch' ? 0.6 : 15 },
+    { id: 'sp', label: 'Speed in the printed range (hard stock, deep or blind holes: low)', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Low', 'Middle', 'High'] } },
+    { level: 'advanced', id: 'vown', label: 'Your own cutting speed (wins over the table)', unit: spdU(s), def: '' },
+    { level: 'advanced', id: 'spn', label: 'Spindle', unit: '', def: 0, options: [[0, 'Main spindle'], [1, 'Driven (live) tool']] },
+    { level: 'advanced', id: 'nmax', label: 'Top tapping speed (blank = top speed of the active machine)', unit: 'RPM', def: '' },
+    { level: 'advanced', id: 'vfmax', label: 'Top feed rate (blank = active machine)', unit: 'mm/min', def: '' },
+  ],
+  calc: (v, W, s) => {
+    const r = advTapRun(v, W, s);
+    if (!r) return [];
+    if (r.none) return [R('Tapping speed', 'The table lists no tapping speed for this material: type your own cutting speed (Advanced)', '', 0)];
+    const inch = r.inch, k = r.k, rows = [
+      R('Spindle speed', r.rpm, 'RPM', 0),
+      R('Feed rate (pitch x spindle speed)', r.vf / k, feedMinU(s), inch ? 4 : 2),
+      R('Feed per revolution (the pitch)', r.p / k, feedRevU(s), inch ? 5 : 3),
+      R('Cutting speed at the thread diameter', inch ? r.vcA / FT_M : r.vcA, spdU(s), 1),
+    ];
+    if (v.depth > 0) rows.push(R('Time in and out (the stop and reversal at the bottom not counted)', W.tap_time_min(v.depth * k, r.p, r.rpm) * 60, 's', 1));
+    rows.push(R('From the table: cutting speed (' + (v.vown > 0 ? 'your own figure' : 'RedLine Tools, general purpose taps') + ')', inch ? r.vTab / FT_M : r.vTab, spdU(s), 1));
+    rows.push(R('From the table: spindle speed', r.rpmTab, 'RPM', 0));
+    rows.push(R('Whole RPM', 'The speed is rounded down to a whole RPM and the feed worked from that, so S and F in the program multiply out to exactly one pitch per revolution.', '', 0));
+    rows.push(cfNote('One publisher only: no second open table of tapping speeds was found to check RedLine Tools against. The row is for general purpose cutting taps; a tap maker\'s own chart for a coated, spiral point or forming tap will differ: use it if you have it.'));
+    rows.push(R('Note', ADV_START_NOTE, '', 0));
+    return rows;
+  },
+  panel: (v, W, s) => {
+    const r = advTapRun(v, W, s);
+    if (!r || r.none) return '';
+    const feed = advTile('Feed rate', fmt(r.vf / r.k, r.inch ? 4 : 1) + ' ' + feedMinU(s), r.limit === 8 ? 'held to the top feed ' + advOf(r.mach.vfSrc) : r.mach.vf > 0 ? 'inside the top feed ' + advOf(r.mach.vfSrc) : 'no machine picked', r.limit === 8 ? 'caution' : 'good');
+    return '<div class="tiles">' + advHoleTiles(r, s) + feed + '</div>' + advTapCard(r, s);
+  },
+  table: (v, W, s) => {
+    const r = advTapRun(v, W, s);
+    if (!r) return null;
+    const inch = s === 'inch', sp = x => fmt(inch ? x : x * FT_M, inch ? 0 : 1);
+    return { title: 'What RedLine Tools prints for general purpose taps', head: ['Row as printed', 'Speed', ''],
+      rows: Object.keys(ADV_TAP).map(key => { const e = ADV_TAP[key]; return [e[0], advRange(e[1], e[2], sp) + ' ' + spdU(s), e === r.e ? (v.vown > 0 ? 'this material' : 'used') : '']; }), text: true };
+  },
+  sends: (v, W, s) => {
+    const r = advTapRun(v, W, s);
+    if (!r || r.none) return [];
+    const k = r.k, thr = r.inch ? { tpi: v.tpi } : { p: v.p };
+    return [['Tapping cycle (G-code)', 'cycdrill', { label: 'the tapping advisor', cycle: 84, rpm: Math.round(r.rpm), feed: +(r.vf / k).toPrecision(6), pitch: r.inch ? v.tpi : v.p, z: v.depth > 0 ? -v.depth : '' }],
+      ['Tap torque and power', 'taptorque', Object.assign({ kind: 1, d: v.d, mat: ADV_TAP_KC[r.m.id] || 0, kc: '', rpm: Math.round(r.rpm) }, thr)]];
+  },
+  working: 'Cutting speed Vc from the printed range for the material; the slider picks a place inside the range. Table spindle speed n = 1000 Vc / (pi d) with d the nominal thread diameter. A tap must advance one pitch per revolution, so feed rate Vf = P x n and the feed per revolution is never changed: n = the smallest of the table speed, the top spindle speed and (top feed rate / P), rounded down to a whole RPM. Time in and out = 2 x depth / Vf; the stop and reversal at the bottom are not counted. Inch threads: P = 25.4 / TPI.',
+  source: 'RedLine Tools, "Taps tech": speed table for general purpose taps (surface feet per minute by material). One publisher; see docs/sources.md, "Advisor". Feed rate = pitch x spindle speed: Haas Automation, G84 tapping guide (see Drilling cycles). n = 1000 Vc / (pi d): the cutting speed formula used throughout.',
 },
 {
   id: 'advturn', level: 'advanced', group: 'Speeds and feeds', title: 'Turning advisor',

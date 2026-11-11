@@ -425,6 +425,21 @@ aT = await advTxt();
 if (!/Spindle speed 159 RPM/i.test(aT) || !/Cutting speed \(yours, locked\) 40 m\/min/.test(aT)) problems.push(`[${where}] typed speed: "${aT.slice(0, 500)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Tapping advisor: M10 x 1.5 in low carbon steel, 20 to 40 ft/min, middle 30 ft/min = 9.144 m/min: n = 9144 / (pi x 10) = 291.06, run at 291 rpm;
+// feed 291 x 1.5 = 436.5 mm/min; 15 mm deep in and out 30 / 436.5 min = 4.1 s. A 250 rpm limit: feed 375 mm/min, card Top spindle speed.
+// A top feed of 300 mm/min: 200 rpm, feed 300 mm/min, and the feed per revolution is still the pitch.
+where = 'advtap';
+await open('advtap');
+aT = await advTxt();
+if (!/Spindle speed 291 RPM/i.test(aT) || !/Feed rate \(pitch x spindle speed\) 436\.50 mm\/min/.test(aT) || !/Time in and out [^0-9]*4\.1 s/.test(aT) || !/Nothing/.test(aT)) problems.push(`[${where}] defaults: "${aT.slice(0, 500)}"`);
+await advSet('nmax', '250');
+aT = await advTxt();
+if (!/Spindle speed 250 RPM/i.test(aT) || !/Feed rate \(pitch x spindle speed\) 375\.00 mm\/min/.test(aT) || !/Top spindle speed/i.test(aT) || !/needs 291 RPM/.test(aT)) problems.push(`[${where}] speed limit: "${aT.slice(0, 500)}"`);
+await advSet('vfmax', '300');
+aT = await advTxt();
+if (!/Spindle speed 200 RPM/i.test(aT) || !/Feed rate \(pitch x spindle speed\) 300\.00 mm\/min/.test(aT) || !/Top feed rate/i.test(aT) || !/Feed per revolution \(the pitch\) 1\.500 mm\/rev/.test(aT)) problems.push(`[${where}] feed limit: "${aT.slice(0, 600)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

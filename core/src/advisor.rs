@@ -6,7 +6,7 @@
 //! order, and reports which limit it was. A value the user locked is never
 //! changed. Sources: docs/sources.md, "Advisor".
 
-use crate::{boring_bar_deflection, second_moment_tube, turning_force, LIMIT_DEFLECTION,
+use crate::{boring_bar_deflection, second_moment_tube, turning_force, tap_feed, LIMIT_DEFLECTION,
             chip_thickness_max, chip_thickness_mean, cut_check, drill_chip_thickness, drill_power_kw, drill_thrust_n, drill_torque_nm,
             kienzle_kc, lead_chip_thickness, mrr_turning_cm3_min, power_kw, rctf, rpm_from_vc, spindle_power_available_kw,
             torque_for_power_nm, vc_from_rpm, CutInput, LIMIT_POWER, LIMIT_TORQUE};
@@ -407,6 +407,30 @@ pub fn advise_drill(vc: f64, d: f64, fnr: f64, point_deg: f64, kc11: f64, mc: f6
     [rpm, vca, f, rpm * f, table, limit, e.0, drill_torque_nm(d, f, e.0), drill_thrust_n(e.0, d, f, point_deg), e.1, e.2, e.3]
 }
 
+// ---------------- Tapping ----------------
+/// Tapping speed and feed. A tap must feed one pitch per revolution, so the feed rate is
+/// `pitch x rpm` and a machine limit can only be met by slowing the spindle:
+/// rpm = min(table speed, top spindle speed, top feed rate / pitch), rounded down to a whole
+/// revolution per minute (above 1 rpm) so that the S and F words of the program multiply out exactly.
+/// Returns [rpm, cutting speed actually reached (m/min), feed rate (mm/min), rpm the table asks for, limit]
+/// with limit 0, ADV_RPM or ADV_FEED. `n_max` / `vf_max` of 0 mean "not checked".
+pub fn advise_tap(vc: f64, d: f64, pitch: f64, n_max: f64, vf_max: f64) -> [f64; 5] {
+    if !(pos(vc) && pos(d) && pos(pitch)) { return [f64::NAN; 5]; }
+    let table = rpm_from_vc(vc, d);
+    let (mut rpm, mut limit) = (table, 0u8);
+    if pos(n_max) && rpm > n_max { rpm = n_max; limit = ADV_RPM; }
+    if pos(vf_max) && tap_feed(pitch, rpm) > vf_max { rpm = vf_max / pitch; limit = ADV_FEED; }
+    if rpm >= 1.0 { rpm = (rpm + 1e-9).floor(); }
+    [rpm, vc_from_rpm(rpm, d), tap_feed(pitch, rpm), table, limit as f64]
+}
+
+/// Time (min) to tap to `depth` (mm) and back out at the same speed: 2 depth / (pitch x rpm).
+/// The stop and reversal of the spindle at the bottom is not included.
+pub fn tap_time_min(depth: f64, pitch: f64, rpm: f64) -> f64 {
+    if !(pos(depth) && pos(pitch) && pos(rpm)) { return f64::NAN; }
+    2.0 * depth / tap_feed(pitch, rpm)
+}
+
 // ---------------- Boring bar ----------------
 pub const ADV_OVERHANG: u8 = 9; // overhang past the bar maker's guidance in bar diameters
 
@@ -750,6 +774,26 @@ mod tests {
         let t = advise_bore(60.0, 20.0, 6.0, 210.0, 0.0, 0.0, 0.0, 0.0, 200.0, 0.0, 0.0);
         assert!(t[6].is_nan() && t[7].is_nan() && t[2].is_nan() && t[5] == 0.0 && close(t[1] / a[1], 160000.0 / (160000.0 - 1296.0), 1e-9));
         assert!(advise_bore(60.0, 20.0, 20.0, 210.0, 2000.0, 0.1, 1.0, 0.0, 0.0, 0.05, 4.0)[0].is_nan());
+    }
+
+    #[test]
+    fn tapping_advice() {
+        // M10 x 1.5 at 30 ft/min = 9.144 m/min: n = 9144 / (pi x 10) = 291.06, run at 291 rpm; feed 291 x 1.5 = 436.5 mm/min;
+        // speed reached pi x 10 x 291 / 1000 = 9.1421 m/min
+        let a = advise_tap(9.144, 10.0, 1.5, 0.0, 0.0);
+        assert!(a[0] == 291.0 && close(a[2], 436.5, 1e-9) && a[4] == 0.0 && close(a[1], 9.1421, 0.0001) && close(a[3], 291.06, 0.01));
+        // M3 x 0.5 in aluminium at 80 ft/min = 24.384 m/min wants 2587 rpm; a 2000 rpm tapping limit holds it, feed stays one pitch per rev
+        let b = advise_tap(24.384, 3.0, 0.5, 2000.0, 0.0);
+        assert!(close(b[3], 2587.2, 0.1) && b[0] == 2000.0 && close(b[2], 1000.0, 1e-9) && b[4] == ADV_RPM as f64 && close(b[1], 18.85, 0.01));
+        // a top feed of 600 mm/min: the spindle slows to 1200 rpm so the feed is still pitch x rpm
+        let c = advise_tap(24.384, 3.0, 0.5, 2000.0, 600.0);
+        assert!(close(c[0], 1200.0, 1e-9) && close(c[2], 600.0, 1e-9) && c[4] == ADV_FEED as f64 && close(c[2] / c[0], 0.5, 1e-12));
+        // a top feed of 1000 mm/min on a 0.7 mm pitch: 1428.57 rounds down to 1428 rpm, feed 999.6 mm/min
+        let e = advise_tap(40.0, 4.0, 0.7, 0.0, 1000.0);
+        assert!(e[0] == 1428.0 && close(e[2], 999.6, 1e-9) && e[4] == ADV_FEED as f64);
+        // 15 mm deep at 291 rpm x 1.5: in and out 2 x 15 / 436.5 = 0.06873 min = 4.124 s
+        assert!(close(tap_time_min(15.0, 1.5, a[0]), 30.0 / a[2], 1e-12) && close(tap_time_min(15.0, 1.5, a[0]) * 60.0, 4.124, 0.001));
+        assert!(advise_tap(0.0, 10.0, 1.5, 0.0, 0.0)[0].is_nan());
     }
 
     #[test]

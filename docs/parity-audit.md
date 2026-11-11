@@ -30,12 +30,12 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 85 | 17 | 9 (0) | 2 | 0 | 77 % |
+| CNC Machinist Calculator Ultra | 113 | 85 | 18 | 8 (0) | 2 | 0 | 77 % |
 | Machinery's Handbook 31 | 306 | 47 | 95 | 130 (12) | 6 | 28 | 17 % |
 | Engineers' Data Book | 94 | 10 | 27 | 19 (1) | 12 | 26 | 18 % |
 | Engineers Black Book | 80 | 23 | 26 | 30 (9) | 1 | 0 | 29 % |
 | CNC Machining handbook | 83 | 13 | 17 | 49 (0) | 0 | 4 | 16 % |
-| **All** | **676** | **177** | **183** | **237 (22)** | **21** | **58** | **30 %** |
+| **All** | **676** | **177** | **184** | **236 (22)** | **21** | **58** | **30 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -62,7 +62,7 @@ features are names only.
 
 **Update (branch `claude/overhaul`, 2026-11-11):** section 1 was re-judged row by row against the 0.2.0 code: Ultra is now 82 done, 16 partial, 13 missing (0 in progress), 2 out of scope, 74 % done of in-scope rows (was 68, 14, 29, 61 %), and the **All** line is re-added with the book lines unchanged. Status changes: U32, U65, U67, U69, U75, U76, U77, U78, U81, U83, U87, U98, U103, U107 missing or partial -> done; U84, U85, U105, U108 missing -> partial. Tool ids and "What's missing" were rewritten for every U row. Cutting-data engines (U1, U2, U28) are still missing. Later on the same branch: U66 partial -> done (milling surface finish and RMS added), so Ultra is 83 done, 15 partial, 13 missing, 75 %.
 
-**Update (branch `claude/advisor`, 2026-11-11):** the speeds and feeds advisors of 0.3.0 are built (`advmill`, `advturn`, `advdrill`, `advream`) on top of the cutting-force tools. U33 missing -> done; U18 partial -> done; U1, U2, U28 missing -> partial; U13 stays partial with less missing. Ultra is now 85 done, 17 partial, 9 missing, 77 %; the All line is updated for these rows only.
+**Update (branch `claude/advisor`, 2026-11-11):** the speeds and feeds advisors of 0.3.0 are built (`advmill`, `advturn`, `advdrill`, `advream`) on top of the cutting-force tools. U33 missing -> done; U18 partial -> done; U1, U2, U28 missing -> partial; U13 stays partial with less missing. Ultra is now 85 done, 17 partial, 9 missing, 77 %; the All line is updated for these rows only. Later the same day the tapping advisor (`advtap`) was added: U35 missing -> partial; Ultra 85 done, 18 partial, 8 missing.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -165,7 +165,7 @@ Store list is the fuller of the two store lists.
 | U32 | Center drill dimensions / center drill hole depth | done | `spotdepth` |  |
 | U33 | Reaming speeds, feeds and allowance | done | `advream` |  |
 | U34 | Gun drill calculators | missing |  |  |
-| U35 | Tapping speed calculators | missing |  | No tapping speed calculator (`tapdrill` and `cycdrill` give hole size and F = pitch x rpm only) |
+| U35 | Tapping speed calculators | partial | `advtap` | Tapping advisor: speed from one publisher's table for general purpose cutting taps, held to the machine's top speed and feed, feed = pitch x rpm, time, tapping cycle. No speeds for forming taps or by tap coating; no second publisher found (`claude/advisor`) |
 | U36 | G84 tap cycle generator | done | `cycdrill` |  |
 | U37 | G81/G82/G83/G73 drill cycle generator | done | `cycdrill` |  |
 

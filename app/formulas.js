@@ -245,6 +245,8 @@ const FORMULAS = [
   F('advmill', 'Stability chart: tool as a bar', 'f1 = (1.8751² / 2π) · √(E I / (ρ A L⁴));  k = 3 E I / L³', 'one vibration mode; holder and spindle left out', ['THOM', 'GERE', 'OWN']),
   F('advdrill', 'Drilling advisor: time to depth and removal rate', 't = (depth + point length) / (fn · n);  Q = π/4 · D² · Vf', 'point length = (D / 2) / tan(point / 2)', ['SAN', 'OWN']),
   F('advream', 'Reaming: hole to drill first', 'drill = reamer diameter − stock on the diameter', 'stock from the reamer maker\'s table, or about 3 % of the hole', ['ADVT']),
+  F('advtap', 'Tapping speed and feed', 'n = 1000 · Vc / (π · d), rounded down to a whole rpm;  Vf = P · n', 'Vc from the printed range for the material; d: nominal thread diameter; P: pitch. A machine limit slows n, never the feed per revolution', ['ADVT', 'HAAS']),
+  F('advtap', 'Tapping time', 't = 2 · depth / (P · n)', 'in and out at the same speed; the stop and reversal are not counted', ['OWN']),
   F('advream', 'Reaming speed and feed against drilling', 'Vc = 1/2 (or 2/3) · drilling Vc;  fn = 2 (to 3) · drilling fn', 'publishers differ: each is shown', ['UFSF', 'ADVT']),
   F('boringbar', 'Boring bar: deepest cut inside an allowed deflection', 'ap = δ_allowed · 3 E I / (L³ · kc · fn)', 'from δ = F L³ / (3 E I) with F = kc · ap · fn', ['GERE', 'SAN', 'OWN']),
   F('boringbar', 'Boring bar: overhang that fits a cut', 'L = ∛(3 E I · δ_allowed / F)', 'deflection goes with the cube of the overhang', ['GERE', 'OWN']),

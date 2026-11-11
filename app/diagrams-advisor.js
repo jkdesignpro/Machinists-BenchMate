@@ -51,6 +51,22 @@ Object.assign(DIAGRAMS, {
     if (!r) return '';
     return daHole(v, sys, r, true);
   },
+  // Tapping advisor: the tap in its hole with the thread depth, the spindle speed and the feed that goes with it.
+  advtap(v, sys, rows) {
+    const r = advTapRun(v, state.W, sys);
+    if (!r || r.none) return '';
+    const W = 520, H = 280, u = dcU(sys), k = r.k, cx = 180, xl = cx - 140, xr = cx + 140, hw = 28, top = 110, bot = 206;
+    let s = DK.rect(xl, top, cx - hw - xl, 262 - top, 'hatch') + DK.rect(cx + hw, top, xr - cx - hw, 262 - top, 'hatch');
+    s += DK.rect(cx - 15, 28, 30, 44, 'tool') + DK.poly([[cx - hw, 72], [cx + hw, 72], [cx + hw, bot - 10], [cx + hw - 8, bot], [cx - hw + 8, bot], [cx - hw, bot - 10]], 'tool');
+    for (let y = 78; y < bot - 14; y += 9) s += DK.line(cx - hw, y + 5, cx + hw, y, 'thin');
+    s += DK.cl(cx, 8, cx, 270) + DK.dimH(cx - hw, cx + hw, 18, 'Ø ' + dcL(v.d, u, 'd'), { from: 28 });
+    if (dcOk(v.depth)) s += dcDimV(top, bot, xr + 18, 'depth ' + dcL(v.depth, u, ''), { from: cx + hw + 2 });
+    s += dcSpin(cx, 52, 56, 14, 205, 335, 'hot') + DK.text(cx + 70, 56, dcN(r.rpm, 0) + ' RPM', { cls: 'hott', anchor: 'start' });
+    s += DK.arrow(cx - 78, 44, cx - 78, 96, 'hot') + DK.text(cx - 86, 66, 'feed ' + dcN(r.vf / k), { cls: 'hott', anchor: 'end' }) + DK.text(cx - 86, 82, dcFU(sys), { cls: 'hott', anchor: 'end' });
+    const lim = ADV_LIMITS[r.limit];
+    s += dcLines(xr + 42, 214, [sys === 'inch' ? dcL(v.tpi, 'tpi', '', 0) : 'pitch ' + dcL(v.p, 'mm', ''), 'feed = pitch x speed', lim ? 'limit: ' + lim.toLowerCase() : ''], { cls: 'txt' });
+    return DK.svg(W, H, s, 'Tap in its hole with the thread depth, the spindle speed and the feed rate of one pitch per revolution');
+  },
   // Turning advisor: the bar in the chuck with the depth of cut, the feed and the diameter being cut.
   advturn(v, sys, rows) {
     const W = 520, H = 270, u = dcU(sys), r = advTurnRun(v, state.W, sys);

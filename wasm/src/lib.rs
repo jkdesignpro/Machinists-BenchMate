@@ -760,6 +760,9 @@ f1!(advise_turn, c::advise_turn_f, d, vc, f, ap, kappa, kc11, mc, lock, n_max, p
 #[no_mangle] pub extern "C" fn drill_feed_range_in(d_in: f64, which: f64) -> f64 { pick(c::drill_feed_range_in(d_in), which) }
 /// Reaming (or any hole tool without a force model): which as in `advise_hole`.
 #[no_mangle] pub extern "C" fn advise_hole(vc: f64, d: f64, fnr: f64, n_max: f64, vf_max: f64, which: f64) -> f64 { pick(c::advise_hole(vc, d, fnr, n_max, vf_max), which) }
+/// Tapping advice: which 0 rpm, 1 cutting speed reached, 2 feed rate, 3 rpm the table asks for, 4 limit.
+#[no_mangle] pub extern "C" fn advise_tap(vc: f64, d: f64, pitch: f64, n_max: f64, vf_max: f64, which: f64) -> f64 { pick(c::advise_tap(vc, d, pitch, n_max, vf_max), which) }
+f1!(tap_time_min, c::tap_time_min, depth, pitch, rpm);
 /// Boring bar advice: which 0 force, 1 deflection, 2 share of the allowed deflection, 3 L/D, 4 share of the guidance, 5 limit, 6 depth used, 7 deepest depth, 8 reduced, 9 overhang at which the starting depth fits.
 #[no_mangle] pub extern "C" fn advise_bore(l: f64, d: f64, di: f64, e_gpa: f64, kc: f64, fnr: f64, ap: f64, ap_locked: f64, f_known: f64, defl_limit: f64, ld_guide: f64, which: f64) -> f64 { pick(c::advise_bore(l, d, di, e_gpa, kc, fnr, ap, ap_locked, f_known, defl_limit, ld_guide), which) }
 /// Drilling advice with the spindle check: which as in `advise_drill`.
