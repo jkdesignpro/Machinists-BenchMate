@@ -1521,14 +1521,25 @@ const TOOLS = [
     { level: 'advanced', id: 'cy', label: 'Center Y', unit: lenU(s), def: 0 },
   ],
   calc: (v, W, s) => {
-    if (!(v.dia > 0 && v.n >= 1 && v.n <= 360)) return [];
-    const rows = [];
-    for (let i = 0; i < v.n; i++) {
-      const x = W.bolt_x(v.n, v.dia, v.start || 0, v.cx || 0, v.cy || 0, i);
-      const y = W.bolt_y(v.n, v.dia, v.start || 0, v.cx || 0, v.cy || 0, i);
-      rows.push(R('Hole ' + (i + 1), 'X ' + x.toFixed(4) + '   Y ' + y.toFixed(4), '', 4));
-    }
+    if (!(v.dia > 0 && Number.isInteger(v.n) && v.n >= 1 && v.n <= 360)) return [];
+    const rows = [R('Angle between holes', 360 / v.n, 'deg', 3)];
+    if (v.n >= 2) rows.push(R('Centre to centre of neighbouring holes (chord)', W.arc_solve(1, v.dia / 2, 360 / v.n, 2), lenU(s), s === 'inch' ? 4 : 3));
+    rows.push(R('Bolt circle radius', v.dia / 2, lenU(s), s === 'inch' ? 4 : 3));
     return rows;
+  },
+  // Every hole: angle and X, Y, with copies for a spreadsheet and for a program.
+  table: (v, W, s, dpAdj) => {
+    const dp = Math.max(0, Math.min(8, (s === 'inch' ? 4 : 3) + (dpAdj || 0))), a0 = v.start || 0, cx = v.cx || 0, cy = v.cy || 0;
+    const z = x => (Math.abs(x) < 0.5 * Math.pow(10, -dp) ? 0 : x).toFixed(dp); // no "-0.0000"
+    const rows = [];
+    for (let i = 0; i < v.n; i++) rows.push([String(i + 1), (+(a0 + 360 * i / v.n).toFixed(4)).toString() + '°', z(W.bolt_x(v.n, v.dia, a0, cx, cy, i)), z(W.bolt_y(v.n, v.dia, a0, cx, cy, i))]);
+    return {
+      title: 'Hole positions (' + lenU(s) + ')', head: ['Hole', 'Angle', 'X', 'Y'], rows,
+      copies: [
+        ['Copy table', 'Hole\tAngle\tX\tY\n' + rows.map(r => r.join('\t')).join('\n')],
+        ['Copy as X Y lines', rows.map(r => 'X' + r[2] + ' Y' + r[3]).join('\n')],
+      ],
+    };
   },
   working: 'x = cx + (D/2) cos(a0 + 360 i / n), y = cy + (D/2) sin(a0 + 360 i / n). Angles measured counter-clockwise from +X.',
   source: "Machinery's Handbook (hole circles)",

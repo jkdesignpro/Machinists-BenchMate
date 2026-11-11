@@ -171,6 +171,13 @@ await page.waitForSelector('#tres table');
 const mtText = await page.textContent('#tres');
 if (!/included angle 2\.98/.test(mtText)) problems.push(`[${where}] Morse angle not labelled as included angle`);
 
+// Bolt circle: the hole table and its program-ready copy.
+where = 'bolt table';
+await units('inch');
+await open('bolt');
+const bt = await page.$$eval('#main .rtab tbody tr', rs => rs.map(r => [...r.cells].map(c => c.textContent)));
+if (bt.length !== 6 || bt[1].join(' ') !== '2 60° 1.0000 1.7321' || bt[3].join(' ') !== '4 180° -2.0000 0.0000') problems.push(`[${where}] 6 holes on 4 in: wrong table ${JSON.stringify(bt.slice(0, 4))}`);
+
 // Calculator (app/calc.js): typed expression with a mixed number, keypad,
 // fraction readout, history tape; then open it from a field and Use.
 where = 'calc typed';

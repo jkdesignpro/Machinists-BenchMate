@@ -364,6 +364,17 @@ function mountTool(host, t, opts) {
       res.innerHTML = '<div class="hero rrow' + (w0 ? ' over' : '') + (longTxt ? ' txt' : '') + '"><div class="hl">' + hero.label + '</div><div class="hv"><b>' + fmt(hero.value, dp(hero)) + '</b><span>' + hero.unit + '</span></div>' + (w0 ? '<div class="wmsg">' + icon('info') + w0 + '</div>' : '') + '</div>' +
         (rest.length ? '<table>' + rest.map(r => { const w = warn(r); return '<tr class="rrow' + (w ? ' over' : '') + '"><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v' + (typeof r.value === 'string' && r.value.length > 24 ? ' txt' : '') + (r.value === 'PASS' || r.value === 'OK' ? ' good' : r.value === 'FAIL' ? ' fail' : '') + '">' + fmt(r.value, dp(r)) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>' : '');
     }
+    // A tool may add a table under its results (t.table): { head, rows, dp, copies: [[label, text]] }.
+    if (!mini && t.table) {
+      let tb = null; try { tb = rows.length ? t.table(v, state.W, sys, dpAdj) : null; } catch (e) { tb = null; }
+      if (tb && tb.rows.length) {
+        const box = document.createElement('div'); box.className = 'rtab';
+        box.innerHTML = '<div class="rtabh"><span>' + hesc(tb.title || '') + '</span></div><div class="rtabs"><table><thead><tr>' + tb.head.map(h => '<th>' + hesc(h) + '</th>').join('') + '</tr></thead><tbody>' +
+          tb.rows.map(r => '<tr>' + r.map((c, i) => '<td' + (i ? ' class="v"' : '') + '>' + hesc(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+        (tb.copies || []).forEach(([label, text]) => { const b = document.createElement('button'); b.className = 'btn sm'; b.type = 'button'; b.innerHTML = icon('copy') + '<span>' + hesc(label) + '</span>'; b.onclick = () => copyText(text); $('.rtabh', box).appendChild(b); });
+        res.appendChild(box);
+      }
+    }
     if (!mini) { const d = t.diagram || (typeof DIAGRAMS !== 'undefined' && DIAGRAMS[t.id]); let h = ''; if (d) { try { h = d(v, sys, rows) || ''; } catch (e) { h = ''; } } dia.innerHTML = h; dia.hidden = !h; }
   }
   const pick = $('#tpick', host);
