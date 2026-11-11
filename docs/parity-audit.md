@@ -31,11 +31,11 @@ features are names only.
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
 | CNC Machinist Calculator Ultra | 113 | 67 | 15 | 29 (8) | 2 | 0 | 60 % |
-| Machinery's Handbook 31 | 306 | 44 | 80 | 148 (12) | 6 | 28 | 16 % |
+| Machinery's Handbook 31 | 306 | 45 | 89 | 138 (11) | 6 | 28 | 17 % |
 | Engineers' Data Book | 94 | 9 | 26 | 21 (0) | 12 | 26 | 16 % |
-| Engineers Black Book | 80 | 20 | 18 | 41 (9) | 1 | 0 | 25 % |
-| CNC Machining handbook | 83 | 13 | 16 | 50 (0) | 0 | 4 | 16 % |
-| **All** | **676** | **153** | **155** | **289 (29)** | **21** | **58** | **26 %** |
+| Engineers Black Book | 80 | 21 | 26 | 32 (9) | 1 | 0 | 27 % |
+| CNC Machining handbook | 83 | 13 | 17 | 49 (0) | 0 | 4 | 16 % |
+| **All** | **676** | **155** | **173** | **269 (28)** | **21** | **58** | **26 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -54,6 +54,8 @@ features are names only.
 **Update (branch `claude/threads-3`, 2026-11-11):** batch A12 (threads round 3) is built except Whitworth tolerances, taper and buttress wire measurement and the trapezoidal tolerances. U39, U40, U42, U45, U46, U49, MH222, MH224, MH225, MH232 done; U41, U44, MH207, MH220, MH221, MH228, MH230, MH233, MH234, MH238, MH247 partial (U47, U51, MH246, BB7 notes updated). Summary counts recounted from all rows by script after merging `claude/cnc-guide` (the in-progress column kept as it was).
 
 **Update (branch `claude/mechanics`, 2026-11-11):** batch B8 (mechanics for the shop) is built: section properties, beams, torsion, columns, stress concentration at holes, fatigue, centrifugal force and chuck grip, balancing, critical speed. MH30, MH35, MH36, MH37, ED30, ED31, ED32, ED36 done; MH31, MH32, MH33, MH39, ED23, ED38, ED42, ED43 partial. Not built: stepped-shaft and groove stress concentration (no free source prints a checkable fit), combined stresses (MH34), springs (MH40, MH41), vibration severity (ED24, ED25), stress-strain basics (ED29, ED39). Summary counts recounted from all rows by script (the Ultra row was one partial/missing off before this change; the in-progress column kept as it was).
+
+**Update (branch `claude/tooling-ref`, 2026-11-11):** batch B3 (tooling reference) is built: tooling guide (`toolguide`), tap pitch diameter limits (`taplimits`), saw blade pitch (`sawtpi`) and a forming-tap makers' comparison in `tapdrill`. BB63 done; MH96, MH101, MH103, MH107, MH109, MH114, MH115, MH156, BB8, BB13, BB19, BB22, BB25, BB26, BB64, BB65, CN6 partial. MH97 (done, `insertcode`) and MH98 (partial, `holdercode`) corrected: those tools were merged earlier but the rows still said missing. Not built: hole saw speeds (BB24: no two independent charts compared), broaching, burrs, mounted points, files, drill and toolbit sharpening, colour-coded taps. Summary counts recounted from all rows by script (the in-progress column changed only for MH97).
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -392,26 +394,26 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH96 | Single-point tool terms: contour, relief, rake, lead angles, nose radius, chipbreakers | missing | | |
-| MH97 | Indexable insert identification system | missing | | In progress (`claude/ref-data-3`) |
-| MH98 | Indexable insert holder identification and selection | missing | | |
+| MH96 | Single-point tool terms: contour, relief, rake, lead angles, nose radius, chipbreakers | partial | `toolguide` | Rake, clearance, entering/lead angle, helix, nose radius, chip breaker and edge hone in own words with drawings (mostly marked "needs 2nd source"); no tool signature or contour terms (`claude/tooling-ref`) |
+| MH97 | Indexable insert identification system | done | `insertcode` | Decode and build ISO 1832 codes with evidence (`claude/ref-data-3`); status corrected on `claude/tooling-ref` |
+| MH98 | Indexable insert holder identification and selection | partial | `holdercode` | ISO 5608 external holder codes decoded; no selection guide (status corrected on `claude/tooling-ref`) |
 | MH99 | Carbide blanks and carbide-tipped tool styles | missing | | |
 | MH100 | Insert radius compensation (NC); threading insert radius | partial | `tnrc` | Nose radius shifts for chamfers, tapers and arcs, any tip 0-9, G41/G42 explained; no threading insert radius (`claude/cnc-guide`) |
-| MH101 | Cemented carbides, ceramics, superhard materials | missing | | |
+| MH101 | Cemented carbides, ceramics, superhard materials | partial | `toolguide` | One-paragraph summary of HSS, carbide, cermet, ceramic, CBN, PCD (needs 2nd source); no property data (`claude/tooling-ref`) |
 | MH102 | ISO classification of hardmetals (P/M/K/N/S/H) | partial | `materials` (ISO group) | Groups shown on work materials; no grade chart |
-| MH103 | Milling cutters: selection, number of teeth, plain/side/T-slot/angle/shell/end mills | missing | | |
+| MH103 | Milling cutters: selection, number of teeth, plain/side/T-slot/angle/shell/end mills | partial | `toolguide` | End mill flutes, end shapes, roughers, variable helix, high-feed; no plain, side, T-slot, angle or shell cutters (`claude/tooling-ref`) |
 | MH104 | Metal slitting saws | missing | | |
 | MH105 | Keyseat and Woodruff cutters, spline-shaft cutters | missing | | |
 | MH106 | Cutter grinding: wheel speeds, clearance angles, indicator drop method | missing | | |
-| MH107 | Reamers: types, sizes, difficulties | missing | | |
+| MH107 | Reamers: types, sizes, difficulties | partial | `toolguide` | Reamer types, flute direction by hole, stock allowance and speed (two sources shown); no reamer sizes or tolerances (`claude/tooling-ref`) |
 | MH108 | Dimensions of centres; countersink and spot drill depths | missing | | |
-| MH109 | Twist drill terms and types | missing | | |
+| MH109 | Twist drill terms and types | partial | `toolguide` | Drill types and point angles 118/135/140, split point, spot drill angle; no terms drawing (`claude/tooling-ref`) |
 | MH110 | Drill sizes: fractional, gauge, letter, metric | done | `drillchart` | |
 | MH111 | Taper-shank drills; tolerance on diameter; accuracy of drilled holes | missing | | |
 | MH112 | Counterboring, counterbore sizes for bolts | partial | `shcs` | Counterbore sizes for socket head cap screws only (two makers, shown side by side); no counterboring practice or other head types |
 | MH113 | Boring tools | missing | | |
-| MH114 | Taps: forms, marking, series designations, tap terms and dimensions | missing | | |
-| MH115 | Tap thread limits (H and D limits), pipe and insert taps | missing | | |
+| MH114 | Taps: forms, marking, series designations, tap terms and dimensions | partial | `toolguide` | Tap types (spiral point, spiral flute, straight, forming) and chamfer lengths; no marking, series or tap dimensions (`claude/tooling-ref`) |
+| MH115 | Tap thread limits (H and D limits), pipe and insert taps | partial | `taplimits` | Inch H and L, metric D numbers computed and checked against 1B/2B/3B and 6H/5H/7H/6G; no pipe or STI tap limits; D minimums only where OSG prints them (`claude/tooling-ref`) |
 | MH116 | Acme and square-threaded taps | missing | | |
 | MH117 | Morse tapers | done | `machinetapers` | |
 | MH118 | Brown & Sharpe and Jarno tapers | missing | | |
@@ -457,7 +459,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH153 | Machine settings and calculation of costs (all operations incl. grinding) | partial | `toollife` | Single tool only |
 | MH154 | High-speed machining econometrics, chip geometry in milling, mean chip thickness | partial | `cutopt` | Mean chip thickness only |
 | MH155 | Automatic screw machines: knurling, cams, speeds, stock | partial | `bar` | Bar stock per part only; cam work missing |
-| MH156 | Band saw blade selection, speeds, feeds, break-in | missing | | |
+| MH156 | Band saw blade selection, speeds, feeds, break-in | partial | `sawtpi`, `bandsaw` | 3-teeth-in-cut pitch rule (two sources) and cut time; no speeds or break-in (`claude/tooling-ref`) |
 | MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | missing | | |
 | MH158 | Metalworking fluids: classes, maintenance, exposure | partial | `coolconc`, `coolmix` | Concentration and mix only |
 | MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | missing | | |
@@ -749,25 +751,25 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB5 | Socket size cross-reference inch/metric | partial | `spanner` | Lookup of a spanner size against metric and inch heads; no socket cross-reference chart |
 | BB6 | Abbreviations for standard threads | partial | `threaddata` | Series names only |
 | BB7 | Thread forms used in engineering | partial | `threaddata`, `pipethreads`, `whitworth`, `acme`, `trapezoidal`, `buttress` | ACME, trapezoidal and buttress added; no forms overview drawing (`claude/threads-3`) |
-| BB8 | Types of ground thread taps | missing | | |
+| BB8 | Types of ground thread taps | partial | `toolguide` | Tap types and chamfers; H limits in `taplimits` (`claude/tooling-ref`) |
 | BB9 | Colour-coded high-performance taps and applications | missing | | Maker-specific; low priority |
 | BB10 | Tapping drill formulae | done | `tapdrill` | |
 | BB11 | Tapping drill sizes for cutting taps | done | `tapdrill` | |
 | BB12 | Tapping drill sizes for fluteless (forming) taps | done | `tapdrill` | |
-| BB13 | Removal of broken taps | missing | | |
+| BB13 | Removal of broken taps | partial | `toolguide` | Own summary of removal methods and prevention, one source so far (flagged) (`claude/tooling-ref`) |
 | BB14 | Coventry/OSG style chasers | missing | | |
 | BB15 | Drill sizes for screw extractors, self-tappers | missing | | |
 | BB16 | Drill sizes for socket head screws | done | `shcs`, `clearance` | (`claude/fasteners`) |
 | BB17 | Hole coordinates | done | `bolt` | |
 | BB18 | Drill point sharpening and effects of bad grinding | missing | | |
-| BB19 | Drill point geometry by material | missing | | |
+| BB19 | Drill point geometry by material | partial | `toolguide` | Point angle by material (118 general, 135 harder, over 140 very hard); no full geometry table (`claude/tooling-ref`) |
 | BB20 | Speeds and feeds for HSS twist drills | missing | | |
 | BB21 | Speeds and feeds for solid carbide drills | missing | | |
-| BB22 | End mills | missing | | |
+| BB22 | End mills | partial | `toolguide` | Types, flutes by material, end shapes, roughers; no dimensions (`claude/tooling-ref`) |
 | BB23 | Cutting speed to RPM conversion | done | `rpm` | |
-| BB24 | Hole saws and recommended speeds | missing | | |
-| BB25 | Hacksaw and power saw blade selection | missing | | |
-| BB26 | Bandsaw blade selection | missing | | |
+| BB24 | Hole saws and recommended speeds | missing |  | Not built: no two independent hole saw speed charts compared (`claude/tooling-ref`) |
+| BB25 | Hacksaw and power saw blade selection | partial | `sawtpi` | Pitch from the 3-teeth rule; no hacksaw blade chart (`claude/tooling-ref`) |
+| BB26 | Bandsaw blade selection | partial | `sawtpi`, `bandsaw` | Pitch selection (min 3 teeth confirmed, upper rule shown from two makers) and cut time; no blade width or speed chart (`claude/tooling-ref`) |
 | BB27 | Sharpening HSS toolbits | missing | | |
 | BB28 | Lubricants and coolants for cutting tools | partial | `coolconc`, `coolmix` | No selection guide |
 | BB29 | Trigonometry, Pythagoras, rise per degree, 3-4-5 rule | missing | | In progress (`claude/geometry`) |
@@ -804,9 +806,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB60 | Grinding wheels: markings, specs, shapes, faces | partial | `wheelcode` | Markings and specs decoded; no shapes or faces (`claude/calcs-3`) |
 | BB61 | Mounted wheels and points | missing | | |
 | BB62 | Tungsten carbide burrs | missing | | |
-| BB63 | Surface coatings (tool coatings) | missing | | |
-| BB64 | Relative position of cutting tool materials | missing | | |
-| BB65 | Carbide grades and grade comparison chart | missing | | |
+| BB63 | Surface coatings (tool coatings) | done | `toolguide` | Ten coatings with use; max temperatures with every publisher value, confirmed only where two agree (`claude/tooling-ref`) |
+| BB64 | Relative position of cutting tool materials | partial | `toolguide` | Tool materials summary; no ranking chart (`claude/tooling-ref`) |
+| BB65 | Carbide grades and grade comparison chart | partial | `iso513`, `toolguide` | ISO 513 groups; no maker grade comparison chart (`claude/tooling-ref`) |
 | BB66 | Carbide insert identification | missing | | In progress (`claude/ref-data-3`) |
 | BB67 | Quick visual identification of insert shapes | missing | | In progress (`claude/ref-data-3`) |
 | BB68 | Carbide toolholder identification | missing | | |
@@ -834,7 +836,7 @@ One row per learning objective.
 | CN3 | L1 Overall CAD/CAM/CNC process | missing | | Explainer |
 | CN4 | L2 Shop safety awareness, rules, clothing, conduct | partial | `cncguide` | Short safety page (guards, dress, chips, coolant, lock-out); points to HSE/OSHA, not a full course (`claude/cnc-guide`) |
 | CN5 | L2 Safety precautions when running a new CNC program | partial | `cncguide` | Prove-out steps in the safety page (`claude/cnc-guide`) |
-| CN6 | L3 Common CNC tools | missing | | |
+| CN6 | L3 Common CNC tools | partial | `toolguide` | End mills, drills, reamers, taps described; no course-specific tool list (`claude/tooling-ref`) |
 | CN7 | L3 Spindle rotation direction | missing | | |
 | CN8 | L3 Chip formation | done | `cncguide` | Shear zone, chip types, chip thickness (`claude/cnc-guide`) |
 | CN9 | L3 Chip load definition | partial | `feed`, `cutopt` | Used, not explained |

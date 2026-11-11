@@ -803,6 +803,36 @@ const TOOLS = [
   source: 'Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut); KASCO (teeth per minute = teeth per foot x blade speed). See docs/sources.md.',
 },
 {
+  id: 'sawtpi', group: 'Sawing', title: 'Saw blade pitch (TPI)',
+  desc: 'Coarsest blade pitch that keeps at least three teeth in the thinnest wall the blade crosses, and how many teeth a given pitch puts in the thickest part of the cut, against the makers\' upper rules of thumb.',
+  fields: s => [
+    { id: 'thin', label: 'Thinnest section the blade crosses (tube or angle wall)', unit: lenU(s), def: s === 'inch' ? 0.125 : 3 },
+    { id: 'thick', label: 'Longest cut through the work (diameter or width)', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
+    { id: 'tpi', label: 'Blade pitch to check (optional)', unit: 'TPI', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.thin > 0)) return [];
+    const k = s === 'inch' ? 1 : 1 / IN_MM, thin = v.thin * k, thick = v.thick > 0 ? v.thick * k : NaN;
+    const minTpi = W.saw_min_tpi(thin, 3);
+    const rows = [R('Fewest teeth per inch for 3 teeth in the thinnest section', minTpi, 'TPI', 1),
+      R('Coarsest tooth pitch', s === 'inch' ? thin / 3 : thin / 3 * IN_MM, lenU(s), s === 'inch' ? 4 : 2)];
+    if (thick > 0) {
+      rows.push(R('Most TPI for 14 teeth in the longest cut (Starrett 10 to 14, soft materials)', 14 / thick, 'TPI', 1));
+      rows.push(R('Most TPI for 12 teeth in the longest cut (RMT prefers 6 to 12)', 12 / thick, 'TPI', 1));
+      if (minTpi > 14 / thick) rows.push(R('Range', 'No single pitch meets both: use a variable pitch blade or favour the thin wall (3 teeth minimum)', '', 0));
+    }
+    if (v.tpi > 0) {
+      const tThin = W.saw_teeth_in_cut(thin, v.tpi);
+      rows.push(R('Teeth in the thinnest section at that pitch', tThin, '', 1));
+      if (tThin < 3) rows.push(R('Check', 'Fewer than 3 teeth in the thin wall: use a finer pitch', '', 0));
+      if (thick > 0) { const tThick = W.saw_teeth_in_cut(thick, v.tpi); rows.push(R('Teeth in the longest cut at that pitch', tThick, '', 1)); if (tThick > 14) rows.push(R('Check', 'More than 14 teeth in the longest cut: gullets may pack, consider a coarser pitch', '', 0)); }
+    }
+    return rows;
+  },
+  working: 'Teeth in the cut = length of cut x TPI. Fewest TPI = 3 / thinnest section (in); coarsest pitch = section / 3. Upper limits: TPI = 14 / longest cut (Starrett, about 10 to 14 teeth in soft materials) or 12 / longest cut (RMT, preferably 6 to 12). The minimum of 3 teeth is confirmed by both; the upper figures differ and both are shown. Variable pitch blades are given by their mean pitch.',
+  source: 'L.S. Starrett, Sawing starts with the material (2023); Revolution Machine Tools, Do I have the right TPI (accessed 2026-11-11). See docs/tooling.md.',
+},
+{
   id: 'drillpoint', group: 'Drilling and tapping', title: 'Drill point length',
   pick: { map: { dia: 'dia', ang: 'point' }, types: ['Drill', 'Spot', 'Other'] },
   desc: 'Axial length of the drill point.',
@@ -857,7 +887,14 @@ const TOOLS = [
   desc: 'Hole size for a chosen percent of thread with a cutting tap or a forming (roll) tap, for ISO metric and Unified threads or any size you enter, with the nearest standard drills and the percent of thread each one gives.',
   render: el => renderTapDrill(el),
   working: 'See the note under the tool.',
-  source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge. ISO 68-1:2023, ASME B1.1-2024.',
+  source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge; forming taps also North American Tool, Besly (Cutting Tool Engineering 1995) and MSC. ISO 68-1:2023, ASME B1.1-2024.',
+},
+{
+  id: 'taplimits', group: 'Drilling and tapping', title: 'Tap pitch diameter limits (H and D numbers)',
+  desc: 'Pitch diameter band of an inch H (and L) or metric D limit tap, checked against the internal thread class (2B, 3B, 1B, 6H, 5H, 7H, 6G), with a suggested limit number and the makers\' printed recommendation where one is in hand.',
+  render: el => renderTapLimits(el),
+  working: 'See the note under the tool. H n: max = basic + n x 0.0005 in, band 0.0005 in through 1 in; D n: max = basic + n x 0.0005 in (OSG) or n x 0.013 mm (USCTI).',
+  source: 'OSG USA tap drill and pitch diameter limit chart vol. 3 (2024); USCTI / GWS Tool Group; MSC; Cutting Tool Supply. Internal thread limits: ASME B1.1, ISO 965-1 formulas (Thread data tool).',
 },
 {
   id: 'chatter', group: 'Chatter and vibration', title: 'Chatter finder (stable speeds)',
@@ -2438,6 +2475,13 @@ const TOOLS = [
   render: el => renderCncGuide(el),
   working: 'Reference only. Your machine and control manuals govern. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
   source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'toolguide', group: 'Guides', title: 'Tooling guide',
+  desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps and tap limits, saw blade pitch and broken tap removal.',
+  render: el => renderToolGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements without two independent public sources are marked "needs 2nd source". Coating temperatures show every value printed.',
+  source: 'Tool and coating makers and distributors listed under the guide and in docs/tooling.md (data/refdata/tooling-evidence.json).',
 },
 {
   id: 'formulas', group: 'Guides', title: 'Formula library',

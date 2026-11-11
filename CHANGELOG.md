@@ -3,6 +3,14 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added (tooling reference)
+- **Tooling guide** (parity batch B3): tool geometry terms with our own drawings (rake and clearance, ISO entering angle and ANSI lead angle, helix, nose radius, chip breaker, edge hone), tool materials and grades (link to ISO 513), ten coatings with typical use and maximum temperature as printed by five publishers (Oerlikon Balzers, Hartner, GWS Tool Group, Brycoat, Jozef Stefan Institute; confirmed only where two agree, all values shown), end mills, drills and point geometry, reamers, taps, tap limits, saw blade pitch and broken tap removal. Statements carry source keys; single-source ones are marked "needs 2nd source".
+- **Tap pitch diameter limits** (`taplimits`): inch H and L numbers (0.0005 in steps, 0.0010 in band over 1 in to 1-1/2 in) and metric D numbers (0.0005 in per OSG and 0.013 mm per USCTI, both shown), checked against the internal thread class, with a 40 % rule suggestion and OSG's printed recommendation for the sizes in hand.
+- **Saw blade pitch (TPI)** (`sawtpi`): fewest TPI for three teeth in the thinnest wall (Starrett and RMT agree) and teeth in the longest cut against Starrett's 10 to 14 and RMT's 6 to 12.
+- **Tap drill size**, forming mode: a table of what each publisher prints for the forming tap hole (North American Tool and Besly, two forming tap makers, now confirm D - 0.0068 x % x P; MSC's metric misprint and D - P/2 shortcut shown as printed).
+- `benchmate-core`: `tap_h_limit`, `tap_l_limit_min`, `tap_d_limit`, `tap_limit_for_fraction`, `saw_teeth_in_cut`, `saw_min_tpi` with tests against OSG and USCTI examples; `data/refdata/tooling-evidence.json`; `docs/tooling.md`.
+### Changed (tooling reference)
+- Parity audit: MH97 and MH98 marked done and partial (insert and holder codes were already built); B3 rows updated and the summary recounted.
 ### Added (mechanics)
 - New **Mechanics** group (parity batch B8). **Section properties**: area, centroid, Ix, Iy, product of inertia, principal second moments and axis angle, section modulus at each fibre, radii of gyration (and J for round bar and tube) for rectangle, hollow rectangle, round bar, tube, I-beam, channel, angle and tee, built up from rectangles (sharp corners), with a drawing.
 - **Beam deflection and bending stress**: cantilever, simply supported and fixed both ends; point load anywhere and a uniform load (either or both); reactions, end moments, largest shear, moment, deflection and slope with their positions, span/deflection, M c / I; drawing of the deflected shape and the moment diagram. Shape fields appear only for the chosen section (new optional `when(v)` on registry fields).

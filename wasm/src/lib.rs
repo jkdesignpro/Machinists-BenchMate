@@ -332,6 +332,12 @@ f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
 f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
 f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
 f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);
+f1!(tap_h_limit, c::tap_h_limit, basic, n, major, which);
+f1!(tap_l_limit_min, c::tap_l_limit_min, basic, n);
+f1!(tap_d_limit, c::tap_d_limit, basic, n, step, sign);
+f1!(tap_limit_for_fraction, c::tap_limit_for_fraction, basic, pd_min, pd_max, frac, step);
+f1!(saw_teeth_in_cut, c::saw_teeth_in_cut, len, tpi);
+f1!(saw_min_tpi, c::saw_min_tpi, thin, teeth);
 
 // Fasteners and machine elements (core/src/fasteners.rs)
 f1!(stress_area, c::stress_area_f, d, p, system);

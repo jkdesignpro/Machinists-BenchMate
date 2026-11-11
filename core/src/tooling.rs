@@ -125,6 +125,63 @@ pub fn lerp(x: f64, x0: f64, y0: f64, x1: f64, y1: f64) -> f64 {
     y0 + (y1 - y0) * (x - x0) / (x1 - x0)
 }
 
+
+// ---------------------------------------------------------------------------
+// Tap pitch diameter limits (H, L, D numbers) and saw tooth pitch
+// ---------------------------------------------------------------------------
+
+/// Step of the inch tap limit numbers: each H or L number is 0.0005 in
+/// (OSG USA tap drill and pitch diameter limit chart vol. 3, 2024; USCTI /
+/// GWS Tool Group tapping tip; MSC taps buying guide).
+pub const TAP_LIMIT_STEP_IN: f64 = 0.0005;
+
+/// Pitch diameter limit of an inch ground-thread tap with limit number Hn,
+/// basic pitch diameter `basic` (in), thread major diameter `major` (in).
+/// `which` 0 = minimum, 1 = maximum. The maximum is basic + n 0.0005 in.
+/// Through 1 in the band is one step wide, so Hn runs from basic +
+/// (n - 1) 0.0005 to basic + n 0.0005 (OSG, MSC). Over 1 in to 1-1/2 in OSG
+/// prints a 0.0010 in band (H4 = basic + 0.0010 to + 0.0020); BenchMate
+/// applies that band to every H number in that range and returns NaN for the
+/// minimum above 1-1/2 in, where no source in hand gives it.
+pub fn tap_h_limit(basic: f64, n: f64, major: f64, which: f64) -> f64 {
+    let max = basic + n * TAP_LIMIT_STEP_IN;
+    if which as i32 == 1 { return max; }
+    let band = if major <= 1.0 + 1e-9 { TAP_LIMIT_STEP_IN } else if major <= 1.5 + 1e-9 { 2.0 * TAP_LIMIT_STEP_IN } else { return f64::NAN };
+    max - band
+}
+
+/// Minimum pitch diameter of an undersize (L) inch tap: basic - n 0.0005 in
+/// (USCTI / GWS Tool Group). The maximum of an L limit comes from the tap
+/// standard (ASME B94.9) and is not computed.
+pub fn tap_l_limit_min(basic: f64, n: f64) -> f64 { basic - n * TAP_LIMIT_STEP_IN }
+
+/// Maximum pitch diameter of a metric tap with limit number Dn (or minimum
+/// of a DU number with `sign` -1): basic + sign n step. `step` is the size
+/// of one number in the unit of `basic`: OSG prints the D limits as
+/// multiples of 0.0005 in (D3 + 0.0015 in ... D9 + 0.0045 in), USCTI as
+/// multiples of 0.013 mm. The two steps differ by 0.0003 mm per number; the
+/// UI shows both.
+pub fn tap_d_limit(basic: f64, n: f64, step: f64, sign: f64) -> f64 { basic + sign * n * step }
+
+/// Limit number whose maximum sits nearest `frac` of the way through the
+/// internal thread's pitch diameter tolerance (min `pd_min`, max `pd_max`),
+/// for a tap whose numbers step by `step` above `basic`. Cutting Tool Supply
+/// prints the "40 % rule" (tap at about 40 % of the part tolerance above its
+/// minimum); the result is at least 1.
+pub fn tap_limit_for_fraction(basic: f64, pd_min: f64, pd_max: f64, frac: f64, step: f64) -> f64 {
+    let target = pd_min + frac * (pd_max - pd_min) - basic;
+    (target / step).round().max(1.0)
+}
+
+/// Number of teeth of a saw blade in a cut of length `len` (in) at `tpi`
+/// teeth per inch.
+pub fn saw_teeth_in_cut(len: f64, tpi: f64) -> f64 { len * tpi }
+
+/// Finest-pitch limit turned round: the fewest teeth per inch that keep
+/// `teeth` teeth in a section `thin` inches thick (the thinnest wall the
+/// blade crosses). Starrett and RMT both give 3 teeth as the minimum.
+pub fn saw_min_tpi(thin: f64, teeth: f64) -> f64 { teeth / thin }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -207,5 +264,39 @@ mod tests {
     #[test] fn interpolation() {
         close(lerp(5.0, 0.0, 10.0, 10.0, 20.0), 15.0, 1e-12);
         close(lerp(3.0, 3.0, 7.0, 3.0, 9.0), 7.0, 0.0);
+    }
+
+    /// OSG USA vol. 3 (2024): H1 = basic to basic + 0.0005 ... H6 = + 0.0025
+    /// to + 0.0030 through 1 in; over 1 in to 1-1/2 in H4 = + 0.0010 to
+    /// + 0.0020. USCTI example: 1/4-20 GH5 max 0.2175 + 0.0025 = 0.2200;
+    /// GL3 min 0.2160.
+    #[test] fn tap_limits_published() {
+        close(tap_h_limit(0.2175, 5.0, 0.25, 1.0), 0.2200, 1e-12);
+        close(tap_h_limit(0.2175, 5.0, 0.25, 0.0), 0.2195, 1e-12);
+        close(tap_h_limit(0.2175, 1.0, 0.25, 0.0), 0.2175, 1e-12);
+        close(tap_h_limit(1.0, 4.0, 1.25, 0.0) - 1.0, 0.0010, 1e-12);
+        close(tap_h_limit(1.0, 4.0, 1.25, 1.0) - 1.0, 0.0020, 1e-12);
+        assert!(tap_h_limit(1.0, 4.0, 2.0, 0.0).is_nan());
+        close(tap_l_limit_min(0.2175, 3.0), 0.2160, 1e-12);
+        // USCTI: M6 x 1 D5 = 5.530 + 0.065 = 5.595 mm (its own basic figure).
+        close(tap_d_limit(5.530, 5.0, 0.013, 1.0), 5.595, 1e-12);
+        close(tap_d_limit(5.530, 3.0, 0.013, -1.0), 5.491, 1e-12);
+        // OSG D9 maximum + 0.0045 in.
+        close(tap_d_limit(0.0, 9.0, TAP_LIMIT_STEP_IN, 1.0), 0.0045, 1e-12);
+    }
+
+    /// 40 % rule against OSG's printed recommendations (vol. 3, 2024):
+    /// 1/4-20 2B (0.2175 to 0.2224) H5, 3B (to 0.2211) H3; 1/2-13 2B
+    /// (0.4500 to 0.4565) H5. M6 x 1 6H (5.350 to 5.500 mm) D5.
+    #[test] fn forty_percent_rule_matches_osg_mostly() {
+        close(tap_limit_for_fraction(0.2175, 0.2175, 0.2224, 0.4, TAP_LIMIT_STEP_IN), 4.0, 0.0); // OSG H5: one step finer
+        close(tap_limit_for_fraction(0.2175, 0.2175, 0.2211, 0.4, TAP_LIMIT_STEP_IN), 3.0, 0.0);
+        close(tap_limit_for_fraction(0.4500, 0.4500, 0.4565, 0.4, TAP_LIMIT_STEP_IN), 5.0, 0.0);
+        close(tap_limit_for_fraction(5.350, 5.350, 5.500, 0.4, 0.0127), 5.0, 0.0);
+    }
+
+    #[test] fn saw_pitch() {
+        close(saw_min_tpi(0.125, 3.0), 24.0, 1e-12);
+        close(saw_teeth_in_cut(0.5, 6.0), 3.0, 1e-12);
     }
 }

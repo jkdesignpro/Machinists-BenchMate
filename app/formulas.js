@@ -37,6 +37,9 @@ const FORMULA_SOURCES = {
   SP811: 'NIST SP 811, appendix B (1 in = 25.4 mm exactly)',
   NAVY: 'US Navy Machinery Repairman training manual, ch. 7 Indexing',
   VDI: 'VDI 2230 Part 1:2015 (cited by name); FVA; Hameedi and Völgyi 2025',
+  OSGLIM: 'OSG USA, tap drill size and pitch diameter limit chart vol. 3, 2024',
+  USCTI: 'USCTI / GWS Tool Group tapping tips (H, L, D, DU limits)',
+  SAWT: 'L.S. Starrett 2023 and Revolution Machine Tools: at least 3 teeth in the cut',
   ORING: 'Parker ORD 5700 (cited); Global O-Ring and Seal; Apple Rubber',
   ISO281: 'ISO 281:2007 clause 6 (cited by name)',
   KEYS: 'DIN 6885-1, ASME B17.1 (cited); fasten.it, MISUMI, Engineers Edge',
@@ -141,6 +144,9 @@ const FORMULAS = [
   F('caxis', 'Inverse time feed (G93)', 'F = Vf / path,  path = √(lin² + (π · D · angle / 360)²)', 'F: [1/min]; lin: linear move; angle: [deg]', ['RS274', 'OWN']),
   F('slitsaw', 'Teeth in the cut', 'z_e = z · φ / 360°', 'z: saw teeth; φ: engagement angle [deg]', ['ALT', 'OWN']),
   F('slitsaw', 'Saw approach distance', 'approach = √(ae · (D − ae))', 'ae: depth of cut; D: saw diameter', ['OWN']),
+  F('taplimits', 'Tap H limit (inch)', 'max = E + n · 0.0005;  min = max − 0.0005 (to 1 in), − 0.0010 (over 1 to 1-1/2 in)', 'E: basic pitch diameter [in]; n: H number', ['OSGLIM', 'USCTI']),
+  F('taplimits', 'Tap D limit (metric)', 'max = E + n · step,  step = 0.0005 in (OSG) or 0.013 mm (USCTI)', 'E: basic pitch diameter', ['OSGLIM', 'USCTI']),
+  F('sawtpi', 'Saw teeth in the cut', 'teeth = length of cut · TPI;  TPI_min = 3 / thinnest section', 'length [in]', ['SAWT']),
   F('bandsaw', 'Cut time from a cutting rate', 't = area / cutting rate', 'area: [in² or cm²]; rate: [per min]', ['STAR']),
   F('bandsaw', 'Band saw chip per tooth', 'f_tooth = down-feed / (blade speed · teeth per length)', 'down-feed: [per min]; blade speed: [ft/min or m/min]', ['KASCO', 'STAR']),
   F('drillpoint', 'Drill point length', 'h = (d / 2) / tan(θ / 2)', 'h: point length; d: drill diameter; θ: point angle', ['MH']),
@@ -299,7 +305,7 @@ const FORMULAS = [
 
 // Tools that only show reference data (no formula of their own).
 const FORMULA_EXEMPT = ['holdercode', 'iso513', 'drillchart', 'tapdrill', 'gritconv', 'wheelcode', 'threaddata', 'pipethreads', 'whitworth', 'fits', 'surface', 'hardness',
-  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'formulas'];
+  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'toolguide', 'formulas'];
 
 const FLIB = { q: '', g: '' };
 function renderFormulaLibrary(el) {

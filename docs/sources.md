@@ -103,13 +103,13 @@ Nothing was typed in from memory and no handbook was used. The formulas are in t
 - **Forming taps:** hole = D - 0.0068 x % x P, as published by FM Carbide (above) and Engineers Edge (both accessed 2026-11-10):
   - https://www.engineersedge.com/calculators/theoretical_tapping_hole_size_16209.htm
   - https://www.engineersedge.com/calculators/hole_sizes_cold_form_tapping_metric_threads_16210.htm
-  - **No forming-tap maker's own catalogue has confirmed this formula yet.**
+  - Confirmed by two forming tap makers on 2026-11-11: North American Tool (TRU-FLO engineering data, 0.0068 and 147.06) and Besly Products (Cutting Tool Engineering, 1995). See the tooling reference section.
 
 - **Forming taps against a tap maker:** Balax, a maker of thread forming taps, publishes "A Balax, Inc. Guide to Tapping in the 21st Century" (2011/2012). It prints hole sizes for 75, 65 and 55 % thread on p. 3 (0-80 to 3-48) and p. 20 (M0.7 to M1.4). Copy read at https://powelltoolsupplyinc.assets-ascend-prod.roccommercecloud.com/assets%2FProduction%2Fc43a93116cca1ca5638577fadbf11477/Balax_10725_Catalog.pdf (accessed 2026-11-10).
   - Balax does not state a formula.
   - Its holes are 0 to 0.0016 in larger than D - 0.0068 x % x P gives; one cell is 0.0002 in smaller (test `form_tap_vs_balax`).
   - The 0.0068 rule is therefore labelled a rule of thumb, and the app tells users to use the tap maker's recommended hole.
-  - No maker catalogue was found that states the formula itself.
+  - (2026-11-11) North American Tool and Besly state the formula; Balax still prints larger holes for miniature sizes.
 
 ### Threads
 - **[WIKI_ISO]** Wikipedia, "ISO metric screw thread" (preferred sizes from ISO 262). https://en.wikipedia.org/wiki/ISO_metric_screw_thread (accessed 2026-11-10).
@@ -491,6 +491,41 @@ All web sources accessed 2026-11-10.
 - Grit sizes are shown per system with the value each publisher prints and a badge; they are not averaged. Coated-abrasive gradings (P, ANSI/CAMI) and bonded gradings (F) differ, and the screen says so. ANSI: 6 confirmed, 10 differ, 9 single source; FEPA F: 2 confirmed, 3 differ, 23 single source; FEPA P: 9 confirmed, 8 differ, 11 single source.
 - Marking: abrasive letters 5 confirmed, 20 maker-specific or single source, 1 differs (AZ: zirconia [HST], blue aluminium oxide [CGW]). Bond letters 4 confirmed, 4 single source, 2 differ (E: shellac [UNITED], epoxy [HST]; O: oxychloride [UNITED], magnesia [HST]). Grit groups: coarse 8-24 [UNITED][CGW] against 10-24 [NAVY]; fine 70-180 [UNITED][NAVY] against 80-180 [CGW].
 - Not used: Gritomatic, metallographic.com and several PDF grit charts (images, scrambled text, or no clear primary source).
+
+## Tooling reference (`data/refdata/tooling-evidence.json`, `core/src/tooling.rs`, `app/tooling.js`)
+Batch B3, branch `claude/tooling-ref`. Decisions and the results of the checks are in `docs/tooling.md`. Standard cited by name only, not read: ASME B94.9 (taps).
+
+### Publishers
+- [OSG] OSG USA, Tap drill size and pitch diameter limit chart, vol. 3, 2024: https://res.cloudinary.com/osg-usa-inc/image/upload/v1717093846/Literature/03%20-%20Charts%20and%20Guides/OSG_-_Chart_-_Tap_Drill_Size_and_Pitch_Diameter_Limit_-_Vol_3_-_2024_-_IA.pdf (accessed 2026-11-11).
+- [USCTI] US Cutting Tool Institute (information from GWS Tool Group), Tapping tips: How H-limits relate to class of fit (part 1) and Finding the perfect tap: https://www.uscti.com/uscti-pages/Tapping Tip-Finding the Perfect Tap.pdf (accessed 2026-11-11).
+- [MSC] MSC Industrial Supply, Taps buying guide; Thread forming taps buying guide: https://www.mscdirect.com/resources/buying-guides/taps (accessed 2026-11-11).
+- [CTS] Cutting Tool Supply (Addison, IL), Manufacturing tips: H limits and class of fit: https://cutting-tool-supply.com/tech-tips/tapping/h-limits-class/h-limits-class.htm (accessed 2026-11-11).
+- [NAT] North American Tool Corporation, TRU-FLO thread forming taps, engineering data (spec sheet 19000): https://cdn.dgisupply.ca/img/product-images/Asset_URL/North_American_Tool_19000_Specification_Sheet.pdf (accessed 2026-11-11).
+- [BESLY] Besly Products Corp. (D. Gajdosik), in Cutting Tool Engineering, Threads will roll, Cutting Tool Engineering, 1 Aug 1995: https://ctemag.com/articles/threads-will-roll/ (accessed 2026-11-11).
+- [FMC] FM Carbide, TechTips: tapping formulas: https://fmcarbide.com/pages/tapping-formulas (accessed 2026-11-10).
+- [EE] Engineers Edge, Theoretical tapping hole size, cold form threads: https://www.engineersedge.com/calculators/theoretical_tapping_hole_size_16209.htm (accessed 2026-11-10).
+- [BALZERS] Oerlikon Balzers, Cutting tools coating overview HQ189EN (2509): https://www.oerlikon.com/ecoma/files/HQ189EN_CUTTING-TOOLS_Overview.pdf?download=1 (accessed 2026-11-11).
+- [HARTNER] Hartner GmbH, Coatings (HARTNER_Beschichtungen_EN): https://www.hartner.de/wp-content/uploads/2017/08/HARTNER_Beschichtungen_EN.pdf (accessed 2026-11-11).
+- [GWS] GWS Tool Group, Tool coatings: https://www.gwstoolgroup.com/tool-coatings/ (accessed 2026-11-11).
+- [BRYCOAT] Brycoat, PVD coating properties: https://brycoat.com/surface-engineering/brycoat-pvd-coating-solutions/pvd-coating-properties/ (accessed 2026-11-11).
+- [IJS] Jozef Stefan Institute, Department F3 (thin films), Coating types: https://www.ijs.si/ijs/dept/f3/TrdePrevleke_A.htm (accessed 2026-11-11).
+- [PRODINC] Productivity Inc (S. Hudis), Selecting the right end mill for your machining set up, 21 Apr 2026: https://productivity.com/blog/selecting-the-right-end-mill-for-your-machining-set-up/ (accessed 2026-11-11).
+- [BROTHER] Brother Industries (machine tools), What is an end mill? (Speedio navi article a0046), 11 Jun 2024: https://machinetool.global.brother/en-us/speedio-navi/articles/a0046 (accessed 2026-11-11).
+- [REGAL] Regal Cutting Tools, Which drill point angle should I be using?, 30 Oct 2024: https://regalcuttingtools.com/which-drill-point-angle-should-i-be-using/ (accessed 2026-11-11).
+- [TRAVERS] Travers Tool Co., How to choose the right drill (2025); Tapping right (2021): https://solutions.travers.com/how-to-choose-the-right-drill-in-depth-guide-travers-tool (accessed 2026-11-11).
+- [GAMMONS] Gammons Hoaglund, Reaming FAQ: https://gammons.com/reaming-faq (accessed 2026-11-11).
+- [CUTWEL] Cutwel, Types of reamers: https://www.cutwel.co.uk/blog/types-of-reamers.html (accessed 2026-11-11).
+- [STARRETT] L.S. Starrett (J. Gordon), Sawing starts with the material, 4 May 2023: https://www.starrett.com/news-events/sawing-starts-with-the-material (accessed 2026-11-11).
+- [RMT] Revolution Machine Tools (RMT), Do I have the right TPI and tooth pitch for my cut?: https://rmtus.com/?p=27937 (accessed 2026-11-11).
+- [RAPID] RapidDirect, How to remove broken taps (2022, updated 2026): https://www.rapiddirect.com/blog/how-to-remove-broken-taps/ (accessed 2026-11-11).
+- [RS] RS Components (L. Little), How to use thread-forming taps, 2026: https://uk.rs-online.com/web/content/discovery/ideas-and-advice/how-to-use-thread-forming-taps (accessed 2026-11-11).
+- [MMC], [SECO]: as in the CNC guide section below (crater wear and aluminium oxide coatings).
+
+### Findings
+- H and D number steps of 0.0005 in confirmed (OSG with MSC, USCTI, Cutting Tool Supply); the over-1-in band, L numbers, D minimums and the 40 % rule are single-source and flagged.
+- Forming tap rule D - 0.0068 x % x P is now printed by two forming tap makers (North American Tool, Besly), so the Tap drill size note no longer calls it unconfirmed by a maker. MSC's metric line repeats the 0.0068 factor and is shown as a disagreement.
+- Coating temperatures: only CVD diamond (600 °C) is confirmed with no other value; TiCN 400 °C and TiAlN 800 °C have two publishers each with others differing; every other coating shows all values.
+- Saw pitch: at least 3 teeth in the cut confirmed (Starrett, RMT); the upper figures differ (10 to 14, 6 to 12) and both are shown.
 
 ## CNC guide and TNRC (`core/src/tnrc.rs`, `app/cncguide.js`, `app/formulas.js`)
 Read for this batch on 2026-11-11 unless noted. Keys are the ones shown in the app. Every statement in the guide carries its keys; one with fewer than two independent public sources is shown as "to be verified" automatically (Haas manuals republished by Haas Factory Outlet count as one publisher).

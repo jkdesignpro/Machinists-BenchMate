@@ -499,12 +499,29 @@ def build_abbrev():
     return {'sources': sources_of(ev), 'rows': rows}
 
 
+def build_tooling():
+    """Tooling reference (parity B3): tap limit steps, forming tap constants, coating
+    temperatures and saw teeth rules, each with publisher consensus."""
+    ev = load_ev('tooling-evidence.json')
+    if not ev: return None
+    def by_item(sec):
+        items = []
+        for rows in sec.values():
+            for k in rows:
+                if k not in items: items.append(k)
+        return {k: any_consensus({pub: rows[k] for pub, rows in sec.items() if k in rows}) for k in items}
+    return {'sources': sources_of(ev), 'tap_limits': by_item(ev['tap_limits']), 'form_tap': by_item(ev['form_tap']),
+            'coating_max_c': by_item(ev['coating_max_c']), 'saw_teeth': by_item(ev['saw_teeth']),
+            'osg_d_bands_in': ev['osg_d_bands_in'], 'osg_recommended': ev['osg_recommended'],
+            'notes': {k: v for k, v in ev.items() if k.startswith('_')}}
+
+
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
            'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes(),
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
-           'power_threads': build_power_threads()}
+           'power_threads': build_power_threads(), 'tooling': build_tooling()}
     out['fasteners'] = build_fasteners(out['drills']['drills'])
     for sec in ('other_threads', 'tapers', 'power_threads'):
         if not out[sec]: continue
@@ -515,6 +532,9 @@ def main():
                     for f, c in row.items():
                         if isinstance(c, dict) and c['status'] not in ('confirmed', 'review'):
                             print(' ', sec, k, row['size'], f, c['status'], c['groups'])
+    for sec, items in (out['tooling'] or {}).items():
+        if sec in ('sources', 'notes', 'osg_d_bands_in', 'osg_recommended'): continue
+        for k, c in items.items(): print('  tooling', sec, k, c['status'], [(g['value'], g['publishers']) for g in c['groups']])
     (ROOT / 'data' / 'refdata.json').write_text(json.dumps(out, separators=(',', ':')))
     d = out['drills']['drills']
     st = collections.Counter(x['status'] for x in d)
