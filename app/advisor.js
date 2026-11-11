@@ -205,6 +205,24 @@ const ADV_MACHINE_FIELDS = [
   { level: 'advanced', id: 'tmax', label: 'Spindle torque (blank = active machine)', unit: 'N·m', def: '' },
   { level: 'advanced', id: 'eta', label: 'Machine efficiency', unit: '0-1', def: 0.8 },
 ];
+// The stability model of the milling advisor's cut (see lobechart.js), or null when it cannot be built.
+function advMillLobe(v, W, r) {
+  if (!isFinite(r.kc) || !(v.L > 0) || typeof lobeModel !== 'function') return null;
+  const m = lobeModel(W, { d: v.dsh > 0 ? v.dsh * r.k : r.dmm, L: v.L * r.k, e: r.eGpa, tm: r.tm, z: v.z, ae: r.ae, D: r.dmm, kc: r.kc, fnat: v.fnat, ktip: v.ktip, zeta: v.zeta, beta: v.beta });
+  return m && m.crit > 0 ? m : null;
+}
+// Where the advisor's cut sits against the stability line at its own speed.
+// state: 0 below the line, 1 above it, 2 above it at a low speed where the model cannot say (best speeds too close together, process damping left out).
+function advMillChatter(v, W, r) {
+  const m = advMillLobe(v, W, r);
+  if (!m) return null;
+  const b = m.lim(r.rpm), pk = m.pockets(r.rpm), gap = pk[1] - pk[0];
+  if (!isFinite(b)) return null;
+  const ok = r.ap <= b * (1 + 1e-9), slow = isFinite(gap) && gap < 0.05 * r.rpm;
+  // the next best speed the machine can reach: the higher one first
+  const up = [pk[1], pk[0]].find(x => isFinite(x) && x > 0 && !(r.mach.n > 0 && x > r.mach.n));
+  return { state: ok ? 0 : slow ? 2 : 1, b, up, crit: m.crit };
+}
 const ADV_LIMITS = { 1: 'Tool deflection', 2: 'Spindle power', 3: 'Spindle torque', 7: 'Top spindle speed', 8: 'Top feed rate' };
 // 'of Haas VF-2' or 'you entered', after 'the top speed' and the like.
 const advOf = src => (src === 'entered' ? 'you entered' : src ? 'of ' + src : 'of the machine');
@@ -320,6 +338,8 @@ TOOLS.push(
     if (r.ball) rows.push(R('Ball nose: largest diameter in the cut at this depth', r.de / k, lu, dpL));
     if (isFinite(r.defl)) rows.push(R(r.kh > 0 ? 'Tool tip deflection (tool bending and a holder of ' + fmt(r.kh, 1) + ' N/µm giving way, ' + (r.khSrc === 'entered' ? 'entered' : 'from ' + r.khSrc) + ')' : 'Tool tip deflection (holder and spindle taken as rigid)', r.defl / k, lu, inch ? 5 : 4));
     if (v.tn > 0 && v.tcn > 0) rows.push(R('Tool life at this speed (Taylor, your n and C)', W.taylor_life(inch ? (r.ball ? r.vcDe : r.vcA) / FT_M : (r.ball ? r.vcDe : r.vcA), v.tn, v.tcn), 'min', 0));
+    if (!r.ball) { const ra = W.mill_finish(r.fz, v.z, r.dmm / 2, 1), ra1 = W.mill_finish(r.fz, v.z, r.dmm / 2, 3), fu = x => (inch ? x / IN_MM * 1e6 : x * 1000);
+      if (isFinite(ra)) rows.push(R('Finish on the wall, theoretical Ra' + (isFinite(ra1) ? ' (' + fmt(fu(ra1), inch ? 1 : 2) + ' if runout leaves one tooth marking)' : ''), fu(ra), inch ? 'uin' : 'um', inch ? 1 : 3)); }
     rows.push(R('Chip thickness: mean hm', r.hm / k, lu, dpF), R('Chip thickness: largest hex', r.hex / k, lu, dpF));
     if (isFinite(r.kc)) rows.push(R('Specific cutting force kc at hm (Iscar group ' + r.g[0] + ')', r.kc, 'N/mm2', 0));
     // The table value beside the corrected one.
@@ -346,6 +366,9 @@ TOOLS.push(
     else tiles += advTile('Power', isFinite(r.pSp) ? f(r.pSp, 2) + ' kW' : 'not worked out', r.mach.live ? 'driven tool: type its power to check it' : 'pick a machine to check it', '');
     if (isFinite(r.useD)) tiles += advTile('Deflection', f(r.defl / k, inch ? 5 : 3) + ' ' + lu, advPct(r.useD) + ' of ' + f(r.lim / k, inch ? 4 : 2) + ' ' + lu + (r.limOwn ? '' : ' (starting figure)'), advBand(r.useD));
     else tiles += advTile('Deflection', 'not worked out', 'enter the stick-out', '');
+    const ch = advMillChatter(v, W, r), dpc = inch ? 4 : 3;
+    if (ch) tiles += advTile('Chatter (simple model)', ch.state === 0 ? 'Below the line' : ch.state === 1 ? 'Above the line' : 'Cannot say',
+      ch.state === 2 ? 'low speed: the model leaves out process damping' : 'steady up to ' + f(ch.b / k, dpc) + ' ' + lu + ' deep at this speed', ch.state === 0 ? 'good' : ch.state === 1 ? 'caution' : '');
     const red = r.reduced === 1 ? 'The depth of cut was reduced from ' + f(r.ap0 / k, 3) + ' to ' + f(r.ap / k, 3) + ' ' + lu + '.' : r.reduced === 2 ? 'Your depth is locked, so the width of cut was reduced from ' + f(r.ae0 / k, 3) + ' to ' + f(r.ae / k, 3) + ' ' + lu + '.'
       : r.reduced === 3 && !r.feedCap ? 'Your width and depth are locked, so the feed per tooth was reduced to ' + f(r.fz / k, inch ? 5 : 4) + ' ' + lu + '.' : '';
     let card;
@@ -354,6 +377,8 @@ TOOLS.push(
     else if (r.limit === 3) card = advCard('Spindle torque', 'This speed is below the base speed of the spindle, where it gives torque, not full power: ' + f(r.pAv, 2) + ' kW here. ' + red, 'Use a smaller cutter: torque is cutting force times the cutter radius, and the smaller cutter also runs faster.');
     else if (r.limit === 8) card = advCard('Top feed rate', 'The table feed would be more than ' + r.mach.vf + ' mm/min, the top feed ' + advOf(r.mach.vfSrc) + ', so the feed per tooth was reduced to ' + f(r.fz / k, inch ? 5 : 4) + ' ' + lu + '.', 'Take a wider or deeper cut at this feed: the chip is thinner than the table asks for, so there is room.');
     else if (r.limit === 7) card = advCard('Top spindle speed', 'The table speed needs ' + f(r.rpmTab, 0) + ' RPM. The top speed is ' + f(r.mach.n, 0) + ' RPM, so the tool cuts at ' + f(inch ? r.vcA / FT_M : r.vcA, 0) + ' ' + spdU(s) + ' and the feed follows the speed.', 'Use a larger cutter if the job allows: it reaches the table speed at fewer RPM.');
+    else if (ch && ch.state === 1) card = advCard('Chatter (simple tool model)', 'Power, torque and deflection fit, but at ' + f(r.rpm, 0) + ' RPM the stability chart keeps the cut steady only up to ' + f(ch.b / k, dpc) + ' ' + lu + ' deep, and this cut is ' + f(r.ap / k, dpc) + ' ' + lu + ' deep. The model is the tool alone, so take it as a warning, not a verdict.',
+      (ch.up ? 'Raise the speed to the next best speed, just above ' + f(ch.up, 0) + ' RPM (drag the marker on the stability chart to see the limit there), or take' : 'Take') + ' the depth down to ' + f(ch.b / k, dpc) + ' ' + lu + '.');
     else card = advCard('Nothing', 'The table speed and chip load fit' + (r.mach.name ? ' ' + r.mach.name : '') + (isFinite(r.useD) ? (r.mach.name ? ' and' : '') + ' the stiffness of the tool.' : '.') + (r.mach.name ? '' : ' No machine is picked, so power, torque and top speed are not checked: pick one in the title bar.'), '');
     return '<div class="tiles">' + tiles + '</div>' + card;
   },
@@ -371,9 +396,9 @@ TOOLS.push(
   // Stability chart: the tool as a round bar of the shank diameter (or a tap test), the cutting force from kc at the mean chip thickness.
   widget: (v, W, s) => {
     const r = advMillRun(v, W, s);
-    if (!r || r.none || !isFinite(r.kc) || !(v.L > 0)) return null;
-    const m = lobeModel(W, { d: v.dsh > 0 ? v.dsh * r.k : r.dmm, L: v.L * r.k, e: r.eGpa, tm: r.tm, z: v.z, ae: r.ae, D: r.dmm, kc: r.kc, fnat: v.fnat, ktip: v.ktip, zeta: v.zeta, beta: v.beta });
-    if (!m || !(m.crit > 0)) return null;
+    if (!r || r.none) return null;
+    const m = advMillLobe(v, W, r);
+    if (!m) return null;
     const vcOf = n => W.vc_from_rpm(n, r.de0);
     return el => lobeChartMount(el, m, { key: 'advmill:' + s, rpm: r.rpm, ap: r.ap, nmax: r.mach.n, inch: r.inch,
       use: n => sendTo('advmill', { vown: r.inch ? vcOf(n) / FT_M : vcOf(n) }) });
@@ -385,6 +410,7 @@ TOOLS.push(
     return [['Check this cut in detail', 'cutopt', { d: v.d, dsh: v.dsh > 0 ? v.dsh : '', L: v.L, lf: v.lf > 0 ? v.lf : '', kf: v.kf > 0 ? v.kf : '', mat: r.tm, z: v.z, ae: r.ae / k, ap: r.ap / k, fz: r.fz / k,
       speed: r.inch ? r.vcA / FT_M : r.vcA, rpm: '', kc: isFinite(r.kc) ? Math.round(r.kc) : '', ratio: r.ratio, lim: r.lim / k }],
       ['Feed rate calculator', 'feed', { rpm: Math.round(r.rpm), z: v.z, fz: r.fz / k }],
+      ...(r.ball ? [] : [['Milling surface finish', 'millfinish', { surf: 2, fz: r.fz / k, z: v.z, d: v.d }]]),
       ['Plunge roughing with this tool', 'advplunge', { mat: v.mat, tm: r.tm, d: v.d, z: v.z }],
       ...(r.ball ? [['Ball-nose effective diameter, speed and feed', 'balleff', { d: v.d, ap: r.ap / k }]] : []),
       ['Tool life and cost per part', 'toollife', { v: Math.round(r.inch ? r.vcA / FT_M : r.vcA) }]];

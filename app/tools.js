@@ -124,19 +124,21 @@ const TOOLS = [
 },
 {
   id: 'mrr', level: 'advanced', group: 'Speeds and feeds', title: 'Material removal rate and power',
-  desc: 'Turning MRR with an optional power estimate. Specific cutting force kc is yours to enter; BenchMate does not guess it.',
+  desc: 'Removal rate in turning, with the power it takes when you enter the specific cutting force kc (the Specific cutting force page gives it for a material). With a machine picked, the power is compared with what its spindle has at the speed of the cut.',
   fields: s => s === 'inch' ? [
     { id: 'speed', label: 'Surface speed', unit: 'SFM', def: 300 },
     { id: 'doc', label: 'Depth of cut', unit: 'in', def: 0.05 },
     { id: 'f', label: 'Feed', unit: 'in/rev', def: 0.005 },
     { id: 'kc', label: 'Specific cutting force kc (optional)', unit: 'N/mm2', def: '' },
     { id: 'eta', label: 'Machine efficiency', unit: '0-1', def: 0.8 },
+    { id: 'dia', label: 'Diameter being cut (optional: checks the active machine at that speed)', unit: 'in', def: '' },
   ] : [
     { id: 'speed', label: 'Cutting speed Vc', unit: 'm/min', def: 200 },
     { id: 'doc', label: 'Depth of cut ap', unit: 'mm', def: 2 },
     { id: 'f', label: 'Feed fn', unit: 'mm/rev', def: 0.2 },
     { id: 'kc', label: 'Specific cutting force kc (optional)', unit: 'N/mm2', def: '' },
     { id: 'eta', label: 'Machine efficiency', unit: '0-1', def: 0.8 },
+    { id: 'dia', label: 'Diameter being cut (optional: checks the active machine at that speed)', unit: 'mm', def: '' },
   ],
   calc: (v, W, s) => {
     if (!(v.speed > 0 && v.doc > 0 && v.f > 0)) return [];
@@ -144,10 +146,22 @@ const TOOLS = [
     let q;
     if (s === 'inch') { q = W.mrr_turning_in3_min(v.speed, v.doc, v.f); rows.push(R('Material removal rate', q, 'in3/min', 3)); q = q * 16.387064; }
     else { q = W.mrr_turning_cm3_min(v.speed, v.doc, v.f); rows.push(R('Material removal rate', q, 'cm3/min', 2)); }
-    if (v.kc > 0 && v.eta > 0) { const kw = W.power_kw(q, v.kc, v.eta); rows.push(R('Power at the spindle', kw, 'kW', 2, 'power_kw')); rows.push(R('Power at the spindle', kw * 1.34102, 'hp', 2)); }
+    if (v.kc > 0 && v.eta > 0) { const kw = W.power_kw(q, v.kc, v.eta); rows.push(R('Power at the spindle', kw, 'kW', 2, 'power_kw')); rows.push(R('Power at the spindle', kw * 1.34102, 'hp', 2));
+      // The active machine: its power at the speed this diameter needs (constant torque up to the base speed, constant power above it).
+      const m = typeof advMachine === 'function' ? advMachine(v, false) : null;
+      if (m && m.p > 0) {
+        const n = v.dia > 0 ? (s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia)) : NaN;
+        const pAv = n > 0 ? W.spindle_power_available_kw(n, m.p, m.t) : m.p, use = W.share_of(kw, pAv);
+        if (n > 0) rows.push(R('Spindle speed at that diameter', n, 'RPM', 0));
+        rows.push(R(n > 0 ? 'Power ' + m.name + ' has at that speed' : 'Rated spindle power of ' + m.name + ' (enter the diameter to check it at the speed of the cut)', pAv, 'kW', 2));
+        rows.push(R('Share of that power', use * 100, '%', 0));
+        if (n > 0 && m.n > 0 && n > m.n) rows.push(R('Top speed', 'This diameter needs ' + fmt(n, 0) + ' RPM, more than the top speed of ' + m.name + ' (' + fmt(m.n, 0) + ' RPM): the cut will run slower and take less power than shown', '', 0));
+        if (use > 1.0005) rows.push(R('Over the limit', n > 0 && pAv < m.p ? 'Below the base speed the spindle gives torque, not full power: ' + fmt(pAv, 2) + ' kW here. Reduce the depth of cut or the feed, or cut at a higher speed if the tool allows.' : 'The cut needs more power than the spindle has. Reduce the depth of cut or the feed.', '', 0));
+      } else rows.push(R('Machine check', 'Pick a machine with its spindle power in the title bar to see the share of its power this cut uses', '', 0));
+    }
     return rows;
   },
-  working: 'Metric Q = Vc x ap x f (cm3/min). Inch Q = 12 x SFM x DOC x IPR. Power Pc = Q x kc / (60 000 x eta), Q in cm3/min, kc in N/mm2.',
+  working: 'Metric Q = Vc x ap x f (cm3/min). Inch Q = 12 x SFM x DOC x IPR. Power Pc = Q x kc / (60 000 x eta), Q in cm3/min, kc in N/mm2. Machine check: n = 1000 Vc / (pi D) at the diameter being cut; the spindle has P(n) = min(P_max, T_max x 2 pi n / 60 000) kW at that speed; the share is the power at the spindle over P(n).',
   source: "Sandvik Coromant formulas and definitions; Machinery's Handbook",
 },
 {

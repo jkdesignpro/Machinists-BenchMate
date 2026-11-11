@@ -498,6 +498,40 @@ await page.$eval('#main [data-id="ld"]', e => { e.value = '5'; e.dispatchEvent(n
 if ((await page.inputValue('#main [data-id="L"]')) !== '60') problems.push(`[${where}] the stick-out slider did not set the stick-out: ${await page.inputValue('#main [data-id="L"]')}`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Milling advisor, chatter on the limit card and the wall finish. Default cut (12 mm, 4 flutes, low carbon steel): fz 0.0706 mm, so
+// Ra = fz^2 / (32 r) = 0.0706^2 / (32 x 6) = 0.026 um, and with one tooth marking f = 0.2824: 0.42 um. At 1,617 RPM the best speeds are
+// too close together, so the tile says the model cannot say. In aluminium the speed is high, deflection fits and the 12 mm depth is above
+// the stability line: the card must name chatter and give the next best speed, which must be above the speed of the cut.
+where = 'advmill chatter and finish';
+await open('advmill');
+aT = await advTxt();
+if (!/Finish on the wall, theoretical Ra \(0\.42 if runout leaves one tooth marking\) 0\.026 um/.test(aT) || !/Chatter \(simple model\)\s+Cannot say/i.test(aT)) problems.push(`[${where}] steel: "${aT.slice(0, 900)}"`);
+await page.selectOption('#main [data-id="mat"]', '15');
+aT = await advTxt();
+{ const mm = /at ([\d,]+) RPM the stability chart keeps the cut steady only up to ([\d.]+) mm deep, and this cut is 12\.000 mm deep[\s\S]*just above ([\d,]+) RPM/.exec(aT), num = x => Number(x.replace(/,/g, ''));
+  if (!/Chatter \(simple model\)\s+Above the line/i.test(aT) || !/Chatter \(simple tool model\)/.test(aT) || !mm || !(num(mm[3]) > num(mm[1])) || !(Number(mm[2]) < 12)) problems.push(`[${where}] aluminium: "${aT.slice(0, 900)}"`);
+  // a depth typed below the line: the card no longer names chatter
+  if (mm) { await advSet('ap', String(Math.floor(Number(mm[2]) * 10) / 10)); aT = await advTxt(); if (!/Chatter \(simple model\)\s+Below the line/i.test(aT) || /Chatter \(simple tool model\)/.test(aT)) problems.push(`[${where}] below the line: "${aT.slice(0, 600)}"`); } }
+await page.click('#main .tpa button[title^="Reset"]');
+
+// Removal rate and power against the machine: 200 m/min, 2 mm, 0.2 mm/rev, kc 2000, efficiency 0.8: 80 cm3/min, 3.333 kW at the spindle.
+// Machine 3.7 kW and 50 N m. At 50 mm: n = 200000 / (pi x 50) = 1273 RPM, 50 N m there is 6.67 kW, so 3.7 kW rules: 90 %.
+// At 150 mm: 424 RPM, 50 x 2 pi x 424.4 / 60000 = 2.22 kW: 150 %, over the limit.
+where = 'mrr machine';
+const mrrMach = await page.evaluate(() => { const m = Profiles.upsert({ name: 'Smoke lathe', rpm_max: 4000, power_kw: 3.7, torque_nm: 50 }); Profiles.setActive(m.id); return m.id; });
+await open('mrr');
+await advSet('kc', '2000');
+aT = await advTxt();
+if (!/Rated spindle power of Smoke lathe[^\n]*\s+3\.70\s+kW/.test(aT) || !/Share of that power\s+90\s+%/.test(aT)) problems.push(`[${where}] rated: "${aT.slice(0, 600)}"`);
+await advSet('dia', '50');
+aT = await advTxt();
+if (!/Spindle speed at that diameter\s+1,273\s+RPM/.test(aT) || !/Power Smoke lathe has at that speed\s+3\.70\s+kW/.test(aT) || !/Share of that power\s+90\s+%/.test(aT) || /Over the limit/.test(aT)) problems.push(`[${where}] 50 mm: "${aT.slice(0, 600)}"`);
+await advSet('dia', '150');
+aT = await advTxt();
+if (!/Spindle speed at that diameter\s+424\s+RPM/.test(aT) || !/Power Smoke lathe has at that speed\s+2\.22\s+kW/.test(aT) || !/Share of that power\s+150\s+%/.test(aT) || !/Over the limit/.test(aT)) problems.push(`[${where}] 150 mm: "${aT.slice(0, 600)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+await page.evaluate(id => Profiles.remove(id), mrrMach);
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

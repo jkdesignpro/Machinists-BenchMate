@@ -31,6 +31,7 @@ f1!(thread_best_wire, c::thread_best_wire, pitch);
 f1!(thread_three_wire_m, c::thread_three_wire_m, e, wire, pitch);
 
 f1!(spindle_power_available_kw, c::spindle_power_available_kw, rpm, p_max, t_max);
+f1!(share_of, c::share_of, x, limit);
 f1!(torque_for_power_nm, c::torque_for_power_nm, p, rpm);
 f1!(arc_feed_internal, c::arc_feed_internal, fe, part_r, tool_r);
 f1!(arc_feed_external, c::arc_feed_external, fe, part_r, tool_r);

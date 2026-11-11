@@ -165,6 +165,13 @@ pub fn spindle_power_available_kw(rpm: f64, p_max_kw: f64, torque_max_nm: f64) -
     p_max_kw.min(torque_max_nm * 2.0 * PI * rpm / 60_000.0)
 }
 
+/// Share of a limit that a value uses: `x / limit` (1 = at the limit). NaN
+/// when there is no limit to compare with.
+pub fn share_of(x: f64, limit: f64) -> f64 {
+    if !(x.is_finite() && limit.is_finite() && limit > 0.0) { return f64::NAN; }
+    x / limit
+}
+
 /// Spindle torque needed for a cutting power (kW) at a speed (RPM), N*m:
 /// `T = P * 60 000 / (2 * pi * n)`.
 pub fn torque_for_power_nm(power_kw: f64, rpm: f64) -> f64 {
@@ -667,6 +674,9 @@ mod tests {
         // at 500 RPM: 2.61799 kW (torque limited)
         close(spindle_power_available_kw(500.0, 3.7, 50.0), 2.617994, 1e-6);
         close(spindle_power_available_kw(500.0, 3.7, 0.0), 3.7, 1e-12);
+        // share of a limit: 2.5 kW of the 2.617994 kW available at 500 RPM
+        close(share_of(2.5, spindle_power_available_kw(500.0, 3.7, 50.0)), 0.954930, 1e-6);
+        assert!(share_of(2.5, 0.0).is_nan() && share_of(f64::NAN, 1.0).is_nan());
         close(torque_for_power_nm(2.617994, 500.0), 50.0, 1e-4);
     }
     #[test] fn bolt() {
