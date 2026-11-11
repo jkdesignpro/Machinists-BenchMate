@@ -56,6 +56,7 @@ features are names only.
 **Update (branch `claude/mechanics`, 2026-11-11):** batch B8 (mechanics for the shop) is built: section properties, beams, torsion, columns, stress concentration at holes, fatigue, centrifugal force and chuck grip, balancing, critical speed. MH30, MH35, MH36, MH37, ED30, ED31, ED32, ED36 done; MH31, MH32, MH33, MH39, ED23, ED38, ED42, ED43 partial. Not built: stepped-shaft and groove stress concentration (no free source prints a checkable fit), combined stresses (MH34), springs (MH40, MH41), vibration severity (ED24, ED25), stress-strain basics (ED29, ED39). Summary counts recounted from all rows by script (the Ultra row was one partial/missing off before this change; the in-progress column kept as it was).
 
 **Update (branch `claude/tooling-ref`, 2026-11-11):** batch B3 (tooling reference) is built: tooling guide (`toolguide`), tap pitch diameter limits (`taplimits`), saw blade pitch (`sawtpi`) and a forming-tap makers' comparison in `tapdrill`. BB63 done; MH96, MH101, MH103, MH107, MH109, MH114, MH115, MH156, BB8, BB13, BB19, BB22, BB25, BB26, BB64, BB65, CN6 partial. MH97 (done, `insertcode`) and MH98 (partial, `holdercode`) corrected: those tools were merged earlier but the rows still said missing. Not built: hole saw speeds (BB24: no two independent charts compared), broaching, burrs, mounted points, files, drill and toolbit sharpening, colour-coded taps. Summary counts recounted from all rows by script (the in-progress column changed only for MH97).
+**Update (branch `claude/inspection-2`, 2026-11-11):** batch B5 (inspection round 2) is built except thread gauges and measurement over pins for a radius: ANSI B4.1 inch fits (`ansifits`, one full source, so its rows are marked "needs 2nd source"), ISO 286 j/J and sizes up to 3150 mm (`fits`), preferred numbers (`prefnum`), control charts (`ctrlchart`) and sampling plan OC curves (`sampling`; ISO 2859-1 / Z1.4 tables not included). U61, MH79, ED79 done; MH77, MH81, ED81 partial. Summary counts updated for these six rows. Details in `docs/inspection.md`.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -197,7 +198,7 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U61 | ISO 286 fits and tolerances | partial | `fits` | No j/J classes; nothing over 500 mm |
+| U61 | ISO 286 fits and tolerances | done | `fits` | j5-j7 and J6-J8 added; sizes up to 3150 mm (over 500 mm: one table each, checked against the ISO 286-1 formulas) (`claude/inspection-2`) |
 | U62 | True position with MMC/LMC bonus | done | `gdttp`, `gdtbonus` | |
 | U63 | GD&T learning centre (without quizzes) | done | `gdtguide`, `gdtdof` | Quiz part out of scope |
 | U64 | Feature control frame builder | done | `gdtfcf` | |
@@ -370,11 +371,11 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH74 | Checking designs and drawings, arrangement of views | out of scope? | | Design office work |
 | MH75 | Limits and fits basics: unilateral/bilateral tolerances | partial | `fits` | Only via ISO classes |
 | MH76 | Force, expansion and shrink fits; temperatures for shrinkage fits | done | `shrinkfit` | Shrink-fit temperatures (hub heated, shaft cooled, both) and Lame press-fit pressure, stress, torque; inputs are yours (`claude/measure-maths`) |
-| MH77 | ANSI/ASME standard fits (RC, LC, LT, LN, FN) | missing | | |
+| MH77 | ANSI/ASME standard fits (RC, LC, LT, LN, FN) | partial | `ansifits` | All 34 classes 0 to 19.69 in, but only one full table read: 491 of 492 rows need a 2nd source; above 19.69 in not covered (`claude/inspection-2`) |
 | MH78 | ANSI preferred metric limits and fits | partial | `fits` | Any class works; preferred fits not listed |
-| MH79 | ISO metric limits and fits | partial | `fits` | No j/J; up to 500 mm |
+| MH79 | ISO metric limits and fits | done | `fits` | j/J and up to 3150 mm added (`claude/inspection-2`) |
 | MH80 | Tolerance stack-up chain, analysis and assignment | partial | `gdtstack` | 1D worst case and RSS; no tolerance assignment |
-| MH81 | Preferred numbers and sizes | missing | | |
+| MH81 | Preferred numbers and sizes | partial | `prefnum` | Renard R5 to R80 (R40-only and R80 values single-source); no more-rounded R' and R'' series, no preferred metric sizes (`claude/inspection-2`) |
 | MH82 | Reading verniers and micrometers | done | `scales` | Reading aid for micrometers (0.01, 0.001 mm; 0.001, 0.0001 in) and vernier calipers (0.02, 0.05 mm; 0.001 in) (`claude/measure-maths`) |
 | MH83 | Sine bar use and constants | missing | | In progress (`claude/geometry`, `sinebar`) |
 | MH84 | Measuring tapers with V-block; dimensioning tapers; taper per foot | partial | `taper`, `machinetapers`, `taperrolls` | Taper per foot, angle, over-rolls measurement; no V-block method (`claude/measure-maths`) |
@@ -723,9 +724,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED76 | 13.12 Drive types | missing | | |
 | ED77 | 14.1-14.3 ISO 9001 quality systems and certification | out of scope? | | Management system |
 | ED78 | 14.4 Taguchi methods | missing | | Low priority |
-| ED79 | 14.5 Statistical process control | partial | `capability` | Cp/Cpk; no control charts |
+| ED79 | 14.5 Statistical process control | done | `capability`, `ctrlchart` | Cp/Cpk; X-bar/R and individuals/MR charts; run rules not applied (`claude/inspection-2`) |
 | ED80 | 14.6 Normal distribution | done | `capability` | |
-| ED81 | 14.7 Binomial and Poisson distributions | missing | | Sampling plans |
+| ED81 | 14.7 Binomial and Poisson distributions | partial | `sampling` | Binomial and Poisson OC curves of single sampling plans; ISO 2859-1 / Z1.4 tables not included (copyright); no general distribution calculator (`claude/inspection-2`) |
 | ED82 | 14.8-14.10 Reliability and design for reliability | out of scope? | | |
 | ED83 | 15.1-15.5 Project engineering (planning, CPA, Gantt, prototyping, value analysis) | out of scope? | | |
 | ED84 | 16.1 Welding processes | out of scope | | |
@@ -957,7 +958,7 @@ U65, U67, U69, U75-U78, U81 and U103 move to done or partial.
 | B2 | **Machine elements for machinists**: keys and keyways (incl. Woodruff), bearing shaft/housing fits and L10, belts and pulleys, chains and sprockets, O-ring glands, adhesives and threadlockers | MH283-296, BB44, BB46, BB47, BB59, ED66-71, ED75-76 | heavy research |
 | B3 | **Tooling reference**: tool geometry terms, carbide grades (ISO 513) and coatings, end mill and drill types, drill point geometry and sharpening, reamers, tap types and H limits, broaching, burrs, mounted points, files, hole saws and saw blade selection, broken-tap removal | MH96-133, BB8-9, BB13-14, BB18-19, BB22, BB24-27, BB61-65, BB68-69 | heavy research |
 | B4 | **Materials round 3**: heat treatment terms and temperatures, temper colours, tool steel selection, corrosion and galvanic series, machining plastics and nonferrous metals, metal identification, mill certificates, zinc and magnesium | MH51-68, MH159-160, BB76-77, ED58, ED63-64 | heavy research |
-| B5 | **Inspection round 2**: ANSI fits (RC/LC/LT/LN/FN), ISO 2768 general tolerances, j/J classes and over 500 mm, preferred numbers, measurement over pins/rolls and radius, micrometer and vernier reading, thread gauges, control charts, sampling | MH75-95, MH245, MH248, ED13, ED79, ED81 | mixed: maths/UI plus moderate research |
+| B5 | **Inspection round 2** (built on `claude/measure-maths` and `claude/inspection-2` except thread gauges and radius over pins; ANSI fits single-source): ANSI fits (RC/LC/LT/LN/FN), ISO 2768 general tolerances, j/J classes and over 500 mm, preferred numbers, measurement over pins/rolls and radius, micrometer and vernier reading, thread gauges, control charts, sampling | MH75-95, MH245, MH248, ED13, ED79, ED81 | mixed: maths/UI plus moderate research |
 | B6 | **CNC knowledge guide**: coordinate systems, work and tool offsets, TNRC and cutter compensation, program structure, 2D/3D and lathe toolpath strategies, CSS, workholding and vise practice, operator procedures, shop safety, glossary; plus a TNRC calculator | MH174-185, CN3-CN82 | writing in our own words, some maths; light research |
 | B7 | **Shop maths**: plane and solid figures beyond the geometry branch, across corners, angle conversion, compound angles, interpolation, involute function, prime factors, lathe change gears, engineering economics | MH1-24, MH256, BB29-34, BB79 | maths/UI |
 | B8 | **Mechanics for the shop** (built on `claude/mechanics`; no stepped-shaft Kt, springs or combined stresses): beam, torsion, column and section properties, stress concentration, fatigue basics, centrifugal force on chucks, balancing, critical speed | MH25-41, ED23-25, ED29-43 | maths/UI |

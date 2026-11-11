@@ -73,9 +73,11 @@ pub fn iso286_it_rounded(d_mean: f64, grade: u32) -> f64 {
 
 /// Delta for the hole rules: `delta = IT(n) - IT(n-1)` from the tabulated
 /// values (ISO 286-1, holes K, M, N up to IT8 and P to ZC up to IT7).
-/// Zero for sizes up to 3 mm, where the rule does not apply.
+/// Zero for sizes up to 3 mm and over 500 mm, where the rule does not apply
+/// (above 500 mm holes K to U follow the general rule ES = -ei; checked
+/// against GOST 25346-89 Table 3 in `inspect` tests).
 pub fn iso286_delta(it_n: f64, it_n_minus_1: f64, size_hi: f64) -> f64 {
-    if size_hi <= 3.0 { 0.0 } else { it_n - it_n_minus_1 }
+    if size_hi <= 3.0 || size_hi > 500.0 { 0.0 } else { it_n - it_n_minus_1 }
 }
 
 /// Letter codes used by the f64 interface (shafts lower case, holes the same

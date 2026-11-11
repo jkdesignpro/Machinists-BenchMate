@@ -587,6 +587,8 @@ pub mod units;
 pub mod expr;
 pub mod gears;
 pub mod mechanics;
+pub mod inspect;
+pub use inspect::*;
 
 #[cfg(test)]
 mod tests {

@@ -165,7 +165,7 @@ Nothing was typed in from memory and no handbook was used. The formulas are in t
   - IT18 over 315-400 mm: Ganter prints 2200, out of sequence with its neighbours; Wikipedia prints 8900. The app shows this value as Sources differ.
   - Simply Bearings prints E7 over 315-400 mm as +185, but the rule gives +182. The tests treat it as a misprint.
   - Shaft k over 400-500 mm has only one source.
-- Not included: letters j and J (they are tabulated only and have no formula).
+- j and J and sizes over 500 mm: added in inspection round 2; sources and findings in `docs/inspection.md` (section 2). Over 500 mm: Wikipedia "IT Grade" (IT1-IT18) and GOST 25346-89 Table 2 (d to u) and Table 3 (holes, https://dnaop.com/html/65935_3.html), each checked against the ISO 286-1 annex formulas (I = 0.004 D + 2.1); j5-j7 from Simply Bearings and RoyMech, J6-J8 from Simply Bearings and GOST 25346 (all accessed 2026-11-11).
 
 ## Pipe threads, Whitworth and BA threads (`data/refdata/threads-other-evidence.json`, `core/src/thread_forms.rs`)
 Same evidence model as above. Series values come from at least two publishers where found; dimensions that follow from a formula are computed and checked against the printed values in `core/src/thread_forms.rs`.
@@ -600,3 +600,16 @@ Vibration with Applications (Rayleigh, Dunkerley). Free sources used for numbers
 - IRD Balancing, Technical Paper 1, Balance Quality Requirements of Rigid Rotors: ISO 1940 / 21940-11 formula, plane allocation, worked example. ISO 21940-11:2016 cited by name.
 - OpenStax, University Physics Vol. 1, 6.3 (F = m r omega^2). VDI 3106 (by name); Optimum Optiturn manual 4.23.8 (manualslib.de) for Fsp0 = Ssp (Fsp +- Fc); Berg Spanntechnik speed notes (backup.berg-spanntechnik.de, drehzahlhinweise.pdf) for the one-third rule.
 - NIST SP 811 appendix B: exact unit factors (lbf, lb, hp, oz).
+## Inspection round 2 (`core/src/inspect.rs`, `app/inspect.js`, `data/refdata/ansi-fits-evidence.json`, `preferred-evidence.json`)
+
+Full detail, counts and disagreements in `docs/inspection.md`. All pages accessed 2026-11-11.
+- **Standards (by name only; nothing reproduced):** ANSI B4.1-1967 (R1999, R2004), preferred limits and fits for cylindrical parts; ISO 286-1:2010 (Cor 1:2013) annex formulas for sizes over 500 mm; ISO 3:1973 preferred numbers (and ISO 17:1973, ISO 497:1973 by name); ISO 2859-1:1999 and ANSI/ASQ Z1.4-2003 attribute sampling (tables not used).
+- **[KSU]** King Saud University course material, ANSI B4.1-1967 (R1987) Tables 3 to 9, https://fac.ksu.edu.sa/sites/default/files/fits_us_tables_ansi_b4.1-1967_r1987.pdf . The only full ANSI fit table read: 491 of 492 rows are single-source ("needs 2nd source").
+- **[EE]** Engineers Edge, Standard Preferred Tolerance Limits Fits ANSI B4.1 (RC5 at 2 in worked example), https://ns1.engineersedge.com/mechanical,045tolerances/preffered-mechanical-tolerances.htm .
+- **[AMES]** AmesWeb, ANSI preferred tolerances and fits charts (symbols and descriptions), https://amesweb.info/fits-tolerances/ansi-preferred-tolerances-fits-charts.aspx .
+- **[ITEH_ISO3]** iTeh Standards catalogue preview of ISO 3:1973, https://iteh.es/catalog/standards/iso/e9d7acbc-57da-4556-8352-b3cf61d8ac97/iso-3-1973 (R5, R10, R20).
+- **[WIKI_RENARD]** Wikipedia, "Renard series", https://en.wikipedia.org/wiki/Renard_series (R5, R40, R80 extra values); **[WIKI_PREF]** Wikipedia, "Preferred number", https://en.wikipedia.org/wiki/Preferred_number (same publisher, R5).
+- **[NISTSEM]** NIST/SEMATECH e-Handbook of Statistical Methods, 6.3.2.1 Shewhart X-bar and R and S control charts (A2, D3, D4 table; A2 = 3/(d2 sqrt n), D3/D4 = 1 -/+ 3 d3/d2), https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc321.htm ; 6.3.2.2 Individuals control charts (limits x-bar +/- 3 MR-bar/1.128, flow-rate worked example), https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc322.htm . Section 6.2.3 (single sampling plans, OC curve, AOQ) cited by name.
+- **[YORK]** University of York, Department of Mathematics, "Factors useful in the construction of control charts", https://www.york.ac.uk/depts/maths/tables/controlfactors.htm . Agrees with NIST on A2; differs in the last digit on D4 for n = 2 to 6 and 8 and D3 for n = 8 (the computed values round to NIST's).
+- **Own derivation (tests):** d2 and d3 by numerical integration of the range distribution of n standard normal values (Simpson and trapezoid rules; n = 2 against the closed forms 2/sqrt(pi) and sqrt(2 - 4/pi)); binomial and Poisson acceptance probabilities checked against direct sums.
+

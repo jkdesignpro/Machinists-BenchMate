@@ -1,0 +1,42 @@
+{
+ "about": "Preferred numbers, basic series R5, R10, R20, R40 (ISO 3:1973) and the R80 exceptional series, mantissas from 1.00 to below 10. Printed values per publisher, transcribed with the WebFetch tool (text extraction).",
+ "sources": {
+  "ITEH_ISO3": {
+   "publisher": "iTeh Standards (standards.iteh.ai catalogue preview of ISO 3:1973)",
+   "title": "ISO 3:1973 Preferred numbers - Series of preferred numbers (catalogue page with the standard's preview text; also lists SIST ISO 3:1995, identical)",
+   "url": "https://iteh.es/catalog/standards/iso/e9d7acbc-57da-4556-8352-b3cf61d8ac97/iso-3-1973",
+   "accessed": "2026-11-11",
+   "note": "Preview text is OCR. R5, R10 and R20 were legible; the R40 column was not and is not recorded."
+  },
+  "WIKI_RENARD": {
+   "publisher": "Wikipedia",
+   "title": "Renard series (article)",
+   "url": "https://en.wikipedia.org/wiki/Renard_series",
+   "accessed": "2026-11-11",
+   "note": "R5 in the text. The R10/R20/R40 table could not be split into columns in the text extraction; its R40 column (40 values) was read and is recorded as R40. The R10 and R20 values are every 4th and every 2nd R40 value (ISO 3 builds each basic series from every other term of the next finer one), so they also appear in this print. R80 extra values from its 'R80 add'l' column. States that the numbers are not always the closest three-digit rounding of the theoretical values and that 3.00 and 6.00 in R40 were chosen as rounder numbers."
+  },
+  "WIKI_PREF": {
+   "publisher": "Wikipedia",
+   "title": "Preferred number (article)",
+   "url": "https://en.wikipedia.org/wiki/Preferred_number",
+   "accessed": "2026-11-11",
+   "note": "Same publisher as WIKI_RENARD, so it is not counted as a second independent source. Prints R5 (1.0, 1.6, 2.5, 4.0, 6.3) as an example and names ISO 3:1973, ISO 17:1973 and ISO 497:1973."
+  }
+ },
+ "printed": {
+  "ITEH_ISO3": {
+   "R5": ["1.00", "1.60", "2.50", "4.00", "6.30"],
+   "R10": ["1.00", "1.25", "1.60", "2.00", "2.50", "3.15", "4.00", "5.00", "6.30", "8.00"],
+   "R20": ["1.00", "1.12", "1.25", "1.40", "1.60", "1.80", "2.00", "2.24", "2.50", "2.80", "3.15", "3.55", "4.00", "4.50", "5.00", "5.60", "6.30", "7.10", "8.00", "9.00"]
+  },
+  "WIKI_RENARD": {
+   "R5": ["1.00", "1.60", "2.50", "4.00", "6.30"],
+   "R40": ["1.00", "1.06", "1.12", "1.18", "1.25", "1.32", "1.40", "1.50", "1.60", "1.70", "1.80", "1.90", "2.00", "2.12", "2.24", "2.36", "2.50", "2.65", "2.80", "3.00", "3.15", "3.35", "3.55", "3.75", "4.00", "4.25", "4.50", "4.75", "5.00", "5.30", "5.60", "6.00", "6.30", "6.70", "7.10", "7.50", "8.00", "8.50", "9.00", "9.50"],
+   "R80_extra": ["1.03", "1.09", "1.15", "1.22", "1.28", "1.36", "1.45", "1.55", "1.65", "1.75", "1.85", "1.95", "2.06", "2.18", "2.30", "2.43", "2.58", "2.72", "2.90", "3.07", "3.25", "3.45", "3.65", "3.87", "4.12", "4.37", "4.62", "4.87", "5.15", "5.45", "5.75", "6.15", "6.50", "6.90", "7.30", "7.75", "8.25", "8.75", "9.25", "9.75"]
+  },
+  "WIKI_PREF": {
+   "R5": ["1.00", "1.60", "2.50", "4.00", "6.30"]
+  }
+ },
+ "same_publisher": {"WIKI_PREF": "WIKI_RENARD"}
+}

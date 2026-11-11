@@ -1428,10 +1428,10 @@ const TOOLS = [
 },
 {
   id: 'fits', group: 'Limits and fits', title: 'ISO limits and fits',
-  desc: 'IT grades, fundamental deviations and limits of any hole and shaft tolerance class up to 500 mm (hole basis or shaft basis), with the clearance or interference of the fit.',
+  desc: 'IT grades, fundamental deviations and limits of any hole and shaft tolerance class up to 3150 mm (hole basis or shaft basis), including j5 to j7 and J6 to J8, with the clearance or interference of the fit.',
   render: el => renderFits(el),
   working: 'See the note under the tool.',
-  source: 'ISO 286-1:2010 (with Cor 1:2013) and ISO 286-2:2010; table values from Wikipedia, Ganter, GOST 25346-89, RoyMech, Simply Bearings and OSG (JIS B 0401).',
+  source: 'ISO 286-1:2010 (with Cor 1:2013) and ISO 286-2:2010; table values from Wikipedia, Ganter, GOST 25346-89, RoyMech, Simply Bearings and OSG (JIS B 0401); over 500 mm checked against the ISO 286-1 annex formulas.',
 },
 {
   id: 'surface', group: 'Limits and fits', title: 'Surface texture: Ra, N grades and symbols',
@@ -1460,6 +1460,20 @@ const TOOLS = [
   render: el => renderGenTol(el),
   working: 'Table lookup by range (over the lower size, up to and including the upper). Angle offset = shorter side x tan(tolerance).',
   source: 'ISO 2768-1:1989 (by name; confirmed current on iso.org). Values from AmesWeb, Star Rapid, Modulus Metal, CamCut and Wevolver.',
+},
+{
+  id: 'ansifits', group: 'Limits and fits', title: 'ANSI inch fits (RC, LC, LT, LN, FN)',
+  desc: 'ANSI B4.1 preferred limits and fits, 0 to 19.69 in: hole and shaft limits and the limits of clearance or interference for RC1 to RC9, LC1 to LC11, LT1 to LT6, LN1 to LN3 and FN1 to FN5, with every class of the family at that size.',
+  render: el => renderAnsiFits(el),
+  working: 'Limits = basic size + deviation / 1000 (deviations in thousandths). Max clearance = hole upper - shaft lower; min clearance = hole lower - shaft upper (negative = interference).',
+  source: 'ANSI B4.1-1967 (R1999, R2004), by name; table as reprinted by King Saud University course material (one full source: marked "needs 2nd source"); RC5 example from Engineers Edge; symbols and descriptions from AmesWeb. See docs/inspection.md.',
+},
+{
+  id: 'prefnum', group: 'Limits and fits', title: 'Preferred numbers (Renard R5 to R80)',
+  desc: 'List the ISO 3 preferred numbers of a Renard series between two values, with the theoretical value, the step and the rounding, or find the preferred number nearest to yours.',
+  render: el => renderPrefNum(el),
+  working: 'Term i = 10^(i/R) (theoretical); rounded values from the published series; nearest term i = round(R log10 x).',
+  source: 'ISO 3:1973 (by name); values from the iTeh Standards preview of ISO 3:1973 and Wikipedia (Renard series). See docs/inspection.md.',
 },
 {
   id: 'bolt', group: 'Geometry', title: 'Bolt circle',
@@ -1867,6 +1881,20 @@ const TOOLS = [
   render: el => renderCapability(el),
   working: 'Cp = (USL - LSL) / 6 sigma; Cpk = min((USL - mean) / 3 sigma, (mean - LSL) / 3 sigma); one-sided: only the index for the limit given. Cp and Cpk use the within (short-term) sigma: average moving range / d2 (d2 = 1.128 for ranges of two consecutive values), or for subgroups of k consecutive values the mean range / d2(k). Pp and Ppk use the same formulas with the overall sample standard deviation (divisor n - 1). Expected ppm: normal tail areas beyond each limit. Histogram bins: Sturges (ceil(log2 n) + 1).',
   source: 'NIST/SEMATECH e-Handbook of Statistical Methods, 6.1.6 (capability indices, ppm table, ~50 values) and 6.3.2 (d2) (public domain); Minitab support, methods and formulas for normal capability analysis (within and overall sigma). Pp/Ppk as the same formulas on the overall sigma: one source read, to be verified. Normal tail: Numerical Recipes erfc. See docs/shop-helpers.md.',
+},
+{
+  id: 'ctrlchart', group: 'Inspection and quality', title: 'Control charts (X-bar/R, individuals)',
+  desc: 'Individuals and moving range, or X-bar and R charts for subgroups of 2 to 10, from pasted measurements: centre lines, control limits, the charts with points beyond a limit marked, and the A2, D3, D4 constants checked against two tables.',
+  render: el => renderCtrlChart(el),
+  working: 'Individuals: mean +/- 3 MR-bar / 1.128; MR UCL = 3.267 MR-bar. X-bar: grand mean +/- A2 R-bar; R: D3 R-bar to D4 R-bar. See the note under the tool.',
+  source: 'NIST/SEMATECH e-Handbook of Statistical Methods 6.3.2.1 and 6.3.2.2; University of York factors for control charts; d2 and d3 computed by numerical integration (core tests). See docs/inspection.md.',
+},
+{
+  id: 'sampling', group: 'Inspection and quality', title: 'Sampling plan OC curve',
+  desc: 'For a single sampling plan (sample n, accept on c or fewer defectives): chance of accepting a lot at any percent defective, the OC curve, the 95 % and 10 % points and the AOQL, plus how ISO 2859-1 / ANSI Z1.4 choose plans (tables not reproduced).',
+  render: el => renderSampling(el),
+  working: 'Pa = sum_{k=0..c} C(n,k) p^k (1-p)^(n-k) (binomial), Poisson with lambda = n p; AOQ = p Pa (N - n) / N.',
+  source: 'Binomial and Poisson distributions; NIST/SEMATECH e-Handbook 6.2.3 (by name); ISO 2859-1:1999 and ANSI/ASQ Z1.4-2003 described by name only. See docs/inspection.md.',
 },
 {
   id: 'tempcomp', group: 'Inspection and quality', title: 'Temperature compensation',
