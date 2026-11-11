@@ -84,20 +84,39 @@ function threadSelect(opts, cur) {
 }
 
 // ------------------------------------------------------------------ tap drills
+const DRILL_SERIES = [['number', 'Number'], ['letter', 'Letter'], ['fraction', 'Fractional'], ['metric', 'Metric']];
+// Nearest drill at or below and above `mm` in each series (a lookup in the drill chart).
+function nearestBySeries(drills, mm) {
+  return DRILL_SERIES.map(([kind, name]) => {
+    const list = drills.filter(d => d.kind === kind).map(d => ({ d, mm: d.inch * IN_MM })).sort((a, b) => a.mm - b.mm);
+    let below = null, above = null;
+    for (const x of list) { if (x.mm <= mm + 1e-9) below = x; else if (!above) above = x; }
+    return { kind, name, below, above, first: list[0], last: list[list.length - 1] };
+  });
+}
+// Suggested starting engagement: 75 % cutting (USCTI tapping tip; FM Carbide 65-75 %, calculator default 75 %),
+// 65 % forming (Besly in CTE 1995: 65 to 75 %, worked at 65 %; FM Carbide 60-65 % in steel). See docs/sources.md.
+const TAP_SUGGEST = { cut: 75, form: 65 };
 async function renderTapDrill(el) {
   const R = await loadRef(el); if (!R) return;
   const W = state.W, opts = threadOptions(R);
-  const m = RMEM.tap || (RMEM.tap = { key: 'M10x1.5', type: 'cut', pct: '', d: 10, p: 1.5 });
+  const m = RMEM.tap || (RMEM.tap = { key: 'M10x1.5', type: 'cut', pctCut: TAP_SUGGEST.cut, pctForm: TAP_SUGGEST.form, d: 10, p: 1.5 });
   const TAP_PICK = { map: { d: 'dia', p: 'pitch' }, types: ['Tap'] };
   el.innerHTML = toolPickRow(TAP_PICK) + '<div class="grid" style="max-width:760px">' +
     '<label class="f"><span>Thread</span><div class="row"><select id="tk">' + threadSelect(opts, m.key) + '</select></div></label>' +
-    '<label class="f"><span>Tap type</span><div class="row"><select id="tt"><option value="cut">Cutting tap</option><option value="form">Forming (roll) tap</option></select></div></label>' +
-    '<label class="f"><span>Percent of thread (blank = 75 cut, 65 form)</span><div class="row"><input id="tp" type="number" step="any"><span class="u">%</span></div></label>' +
+    '<div class="f"><span>Tap type</span><div class="row"><div class="seg" id="tt"><button type="button" data-v="cut">Cut tap</button><button type="button" data-v="form">Form (roll) tap</button></div></div></div>' +
+    '<label class="f"><span>Thread engagement <b id="tpv" class="mv"></b> <span class="ms" id="tps"></span></span><div class="row"><input id="tp" type="range" min="55" max="85" step="1" style="flex:1 1 160px;min-width:120px;padding:0;border:0;background:transparent" aria-label="Thread engagement in percent"><span class="u">%</span></div></label>' +
     '<label class="f cust"><span>Major diameter</span><div class="row"><input id="td" type="number" step="any"><span class="u">' + uLen() + '</span></div></label>' +
     '<label class="f cust"><span>Pitch' + (inMode() ? ' (threads per inch)' : '') + '</span><div class="row"><input id="tpp" type="number" step="any"><span class="u">' + (inMode() ? 'TPI' : 'mm') + '</span></div></label>' +
-    '</div><div id="tres"></div><div class="note"><b>Working:</b> Cutting taps: drill = D - 1.299038 P x %/100, the convention behind the inch formula drill = D - 0.01299 x % / TPI (OSG USA tapping guide, 2024) and the metric form D - % x P / 76.98 (FM Carbide). In this convention 100 % is a thread depth of 2 x 0.75 H = 1.299 P on the diameter, deeper than the basic engagement of ISO 68-1 / ASME B1.1 (2 x 5/8 H = 1.0825 P), so a hole at the basic minor diameter is 83.3 %. Forming taps: hole = D - 0.0068 x % x P (inch: D - 0.0068 x % / TPI; metric form D - % x P / 147.06), as published by the forming tap makers North American Tool and Besly and by FM Carbide, Engineers Edge and MSC (compared under the result in forming mode); the formed metal flows inward, so the hole is larger than for a cutting tap. It is a rule of thumb: the forming-tap maker Balax prints hole sizes for 75, 65 and 55 % thread (miniature sizes, 0-80 to 3-48 and M1 to M1.4) that are 0 to 0.0016 in larger than it gives. Use the tap maker\'s recommended hole size for the tap you have. The shop rule of thumb "drill = major minus pitch" is an approximation: it gives 77 % thread with a cutting tap. Nearest drills come from the drill chart; check the hole against the internal thread minor diameter limits and your tap maker\'s chart, especially for forming taps.<br><b>Sources:</b> OSG USA, Tapping Guide vol. 3 (2024), formula and drill tables for 60 to 80 % thread; FM Carbide TechTips "Tapping formulas" (constants 1.299 / 0.68, 76.98 / 147.06); Engineers Edge "Theoretical tapping hole size, cold form threads" (0.0068). Thread geometry ISO 68-1:2023, ASME B1.1-2024.</div>';
+    '</div><div id="tres"></div><div class="note"><b>Working:</b> Cutting taps: drill = D - 1.299038 P x %/100, the convention behind the inch formula drill = D - 0.01299 x % / TPI (OSG USA tapping guide, 2024) and the metric form D - % x P / 76.98 (FM Carbide). In this convention 100 % is a thread depth of 2 x 0.75 H = 1.299 P on the diameter, deeper than the basic engagement of ISO 68-1 / ASME B1.1 (2 x 5/8 H = 1.0825 P), so a hole at the basic minor diameter is 83.3 %. Forming taps: hole = D - 0.0068 x % x P (inch: D - 0.0068 x % / TPI; metric form D - % x P / 147.06), as published by the forming tap makers North American Tool and Besly and by FM Carbide, Engineers Edge and MSC (compared under the result in forming mode); the formed metal flows inward, so the hole is larger than for a cutting tap. It is a rule of thumb: the forming-tap maker Balax prints hole sizes for 75, 65 and 55 % thread (miniature sizes, 0-80 to 3-48 and M1 to M1.4) that are 0 to 0.0016 in larger than it gives. Use the tap maker\'s recommended hole size for the tap you have. The shop rule of thumb "drill = major minus pitch" is an approximation: it gives 77 % thread with a cutting tap.<br>' +
+    '<b>Suggested engagement:</b> 75 % for cutting taps: USCTI calls 75 % the general rule for 2B and 3B threads (a little more in soft, a little less in hard material, and not under 65 % in holes shallower than 3 x D); FM Carbide gives 65 to 75 % for cutting taps and starts its calculator at 75 %. 65 % for forming taps: Besly (Cutting Tool Engineering, 1995) says 65 to 75 % is enough for general work and works its example at 65 %; FM Carbide gives 60 to 65 % for forming in steel, stainless and ductile alloys; North American Tool gives 55 to 75 %. Besly and FM Carbide both advise against forming above 75 %. The slider runs from 55 to 85 %; the suggestions are starting points, not limits.<br>' +
+    '<b>Nearest drills:</b> for each drill series, the nearest size at or below and the nearest above the theoretical hole for the tap type you chose, with the engagement each gives with a cutting tap and with a forming tap (the two use different formulas, so the same drill gives a different percent). Sizes come from the drill chart (number and letter sizes as printed by its publishers). Check the hole against the internal thread minor diameter limits and your tap maker\'s chart, especially for forming taps.<br><b>Sources:</b> OSG USA, Tapping Guide vol. 3 (2024), formula and drill tables for 60 to 80 % thread; FM Carbide TechTips "Tapping formulas" (constants 1.299 / 0.68, 76.98 / 147.06; engagement ranges); Engineers Edge "Theoretical tapping hole size, cold form threads" (0.0068); USCTI tapping tip "Don\'t let percent of thread derail your part"; Besly Products in Cutting Tool Engineering, "Threads will roll" (1995); North American Tool TRU-FLO engineering data. Thread geometry ISO 68-1:2023, ASME B1.1-2024.</div>';
   const k = $('#tk', el), tt = $('#tt', el), tp = $('#tp', el), td = $('#td', el), tpp = $('#tpp', el);
-  tt.value = m.type; tp.value = m.pct;
+  const type = () => m.type === 'form' ? 'form' : 'cut';
+  function setType() {
+    tt.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === type()));
+    tp.value = type() === 'form' ? m.pctForm : m.pctCut;
+  }
   function setCustomFields() {
     const cust = k.value === 'custom';
     el.querySelectorAll('.cust').forEach(x => x.style.display = cust ? '' : 'none');
@@ -105,29 +124,46 @@ async function renderTapDrill(el) {
     tpp.value = inMode() ? +(IN_MM / m.p).toFixed(3) : +m.p.toFixed(4);
   }
   function upd() {
-    m.key = k.value; m.type = tt.value; m.pct = tp.value;
+    m.key = k.value;
+    const pct = parseFloat(tp.value), form = type() === 'form';
+    if (form) m.pctForm = pct; else m.pctCut = pct;
+    $('#tpv', el).textContent = fx(pct, 0) + ' %';
+    $('#tps', el).textContent = pct === TAP_SUGGEST[type()] ? '(suggested for ' + (form ? 'forming' : 'cutting') + ' taps)' : '(suggested ' + TAP_SUGGEST[type()] + ' %)';
     let d, p, sel = opts.find(o => o.key === k.value);
     if (sel) { d = sel.d; p = sel.p; m.d = d; m.p = p; }
     else { d = fromUser(parseFloat(td.value)); const pv = parseFloat(tpp.value); p = inMode() ? IN_MM / pv : pv; if (d > 0 && p > 0) { m.d = d; m.p = p; } }
     const out = $('#tres', el);
     if (!(d > 0 && p > 0 && p < d)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter the thread size.</td></tr></table></div>'; return; }
-    const form = tt.value === 'form';
-    const pct = tp.value === '' ? (form ? 65 : 75) : parseFloat(tp.value);
-    const drill = form ? W.tap_drill_form(d, p, pct) : W.tap_drill_cut(d, p, pct);
-    const pctOf = h => form ? W.tap_pct_form(d, p, h) : W.tap_pct_cut(d, p, h);
-    const d1 = W.thread_basic_minor_dia(d, p);
-    const pctTxt = h => { const v = pctOf(h); return v > 100 ? 'too small for a forming tap (over 100 %)' : '= ' + fx(v, 1) + ' %'; };
-    const rows = [
-      ['Hole for ' + fx(pct, 0) + ' % thread', fBoth(drill)],
+    // Each tap type at its own engagement (the slider sets the one chosen; the other keeps its value).
+    const T = { cut: { pct: m.pctCut, hole: W.tap_drill_cut(d, p, m.pctCut), of: h => W.tap_pct_cut(d, p, h), name: 'Cutting tap' },
+      form: { pct: m.pctForm, hole: W.tap_drill_form(d, p, m.pctForm), of: h => W.tap_pct_form(d, p, h), name: 'Forming tap' } };
+    const cur = T[type()], d1 = W.thread_basic_minor_dia(d, p);
+    const pctTxt = h => { const v = cur.of(h); return v > 100 ? 'too small for a ' + (form ? 'forming' : 'cutting') + ' tap (over 100 %)' : '= ' + fx(v, 1) + ' % with a ' + (form ? 'forming' : 'cutting') + ' tap'; };
+    const pitchTxt = (sel ? sel.sys === 'unified' : inMode()) ? fx(IN_MM / p, 2) + ' TPI' : fx(p, 3) + ' mm pitch';
+    const order = form ? ['form', 'cut'] : ['cut', 'form'];
+    const rows = order.map(t => ['Theoretical hole, ' + T[t].name.toLowerCase() + ', ' + fx(T[t].pct, 0) + ' % engagement' + (t === type() ? '' : ' <span class="ms">(its own setting; choose ' + (t === 'form' ? 'Form' : 'Cut') + ' tap to change it)</span>'), t === type() ? '<b>' + fBoth(T[t].hole) + '</b>' : fBoth(T[t].hole)]).concat([
       ['Basic minor diameter of the internal thread (D1)', fBoth(d1) + ' <span class="ms">' + pctTxt(d1) + '</span>'],
       ['Rule of thumb D - P (approximation)', fBoth(d - p) + ' <span class="ms">' + pctTxt(d - p) + '</span>'],
-    ];
-    const near = R.drills.drills.map(x => ({ x, mm: x.inch * IN_MM })).sort((a, b) => Math.abs(a.mm - drill) - Math.abs(b.mm - drill)).slice(0, 8).sort((a, b) => a.mm - b.mm);
-    out.innerHTML = '<div class="res"><div class="h">Results' + (sel ? ' for ' + rEsc(sel.label) + ' ' + badge(sel.status) : '') + '</div><table>' + rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') + '</table></div>' +
-      '<div class="res" style="margin-top:12px"><div class="h">Nearest standard drills (' + (form ? 'forming' : 'cutting') + ' tap)</div><table><tr><td class="ms">Drill</td><td class="ms" style="text-align:right">Size</td><td class="ms" style="text-align:right">Thread</td></tr>' + near.map(({ x, mm }) => {
-        const pc = pctOf(mm), warn = pc > 100 || pc < 50;
-        return '<tr' + (warn ? ' class="over"' : '') + '><td>' + rEsc(drillLabel(x)) + ' ' + badge(x.status) + '</td><td class="v">' + fBoth(mm) + '</td><td class="v">' + fx(pc, 1) + ' %' + (warn ? '<div class="wmsg">' + (pc > 100 ? 'over 100 %: tap will bind or break' : 'under 50 %: weak thread') + '</div>' : '') + '</td></tr>';
-      }).join('') + '</table></div>' + (form && typeof formTapCompare === 'function' ? formTapCompare(R, d, p, pct) : '');
+    ]);
+    const nearTable = t => {
+      const X = T[t];
+      let near = '';
+      nearestBySeries(R.drills.drills, X.hole).forEach(s => {
+        const pick = [];
+        if (!s.above) { near += '<tr><td><b>' + s.name + '</b></td><td colspan="4" class="ms">None this large: the largest is ' + rEsc(s.last.d.name) + ' (' + fLen(s.last.mm) + ' ' + uLen() + ')</td></tr>'; return; }
+        if (s.below) pick.push(['at or below', s.below]);
+        pick.push(['above', s.above]);
+        pick.forEach(([side, x], i) => {
+          const diff = x.mm - X.hole, v = X.of(x.mm), warn = v > 100 ? 'over 100 %: tap will bind or break' : v < 50 ? 'under 50 %: weak thread' : '';
+          near += '<tr' + (warn ? ' class="over"' : '') + '>' + (i === 0 ? '<td rowspan="' + pick.length + '"><b>' + s.name + '</b>' + (!s.below ? '<div class="ms">none smaller in the chart</div>' : '') + '</td>' : '') +
+            '<td>' + rEsc(x.d.name) + ' ' + badge(x.d.status) + '</td><td class="v">' + fBoth(x.mm) + '</td><td class="v ms">' + side + ', ' + (diff >= 0 ? '+' : '') + (inMode() ? fx(diff / IN_MM, 4) : fx(diff, 3)) + '</td><td class="v"><b>' + fx(v, 1) + ' %</b>' + (warn ? '<div class="wmsg">' + warn + '</div>' : '') + '</td></tr>';
+        });
+      });
+      return '<div class="res mtab" style="margin-top:12px"><div class="h">' + X.name + ': nearest standard drills to ' + fLen(X.hole) + ' ' + uLen() + ' (' + fx(X.pct, 0) + ' %)</div><table><tr><th>Series</th><th>Drill</th><th style="text-align:right">Size</th><th style="text-align:right">Difference (' + uLen() + ')</th><th style="text-align:right">Engagement</th></tr>' + near + '</table></div>';
+    };
+    out.innerHTML = '<div class="res"><div class="h">Results' + (sel ? ' for ' + rEsc(sel.label) + ' ' + badge(sel.status) : ' for ' + fLen(d) + ' ' + uLen() + ', ' + pitchTxt) + '</div><table>' + rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') + '</table></div>' +
+      order.map(nearTable).join('') +
+      (form && typeof formTapCompare === 'function' ? formTapCompare(R, d, p, pct) : '');
   }
   const pick = $('#tpick', el);
   if (pick) pick.onchange = () => {
@@ -137,12 +173,13 @@ async function renderTapDrill(el) {
     // A standard thread with the same size is selected; anything else goes in as "Other".
     const std = opts.find(o => Math.abs(o.d - d) < 1e-6 && Math.abs(o.p - p) < 1e-6);
     m.d = d; m.p = p; k.value = std ? std.key : 'custom';
-    if (t.type === 'Tap (forming)') tt.value = 'form'; else if (t.type === 'Tap (cutting)') tt.value = 'cut';
+    if (t.type === 'Tap (forming)') m.type = 'form'; else if (t.type === 'Tap (cutting)') m.type = 'cut';
     $('#tpickmsg', el).textContent = 'Filled from ' + ToolLib.describe(t) + (std ? ' (' + std.label + ')' : '') + '.';
-    setCustomFields(); upd();
+    setCustomFields(); setType(); upd();
   };
-  k.onchange = () => { setCustomFields(); upd(); }; tt.onchange = upd; tp.oninput = upd; td.oninput = upd; tpp.oninput = upd;
-  setCustomFields(); upd();
+  tt.querySelectorAll('button').forEach(b => b.onclick = () => { m.type = b.dataset.v; setType(); upd(); });
+  k.onchange = () => { setCustomFields(); upd(); }; tp.oninput = upd; td.oninput = upd; tpp.oninput = upd;
+  setCustomFields(); setType(); upd();
 }
 
 // ------------------------------------------------------------------ thread data

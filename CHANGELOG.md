@@ -3,6 +3,8 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+### Added
+- **Tap drill size**: thread engagement slider (55 to 85 %, value shown) and a Cut tap / Form tap choice. Each tap type keeps its own engagement, starting at 75 % for cutting and 65 % for forming (USCTI and FM Carbide for cutting; Besly and FM Carbide for forming, quoted as ranges). The result shows the theoretical hole for both tap types and, for each, the nearest number, letter, fractional and metric drill below and above with the difference and the engagement that drill really gives.
 
 ## [0.1.0] - 2026-11-11
 ### Added (tooling reference)

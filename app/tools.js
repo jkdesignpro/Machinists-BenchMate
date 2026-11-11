@@ -885,10 +885,10 @@ const TOOLS = [
 },
 {
   id: 'tapdrill', level: 'simple', group: 'Drilling and tapping', title: 'Tap drill size',
-  desc: 'Hole size for a chosen percent of thread with a cutting tap or a forming (roll) tap, for ISO metric and Unified threads or any size you enter, with the nearest standard drills and the percent of thread each one gives.',
+  desc: 'Hole size for a chosen thread engagement (55 to 85 %) with a cutting tap or a forming (roll) tap, for ISO metric and Unified threads or any size you enter, with the nearest number, letter, fractional and metric drills and the engagement each one gives.',
   render: el => renderTapDrill(el),
   working: 'See the note under the tool.',
-  source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge; forming taps also North American Tool, Besly (Cutting Tool Engineering 1995) and MSC. ISO 68-1:2023, ASME B1.1-2024.',
+  source: 'OSG USA Tapping Guide vol. 3 (2024); FM Carbide TechTips; Engineers Edge; forming taps also North American Tool, Besly (Cutting Tool Engineering 1995) and MSC; suggested engagement USCTI tapping tip, FM Carbide, Besly. ISO 68-1:2023, ASME B1.1-2024.',
 },
 {
   id: 'taplimits', level: 'expert', group: 'Drilling and tapping', title: 'Tap pitch diameter limits (H and D numbers)',

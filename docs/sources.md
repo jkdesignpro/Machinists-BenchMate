@@ -99,6 +99,11 @@ Nothing was typed in from memory and no handbook was used. The formulas are in t
   - OSG USA, "Tap drill size and pitch diameter limit chart", vol. 3, 2024, as drill = D - 0.01299 x % / TPI: https://res.cloudinary.com/osg-usa-inc/image/upload/v1717093846/Literature/03%20-%20Charts%20and%20Guides/OSG_-_Chart_-_Tap_Drill_Size_and_Pitch_Diameter_Limit_-_Vol_3_-_2024_-_IA.pdf
   - FM Carbide, in metric form as D - % x P / 76.98: https://fmcarbide.com/pages/tapping-formulas
   - In this convention a hole at the basic minor diameter gives 83.3 % thread.
+- **Suggested engagement (tap drill slider, added 2026-11-11):** 75 % for cutting taps and 65 % for forming taps, the defaults of the 55 to 85 % slider.
+  - Cutting, 75 %: USCTI, "Tapping tip: Don't let percent of thread derail your part" (https://www.uscti.com/uscti-pages/Tapping%20Tip-Don't%20Let%20Percent%20of%20Thread%20Derail%20Your%20Part.pdf, accessed 2026-11-11): 75 % is the general rule for 2B / 3B, a little higher in soft and lower in hard material, not less than 65 % in holes shallower than 3 x D. FM Carbide (tapping formulas page above, read again 2026-11-11): cut taps 65 to 75 %, calculator default 75 %.
+  - Forming, 65 %: Besly Products in Cutting Tool Engineering, "Threads will roll" (1995, https://ctemag.com/articles/threads-will-roll/): 65 to 75 % is adequate, worked example 1/4-20 at 65 % = 0.2280 in, not above 75 %. FM Carbide: form taps 60 to 65 % in steel, stainless and ductile alloys. North American Tool gives 55 to 75 %.
+  - The two sources for each figure give ranges that include it rather than one identical number; the app says so and shows the ranges.
+  - Nearest drills per series (number, letter, fractional, metric) are looked up in the drill chart data; the engagement each gives is computed with the cut and form formulas above.
 - **Rule of thumb "tap drill = D - P":** checked against the formula, it gives about 77 % thread. The app labels it as an approximation.
 - **Forming taps:** hole = D - 0.0068 x % x P, as published by FM Carbide (above) and Engineers Edge (both accessed 2026-11-10):
   - https://www.engineersedge.com/calculators/theoretical_tapping_hole_size_16209.htm
