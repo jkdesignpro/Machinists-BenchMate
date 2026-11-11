@@ -74,9 +74,9 @@ PROPS = {
     "elongation": {"label": "Elongation", "unit": "%", "mech": True, "units": {"%": 1}},
     "hardness":  {"label": "Hardness", "unit": "(scale)", "mech": True, "units": None},
     "cte":       {"label": "Thermal expansion", "unit": "µm/m·K", "mech": False,
-                  "units": {"um/mk": 1, "1e-6/k": 1, "um/mc": 1, "1e-6/c": 1, "uin/inf": 1.8, "1e-6/f": 1.8}},
+                  "units": {"um/mk": 1, "1e-6/k": 1, "um/mc": 1, "1e-6/c": 1, "uin/inf": 1.8, "1e-6/f": 1.8, "1e-5/k": 10, "1e-5/c": 10}},
     "k":         {"label": "Thermal conductivity", "unit": "W/m·K", "mech": False,
-                  "units": {"w/mk": 1, "w/mc": 1, "btu/hftf": 1.730735, "btuin/hft2f": 0.1442279}},
+                  "units": {"w/mk": 1, "w/mc": 1, "btu/hftf": 1.730735, "btuin/hft2f": 0.1442279, "w/km": 1}},
     "machinability": {"label": "Machinability rating", "unit": "%", "mech": False, "units": {"%": 1}},
 }
 # Two printed values count as "the same value" when, after conversion to the
@@ -95,9 +95,9 @@ BASES = ("min", "max", "typical", "range", "unstated")
 
 def unit_key(u):
     """'W/m°C', 'W/(m·K)', 'x10^-6 /K', 'µm/m-K' -> 'w/mc', 'w/mk', '1e-6/k', 'um/mk'."""
-    u = u.lower().replace("µ", "u").replace("μ", "u").replace("³", "3").replace("²", "2").replace("−", "-").replace("⁻", "-").replace("⁶", "6")
-    u = re.sub(r"x?\s*10\s*\^?\s*-\s*6", "1e-6", u)
-    return re.sub(r"[\s°·.*()\-]|(?<=1e)-", "", u).replace("1e6", "1e-6").replace("/m/", "/m")
+    u = u.lower().replace("µ", "u").replace("μ", "u").replace("³", "3").replace("²", "2").replace("−", "-").replace("⁻", "-").replace("⁶", "6").replace("⁵", "5")
+    u = re.sub(r"x?\s*10\s*\^?\s*-\s*([56])", r"1e-\1", u)
+    return re.sub(r"[\s°·.*()\-]|(?<=1e)-", "", u).replace("1e6", "1e-6").replace("1e5", "1e-5").replace("/m/", "/m")
 
 def canon(prop, e, where):
     if prop == "hardness":

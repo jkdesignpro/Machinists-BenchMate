@@ -1,0 +1,37 @@
+{
+ "sources": {
+  "MARKS_07040": {
+   "title": "Marks GmbH data sheet 0.7040 (EN-GJS-400-15)",
+   "url": "https://www.marks-gmbh.de/afs/downloads/07040-datenblatt.pdf",
+   "publisher": "Marks GmbH",
+   "accessed": "2026-11-11"
+  },
+  "KIPP_GJS": {
+   "title": "KIPP USA: cast iron with spheroidal graphite (ductile iron)",
+   "url": "https://www.kippusa.com/en-us/cast-iron-with-spheroidal-graphite-ductile-iron",
+   "publisher": "KIPP",
+   "accessed": "2026-11-11"
+  }
+ },
+ "grades": [
+  {
+   "grade": "Ductile iron GGG 40",
+   "family": "Cast iron",
+   "printed": [
+    {
+     "source": "MARKS_07040",
+     "values": {"en_name": "EN-GJS-400-15", "en_number": "EN-JS1030", "din_en_name": "GGG 40", "w_nr": "0.7040"},
+     "verbatim_row": "Werkstoff-Nr.: 0.7040 | Bezeichnung n. EN: EN-GJS-400-15 (GGG40) | DIN/EN EN-JS-1030",
+     "transcription": "Quoted from a text extraction of the PDF; 'GGG40' and 'EN-JS-1030' normalised to the database spelling only for matching."
+    },
+    {
+     "source": "KIPP_GJS",
+     "values": {"en_name": "EN-GJS-400", "en_number": "EN-JS1020", "din_en_name": "GGG 40", "astm": "60-40-18"},
+     "verbatim_row": "Abbreviation EN-GJS-400 | Material No. EN-JS1020 | US standard (AISI) 60-40-18 | Old designation GGG 40 | DIN EN 1563",
+     "transcription": "Quoted from a text extraction of the page."
+    }
+   ],
+   "disagreements": "Marks prints EN-GJS-400-15 / EN-JS1030 for GGG 40; KIPP prints 'EN-GJS-400' (no elongation suffix) with EN-JS1020, which is the EN 1563 number of EN-GJS-400-18. Recorded as printed."
+  }
+ ]
+}
