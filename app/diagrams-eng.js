@@ -670,7 +670,10 @@ Object.assign(DIAGRAMS, {
   // Bend: the sheet in side view with the inside radius, the neutral line at K t (bend allowance), setbacks and flanges.
   bend(v, sys, rows) {
     const W = 520, H = 300, u = deU(sys), dp = deDp(sys);
-    if (!(v.t > 0 && v.r >= 0 && v.a > 0 && v.a < 180)) return '';
+    // Nothing entered yet: the same picture with letters in place of numbers.
+    const demo = !(v.t > 0 && v.r >= 0 && v.a > 0 && v.a < 180);
+    if (demo) { v = { t: 1, r: 1.3, a: 90, k: 0.44 }; rows = []; }
+    const num = (x, d) => (demo ? '' : ' ' + DK.n(x, d));
     const t = v.t, r = v.r, a = v.a * Math.PI / 180, K = v.k >= 0 && v.k <= 1 ? v.k : NaN;
     const ossb = deV(rows, 'Outside setback'), BA = deV(rows, 'Bend allowance'), BD = deV(rows, 'Bend deduction'), flat = deV(rows, 'Flat length');
     const ro = r + t, os = deFin(ossb) ? ossb : Math.tan(a / 2) * ro;
@@ -705,18 +708,19 @@ Object.assign(DIAGRAMS, {
       h += '<path class="hot" style="stroke-width:3" d="M' + na.map(p => deF(p[0]) + ' ' + deF(p[1])).join('L') + '"/>';
       const mid = X(P(a0 + a / 2, rn));
       const lx = Math.min(mid[0] + 60, 392), ly = Math.min(mid[1] + 56, H - 64);
-      lab += DK.leader(mid[0], mid[1], lx, ly, 'BA ' + (deFin(BA) ? DK.n(BA, dp) + ' ' + u : '?'), { anchor: 'start', hot: true });
+      lab += DK.leader(mid[0], mid[1], lx, ly, demo ? 'BA' : 'BA ' + (deFin(BA) ? DK.n(BA, dp) + ' ' + u : '?'), { anchor: 'start', hot: true });
       lab += DK.text(lx + 4, ly + 16, 'neutral line, R + K t', { cls: 'mut', anchor: 'start' });
     }
-    if (r > 0) { const q = X(P(a0 + a * 0.6, r)); lab += DK.leader(q[0], q[1], Math.max(60, C[0] - 50), Math.max(16, C[1] - 40), 'R ' + DK.n(r, dp), { anchor: 'end' }); }
+    if (r > 0) { const q = X(P(a0 + a * 0.6, r)); lab += DK.leader(q[0], q[1], Math.max(60, C[0] - 50), Math.max(16, C[1] - 40), 'R' + num(r, dp), { anchor: 'end' }); }
     // Thickness, setback, flanges and angle.
     const tx = X([-L1 * 0.3, 0])[0];
-    lab += deDimV(X([0, -r])[1], X([0, -ro])[1], tx, 't ' + DK.n(t, dp), { from: tx });
+    lab += deDimV(X([0, -r])[1], X([0, -ro])[1], tx, 't' + num(t, dp), { from: tx });
     const yo = X([0, -ro])[1];
     lab += DK.dimH(T1[0], V[0], yo + 20, 'OSSB ' + (deFin(ossb) ? DK.n(ossb, dp) : ''), { from: yo, below: true });
     if (v.f1 > 0) lab += DK.dimH(X([-L1, 0])[0], V[0], yo + 50, 'f1 ' + DK.n(v.f1, dp) + (brk1 ? ' (shortened)' : ''), { from: yo, below: true });
-    lab += DK.angle(V[0], V[1], 26, 0, v.a, DK.n(v.a, 2) + '°');
-    lab += deLines(340, 40, ['K ' + (deFin(K) ? DK.n(K, 3) : 'not entered'), deFin(BD) ? 'bend deduction ' + DK.n(BD, dp) : '', deFin(flat) ? 'flat length ' + DK.n(flat, dp) + ' ' + u : '', v.f2 > 0 ? 'f2 ' + DK.n(v.f2, dp) + (brk2 ? ' (shortened)' : '') : ''], { cls: 'txt' });
+    lab += DK.angle(V[0], V[1], 26, 0, v.a, demo ? 'A' : DK.n(v.a, 2) + '°');
+    if (demo) lab += deLines(340, 40, ['Enter the thickness, the', 'inside radius and the', 'bend angle.'], { cls: 'txt' });
+    else lab += deLines(340, 40, ['K ' + (deFin(K) ? DK.n(K, 3) : 'not entered'), deFin(BD) ? 'bend deduction ' + DK.n(BD, dp) : '', deFin(flat) ? 'flat length ' + DK.n(flat, dp) + ' ' + u : '', v.f2 > 0 ? 'f2 ' + DK.n(v.f2, dp) + (brk2 ? ' (shortened)' : '') : ''], { cls: 'txt' });
     lab += deLines(340, 112, ['Mould lines dashed to the', 'virtual sharp (dot).']);
     return DK.svg(W, H, h + lab, 'Sheet-metal bend with neutral line and bend allowance');
   },
@@ -724,7 +728,8 @@ Object.assign(DIAGRAMS, {
   // Refractometer: the reading on the prism scale and the concentration against the recommended range.
   coolconc(v, sys, rows) {
     const W = 520, H = 240;
-    if (!(v.brix >= 0)) return '';
+    const demo = !(v.brix >= 0);
+    if (demo) { v = { brix: 6 }; rows = []; }
     const c = deV(rows, /^Concentration$/), top = Math.max(10, Math.ceil((v.brix * 1.4 + 0.1) / 5) * 5);
     const cx = 110, cy = 118, R = 88, Y = b => cy + R * 0.8 - 1.6 * R * 0.8 * b / top;
     let h = '<clipPath id="declip-refr"><circle cx="' + cx + '" cy="' + cy + '" r="' + R + '"/></clipPath><g clip-path="url(#declip-refr)">';
@@ -736,7 +741,7 @@ Object.assign(DIAGRAMS, {
     }
     h += DK.line(cx - 10, Y(0), cx - 10, Y(top), 'ln') + DK.line(cx - R, Y(v.brix), cx + R, Y(v.brix), 'hot') + '</g>';
     h += DK.circle(cx, cy, R, 'ln') + DK.circle(cx, cy, R + 7, 'thin');
-    h += DK.text(cx, H - 6, 'Brix scale: line at ' + DK.n(v.brix, 2), { cls: 'hott' });
+    h += DK.text(cx, H - 6, demo ? 'Read the Brix scale at the line' : 'Brix scale: line at ' + DK.n(v.brix, 2), { cls: 'hott' });
     // Gauge.
     if (deFin(c)) {
       const gx0 = 250, gx1 = 500, gy = 120, cmax = Math.max(10, Math.ceil(Math.max(c, v.hi || 0) * 1.3 / 5) * 5), X = q => gx0 + (gx1 - gx0) * q / cmax;
@@ -749,14 +754,15 @@ Object.assign(DIAGRAMS, {
       const st = rows.find(r => /range/i.test(r.label));
       h += DK.text((gx0 + gx1) / 2, 62, 'Concentration = reading × factor ' + deIn(v.k, 3, '', 'k'), { cls: 'txt' });
       if (st) h += DK.text((gx0 + gx1) / 2, 200, st.label.replace(/\s*\(.*\)/, ''), { cls: 'mut' });
-    } else h += DK.text(380, 120, 'Enter the refractometer factor', { cls: 'mut' });
+    } else h += DK.text(380, 120, demo ? 'Enter the reading and the factor' : 'Enter the refractometer factor', { cls: 'mut' });
     return DK.svg(W, H, h, 'Refractometer reading and coolant concentration');
   },
 
   // Coolant mix: the sump with what is in it now, what to add, and the top-up to full.
   coolmix(v, sys, rows) {
     const W = 520, H = 270, u = sys === 'inch' ? 'gal' : 'L';
-    if (!(v.v > 0 && v.t > 0)) return '';
+    const demo = !(v.v > 0 && v.t > 0);
+    if (demo) { v = { v: 60, t: 8, c: 5, full: 0 }; rows = []; }
     const fresh = !deFin(v.c), add = fresh ? NaN : deV(rows, /to add/), after = deV(rows, 'Volume after');
     const conc = rows.some(r => /^Concentrate to add/.test(r.label)), mix = deV(rows, 'mix strength'), tk = deV(rows, 'Top-up: concentrate'), tw = deV(rows, 'Top-up: water');
     const vmax = Math.max(v.v, deFin(after) ? after : 0, v.full > 0 ? v.full : 0) * 1.08;
@@ -776,6 +782,7 @@ Object.assign(DIAGRAMS, {
       return g + DK.text(x + w / 2, 246, title, { cls: 'txt' });
     };
     let h = '';
+    if (demo) return DK.svg(W, H, tank(160, 150, [{ q: 40, cls: 'part', t: 'in the sump now' }, { q: 14, cls: 'tool', t: '+ what to add' }], 0, 'Enter the sump volume and the target strength'), 'Coolant sump: what is in it and what to add');
     if (fresh) {
       const kq = deV(rows, 'Fresh fill: concentrate'), wq = deV(rows, 'Fresh fill: water');
       h += tank(150, 150, [{ q: wq, cls: 'part', t: 'water ' + DK.n(wq, 2) + ' ' + u }, { q: kq, cls: 'tool', t: '+ concentrate ' + DK.n(kq, 2) + ' ' + u }], 0, 'Fresh fill to ' + DK.n(v.v, 1) + ' ' + u + ' at ' + DK.n(v.t, 2) + ' %');

@@ -607,6 +607,48 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Lathe feed per revolution and per minute');
   },
 
+  // Part-off and groove time: the blade plunging from the start diameter to the end diameter (diameters to scale),
+  // and the spindle speed against the diameter with the speed limit. The curve only shows the shape; every number is a row.
+  partofftime(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), ok = dcOk(v.d0) && v.d1 >= 0 && v.d0 > v.d1, css = v.mode !== 0;
+    const ts = dcRow(rows, 'Cutting time', 's'), tm = dcRow(rows, 'Cutting time', 'min');
+    const n0 = css ? dcRow(rows, 'Spindle speed at the start diameter') : v.rpm, n1 = dcRow(rows, 'Spindle speed at the end diameter');
+    const lim = dcRow(rows, 'Speed limit used'), dlim = dcRow(rows, 'Diameter where the limit is reached');
+    const cy = 122, R0 = 60, R1 = ok ? Math.max(1.5, R0 * v.d1 / v.d0) : 12, x0 = 62, xb = 170, bw = 12, xe = 232;
+    let h = dcChuck(x0, cy, R0);
+    h += DK.poly([[x0, cy - R0], [xb, cy - R0], [xb, cy - R1], [xb + bw, cy - R1], [xb + bw, cy - R0], [xe, cy - R0], [xe, cy + R0], [xb + bw, cy + R0], [xb + bw, cy + R1], [xb, cy + R1], [xb, cy + R0], [x0, cy + R0]], 'part');
+    h += DK.cl(x0 - 44, cy, xe + 44, cy);
+    h += DK.rect(xb + 1.5, cy - R0 - 40, bw - 3, R0 - R1 + 40, 'tool') + DK.rect(xb - 9, cy - R0 - 56, bw + 18, 16, 'part');
+    h += DK.arrow(xb + bw + 16, cy - R0 - 44, xb + bw + 16, cy - R0 - 10, 'hot');
+    h += DK.text(xb + bw + 24, cy - R0 - 24, dcOk(v.f) ? 'f ' + dcN(v.f) + ' ' + (sys === 'inch' ? 'in/rev' : 'mm/rev') : 'f', { cls: 'hott', anchor: 'start' });
+    h += dcDimV(cy - R0, cy + R0, xe + 20, 'Ø ' + dcL(v.d0, u, 'D'), { from: xe + 2 });
+    h += DK.leader(xb + bw / 2, cy + R1, xb + bw / 2, cy + R0 + 20, ok ? (v.d1 > 0 ? 'to Ø ' + dcN(v.d1) + ' ' + u : 'to the centre') : 'to Ø d', { anchor: 'middle' });
+    // Spindle speed against the diameter, start diameter on the left.
+    const gx0 = 336, gx1 = 500, gt = 44, gb = 168, live = ok && dcOk(n0);
+    const D0 = live ? v.d0 : 1, D1 = live ? v.d1 : 0, N0 = live ? n0 : 1, cap = css ? (live ? (dcOk(lim) ? lim : Infinity) : 3) : N0;
+    const nEnd = css ? Math.min(D1 > 0 ? N0 * D0 / D1 : Infinity, cap) : N0, open = !isFinite(nEnd), top = open ? 4 * N0 : nEnd * (css ? 1 : 1.6);
+    const X = d => gx0 + (gx1 - gx0) * (D0 - d) / (D0 - D1), Y = n => gb - (gb - gt) * Math.min(n, top) / top;
+    h += DK.line(gx0, gt - 14, gx0, gb, 'thin') + DK.line(gx0, gb, gx1 + 8, gb, 'thin') + DK.text(gx0 + 6, gt - 12, 'RPM', { cls: 'mut', anchor: 'start' });
+    const pts = [];
+    for (let i = 0; i <= 80; i++) { const d = D0 - (D0 - D1) * i / 80, n = css ? Math.min(d > 0 ? N0 * D0 / d : Infinity, cap) : N0; if (n > top * 1.0001) break; pts.push([X(d), Y(n)]); }
+    h += dcPl(pts, 'hot');
+    if (open && pts.length) { const q = pts[pts.length - 1]; h += DK.arrow(q[0], q[1] + 1, q[0] + 2, gt - 12, 'hot'); }
+    if (css && isFinite(cap) && nEnd >= cap * 0.9999) {
+      const dl = live && dcOk(dlim) ? dlim : D0 * N0 / cap, xl = X(Math.max(D1, Math.min(D0, dl)));
+      h += DK.line(gx0, Y(cap), gx1, Y(cap), 'hid') + DK.line(xl, Y(cap), xl, gb, 'hid') + DK.circle(xl, Y(cap), 2.6, 'hotf');
+      if (!live) h += DK.text(xl, gb + 15, 'limit reached', { cls: 'dimt' });
+    }
+    h += DK.text(gx0, gb + 15, live ? 'Ø ' + dcN(v.d0) : 'start', { cls: 'mut', anchor: 'start' }) + DK.text(gx1 + 8, gb + 15, live ? (v.d1 > 0 ? 'Ø ' + dcN(v.d1) : 'centre') : 'end', { cls: 'mut', anchor: 'end' });
+    h += dcLines(gx0, gb + 38, [
+      live ? (css ? 'start ' : 'constant ') + dcN(n0, 0) + ' RPM' : '',
+      live && css && dcOk(lim) ? 'limit ' + dcN(lim, 0) + ' RPM' + (dcOk(dlim) && dlim > v.d1 && dlim < v.d0 ? ' below Ø ' + dcN(dlim) + ' ' + u : '') : (live && css && !dcOk(n1) ? 'no limit: rpm rises without end' : ''),
+      live && css && dcOk(n1) ? 'end ' + dcN(n1, 0) + ' RPM' : '',
+    ], { cls: 'txt' });
+    h += DK.text(20, 236, 'cutting time ' + (dcOk(ts) ? dcN(ts, 1) + ' s' : 'T') + (dcOk(tm) ? ' = ' + dcN(tm) + ' min' : ''), { cls: 'hott', anchor: 'start' });
+    h += DK.text(20, 254, css ? 'G96: the rpm rises as the diameter falls' : 'G97: T = (D - d) / (2 f n)', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, h, 'Part-off: blade travel and spindle speed against diameter');
+  },
+
   // Multi-pass turning: the part to scale with the stock divided into equal passes, and each pass's time.
   roughtime(v, sys, rows) {
     const W = 520, H = 290, u = dcU(sys), ok = dcOk(v.d0) && v.d1 >= 0 && v.d0 > v.d1 && dcOk(v.len);
