@@ -179,6 +179,17 @@ await page.waitForSelector('#tres table');
 const mtText = await page.textContent('#tres');
 if (!/included angle 2\.98/.test(mtText)) problems.push(`[${where}] Morse angle not labelled as included angle`);
 
+// Gauge blocks: wear blocks at both ends, the set makes the rest with the fewest blocks.
+where = 'gauge blocks';
+await units('inch');
+await open('sinebar');
+await page.selectOption('#main [data-k="set"]', 'i81');
+await page.fill('#main [data-k="target"]', '1.2345');
+await page.fill('#main [data-k="wear"]', '0.05');
+const gbt = ((await page.textContent('#main #gbres')) || '').replace(/\s+/g, ' ');
+if (!/3 blocks between two wear blocks \(fewest possible\)/.test(gbt) || !/Wear block \(bottom\)\s*0\.05000/.test(gbt) || !/Total\s*1\.23450/.test(gbt)) problems.push(`[${where}] 1.2345 in with 0.05 wear blocks: got "${gbt.slice(0, 260)}"`);
+await page.fill('#main [data-k="wear"]', '');
+
 // Bolt circle: the hole table and its program-ready copy.
 where = 'bolt table';
 await units('inch');

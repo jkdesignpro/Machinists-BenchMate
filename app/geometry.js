@@ -152,7 +152,10 @@ const GB_SETS = {
   m32: { name: 'Metric 32 pieces (one maker\'s listing)', sys: 'mm', unit: 0.0005, blocks: () => [1.005, ...GB_RANGE(1.01, 1.09, 0.01), ...GB_RANGE(1.1, 1.9, 0.1), ...GB_RANGE(1, 9, 1), 10, 20, 30, 60] },
   custom: { name: 'My own set (list the sizes)', sys: '', unit: 0, blocks: () => [] },
 };
-const SB_STATE = { L: '', ang: '', h: '', set: '', custom: '', target: '' };
+const SB_STATE = { L: '', ang: '', h: '', set: '', custom: '', target: '', wear: '' };
+// The block set you own, your own list and your wear blocks are kept between runs.
+try { const k = JSON.parse(localStorage.getItem('bm.gb') || '{}'); ['set', 'custom', 'wear'].forEach(f => { if (typeof k[f] === 'string') SB_STATE[f] = k[f]; }); if (!GB_SETS[SB_STATE.set]) SB_STATE.set = ''; } catch (e) {}
+const sbKeep = () => { try { localStorage.setItem('bm.gb', JSON.stringify({ set: SB_STATE.set, custom: SB_STATE.custom, wear: SB_STATE.wear })); } catch (e) {} };
 function sineDiagram(ang) {
   const a = Math.min(Math.max(ang || 20, 2), 60) * Math.PI / 180, L = 300, x0 = 50, y0 = 190, h = L * Math.sin(a);
   const x1 = x0 + L * Math.cos(a), y1 = y0 - h;
@@ -172,11 +175,12 @@ function renderSineBar(el) {
     const setOpts = Object.entries(GB_SETS).map(([k, v]) => [k, v.name + (v.sys ? ' (' + v.sys + ')' : '')]);
     el.innerHTML = sineDiagram(snum(s.ang)) + '<div class="grid">' + sfield('Sine bar length (centre distance of the rolls)', sinp('L', s.L), u) + sfield('Angle to set', sinp('ang', s.ang), 'deg') + sfield('Or: stack height you have', sinp('h', s.h), u) + '</div>' +
       '<div class="res" id="sbres"></div><h2>Gauge-block stack</h2>' +
-      '<div class="grid">' + sfield('Block set', gsel('set', setOpts, s.set), '') + sfield('Stack size (blank = the sine bar height above)', sinp('target', s.target), GB_SETS[s.set].sys === 'inch' ? 'in' : (GB_SETS[s.set].sys === 'mm' ? 'mm' : u)) + '</div>' +
+      '<div class="grid">' + sfield('Block set', gsel('set', setOpts, s.set), '') + sfield('Stack size (blank = the sine bar height above)', sinp('target', s.target), GB_SETS[s.set].sys === 'inch' ? 'in' : (GB_SETS[s.set].sys === 'mm' ? 'mm' : u)) +
+      sfield('Wear blocks: size of each, one at each end (blank = none)', sinp('wear', s.wear), GB_SETS[s.set].sys === 'inch' ? 'in' : (GB_SETS[s.set].sys === 'mm' ? 'mm' : u)) + '</div>' +
       (s.set === 'custom' ? '<label class="f" style="max-width:760px"><span>Block sizes in your set, one entry per block (' + u + '; list a size twice if you have two)</span><textarea data-k="custom" rows="3" style="width:100%;font-family:var(--mono);border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:6px">' + sesc(s.custom) + '</textarea></label>' : '') +
       '<div class="res" id="gbres" style="margin-top:10px"></div>';
-    el.querySelector('[data-k="set"]').onchange = e => { s.set = e.target.value; draw(); };
-    el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k !== 'set') i.oninput = () => { s[i.dataset.k] = i.value; calc(); }; });
+    el.querySelector('[data-k="set"]').onchange = e => { s.set = e.target.value; sbKeep(); draw(); };
+    el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k !== 'set') i.oninput = () => { s[i.dataset.k] = i.value; sbKeep(); calc(); }; });
     calc();
   };
   const calc = () => {
@@ -198,10 +202,15 @@ function renderSineBar(el) {
     if (!blocks.length) { gb.innerHTML = stable('Stack', [['List the block sizes in your set', '', '']]); return; }
     if (!(target > 0)) { gb.innerHTML = stable('Stack', [['Enter a stack size or a sine bar angle', '', '']]); return; }
     const tq = Math.round(target / unit) * unit;
-    const n = W.gauge_stack(toBuf(W, blocks), tq, unit);
-    if (!(n > 0)) { gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su, [['No combination of this set makes that size (each block used once)', '', '', 'Not possible']]); return; }
+    // Wear blocks sit at both ends of the stack, so the set only has to make what is left between them.
+    const wear = snum(s.wear), hasWear = wear > 0, inner = hasWear ? Math.round((tq - 2 * wear) / unit) * unit : tq;
+    if (hasWear && !(inner > 0)) { gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su, [['Two wear blocks of ' + gf(wear, sdpp) + ' ' + su + ' are already as tall as the stack', '', '', 'Not possible']]); return; }
+    const n = W.gauge_stack(toBuf(W, blocks), inner, unit);
+    if (!(n > 0)) { gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su, [['No combination of this set makes ' + (hasWear ? gf(inner, sdpp) + ' ' + su + ' between the wear blocks' : 'that size') + ' (each block used once)', '', '', 'Not possible']]); return; }
     const used = listOut(W, n).sort((a, b) => a - b);
-    gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su + ': ' + n + ' block' + (n === 1 ? '' : 's') + ' (fewest possible)', used.map((b, i) => ['Block ' + (i + 1), gf(b, sdpp), su]).concat([['Total', gf(used.reduce((a, b) => a + b, 0), sdpp), su]])) +
+    const stackRows = used.map((b, i) => ['Block ' + (i + 1), gf(b, sdpp), su]);
+    if (hasWear) { stackRows.unshift(['Wear block (bottom)', gf(wear, sdpp), su]); stackRows.push(['Wear block (top)', gf(wear, sdpp), su]); }
+    gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su + ': ' + n + ' block' + (n === 1 ? '' : 's') + (hasWear ? ' between two wear blocks' : '') + ' (fewest possible)', stackRows.concat([['Total', gf(used.reduce((a, b) => a + b, 0) + (hasWear ? 2 * wear : 0), sdpp), su]])) +
       '<p class="ms" style="padding:4px 10px">' + (Math.abs(tq - target) > 1e-12 ? 'Size rounded to the set\'s smallest step (' + unit + ' ' + su + '). ' : '') + (s.set === 'm112' || s.set === 'i81' ? 'Set composition as printed by two makers (see sources); check it against the lid of your own box. ' : s.set !== 'custom' ? 'Set composition from one maker\'s listing (Mitutoyo); check it against the lid of your own box. ' : '') + 'If you use wear blocks, add them to the stack size.</p>';
   };
   draw();
