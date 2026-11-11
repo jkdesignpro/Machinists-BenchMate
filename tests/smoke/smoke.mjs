@@ -95,6 +95,14 @@ for (const w of meta.ws) {
   const n = await page.$$eval('#main .tcard', cs => cs.length);
   if (n < 3) problems.push(`[${where}] landing page shows ${n} cards`);
 }
+// Cards or list: the choice sticks and the list still holds every tool.
+where = 'workspace list view';
+await go('#/w/turning');
+const nCards = await page.$$eval('#main .tcard', cs => cs.length);
+await page.click('#main .wsv button[data-v="list"]');
+const lv = await page.evaluate(() => [document.querySelectorAll('#main .wslist .tcard').length, localStorage.getItem('bm.wsview')]);
+if (lv[0] !== nCards || lv[1] !== 'list') problems.push(`[${where}] list view: ${lv[0]} of ${nCards} tools, stored "${lv[1]}"`);
+await page.click('#main .wsv button[data-v="cards"]');
 for (const m of ['simple', 'advanced', 'expert']) {
   await mode(m);
   for (const sys of ['inch', 'mm']) {

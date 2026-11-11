@@ -227,8 +227,13 @@ function pageCard(p) {
 }
 function renderWorkspace(main, w) {
   const head = document.createElement('div'); head.className = 'wshead';
-  head.innerHTML = '<span class="wsi">' + icon(w.icon) + '</span><div><h1>' + hesc(w.name) + '</h1><p>' + hesc(w.blurb) + '</p></div>';
+  // Cards or a compact list: the user's choice, kept for all workspaces.
+  const list = lsGet('bm.wsview') === 'list';
+  head.innerHTML = '<span class="wsi">' + icon(w.icon) + '</span><div class="wst"><h1>' + hesc(w.name) + '</h1><p>' + hesc(w.blurb) + '</p></div>' +
+    '<div class="seg wsv" role="group" aria-label="Show tools as"><button type="button" data-v="cards"' + (list ? '' : ' class="on"') + ' aria-pressed="' + !list + '">Cards</button><button type="button" data-v="list"' + (list ? ' class="on"' : '') + ' aria-pressed="' + list + '">List</button></div>';
+  $$('.wsv button', head).forEach(bt => bt.onclick = () => { lsSet('bm.wsview', bt.dataset.v); renderMain(); });
   main.appendChild(head);
+  const wsWrap = document.createElement('div'); wsWrap.className = list ? 'wslist' : ''; main.appendChild(wsWrap); main = wsWrap;
   w.sections.forEach(([name, ids]) => {
     const pages = ids.map(id => PAGES[id]).filter(p => p && pageShown(p)); if (!pages.length) return;
     const h = document.createElement('h2'); h.className = 'sech'; h.textContent = name; main.appendChild(h);

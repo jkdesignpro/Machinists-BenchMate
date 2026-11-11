@@ -88,6 +88,14 @@ h1{font-size:20px;letter-spacing:-.01em;margin:0}
 .wshead .wsi .ic{width:28px;height:28px}
 .wshead h1{font-size:24px}
 .wshead p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.wshead .wst{flex:1;min-width:0}
+.wshead .wsv{flex:none;align-self:flex-start}
+.wslist .cards{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:4px 12px}
+.wslist .tcb{padding:7px 34px 7px 9px;box-shadow:none;align-items:center;border-radius:var(--r)}
+.wslist .tci{width:26px;height:26px;border-radius:7px}
+.wslist .tci .ic{width:16px;height:16px}
+.wslist .tct small,.wslist .tct .chips{display:none}
+.wslist .tcard .star{top:5px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
 .tcard{position:relative;display:flex}
 .tcb{flex:1;display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r2);padding:13px 34px 13px 13px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .12s,transform .12s;min-width:0}
