@@ -202,6 +202,31 @@ pub fn turning_force(kc: f64, ap: f64, fnr: f64) -> f64 { kc * ap * fnr }
 /// (m/min) and teeth per inch: vf / teeth per minute, teeth per minute = vb x 1000 / 25.4 x TPI. [KASCO]
 pub fn bandsaw_chip_per_tooth(vf: f64, vb: f64, tpi: f64) -> f64 { vf / (vb * 1000.0 / crate::MM_PER_IN * tpi) }
 
+/// Section a bandsaw cuts through: one piece or a bundle of `nx` pieces across
+/// (side by side, across the blade) and `ny` layers high (stacked in the feed
+/// direction), packed square. `shape`: 1 round bar (diameter a), 2 rectangle
+/// (width a across the blade, height b), 3 tube (outside diameter a, wall b).
+/// `which`: 0 metal area cut (all pieces), 1 height the blade feeds through,
+/// 2 effective width (the longest path of the blade in the bundle, across it),
+/// 3 number of pieces. Same length unit throughout; area in that unit squared.
+/// NaN for impossible input (tube wall over half the diameter).
+pub fn saw_section(shape: f64, a: f64, b: f64, nx: f64, ny: f64, which: f64) -> f64 {
+    let (nx, ny) = (nx.max(1.0).floor(), ny.max(1.0).floor());
+    if !(a > 0.0) { return f64::NAN; }
+    let (area, w, h) = match shape as i32 {
+        1 => (PI / 4.0 * a * a, a, a),
+        2 if b > 0.0 => (a * b, a, b),
+        3 if b > 0.0 && b < a / 2.0 => (PI / 4.0 * (a * a - (a - 2.0 * b).powi(2)), a, a),
+        _ => return f64::NAN,
+    };
+    match which as i32 { 0 => area * nx * ny, 1 => h * ny, 2 => w * nx, 3 => nx * ny, _ => f64::NAN }
+}
+
+/// Bandsaw cut time (min) from the metal area cut and a cutting rate in area
+/// per minute (in^2/min or cm^2/min, the figure saw and blade makers quote):
+/// t = area / rate. [Starrett Bulletin 193; Machinery's Handbook, band saw blades]
+pub fn saw_cut_time(area: f64, rate: f64) -> f64 { if area >= 0.0 && rate > 0.0 { area / rate } else { f64::NAN } }
+
 /// Spot or countersink depth from the tool tip for a chamfer (countersink) diameter
 /// `dc` with included angle `angle`: (dc/2) / tan(angle/2).
 pub fn spot_depth(dc: f64, angle_deg: f64) -> f64 {
@@ -374,6 +399,25 @@ mod tests {
         // 60 m/min blade, 6 TPI, 30 mm/min down-feed: teeth per min = 60000/25.4 x 6 = 14173.2,
         // chip = 0.0021167 mm
         assert!(close(bandsaw_chip_per_tooth(30.0, 60.0, 6.0), 30.0 / (60000.0 / 25.4 * 6.0), 1e-15));
+        // Machinery's Handbook (band saw blades) example: 5.5 in^2 at about 4 in^2/min = 1.375 min.
+        assert!(close(saw_cut_time(5.5, 4.0), 1.375, 1e-15));
+        assert!(saw_cut_time(5.5, 0.0).is_nan());
+        // Single 4 in round: area 12.566 in^2, height and width 4 in.
+        assert!(close(saw_section(1.0, 4.0, 0.0, 1.0, 1.0, 0.0), 4.0 * PI, 1e-12));
+        assert!(close(saw_section(1.0, 4.0, 0.0, 1.0, 1.0, 1.0), 4.0, 1e-15));
+        // Bundle of 2 in rounds, 3 across and 2 high: 6 pieces, metal area 6 pi = 18.85 in^2,
+        // feed through 4 in, blade crosses 6 in.
+        assert!(close(saw_section(1.0, 2.0, 0.0, 3.0, 2.0, 0.0), 6.0 * PI, 1e-12));
+        assert!(close(saw_section(1.0, 2.0, 0.0, 3.0, 2.0, 1.0), 4.0, 1e-15));
+        assert!(close(saw_section(1.0, 2.0, 0.0, 3.0, 2.0, 2.0), 6.0, 1e-15));
+        assert!(close(saw_section(1.0, 2.0, 0.0, 3.0, 2.0, 3.0), 6.0, 1e-15));
+        // Rectangles 50 x 20 mm, 4 across, 3 high: area 12 000 mm^2, height 60, width 200.
+        assert!(close(saw_section(2.0, 50.0, 20.0, 4.0, 3.0, 0.0), 12_000.0, 1e-9));
+        assert!(close(saw_section(2.0, 50.0, 20.0, 4.0, 3.0, 1.0), 60.0, 1e-12));
+        assert!(close(saw_section(2.0, 50.0, 20.0, 4.0, 3.0, 2.0), 200.0, 1e-12));
+        // Tube 60 x 3 wall: pi/4 (3600 - 2916) = 171 pi = 537.21 mm^2 per piece.
+        assert!(close(saw_section(3.0, 60.0, 3.0, 2.0, 2.0, 0.0), 4.0 * 171.0 * PI, 1e-9));
+        assert!(saw_section(3.0, 60.0, 30.0, 1.0, 1.0, 0.0).is_nan());
         // 90 deg spot drill, 10 mm chamfer diameter: depth 5 mm
         assert!(close(spot_depth(10.0, 90.0), 5.0, 1e-12));
         // 120 deg: 5 / tan 60 = 2.8868

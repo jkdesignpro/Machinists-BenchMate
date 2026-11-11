@@ -11,6 +11,8 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - `benchmate-core`: `arc_from_two`, `arc_two_flat`, `arc_sl_peak` and a general `bisect`, with tests that rebuild minor and major arcs from every pair.
 - **Unit converter, angles**: type an angle as degrees-minutes-seconds, % slope, slope 1 in n, taper per foot, taper ratio 1:x or rate of taper, and see it in every angle unit; any angle is also shown as DMS, slope and taper with the half angle. Factors are exact (1 gon = 0.9°); tests against ISO/R 1119 (1:20 = 2°51′51.1″), the grade-of-slope examples and the NPT taper.
 - `benchmate-core`: `units::dms_to_deg`, `angle_form_from_deg`, `angle_form_to_deg` with tests.
+- **Bandsaw cut time**: single piece or bundle (pieces across and layers high) for round bar, rectangle and tube: metal area, feed height, effective width, cut time from the down-feed and from the cutting rate, and time per piece. Cut time = metal area / cutting rate (Starrett Bulletin 193; Machinery's Handbook example 5.5 in² at 4 in²/min = 1.375 min as a test).
+- `benchmate-core`: `saw_section` and `saw_cut_time` with tests (the section area was worked out in the screen before).
 ### Changed
 - The spot and centre drill tool is now its own screen (it was a plain form) so each table value can show its sources.
 

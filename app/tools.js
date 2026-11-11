@@ -774,11 +774,14 @@ const TOOLS = [
 },
 {
   id: 'bandsaw', level: 'advanced', group: 'Sawing', title: 'Bandsaw cut time',
-  desc: 'Time to cut through a round, rectangular or tube section from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
+  desc: 'Time to cut through a round, rectangular or tube section, one piece or a bundle (pieces across and layers high), from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
   fields: s => [
     { id: 'shape', label: 'Section', unit: '', def: 1, options: [[1, 'Round bar'], [2, 'Rectangle (cut through the height)'], [3, 'Tube']] },
     { id: 'a', label: 'Diameter, or width of the rectangle', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
-    { id: 'b', label: 'Rectangle height, or tube wall', unit: lenU(s), def: '' },
+    { id: 'b', label: 'Rectangle height, or tube wall', unit: lenU(s), def: '', when: v => v.shape !== 1 },
+    { id: 'bundle', label: 'Cut', unit: '', def: 0, options: [[0, 'Single piece'], [1, 'Bundle']] },
+    { id: 'nx', label: 'Pieces across (side by side, across the blade)', unit: '', def: 3, when: v => v.bundle === 1 },
+    { id: 'ny', label: 'Layers high (stacked in the feed direction)', unit: '', def: 2, when: v => v.bundle === 1 },
     { id: 'vf', label: 'Down-feed rate', unit: feedMinU(s), def: '' },
     { id: 'rate', label: 'Or cutting rate', unit: s === 'inch' ? 'in2/min' : 'cm2/min', def: '' },
     { id: 'vb', label: 'Blade speed (for chip per tooth)', unit: s === 'inch' ? 'ft/min' : 'm/min', def: '' },
@@ -786,22 +789,26 @@ const TOOLS = [
   ],
   calc: (v, W, s) => {
     if (!(v.a > 0)) return [];
-    let area, h;
-    if (v.shape === 2) { if (!(v.b > 0)) return [R('Section', 'Enter the height', '', 0)]; area = v.a * v.b; h = v.b; }
-    else if (v.shape === 3) { if (!(v.b > 0 && v.b < v.a / 2)) return [R('Section', 'Enter a wall thinner than half the diameter', '', 0)]; area = Math.PI / 4 * (v.a ** 2 - (v.a - 2 * v.b) ** 2); h = v.a; }
-    else { area = Math.PI / 4 * v.a ** 2; h = v.a; }
+    const bun = v.bundle === 1, nx = bun ? v.nx : 1, ny = bun ? v.ny : 1;
+    if (bun && !(nx >= 1 && ny >= 1)) return [R('Bundle', 'Enter at least 1 piece across and 1 layer', '', 0)];
+    if (bun && (nx % 1 || ny % 1)) return [R('Bundle', 'Pieces and layers are whole numbers', '', 0)];
+    const S = k => W.saw_section(v.shape, v.a, v.b > 0 ? v.b : 0, nx, ny, k);
+    const area = S(0), h = S(1), wid = S(2);
+    if (!isFinite(area)) return [R('Section', v.shape === 3 ? 'Enter a wall thinner than half the diameter' : 'Enter the height', '', 0)];
     const au = s === 'inch' ? 'in2' : 'cm2', ak = s === 'inch' ? 1 : 0.01;
-    const rows = [R('Area cut', area * ak, au, 2), R('Height the blade feeds through', h, lenU(s), 2)];
+    const rows = [R(bun ? 'Metal area cut (' + S(3) + ' pieces)' : 'Area cut', area * ak, au, 2), R('Height the blade feeds through', h, lenU(s), 2), R('Effective width (longest path of the blade in the work)', wid, lenU(s), 2)];
     if (v.vf > 0) rows.push(R('Cut time from the down-feed', h / v.vf, 'min', 2));
-    if (v.rate > 0) { const t = area * ak / v.rate; rows.push(R('Cut time from the cutting rate', t, 'min', 2)); rows.push(R('Average down-feed at that rate', h / t, feedMinU(s), 2)); }
+    if (v.rate > 0) { const t = W.saw_cut_time(area * ak, v.rate); rows.push(R('Cut time from the cutting rate', t, 'min', 2)); rows.push(R('Average down-feed at that rate', h / t, feedMinU(s), 2)); if (bun) rows.push(R('Cut time per piece', t / S(3), 'min', 3)); }
+    if (bun && v.vf > 0) rows.push(R('Cut time per piece (down-feed)', h / v.vf / S(3), 'min', 3));
+    if (bun && v.shape !== 2) rows.push(R('Note', 'Rounds and tubes leave gaps: the blade cuts metal only part of the way down, so the down-feed time and the cutting-rate time differ. Makers quote rates for solid sections; a bundle usually cuts slower than the rate suggests.', '', 0));
     if (v.vf > 0 && v.vb > 0 && v.tpi > 0) {
       const c = s === 'inch' ? W.bandsaw_chip_per_tooth(v.vf * IN_MM, v.vb * FT_M, v.tpi) / IN_MM : W.bandsaw_chip_per_tooth(v.vf, v.vb, v.tpi);
       rows.push(R('Feed per tooth (depth each tooth takes)', c, lenU(s), s === 'inch' ? 6 : 5));
     }
     return rows;
   },
-  working: 'Time = height / down-feed rate, or area / cutting rate (the square inches or cm2 per minute figure saw makers quote). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle W x H. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker.',
-  source: 'Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut); KASCO (teeth per minute = teeth per foot x blade speed). See docs/sources.md.',
+  working: 'Time = height / down-feed rate, or metal area / cutting rate (the square inches or cm2 per minute figure saw makers quote: the cut area divided by the minutes per cut). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle W x H. Bundle of n across and m high, packed square: metal area = n m x piece area, height = m x piece height (D for rounds and tubes), effective width = n x piece width. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker. For a bundle the makers base the blade pitch on the average section (Fabricating and Metalworking, 2020) and keep at least three teeth in the work (The Tube and Pipe Journal, 2007).',
+  source: "Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut for each bar area); Machinery's Handbook 31st ed., band saw blades, p. 1245 (cutting time = area / cutting rate, by name); KASCO (teeth per minute = teeth per foot x blade speed); bundles: A. Popson, 'Bundles of joy', The Tube and Pipe Journal, 2007; 'How to optimize sawing operations', Fabricating and Metalworking, 2020. See docs/sources.md.",
 },
 {
   id: 'sawtpi', level: 'simple', group: 'Sawing', title: 'Saw blade pitch (TPI)',

@@ -392,6 +392,8 @@ f1!(spot_depth, c::spot_depth, dc, angle);
 f1!(centre_drill_depth, c::centre_drill_depth, dc, dp, l, angle);
 f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
 f1!(spot_chamfer_dia, c::spot_chamfer_dia, z, angle);
+f1!(saw_section, c::saw_section, shape, a, b, nx, ny, which);
+f1!(saw_cut_time, c::saw_cut_time, area, rate);
 /// Per-tooth chip loads with runout into list_out; returns the tooth count.
 #[no_mangle] pub extern "C" fn runout_chips(fz: f64, tir: f64, z: f64) -> f64 { set_out(c::runout_chips(fz, tir, z.max(0.0) as usize)) }
 /// Multi-pass turning into list_out as (finished dia, rpm, minutes) per pass; returns the pass count.
