@@ -322,3 +322,28 @@ f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
 f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
 f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
 f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);
+
+// Fasteners and machine elements (core/src/fasteners.rs)
+f1!(stress_area, c::stress_area_f, d, p, system);
+f1!(stress_dia, c::stress_dia_f, d, p, system);
+f1!(bearing_mean_dia, c::bearing_mean_dia, dw, dh);
+f1!(tightening_torque, c::tightening_torque, f, p, d2, mu_g, dkm, mu_k);
+f1!(tightening_torque_part, c::tightening_torque_part, f, p, d2, mu_g, dkm, mu_k, part);
+f1!(preload_from_torque, c::preload_from_torque, t, p, d2, mu_g, dkm, mu_k);
+f1!(assembly_equiv_stress, c::assembly_equiv_stress, f, as_, d0, p, d2, mu_g);
+f1!(preload_permitted, c::preload_permitted, as_, d0, d2, p, mu_g, nu, rp02);
+f1!(preload_from_proof, c::preload_from_proof, as_, sp, pct);
+f1!(nut_factor, c::nut_factor, t, f, d);
+f1!(oring_squeeze_pct, c::oring_squeeze_pct, cs, depth);
+f1!(oring_stretch_pct, c::oring_stretch_pct, id, seat);
+f1!(oring_cs_stretched, c::oring_cs_stretched, cs, id, seat);
+f1!(oring_fill_pct, c::oring_fill_pct, cs, ring_dm, w, h, groove_dm);
+f1!(oring_depth_for_squeeze, c::oring_depth_for_squeeze, cs, squeeze);
+f1!(oring_width_for_fill, c::oring_width_for_fill, cs, h, fill);
+f1!(bearing_l10, c::bearing_l10, c, p, roller);
+f1!(bearing_l10h, c::bearing_l10h, c, p, roller, rpm);
+f1!(bearing_c_required, c::bearing_c_required, p, roller, rpm, hours);
+f1!(bearing_equiv_load, c::bearing_equiv_load, x, fr, y, fa);
+f1!(keyseat_shaft_dim, c::keyseat_shaft_dim, d, t1);
+f1!(keyway_hub_dim, c::keyway_hub_dim, d, t2);
+f1!(keyseat_chordal_height, c::keyseat_chordal_height, d, b);

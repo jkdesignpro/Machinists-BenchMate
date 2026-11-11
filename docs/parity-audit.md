@@ -30,16 +30,18 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 37 | 19 | 55 (8) | 2 | 0 | 33 % |
-| Machinery's Handbook 31 | 306 | 15 | 45 | 212 (14) | 6 | 28 | 6 % |
-| Engineers' Data Book | 94 | 3 | 20 | 33 (1) | 12 | 26 | 5 % |
-| Engineers Black Book | 80 | 9 | 15 | 55 (10) | 1 | 0 | 11 % |
+| CNC Machinist Calculator Ultra | 113 | 38 | 19 | 54 (8) | 2 | 0 | 34 % |
+| Machinery's Handbook 31 | 306 | 19 | 54 | 199 (14) | 6 | 28 | 7 % |
+| Engineers' Data Book | 94 | 4 | 22 | 30 (1) | 12 | 26 | 7 % |
+| Engineers Black Book | 80 | 13 | 18 | 48 (10) | 1 | 0 | 16 % |
 | CNC Machining handbook | 83 | 4 | 9 | 66 (0) | 0 | 4 | 5 % |
-| **All** | **676** | **68** | **108** | **421 (32)** | **21** | **58** | **11 %** |
+| **All** | **676** | **78** | **122** | **397 (32)** | **21** | **58** | **13 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
+
+**Update (branch `claude/fasteners`, 2026-11-11):** batch B1 and part of B2 are built (bolt grades, bolt torque and preload, socket head cap screws with counterbores, clearance holes, spanner sizes, T-slots, keys, O-ring glands, bearing L10). U71, MH199, MH205, MH206, MH251, ED68, BB3, BB16, BB43, BB48 done; MH112, MH198, MH200, MH202, MH204, MH210, MH212, MH285, MH288, MH294, ED65, ED71, BB5, BB44, BB49 partial. Still missing from B1/B2: thread engagement length, wrench clearances, helical inserts, pins, retaining rings, Woodruff keys, bearing fits. Summary counts updated for these rows.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -191,7 +193,7 @@ Store list is the fuller of the two store lists.
 | U68 | Thermal expansion calculator | partial | `tempcomp` | Corrects a measurement to 20 °C; no plain growth/shrink calculator (e.g. shrink-fit heating) |
 | U69 | Sine bar | missing | | In progress (`claude/geometry`) |
 | U70 | Height over ball for countersinks and tapered bores | missing | | |
-| U71 | Socket head cap screw hole dimensions | missing | | Counterbore and clearance sizes |
+| U71 | Socket head cap screw hole dimensions | done | `shcs`, `clearance` | Metric and inch counterbores and clearance holes, publisher disagreements shown (`claude/fasteners`) |
 
 ### Shop maths and geometry
 
@@ -394,7 +396,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH109 | Twist drill terms and types | missing | | |
 | MH110 | Drill sizes: fractional, gauge, letter, metric | done | `drillchart` | |
 | MH111 | Taper-shank drills; tolerance on diameter; accuracy of drilled holes | missing | | |
-| MH112 | Counterboring, counterbore sizes for bolts | missing | | |
+| MH112 | Counterboring, counterbore sizes for bolts | partial | `shcs` | Counterbore sizes for socket head cap screws only (two makers, shown side by side); no counterboring practice or other head types |
 | MH113 | Boring tools | missing | | |
 | MH114 | Taps: forms, marking, series designations, tap terms and dimensions | missing | | |
 | MH115 | Tap thread limits (H and D limits), pipe and insert taps | missing | | |
@@ -495,21 +497,21 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH198 | Torque and tension: tightening, wrench torque, preload, friction | missing | | |
-| MH199 | Thread tensile-stress area, torque-tension relationships | missing | | |
-| MH200 | Grade marks, material properties, counterfeit detection | missing | | |
+| MH198 | Torque and tension: tightening, wrench torque, preload, friction | partial | `bolttorque` | VDI 2230 torque from preload with your own friction (cited classes shown); no torque-angle or yield-controlled tightening, no tightening factor (scatter) |
+| MH199 | Thread tensile-stress area, torque-tension relationships | done | `bolttorque` | Stress area (ISO and Unified), torque-preload relation with the share of each term (`claude/fasteners`) |
+| MH200 | Grade marks, material properties, counterfeit detection | partial | `boltgrade` | ISO 898-1, SAE J429 and ASTM A574 minimums and head marks; no counterfeit detection |
 | MH201 | Working strength, engagement length, breaking force, lock wire | missing | | Thread engagement length is a common shop question |
-| MH202 | Inch bolts, screws, nuts and washers (dimensions) | missing | | |
+| MH202 | Inch bolts, screws, nuts and washers (dimensions) | partial | `shcs`, `spanner` | Socket head cap screw heads and hex widths across flats only; no full bolt, nut and washer dimensions |
 | MH203 | Wrench clearances | missing | | |
-| MH204 | Metric hex screws, bolts, nuts and washers | missing | | |
-| MH205 | Socket head cap screws (inch and metric) | missing | | |
-| MH206 | Clearance holes for bolts, screws and studs (inch and metric) | missing | | |
+| MH204 | Metric hex screws, bolts, nuts and washers | partial | `spanner` | Widths across flats (ISO 272, old DIN, JIS) only; no head heights, nuts or washers |
+| MH205 | Socket head cap screws (inch and metric) | done | `shcs` | ISO 4762 and ASME B18.3 head diameter, height and key (`claude/fasteners`) |
+| MH206 | Clearance holes for bolts, screws and studs (inch and metric) | done | `clearance` | ISO 273 fine/medium/coarse and inch close/normal/free, with disagreements (`claude/fasteners`) |
 | MH207 | Helical coil screw thread inserts (STI) | missing | | |
 | MH208 | British fasteners | missing | | |
 | MH209 | Machine screws and nuts (inch, metric, British) | missing | | |
-| MH210 | Cap screws and set screws; drill and counterbore sizes; hex keys | missing | | |
+| MH210 | Cap screws and set screws; drill and counterbore sizes; hex keys | partial | `shcs`, `clearance`, `spanner` | Cap screws, clearance and counterbore holes and hex keys; no set screws |
 | MH211 | Self-threading and thread-forming screws; hole sizes | missing | | |
-| MH212 | T-slots, T-bolts and T-nuts | missing | | |
+| MH212 | T-slots, T-bolts and T-nuts | partial | `tslots` | ISO 299 T-slot dimensions and pitches; no T-bolt or T-nut dimensions |
 | MH213 | Rivets and riveted joints | out of scope? | | |
 | MH214 | Pins and studs: dowel pins, taper pins, spring pins, grooved pins, cotter pins | missing | | Dowel hole fits matter |
 | MH215 | Retaining rings | missing | | Groove dimensions |
@@ -553,7 +555,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH248 | Thread gauges, gauge tolerances | missing | | |
 | MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | missing | | |
 | MH250 | Tap drill diameter, percentage of thread, cold form tapping | done | `tapdrill` | |
-| MH251 | Tap and clearance drills; tolerances of tapped holes | partial | `tapdrill`, `threaddata` | No clearance drills |
+| MH251 | Tap and clearance drills; tolerances of tapped holes | done | `tapdrill`, `threaddata`, `clearance` | Clearance holes added in `clearance` (`claude/fasteners`) |
 | MH252 | Removing a broken tap | missing | | |
 | MH253 | Tap drills and power for pipe taps | missing | | |
 | MH254 | High-speed CNC tapping; combined drilling and tapping | missing | | |
@@ -597,16 +599,16 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH282 | Plain bearings: machining bores, hardness and finish; bearing materials | missing | | |
 | MH283 | Rolling bearings: types, designation, tolerances | missing | | |
 | MH284 | Shaft and housing fits for bearings; mounting | missing | | |
-| MH285 | Bearing load ratings and life (L10) | missing | | |
+| MH285 | Bearing load ratings and life (L10) | partial | `bearinglife` | ISO 281 basic rating life L10 and equivalent load with your X and Y; no modified life (aISO) or static safety factor |
 | MH286 | Lubrication theory, lubricants, contamination | out of scope? | | |
 | MH287 | Couplings, clutches, brakes | out of scope? | | Cutting clutch teeth is the only machining part |
-| MH288 | Keys and keyseats (metric, inch, Woodruff), keyseat depths | missing | | |
+| MH288 | Keys and keyseats (metric, inch, Woodruff), keyseat depths | partial | `keys` | Metric (DIN 6885-1 / ISO 773) and inch (ASME B17.1) parallel keys and keyseat depths; no Woodruff (no second source) |
 | MH289 | Belts and pulleys (flat, V, synchronous) | missing | | |
 | MH290 | Transmission chains and sprockets | missing | | |
 | MH291 | Ball and ACME leadscrews | missing | | |
 | MH292 | Electric motors | missing | | |
 | MH293 | Adhesives and sealants, retaining compounds, threadlocking | missing | | |
-| MH294 | O-rings and glands | missing | | |
+| MH294 | O-rings and glands | partial | `oring` | AS568 sizes and a squeeze, stretch and fill check; no ISO 3601-1 G series, no -9xx sizes, no back-up rings |
 | MH295 | Rolled steel sections, aluminium structural shapes | missing | | |
 | MH296 | Wire and sheet metal gauges | missing | | |
 | MH297 | Wire rope | out of scope | | |
@@ -693,13 +695,13 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED62 | 12.13 Engineering plastics | partial | `materials` | 5 plastics |
 | ED63 | 12.14 Material traceability and documentation (certificates) | missing | | Reading a mill cert |
 | ED64 | 12.15 Corrosion | missing | | |
-| ED65 | 13.1 Screw fasteners | missing | | |
+| ED65 | 13.1 Screw fasteners | partial | `bolttorque`, `boltgrade` | Torque, preload and grades; no joint stiffness or fatigue |
 | ED66 | 13.2 Bearings | missing | | |
 | ED67 | 13.3 Ball and roller bearings | missing | | |
-| ED68 | 13.4 Bearing lifetime | missing | | |
+| ED68 | 13.4 Bearing lifetime | done | `bearinglife` | Basic rating life L10 (`claude/fasteners`) |
 | ED69 | 13.5 Coefficient of friction | missing | | |
 | ED70 | 13.6 Gear trains | missing | | |
-| ED71 | 13.7 Seals | missing | | |
+| ED71 | 13.7 Seals | partial | `oring` | O-rings only |
 | ED72 | 13.8 Shaft couplings | out of scope? | | |
 | ED73 | 13.9 Cam mechanisms | missing | | |
 | ED74 | 13.10 Clutches | out of scope? | | |
@@ -730,9 +732,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | BB1 | Conversion factors inch/metric | partial | `fraction` | Length only |
 | BB2 | Drill size and decimal equivalent chart | done | `drillchart` | |
-| BB3 | Spanner selection chart | missing | | |
+| BB3 | Spanner selection chart | done | `spanner` | (`claude/fasteners`) |
 | BB4 | Torque conversion chart | missing | | |
-| BB5 | Socket size cross-reference inch/metric | missing | | |
+| BB5 | Socket size cross-reference inch/metric | partial | `spanner` | Lookup of a spanner size against metric and inch heads; no socket cross-reference chart |
 | BB6 | Abbreviations for standard threads | partial | `threaddata` | Series names only |
 | BB7 | Thread forms used in engineering | partial | `threaddata`, `pipethreads`, `whitworth` | No ACME, trapezoidal, buttress or forms overview |
 | BB8 | Types of ground thread taps | missing | | |
@@ -743,7 +745,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB13 | Removal of broken taps | missing | | |
 | BB14 | Coventry/OSG style chasers | missing | | |
 | BB15 | Drill sizes for screw extractors, self-tappers | missing | | |
-| BB16 | Drill sizes for socket head screws | missing | | |
+| BB16 | Drill sizes for socket head screws | done | `shcs`, `clearance` | (`claude/fasteners`) |
 | BB17 | Hole coordinates | done | `bolt` | |
 | BB18 | Drill point sharpening and effects of bad grinding | missing | | |
 | BB19 | Drill point geometry by material | missing | | |
@@ -770,13 +772,13 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB40 | Morse, Jacobs and DIN tapers | partial | `machinetapers` | DIN metric tapers missing |
 | BB41 | Milling machine tapers | done | `machinetapers` | |
 | BB42 | Pull studs and retention knobs | partial | `machinetapers` | Standard references only, no dimensions |
-| BB43 | T-slots | missing | | |
-| BB44 | Keys and keyways | missing | | |
+| BB43 | T-slots | done | `tslots` | (`claude/fasteners`) |
+| BB44 | Keys and keyways | partial | `keys` | Parallel keys metric and inch; no Woodruff |
 | BB45 | Spur gear calculations | missing | | |
 | BB46 | Belt and gear drive calculations | missing | | |
 | BB47 | V-belt cross sections | missing | | |
-| BB48 | Bolts and nuts identification and grades | missing | | |
-| BB49 | Bolt and screw heads, types and drives | missing | | |
+| BB48 | Bolts and nuts identification and grades | done | `boltgrade` | (`claude/fasteners`) |
+| BB49 | Bolt and screw heads, types and drives | partial | `shcs` | Socket head cap screws only; no other head types or drives |
 | BB50 | Weights of round, square and hex bars | partial | `bar` | Density entered by hand; full tool in progress (`claude/geometry`, `weight`) |
 | BB51 | Weights of round tubes | missing | | In progress (`claude/geometry`, `weight`) |
 | BB52 | Weights of sheet metal | missing | | In progress (`claude/geometry`, `weight`) |

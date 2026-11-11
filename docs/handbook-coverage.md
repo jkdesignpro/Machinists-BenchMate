@@ -148,15 +148,15 @@ current practice and says so in the tool's notes.
 | Topic | Books | Status | Planned source |
 |---|---|---|---|
 | Beams, deflection, stress, torsion, columns | MH31 EDB | missing | [GERE] [ROARK]; public-domain MIL-HDBK-5 era formulas |
-| Bolt torque and preload, grade marks | EBB MH31 EDB | missing | VDI 2230 method (cited), ISO 898-1, SAE J429 |
-| Spanner and socket sizes | EBB | missing | ISO 272, ASME B18.2 (cited) |
-| Screw heads, drives, cap and set screws | EBB MH31 | missing | ISO 4762 etc. (cited), own drawings |
-| Keys and keyways | EBB MH31 | missing | DIN 6885 / BS 4235 / ASME B17.1 (cited) |
-| T-slots | EBB MH31 | missing | ISO 299 / DIN 650 (cited) |
+| Bolt torque and preload, grade marks | EBB MH31 EDB | built (`bolttorque`, `boltgrade`: VDI 2230 torque and permitted preload, friction user-entered; ISO 898-1, SAE J429, ASTM A574 minimums and head marks; no torque-angle, no engagement length) | VDI 2230-1:2015 (cited), FVA, Hameedi and Völgyi, Bossard; three to four publishers per grade table |
+| Spanner and socket sizes | EBB | built (`spanner`: ISO 272, old DIN, JIS and inch across flats, hex keys, lookup by spanner size) | ISO 272:1982, ASME B18.2.1 (cited); Wikipedia, Accu, SLS Bearings |
+| Screw heads, drives, cap and set screws | EBB MH31 | partial (`shcs`, `clearance`: socket head cap screws metric and inch with counterbores and clearance holes; no set screws, other heads or drives) | ISO 4762:2004, ISO 273:1979, ASME B18.3 (cited); eight publishers |
+| Keys and keyways | EBB MH31 | partial (`keys`: metric and inch parallel keys, keyseat depths and check dimensions; no Woodruff) | DIN 6885-1, ISO 773, ASME B17.1 (cited); fasten.it, AIMS, MISUMI, Engineers Edge, AMES |
+| T-slots | EBB MH31 | built (`tslots`: slot dimensions and pitches; no T-bolt or T-nut dimensions) | ISO 299:1987 (cited); Engineers Edge, iTeh preview |
 | Spur gears, gear trains, splines | EBB MH31 EDB | missing | ISO 53, ISO 54, AGMA public formulas; ANSI B92.1 (cited) |
 | Belt and pulley, chains | EBB MH31 EDB | missing | ISO 4183, maker data |
-| Bearings: life (L10), fits | MH31 EDB | missing | ISO 281 formula (cited), bearing maker data |
-| O-rings, seals | MH31 EDB | missing | AS568 / ISO 3601 (cited), maker groove guides |
+| Bearings: life (L10), fits | MH31 EDB | partial (`bearinglife`: L10, L10h, required C, equivalent load; no fits, no aISO) | ISO 281:2007 clause 6 (cited) |
+| O-rings, seals | MH31 EDB | partial (`oring`: AS568 sizes, piston/rod/face gland squeeze, stretch and fill against two makers; no ISO 3601-1 G series) | AS568, ISO 3601-1:2012 (cited); Greene Tweed, eFunda, O-Rings Inc., Global O-Ring and Seal, Apple Rubber |
 | Retaining rings, pins, rivets, inserts | MH31 | missing | cited standards, maker data |
 | Springs | MH31 | missing | standard spring formulas |
 | Adhesives and sealants | EBB MH31 | missing | maker guides |

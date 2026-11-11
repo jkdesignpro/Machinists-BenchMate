@@ -46,7 +46,10 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Reference | Material weight | partial (bar only; full tool in progress on `claude/geometry`) | `bar` | U81 |
 | Reference | Hardness conversion | missing (in progress, `claude/ref-data-3`) | | U67 |
 | Reference | Thermal expansion | partial (measurement correction only) | `tempcomp` | U68 |
-| Reference | Socket head cap screw holes, knurling, reaming | missing | | U71, U87, U33 |
+| Reference | Socket head cap screw holes (counterbore and clearance) | done (metric and inch; publisher disagreements shown) | `shcs`, `clearance` | U71 |
+| Reference | Knurling, reaming | missing | | U87, U33 |
+| Fasteners | Bolt grades, torque and preload (VDI 2230), spanner sizes, T-slots | done (beyond Ultra; friction always user-entered) | `boltgrade`, `bolttorque`, `spanner`, `tslots` | MH198-MH212 (section 2) |
+| Machine elements | Keys and keyways, O-ring glands, bearing L10 | partial (no Woodruff, no ISO 3601 G series, no bearing fits) | `keys`, `oring`, `bearinglife` | MH285, MH288, MH294 (section 2) |
 | Geometry | Bolt circle | done | `bolt` | U72 |
 | Geometry | Rectangular hole pattern, coordinate export | done (grid, bolt circle, pasted list; CSV and G-code) | `cycdrill` | U73, U74 |
 | Geometry | Triangle solver, arc calculator, geometry, angles | missing (in progress, `claude/geometry`) | | U75-U78 |

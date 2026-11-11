@@ -171,8 +171,9 @@ def frac_in(s):
     return float(sum(Fraction(p) for p in s.split()))
 
 
-def build_series(sec, fields, order=frac_in):
-    """sec: {publisher: {size: {field: printed}}} -> [{size, field: consensus...}] in size order."""
+def build_series(sec, fields, order=frac_in, exact=False):
+    """sec: {publisher: {size: {field: printed}}} -> [{size, field: consensus...}] in size order.
+    exact=True: numbers agree only when equal (for dimensions where '14' means 14.0, not 13.5 to 14.5)."""
     sizes = set()
     for rows in sec.values(): sizes.update(rows)
     out = []
@@ -180,9 +181,17 @@ def build_series(sec, fields, order=frac_in):
         row = {'size': s}
         for f in fields:
             printed = {pub: rows[s][f] for pub, rows in sec.items() if s in rows and rows[s].get(f) not in (None, '')}
-            if printed: row[f] = consensus(printed) if all(is_num(v) for v in printed.values()) else text_consensus(printed)
+            if printed: row[f] = (exact_consensus if exact else consensus)(printed) if all(is_num(v) for v in printed.values()) else text_consensus(printed)
         out.append(row)
     return out
+
+
+def exact_consensus(printed):
+    """Like consensus(), but values agree only when numerically equal (14 and 14.0 agree, 14 and 13.5 do not)."""
+    c = consensus({pub: f"{float(v):.6f}" for pub, v in printed.items()})
+    for g in c['groups']:
+        g['printed'] = [str(printed[p]) for p in g['publishers']]
+    return c
 
 
 def is_num(v):
@@ -370,10 +379,73 @@ def build_gcodes():
             'disagreements': ev['disagreements'], 'gaps': ev['gaps']}
 
 
+# ---------------------------------------------------------------- fasteners and machine elements
+def inch_size(s):
+    """'#10' (number size) -> 0.190; '1/4' -> 0.25; '1 1/4' -> 1.25; '1' -> 1 in."""
+    s = s.strip()
+    if s.startswith('#'):
+        return 0.060 + 0.013 * int(s[1:])
+    return frac_in(s)
+
+
+def drill_inch(name, drills):
+    """Decimal inch of a drill name as printed ('#9', 'F', '29/64', '1 1/64'), from the drill chart consensus."""
+    n = name.strip()
+    if n.startswith('#') or (len(n) == 1 and n.isalpha()):
+        key = n if n.startswith('#') else n.upper()
+        for d in drills:
+            if d['name'] == key: return d['inch']
+        raise SystemExit(f'unknown drill {name}')
+    return frac_in(n)
+
+
+def build_fasteners(drills):
+    """Fasteners and machine elements: every value as printed by each publisher, with consensus."""
+    ev = load_ev('fasteners-evidence.json')
+    if not ev: return None
+    out = {'sources': sources_of(ev)}
+    pos = lambda lst: (lambda s: (lst.index(s) if s in lst else len(lst), s))
+    out['iso898'] = build_series(ev['iso898'], ['sp', 'yield_min', 'rm_min', 'hv'], order=pos(ev['iso898_order']), exact=True)
+    out['sae'] = build_series(ev['sae'], ['sp', 'yield_min', 'rm_min', 'hrc_min'], order=pos(ev['sae_order']), exact=True)
+    out['shcs_inch'] = build_series(ev['shcs_inch'], ['head_d_max', 'head_d_min', 'head_h_max', 'head_h_min', 'key'], order=inch_size)
+    mnum = lambda s: float(s[1:])
+    out['shcs_metric'] = build_series(ev['shcs_metric'], ['dk_max', 'dk_min', 'k_max', 'k_min', 's_key'], order=mnum)
+    out['clearance_metric'] = build_series(ev['clearance_metric'], ['fine', 'medium', 'coarse'], order=mnum, exact=True)
+    ci = {}
+    for pub, rows in ev['clearance_inch'].items():
+        for size, r in rows.items():
+            q = dict(r)
+            if 'close_drill' in r: q['close'] = f"{drill_inch(r['close_drill'], drills):.4f}"
+            if 'free_drill' in r: q['free'] = f"{drill_inch(r['free_drill'], drills):.4f}"
+            ci.setdefault(pub, {})[size] = q
+    out['clearance_inch'] = build_series(ci, ['close', 'normal', 'free', 'close_drill', 'free_drill'], order=inch_size, exact=True)
+    out['cbore_metric'] = build_series(ev['cbore_metric'], ['hole', 'cbore_d', 'depth_min', 'depth_max'], order=mnum, exact=True)
+    cbi = {pub: {s: {'cbore_d': f"{frac_in(r['cbore_d']):.4f}", 'cbore_frac': r['cbore_d']} for s, r in rows.items()} for pub, rows in ev['cbore_inch'].items()}
+    out['cbore_inch'] = build_series(cbi, ['cbore_d', 'cbore_frac'], order=inch_size)
+    out['af_metric'] = build_series(ev['af_metric'], ['iso', 'din', 'jis'], order=mnum, exact=True)
+    out['af_inch'] = build_series(ev['af_inch'], ['hex', 'bs'], order=inch_size)
+    out['keys_metric'] = build_series(ev['keys_metric'], ['d_over', 'd_to', 't1', 't2', 'lengths'], order=pos(ev['keys_metric_order']), exact=True)
+    out['keys_inch'] = build_series(ev['keys_inch'], ['range', 'width', 'square_h', 'rect_h'], order=lambda s: frac_in(s.split('-')[0]))
+    out['tslots'] = build_series(ev['tslots'], ['b_min', 'b_max', 'c_min', 'c_max', 'h_min', 'h_max', 'bolt'], order=float, exact=True)
+    out['tslot_pitch'] = ev['tslot_pitch']
+    out['as568'] = build_series(ev['as568'], ['id', 'id_tol', 'cs', 'cs_tol'], order=int)
+    for k in ('torque_friction', 'oring_rules', 'sae_note', 'clearance_metric_note', 'clearance_inch_note', 'af_metric_note', 'keys_inch_note', 'tslot_pitch_source'):
+        out[k] = ev.get(k)
+    # every row must name at least one publisher; record the publishers of each row
+    for sec, v in out.items():
+        if isinstance(v, list):
+            for row in v:
+                pubs = sorted({p for f, c in row.items() if isinstance(c, dict) for g in c['groups'] for p in g['publishers']})
+                if not pubs: raise SystemExit(f'fasteners {sec} {row["size"]}: no publisher')
+                row['publishers'] = pubs
+    return out
+
+
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
            'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes()}
+    out['fasteners'] = build_fasteners(out['drills']['drills'])
     for sec in ('other_threads', 'tapers'):
         if not out[sec]: continue
         for k, rows in out[sec].items():
@@ -413,6 +485,16 @@ def main():
     if g:
         n = collections.Counter((r['ctrl'], r['status']) for r in g['codes'])
         print('  gcodes', len(g['codes']), 'rows,', len(g['macro']), 'macro notes,', len(g['disagreements']), 'disagreements:', dict(n))
+    fa = out['fasteners']
+    if fa:
+        for sec, rows in fa.items():
+            if not isinstance(rows, list): continue
+            st = collections.Counter(c['status'] for r in rows for f, c in r.items() if isinstance(c, dict))
+            print('  fasteners', sec, len(rows), 'rows', dict(st))
+            for r in rows:
+                for f, c in r.items():
+                    if isinstance(c, dict) and c['status'] not in ('confirmed', 'review'):
+                        print('    ', sec, r['size'], f, [(g['value'], g['publishers']) for g in c['groups']])
     print('  knurl pitches', [(x['p'], x['status']) for x in out['knurl']['pitches_mm']])
 
 

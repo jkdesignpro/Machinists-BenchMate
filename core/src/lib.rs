@@ -569,6 +569,8 @@ pub mod dxf;
 pub mod cad;
 pub mod tooling;
 pub use tooling::*;
+pub mod fasteners;
+pub use fasteners::*;
 
 #[cfg(test)]
 mod tests {
