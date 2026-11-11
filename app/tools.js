@@ -2323,7 +2323,7 @@ const TOOLS = [
       if (!(v.G > 0) && G > 0) rows.push(R('Shear modulus G = E / (2 (1 + nu))', G, u.E, inch ? 2 : 1));
       if (G > 0 && v.L > 0) {
         const phi = W.mech_torsion_angle(Tc, v.L, G * u.eK, v.D, di);
-        rows.push(R('Angle of twist', phi * 180 / Math.PI, 'deg', 4), R('Angle of twist', phi, 'rad', 6),
+        rows.push(R('Angle of twist', phi * 180 / Math.PI, 'deg', 4), R('Angle of twist in radians', phi, 'rad', 6),
           R(inch ? 'Twist per foot' : 'Twist per metre', phi * 180 / Math.PI / v.L * (inch ? 12 : 1000), 'deg', 4),
           R('Torsional stiffness T / angle', T / phi * Math.PI / 180, (inch ? 'lbf·in' : 'N·m') + '/deg', 2));
       } else rows.push(mkNote('Enter G (or E and Poisson\'s ratio) and the length for the angle of twist.'));

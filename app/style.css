@@ -1,11 +1,13 @@
 /* Layout and components; colours and fonts come from tokens.css (shared with Alkart Mega Wizard). */
 .sp{flex:1}
-.seg{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.seg button{background:var(--panel);border:0;padding:3px 10px;cursor:pointer;height:26px}
-.seg button+button{border-left:1px solid var(--line)}
-.seg button.on{background:var(--accent);color:var(--accent-ink)}
-.btn{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:3px 10px;height:26px;cursor:pointer}
-.btn:hover{border-color:var(--muted)}
+/* Hard keys: every button that does something is a key with a face, an edge and a pressed state. The key that is on takes the accent. */
+.seg{display:flex;gap:3px}
+.seg button,.btn{background:linear-gradient(var(--keytop),var(--keybot));border:1px solid var(--keyedge);border-bottom-width:3px;border-radius:3px;padding:0 10px;height:28px;cursor:pointer;
+  color:var(--keyink);font:700 11px var(--sans);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.seg button:hover,.btn:hover{filter:brightness(1.12)}
+.seg button:active,.btn:active{border-bottom-width:1px;transform:translateY(2px);margin-bottom:2px}
+.seg button.on,.btn.pri{background:var(--key);color:var(--key-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.btn:disabled{opacity:.5;cursor:default;filter:none}
 .card{max-width:760px}
 .tpick{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:-4px 0 12px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--head)}
 .tpick label{color:var(--muted);font-size:11.5px}
@@ -19,8 +21,10 @@ label.f[hidden]{display:none}
 label.f .row{display:flex;align-items:center;gap:6px;color:var(--ink)}
 label.f input,label.f select{flex:1;font-family:var(--mono)}
 label.f .u{color:var(--muted);min-width:34px;font-size:11.5px}
-.res{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);max-width:760px}
-.res .h{padding:6px 10px;font-weight:600;background:var(--raise);border-bottom:1px solid var(--line)}
+/* Readout screens: results and tables sit on the screen colour. Tokens are re-pointed inside a screen so anything nested follows. */
+.res,.screen{--panel:var(--screen);--line:var(--screen-line);--soft:var(--screen-line);--raise:color-mix(in srgb,var(--screen) 90%,var(--ink));--head:color-mix(in srgb,var(--screen) 90%,var(--ink))}
+.res{border:2px solid var(--edge);box-shadow:inset 0 0 0 1px var(--screen-line);background:var(--screen);border-radius:var(--r);max-width:760px}
+.res .h{padding:6px 10px;font-weight:700;background:var(--raise);border-bottom:1px solid var(--line)}
 .res table{width:100%;border-collapse:collapse}
 .res td{padding:5px 10px;border-bottom:1px solid var(--soft)}
 .res td.v{font-family:var(--mono);text-align:right;font-weight:600;white-space:nowrap}
@@ -148,7 +152,7 @@ svg.geo .gv{fill:var(--ink);font:600 13px var(--mono)}
 .sheetprint{display:none}
 pre.gcode{font-family:var(--mono);font-size:12px;line-height:1.45;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;max-width:760px;max-height:480px;overflow:auto;white-space:pre;margin:8px 0}
 @media print{
-  :root,:root[data-theme="dark"]{--bg:#fff;--panel:#fff;--ink:#000;--muted:#333;--line:#999;--soft:#ddd;--raise:#eee}
+  :root,:root[data-theme]{--bg:#fff;--panel:#fff;--ink:#000;--muted:#333;--line:#999;--soft:#ddd;--raise:#eee;--head:#eee;--screen:#fff;--screen-line:#bbb;--digit:#000;--hot:#000;--hot2:#ddd;--edge:#999;--field:#fff;--accent:#000;--accent2:#eee;--sel:#eee;--dim:#333;--glow:none;--bevel:#fff}
   html,body{height:auto;overflow:visible;display:block;background:#fff;color:#000}
   #titlebar,#side,#status,.note,.noprint,#main>.card>.thead,#main>.card>.desc{display:none!important}
   #shell,#main{display:block;overflow:visible;padding:0}
@@ -298,14 +302,14 @@ svg.geo.cnw{width:150px;max-width:150px;flex:none;margin:0}
 .bcalc .bc-mem{font:10.5px var(--mono);color:var(--accent)}
 .bcalc .bc-mem:empty{display:none}
 .bcalc .bc-keys{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
-.bcalc .bc-keys button{height:34px;min-width:0;padding:0 2px;border:1px solid var(--line);border-radius:var(--r);background:var(--raise);color:var(--ink);cursor:pointer;font:12px var(--sans);white-space:nowrap;overflow:hidden}
-.bcalc .bc-keys button:hover{border-color:var(--muted)}
-.bcalc .bc-keys button:active{background:var(--sel)}
-.bcalc .bc-keys .num{background:var(--panel);font:600 15px var(--mono)}
-.bcalc .bc-keys .op{background:var(--soft);font:600 15px var(--mono)}
+.bcalc .bc-keys button{height:34px;min-width:0;padding:0 2px;border:1px solid var(--keyedge);border-bottom-width:3px;border-radius:var(--r2);background:linear-gradient(var(--keytop),var(--keybot));color:var(--keyink);cursor:pointer;font:12px var(--sans);white-space:nowrap;overflow:hidden}
+.bcalc .bc-keys button:hover{filter:brightness(1.08)}
+.bcalc .bc-keys button:active{border-bottom-width:1px;transform:translateY(2px)}
+.bcalc .bc-keys .num{background:linear-gradient(color-mix(in srgb,var(--keytop) 70%,var(--panel)),color-mix(in srgb,var(--keybot) 70%,var(--panel)));font:600 15px var(--mono)}
+.bcalc .bc-keys .op{font:600 15px var(--mono)}
 .bcalc .bc-keys .mem{font:600 11px var(--mono);color:var(--muted)}
 .bcalc .bc-keys .ctl{color:var(--err);font-weight:600}
-.bcalc .bc-keys .eq{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font:700 16px var(--mono)}
+.bcalc .bc-keys .eq{background:var(--key);color:var(--key-ink);font:700 16px var(--mono)}
 .bcalc .bc-use{display:flex}
 .bcalc .bc-usebtn{flex:1;height:30px;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bcalc .bc-usebtn:disabled{opacity:.5;cursor:default}

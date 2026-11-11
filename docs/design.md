@@ -3,16 +3,20 @@
 BenchMate has its own look (from 0.2.0). It keeps the same bones as Jacob's other tools (top bar, left rail, content area, CSS tokens) but no longer copies their colours or sizes.
 
 ## Look
-- **Feel:** an engineering drawing on a clean desk. Crisp line drawings with dimension arrows, numbers in a monospace face, a faint drafting grid behind the content.
-- **Colour has a meaning.** Drafting blue (`--accent`) is for controls, dimensions and "you are here". Marking-out orange (`--hot`) is for the answer on a drawing, cutters and favourites. Green, amber and red (`--ok`, `--warn`, `--err`) are only for status.
-- **Themes:** light ("cool paper") and dark ("blueprint"), from `prefers-color-scheme` with a manual override in the view menu. Every colour comes from `app/tokens.css`; nothing else hard-codes a colour.
-- **Type:** 13 px system sans (Inter or Segoe UI where installed), JetBrains Mono / Cascadia Mono / Consolas for numbers and code. No web fonts: the app is offline.
-- **Surfaces:** panels with a 1 px border, 10 px radius and a soft shadow; controls 30 to 32 px high with a 6 px radius.
+The look is called **Machine control** (chosen by Jacob on 2026-11-11 from four mock-ups, after the first 0.2.0 look read as a generic web app).
+
+- **Feel:** the front of a CNC control. An enamel chassis with hard edges, results on readout screens, buttons and tabs as hard keys with a thick lower edge that press down. No rounded cards, soft shadows, gradient headers, pills or background grid.
+- **Colour has a meaning.** The accent (`--key`, amber as standard) is the selected key, headings and "you are here". Green (`--digit`, `--hot`) is a computed number: the main result, a worked-out box, the answer on a drawing. Blue (`--dim`) is a dimension line on a drawing. Green, orange and red (`--ok`, `--warn`, `--err`) are only for status.
+- **Accent colour is the user's.** The view menu has eight swatches and a colour picker; the choice is kept under `bm.accent`. `setAccent()` in `app/app.js` sets `--key`, `--key-ink` (black or white lettering, whichever has more contrast), and `--key-lift` / `--key-drop` (the colour lightened or darkened to a 4.5:1 contrast on the dark and the light panel), which `--accent` uses wherever the accent is text or a line. Use `--key` only as a fill behind `--key-ink`; use `--accent` for text, icons and lines.
+- **Themes:** Dark (the standard), Light (a pale enamel panel with LCD-style readouts) and Auto (follows the system), in the view menu. `data-theme` on the root is always `dark`, `light` or `auto`. Every colour comes from `app/tokens.css`; nothing else hard-codes a colour (the ISO 513 material group colours are data, not styling).
+- **Readout screens:** `.res`, `.screen` and a tool's results panel re-point `--panel`, `--line` and `--soft` to the screen tokens (`--screen`, `--screen-line`), so anything placed inside, a drawing included, picks up the screen colours.
+- **Type:** 13 px system sans (Segoe UI, the system face on a Mac, Arial or Liberation Sans), headings and keys in capitals with letter spacing; JetBrains Mono / Cascadia Mono / Consolas for numbers and code. No web fonts: the app is offline.
+- **Surfaces:** panels with a 1 px chassis edge (`--edge`), a light line on the top edge (`--bevel`) and a 2 to 3 px radius; keys 30 px high (`--keytop`, `--keybot`, `--keyedge`).
 - **Icons:** BenchMate's own line icons in `app/icons.js` (24 px grid, 1.6 stroke, round caps). No icon fonts.
 - **Units always shown** next to a number; inch / mm in the top bar and on each tool.
 
 ## Shell (`app/app.js`, `app/shell.css`)
-- **Top bar:** brand, search (Ctrl+K or /), mode selector, active machine, units, calculator (Alt+C), view menu (theme, Compact view, What's new).
+- **Top bar:** brand, search (Ctrl+K or /), mode selector, active machine, units, calculator (Alt+C), view menu (theme, accent colour, Compact view, What's new).
 - **Left rail:** Home, favourites, the workspaces (the open one lists its sections and pages), My shop.
 - **Routes:** `#/home`, `#/w/<workspace>`, `#/t/<page>[/<tab>]`, `#/news`. `openTool(id)` opens a tool by id; a tool inside a hub opens the hub on that tab.
 - **Pages and hubs** (`app/workspaces.js`): a page is one entry in the rail. A hub page holds several related tools as tabs. A tool or hub may be listed in more than one workspace; `UNLISTED_PAGES` must stay empty (the smoke test checks).

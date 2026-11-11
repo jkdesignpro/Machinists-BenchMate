@@ -166,9 +166,29 @@ await page.keyboard.press('Enter');
 await page.waitForTimeout(60);
 if (!/#\/t\//.test(await page.evaluate(() => location.hash))) problems.push(`[${where}] Enter did not open the first result`);
 where = 'theme';
+const themeNow = () => page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+if ((await themeNow()) !== 'dark') problems.push(`[${where}] the look should start dark, got "${await themeNow()}"`);
 await page.click('#menubtn');
-await page.click('#mtheme button[data-v="dark"]');
-if ((await page.evaluate(() => document.documentElement.getAttribute('data-theme'))) !== 'dark') problems.push(`[${where}] dark theme not applied`);
+for (const t of ['auto', 'light', 'dark']) {
+  await page.click(`#mtheme button[data-v="${t}"]`);
+  if ((await themeNow()) !== t) problems.push(`[${where}] ${t} theme not applied`);
+}
+// Accent colour: a swatch sets --key and is remembered; a dark colour gets white lettering; amber puts it back.
+where = 'accent';
+const keyNow = () => page.evaluate(() => [document.documentElement.style.getPropertyValue('--key'), document.documentElement.style.getPropertyValue('--key-ink'), localStorage.getItem('bm.accent')].join(' '));
+await page.click('#maccent button[data-c="#35c5f0"]');
+if ((await keyNow()) !== '#35c5f0 #141414 #35c5f0') problems.push(`[${where}] cyan swatch gave "${await keyNow()}"`);
+if (!(await page.$('#maccent button[data-c="#35c5f0"].on'))) problems.push(`[${where}] the chosen swatch is not marked`);
+await page.$eval('#maccentpick', e => { e.value = '#203a8f'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); });
+if ((await keyNow()) !== '#203a8f #ffffff #203a8f') problems.push(`[${where}] picked navy gave "${await keyNow()}"`);
+const lift = await page.evaluate(() => document.documentElement.style.getPropertyValue('--key-lift'));
+if (lift === '#203a8f' || !/^#[0-9a-f]{6}$/.test(lift)) problems.push(`[${where}] navy was not lightened for text on the dark panel, got "${lift}"`);
+if (!(await page.$('.swpick.on'))) problems.push(`[${where}] the picker is not marked for a custom colour`);
+await page.reload(); await page.waitForSelector('#main h1, #main .wshead, #main .dhead');
+if ((await keyNow()) !== '#203a8f #ffffff #203a8f') problems.push(`[${where}] accent not kept after a reload, got "${await keyNow()}"`);
+await page.click('#menubtn');
+await page.click('#maccent button[data-c="#ffb000"]');
+if ((await keyNow()) !== '#ffb000 #141414 #ffb000') problems.push(`[${where}] amber swatch gave "${await keyNow()}"`);
 await page.click('#mtheme button[data-v="light"]');
 await page.click('#menubtn');
 where = 'pair rpm';

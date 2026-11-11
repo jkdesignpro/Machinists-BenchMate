@@ -28,10 +28,11 @@ const page = await browser.newPage({ viewport: { width: +(opt('w') || 1360), hei
 const errs = [];
 page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
 page.on('pageerror', e => errs.push('uncaught: ' + e.message));
-await page.addInitScript(([mode, theme, sys]) => {
+await page.addInitScript(([mode, theme, sys, accent]) => {
   localStorage.setItem('bm.mode', mode); localStorage.setItem('bm.theme', theme); localStorage.setItem('bm.units', sys);
+  if (accent) localStorage.setItem('bm.accent', accent);
   if (!localStorage.getItem('bm.dash')) localStorage.setItem('bm.dash', JSON.stringify({ v: 1, items: [{ k: 'tool', id: 'rpm', size: 'm' }, { k: 'tool', id: 'feed', size: 'm' }, { k: 'tool', id: 'bolt', size: 'm' }, { k: 'pins', size: 'm' }, { k: 'favs', size: 's' }, { k: 'recent', size: 's' }, { k: 'tip', size: 'm' }] }));
-}, [opt('mode') || 'advanced', opt('theme') || 'light', opt('sys') || 'inch']);
+}, [opt('mode') || 'advanced', opt('theme') || 'dark', opt('sys') || 'inch', opt('accent') || '']);
 await page.goto(`http://127.0.0.1:${server.address().port}/${hash}`);
 await page.waitForTimeout(+(opt('wait') || 600));
 for (const kv of (opt('set') || '').split(',').filter(Boolean)) {
@@ -40,6 +41,7 @@ for (const kv of (opt('set') || '').split(',').filter(Boolean)) {
   if (tag === 'SELECT') await page.selectOption(sel, v); else await page.fill(sel, v);
   await page.dispatchEvent(sel, 'input');
 }
+for (const c of (opt('click') || '').split(';;').filter(Boolean)) { await page.click(c); await page.waitForTimeout(150); }
 await page.waitForTimeout(150);
 const sel = opt('sel');
 if (sel) await (await page.$(sel)).screenshot({ path: out }); else await page.screenshot({ path: out });

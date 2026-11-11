@@ -44,10 +44,17 @@ function copyText(txt) {
   const old = () => { const t = document.createElement('textarea'); t.value = txt; t.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Could not copy'); } t.remove(); };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, old); else old();
 }
+// The desktop app only loads its own pages (it works offline), so a link to a source on the web cannot open there.
+// Copy the address instead and say so, rather than doing nothing.
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href^="http"]');
+  if (!a || typeof window.BenchMateSave !== 'function') return;
+  e.preventDefault(); copyText(a.href); setTimeout(() => toast('Link copied. Paste it into a web browser.', 3200), 30);
+});
 let toastTimer = 0;
-function toast(msg) {
+function toast(msg, ms) {
   let t = $('#toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
-  t.textContent = msg; t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 1600);
+  t.textContent = msg; t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), ms || 1600);
 }
 
 // ---- Favourites, recent pages and pinned results (kept in this browser) ----
@@ -427,10 +434,30 @@ function setUnits(u) {
   $$('#units button').forEach(b => { const on = b.dataset.u === u; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
   renderMain();
 }
-function setTheme(t) {
-  if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme');
+// Theme: dark is the default look; 'auto' follows the system. (0.1.0 stored '' for Auto.)
+function themePref() { const t = lsGet('bm.theme'); return t === 'light' || t === 'dark' ? t : (t === 'auto' || t === '') ? 'auto' : 'dark'; }
+function setTheme(t) { document.documentElement.setAttribute('data-theme', t === 'light' || t === 'auto' ? t : 'dark'); }
+setTheme(themePref());
+// Accent colour: the user's choice, kept under bm.accent. Sets --key (the colour as chosen), --key-ink (black or
+// white lettering to sit on it), and --key-lift / --key-drop (the colour lightened or darkened until it reads as
+// text on the dark and the light panel). Colour maths only: WCAG relative luminance and contrast ratio.
+const ACCENT_DEFAULT = '#ffb000';
+const ACCENTS = [['#ffb000', 'Amber'], ['#ff6a3d', 'Orange'], ['#ff4d5e', 'Red'], ['#e86bd6', 'Magenta'], ['#5b9dff', 'Blue'], ['#35c5f0', 'Cyan'], ['#4fe08a', 'Green'], ['#d9dfe0', 'Steel']];
+function accentPref() { const a = (lsGet('bm.accent') || '').toLowerCase(); return /^#[0-9a-f]{6}$/.test(a) ? a : ACCENT_DEFAULT; }
+function setAccent(hex) {
+  hex = /^#[0-9a-f]{6}$/i.test(hex || '') ? hex.toLowerCase() : ACCENT_DEFAULT;
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const lum = c => { const [r, g, b] = c.map(x => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const ratio = (a, b) => { const la = lum(a), lb = lum(b); return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05); };
+  const toHex = c => '#' + c.map(x => Math.round(x).toString(16).padStart(2, '0')).join('');
+  const toward = (c, t, bg) => { let out = c; for (let k = 0; k <= 20 && ratio(out, bg) < 4.5; k++) out = c.map((x, i) => x + (t[i] - x) * k / 20); return toHex(out); };
+  const key = rgb(hex), st = document.documentElement.style;
+  st.setProperty('--key', hex);
+  st.setProperty('--key-ink', ratio(key, [20, 20, 20]) >= ratio(key, [255, 255, 255]) ? '#141414' : '#ffffff');
+  st.setProperty('--key-lift', toward(key, [255, 255, 255], [27, 31, 34]));
+  st.setProperty('--key-drop', toward(key, [0, 0, 0], [236, 238, 234]));
 }
-setTheme(lsGet('bm.theme'));
+setAccent(accentPref());
 function setMode(m) {
   if (!MODES.includes(m)) return;
   state.mode = m; lsSet('bm.mode', m);
@@ -452,7 +479,10 @@ function initMenu() {
   const btn = $('#menubtn'), pop = $('#menupop');
   const seg = (id, opts, cur) => '<div class="seg" id="' + id + '">' + opts.map(([v, l]) => '<button data-v="' + v + '"' + (v === cur ? ' class="on"' : '') + '>' + l + '</button>').join('') + '</div>';
   const paint = () => {
-    pop.innerHTML = '<div class="mrow"><span>Theme</span>' + seg('mtheme', [['', 'Auto'], ['light', 'Light'], ['dark', 'Dark']], lsGet('bm.theme') || '') + '</div>' +
+    pop.innerHTML = '<div class="mrow"><span>Theme</span>' + seg('mtheme', [['dark', 'Dark'], ['light', 'Light'], ['auto', 'Auto']], themePref()) + '</div>' +
+      '<div class="mrow macc"><span>Accent colour</span><div class="swatches" id="maccent">' +
+      ACCENTS.map(([c, n]) => '<button data-c="' + c + '" title="' + n + (c === ACCENT_DEFAULT ? ' (standard)' : '') + '" aria-label="' + n + ' accent" style="background:' + c + '"' + (c === accentPref() ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '></button>').join('') +
+      '<label class="swpick' + (ACCENTS.some(([c]) => c === accentPref()) ? '' : ' on') + '" title="Pick any colour"><input type="color" id="maccentpick" value="' + accentPref() + '" aria-label="Pick any accent colour">' + icon('theme') + '</label></div></div>' +
       '<div class="mrow"><span>Compact view</span>' + seg('mcompact', [['auto', 'Auto'], ['on', 'On'], ['off', 'Off']], state.compactPref) + '</div>' +
       '<div class="mrow narrowonly"><span>Mode</span>' + seg('mmode', MODES.map(m => [m, MODE_NAME[m]]), state.mode) + '</div>' +
       '<div class="mrow narrowonly"><span>Units</span>' + seg('munits', [['inch', 'inch'], ['mm', 'mm']], state.sys) + '</div>' +
@@ -461,6 +491,10 @@ function initMenu() {
       '<button class="mlink" data-go="#/t/toollib">' + icon('toollib') + 'Tool library</button>' +
       '<div class="mabout">Machinists BenchMate ' + hesc($('#ver').textContent) + '. Open source, AGPL-3.0. Results are a guide: check them before you cut.</div>';
     $$('#mtheme button', pop).forEach(b => b.onclick = () => { lsSet('bm.theme', b.dataset.v); setTheme(b.dataset.v); paint(); if (state.route.kind !== 'home') renderMain(); });
+    const accent = c => { lsSet('bm.accent', c); setAccent(c); };
+    $$('#maccent button', pop).forEach(b => b.onclick = () => { accent(b.dataset.c); paint(); });
+    $('#maccentpick', pop).oninput = e => accent(e.target.value);
+    $('#maccentpick', pop).onchange = () => paint();
     $$('#mcompact button', pop).forEach(b => b.onclick = () => { setCompact(b.dataset.v); paint(); });
     $$('#mmode button', pop).forEach(b => b.onclick = () => { setMode(b.dataset.v); paint(); });
     $$('#munits button', pop).forEach(b => b.onclick = () => { setUnits(b.dataset.v); paint(); });
