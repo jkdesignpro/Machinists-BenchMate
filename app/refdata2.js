@@ -139,7 +139,7 @@ async function renderMachineTapers(el) {
   function show(unit, v) {
     if (unit === 'in') return fBoth(v * IN_MM);
     if (unit === 'mm') return fBoth(v);
-    if (unit === 'tpf') return '<span class="mv">' + fx(v, 4) + ' in/ft</span><br><span class="ms">angle ' + fx(W.taper_included_angle_deg(v, 0, 12), 4) + ' deg</span>';
+    if (unit === 'tpf') return '<span class="mv">' + fx(v, 4) + ' in/ft</span><br><span class="ms">included angle ' + fx(W.taper_included_angle_deg(v, 0, 12), 4) + ' deg</span>';
     if (unit === 'deg') return '<span class="mv">' + fx(v, 2) + ' deg</span>';
     return rEsc(v);
   }

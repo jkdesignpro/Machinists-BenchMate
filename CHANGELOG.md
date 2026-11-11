@@ -50,6 +50,11 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 ### Fixed
 - Grinding wheel marking and grit conversion screens failed to load (unescaped quote in `app/grinding.js`); `scripts/build-web.sh` now syntax-checks every UI script.
 - Chatter finder listed the side lobes of one tone as separate peaks (a single 1234 Hz tone showed 1226, 1219 Hz and so on). Peaks inside the Hann main lobe (2 bins) of a stronger peak, or not 15 dB above its side-lobe envelope, are now dropped, as are peaks more than 40 dB below the largest; frequencies are still refined by parabolic interpolation. New tests with single tones (on and off bin, 44.1 and 48 kHz, drifting), two far and two close tones.
+- Drill chart: searching `#7` (the search box's own example) listed 217 sizes whose decimals contain a 7. A `#<number>` search now finds that number drill only.
+- Material equivalents: 30 designations in 19 grades that publishers do print (for example 4140 EN19, 904L 1.4539) were also listed as "unsourced, not printed by any source yet". The materials build now drops an unsourced entry that equals a printed value in the same field; no printed value changed.
+- Surface finish: theoretical Ra and Rt in µm are shown to 2 decimals (Ra 0.33 µm showed as 0.3).
+- Machine tapers: the Morse taper angle is labelled "included angle" (the cited table prints the half angle).
+- These four were found by the QA audit (`docs/qa-audit-2026-11-11.md`); each has a check in `tests/smoke/smoke.mjs`.
 ### Added (calculators batch 3: small mill and lathe, chatter, grinding)
 - **Milling:** radial chip thinning (feed for a target chip, engagement angle, with a drawing), corner and boss engagement (law of cosines, feed reduction into an inside corner), ball-nose cusp height and step-over (exact circle form), ball-nose effective diameter with tool tilt (speed and feed corrected), runout and chip load (per-tooth chip with dial-indicator TIR, feed that keeps the worst tooth at the target).
 - **Turning:** lathe feed (mm/min and mm/rev), multi-pass roughing time with a per-pass table, boring bar deflection (steel, carbide, heavy metal or your own modulus; optional coolant bore; overhang guidance from Seco, Kennametal and Cutwel shown side by side), C-axis feed (degrees per minute, feed along the circumference, inverse time F for G93).

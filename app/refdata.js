@@ -55,7 +55,10 @@ async function renderDrillChart(el) {
   function draw() {
     m.q = q.value; m.kind = k.value;
     const s = q.value.trim().toLowerCase().replace(/^#/, '').replace(/"/g, '');
-    const rows = D.drills.filter(d => (!k.value || d.kind === k.value) && (!s || d.name.toLowerCase().replace(/[#"]/g, '').replace(' mm', '') === s || d.name.toLowerCase().includes(s) || String(+d.inch.toFixed(4)).includes(s) || String(+(d.inch * IN_MM).toFixed(3)).includes(s)));
+    // "#7" names a number drill: match that size only, not every size whose decimals contain a 7.
+    const numberSize = /^#\s*\d+$/.test(q.value.trim());
+    const rows = D.drills.filter(d => (!k.value || d.kind === k.value) && (numberSize ? d.kind === 'number' && d.name.replace('#', '') === s.trim() :
+      (!s || d.name.toLowerCase().replace(/[#"]/g, '').replace(' mm', '') === s || d.name.toLowerCase().includes(s) || String(+d.inch.toFixed(4)).includes(s) || String(+(d.inch * IN_MM).toFixed(3)).includes(s))));
     $('#dres', el).innerHTML = '<div class="res mtab"><table><tr><th>Size</th><th>Series</th><th>Decimal inch</th><th>mm</th><th>Evidence</th></tr>' + rows.map(d =>
       '<tr><td><b>' + rEsc(d.name) + '</b></td><td>' + rEsc(d.kind === 'number' ? 'Number (wire gauge)' : d.kind === 'letter' ? 'Letter' : d.kind === 'fraction' ? 'Fractional' : 'Metric') + '</td><td class="mv">' + fx(d.inch, 4) + '</td><td class="mv">' + fx(d.inch * IN_MM, 3) + '</td><td title="' + rEsc(groupsTitle(D.sources, d.groups)) + '">' + badge(d.status) +
       (d.groups.length > 1 ? '<div class="ms">' + d.groups.slice(1).map(g => rEsc(g.printed[0]) + ' printed by ' + g.publishers.map(p => rEsc(pubName(D.sources, p))).join(', ')).join('; ') + '</div>' : '') +
