@@ -455,3 +455,250 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Runout: chip per tooth');
   },
 });
+
+// ---- lathe helpers ----
+// Chuck jaws gripping a part of radius R whose face is at x (part to the right).
+const dcChuck = (x, cy, R) => DK.rect(x - 36, cy - R - 34, 22, 2 * R + 68, 'hatch') + DK.rect(x - 14, cy - R - 18, 24, 18, 'hatch') + DK.rect(x - 14, cy + R, 24, 18, 'hatch');
+// Turning tool in plan view: a triangular insert with its tip at (tx, ty) and a holder shank.
+// dir +1: body to the right of the tip (turning towards the chuck on the left), -1 mirrored.
+// rot (degrees, clockwise on screen) turns the whole tool about its tip: 0 = shank straight up.
+// holder: shank length in px, or false for the insert alone. cls: the insert's class.
+function dcInsert(tx, ty, s, dir, holder, cls, rot) {
+  const a = dcRad(rot || 0), ca = Math.cos(a), sa = Math.sin(a), d = dir || 1;
+  const P = (x, y) => [tx + (d * x) * ca - y * sa, ty + (d * x) * sa + y * ca];
+  let h = '';
+  if (holder !== false) { const hl = holder || 2.4 * s; h += DK.poly([P(0.22 * s, -0.42 * s), P(1.1 * s, -0.42 * s), P(1.1 * s, -0.42 * s - hl), P(0.22 * s, -0.42 * s - hl)], 'part'); }
+  return h + DK.poly([P(0, 0), P(0.98 * s, -0.17 * s), P(0.34 * s, -0.94 * s)], cls || 'tool');
+}
+// Rotation of a turning part seen from the side: arrow round a narrow ellipse at x.
+const dcTurnSpin = (x, cy, R, cls) => dcSpin(x, cy, 9, R + 10, 115, 245, cls || 'dim');
+
+Object.assign(DIAGRAMS, {
+  // ---------------- Turning ----------------
+  // Surface finish: the nose radius leaving feed marks f apart (to scale), and the profile enlarged with Rt and the mean line.
+  finish(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), r = v.r, fr = dcOk(v.f) ? v.f : dcRow(rows, 'Feed for target Ra');
+    const ra = dcRow(rows, 'Theoretical Ra'), rt = dcRow(rows, 'Theoretical Rt'), mu = sys === 'inch' ? 'µin' : 'µm';
+    const Rn = 44, fp = dcOk(r) && dcOk(fr) ? dcClamp(fr / r * Rn, 5, 1.9 * Rn) : 0.6 * Rn, ys = 168, cx = 120, cyc = ys - Rn;
+    // Finished surface: envelope of the nose circles to the right of the tool; stock (uncut) to the left.
+    const prof = [];
+    for (let x = cx; x <= 262; x += 1) { const i = Math.round((x - cx) / fp), dx = x - (cx + i * fp); prof.push([x, cyc + Math.sqrt(Math.max(0, Rn * Rn - dx * dx))]); }
+    const stockY = ys - 34;
+    const left = []; for (let i = 0; i <= 20; i++) { const t = Math.PI - (Math.PI / 2) * i / 20, x = cx + Rn * Math.cos(t), y = cyc + Rn * Math.sin(t); if (y >= stockY) left.push([x, y]); }
+    let h = DK.poly([[14, stockY]].concat(left, prof, [[262, ys + 40], [14, ys + 40]]), 'hatch');
+    // Insert: nose arc from 40° to 140° (screen), flanks at 40° to the vertical.
+    const pt = a => [cx + Rn * Math.cos(dcRad(a)), cyc + Rn * Math.sin(dcRad(a))], nose = [];
+    for (let a = 140; a >= 40; a -= 5) nose.push(pt(a));
+    const dl = [-Math.sin(dcRad(40)), -Math.cos(dcRad(40))], dr = [Math.sin(dcRad(40)), -Math.cos(dcRad(40))], Lf = 52;
+    const lv = [pt(140)[0] + Lf * dl[0], pt(140)[1] + Lf * dl[1]], rv = [pt(40)[0] + Lf * dr[0], pt(40)[1] + Lf * dr[1]];
+    h += DK.poly([lv].concat(nose, [rv, [lv[0] + rv[0] - cx, lv[1] + rv[1] - (cyc + Rn) + 0]]), 'tool');
+    h += DK.circle(cx, cyc, 2, 'dimf') + DK.line(cx, cyc, pt(128)[0], pt(128)[1], 'dim') + dcHead(pt(128)[0], pt(128)[1], dcRad(128), 'dimf');
+    h += DK.leader(pt(128)[0] - 1, pt(128)[1] - 1, 18, 232, 'nose r ' + dcL(r, u, 'r'), { anchor: 'start' });
+    h += DK.arrow(cx + 70, 30, cx + 20, 30, 'dim') + DK.text(cx + 74, 34, 'feed ' + dcL(fr, sys === 'inch' ? 'in/rev' : 'mm/rev', 'f'), { cls: 'dimt', anchor: 'start' });
+    h += DK.text(14, H - 8, 'Nose and feed to scale', { cls: 'mut', anchor: 'start' });
+    // Profile enlarged.
+    const x0 = 300, cw = 60, sg = 30, rr = (cw * cw / 4 + sg * sg) / (2 * sg), yv = 120, c0 = x0 + 22;
+    const dp = [];
+    for (let x = x0; x <= 506; x += 1) { const i = Math.round((x - c0) / cw), dx = x - (c0 + i * cw); dp.push([x, yv - rr + Math.sqrt(Math.max(0, rr * rr - dx * dx))]); }
+    h += DK.text(404, 40, 'profile, height enlarged', { cls: 'mut' });
+    h += DK.poly(dp.concat([[506, yv + 24], [x0, yv + 24]]), 'hatch');
+    const xp = c0 + cw * 2.5, ym = yv - sg / 3;
+    h += DK.cl(x0, ym, 506, ym);
+    h += DK.line(xp, yv - sg, xp + 22, yv - sg, 'hot ext') + DK.line(c0 + 3 * cw, yv, xp + 22, yv, 'hot ext');
+    h += dcDimV(yv - sg, yv, xp + 16, '', { hot: true }) + DK.text(xp + 22, yv - sg / 2 + 4, 'Rt', { cls: 'hott', anchor: 'start' });
+    h += DK.dimH(c0 + cw, c0 + 2 * cw, yv + 46, 'f', { from: yv + 2 });
+    h += DK.text(c0 + 2 * cw + 8, yv + 50, 'feed marks', { cls: 'mut', anchor: 'start' });
+    h += DK.text(310, 210, 'Ra ' + (dcOk(ra) ? dcN(ra) + ' ' + mu : '?'), { cls: 'hott', anchor: 'start' });
+    h += dcLines(310, 228, [dcOk(rt) ? 'Rt ' + dcN(rt) + ' ' + mu + ' peak to valley' : '', dcOk(v.ra) && dcOk(fr) ? 'feed ' + dcN(fr) + ' for Ra ' + dcN(v.ra) : '', 'dash-dot: mean line']);
+    return DK.svg(W, H, h, 'Surface finish: feed marks left by the nose radius');
+  },
+
+  // Pass time: the part in the chuck, the tool travelling the length of cut at f per rev.
+  passtime(v, sys, rows) {
+    const W = 520, H = 260, u = dcU(sys), cy = 120, R = 44, x0 = 64, xe = 392, xs = 170;
+    const t = dcRow(rows, 'Cut time', 'min'), ts = dcRow(rows, 'Cut time', 's');
+    let h = dcChuck(x0, cy, R) + DK.rect(x0, cy - R, xe - x0, 2 * R, 'part') + DK.cl(x0 - 44, cy, xe + 40, cy);
+    h += DK.rect(xs, cy - R, xe - xs, 5, 'ghost');
+    h += dcInsert(xs, cy - R, 34, 1, false, 'ghost') + dcInsert(xe, cy - R, 34, 1, 40);
+    h += DK.dimH(xs, xe, 24, 'L ' + dcL(v.len, u, 'L'), { from: cy - R - 4 });
+    h += DK.arrow(xe - 30, cy + R + 22, xs + 4, cy + R + 22, 'dim') + DK.text((xs + xe) / 2, cy + R + 40, (dcOk(v.f) ? dcN(v.f) + ' ' + (sys === 'inch' ? 'in/rev' : 'mm/rev') : 'f') + ' at ' + (dcOk(v.rpm) ? dcN(v.rpm, 0) : 'n') + ' RPM', { cls: 'dimt' });
+    h += dcTurnSpin(xe + 26, cy, R - 10);
+    h += DK.text(20, 236, 'cut time ' + (dcOk(t) ? dcN(t) + ' min' : 'T') + (dcOk(ts) ? ' = ' + dcN(ts, 1) + ' s' : ''), { cls: 'hott', anchor: 'start' });
+    h += DK.text(20, 252, 'T = L / (f × n)', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, h, 'Cut time for a turning pass');
+  },
+
+  // Taper: the part to scale with both diameters, the length, the half angle at the slide and the included angle.
+  taper(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), ok = dcOk(v.D) && dcOk(v.d) && dcOk(v.L) && v.D > v.d;
+    const inc = dcRow(rows, 'Included angle'), half = dcRow(rows, 'Half angle'), tpl = dcRow(rows, 'Taper per unit length');
+    const s = ok ? Math.min(280 / v.L, 150 / v.D) : 1, Lp = ok ? v.L * s : 260, Dp = ok ? v.D * s : 140, dp = ok ? Math.max(6, v.d * s) : 70;
+    const cy = 128, x0 = 60, x1 = x0 + Lp;
+    let h = DK.poly([[x0, cy - Dp / 2], [x1, cy - dp / 2], [x1, cy + dp / 2], [x0, cy + Dp / 2]], 'part') + DK.cl(x0 - 16, cy, x1 + 70, cy);
+    h += dcDimV(cy - Dp / 2, cy + Dp / 2, x0 - 24, 'Ø ' + dcL(v.D, u, 'D'), { from: x0 - 2 });
+    h += DK.dimH(x0, x1, cy + Dp / 2 + 30, 'L ' + dcL(v.L, u, 'L'), { from: cy + Math.max(Dp, dp) / 2 + 2, below: true });
+    // Half angle at the small end, against a line parallel to the axis.
+    const tang = Math.atan2((Dp - dp) / 2, Lp) * 180 / Math.PI;
+    const ra = Math.min(Lp - 10, 120), am = dcRad(180 - tang / 2);
+    h += DK.line(x1, cy - dp / 2, x1 - ra - 12, cy - dp / 2, 'thin') + DK.angle(x1, cy - dp / 2, ra, 180 - tang, 180, '', { hot: true });
+    h += DK.leader(x1 + ra * Math.cos(am), cy - dp / 2 - ra * Math.sin(am), x1 - ra - 20, Math.max(20, cy - Dp / 2 - 20), 'half ' + (dcOk(half) ? dcN(half) + '°' : 'α/2') + ' (slide)', { hot: true, anchor: 'end' });
+    // Small diameter: dimension on the right with room for the apex lines.
+    h += dcDimV(cy - dp / 2, cy + dp / 2, x1 + 26, dp > 50 ? 'Ø ' + dcL(v.d, u, 'd') : '', { from: x1 + 2 });
+    if (dp <= 50) h += DK.text(x1 + 34, cy + dp / 2 + 18, 'Ø ' + dcL(v.d, u, 'd'), { cls: 'dimt', anchor: 'start' });
+    const xa = x1 + (dp / 2) / Math.max(Math.tan(dcRad(tang)), 1e-6);
+    if (xa < 500) { h += DK.line(x1, cy - dp / 2, xa, cy, 'ghost') + DK.line(x1, cy + dp / 2, xa, cy, 'ghost') + DK.text(Math.min(xa + 6, 506), cy + 4, '', { cls: 'mut' }); }
+    h += DK.text(380, 220, 'included ' + (dcOk(inc) ? dcN(inc) + '°' : 'α'), { cls: 'hott', anchor: 'start' });
+    h += dcLines(380, 238, [dcOk(tpl) ? 'taper ' + dcN(tpl) + ' ' + (sys === 'inch' ? 'in/in' : 'mm/mm') + ' on Ø' : '', ok ? 'drawn to scale' : '']);
+    return DK.svg(W, H, h, 'Taper: diameters, length and angles');
+  },
+
+  // Bar stock: the whole bar to scale cut into parts with the scrap end; one part's share of bar enlarged.
+  bar(v, sys, rows) {
+    const W = 520, H = 280, u = dcU(sys);
+    if (!(dcOk(v.bar) && dcOk(v.part))) return '';
+    const n = dcRow(rows, 'Parts per bar'), per = dcRow(rows, 'Bar used per part'), scrap = dcRow(rows, 'Scrap per bar', u), pct = dcRow(rows, 'Scrap per bar', '%');
+    const x0 = 20, x1 = 500, yb = 52, hb = 24, k = (x1 - x0) / v.bar, start = dcOk(v.start) ? v.start : 0, rem = dcOk(v.rem) ? v.rem : 0;
+    let h = DK.rect(x0, yb, x1 - x0, hb, 'part');
+    const xs = x0 + Math.min(start * k, x1 - x0), pw = dcOk(per) ? per * k : 0, xsc = Math.min(x1, xs + (n > 0 ? n * pw : 0));
+    if (start > 0) h += DK.rect(x0, yb, xs - x0, hb, 'hatch');
+    if (n > 0 && pw >= 3) for (let i = 1; i < n; i++) h += DK.line(xs + i * pw, yb + 3, xs + i * pw, yb + hb - 3, 'thin');
+    if (rem > 0) h += DK.rect(Math.max(xsc, x1 - rem * k), yb, x1 - Math.max(xsc, x1 - rem * k), hb, 'hatch');
+    if (x1 - xsc > 0.5) h += DK.rect(xsc, yb, x1 - xsc, hb, 'hot');
+    if (n > 0) h += DK.text((xs + xsc) / 2, yb - 8, dcN(n, 0) + ' parts', { cls: 'hott' });
+    h += DK.text(x1, yb - 8, dcOk(scrap) ? 'scrap ' + dcN(scrap) + ' ' + u + (dcOk(pct) ? ' (' + dcN(pct, 1) + '%)' : '') : '', { cls: 'hott', anchor: 'end' });
+    h += DK.dimH(x0, x1, yb + hb + 20, 'bar ' + dcL(v.bar, u, ''), { from: yb + hb + 2, below: true });
+    if (rem > 0) h += DK.text(x1, yb + hb + 50, 'remnant ' + dcN(rem) + ' ' + u, { cls: 'mut', anchor: 'end' });
+    if (start > 0) h += DK.text(x0 + 2, yb + hb + 15, 'start facing', { cls: 'mut', anchor: 'start' });
+    // One part's share, enlarged: facing allowance, the part, the cut-off kerf with the parting blade.
+    const face = dcOk(v.face) ? v.face : 0, cut = dcOk(v.cut) ? v.cut : 0, tot = v.part + face + cut, ya = 150, ha = 46, xa = 96, xb = 470;
+    const k2 = (xb - xa) / tot, wf = face > 0 ? Math.max(12, face * k2) : 0, wc = cut > 0 ? Math.max(12, cut * k2) : 0, wp = xb - xa - wf - wc;
+    h += DK.text(xa, 118, 'one part, enlarged', { cls: 'mut', anchor: 'start' });
+    h += DK.rect(xa - 26, ya, 26, ha, 'ghost') + DK.rect(xb, ya, 26, ha, 'ghost');
+    if (wf) h += DK.rect(xa, ya, wf, ha, 'hatch');
+    h += DK.rect(xa + wf, ya, wp, ha, 'part') + DK.cl(xa - 30, ya + ha / 2, xb + 30, ya + ha / 2);
+    if (wc) h += DK.rect(xb - wc, ya, wc, ha, 'hatch') + DK.rect(xb - wc, ya - 26, wc, ha / 2 + 26, 'tool');
+    h += DK.dimH(xa + wf, xb - wc, ya + ha + 20, 'part ' + dcL(v.part, u, ''), { from: ya + ha + 2, below: true });
+    if (wf) h += DK.leader(xa + wf / 2, ya + 6, xa + 40, ya - 18, 'face ' + dcN(face), { anchor: 'start' });
+    if (wc) h += DK.leader(xb - wc / 2, ya - 26, xb - 40, ya - 36, 'cut-off ' + dcN(cut), { anchor: 'end' });
+    h += DK.dimH(xa, xb, ya + ha + 50, 'bar per part ' + dcL(per, u, '?'), { from: ya + ha + 26, below: true, hot: true });
+    // Section of the bar.
+    const sx = 40, sy = ya + ha / 2, sr = 15;
+    h += v.shape === 2 ? DK.poly([0, 1, 2, 3, 4, 5].map(i => [sx + sr / Math.cos(Math.PI / 6) * Math.cos(Math.PI / 3 * i), sy + sr / Math.cos(Math.PI / 6) * Math.sin(Math.PI / 3 * i)]), 'part')
+      : v.shape === 3 ? DK.rect(sx - sr, sy - sr, 2 * sr, 2 * sr, 'part') : DK.circle(sx, sy, sr, 'part');
+    h += DK.text(sx, sy + sr + 30, (v.shape === 1 || !v.shape ? 'Ø ' : 'A/F ') + dcL(v.size, u, ''), { cls: 'dimt' });
+    const cost = dcRow(rows, 'Material cost per part');
+    if (dcOk(cost)) h += DK.text(x1, H - 6, 'material cost ' + dcN(cost) + ' per part', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Bar stock: parts per bar, scrap and the bar used per part');
+  },
+
+  // Lathe feed: feed marks f apart on the turned diameter (enlarged), the spindle speed and the feed per minute.
+  lathefeed(v, sys, rows) {
+    const W = 520, H = 250, cy = 112, R = 48, x0 = 64, xe = 430, xt = 240, st = 6, fu = sys === 'inch' ? 'in/rev' : 'mm/rev';
+    const n = dcOk(v.rpm) ? v.rpm : dcRow(rows, 'Spindle speed at that diameter'), vf = dcRow(rows, 'Feed per minute'), fr = dcOk(v.f) ? v.f : dcRow(rows, 'Feed per revolution');
+    let h = dcChuck(x0, cy, R) + DK.poly([[x0, cy - R], [xt, cy - R], [xt, cy - R + st], [xe, cy - R + st], [xe, cy + R - st], [xt, cy + R - st], [xt, cy + R], [x0, cy + R]], 'part');
+    const fp = 18;
+    for (let x = xt + fp; x < xe - 2; x += fp) h += DK.line(x, cy - R + st, x - 9, cy + R - st, 'thin');
+    h += DK.cl(x0 - 44, cy, xe + 34, cy) + dcInsert(xt, cy - R + st, 34, 1, 34);
+    h += DK.dimH(xt + 6 * fp, xt + 7 * fp, cy - R - 14, '', { from: cy - R + st - 2 }) + DK.text(xt + 7 * fp + 22, cy - R - 10, 'f ' + dcL(fr, fu, 'f'), { cls: 'dimt', anchor: 'start' });
+    h += dcTurnSpin(xe + 18, cy, R - 12) + DK.text(xe + 4, cy + R + 22, dcOk(n) ? dcN(n, 0) + ' RPM' : 'n', { cls: 'dimt' });
+    h += DK.arrow(xt - 4, cy + R + 22, xt - 120, cy + R + 22, 'hot') + DK.text(xt - 62, cy + R + 40, dcOk(vf) ? 'Vf ' + dcN(vf) + ' ' + dcFU(sys) : 'Vf = f × n', { cls: 'hott' });
+    if (dcOk(v.speed) && dcOk(v.dia) && !dcOk(v.rpm)) h += DK.text(20, H - 8, 'at Ø ' + dcN(v.dia) + ' ' + dcU(sys) + ' and ' + dcN(v.speed) + ' ' + dcSU(sys), { cls: 'mut', anchor: 'start' });
+    h += DK.text(W - 8, H - 8, 'feed marks enlarged', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Lathe feed per revolution and per minute');
+  },
+
+  // Multi-pass turning: the part to scale with the stock divided into equal passes, and each pass's time.
+  roughtime(v, sys, rows) {
+    const W = 520, H = 290, u = dcU(sys), ok = dcOk(v.d0) && v.d1 >= 0 && v.d0 > v.d1 && dcOk(v.len);
+    const n = dcRow(rows, 'Passes'), dep = dcRow(rows, 'Depth of cut per pass'), tot = dcRow(rows, 'Total cutting time', 'min'), tots = dcRow(rows, 'Total cutting time', 's');
+    const passes = rows.filter(r => /^Pass \d+ to/.test(r.label));
+    const s = ok ? Math.min(230 / v.len, 180 / v.d0) : 1, Lp = ok ? v.len * s : 220, R0 = ok ? v.d0 / 2 * s : 80, R1 = ok ? Math.max(1, v.d1 / 2 * s) : 56;
+    const cy = 136, x0 = 56, xe = x0 + 30 + Lp, xc = xe - Lp;
+    let h = dcChuck(x0, cy, R0) + DK.poly([[x0, cy - R0], [xc, cy - R0], [xc, cy - R1], [xe, cy - R1], [xe, cy + R1], [xc, cy + R1], [xc, cy + R0], [x0, cy + R0]], 'part');
+    h += DK.rect(xc, cy - R0, Lp, R0 - R1, 'ghost') + DK.rect(xc, cy + R1, Lp, R0 - R1, 'ghost') + DK.cl(x0 - 44, cy, xe + 14, cy);
+    const N = dcOk(n) ? Math.round(n) : 3, band = (R0 - R1) / N;
+    for (let i = 1; i < N && band >= 2.5; i++) h += DK.line(xc, cy - R0 + i * band, xe, cy - R0 + i * band, 'hid');
+    h += DK.rect(xc, cy - R0, Lp, band, 'hot');
+    if (band >= 12 && N <= 12) for (let i = 0; i < N; i++) h += DK.text(xc + Lp / 2, cy - R0 + (i + 0.5) * band + 4, String(i + 1), { cls: i === 0 ? 'hott' : 'mut' });
+    h += dcInsert(xe, cy - R0 + band, 30, 1, 22);
+    h += dcDimV(cy - R1, cy + R1, xe + 16, R1 > 30 ? 'Ø ' + dcL(v.d1, u, '') : '', { from: xe + 2 });
+    h += dcDimV(cy - R0, cy + R0, xe + 40, 'Ø ' + dcL(v.d0, u, ''), { from: xe + 2 });
+    h += DK.dimH(xc, xe, cy + R0 + 22, 'L ' + dcL(v.len, u, ''), { from: cy + R0 + 2, below: true });
+    const x = 400;
+    h += DK.text(x, 26, dcOk(tot) ? 'total ' + dcN(tot) + ' min' : 'total time', { cls: 'hott', anchor: 'start' });
+    if (dcOk(tots)) h += DK.text(x, 42, '= ' + dcN(tots, 1) + ' s', { cls: 'hott', anchor: 'start' });
+    h += dcLines(x, 66, [dcOk(n) ? dcN(n, 0) + ' passes of ' + dcN(dep) + ' ' + u : ''], { cls: 'txt' });
+    passes.slice(0, 10).forEach((r, i) => { h += DK.text(x, 88 + i * 15, 'pass ' + (i + 1) + ':  ' + dcN(r.value, 1) + ' s', { cls: i === 0 ? 'hott' : 'mut', anchor: 'start' }); });
+    if (passes.length > 10 || n > 10) h += DK.text(x, 88 + 10 * 15, '…', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, h, 'Multi-pass turning: passes and cutting time');
+  },
+
+  // Boring bar: section through the bore, the bar clamped in its holder, the cutting force at the tip and the bent bar (exaggerated).
+  boringbar(v, sys, rows) {
+    const W = 520, H = 280, u = dcU(sys), ok = dcOk(v.d) && dcOk(v.L), s = ok ? Math.min(290 / v.L, 52 / v.d) : 1;
+    const Lp = ok ? v.L * s : 250, dp = ok ? Math.max(10, v.d * s) : 40, cy = 128, xh = Math.min(420, 236 + Lp / 2), xt = xh - Lp, rb = dp / 2 + 24, e = 16;
+    const dt = dcRow(rows, 'Tip deflection, tangential'), dr = dcRow(rows, 'Tip deflection, radial'), ld = dcRow(rows, 'Overhang L/D'), du = sys === 'inch' ? 'thou' : 'µm';
+    const F = dcOk(v.F) ? v.F : dcRow(rows, 'Tangential force Fc'), fU = sys === 'inch' ? 'lbf' : 'N';
+    let h = DK.rect(xt - 36, cy - rb - 30, Math.max(20, xh - 60 - xt + 36), 30, 'hatch') + DK.rect(xt - 36, cy + rb, Math.max(20, xh - 60 - xt + 36), 30, 'hatch');
+    h += DK.rect(xh, cy - dp / 2 - 26, 60, dp + 52, 'hatch');
+    const bend = t => e * t * t * (3 - t) / 2, gl = k => { const p = []; for (let i = 0; i <= 30; i++) { const t = i / 30, x = xh - t * Lp; p.push([x, cy + k * dp / 2 + bend(t)]); } return p; };
+    h += DK.rect(xt, cy - dp / 2, Lp, dp, 'part');
+    if (dcOk(v.di) && v.di < v.d) { const hi = dp * v.di / v.d / 2; h += DK.line(xt, cy - hi, xh + 50, cy - hi, 'hid') + DK.line(xt, cy + hi, xh + 50, cy + hi, 'hid'); }
+    h += dcPl(gl(-1), 'ghost') + dcPl(gl(1), 'ghost') + DK.cl(xt - 46, cy, xh + 70, cy);
+    h += dcInsert(xt + 4, cy - rb, 26, -1, false, 'tool', 180);
+    h += DK.arrow(xt + 12, cy + dp / 2 + 6, xt + 12, cy + dp / 2 + 20 + 2, 'dim') + DK.text(xt + 20, cy + dp / 2 + 22, 'Fc ' + dcL(F, fU, ''), { cls: 'dimt', anchor: 'start' });
+    h += dcDimV(cy, cy + e, xt - 18, '', { hot: true, from: xt - 2 }) + DK.text(xt - 24, cy + e + 18, 'δ', { cls: 'hott', anchor: 'end' });
+    h += DK.dimH(xt, xh, 24, 'overhang ' + dcL(v.L, u, 'L') + (dcOk(ld) ? ' = ' + dcN(ld, 2) + ' × D' : ''), { from: cy - dp / 2 - 2 });
+    h += dcDimV(cy - dp / 2, cy + dp / 2, xh - 22, '', { from: xh - 22 }) + DK.leader(xh - 22, cy + dp / 2, xh - 6, cy + rb + 44, 'Ø ' + dcL(v.d, u, 'd'), { anchor: 'start' });
+    h += DK.text(20, H - 38, dcOk(dt) ? 'δ ' + dcN(dt) + ' ' + du + ' at the edge (tangential)' : 'δ: enter the force, or kc with ap and feed', { cls: 'hott', anchor: 'start' });
+    if (dcOk(dr)) h += DK.text(20, H - 22, 'radial ' + dcN(dr) + ' ' + du + ', combined ' + dcN(dcRow(rows, 'Combined tip deflection')) + ' ' + du, { cls: 'mut', anchor: 'start' });
+    const chk = dcStr(rows, 'Check');
+    h += DK.text(20, H - 6, chk ? 'Past the bar makers\' overhang guidance: see the results.' : 'Bent shape exaggerated; holder flex not included.', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, h, 'Boring bar: overhang, cutting force and tip deflection');
+  },
+
+  // C axis: end view of the part with the live tool at the rim, C rotation and the surface feed; the G93 move unrolled.
+  caxis(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), cx = 128, cy = 158, R = 84;
+    const cdeg = dcOk(v.vf) ? dcRow(rows, 'C-axis feed') : v.deg, vf = dcOk(v.vf) ? v.vf : dcRow(rows, 'Feed along the surface');
+    let h = DK.circle(cx, cy, R, 'part') + DK.cl(cx - R - 14, cy, cx + R + 14, cy) + DK.cl(cx, cy - R - 14, cx, cy + R + 14);
+    h += dcEndMill(cx, cy - R - 54, 54, 18, 30) + DK.circle(cx, cy - R, 2.5, 'hotf');
+    h += dcSpin(cx, cy, R + 14, R + 14, 120, 40, 'hot') + DK.text(cx + R + 4, cy - R + 2, 'C ' + (dcOk(cdeg) ? dcN(cdeg) + ' °/min' : ''), { cls: 'hott', anchor: 'start' });
+    h += DK.arrow(cx + 12, cy - R, cx + 70, cy - R, 'dim') + DK.text(cx + 14, cy - R + 16, dcOk(vf) ? dcN(vf) + ' ' + dcFU(sys) : 'Vf', { cls: 'dimt', anchor: 'start' });
+    h += DK.dim(cx + R * Math.cos(dcRad(210)), cy - R * Math.sin(dcRad(210)), cx + R * Math.cos(dcRad(30)), cy - R * Math.sin(dcRad(30)), 'Ø ' + dcL(v.d, u, 'D'), { below: true });
+    const rev = dcRow(rows, 'C-axis speed');
+    if (dcOk(rev)) h += DK.text(14, H - 6, '= ' + dcN(rev) + ' rev/min', { cls: 'mut', anchor: 'start' });
+    // G93 move unrolled: linear distance against the arc length on the surface.
+    const F = dcRow(rows, 'G93 inverse time F'), mt = dcRow(rows, 'Move time');
+    if ((dcOk(v.lin) || dcOk(v.ang)) && dcOk(v.d)) {
+      const arc = dcOk(v.ang) ? Math.PI * v.d * v.ang / 360 : 0, lin = dcOk(v.lin) ? v.lin : 0, k = Math.min(170 / Math.max(arc, 1e-9), 130 / Math.max(lin, 1e-9));
+      const aw = Math.max(arc * k, 0), lh = Math.max(lin * k, 0), x0 = 312, y0 = 190;
+      h += DK.text(410, 26, 'G93 move, surface unrolled', { cls: 'mut' });
+      h += DK.line(x0, y0, x0 + Math.max(aw, 30), y0, 'thin') + DK.line(x0, y0, x0, y0 - Math.max(lh, 30), 'thin');
+      h += DK.arrow(x0, y0, x0 + aw, y0 - lh, 'hot') + DK.circle(x0, y0, 2.5, 'hotf');
+      if (aw > 0) h += DK.dimH(x0, x0 + aw, y0 + 18, 'C ' + dcN(v.ang) + '°', { from: y0 + 2, below: true });
+      if (lh > 0) h += dcDimV(y0 - lh, y0, x0 - 16, 'linear ' + dcN(lin), { from: x0 - 2 });
+      h += DK.text(x0 + aw / 2 - 8, y0 - lh / 2 - 8, dcOk(F) ? 'F ' + dcN(F) : '', { cls: 'hott', anchor: 'end' });
+      if (dcOk(mt)) h += DK.text(506, H - 6, 'move time ' + dcN(mt) + ' s', { cls: 'hott', anchor: 'end' });
+    } else h += dcLines(312, 70, ['Add a G93 move (linear', 'distance and C rotation) to', 'see the inverse time feed.']);
+    return DK.svg(W, H, h, 'C axis feed: rotation and feed along the surface');
+  },
+
+  // Removal rate: the part turning, the depth of cut ap and feed f per rev forming the chip section, speed at the surface.
+  mrr(v, sys, rows) {
+    const W = 520, H = 290, u = dcU(sys), cy = 142, R0 = 62, ap = 18, x0 = 66, xe = 404, xt = 250, fp = 16, fu = sys === 'inch' ? 'in/rev' : 'mm/rev';
+    const R1 = R0 - ap, q = (rows.find(r => r.label === 'Material removal rate') || {}), kw = dcRow(rows, 'Power at the spindle', 'kW'), hp = dcRow(rows, 'Power at the spindle', 'hp');
+    let h = dcChuck(x0, cy, R0) + DK.poly([[x0, cy - R0], [xt, cy - R0], [xt, cy - R1], [xe, cy - R1], [xe, cy + R1], [xt, cy + R1], [xt, cy + R0], [x0, cy + R0]], 'part');
+    h += DK.rect(xt, cy - R0, xe - xt, ap, 'ghost') + DK.rect(xt, cy + R1, xe - xt, ap, 'ghost') + DK.cl(x0 - 44, cy, xe + 30, cy);
+    h += DK.rect(xt - fp, cy - R0, fp, ap, 'hatch') + DK.rect(xt - fp, cy - R0, fp, ap, 'hot');
+    h += dcInsert(xt, cy - R1, 36, 1, 30);
+    h += dcDimV(cy - R0, cy - R1, xe + 18, '', { from: xe - 2 }) + DK.text(xe + 24, cy - R0 + ap / 2 + 4, 'ap ' + dcL(v.doc, u, ''), { cls: 'dimt', anchor: 'start' });
+    h += DK.dimH(xt - fp, xt, cy - R0 - 18, '', { from: cy - R0 - 2 }) + DK.text(xt - fp - 24, cy - R0 - 14, 'f ' + dcL(v.f, fu, ''), { cls: 'dimt', anchor: 'end' });
+    h += DK.leader(xt - fp / 2, cy - R0 + ap / 2 + 2, xt - 40, cy - 6, 'chip section ap × f', { hot: true, anchor: 'end' });
+    h += dcTurnSpin(xe - 40, cy, R1) + DK.text(xe + 10, cy + R1 + 14, dcL(v.speed, dcSU(sys), 'Vc'), { cls: 'dimt', anchor: 'start' });
+    h += DK.arrow(xt - 20, cy + R0 + 20, xt - 100, cy + R0 + 20, 'dim') + DK.text(xt - 16, cy + R0 + 24, 'feed', { cls: 'mut', anchor: 'start' });
+    h += DK.text(14, H - 24, isFinite(q.value) ? 'Q ' + dcN(q.value) + ' ' + dcUnit(q.unit) : 'Q = Vc × ap × f', { cls: 'hott', anchor: 'start' });
+    h += DK.text(14, H - 8, dcOk(kw) ? 'power at the spindle ' + dcN(kw) + ' kW' + (dcOk(hp) ? ' (' + dcN(hp) + ' hp)' : '') : 'Enter kc for the power.', { cls: dcOk(kw) ? 'hott' : 'mut', anchor: 'start' });
+    return DK.svg(W, H, h, 'Material removal rate in turning');
+  },
+});
