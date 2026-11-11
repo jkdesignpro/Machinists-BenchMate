@@ -493,6 +493,7 @@ await page.selectOption('#main [data-id="shape"]', '1');
 await advSet('ap', '2');
 aT = await advTxt();
 if (!/Spindle speed 2,169 RPM/i.test(aT) || !/Ball nose: largest diameter in the cut at this depth 8\.944 mm/.test(aT) || !/Cutting speed at the largest diameter in the cut 61 m\/min/.test(aT)) problems.push(`[${where}] ball: "${aT.slice(0, 700)}"`);
+for (const [, id] of await page.evaluate(() => { const t = TOOLS.find(x => x.id === 'advmill'); return t.sends({ mat: 3, tm: 1, op: 1, d: 12, z: 4, L: 40, lf: 26, shape: 1, ap: 2, sp: 50, ag: 50, hard: 50, cool: 1, src: 0, eta: 0.8 }, state.W, 'mm'); })) if (!(await page.evaluate(i => TOOLS.some(x => x.id === i), id))) problems.push(`[${where}] send button to a tool that does not exist: ${id}`);
 await page.$eval('#main [data-id="ld"]', e => { e.value = '5'; e.dispatchEvent(new Event('input', { bubbles: true })); });
 if ((await page.inputValue('#main [data-id="L"]')) !== '60') problems.push(`[${where}] the stick-out slider did not set the stick-out: ${await page.inputValue('#main [data-id="L"]')}`);
 await page.click('#main .tpa button[title^="Reset"]');
