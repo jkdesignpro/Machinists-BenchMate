@@ -6,7 +6,45 @@
 // control", never borrowed from another control.
 // Uses loadRef and rEsc from refdata.js and Profiles from profiles.js.
 
-const GMUI = { ctrl: null, cmp: '', q: '', kind: '', mach: '', mctrl: null, mq: '' };
+const GMUI = { ctrl: null, cmp: '', q: '', kind: '', mach: '', mctrl: null, mq: '', tag: '', open: -1 };
+
+// Operation tags: BenchMate's own grouping of the codes, read from the meaning
+// already in the data (nothing is added to a code). This is the only list of tags.
+// Each tag: [id, chip label, words that put a meaning in it, words that keep it out].
+// A code gets every tag that matches. "Cancel G43" style meanings take the tags of
+// the code they cancel on the same control. A meaning that matches none is 'Other'.
+const GM_TAGS = [
+  ['motion', 'Motion', /rapid|linear|straight|\barc\b|\barc,|helix|involute|positioning|\bmove\b|movement|traverse|reference (point|position)|home position|machine zero|machine coordinates|^dwell|interpolation|tangential|chamfer of|corner rounding|automatic chamfering|retract from the contour|index on the fly/i,
+    /cycle|bore|drill|bolt hole|absolute|incremental|compensation|infeed|repetition/i],
+  ['path', 'Path control', /exact stop|exact path|continuous|cutting mode|look-ahead|smoothness|contour control|corner override|pre-control|high-speed cycle/i],
+  ['holes', 'Hole cycles', /drill|bor(e|ing)\b|\btap\b|tapping|ream|centring|spot|bolt hole|canned|(canned|fixed) cycle: return|cycle (cancel|off)|cancel motion mode|broaching/i],
+  ['turning', 'Turning cycles', /\brough|stock removal|finishing cycle|groov|cut-?off|facing cycle|end fac|end face (cutting|turning)|face cutting|o\.d\.|outer \/ inner|outside \/ inside|longitudinal cutting|pattern repeating|formed material|forming material|irregular path/i],
+  ['milling', 'Milling cycles', /pocket|bore milling|engraving|contour repetition|polygonal|hob milling/i],
+  ['thread', 'Threading', /thread|\btap\b|tapping/i],
+  ['comp', 'Compensation', /compensation|cutter comp|nose r\b|tool offset (double )?(in|de)crease|tool centre point|paraxial|tool length offset/i],
+  ['coords', 'Coordinates and offsets', /coordinate|work offset|offsets|zero offset|local coordinate|\(local\)|g92 shift|shift|^rotation|cancel rotation|mirror|scaling|polar|pole|cylindrical|preset|actual value|data input|data setting|tool definition|mapping|^milling mode/i],
+  ['units', 'Units and modes', /inch|metric|millimetre|absolute|incremental|plane|diameter programming|radius programming|dialect|siemens mode|swiss-type/i, /cycle/i],
+  ['spindle', 'Spindle and feed', /spindle|feed per|feed in units|inverse time|surface speed|cutting speed|peripheral speed|gear|live tool|rotary (\(milling\) )?tool|speed override|override switches|override ignore|asynchronous|synchronous feed|c-axis/i,
+    /cycle|tap|plane|coolant|dwell|feature|tailstock|bore|drill/i],
+  ['coolant', 'Coolant and air', /coolant|air blast|air jet/i],
+  ['program', 'Program control', /program (stop|end)|end of (sub)?program|main program end|subprogram|macro|optional stop|jump if|alarm if|parameter entry|interactive|sleep mode|display media|output relay|two-process|modify a setting|blank form/i],
+  ['probe', 'Probing and measuring', /prob|skip|measure/i],
+  ['machine', 'Machine functions', /tool change|pallet|door|chuck|tailstock|steady rest|turret|parts catcher|brake|tool (un)?clamp|barrier|stroke (check|limit)|working area|chip auger|secondary spindle|spindle swap|servo bar|balance cut|cross machining/i],
+];
+const GM_TAG_NAME = Object.fromEntries(GM_TAGS.map(([id, name]) => [id, name]).concat([['other', 'Other']]));
+const gmTagCache = new Map();
+function gmTags(r, G) {
+  const key = r.ctrl + '|' + r.meaning;
+  if (gmTagCache.has(key)) return gmTagCache.get(key);
+  let t = GM_TAGS.filter(([, , yes, no]) => yes.test(r.meaning) && !(no && no.test(r.meaning))).map(([id]) => id);
+  const c = /^cancel ([GM]\d+(?:\.\d+)?)\b/i.exec(r.meaning);
+  if (!t.length && c && G) {
+    const target = G.codes.find(x => x.ctrl === r.ctrl && gmNorm(x.code) === gmNorm(c[1]) && x !== r);
+    if (target) t = gmTags(target, G).slice();
+  }
+  if (!t.length) t.push('other');
+  gmTagCache.set(key, t); return t;
+}
 // Order matters: the more specific names are tried first.
 const GM_MATCH_ORDER = ['siemens-iso', 'meldas', 'mitsubishi', 'siemens', 'fanuc', 'haas', 'heidenhain', 'okuma', 'mazak', 'generic'];
 
@@ -113,49 +151,97 @@ function gmNotes(G, ctrl, sec) {
   return h;
 }
 
+// The info drawer for one code: everything the data holds for it, arranged; nothing added.
+function gmDrawer(G, r) {
+  const nq = gmNorm(r.code), C = G.controls[r.ctrl];
+  const same = G.codes.filter(x => x !== r && gmNorm(x.code) === nq);
+  const line = x => '<div><b class="mv">' + rEsc(x.code) + '</b> ' + rEsc(x.meaning) + ' <span class="ms">(' + gmApps(x) + ')</span>' + (x.option ? ' <span class="badge review">Option</span>' : '') + '</div>' + (x.note ? '<div class="ms">' + rEsc(x.note) + '</div>' : '');
+  const here = same.filter(x => x.ctrl === r.ctrl), others = Object.keys(G.controls).filter(id => id !== r.ctrl);
+  const listed = others.filter(id => same.some(x => x.ctrl === id)), missing = others.filter(id => !listed.includes(id));
+  // Disagreements that name this code (G36, G036 ...) on any control.
+  const m = /^([GM])(\d+)(?:\.(\d+))?$/.exec(nq || '');
+  const re = m ? new RegExp('\\b' + m[1] + '0*' + m[2] + (m[3] ? '\\.' + m[3] : '') + '(?![\\d.])', 'i') : null;
+  const dis = re ? G.disagreements.filter(d => re.test(d.topic + ' ' + d.text)) : [];
+  const srcFull = x => x.src.map(s => {
+    const S = G.sources[s.s] || {};
+    return '<li><b>' + rEsc(s.s) + '</b>' + (s.at ? ', ' + rEsc(s.at) : '') + ': ' + rEsc(S.publisher || '') + ', <i>' + rEsc(S.title || '') + '</i>' + (S.edition ? ', ' + rEsc(S.edition) : '') +
+      (S.kind ? ' (' + rEsc(GM_KIND[S.kind] || S.kind) + ')' : '') + '. ' + (S.url ? '<a href="' + rEsc(S.url) + '" target="_blank" rel="noopener">' + rEsc(S.url) + '</a>' : '') +
+      (S.accessed ? ', accessed ' + rEsc(S.accessed) : '') + (S.note ? '. <span class="ms">' + rEsc(S.note) + '</span>' : '') + '</li>';
+  }).join('');
+  const dd = (t, v) => '<dt>' + t + '</dt><dd>' + v + '</dd>';
+  return '<div class="gmdrawer" role="region" aria-label="' + rEsc(r.code + ' on ' + C.short) + '"><div class="gmdh"><span><b class="mv">' + rEsc(r.code) + '</b> ' + rEsc(r.meaning) + '<span class="ms gmdc">' + rEsc(C.name) + '</span></span>' +
+    '<button type="button" class="btn sm gmdx" aria-label="Close the details">Close</button></div><dl class="gmdl">' +
+    dd('Meaning', rEsc(r.meaning) + (r.option ? ' <span class="badge review" title="An option, or fitted by the machine builder">Option</span>' : '')) +
+    (r.note ? dd('Note', rEsc(r.note)) : '') + (r.group ? dd('Modal group', '<span class="mv">' + rEsc(r.group) + '</span>') : '') +
+    dd('Used on', gmApps(r)) + dd('Operation', gmTags(r, G).map(t => rEsc(GM_TAG_NAME[t])).join(', ') + ' <span class="ms">(BenchMate grouping)</span>') + dd('Evidence', gmBadge(G, r)) +
+    (here.length ? dd('Also on ' + rEsc(C.short), here.map(line).join('')) : '') + '</dl>' +
+    '<div class="gmdsec"><div class="h">Other controls</div>' + (listed.length ? '<table>' + listed.map(id => '<tr><td><b>' + rEsc(G.controls[id].short) + '</b></td><td>' + same.filter(x => x.ctrl === id).map(line).join('') + '</td></tr>').join('') + '</table>' : '') +
+    (missing.length ? '<p class="ms">Not confirmed for: ' + missing.map(id => rEsc(G.controls[id].short)).join(', ') + '.</p>' : '') + '</div>' +
+    (dis.length ? '<div class="gmdsec"><div class="h">Where sources disagree</div>' + dis.map(d => '<p><b>' + rEsc(G.controls[d.ctrl] ? G.controls[d.ctrl].short : d.ctrl) + ', ' + rEsc(d.topic) + ':</b> ' + rEsc(d.text) + '</p><ul class="gmdsrc">' + srcFull(d) + '</ul>').join('') + '</div>' : '') +
+    '<div class="gmdsec"><div class="h">Sources</div><ul class="gmdsrc">' + srcFull(r) + '</ul></div></div>';
+}
+
 async function renderGmCodes(el) {
   const R = await loadRef(el); if (!R) return;
   const G = R.gcodes; if (!G) { el.textContent = 'G-code data not found (run scripts/build-web.sh).'; return; }
   const fromProfile = gmProfileCtrl(G);
   if (!GMUI.ctrl) { GMUI.ctrl = fromProfile || 'generic'; if (!GMUI.mach) GMUI.mach = gmProfileType(); }
+  const idx = new Map(G.codes.map((r, i) => [r, i]));
   el.innerHTML = '<div class="mfilter gmf">' +
     '<label class="gml"><span class="ms">Control</span><select id="gmc">' + gmCtrlOptions(G, GMUI.ctrl) + '</select></label>' +
     '<label class="gml"><span class="ms">Compare with</span><select id="gmx">' + gmCtrlOptions(G, GMUI.cmp, 'No comparison') + '</select></label>' +
     '<label class="gml"><span class="ms">Search code or word</span><input id="gmq" type="search" placeholder="G76, M98, thread, tap ..."></label>' +
     '<label class="gml"><span class="ms">Codes</span><select id="gmk"><option value="">G and M</option><option value="G">G only</option><option value="M">M only</option></select></label>' +
     '<label class="gml"><span class="ms">Machine</span><select id="gmm"><option value="">Mill and lathe</option><option value="M">Mill</option><option value="L">Lathe</option></select></label></div>' +
+    '<div class="fchips gmtags" id="gmt" role="group" aria-label="Filter by operation"></div>' +
     '<p class="desc" id="gmprof"></p><div id="gmctl" class="note"></div><div id="gmres"></div><div id="gmnotes"></div><div id="gmsrc" class="note"></div>' + gmAddrTable(G);
-  const c = $('#gmc', el), x = $('#gmx', el), q = $('#gmq', el), k = $('#gmk', el), mm = $('#gmm', el);
+  const c = $('#gmc', el), x = $('#gmx', el), q = $('#gmq', el), k = $('#gmk', el), mm = $('#gmm', el), tg = $('#gmt', el);
   q.value = GMUI.q; k.value = GMUI.kind; mm.value = GMUI.mach;
-  function rowsOf(ctrl) {
+  const tagOk = r => !GMUI.tag || gmTags(r, G).includes(GMUI.tag);
+  function rowsOf(ctrl, noTag) {
     const s = q.value.trim(), nq = gmNorm(s), low = s.toLowerCase();
     return G.codes.filter(r => r.ctrl === ctrl && (!k.value || r.kind === k.value) &&
-      (!mm.value || (mm.value === 'M' ? r.mill : r.lathe)) &&
+      (!mm.value || (mm.value === 'M' ? r.mill : r.lathe)) && (noTag || tagOk(r)) &&
       (!s || (nq ? gmNorm(r.code) === nq : (r.code + ' ' + r.meaning + ' ' + r.note).toLowerCase().includes(low)))).sort(gmSort);
   }
   function cell(G, r) {
     return '<td><div>' + rEsc(r.meaning) + (r.option ? ' <span class="badge review" title="An option, or fitted by the machine builder">Option</span>' : '') + '</div>' +
       (r.note ? '<div class="ms">' + rEsc(r.note) + '</div>' : '') + '</td>';
   }
+  // Operation chips; each count is the rows the other filters leave.
+  function chips() {
+    const base = rowsOf(GMUI.ctrl, true).concat(GMUI.cmp ? rowsOf(GMUI.cmp, true) : []);
+    const n = id => base.filter(r => gmTags(r, G).includes(id)).length;
+    const ids = GM_TAGS.map(t => t[0]).concat(G.codes.some(r => gmTags(r, G).includes('other')) ? ['other'] : []);
+    tg.innerHTML = '<button type="button" class="fchip' + (GMUI.tag ? '' : ' on') + '" data-t="" aria-pressed="' + !GMUI.tag + '">All</button>' +
+      ids.map(id => { const on = GMUI.tag === id, cnt = n(id); return '<button type="button" class="fchip' + (on ? ' on' : '') + '" data-t="' + id + '" aria-pressed="' + on + '"' + (cnt || on ? '' : ' disabled') + '>' + rEsc(GM_TAG_NAME[id]) + ' <span class="gmtn">' + cnt + '</span></button>'; }).join('');
+    tg.querySelectorAll('.fchip').forEach(b => b.onclick = () => { GMUI.tag = b.dataset.t; draw(); });
+  }
+  const rowAttrs = i => ' class="gmrow' + (GMUI.open === i ? ' open' : '') + '" data-i="' + i + '" tabindex="0" aria-expanded="' + (GMUI.open === i) + '"';
   function draw() {
     GMUI.ctrl = c.value; GMUI.cmp = x.value === c.value ? '' : x.value; GMUI.q = q.value; GMUI.kind = k.value; GMUI.mach = mm.value;
     const C = G.controls[GMUI.ctrl];
+    chips();
     $('#gmprof', el).textContent = fromProfile ? 'Active machine control: ' + G.controls[fromProfile].name + (fromProfile === GMUI.ctrl ? ' (selected).' : '.') : 'No active machine with a recognised control: pick one above. Machine profiles (Setup) set the default.';
     $('#gmctl', el).innerHTML = '<b>' + rEsc(C.name) + ':</b> ' + rEsc(C.note);
     const A = rowsOf(GMUI.ctrl), out = $('#gmres', el);
     const nq = gmNorm(q.value.trim());
+    const tagTxt = GMUI.tag ? ' tagged ' + GM_TAG_NAME[GMUI.tag] : '';
     let h = '';
     if (!GMUI.cmp) {
       if (A.length) {
-        h = '<div class="res mtab"><table><tr><th>Code</th><th>Meaning</th><th>Group</th><th>Use</th><th>Source</th></tr>' + A.map(r =>
-          '<tr><td class="mv"><b>' + rEsc(r.code) + '</b></td>' + cell(G, r) + '<td class="mv">' + rEsc(r.group || '') + '</td><td>' + gmApps(r) + '</td><td>' + gmBadge(G, r) + gmSrc(G, r) + '</td></tr>').join('') + '</table></div>';
+        h = '<div class="res mtab"><table class="gmtab"><tr><th>Code</th><th>Meaning</th><th>Group</th><th>Use</th><th>Source</th></tr>' + A.map(r => {
+          const i = idx.get(r);
+          return '<tr' + rowAttrs(i) + '><td class="mv"><b>' + rEsc(r.code) + '</b></td>' + cell(G, r) + '<td class="mv">' + rEsc(r.group || '') + '</td><td>' + gmApps(r) + '</td><td>' + gmBadge(G, r) + gmSrc(G, r) + '</td></tr>' +
+            (GMUI.open === i ? '<tr class="gmdrw"><td colspan="5">' + gmDrawer(G, r) + '</td></tr>' : '');
+        }).join('') + '</table></div>';
       }
-      if (nq && !A.length) {
+      if (nq && !A.length && !rowsOf(GMUI.ctrl, true).length) {
         const other = Object.keys(G.controls).filter(id => id !== GMUI.ctrl && G.codes.some(r => r.ctrl === id && gmNorm(r.code) === nq));
         h += '<p class="warn gmnc">' + rEsc(nq) + ' is not confirmed for ' + rEsc(C.name) + (mm.value ? ' (' + (mm.value === 'M' ? 'mill' : 'lathe') + ')' : '') + '.</p>' +
           (other.length ? '<p class="desc">Listed for: ' + other.map(id => '<a href="#" data-c="' + id + '">' + rEsc(G.controls[id].short) + '</a>').join(', ') + '. Its meaning there does not carry over to this control.</p>' : '<p class="desc">Not listed for any control here.</p>');
-      } else if (!A.length) h += '<p class="warn">Nothing matches.</p>';
-      h += '<p class="desc">' + A.length + ' of ' + G.codes.filter(r => r.ctrl === GMUI.ctrl).length + ' rows for this control. Hover a source for its title, edition and page; click it to open the document.</p>';
+      } else if (!A.length) h += '<p class="warn">Nothing matches' + rEsc(tagTxt) + '.</p>';
+      h += '<p class="desc">' + A.length + ' of ' + G.codes.filter(r => r.ctrl === GMUI.ctrl).length + ' rows for this control' + rEsc(tagTxt) + '. Click a row to see everything BenchMate holds on that code. Hover a source for its title, edition and page; click it to open the document.</p>';
     } else {
       const B = rowsOf(GMUI.cmp), D = G.controls[GMUI.cmp];
       const keys = []; const seen = new Set();
@@ -165,12 +251,24 @@ async function renderGmCodes(el) {
         return rs.length ? '<td>' + rs.map(r => '<div><b class="mv">' + rEsc(r.code) + '</b> ' + rEsc(r.meaning) + ' <span class="ms">(' + gmApps(r) + ')</span>' + (r.option ? ' <span class="badge review">Option</span>' : '') + '</div>' + (r.note ? '<div class="ms">' + rEsc(r.note) + '</div>' : '') + gmBadge(G, r) + gmSrc(G, r)).join('<hr class="gmhr">') + '</td>'
           : '<td class="gmnc"><span class="ms">Not confirmed for ' + rEsc(name) + '</span></td>';
       };
-      h = keys.length ? '<div class="res mtab"><table class="gmcmp"><tr><th>Code</th><th>' + rEsc(C.short) + '</th><th>' + rEsc(D.short) + '</th></tr>' +
-        keys.map(kk => '<tr><td class="mv"><b>' + rEsc(kk) + '</b></td>' + side(A, kk, C.short) + side(B, kk, D.short) + '</tr>').join('') + '</table></div>' : '<p class="warn">Nothing matches.</p>';
-      h += '<p class="desc">Side by side: ' + keys.length + (keys.length === 1 ? ' code. ' : ' codes. ') + 'Codes are matched by number (G01 = G1). "Not confirmed" means the sources read for that control do not list it; it may still exist, but BenchMate will not borrow another control\'s meaning.</p>';
+      // Side by side, a row opens the drawer for the first control that lists the code.
+      h = keys.length ? '<div class="res mtab"><table class="gmcmp gmtab"><tr><th>Code</th><th>' + rEsc(C.short) + '</th><th>' + rEsc(D.short) + '</th></tr>' +
+        keys.map(kk => {
+          const r0 = A.find(r => gmNorm(r.code) === kk) || B.find(r => gmNorm(r.code) === kk), i = idx.get(r0);
+          return '<tr' + rowAttrs(i) + '><td class="mv"><b>' + rEsc(kk) + '</b></td>' + side(A, kk, C.short) + side(B, kk, D.short) + '</tr>' +
+            (GMUI.open === i ? '<tr class="gmdrw"><td colspan="3">' + gmDrawer(G, r0) + '</td></tr>' : '');
+        }).join('') + '</table></div>' : '<p class="warn">Nothing matches' + rEsc(tagTxt) + '.</p>';
+      h += '<p class="desc">Side by side: ' + keys.length + (keys.length === 1 ? ' code' : ' codes') + rEsc(tagTxt) + '. Codes are matched by number (G01 = G1). "Not confirmed" means the sources read for that control do not list it; it may still exist, but BenchMate will not borrow another control\'s meaning. Click a row for more on that code.</p>';
     }
     out.innerHTML = h;
     out.querySelectorAll('a[data-c]').forEach(a => a.onclick = e => { e.preventDefault(); c.value = a.dataset.c; draw(); });
+    const refocus = i => { const t = out.querySelector('tr.gmrow[data-i="' + i + '"]'); if (t) t.focus({ preventScroll: true }); };
+    const toggle = tr => { const i = +tr.dataset.i; GMUI.open = GMUI.open === i ? -1 : i; draw(); refocus(i); };
+    out.querySelectorAll('tr.gmrow').forEach(tr => {
+      tr.onclick = e => { if (e.target.closest('a, button')) return; toggle(tr); };
+      tr.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === tr) { e.preventDefault(); toggle(tr); } };
+    });
+    out.querySelectorAll('.gmdx').forEach(b => b.onclick = () => { const i = GMUI.open; GMUI.open = -1; draw(); refocus(i); });
     $('#gmnotes', el).innerHTML = gmNotes(G, GMUI.ctrl, 'codes') + (GMUI.cmp ? gmNotes(G, GMUI.cmp, 'codes') : '');
     const ids = new Set(); G.codes.filter(r => r.ctrl === GMUI.ctrl || r.ctrl === GMUI.cmp).forEach(r => r.src.forEach(s => ids.add(s.s)));
     G.disagreements.filter(d => d.ctrl === GMUI.ctrl || d.ctrl === GMUI.cmp).forEach(d => d.src.forEach(s => ids.add(s.s)));

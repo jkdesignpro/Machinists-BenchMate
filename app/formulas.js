@@ -330,36 +330,59 @@ const FORMULA_EXEMPT = ['holdercode', 'iso513', 'drillchart', 'tapdrill', 'gritc
   'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'toolguide', 'formulas',
   'tempercolours', 'heattreat', 'plastics', 'metalid'];
 
+// Library screen. FLIB.g is a group name, '' for all, or FLIB_FAV for the favourites.
+// Favourites (bm.formfav) are kept in this browser as "tool|formula name" keys.
 const FLIB = { q: '', g: '' };
+const FLIB_FAV = '\u0001fav';
+const flibKey = f => f.tool + '|' + f.name;
+const FormFavs = {
+  all: () => { const v = lsJson('bm.formfav', []); return Array.isArray(v) ? v.filter(x => typeof x === 'string') : []; },
+  has: k => FormFavs.all().includes(k),
+  toggle: k => { const a = FormFavs.all(); lsPut('bm.formfav', a.includes(k) ? a.filter(x => x !== k) : a.concat(k)); },
+};
 function renderFormulaLibrary(el) {
   const esc = x => String(x ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const tool = id => TOOLS.find(t => t.id === id);
   const groups = [...new Set(FORMULAS.map(f => (tool(f.tool) || {}).group).filter(Boolean))];
-  el.innerHTML = '<div class="flib-bar"><input id="fq" type="search" placeholder="Search formulas: rpm, chip, cusp, taper, torque ..." aria-label="Search formulas"><select id="fg" aria-label="Filter by group"><option value="">All groups</option>' +
-    groups.map(g => '<option>' + esc(g) + '</option>').join('') + '</select></div><div id="flist"></div>' +
+  if (FLIB.g && FLIB.g !== FLIB_FAV && !groups.includes(FLIB.g)) FLIB.g = '';
+  el.innerHTML = '<div class="flib-bar"><input id="fq" type="search" placeholder="Search formulas: rpm, chip, cusp, taper, torque ..." aria-label="Search formulas"></div>' +
+    '<div class="fchips flib-chips" id="fg" role="group" aria-label="Filter by category"></div><div id="flist"></div>' +
     '<h2>Source keys</h2><ul class="gsl">' + Object.entries(FORMULA_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + esc(v) + '</li>').join('') + '</ul>';
+  const chipBox = $('#fg', el);
+  const chips = () => {
+    const favs = FormFavs.all(), nFav = FORMULAS.filter(f => favs.includes(flibKey(f))).length;
+    const chip = (v, label, n) => '<button type="button" class="fchip' + (FLIB.g === v ? ' on' : '') + '" data-g="' + esc(v) + '" aria-pressed="' + (FLIB.g === v) + '">' + label + (n !== undefined ? ' <span class="gmtn">' + n + '</span>' : '') + '</button>';
+    chipBox.innerHTML = chip('', 'All') + chip(FLIB_FAV, icon('star') + 'Favourites', nFav) +
+      groups.map(g => chip(g, esc(g), FORMULAS.filter(f => (tool(f.tool) || {}).group === g).length)).join('');
+    chipBox.querySelectorAll('.fchip').forEach(b => b.onclick = () => { FLIB.g = b.dataset.g; chips(); draw(); });
+  };
   const draw = () => {
-    const q = FLIB.q.trim().toLowerCase();
+    const q = FLIB.q.trim().toLowerCase(), favs = FormFavs.all();
     const rows = FORMULAS.filter(f => {
       const t = tool(f.tool); if (!t) return false;
-      if (FLIB.g && t.group !== FLIB.g) return false;
+      if (FLIB.g === FLIB_FAV ? !favs.includes(flibKey(f)) : (FLIB.g && t.group !== FLIB.g)) return false;
       return !q || (f.name + ' ' + f.expr + ' ' + f.vars + ' ' + t.title + ' ' + f.src.join(' ')).toLowerCase().includes(q);
     });
-    $('#flist', el).innerHTML = '<p class="desc">' + rows.length + ' of ' + FORMULAS.length + ' formulas, from ' + new Set(FORMULAS.map(f => f.tool)).size + ' tools. Click a tool name to open it.</p>' +
+    const empty = FLIB.g === FLIB_FAV && !rows.length ? '<p class="desc">' + (favs.length ? 'No favourite matches the search.' : 'No favourites yet. Click the star on a formula to keep it here.') + '</p>' : '';
+    $('#flist', el).innerHTML = '<p class="desc">' + rows.length + ' of ' + FORMULAS.length + ' formulas, from ' + new Set(FORMULAS.map(f => f.tool)).size + ' tools. Star a formula to keep it under Favourites.</p>' + empty +
       rows.map(f => {
-        const t = tool(f.tool);
-        return '<div class="frow"><div class="fh"><b>' + esc(f.name) + '</b> <button class="btn flink" data-id="' + f.tool + '">' + esc(t.title) + '</button></div>' +
+        const t = tool(f.tool), k = flibKey(f), on = favs.includes(k);
+        return '<div class="frow"><div class="fh"><span class="fht"><button type="button" class="star fstar' + (on ? ' on' : '') + '" data-k="' + esc(k) + '" aria-pressed="' + on + '" title="' + (on ? 'Remove from favourites' : 'Add to favourites') + '" aria-label="' + (on ? 'Remove from favourites: ' : 'Add to favourites: ') + esc(f.name) + '">' + icon('star') + '</button><b>' + esc(f.name) + '</b></span>' +
+          '<span class="fgo"><span class="ms">' + esc(t.title) + '</span><button type="button" class="btn sm flink" data-id="' + f.tool + '" title="Open ' + esc(t.title) + '">' + icon('calc') + '<span>Open calculator</span></button></span></div>' +
           '<div class="fx">' + esc(f.expr) + '</div>' +
           (f.vars ? '<div class="fv">' + f.vars.split(';').map(v => esc(v.trim())).join('<br>') + '</div>' : '') +
           '<div class="fs">' + f.src.map(k => '<abbr class="gsrc" title="' + esc(FORMULA_SOURCES[k] || k) + '">' + k + '</abbr>').join('') + ' <span class="ms">' + esc(t.group) + '</span></div></div>';
       }).join('');
-    el.querySelectorAll('.flink').forEach(b => b.onclick = () => {
-      openTool(b.dataset.id);
+    el.querySelectorAll('.flink').forEach(b => b.onclick = () => { openTool(b.dataset.id); });
+    el.querySelectorAll('.fstar').forEach(b => b.onclick = () => {
+      FormFavs.toggle(b.dataset.k); chips();
+      if (FLIB.g === FLIB_FAV) { draw(); return; }
+      const on = FormFavs.has(b.dataset.k); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+      b.title = on ? 'Remove from favourites' : 'Add to favourites';
     });
   };
-  const q = $('#fq', el), g = $('#fg', el);
-  q.value = FLIB.q; g.value = FLIB.g;
+  const q = $('#fq', el);
+  q.value = FLIB.q;
   q.oninput = () => { FLIB.q = q.value; draw(); };
-  g.onchange = () => { FLIB.g = g.value; draw(); };
-  draw();
+  chips(); draw();
 }

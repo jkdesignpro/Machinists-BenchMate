@@ -40,11 +40,39 @@ const spindleFields = [
 ];
 const spParams = s => [+s.css === 1 ? 1 : 0, snum(s.v), snum(s.vmax), snum(s.rpm)];
 
+// Required inputs (field.req): what a box must hold before the program is made.
+// 'pos' a number above 0; 'num' any number; 'int1' a whole number from 1; 'int0' a whole number from 0;
+// 'opt0' blank or 0 and above; 'optpos' blank or above 0.
+const CY_REQ = {
+  pos: v => snum(v) > 0, num: v => isFinite(snum(v)), int1: v => Number.isInteger(snum(v)) && snum(v) >= 1,
+  int0: v => Number.isInteger(snum(v)) && snum(v) >= 0, opt0: v => v === '' || v == null || snum(v) >= 0, optpos: v => v === '' || v == null || snum(v) > 0,
+};
+// What is missing in one section: the short names of its shown, required boxes that do not pass.
+function cyMissing(sec, fields, s) {
+  return fields.filter(f => sec.keys.includes(f.k) && f.req && (!f.show || f.show(s)) && !CY_REQ[f.req](s[f.k])).map(f => f.short || f.label);
+}
+const CYSEC = {};   // open or folded sections, per screen
+
 // Generic screen: draws the form, runs the generator on every change.
-function cyScreen(el, id, defs, fields, build, extra) {
+// opts.sections: [{ id, title, keys, open, pre(s) }] draws the inputs as folding sections, each with a
+// Ready / Needs input chip; the program is made only when every section is ready.
+// opts.after(el, s): called after every change (for messages a screen keeps up to date).
+// opts.wire(el, s, redraw): called after the form is drawn (for controls that are not inputs, such as a picker).
+// opts.top(s): HTML drawn above the inputs.
+function cyScreen(el, id, defs, fields, build, extra, opts) {
   const s = cyState(id, defs);
+  const secs = opts && opts.sections;
+  const shown = f => !f.show || f.show(s);
   const draw = () => {
-    el.innerHTML = '<div class="grid">' + fields.filter(f => !f.show || f.show(s)).map(f => cyField(f, s)).join('') + '</div><div id="cyx"></div><div id="cyout"></div>';
+    if (secs) {
+      const open = CYSEC[id] || (CYSEC[id] = {});
+      el.innerHTML = (opts.top ? opts.top(s) : '') + secs.map(sec => {
+        const isOpen = open[sec.id] !== undefined ? open[sec.id] : (state.mode === 'expert' || !!sec.open);
+        return '<details class="cysec" data-kept="1" data-sec="' + sec.id + '"' + (isOpen ? ' open' : '') + '><summary><span class="cysh">' + sec.title + '</span><span class="cyst"></span></summary>' +
+          '<div class="cysb">' + (sec.pre ? sec.pre(s) : '') + '<div class="grid">' + fields.filter(f => sec.keys.includes(f.k) && shown(f)).map(f => cyField(f, s)).join('') + '</div></div></details>';
+      }).join('') + '<div id="cyx"></div><div id="cyout"></div>';
+      el.querySelectorAll('details.cysec').forEach(d => d.addEventListener('toggle', () => { open[d.dataset.sec] = d.open; }));
+    } else el.innerHTML = (opts && opts.top ? opts.top(s) : '') + '<div class="grid">' + fields.filter(shown).map(f => cyField(f, s)).join('') + '</div><div id="cyx"></div><div id="cyout"></div>';
     el.querySelectorAll('[data-k]').forEach(i => {
       i.oninput = i.onchange = () => {
         if (s[i.dataset.k] === i.value) return;
@@ -54,10 +82,21 @@ function cyScreen(el, id, defs, fields, build, extra) {
         if (i.dataset.redraw) { const y = window.scrollY; draw(); window.scrollTo(0, y); } else calc();
       };
     });
+    if (opts && opts.wire) opts.wire(el, s, () => { const y = window.scrollY; draw(); window.scrollTo(0, y); });
     calc();
   };
   const calc = () => {
     const out = el.querySelector('#cyout'), xb = el.querySelector('#cyx');
+    if (opts && opts.after) opts.after(el, s);
+    if (secs) {
+      let ready = true;
+      secs.forEach(sec => {
+        const miss = cyMissing(sec, fields, s), st = el.querySelector('details[data-sec="' + sec.id + '"] .cyst');
+        if (miss.length) ready = false;
+        if (st) st.innerHTML = miss.length ? '<span class="rdy no">Needs input</span><span class="ms cymiss">' + sesc(miss.join(', ')) + '</span>' : '<span class="rdy">Ready</span>';
+      });
+      if (!ready) { xb.innerHTML = ''; out.innerHTML = '<div class="rempty cywait">' + icon('info') + '<span>Fill in the sections marked Needs input to see the program.</span></div>'; return; }
+    }
     let job;
     try { job = build(s); } catch (e) { job = { error: e.message }; }
     if (job.error) { xb.innerHTML = ''; out.innerHTML = '<div class="res">' + stable('Program', [[sesc(job.error), '', '']]) + '</div>'; return; }
@@ -236,10 +275,51 @@ function renderDrillCycles(el) {
   });
 }
 
+// ---------- Thread size from a standard or from another tool ----------
+// The major diameter and pitch boxes of a cycle, in the units on screen. dmm and pmm in mm;
+// tpi when the thread is a Unified one (so 13 TPI stays 13, not 12.99999).
+function cyThreadBoxes(dmm, pmm, tpi) {
+  const inch = cyInch();
+  return { major: String(+(inch ? dmm / IN_MM : dmm).toPrecision(7)), pitch: String(inch ? (tpi > 0 ? tpi : +(IN_MM / pmm).toPrecision(6)) : +pmm.toPrecision(7)) };
+}
+// A hand-off { dia, pitch, internal, label } in the units on screen (pitch as a length; tpi optional) to the boxes.
+function cyThreadHandoff(h) {
+  if (!h || !(+h.dia > 0) || !(+h.pitch > 0 || +h.tpi > 0)) return null;
+  const k = cyInch() ? IN_MM : 1, pmm = +h.tpi > 0 ? IN_MM / +h.tpi : +h.pitch * k;
+  const v = cyThreadBoxes(+h.dia * k, pmm, +h.tpi > 0 ? +h.tpi : 0);
+  if (h.internal !== undefined && h.internal !== null) v.internal = h.internal ? 1 : 0;
+  return v;
+}
+// "Fill from a standard thread": the thread list of the Thread data tool (threadOptions in
+// refdata.js, built from data/refdata.json), so there is one table of sizes.
+const cyStdPickHtml = s => '<div class="cystd"><label class="f"><span>Fill from a standard thread</span><div class="row"><select id="cystd" aria-label="Fill from a standard thread"><option value="">Loading the thread list</option></select></div></label>' +
+  '<p class="ms" id="cystdmsg">' + (s._from ? 'Filled from ' + sesc(s._from) + '.' : '') + '</p></div>';
+function cyStdPickWire(el, s) {
+  const sel = el.querySelector('#cystd'); if (!sel) return;
+  loadRef({}).then(R => {
+    if (!R || !sel.isConnected) return;
+    const opts = threadOptions(R), grp = (sys, name) => '<optgroup label="' + name + '">' + opts.filter(o => o.sys === sys).map(o => '<option value="' + sesc(o.key) + '">' + sesc(o.label) + '</option>').join('') + '</optgroup>';
+    sel.innerHTML = '<option value="">Pick a thread</option>' + grp('metric', 'ISO metric (ISO 261 / ISO 262)') + grp('unified', 'Unified inch (ASME B1.1)');
+    sel.onchange = () => {
+      const o = opts.find(x => x.key === sel.value); if (!o) return;
+      const v = cyThreadBoxes(o.d, o.p, o.tpi);
+      // Thread depth goes back to blank so the basic depth of the new pitch is used.
+      [['depth', ''], ['pitch', v.pitch], ['major', v.major]].forEach(([k, val]) => { const i = el.querySelector('[data-k="' + k + '"]'); if (i) { i.value = val; i.dispatchEvent(new Event('input')); } else s[k] = val; });
+      s._from = o.label; sel.value = '';
+      const m = el.querySelector('#cystdmsg'); if (m) m.textContent = 'Filled from ' + o.label + '.';
+    };
+  });
+}
+
 // ---------- Thread milling ----------
 function renderThreadMillCycle(el) {
   const defs = inch => ({ ctrl: 0, prog: 2001, tool: 1, wcs: 54, dreg: 1, internal: 1, lh: 0, climb: 1, comp: 0, major: inch ? 0.5 : 12, pitch: inch ? 13 : 1.75, depth: '',
     td: inch ? 0.375 : 9, len: inch ? 0.5 : 12, ztop: 0, zcl: inch ? 0.2 : 5, rpm: 4000, fe: inch ? 20 : 500, passes: 1, spring: 0, multi: 0, cx: 0, cy: 0, rapid: '' });
+  const raw = takeHandoff('cyctmill'), h = cyThreadHandoff(raw);
+  if (h) {
+    const s = cyState('tmill', defs); Object.assign(s, h, { depth: '' }); s._from = String(raw.label || 'another tool');
+    (CYSEC.tmill || (CYSEC.tmill = {})).thread = true;
+  }
   const pitchOf = s => cyInch() ? 1 / snum(s.pitch) : snum(s.pitch);
   const depthOf = s => { const d = snum(s.depth); if (d > 0) return d; const p = pitchOf(s); return +s.internal === 1 ? state.W.thread_depth_internal(p) : state.W.thread_depth_external(p); };
   const fields = [...commonHead(CYC.TMILL),
@@ -256,7 +336,23 @@ function renderThreadMillCycle(el) {
     { k: 'cx', label: 'Centre X', unit: cyU }, { k: 'cy', label: 'Centre Y', unit: cyU },
     { k: 'rpm', label: 'Spindle speed', unit: 'RPM' }, { k: 'fe', label: 'Feed at the cutting edge', unit: () => feedMinU(state.sys) },
     { k: 'passes', label: 'Radial passes', unit: '' }, { k: 'spring', label: 'Spring passes', unit: '' }, rapidField,
+  ].map(f => {
+    // Required boxes and the short name shown when one is missing.
+    const R = { prog: ['int0', 'program number'], tool: ['int0', 'tool number'], dreg: ['int0', 'D register'], major: ['pos', 'major diameter'], pitch: ['pos', cyInch() ? 'threads per inch' : 'pitch'],
+      depth: ['optpos', 'thread depth'], td: ['pos', 'thread mill diameter'], len: ['pos', 'thread length'], ztop: ['num', 'top Z'], zcl: ['num', 'clearance Z'],
+      rpm: ['pos', 'spindle speed'], fe: ['pos', 'feed'], passes: ['int1', 'radial passes'], spring: ['opt0', 'spring passes'], rapid: ['optpos', 'rapid rate'] }[f.k];
+    const g = Object.assign({}, f, R ? { req: R[0], short: R[1] } : {});
+    if (f.k === 'major' || f.k === 'pitch') g.on = s => { s._from = ''; };
+    return g;
+  });
+  const sections = [
+    { id: 'thread', title: 'Thread', keys: ['internal', 'lh', 'major', 'pitch', 'depth'], open: true, pre: cyStdPickHtml },
+    { id: 'tool', title: 'Tool', keys: ['tool', 'td', 'multi', 'comp', 'dreg'], open: true },
+    { id: 'pos', title: 'Position', keys: ['wcs', 'cx', 'cy', 'ztop', 'len', 'zcl'] },
+    { id: 'cut', title: 'Cutting', keys: ['climb', 'rpm', 'fe', 'passes', 'spring'], open: true },
+    { id: 'out', title: 'Program output', keys: ['ctrl', 'prog', 'rapid'] },
   ];
+  const after = (el, s) => { const m = el.querySelector('#cystdmsg'); if (m) m.textContent = s._from ? 'Filled from ' + s._from + '.' : ''; };
   cyScreen(el, 'tmill', defs, fields, s => {
     const p = [...cyHead(s, !cyInch()), +s.internal, +s.lh, +s.climb, +s.comp, snum(s.major), pitchOf(s), depthOf(s), snum(s.td), snum(s.len), snum(s.ztop), snum(s.zcl),
       snum(s.rpm), snum(s.fe), snum(s.passes), snum(s.spring) || 0, +s.multi, snum(s.cx) || 0, snum(s.cy) || 0, snum(s.dreg), +s.wcs];
@@ -274,7 +370,7 @@ function renderThreadMillCycle(el) {
       pass = '<div class="res" style="margin-top:10px">' + stable('Passes: thread diameter / tool centre path diameter', t) + '</div>';
     }
     return '<div class="res">' + stable('Thread mill data', rows) + '</div>' + pass + '<div style="height:10px"></div>';
-  });
+  }, { sections, after, wire: cyStdPickWire });
 }
 
 // ---------- Lathe threading: G76 or G92 with infeed table ----------
@@ -282,6 +378,9 @@ function renderLatheThreadCycle(el) {
   const defs = inch => ({ ctrl: 0, prog: 3001, tool: 1, mode: 'g76', internal: 0, major: inch ? 0.5 : 10, pitch: inch ? 13 : 1.5, depth: '', zs: inch ? 0.2 : 5, ze: inch ? -0.75 : -20,
     xc: inch ? 0.04 : 1, infeed: 0, first: inch ? 0.008 : 0.2, minc: inch ? 0.002 : 0.05, np: 8, ff: 0.3, step: inch ? 0.005 : 0.12, custom: inch ? '0.010 0.008 0.007 0.006 0.005 0.004 0.003 0.002' : '0.25 0.2 0.15 0.12 0.1 0.06 0.04',
     finish: inch ? 0.002 : 0.05, spring: 1, angle: 60, pull: 1, iang: 0, rpm: 800, rapid: '' });
+  // A thread passed from another tool (Thread data): fill the major diameter, pitch and internal / external.
+  const raw = takeHandoff('cycthread'), h = cyThreadHandoff(raw);
+  if (h) { const s = cyState('lthread', defs); Object.assign(s, h, { depth: '' }); toast('Filled from ' + String(raw.label || 'another tool')); }
   const pitchOf = s => cyInch() ? 1 / snum(s.pitch) : snum(s.pitch);
   const depthOf = s => { const d = snum(s.depth); if (d > 0) return d; if (+s.infeed === 3) { const v = numsFrom(s.custom); if (v.length) return v.reduce((a, b) => a + b, 0); } const p = pitchOf(s); return +s.internal === 1 ? state.W.thread_depth_internal(p) : state.W.thread_depth_external(p); };
   const cycOf = s => s.mode === 'g76' ? CYC.G76 : CYC.G92;
@@ -397,7 +496,58 @@ function renderBroachCycle(el) {
     { k: 'edge', label: 'Cutting edge distance from the spindle axis', unit: cyU, show: mill }, rapidField];
   cyScreen(el, 'broach', defs, fields, s => ({ cycle: CYC.BROACH, lathe: +s.lathe === 1,
     params: [...cyHead(s, !cyInch()), +s.lathe, snum(s.bore), snum(s.depth), snum(s.doc), snum(s.spring) || 0, snum(s.zs), snum(s.ze), snum(s.feed), snum(s.lift) || 0, snum(s.cx) || 0, snum(s.cy) || 0, +s.dir, snum(s.edge) || 0, +s.wcs] }),
-  (s, res) => res.ok ? '<div class="res" style="margin-bottom:10px">' + stable('Strokes', [['Strokes (incl. spring)', String(res.table.length / 2), ''], ['Stroke length', fmt(snum(s.zs) - snum(s.ze), cyInch() ? 4 : 3), cyU()]]) + '</div>' : '');
+  (s, res) => res.ok ? '<div class="res" style="margin-bottom:10px">' + stable('Strokes', [['Strokes (incl. spring)', String(res.table.length / 2), ''], ['Stroke length', fmt(snum(s.zs) - snum(s.ze), cyInch() ? 4 : 3), cyU()]]) + '</div>' : '',
+  { top: broachPresetHtml, wire: (el, s, redraw) => broachPresetWire(el, s, redraw, defs) });
+}
+
+// Keyway broaching presets: the user's own (a name and every input on the form, in the
+// units they were saved in), kept in this browser under bm.broachpresets. No maker's data is shipped.
+const BPRE_KEY = 'bm.broachpresets';
+const BPUI = { cur: '', msg: '' };
+function broachPresets() {
+  const p = lsJson(BPRE_KEY, []);
+  return Array.isArray(p) ? p.filter(x => x && typeof x.name === 'string' && x.name && x.vals && typeof x.vals === 'object' && (x.sys === 'inch' || x.sys === 'mm')) : [];
+}
+function broachPresetHtml() {
+  const list = broachPresets();
+  if (!list.some(p => p.name === BPUI.cur)) BPUI.cur = '';
+  return '<div class="cypre"><div class="cypreh"><b>Your presets</b> <span class="ms">Your own settings, kept in this browser only. BenchMate ships no maker\'s presets or data.</span></div><div class="cyprer">' +
+    '<select id="bpsel" aria-label="Your presets"><option value="">' + (list.length ? 'Pick a preset to fill the form' : 'No presets saved yet') + '</option>' +
+    list.map((p, i) => '<option value="' + i + '"' + (p.name === BPUI.cur ? ' selected' : '') + '>' + sesc(p.name) + (p.sys !== state.sys ? ' (' + p.sys + ')' : '') + '</option>').join('') + '</select>' +
+    '<button type="button" class="btn sm" id="bpdel"' + (BPUI.cur ? '' : ' disabled') + ' title="Delete the picked preset">' + icon('trash') + '<span>Delete</span></button>' +
+    '<input id="bpname" type="text" maxlength="60" placeholder="Name for these settings" aria-label="Preset name" value="' + sesc(BPUI.cur) + '">' +
+    '<button type="button" class="btn sm" id="bpsave">' + icon('plus') + '<span>Save as preset</span></button></div>' +
+    '<p class="ms" id="bpmsg" role="status">' + sesc(BPUI.msg) + '</p></div>';
+}
+function broachPresetWire(el, s, redraw, defs) {
+  const sel = el.querySelector('#bpsel'), name = el.querySelector('#bpname');
+  const keys = Object.keys(defs(true));
+  const say = m => { BPUI.msg = m; const p = el.querySelector('#bpmsg'); if (p) p.textContent = m; };
+  BPUI.msg = '';
+  sel.onchange = () => {
+    const p = broachPresets()[+sel.value]; if (sel.value === '' || !p) return;
+    const vals = {}; keys.forEach(k => { if (p.vals[k] !== undefined) vals[k] = String(p.vals[k]); });
+    BPUI.cur = p.name;
+    if (p.sys !== state.sys) {
+      // A preset keeps the units it was saved in: switch to them, then fill.
+      CYS['broach:' + p.sys] = Object.assign(defs(p.sys === 'inch'), vals);
+      BPUI.msg = 'Filled from "' + p.name + '". Units switched to ' + p.sys + ', the units it was saved in.';
+      setUnits(p.sys); return;
+    }
+    Object.assign(s, vals); BPUI.msg = 'Filled from "' + p.name + '".'; redraw();
+  };
+  el.querySelector('#bpsave').onclick = () => {
+    const n = name.value.trim(); if (!n) { say('Type a name first.'); name.focus(); return; }
+    const vals = {}; keys.forEach(k => { vals[k] = s[k] === undefined ? '' : String(s[k]); });
+    const list = broachPresets(), had = list.some(p => p.name === n);
+    lsPut(BPRE_KEY, [{ name: n, sys: state.sys, vals }].concat(list.filter(p => p.name !== n)));
+    BPUI.cur = n; BPUI.msg = (had ? 'Updated "' : 'Saved "') + n + '" (' + state.sys + ').'; redraw();
+  };
+  el.querySelector('#bpdel').onclick = () => {
+    if (!BPUI.cur) return;
+    const n = BPUI.cur; lsPut(BPRE_KEY, broachPresets().filter(p => p.name !== n));
+    BPUI.cur = ''; BPUI.msg = 'Deleted "' + n + '".'; redraw();
+  };
 }
 
 // ---------- G71 / G70 from a simple profile ----------
