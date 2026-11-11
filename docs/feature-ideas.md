@@ -27,3 +27,33 @@ Ideas from looking at other machinist tools (G-Wizard, HSMAdvisor, FSWizard, ope
 18. **Phone/tablet build** of the same app for use at the machine.
 
 Sources looked at: G-Wizard feature list (cnccookbook.com), HSMAdvisor forum discussions, FSWizard store listing, better-tool-library feeds-and-speeds notes (GitHub). Ideas only; no code or data taken.
+
+## Agreed additions (owner decision, 2026-11-11)
+The owner asked for all 18 ideas from the review "what is missing, new ideas and sources" and for every missing Ultra feature, except a mobile app and a link to another app or device. The vibration check is to work with any sensor. They are built in the stage where they fit; each still needs its sources (two publishers, or marked single source).
+
+| # | Idea | Stage | State |
+|---|---|---|---|
+| 1 | Thread identifier (`threadid`) | 0 (0.2.0) | built |
+| 2 | Limits and middle of a tolerance (`tolmid`) | 0 (0.2.0) | built |
+| 3 | Wear offset adjustment (`offsetadj`) | 0 (0.2.0) | built |
+| 4 | Proof tab: every result with its formula and the numbers put in | 0 (0.2.0) | to do |
+| 5 | Print and share a result | 0 (0.2.0) | to do |
+| 6 | G-code tidy tools (renumber, strip, convert) | 2 (0.4.0) | to do |
+| 7 | Text engraving with the Hershey fonts | 2 (0.4.0) | to do |
+| 8 | Collet and pull stud torque | 3 (0.5.0) | to do |
+| 9 | Slender part deflection | 1 (0.3.0) | to do |
+| 10 | High-feed chip thinning | 1 (0.3.0) | to do |
+| 11 | Drill thrust and torque | 1 (0.3.0) | to do |
+| 12 | Tap torque | 1 (0.3.0) | to do |
+| 13 | Gauge R&R | 3 (0.5.0) | to do |
+| 14 | Thread gauge limits | 3 (0.5.0) | to do |
+| 15 | Rotary axis helper | 2 (0.4.0) | to do |
+| 16 | Job time and quote | 5 (0.9.0) | to do |
+| 17 | Vendor data import and cut log | 5 (0.9.0) | to do |
+| 18 | Wire EDM | 3 (0.5.0) | to do |
+
+Missing Ultra rows (docs/parity-audit.md) keep the stage the spec gives them: cutting-data advisors for turning, milling and drilling, reaming and tapping speeds in stage 1; gun drill, RPM cylindricity, SAE J499a and milling surface finish with RMS in stage 3; the vibration check in stage 5.
+
+**Vibration check, any sensor:** the check takes a typed frequency and amplitude, a CSV from any accelerometer or data logger (time and one to three axes), or a sound recording, and uses the device's own motion sensor only where one exists. It compares like with like (same machine, same place, same speed) and never depends on one make of sensor. Everything stays on the device.
+
+Not planned for now: a phone or tablet app, and links to another app or device.
