@@ -107,6 +107,30 @@ const ADV_MATS = [
   { id: 19, name: 'Plastics (acetal, acrylic)', kc: 0, uf: 'acetal', har: 'plastic', upn: 'plastic' },
 ];
 const advMat = id => ADV_MATS.find(m => m.id === id);
+// Gaylee Corporation, "Cutting speed recommendations: circular saws" (solid carbide, carbide-tipped and HSS saws), ft/min:
+// [row as printed, hardness range as printed, carbide low, high, HSS low, high]. Kyocera's "Slitting saw parameters" reprints the carbide column.
+// Each range covers the whole hardness range of the group, so the soft end of a group takes the high end of the speed.
+const ADV_SAW = {
+  fmcs: ['Free machining carbon steels, wrought', '100 to 425 HB', 130, 555, 30, 130], cs: ['Carbon steels, wrought', '85 to 425 HB', 105, 530, 25, 125],
+  as: ['Alloy steels, wrought', '125 to 425 HB', 35, 425, 8, 100], ts: ['Tool steels, wrought', '100 to 375 HB', 35, 470, 8, 110],
+  fmss: ['Free machining stainless steels, wrought', '135 to 425 HB', 150, 470, 35, 110], ss: ['Stainless steels, wrought', '135 to 425 HB', 35, 425, 8, 100],
+  gci: ['Gray cast irons', '120 to 320 HB', 105, 470, 25, 110], alw: ['Aluminum alloys, wrought', '30 to 150 HB', 3400, 4250, 800, 1000],
+  alc: ['Aluminum alloys, cast', '40 to 125 HB', 2125, 5315, 500, 1250], ti: ['Titanium alloys, wrought', '110 to 440 HB', 65, 530, 15, 125],
+  cu: ['Copper alloys, wrought', '10 to 100 HRB', 340, 2125, 80, 500], ht: ['High temperature alloys, wrought and cast', '140 to 475 HB', 35, 255, 8, 60],
+  tp: ['Plastics, thermoplastics', '', 1065, 1490, 250, 350],
+};
+// Which Gaylee row each BenchMate material class reads (BenchMate's own matching).
+const ADV_SAW_OF = { 3: 'cs', 2: 'fmcs', 1: 'fmcs', 20: 'fmcs', 21: 'fmcs', 4: 'cs', 5: 'as', 6: 'as', 7: 'ts', 8: 'ts', 22: 'ts', 9: 'ss', 10: 'fmss', 11: 'ss', 12: 'gci',
+  13: 'cu', 14: 'cu', 15: 'alw', 16: 'alc', 17: 'ti', 18: 'ht', 19: 'tp' };
+// Feed per tooth the same sheet prints for all materials (in): carbide saws 0.0002 to 0.0015, HSS saws 0.002 to 0.006.
+const ADV_SAW_FZ = { 1: [0.0002, 0.0015], 2: [0.002, 0.006] };
+// Starting speed (m/min) and feed per tooth (mm) for a saw: tm 1 carbide, 2 HSS; sp and ag are the slider places 0 to 100.
+function advSaw(W, matId, tm, sp, ag) {
+  const row = ADV_SAW[ADV_SAW_OF[matId]], t = tm === 1 ? 1 : 2;
+  if (!row) return null;
+  const v = t === 1 ? [row[2], row[3]] : [row[4], row[5]], fz = ADV_SAW_FZ[t];
+  return { row, v, fz, vc: W.range_pick(v[0], v[1], (isFinite(sp) ? sp : 50) / 100) * FT_M, chip: W.range_pick(fz[0], fz[1], (isFinite(ag) ? ag : 50) / 100) * IN_MM };
+}
 const ADV_MAT_OPTIONS = ADV_MATS.map(m => [m.id, m.name]);
 const ADV_COOL = [[1, 'Flood or through-tool coolant (table figures)'], [2, 'Oil put on by hand: 60 % of speed and feed'], [3, 'Dry or mist: no published factor, table figures']];
 const ADV_PUB = { har: 'Harvey Tool', red0: 'RedLine Tools, uncoated', red1: 'RedLine Tools, AlTiN coated', red2: 'RedLine Tools, TiCN coated', upn: 'University of Pennsylvania guide',

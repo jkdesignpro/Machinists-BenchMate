@@ -124,7 +124,7 @@ Store list is the fuller of the two store lists.
 | U6 | Groove and cut-off cycle time | done | `cycgroove`, `partofftime` |  |
 | U7 | Taper calculation | done | `taper` |  |
 | U8 | Lathe taper G-code / taper programming | done | `cyctaper` |  |
-| U9 | Boring bar deflection | done | `boringbar` |  |
+| U9 | Boring bar deflection | done | `boringbar` | Work material, sliders, damped bar option, limit card and live bent-bar drawing added in 0.3.0 |
 | U10 | C-axis rotational feed converter | done | `caxis` |  |
 | U11 | Lathe cycle generator, CAD profile to canned cycles (G71/G70 style) | partial | `cycg71` | Straight lines only, type I only, typed point list; no arcs and no CAD or DXF input |
 | U12 | Lathe surface finish | done | `finish` |  |

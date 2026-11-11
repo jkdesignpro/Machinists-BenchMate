@@ -378,6 +378,36 @@ aT = await advTxt();
 if (!/Spindle speed 8,000 RPM/i.test(aT) || !/What is limiting this cut Top spindle speed/i.test(aT)) problems.push(`[${where}] "${aT.slice(0, 400)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Boring bar advisor. 20 mm steel bar, 60 mm out, low carbon steel, 0.4 mm nose radius: feed 0.1667 mm/rev, kc 1968 (as the turning
+// advisor above), Fc = 1968 x 1.016 x 0.1667 = 333.3 N; I = pi 20^4 / 64 = 7853.98 mm4; delta = 333.3 x 60^3 / (3 x 210000 x 7853.98) = 0.01455 mm.
+where = 'boringbar advisor';
+await open('boringbar');
+aT = await advTxt();
+if (!/Tip deflection, tangential \(edge drops below centre\) 14\.5 um/i.test(aT) || !/Tangential force Fc = kc ap fn 333\.3 N/.test(aT) || !/What is limiting this cut Nothing/i.test(aT)) problems.push(`[${where}] defaults: "${aT.slice(0, 500)}"`);
+// 130 mm out (6.5 x D against 3 x D) for a finishing cut: the overhang is named and the depth comes down to 0.01 / (0.01455 x (130/60)^3 / 1.016) = 0.069 mm.
+await advSet('L', '130'); await page.selectOption('#main [data-id="cut"]', '3');
+aT = await advTxt();
+if (!/What is limiting this cut Overhang/i.test(aT) || !/Depth of cut \(reduced from 1\.016 mm to fit the deflection\) 0\.069 mm/.test(aT)) problems.push(`[${where}] overhang: "${aT.slice(0, 600)}"`);
+// a typed depth is locked and reported over, never changed
+await advSet('ap', '0.5');
+aT = await advTxt();
+if (!/Depth of cut \(yours, locked\) 0\.500 mm/.test(aT) || !/What is limiting this cut Bar deflection/i.test(aT)) problems.push(`[${where}] locked depth: "${aT.slice(0, 600)}"`);
+// the overhang slider drives the overhang box: 8 x D on a 20 mm bar is 160 mm
+await page.$eval('#main [data-id="ld"]', e => { e.value = '8'; e.dispatchEvent(new Event('input', { bubbles: true })); });
+if ((await page.inputValue('#main [data-id="L"]')) !== '160') problems.push(`[${where}] the overhang slider did not set the overhang: ${await page.inputValue('#main [data-id="L"]')}`);
+await page.click('#main .tpa button[title^="Reset"]');
+
+// Slitting saw from the saw sheet: HSS saw in carbon steel, 25 to 125 ft/min, middle 75 ft/min = 22.86 m/min: n = 22860 / (pi x 80) = 91 rpm;
+// feed per tooth 0.002 to 0.006 in, middle 0.004 in = 0.1016 mm; Vf = 90.96 x 32 x 0.1016 = 295.7 mm/min. A typed speed is used as it is.
+where = 'slitsaw advisor';
+await open('slitsaw');
+aT = await advTxt();
+if (!/Spindle speed 91 RPM/i.test(aT) || !/Table feed 295\.7\d mm\/min/.test(aT) || !/Feed per tooth \(suggested: Gaylee, HSS saws\) 0\.1016 mm/.test(aT)) problems.push(`[${where}] defaults: "${aT.slice(0, 500)}"`);
+await advSet('speed', '40');
+aT = await advTxt();
+if (!/Spindle speed 159 RPM/i.test(aT) || !/Cutting speed \(yours, locked\) 40 m\/min/.test(aT)) problems.push(`[${where}] typed speed: "${aT.slice(0, 500)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

@@ -6,7 +6,8 @@
 //! order, and reports which limit it was. A value the user locked is never
 //! changed. Sources: docs/sources.md, "Advisor".
 
-use crate::{chip_thickness_max, chip_thickness_mean, cut_check, drill_chip_thickness, drill_power_kw, drill_thrust_n, drill_torque_nm,
+use crate::{boring_bar_deflection, second_moment_tube, turning_force, LIMIT_DEFLECTION,
+            chip_thickness_max, chip_thickness_mean, cut_check, drill_chip_thickness, drill_power_kw, drill_thrust_n, drill_torque_nm,
             kienzle_kc, lead_chip_thickness, mrr_turning_cm3_min, power_kw, rctf, rpm_from_vc, spindle_power_available_kw,
             torque_for_power_nm, vc_from_rpm, CutInput, LIMIT_POWER, LIMIT_TORQUE};
 
@@ -406,10 +407,60 @@ pub fn advise_drill(vc: f64, d: f64, fnr: f64, point_deg: f64, kc11: f64, mc: f6
     [rpm, vca, f, rpm * f, table, limit, e.0, drill_torque_nm(d, f, e.0), drill_thrust_n(e.0, d, f, point_deg), e.1, e.2, e.3]
 }
 
+// ---------------- Boring bar ----------------
+pub const ADV_OVERHANG: u8 = 9; // overhang past the bar maker's guidance in bar diameters
+
+/// Deepest cut (mm) that keeps the tip of a boring bar at `defl_limit` (mm): the
+/// deflection is linear in the force and Fc = kc ap fn [SAN], so
+/// `ap = defl_limit / (deflection for 1 mm of depth)`. Bar as in [`boring_bar_deflection`].
+pub fn bore_depth_for_deflection(defl_limit: f64, l: f64, d: f64, di: f64, e_gpa: f64, kc: f64, fnr: f64) -> f64 {
+    if !(pos(defl_limit) && pos(kc) && pos(fnr)) { return f64::NAN; }
+    defl_limit / boring_bar_deflection(turning_force(kc, 1.0, fnr), l, d, di, e_gpa)
+}
+
+/// Longest overhang (mm) that keeps the tip at `defl_limit` under the force `f_n`:
+/// from delta = F L^3 / (3 E I) [GERE], `L = cbrt(3 E I delta / F)`.
+pub fn bore_overhang_for_deflection(defl_limit: f64, f_n: f64, d: f64, di: f64, e_gpa: f64) -> f64 {
+    if !(pos(defl_limit) && pos(f_n) && pos(d) && pos(e_gpa) && di < d) { return f64::NAN; }
+    (3.0 * e_gpa * 1000.0 * second_moment_tube(d, di) * defl_limit / f_n).cbrt()
+}
+
+/// Boring bar advice. The bar is a cantilever clamped at the holder face. The force is
+/// `f_known` (N) if given, otherwise Fc = kc ap fn. Two shares are reported: the tip
+/// deflection against `defl_limit` (mm, 0 = not checked) and the overhang L/D against
+/// `ld_guide` (a bar maker's guidance in bar diameters, 0 = not checked).
+/// If the depth would bend the bar past the allowed deflection it is reduced to the
+/// deepest cut that fits, unless `ap_locked` > 0 (a locked depth is never changed) or
+/// the force was typed. The limit named is the larger share when it is over 1, or the
+/// deflection when the depth was reduced and the overhang is inside its guidance.
+/// Returns [force, deflection, share of the allowed deflection, L/D, share of the guidance,
+/// limit (0, LIMIT_DEFLECTION or ADV_OVERHANG), depth used, deepest depth inside the
+/// deflection, reduced (0 or 1), overhang at which the starting depth fits].
+#[allow(clippy::too_many_arguments)]
+pub fn advise_bore(l: f64, d: f64, di: f64, e_gpa: f64, kc: f64, fnr: f64, ap: f64, ap_locked: f64,
+                   f_known: f64, defl_limit: f64, ld_guide: f64) -> [f64; 10] {
+    if !(pos(l) && pos(d) && pos(e_gpa) && di < d) { return [f64::NAN; 10]; }
+    let typed = pos(f_known);
+    let ap_max = if typed { f64::NAN } else { bore_depth_for_deflection(defl_limit, l, d, di, e_gpa, kc, fnr) };
+    let f0 = if typed { f_known } else if pos(kc) && pos(fnr) && pos(ap) { turning_force(kc, ap, fnr) } else { f64::NAN };
+    let mut ap_used = if typed { f64::NAN } else { ap };
+    let mut reduced = 0.0;
+    if !typed && !(ap_locked > 0.0) && ap_max.is_finite() && ap > ap_max { ap_used = ap_max; reduced = 1.0; }
+    let force = if typed { f_known } else if reduced > 0.0 { turning_force(kc, ap_used, fnr) } else { f0 };
+    let defl = boring_bar_deflection(force, l, d, di, e_gpa);
+    let share_d = if pos(defl_limit) { defl / defl_limit } else { f64::NAN };
+    let ld = l / d;
+    let share_l = if pos(ld_guide) { ld / ld_guide } else { f64::NAN };
+    let over_d = share_d.is_finite() && (share_d > 1.0 + 1e-9 || reduced > 0.0);
+    let over_l = share_l.is_finite() && share_l > 1.0 + 1e-9;
+    let limit = if over_l && (!over_d || share_l > share_d) { ADV_OVERHANG } else if over_d { LIMIT_DEFLECTION } else { 0 };
+    [force, defl, share_d, ld, share_l, limit as f64, ap_used, ap_max, reduced, bore_overhang_for_deflection(defl_limit, f0, d, di, e_gpa)]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{LIMIT_DEFLECTION, LIMIT_POWER, LIMIT_TORQUE, MM_PER_IN};
+    use crate::{LIMIT_POWER, LIMIT_TORQUE, MM_PER_IN};
     fn close(a: f64, b: f64, tol: f64) -> bool { (a - b).abs() <= tol }
     const SFM: f64 = 0.3048; // m/min per ft/min
 
@@ -665,6 +716,40 @@ mod tests {
         // feed locked: untouched, reported over
         let c = advise_drill(80.0, 10.0, 0.15, 140.0, 1500.0, 0.22, 1.0, 0.0, 0.0, 1.0, 0.0, 0.8);
         assert!(c[2] == 0.15 && c[11] > 1.0);
+    }
+
+    #[test]
+    fn boring_bar_advice() {
+        // 20 mm steel bar (210 GPa), 60 mm overhang: I = pi 20^4 / 64 = 7853.98 mm^4.
+        // kc 2000, 0.1 mm/rev, 1 mm deep: Fc = 200 N; delta = 200 x 60^3 / (3 x 210000 x 7853.98) = 0.008731 mm
+        let i = std::f64::consts::PI * 20f64.powi(4) / 64.0;
+        let a = advise_bore(60.0, 20.0, 0.0, 210.0, 2000.0, 0.1, 1.0, 0.0, 0.0, 0.05, 4.0);
+        assert!(close(a[0], 200.0, 1e-9) && close(a[1], 200.0 * 216000.0 / (3.0 * 210000.0 * i), 1e-12) && close(a[1], 0.008731, 1e-6));
+        assert!(close(a[2], a[1] / 0.05, 1e-12) && close(a[3], 3.0, 1e-12) && close(a[4], 0.75, 1e-12) && a[5] == 0.0 && a[8] == 0.0 && a[6] == 1.0);
+        // deepest cut inside 0.05 mm: 0.05 / 0.008731 = 5.727 mm; at that depth the deflection is the limit
+        assert!(close(a[7], 0.05 / a[1], 1e-9) && close(advise_bore(60.0, 20.0, 0.0, 210.0, 2000.0, 0.1, a[7], 1.0, 0.0, 0.05, 4.0)[2], 1.0, 1e-9));
+        // 120 mm overhang (6 x D against 4 x D): 8 times the deflection for the same force. A 0.5 mm cut bends the bar
+        // 4 x 0.008731 = 0.0349 mm, inside 0.05 mm, so the depth stays and the overhang is named
+        let b = advise_bore(120.0, 20.0, 0.0, 210.0, 2000.0, 0.1, 0.5, 0.0, 0.0, 0.05, 4.0);
+        assert!(close(b[1], 4.0 * a[1], 1e-12) && close(b[4], 1.5, 1e-12) && b[5] == ADV_OVERHANG as f64 && b[8] == 0.0);
+        // finishing limit 0.01 mm at 60 mm: a 2 mm depth (0.01746 mm) is reduced to 0.01 / 0.008731 = 1.145 mm
+        let c = advise_bore(60.0, 20.0, 0.0, 210.0, 2000.0, 0.1, 2.0, 0.0, 0.0, 0.01, 4.0);
+        assert!(c[8] == 1.0 && close(c[6], 0.01 / a[1], 1e-9) && close(c[1], 0.01, 1e-12) && c[5] == LIMIT_DEFLECTION as f64);
+        // the starting 2 mm depth would fit at L = 60 x cbrt(0.01 / 0.017462) = 49.83 mm
+        assert!(close(c[9], 60.0 * (0.01f64 / (2.0 * a[1])).cbrt(), 1e-9) && close(c[9], 49.83, 0.01));
+        // locked depth: never changed, reported over
+        let l = advise_bore(60.0, 20.0, 0.0, 210.0, 2000.0, 0.1, 2.0, 1.0, 0.0, 0.01, 4.0);
+        assert!(l[6] == 2.0 && l[8] == 0.0 && close(l[2], 2.0 * a[1] / 0.01, 1e-9) && l[5] == LIMIT_DEFLECTION as f64);
+        // both over: the larger share is named (overhang 1.5 against deflection 8 x 2 x 0.8731 = 13.97: deflection)
+        let m = advise_bore(120.0, 20.0, 0.0, 210.0, 2000.0, 0.1, 2.0, 1.0, 0.0, 0.01, 4.0);
+        assert!(m[5] == LIMIT_DEFLECTION as f64 && m[2] > m[4]);
+        // depth reduced to fit and the overhang past its guidance: the overhang is named
+        let n = advise_bore(120.0, 20.0, 0.0, 210.0, 2000.0, 0.1, 2.0, 0.0, 0.0, 0.01, 4.0);
+        assert!(n[8] == 1.0 && close(n[2], 1.0, 1e-9) && n[5] == ADV_OVERHANG as f64);
+        // a typed force: no depth advice; a coolant hole softens the bar by d^4 / (d^4 - di^4)
+        let t = advise_bore(60.0, 20.0, 6.0, 210.0, 0.0, 0.0, 0.0, 0.0, 200.0, 0.0, 0.0);
+        assert!(t[6].is_nan() && t[7].is_nan() && t[2].is_nan() && t[5] == 0.0 && close(t[1] / a[1], 160000.0 / (160000.0 - 1296.0), 1e-9));
+        assert!(advise_bore(60.0, 20.0, 20.0, 210.0, 2000.0, 0.1, 1.0, 0.0, 0.0, 0.05, 4.0)[0].is_nan());
     }
 
     #[test]

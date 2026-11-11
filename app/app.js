@@ -398,7 +398,7 @@ function proofPanel(t) {
 // opts.mini: the small version used by Home widgets (main inputs, main results).
 // The word shown beside a slider: its labels spread evenly from one end to the other.
 function sliderWord(sl, val) {
-  const L = sl.labels || []; if (!L.length) return String(val);
+  const L = sl.labels || []; if (!L.length) return String(val) + (sl.suffix || '');
   const t = (Number(val) - sl.min) / ((sl.max - sl.min) || 1);
   return L[Math.max(0, Math.min(L.length - 1, Math.round(t * (L.length - 1))))];
 }
@@ -452,7 +452,7 @@ function mountTool(host, t, opts) {
     if (f.wide && !mini) lab.style.gridColumn = '1 / -1';
     const hide = !fieldShown(f) || (mini && shownCount >= 4 && !pairOf(f.id));
     if (hide) { lab.classList.add('lvhide'); if (saved[f.id] === undefined) inp.dataset.def = f.def; } else shownCount++;
-    els[f.id] = { lab, inp, f, lock }; return lab;
+    els[f.id] = { lab, inp, f, lock, u }; return lab;
   };
   fields.forEach(f => {
     const p = pairOf(f.id);
@@ -475,6 +475,8 @@ function mountTool(host, t, opts) {
       let out = NaN; try { out = fn(v, state.W, sys); } catch (e) {}
       const e = els[to].inp; e.value = isFinite(out) ? String(+out.toPrecision(7)) : ''; saved[to] = e.value; v[to] = isFinite(out) ? out : NaN;
       els[to].lab.classList.add('calcd'); els[from].lab.classList.remove('calcd'); vc[to] = p.both ? v[to] : NaN;
+      // A slider that is the worked-out half of a pair shows the true figure beside it (the handle stops at the ends of its track).
+      if (els[to].f.slider) els[to].u.textContent = isFinite(out) ? sliderWord(els[to].f.slider, +out.toPrecision(3)) : '';
     });
     fields.forEach(f => { if (f.when) { let on = true; try { on = !!f.when(v); } catch (e) {} els[f.id].lab.hidden = !on; } });
     // Required boxes: a box with a starting value must hold a number.

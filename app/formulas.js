@@ -242,6 +242,8 @@ const FORMULAS = [
   F('advdrill', 'Drilling advisor: time to depth and removal rate', 't = (depth + point length) / (fn · n);  Q = π/4 · D² · Vf', 'point length = (D / 2) / tan(point / 2)', ['SAN', 'OWN']),
   F('advream', 'Reaming: hole to drill first', 'drill = reamer diameter − stock on the diameter', 'stock from the reamer maker\'s table, or about 3 % of the hole', ['ADVT']),
   F('advream', 'Reaming speed and feed against drilling', 'Vc = 1/2 (or 2/3) · drilling Vc;  fn = 2 (to 3) · drilling fn', 'publishers differ: each is shown', ['UFSF', 'ADVT']),
+  F('boringbar', 'Boring bar: deepest cut inside an allowed deflection', 'ap = δ_allowed · 3 E I / (L³ · kc · fn)', 'from δ = F L³ / (3 E I) with F = kc · ap · fn', ['GERE', 'SAN', 'OWN']),
+  F('boringbar', 'Boring bar: overhang that fits a cut', 'L = ∛(3 E I · δ_allowed / F)', 'deflection goes with the cube of the overhang', ['GERE', 'OWN']),
   F('advturn', 'Turning advisor: feed from the nose radius', 'r / 3 ≤ fn ≤ r / 2', 'a corner radius of 2 to 3 times the feed', ['MITCR']),
   F('advturn', 'Turning advisor: force and power', 'h = fn · sin κ;  Fc = kc · ap · fn;  Pc = Fc · Vc / 60 000', 'kc = kc1.1 · h^(−mc); spindle power = Pc / efficiency', ['SAN', 'ISCKC']),
   F('taptorque', 'Torque of a cutting tap', 'Md = kc · P² · d / 8000', 'N·m; P pitch and d nominal diameter in mm; kc from the tap maker\'s table', ['LUBERO', 'OWN']),
