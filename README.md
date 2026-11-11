@@ -10,7 +10,7 @@ A free, open-source (AGPLv3) machinist's calculator, built to sit beside the mac
 - **Home**: a dashboard of widgets you choose: small calculators, favourites, recent tools, pinned results, the calculator, a tip of the day.
 - **Drawings**: every calculator has a drawing in one engineering-drawing style, live and to scale where it helps, labelled with your own numbers.
 - **Calculator**: opens over any page (Alt+C) and from any number box.
-- **Every calculator**: a large main result, a drawing, linked boxes where either value can be typed, decimals, reset, copy, pin, and "Formula and sources".
+- **Every calculator**: a large main result, a drawing, linked boxes where either value can be typed, decimals, reset, copy, pin, print, a link that reopens it with the same numbers, "Formula and sources", and on a growing number of tools a published worked example to check the maths against.
 - **Machine control look**: styled as a CNC control panel, with results on readout screens and hard keys. Dark, Light or Auto theme, and an accent colour you choose from swatches or a colour picker.
 - **Compact view** for a narrow window; search with Ctrl+K.
 

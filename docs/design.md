@@ -42,3 +42,8 @@ One kit, one style: `DK.svg`, `fit`, `line`, `path`, `poly`, `rect`, `circle`, `
 
 ## Home (`app/dashboard.js`)
 A 12-column grid of widgets saved in `localStorage` (`bm.dash`): a calculator in small form (`mountTool(..., { mini: true })`), favourites, recent tools, pinned results, the calculator, tip of the day (`app/tips.js`), tool library, what's new. The first run asks what the user mostly does.
+
+## Worked examples, printing and links
+- **Worked example** (`proof` on a tool in `app/tools.js`): `[{ name, sys, vals: { fieldId: value }, expect: [[label contains, unit or null, published value, tolerance]], source, note }]`. `proofRun` in `app/app.js` runs the tool's own `calc` on those inputs; `proofPanel` shows published against BenchMate. Only add an example whose numbers a named source prints; the smoke test fails when one stops agreeing.
+- **Print**: `printPage` opens the sources, adds a dated footer and calls `window.print()`; print styles are at the end of `app/shell.css` and `app/style.css`. `node tests/smoke/shot.mjs '#/t/<id>' out.png --print` shows the page as it prints.
+- **Link with numbers**: `#/t/<page>[/<tab>]?_sys=mm&<fieldId>=<value>&_src_<pairA>=<fieldId>`. `takeLink` accepts only the tool's own field ids with numeric values, stores them as the tool's values and removes the query from the address.

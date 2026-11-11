@@ -295,7 +295,17 @@ body.compact .hero .hv b{font-size:28px}
 body.compact .tp .card.wide{padding:12px;overflow-x:auto}
 @media (max-width:1180px){.wd.s{grid-column:span 4}.wd.m,.wd.w{grid-column:span 6}}
 @media (max-width:1100px){#machine{display:none}}
-@media print{#titlebar,#side,#status,#bbar,.tpa{display:none !important}#main{overflow:visible;background:none}body{overflow:visible;display:block}}
+.printfoot{display:none}
+.ptab{border-collapse:collapse;margin:4px 0 8px}
+.ptab th,.ptab td{padding:4px 12px 4px 0;text-align:left;border-bottom:1px solid var(--soft);font-size:12.5px}
+.ptab th{font-size:11px;color:var(--muted);font-weight:600}
+.ptab td.v{font-family:var(--mono);color:var(--ink);white-space:nowrap}
+.pex+.pex{border-top:1px solid var(--soft);margin-top:10px;padding-top:10px}
+@media print{#titlebar,#side,#status,#bbar,.tpa,.tabs,.modenote,.fx,.crumb{display:none !important}#main{overflow:visible;background:none}body{overflow:visible;display:block}
+  .printfoot{display:block;margin-top:14pt;padding-top:6pt;border-top:1px solid #999;font-size:9pt;color:#000}
+  .tg{display:block}.tg .pane{break-inside:avoid;margin-bottom:10pt;box-shadow:none}.tp{max-width:none}
+  details.why{break-inside:avoid;box-shadow:none}details.why summary{list-style:none}
+  input,select{border:1px solid #999 !important;background:#fff !important;color:#000 !important;box-shadow:none !important}}
 
 /* ---- Drawings (app/dk.js) ---- */
 svg.dk{font:11.5px var(--sans);overflow:visible}

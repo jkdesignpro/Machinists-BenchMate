@@ -556,6 +556,8 @@ const TOOLS = [
   ] : [],
   working: 'tan(half angle) = (D - d) / (2 L).',
   source: "Machinery's Handbook (tapers)",
+  proof: [{ name: 'The NPT pipe taper, 3/4 in per foot on the diameter', sys: 'inch', vals: { D: 1.75, d: 1, L: 12 }, expect: [['Half angle', 'deg', 1.79, 0.0002]],
+    source: 'Wikipedia, "National pipe thread": the taper of 3/4 in per foot is printed with its half angle, 1° 47′ 24″, which is 1.7900°. ASME B1.20.1 by name.', note: 'Any two diameters 0.75 in apart over a length of 12 in have this taper.' }],
 },
 {
   id: 'bar', level: 'advanced', group: 'Turning', title: 'Bar stock planner',
@@ -855,6 +857,8 @@ const TOOLS = [
   },
   working: 'Time = height / down-feed rate, or metal area / cutting rate (the square inches or cm2 per minute figure saw makers quote: the cut area divided by the minutes per cut). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle W x H. Bundle of n across and m high, packed square: metal area = n m x piece area, height = m x piece height (D for rounds and tubes), effective width = n x piece width. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker. For a bundle the makers base the blade pitch on the average section (Fabricating and Metalworking, 2020) and keep at least three teeth in the work (The Tube and Pipe Journal, 2007).',
   source: "Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut for each bar area); Machinery's Handbook 31st ed., band saw blades, p. 1245 (cutting time = area / cutting rate, by name); KASCO (teeth per minute = teeth per foot x blade speed); bundles: A. Popson, 'Bundles of joy', The Tube and Pipe Journal, 2007; 'How to optimize sawing operations', Fabricating and Metalworking, 2020. See docs/sources.md.",
+  proof: [{ name: 'A 5.5 in2 section at 4 in2 per minute', sys: 'inch', vals: { shape: 2, a: 2.75, b: 2, rate: 4 }, expect: [['Cut time from the cutting rate', 'min', 1.375, 1e-9]],
+    source: "Machinery's Handbook, 31st ed., band saw blades (by name): cutting time = area / cutting rate, 5.5 in2 at 4 in2 per minute is 1.375 minutes.", note: 'The 2.75 x 2 in rectangle is only a way to enter 5.5 in2.' }],
 },
 {
   id: 'sawtpi', level: 'simple', group: 'Sawing', title: 'Saw blade pitch (TPI)',
@@ -2005,6 +2009,8 @@ const TOOLS = [
   },
   working: 'upper limit = size + larger deviation; lower limit = size + smaller deviation; middle = (upper limit + lower limit) / 2; tolerance = upper limit - lower limit. 1 in = 25.4 mm exactly.',
   source: 'Definitions of limits of size, deviations and tolerance as in ISO 286-1:2010 clause 3 and ASME Y14.5-2018 (cited by name; nothing reproduced). The middle is plain arithmetic; worked examples in the core tests.',
+  proof: [{ name: 'A 25 g6 shaft', sys: 'mm', vals: { form: 1, nom: 25, up: -0.007, lo: -0.02 }, expect: [['Upper limit', 'mm', 24.993, 1e-9], ['Lower limit', 'mm', 24.98, 1e-9]],
+    source: 'ISO 286 limit deviations for g6 over 18 up to 30 mm, -0.007 and -0.020 mm, as in the Limits and fits tool (each value printed by two publishers). The limits of size are 24.993 and 24.980 mm.' }],
 },
 {
   id: 'offsetadj', level: 'advanced', group: 'Inspection and quality', title: 'Wear offset adjustment',
@@ -2029,6 +2035,8 @@ const TOOLS = [
   },
   working: 'error = measured - target. Lathe diameter or bore: change = -error when the X offset is a diameter value, -error / 2 when it is a radius value. Mill with cutter compensation, D as a radius value: outside size change = -error / 2, inside size change = +error / 2 (a smaller D value lets the cutter remove more on both); as a diameter value, -error and +error. Depth below Z zero: change = +error. Height or length left: change = -error. New value = wear offset now + change. This assumes the control adds the wear value to the tool position (X and Z wear on a lathe, the G43 length offset on a mill) and that G41 / G42 hold the cutter away from the programmed part outline by the D value. Controls, posts and shops differ (G44, wear kept on the work offset, "inverse wear" from a CAM post, a boring bar set on the far side), and tool pressure changes the size too: make the change, cut and measure again before you trust the sign.',
   source: 'Turned diameter: Modern Machine Shop, "Taking full advantage of geometry and wear offsets" (0.002 in oversize, -0.002 in the X wear offset). Outside size with cutter compensation: Autodesk Fusion blog, "Cutter compensation for beginners" (boss 1.001 for 1.000, -0.001 in a diameter table) and CIMCO CNC Handbook chapter 6, "Adjusting CDC offsets" (1.0120 for 1.0000, -0.0120). G43 adds the length offset to the Z position: Machinist Guides, "G43 G-code". The inside size, radius value, depth and height rules are BenchMate\'s own arithmetic from those and have no second publisher yet (tests in core/src/measure.rs).',
+  proof: [{ name: 'A turned diameter 0.002 in oversize', sys: 'inch', vals: { kind: 1, meas: 1.002, targ: 1, xval: 1, cur: 0 }, expect: [['Change the X wear', 'in', -0.002, 1e-9]],
+    source: 'Modern Machine Shop, "Taking full advantage of geometry and wear offsets": a finish turning tool cutting a diameter 0.002 in oversize is corrected with -0.002 in the X register of its wear offset.' }],
 },
 {
   id: 'tempcomp', level: 'expert', group: 'Inspection and quality', title: 'Temperature compensation',
@@ -2604,6 +2612,8 @@ const TOOLS = [
   },
   working: 'U_per = 1000 G m / omega = 9549 G m / n (U in g·mm, G in mm/s, m in kg, n in rpm); e_per = U_per / m in g·mm/kg = µm. Two planes between the bearings: U_L = U_per hR / b, U_R = U_per hL / b, h = distance from the centre of gravity, b = hL + hR; each should be 30 to 70 % of U_per. Correction mass = U / r. Force = U omega^2 (U in kg·m). Grade reached G = U omega / (1000 m).',
   source: 'ISO 21940-11:2016 (formerly ISO 1940-1:2003), by name; formula, plane allocation and worked example (1000 lb rotor, 900 rpm, G 6.3: 21 oz·in per plane) from IRD Balancing Technical Paper 1, Balance quality requirements of rigid rotors (free). See docs/mechanics.md.',
+  proof: [{ name: 'A 1000 lb rotor at 900 rpm, grade G 6.3', sys: 'inch', vals: { m: 1000, n: 900, G: 6.3 }, expect: [['U_per', 'oz·in', 42.1, 0.05]],
+    source: 'IRD Balancing, Technical Paper 1, "Balance quality requirements of rigid rotors": worked example, 6.015 G W / N = 42.1 oz·in.' }],
 },
 {
   id: 'critspeed', level: 'expert', group: 'Mechanics', title: 'Critical speed of a shaft',

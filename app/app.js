@@ -93,14 +93,17 @@ function starBtn(id, cls) {
   return b;
 }
 
-// ---- Routing: #/home, #/w/<workspace>, #/t/<page>[/<tab>], #/news ----
+// ---- Routing: #/home, #/w/<workspace>, #/t/<page>[/<tab>][?numbers], #/news ----
+// A tool link may carry the numbers to open with: ?_sys=mm&dia=12&speed=90 (see linkQuery in mountTool).
 function parseHash() {
-  const h = (location.hash || '').replace(/^#\/?/, '').split('/').map(decodeURIComponent);
+  const raw = (location.hash || '').replace(/^#\/?/, ''), qi = raw.indexOf('?');
+  const h = (qi < 0 ? raw : raw.slice(0, qi)).split('/').map(decodeURIComponent);
+  let q = null; if (qi >= 0) { try { q = Object.fromEntries(new URLSearchParams(raw.slice(qi + 1))); } catch (e) { q = null; } }
   if (h[0] === 'w' && WORKSPACES.some(w => w.id === h[1])) return { kind: 'ws', id: h[1] };
   if (h[0] === 't') {
     let id = h[1], tab = h[2];
     if (!PAGES[id] && PAGE_OF[id]) { tab = id; id = PAGE_OF[id]; }
-    if (PAGES[id]) return { kind: 'tool', id, tab };
+    if (PAGES[id]) return { kind: 'tool', id, tab, q };
   }
   if (h[0] === 'news') return { kind: 'news' };
   return { kind: 'home' };
@@ -186,6 +189,7 @@ function initSearch() {
     const q = inp.value; hits = searchHits(q); sel = Math.min(sel, Math.max(0, hits.length - 1));
     if (!q.trim()) { close(); return; }
     pop.hidden = false;
+    if (/#\/t\/\S+/.test(q)) { pop.innerHTML = '<div class="shn">Press Enter to open this link.</div>'; return; }
     pop.innerHTML = hits.length ? hits.map((h, i) => '<button class="sh' + (i === sel ? ' on' : '') + '" data-i="' + i + '">' + icon(h.icon) + '<span><b>' + hesc(h.title) + '</b><small>' + hesc(h.sub || '') + '</small></span></button>').join('')
       : '<div class="shn">No tool matches' + (state.mode === 'simple' ? ' in Simple mode. Switch to Advanced to search every tool.' : '.') + '</div>';
   };
@@ -195,7 +199,7 @@ function initSearch() {
   inp.onkeydown = e => {
     if (e.key === 'ArrowDown') { sel = Math.min(sel + 1, hits.length - 1); paint(); e.preventDefault(); }
     else if (e.key === 'ArrowUp') { sel = Math.max(sel - 1, 0); paint(); e.preventDefault(); }
-    else if (e.key === 'Enter') { pick(sel); }
+    else if (e.key === 'Enter') { const m = /#\/t\/\S+/.exec(inp.value); if (m) { inp.value = ''; close(); inp.blur(); go(m[0]); } else pick(sel); }
     else if (e.key === 'Escape') { inp.value = ''; close(); inp.blur(); }
   };
   pop.onmousedown = e => { const b = e.target.closest('.sh'); if (b) { e.preventDefault(); pick(+b.dataset.i); } };
@@ -208,7 +212,7 @@ function render() {
   const r = state.route;
   if (r.kind === 'ws') state.ws = r.id;
   if (r.kind === 'tool') { state.ws = wsOfPage(r.id); Recents.add(r.id); }
-  lsSet('bm.route', location.hash || '#/home');
+  lsSet('bm.route', (location.hash || '#/home').split('?')[0]);
   document.body.classList.remove('railopen');
   renderRail(); renderMain();
   const m = $('#main'); if (m) m.scrollTop = 0;
@@ -254,6 +258,7 @@ function renderPage(main, page, tabId) {
   let tab = tabs ? (page.tabs.find(tb => tb.id === tabId) || tabs.find(tb => tb.id === lsGet('bm.tab.' + page.id)) || tabs[0]) : null;
   const t = tab ? tab.tool : page.tool;
   state.tool = t.id;
+  takeLink(t);
   if (tab) lsSet('bm.tab.' + page.id, tab.id);
   const wsId = wsOfPage(page.id), ws = WORKSPACES.find(w => w.id === wsId);
   const sec = ws ? (ws.sections.find(s => s[1].includes(page.id)) || [''])[0] : (PAGE_HOME[page.id] || {}).section;
@@ -300,13 +305,94 @@ function renderPage(main, page, tabId) {
   }
   const ub = document.createElement('button'); ub.className = 'ib unitb'; ub.textContent = state.sys === 'inch' ? 'in' : 'mm'; ub.title = 'Units: ' + (state.sys === 'inch' ? 'inch. Switch to mm' : 'mm. Switch to inch'); ub.setAttribute('aria-label', ub.title);
   ub.onclick = () => setUnits(state.sys === 'inch' ? 'mm' : 'inch'); acts.appendChild(ub);
+  act('link', api ? 'Copy a link that reopens this calculator with these numbers' : 'Copy a link to this page', () => {
+    const h = '#/t/' + page.id + (tab ? '/' + tab.id : '') + (api && api.query() ? '?' + api.query() : '');
+    const web = /^https?:$/.test(location.protocol) && typeof window.BenchMateSave !== 'function';
+    copyText(web ? location.origin + location.pathname + h : h);
+    setTimeout(() => toast(web ? 'Link copied' : 'Link copied. Paste it into the search box to open it again.', 3200), 30);
+  });
+  act('print', 'Print this page: inputs, results, drawing and sources', printPage);
   act('info', 'Formula and sources', () => { why.hidden = false; why.open = !why.open || why.hidden; if (why.open) why.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
   acts.appendChild(starBtn(page.id, 'ib'));
   body.appendChild(why);
+  if (t.proof && t.proof.length && !t.render) body.appendChild(proofPanel(t));
   if (state.mode === 'expert') openDetails(main);
 }
 // Expert mode opens every evidence table a tool keeps folded. Tools that redraw are caught by the observer.
 function openDetails(root) { $$('details:not([data-kept])', root).forEach(d => { d.open = true; d.dataset.kept = '1'; }); }
+
+// ---- Links with numbers, printing and worked examples ----
+// Numbers from a link (#/t/<page>?_sys=mm&dia=12): checked against the tool's own boxes, stored as its
+// values, and the link is then shortened so later typing is not undone by a reload.
+function takeLink(t) {
+  const q = state.route && state.route.q; if (!q) return;
+  state.route.q = null;
+  if ((q._sys === 'inch' || q._sys === 'mm') && q._sys !== state.sys) markUnits(q._sys);
+  if (!t.render && t.fields) {
+    const ids = new Set(t.fields(state.sys).map(f => f.id)), vals = {};
+    Object.keys(q).forEach(k => {
+      const m = /^_src_(.+)$/.exec(k);
+      if (m) { if (ids.has(m[1]) && ids.has(q[k])) vals[k] = q[k]; }
+      else if (ids.has(k) && /^-?[0-9.eE+-]{1,24}$/.test(q[k]) && isFinite(parseFloat(q[k]))) vals[k] = q[k];
+    });
+    if (Object.keys(vals).length) { state.vals[t.id + ':' + state.sys] = vals; saveVals(); setTimeout(() => toast('Opened with the numbers from the link', 2400), 30); }
+  }
+  try { history.replaceState(null, '', location.pathname + location.search + location.hash.split('?')[0]); } catch (e) {}
+  lsSet('bm.route', (location.hash || '#/home').split('?')[0]);
+}
+// Print the page in view: the sources are opened and a dated footer added for the paper, then put back.
+function printSetup() {
+  const main = $('#main'), opened = $$('details.why', main).filter(d => !d.open || d.hidden).map(d => [d, d.open, d.hidden]);
+  opened.forEach(([d]) => { d.hidden = false; d.open = true; });
+  const f = document.createElement('div'); f.className = 'printfoot';
+  f.textContent = 'Machinists BenchMate ' + $('#ver').textContent + ', printed ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + '. Results are a guide: check them before you cut.';
+  main.appendChild(f);
+  return () => { opened.forEach(([d, o, h]) => { d.open = o; d.hidden = h; }); f.remove(); };
+}
+function printPage() {
+  if (typeof window.print !== 'function') { toast('Printing is not available here'); return; }
+  const undo = printSetup(), done = () => { removeEventListener('afterprint', done); undo(); };
+  addEventListener('afterprint', done);
+  window.print();
+}
+// A worked example (t.proof[i]): the tool's own calculation run on the published inputs.
+// expect rows are [label contains, unit or null, published value, tolerance].
+function proofRun(t, ex) {
+  const v = {};
+  t.fields(ex.sys).forEach(f => { const x = ex.vals[f.id] !== undefined ? ex.vals[f.id] : f.def; v[f.id] = x === '' ? NaN : parseFloat(x); });
+  (t.pairs || []).forEach(p => { if (p[4] !== 'both') v[ex.vals[p[1]] !== undefined && ex.vals[p[0]] === undefined ? p[0] : p[1]] = NaN; });
+  let rows = []; try { rows = t.calc(v, state.W, ex.sys) || []; } catch (e) { rows = []; }
+  return ex.expect.map(([lab, unit, val, tol]) => {
+    const r = rows.find(x => String(x.label).replace(/<[^>]+>/g, '').indexOf(lab) >= 0 && (unit === null || x.unit === unit));
+    const got = r && typeof r.value === 'number' ? r.value : NaN;
+    return { label: r ? String(r.label).replace(/<[^>]+>/g, '') : lab, unit: r ? r.unit : unit || '', val, tol, got, dp: r ? r.dp : 4, ok: isFinite(got) && Math.abs(got - val) <= tol };
+  });
+}
+function proofPanel(t) {
+  const d = document.createElement('details'); d.className = 'why proof';
+  d.innerHTML = '<summary>Worked example: check the maths</summary><div class="whyb"></div>';
+  const box = $('.whyb', d);
+  t.proof.forEach((ex, i) => {
+    const fields = t.fields(ex.sys), res = proofRun(t, ex), sec = document.createElement('div'); sec.className = 'pex';
+    const inputs = fields.filter(f => ex.vals[f.id] !== undefined).map(f => hesc(f.label) + ' <b>' + hesc(f.options ? (f.options.find(o => o[0] === ex.vals[f.id]) || ['', ex.vals[f.id]])[1] : ex.vals[f.id]) + '</b>' + (f.unit && !f.options ? ' ' + hesc(f.unit) : '')).join('; ');
+    sec.innerHTML = '<p><b>' + hesc(ex.name) + '</b></p><p>Inputs: ' + inputs + '.</p>' +
+      '<table class="ptab"><tr><th>Result</th><th>Published</th><th>BenchMate</th><th></th></tr>' + res.map(r => '<tr><td>' + hesc(r.label) + '</td><td class="v">' + hesc(String(r.val)) + ' ' + hesc(r.unit) + '</td><td class="v">' + fmt(r.got, Math.max(r.dp || 0, (String(r.val).split('.')[1] || '').length)) + ' ' + hesc(r.unit) + '</td><td>' +
+        (r.ok ? '<span class="badge confirmed">Agrees</span>' : '<span class="badge differs">Differs</span>') + '</td></tr>').join('') + '</table>' +
+      '<p><b>Source:</b> ' + hesc(ex.source) + '</p>' + (ex.note ? '<p>' + hesc(ex.note) + '</p>' : '') +
+      '<p><button type="button" class="btn sm noprint" data-ex="' + i + '">Load these numbers</button></p>';
+    box.appendChild(sec);
+  });
+  box.addEventListener('click', e => {
+    const b = e.target.closest('button[data-ex]'); if (!b) return;
+    const ex = t.proof[+b.dataset.ex], vals = {};
+    Object.keys(ex.vals).forEach(k => { vals[k] = String(ex.vals[k]); });
+    (t.pairs || []).forEach(p => { vals['_src_' + p[0]] = ex.vals[p[1]] !== undefined && ex.vals[p[0]] === undefined ? p[1] : p[0]; });
+    if (ex.sys !== state.sys) markUnits(ex.sys);
+    state.vals[t.id + ':' + ex.sys] = vals; saveVals(); renderMain();
+    toast('Loaded the worked example');
+  });
+  return d;
+}
 
 // ---- The standard calculator view: inputs, results, drawing ----
 // opts.mini: the small version used by Home widgets (main inputs, main results).
@@ -406,6 +492,11 @@ function mountTool(host, t, opts) {
   const text = () => t.title + '\n' + last.map(r => r.label.replace(/<[^>]+>/g, '') + ': ' + fmt(r.value, r.dp) + (r.unit ? ' ' + r.unit : '')).join('\n');
   return {
     update,
+    // The numbers on screen as a link query: every filled box, the unit system and which box of a linked pair was typed.
+    query: () => { const q = new URLSearchParams(); q.set('_sys', sys);
+      fields.forEach(f => { const e = els[f.id].inp, x = e.dataset.def !== undefined ? e.dataset.def : e.value; if (x !== '' && x !== undefined) q.set(f.id, x); });
+      pairs.forEach(p => q.set('_src_' + p.a, src[p.a + p.b]));
+      return q.toString(); },
     decimals: d => { dpAdj = Math.max(-3, Math.min(4, dpAdj + d)); lsSet(dpKey, String(dpAdj)); update(); },
     reset: () => { Object.keys(saved).forEach(k => delete saved[k]); saveVals(); mountToolAgain(); },
     copy: () => { if (last.length) copyText(text()); else toast('Nothing to copy yet'); },
@@ -428,12 +519,12 @@ async function renderNews(main) {
 }
 
 // ---- Units, theme, mode, compact view ----
-function setUnits(u) {
+function markUnits(u) {
   state.sys = u; lsSet('bm.units', u);
   if (window.BenchCalc) BenchCalc.unitsChanged();
   $$('#units button').forEach(b => { const on = b.dataset.u === u; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
-  renderMain();
 }
+function setUnits(u) { markUnits(u); renderMain(); }
 // Theme: dark is the default look; 'auto' follows the system. (0.1.0 stored '' for Auto.)
 function themePref() { const t = lsGet('bm.theme'); return t === 'light' || t === 'dark' ? t : (t === 'auto' || t === '') ? 'auto' : 'dark'; }
 function setTheme(t) { document.documentElement.setAttribute('data-theme', t === 'light' || t === 'auto' ? t : 'dark'); }

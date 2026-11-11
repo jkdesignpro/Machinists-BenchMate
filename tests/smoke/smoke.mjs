@@ -263,6 +263,34 @@ off = await offRows();
 if (!/Change the D \(cutter\) wear offset by 0\.0200 mm/i.test(off) || !/Add 0\.02 mm/.test(off)) problems.push(`[${where}] pocket 25.04 for 25, radius value: got "${off}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Worked examples: every one must agree with its published value, and the panel shows on the page.
+where = 'worked examples';
+const proofs = await page.evaluate(() => TOOLS.filter(t => t.proof).map(t => ({ id: t.id, bad: t.proof.flatMap(ex => proofRun(t, ex).filter(r => !r.ok).map(r => ex.name + ': ' + r.label + ' published ' + r.val + ', got ' + r.got)) })));
+if (proofs.length < 5) problems.push(`[${where}] expected at least 5 tools with a worked example, found ${proofs.length}`);
+for (const p of proofs) if (p.bad.length) problems.push(`[${where}] ${p.id}: ${p.bad.join('; ')}`);
+await units('mm');
+await open('taper');
+if (!(await page.$('#main details.proof .badge.confirmed'))) problems.push(`[${where}] the taper page does not show its worked example as agreeing`);
+await page.click('#main details.proof summary');
+await page.click('#main details.proof button[data-ex="0"]');
+await page.waitForTimeout(80);
+const taperHalf = await page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).find(t => /Half angle/.test(t)) || '');
+if (!/1\.7899/.test(taperHalf) || (await page.evaluate(() => state.sys)) !== 'inch') problems.push(`[${where}] loading the taper example should switch to inch and give 1.7899 deg, got "${taperHalf}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
+// A link with numbers: opens the calculator in the link's units with those numbers, then drops them from the address.
+where = 'link with numbers';
+await page.evaluate(() => { location.hash = '#/t/rpm?_sys=mm&speed=120&dia=20&_src_speed=speed'; });
+await page.waitForTimeout(150);
+const linkRpm = await page.$eval('#res', e => e.innerText.replace(/\s+/g, ' '));
+if (!/1,909\.9/.test(linkRpm)) problems.push(`[${where}] 120 m/min at 20 mm should give 1,909.9 RPM, got "${linkRpm}"`);
+if ((await page.evaluate(() => location.hash)) !== '#/t/rpm') problems.push(`[${where}] the numbers should be dropped from the address, got ${await page.evaluate(() => location.hash)}`);
+const linkQ = await page.evaluate(() => { const b = document.querySelector('#main .tpa button[title^="Copy a link"]'); return !!b; });
+if (!linkQ) problems.push(`[${where}] no link button on the calculator`);
+if (!(await page.$('#main .tpa button[title^="Print this page"]'))) problems.push(`[${where}] no print button on the calculator`);
+await page.click('#main .tpa button[title^="Reset"]');
+await units('mm');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

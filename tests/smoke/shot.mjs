@@ -3,6 +3,7 @@
 // Usage: node tests/smoke/shot.mjs '#/t/rpm' out.png [--w 1360] [--h 900] [--mode advanced] [--theme light]
 //        [--sys inch] [--sel '.tdia'] [--set speed=250,dia=1.5] [--wait 600] [--scale 2]
 //   --sel  screenshot only that element          --set  type values into inputs by data-id first
+//   --print  the page as it prints (print styles, sources opened, footer), full length
 // Needs app/benchmate.wasm and app/data (run scripts/build-web.sh, or copy them from a built checkout).
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -43,8 +44,11 @@ for (const kv of (opt('set') || '').split(',').filter(Boolean)) {
 }
 for (const c of (opt('click') || '').split(';;').filter(Boolean)) { await page.click(c); await page.waitForTimeout(150); }
 await page.waitForTimeout(150);
+// --print: the page as it goes to paper (print styles, sources opened, dated footer), full length.
+const asPrint = args.includes('--print');
+if (asPrint) { await page.evaluate(() => printSetup()); await page.emulateMedia({ media: 'print' }); await page.waitForTimeout(100); }
 const sel = opt('sel');
-if (sel) await (await page.$(sel)).screenshot({ path: out }); else await page.screenshot({ path: out });
+if (sel) await (await page.$(sel)).screenshot({ path: out }); else await page.screenshot({ path: out, fullPage: asPrint });
 console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'ok, no console errors: ' + out);
 await browser.close(); server.close();
 process.exit(errs.length ? 1 : 0);
