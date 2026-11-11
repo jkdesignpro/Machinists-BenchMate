@@ -225,6 +225,9 @@ fn ints(v: &[f64]) -> Vec<u64> { v.iter().filter(|x| **x >= 1.0).map(|x| x.round
 // Other thread forms (core/src/thread_forms.rs)
 f1!(whitworth_value, c::whitworth_value_f, d, p, what);
 f1!(ba_value, c::ba_value_f, n, what);
+f1!(pitch_tpi, c::pitch_tpi, x);
+/// Thread identifier: which 0 diameter difference, 1 pitch difference (fraction), 2 score (NaN = not a candidate).
+#[no_mangle] pub extern "C" fn thread_match(d_meas: f64, p_meas: f64, d_ref: f64, p_nom: f64, which: f64) -> f64 { pick(c::thread_match(d_meas, p_meas, d_ref, p_nom), which) }
 f1!(npt_value, c::npt_value_f, d, p, l1, what);
 f1!(round_sig, c::round_sig_f, x, sig);
 // Threads round 3 (core/src/power_threads.rs)

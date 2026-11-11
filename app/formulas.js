@@ -217,6 +217,7 @@ const FORMULAS = [
   F('bend', 'Outside setback and bend deduction', 'OSSB = tan(angle/2) · (R + t);  BD = 2 · OSSB − BA', '', ['KETIV', 'AST']),
   F('capability', 'Process capability', 'Cp = (USL − LSL) / 6σ;  Cpk = min(USL − x̄, x̄ − LSL) / 3σ', 'σ: within sigma (moving range / d2)', ['NISTSEM', 'MINITAB']),
   F('capability', 'Within sigma from moving ranges', 'σ = MR̄ / d2,  d2 = 1.128', 'MR̄: average moving range of two', ['NISTSEM']),
+  F('threadid', 'Thread identifier: closeness of a standard thread', 'score = √((Δp / 0.02)² + (Δd / (0.02 · d + 0.05))²)', 'Δp: (measured pitch − its pitch) / its pitch; Δd: measured diameter − its basic diameter [mm]; d: its basic diameter [mm]; listed when |Δp| ≤ 0.06 and |Δd| ≤ max(0.06 · d, 0.3)', ['OWN']),
   F('tolmid', 'Middle of a tolerance', 'middle = (upper limit + lower limit) / 2', 'upper limit = size + larger deviation; lower limit = size + smaller deviation', ['OWN']),
   F('tempcomp', 'Measurement at 20 °C', 'L20 = reading · (1 + αg (Tg − 20)) / (1 + αp (Tp − 20))', 'α: expansion coefficient [1/K]; T: temperature [°C]', ['DOIRON', 'OWN']),
   F('coolconc', 'Coolant concentration', 'c = Brix reading · refractometer factor', 'c: [%]; factor from the fluid data sheet', ['FASTENAL']),

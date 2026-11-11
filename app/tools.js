@@ -1085,6 +1085,13 @@ const TOOLS = [
   source: 'ISO 68-1:2023, ISO 261:1998, ISO 262:2023, ISO 965-1:2013 (revised 2026), ASME B1.1-2024; series and published limits from the publishers listed under the tool.',
 },
 {
+  id: 'threadid', level: 'advanced', group: 'Threads', title: 'Thread identifier',
+  desc: 'Measure the diameter and the pitch of an unknown screw, nut or tapped hole and it lists the closest standard threads: ISO metric, Unified, Whitworth, BSP, NPT, BA, ACME, trapezoidal and miniature.',
+  render: el => renderThreadId(el),
+  working: 'See the note under the tool.',
+  source: "The sizes, pitches and basic diameters are those of the thread tools, with their standards and publishers. The search rule is BenchMate's own (tests in core/src/thread_forms.rs).",
+},
+{
   id: 'pipethreads', level: 'simple', group: 'Threads', title: 'Pipe threads (BSP and NPT)',
   desc: 'BSP parallel (G, ISO 228-1) and taper (R / Rc / Rp, ISO 7-1) and NPT (ASME B1.20.1): threads per inch, diameters, pitch diameters, gauge and engagement lengths.',
   render: el => renderPipeThreads(el),

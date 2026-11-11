@@ -215,6 +215,41 @@ for (const [k, v] of [['f', '0.092'], ['r', '0.8']]) { await page.fill(`#main [d
 const raRow = await page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).find(t => /Theoretical Ra/i.test(t)) || '');
 if (!/0\.33\b/.test(raRow)) problems.push(`[${where}] expected Ra 0.33 um, got "${raRow}"`);
 
+// Thread identifier: a 9.85 mm screw with a 1.5 mm pitch is M10 x 1.5, with 3/8-16 UNC only possible;
+// an 8.4 mm bore with the same pitch is M10 x 1.5 too, and the link opens that thread.
+where = 'threadid';
+await open('threadid');
+await page.waitForSelector('#ires table');
+const tidRows = () => page.$$eval('#ires tr', trs => trs.slice(1).map(tr => [...tr.querySelectorAll('td')].slice(0, 2).map(td => td.textContent.trim()).join(' | ')));
+for (const [k, v] of [['#idv', '9.85'], ['#ipv', '1.5']]) { await page.fill(k, v); await page.dispatchEvent(k, 'input'); }
+let tid = await tidRows();
+if (tid[0] !== 'M10 x 1.5 | Closest' || !tid.includes('3/8-16 UNC | possible')) problems.push(`[${where}] screw 9.85 x 1.5: got ${tid.join('; ')}`);
+await page.selectOption('#ipu', 'tpi');
+if (Math.abs(parseFloat(await page.inputValue('#ipv')) - 16.9333) > 0.001) problems.push(`[${where}] 1.5 mm should become 16.9333 TPI, got ${await page.inputValue('#ipv')}`);
+await page.selectOption('#ipu', 'mm');
+await page.click('#ib button[data-v="1"]');
+await page.fill('#idv', '8.4'); await page.dispatchEvent('#idv', 'input');
+tid = await tidRows();
+if (tid[0] !== 'M10 x 1.5 | Closest') problems.push(`[${where}] bore 8.4 x 1.5: got ${tid.join('; ')}`);
+await page.fill('#ipv', '9'); await page.dispatchEvent('#ipv', 'input');
+if (!/No standard thread/.test(await page.textContent('#ires'))) problems.push(`[${where}] an 8.4 mm bore with a 9 mm pitch should match nothing`);
+await page.fill('#ipv', '1.5'); await page.dispatchEvent('#ipv', 'input');
+await page.click('#ires a[data-i="0"]');
+await page.waitForSelector('#hk');
+if ((await page.inputValue('#hk')) !== 'M10x1.5') problems.push(`[${where}] the link should open M10 x 1.5 in Thread data, got ${await page.inputValue('#hk')}`);
+await open('threadid');
+await page.waitForSelector('#ib');
+await page.click('#ib button[data-v="0"]');
+for (const [k, v] of [['#idv', '9.85'], ['#ipv', '1.5']]) { await page.fill(k, v); await page.dispatchEvent(k, 'input'); }
+
+// Middle of a tolerance: 25 +0.05 / -0.02 is 25.05 to 24.98, middle 25.015.
+where = 'tolmid';
+await open('tolmid');
+for (const [k, v] of [['nom', '25'], ['up', '0.05'], ['lo', '-0.02']]) { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); }
+const tolRows = await page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).join(' ; '));
+if (!/Middle of the tolerance[^;]*25\.0150 mm/i.test(tolRows) || !/Upper limit[^;]*25\.0500 mm/i.test(tolRows) || !/Lower limit[^;]*24\.9800 mm/i.test(tolRows)) problems.push(`[${where}] 25 +0.05/-0.02: got "${tolRows}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

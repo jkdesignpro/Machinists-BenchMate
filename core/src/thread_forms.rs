@@ -139,6 +139,34 @@ pub fn ba_value_f(n: f64, what: f64) -> f64 {
     match what as i32 { 0 => ba_pitch_mm(n), 1 => ba_major_mm(n), _ => f64::NAN }
 }
 
+// ---------- Thread identifier ----------
+
+/// Pitch in mm from threads per inch, or threads per inch from a pitch in
+/// mm: 25.4 / x (1 in = 25.4 mm exactly).
+pub fn pitch_tpi(x: f64) -> f64 { if x > 0.0 { 25.4 / x } else { f64::NAN } }
+
+/// Thread identifier: how well a measured diameter and pitch fit one
+/// standard thread. `d_ref` is that thread's diameter at the place measured
+/// (basic major diameter for a screw, basic minor diameter for a bore),
+/// `p_nom` its pitch; all in the same length unit as the measurement, mm.
+///
+/// Returns `[measured diameter - d_ref, (measured pitch - p_nom) / p_nom,
+/// score]`. The thread is a candidate when the pitch is within 6 % and the
+/// diameter within 6 % of `d_ref` (never less than 0.3 mm); otherwise the
+/// score is NaN. The score is the distance in units of "2 % of pitch" and
+/// "2 % of diameter + 0.05 mm", so 0 is exact and about 1 or less is a
+/// close fit for caliper and pitch-gauge readings. This is BenchMate's own
+/// search rule, not a standard: it only orders the table.
+pub fn thread_match(d_meas: f64, p_meas: f64, d_ref: f64, p_nom: f64) -> [f64; 3] {
+    if !(d_meas > 0.0 && p_meas > 0.0 && d_ref > 0.0 && p_nom > 0.0) || !(d_meas + p_meas + d_ref + p_nom).is_finite() { return [f64::NAN; 3]; }
+    let dd = d_meas - d_ref;
+    let dp = (p_meas - p_nom) / p_nom;
+    if dp.abs() > 0.06 || dd.abs() > (0.06 * d_ref).max(0.3) { return [dd, dp, f64::NAN]; }
+    let a = dp / 0.02;
+    let b = dd / (0.02 * d_ref + 0.05);
+    [dd, dp, (a * a + b * b).sqrt()]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -240,5 +268,34 @@ mod tests {
         let (d, p) = (0.840, 1.0 / 14.0);
         close(npt_value_f(d, p, 0.0, 4.0) - npt_e0(d, p), npt_l2(d, p) / 16.0, 1e-12);
         close(npt_thread_height(p), 0.05714, 1e-5);
+    }
+
+    #[test]
+    fn thread_identifier() {
+        // 20 threads per inch is a 1.27 mm pitch, and back.
+        close(pitch_tpi(20.0), 1.27, 1e-12);
+        close(pitch_tpi(1.27), 20.0, 1e-12);
+        assert!(pitch_tpi(0.0).is_nan());
+        // An exact reading scores 0.
+        let r = thread_match(10.0, 1.5, 10.0, 1.5);
+        close(r[0], 0.0, 1e-12); close(r[1], 0.0, 1e-12); close(r[2], 0.0, 1e-12);
+        // A screw measuring 9.85 mm with a 1.5 mm pitch gauge: M10 x 1.5 fits far better than
+        // 3/8-16 UNC (9.525 mm, 1.5875 mm), which is still listed as a candidate.
+        let m10 = thread_match(9.85, 1.5, 10.0, 1.5);
+        let unc = thread_match(9.85, 1.5, 9.525, pitch_tpi(16.0));
+        close(m10[0], -0.15, 1e-12);
+        close(m10[2], 0.6, 1e-9); // 0.15 / (0.02 x 10 + 0.05)
+        assert!(unc[2].is_finite() && unc[2] > 3.0 * m10[2]);
+        // M8 x 1.25 and 5/16-20 UNF (7.9375 mm, 1.27 mm) are near twins: both are candidates
+        // for a 7.9 mm, 1.25 mm reading and the pitch decides.
+        let m8 = thread_match(7.9, 1.25, 8.0, 1.25);
+        let unf = thread_match(7.9, 1.25, 7.9375, 1.27);
+        assert!(m8[2].is_finite() && unf[2].is_finite() && m8[2] < unf[2]);
+        // Outside the window: M10 x 1.5 against a 12 mm reading, or a 1.75 mm pitch.
+        assert!(thread_match(12.0, 1.5, 10.0, 1.5)[2].is_nan());
+        assert!(thread_match(10.0, 1.75, 10.0, 1.5)[2].is_nan());
+        // Small threads keep a 0.3 mm diameter window: M2 x 0.4 against a 1.75 mm reading.
+        assert!(thread_match(1.75, 0.4, 2.0, 0.4)[2].is_finite());
+        assert!(thread_match(-1.0, 0.4, 2.0, 0.4)[2].is_nan());
     }
 }

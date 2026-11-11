@@ -94,7 +94,38 @@
 
   const V60 = { a1: 30, a2: 30, h: 0.541266, fc: 0.125 }; // ISO 68-1 / ASME B1.1 basic profile: depth 5/8 H, crest P/8, root P/4
 
+  // Thread identifier: where to measure. A screw in side view with its outside diameter and pitch, and a nut
+  // in section with its bore. A key to the three readings; no live values.
+  function identify() {
+    const W = 520, H = 250, P = 32, ax = 104, r = 41, h = 0.541266 * P, x0 = 62, x1 = x0 + 5.25 * P;
+    // 60 degree outline between x0 and x1 at radius r from the axis; side -1 = top, +1 = bottom (half a pitch on, as a helix shows).
+    const edge = (side, shift) => {
+      const lev = u => u < 0.3125 ? u / 0.3125 : u < 0.4375 ? 1 : u < 0.75 ? 1 - (u - 0.4375) / 0.3125 : 0;
+      const y = x => { let u = ((x - x0) / P - shift) % 1; if (u < 0) u += 1; return ax + side * (r - h + h * lev(u)); };
+      const xs = [x0, x1];
+      for (let k = -1; k < 8; k++) [0, 0.3125, 0.4375, 0.75].forEach(b => { const x = x0 + (k + b + shift) * P; if (x > x0 && x < x1) xs.push(x); });
+      return xs.sort((a, b) => a - b).map(x => [x, y(x)]);
+    };
+    const top = edge(-1, 0), bot = edge(1, 0.5);
+    let s = DK.poly(top.concat(bot.slice().reverse()), 'part');
+    for (let k = 0; k < 5; k++) { const xc = x0 + (k + 0.375) * P; s += DK.line(xc, ax - r, xc + P / 2, ax + r, 'thin'); }
+    s += DK.rect(x1, ax - r - 16, 30, 2 * r + 32, 'part') + DK.cl(x0 - 34, ax, x1 + 44, ax);
+    s += DK.dim(x0, ax + r, x0, ax - r, 'outside Ø', { off: 22 });
+    s += DK.dim(x0 + 1.375 * P, ax - r, x0 + 2.375 * P, ax - r, 'pitch P', { off: 20 });
+    s += DK.text((x0 + x1) / 2, ax + r + 34, 'screw: measure across the crests', { cls: 'mut' });
+    // Nut in section: internal crests at the minor diameter.
+    const nx = 348, ri = r - h, yo = r + 22;
+    const Nt = form({ a1: 30, a2: 30, h: 0.541266, fc: 0.25, P, n: 3, x0: nx, yc: ax - ri, flip: true }), Nb = form({ a1: 30, a2: 30, h: 0.541266, fc: 0.25, P, n: 3, x0: nx, yc: ax + ri });
+    s += DK.path(Nt.d + 'L' + f(Nt.xe) + ' ' + f(ax - yo) + 'L' + f(Nt.xs) + ' ' + f(ax - yo) + 'Z', 'hatch') + DK.path(Nb.d + 'L' + f(Nb.xe) + ' ' + f(ax + yo) + 'L' + f(Nb.xs) + ' ' + f(ax + yo) + 'Z', 'hatch');
+    s += DK.cl(Nt.xs - 14, ax, Nt.xe + 40, ax);
+    s += DK.dim(Nt.xe, ax + ri, Nt.xe, ax - ri, 'bore Ø', { off: -22 });
+    s += DK.text((Nt.xs + Nt.xe) / 2, ax + r + 34, 'nut or tapped hole: measure the bore', { cls: 'mut' });
+    s += notes('Read the pitch with a thread pitch gauge, or count the crests along 1 in (25.4 mm) for threads per inch.', 18, 228);
+    return DK.svg(W, H, s, 'Where to measure an unknown thread: outside diameter and pitch of a screw, bore of a nut');
+  }
+
   Object.assign(DIAGRAMS, {
+    threadid: identify,
     threaddata: () => profile({
       form: V60, ang: [[60, 120, '60°']], names: ['major Ø  d', 'pitch Ø  d2', 'minor Ø  d1'],
       label: 'Basic 60 degree thread profile: pitch, depth and the major, pitch and minor diameters',
