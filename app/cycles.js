@@ -261,6 +261,9 @@ function renderDrillCycles(el) {
     { k: 'gdx', label: 'Pitch X', unit: cyU, show: s => s.pat === 'grid' }, { k: 'gdy', label: 'Pitch Y', unit: cyU, show: s => s.pat === 'grid' },
     { k: 'list', label: 'Coordinates: X and Y on each line (space, comma or tab; decimal point ".")', area: 5, show: s => s.pat === 'list' },
   ];
+  // Values handed over by another tool (the drilling advisor): spindle speed, feed, depth.
+  const raw = takeHandoff('cycdrill');
+  if (raw) { const s = cyState('drill', defs); Object.keys(raw).forEach(k2 => { if (k2 !== 'label' && raw[k2] !== '' && raw[k2] != null) s[k2] = String(raw[k2]); }); toast('Filled from ' + String(raw.label || 'another tool')); }
   cyScreen(el, 'drill', defs, fields, s => {
     const holes = cyHoles(s), inch = cyInch();
     const pitch = tap(s) ? (inch ? 1 / snum(s.pitch) : snum(s.pitch)) : NaN;

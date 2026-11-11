@@ -347,3 +347,33 @@ svg.dk{font:11.5px var(--sans);overflow:visible}
 .wd .tg.mini .hero.txt .hv b{font:600 13px/1.4 var(--sans);letter-spacing:0}
 .editing .wdh{padding-right:124px}
 .editing .wdh a{display:none}
+
+/* Advisor (0.3.0): sliders, lock boxes, status tiles, limit card, send buttons */
+label.f.sl input[type=range]{height:32px;padding:0;accent-color:var(--accent);background:none;border:0}
+label.f.sl .u{min-width:92px;color:var(--ink);font-size:12px}
+label.f .flock{flex:none;width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);border-radius:var(--r);background:var(--field);color:var(--muted);cursor:pointer;padding:0}
+label.f .flock .ic{width:16px;height:16px}
+label.f.locked .flock{color:var(--accent);border-color:var(--accent)}
+label.f.lk input::placeholder{color:var(--digit);opacity:.75}
+label.f.lk .fx{right:76px}
+.rpanel{padding:10px 16px;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.tile{border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:var(--r);padding:6px 9px;background:var(--panel);min-width:0}
+.tile b{display:block;font:700 10px var(--sans);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.tile span{display:block;font:600 14px var(--mono);color:var(--ink);overflow-wrap:anywhere}
+.tile i{display:block;font-style:normal;font-size:11.5px;color:var(--muted)}
+.tile.good{border-left-color:var(--ok)}.tile.good span{color:var(--ok)}
+.tile.caution{border-left-color:var(--warn)}.tile.caution span{color:var(--warn)}
+.tile.over{border-left-color:var(--err);background:var(--err2)}.tile.over span{color:var(--err)}
+.limcard{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r);padding:8px 11px;background:var(--panel)}
+.limcard h3{margin:0 0 3px;font:700 10.5px var(--sans);text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
+.limcard .lname{font:600 15px var(--sans);color:var(--ink)}
+.limcard p{margin:4px 0 0;font-size:12.5px;color:var(--ink)}
+.limcard p.fix{color:var(--muted)}
+.limcard.over{border-left-color:var(--err)}
+.rsend{display:flex;flex-wrap:wrap;gap:8px;padding:10px 16px;border-top:1px solid var(--line)}
+.rsend .btn.sm{height:26px;padding:0 9px;font-size:12px;display:inline-flex;align-items:center;gap:5px}
+.rsend .btn.sm .ic{width:14px;height:14px}
+@media print{.rsend,label.f .flock{display:none}}
+.rtab.text th,.rtab.text td,.tg .res .rtab.text td.v{white-space:normal;text-align:left;font:12.5px/1.35 var(--sans);vertical-align:top;padding:5px 8px}
+.rtab.text .rtabs{max-height:none}

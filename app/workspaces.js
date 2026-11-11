@@ -53,20 +53,20 @@ const HUBS = {
 
 const WORKSPACES = [
   { id: 'turning', name: 'Turning', icon: 'turning', blurb: 'Speeds, inserts, boring bars, tapers and cut times for lathe work.', sections: [
-    ['Speeds and feeds', ['rpm', 'feeds', 'mrr', 'kcforce', 'toollife'], 'gauge'],
+    ['Speeds and feeds', ['advturn', 'rpm', 'feeds', 'mrr', 'kcforce', 'toollife'], 'gauge'],
     ['Tooling', ['inserts', 'boringbar', 'tnrc'], 'insert'],
     ['Operations', ['turntime', 'taper', 'surfacefin', 'knurl'], 'turning'],
     ['Programs', ['cycg71', 'cycgroove', 'cyctaper', 'threadprog'], 'code'],
     ['Stock and workholding', ['bar', 'chuckforce', 'slender', 'changegears'], 'material'],
   ] },
   { id: 'milling', name: 'Milling', icon: 'milling', blurb: 'Speeds and feeds, engagement, deflection and chatter for mills.', sections: [
-    ['Speeds and feeds', ['rpm', 'feeds', 'mrr', 'kcforce', 'cutopt', 'toollife'], 'gauge'],
+    ['Speeds and feeds', ['advmill', 'rpm', 'feeds', 'mrr', 'kcforce', 'cutopt', 'toollife'], 'gauge'],
     ['Engagement', ['chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
     ['Tool behaviour', ['deflection', 'runout', 'chatter'], 'wave'],
     ['Other milling', ['surfacefin', 'slitsaw', 'indexing'], 'saw'],
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
-    ['Drilling', ['drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
+    ['Drilling', ['advdrill', 'advream', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
     ['Tapping and thread data', ['threaddata', 'threadid', 'taplimits', 'wires', 'sti', 'coating', 'multistart'], 'tap'],
     ['Thread standards', ['pipethreads', 'whitworth', 'acme', 'trapezoidal', 'buttress', 'unseries', 'unm', 'unjunr'], 'thread'],
     ['Thread programs', ['threadprog'], 'code'],

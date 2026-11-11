@@ -328,6 +328,56 @@ const slT = await page.$eval('#res', e => e.innerText.replace(/\s+/g, ' '));
 if (!/worst place 9\.2 um/i.test(slT) || !/In the chuck only it would be 311\.9/i.test(slT)) problems.push(`[${where}] got "${slT.slice(0, 300)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Speeds and feeds advisor (0.3.0). Hand values from the publishers' tables (docs/sources.md, "Advisor"):
+// milling: 12 mm carbide in low carbon steel, Harvey Tool 100 to 300 ft/min, middle 200 ft/min = 60.96 m/min: n = 1617 rpm;
+//   chip load between 3/8 in (0.002) and 1/2 in (0.003) at 0.4724 in = 0.00278 in = 0.0706 mm; Vf = 1617 x 4 x 0.0706 = 457 mm/min.
+// drilling: 10 mm HSS, LittleMachineShop 60 to 100 ft/min, middle 80 = 24.38 m/min: 776 rpm; feed 0.004 to 0.008 in/rev, middle 0.152 mm/rev;
+//   kc = 1350 x (0.0762 sin 59)^-0.21 = 2394; torque = 100 x 0.1524 x 2394 / 8000 = 4.56 N m.
+// reaming: 10 mm, 40 to 65 ft/min, middle 52.5 = 16.0 m/min: 509 rpm; ICS stock 0.010 to 0.015 in; Gammons 3 % = 0.3 mm, drill 9.7 mm.
+// turning: 25 mm, carbide 800 to 885 ft/min, middle 842.5 = 256.8 m/min: 3270 rpm; feed (0.4 / 3 + 0.4 / 2) / 2 = 0.1667 mm/rev;
+//   kc = 1350 x (0.1667 sin 95)^-0.21 = 1968; Fc = 1968 x 1.016 x 0.1667 = 333 N; Ra = 0.1667^2 / (32 x 0.4) x 1000 = 2.17 um.
+for (const [id, res] of [
+  ['advmill', [/Spindle speed 1,617 RPM/i, /Table feed 457 mm\/min/, /Feed per tooth 0\.0706 mm/, /From the table: chip load \(Harvey Tool, between two printed sizes/]],
+  ['advdrill', [/Spindle speed 776 RPM/i, /0\.152 mm\/rev/, /Torque 4\.56 N m/, /Point length to add to the depth 3\.004 mm/]],
+  ['advream', [/Spindle speed 509 RPM/i, /0\.254 to 0\.381 mm/, /Hole to drill first, Gammons 9\.700 mm/]],
+  ['advturn', [/Spindle speed 3,270 RPM/i, /Cutting force 333 N/, /theoretical Ra\) 2\.17 um/]],
+]) {
+  where = id;
+  await open(id);
+  const t = await page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(x => x.innerText.replace(/\s+/g, ' ')).join(' ; '));
+  for (const re of res) if (!re.test(t)) problems.push(`[${where}] ${re} not in "${t.slice(0, 400)}"`);
+  if (!(await page.$('#res .limcard'))) problems.push(`[${where}] no limit card`);
+  if (!(await page.$('#res .rtab.text'))) problems.push(`[${where}] no table of publishers`);
+}
+// Locks and the limit card on the milling advisor: a 0.5 kW spindle limits the cut, and a typed depth is never changed.
+where = 'advmill locks';
+await open('advmill');
+const advSet = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); };
+const advTxt = async () => (await page.$eval('#res', e => e.innerText.replace(/\s+/g, ' ')));
+if ((await page.getAttribute('#main [data-id="ae"]', 'placeholder')) !== '6' || (await page.getAttribute('#main [data-id="ap"]', 'placeholder')) !== '12') problems.push(`[${where}] suggested width and depth are not shown in the empty boxes`);
+await advSet('pmax', '0.5');
+let aT = await advTxt();
+if (!/What is limiting this cut Spindle power/i.test(aT) || !/Depth of cut ap \(reduced from 12\.000 mm to fit spindle power\)/.test(aT)) problems.push(`[${where}] power limit: "${aT.slice(0, 500)}"`);
+await advSet('ap', '12');
+aT = await advTxt();
+if (!/Depth of cut ap \(yours, locked\) 12\.000 mm/.test(aT) || !/Width of cut ae \(reduced from 6\.000 mm to fit spindle power\)/.test(aT)) problems.push(`[${where}] locked depth: "${aT.slice(0, 500)}"`);
+await advSet('ae', '6');
+aT = await advTxt();
+if (!/Width of cut ae \(yours, locked\) 6\.000 mm/.test(aT) || !/Depth of cut ap \(yours, locked\) 12\.000 mm/.test(aT) || !/Your width and depth are locked, so the feed per tooth was reduced/.test(aT)) problems.push(`[${where}] both locked: "${aT.slice(0, 500)}"`);
+if (!(await page.$('#main label.f.locked [data-id="ap"]'))) problems.push(`[${where}] the lock is not shown closed`);
+// the lock button clears a locked box
+await page.click('#main label.f.locked:has([data-id="ap"]) .flock');
+if ((await page.inputValue('#main [data-id="ap"]')) !== '') problems.push(`[${where}] the lock button did not unlock the depth`);
+await page.click('#main .tpa button[title^="Reset"]');
+// Top spindle speed named: a 3 mm cutter in aluminium wants far more than 8000 rpm.
+where = 'advmill top speed';
+await open('advmill');
+await page.selectOption('#main [data-id="mat"]', '15');
+await advSet('d', '3'); await advSet('L', '12'); await advSet('lf', '8'); await advSet('nmax', '8000');
+aT = await advTxt();
+if (!/Spindle speed 8,000 RPM/i.test(aT) || !/What is limiting this cut Top spindle speed/i.test(aT)) problems.push(`[${where}] "${aT.slice(0, 400)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

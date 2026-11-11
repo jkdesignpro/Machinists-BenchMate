@@ -2,7 +2,7 @@
 
 A free, open-source (AGPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. For all machinists and all machines: mills, lathes, Swiss-type and more.
 
-**Status:** v0.3.0 (in progress; 0.2.0 is on its own pull request). 162 tools on 129 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
+**Status:** v0.3.0 (in progress; 0.2.0 is on its own pull request). 166 tools on 133 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
 
 ## How the app is organised
 - **Modes** (top bar): **Simple** shows 16 everyday tools with only their main inputs; **Advanced** shows every tool; **Expert** also opens every working, constant and evidence table. A mode never changes a calculation.
@@ -81,6 +81,9 @@ G and M codes for ten controls: a generic ISO 6983 / RS-274 base (NIST RS274NGC)
 ## CAD / DXF
 Parametric 2D shapes exported as DXF for CAM: bolt circle (with outside diameter and centre bore), rectangular hole grid on an optional plate, straight and arc slots, rectangle with corner radii and corner holes, regular polygon from across flats or corners, circle and ring, keyhole, D-flat and double-D. Live SVG preview with overall dimensions, hole callouts and a hole position table. Inch or mm (`$INSUNITS` set), layers OUTLINE / HOLES / CENTRE, optional centre marks, origin at the centre or lower-left, DXF R2000 (LWPOLYLINE with bulges) or R12 (POLYLINE/VERTEX). The writer is in the Rust core, tested by reading its own output back, and the files load and audit cleanly in ezdxf. See `docs/cad-dxf.md`.
 
+## Speeds and feeds advisor and cutting forces (0.3.0, in progress)
+**Milling, turning, drilling and reaming advisors**: pick the material and the tool and get a starting speed and feed from published tables, a suggested width and depth of cut, and a check against the active machine (top speed, top feed, power and torque at that speed) and the stiffness of the tool. A card names what limits the cut and one fix. Type your own width, depth or feed and it is locked: the advice works around it and never changes it. Every publisher that lists the material is shown side by side and nothing is averaged; results are starting points. **Cutting forces**: specific cutting force kc by material group (Kienzle), drill thrust, torque and power, tap torque, chip thinning for an entering angle or a round insert, slender part deflection in the lathe. Formulas in `core/src/advisor.rs` and `core/src/cutforce.rs`; sources, disagreements between publishers and BenchMate's own starting figures in `docs/sources.md` ("Advisor", "Cutting forces").
+
 ## Small mill and lathe calculators
 Radial chip thinning, corner and boss engagement, ball-nose cusp height and effective diameter (with tool tilt), runout and chip load, lathe feed, multi-pass roughing time, boring bar deflection with overhang guidance from three makers, C-axis feed and inverse time F, slitting saw, bandsaw chip per tooth and cut time, spot and centre drill depth. Formulas in `core/src/millturn.rs`; sources in `docs/sources.md`.
 
@@ -120,7 +123,7 @@ Save end mills, drills, taps, reamers and inserts (type, diameter, shank, flutes
 **ANSI inch fits** (ANSI B4.1 RC, LC, LT, LN and FN classes, 0 to 19.69 in) with hole and shaft limits and the fit; only one full table could be read, so the rows are marked "needs 2nd source" and every row is checked for internal consistency. **ISO fits** now include the j5-j7 and J6-J8 classes and sizes up to 3150 mm (checked against the ISO 286-1 formulas). **Preferred numbers** (ISO 3 Renard R5 to R80). **Control charts** (individuals and moving range, X-bar and R) with constants checked against NIST, York and our own integration. **Sampling plan OC curves** for any single sampling plan, with an own-words outline of ISO 2859-1 / ANSI Z1.4 (their tables are not included). See `docs/inspection.md`.
 
 ## Planned
-Speeds and feeds, turning/finish, drilling and tapping, threads (UN, metric, NPT), taper and trig, bolt circles, drill/tap/fit charts, materials table, Swiss-lathe helpers, second-opinion feeds from published manufacturer data, link-up with Alkart Mega Wizard.
+Speeds and feeds, turning/finish, drilling and tapping, threads (UN, metric, NPT), taper and trig, bolt circles, drill/tap/fit charts, materials table, Swiss-lathe helpers, second-opinion feeds from published manufacturer data. The staged plan is in `docs/feature-ideas.md`.
 
 ## Licence
 GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later). See `LICENSE`. If you run a modified version for others over a network, you must offer them its source.

@@ -30,12 +30,12 @@ features are names only.
 
 | Checklist | Rows | Done | Partial | Missing (of which in progress) | Out of scope | Out of scope? | Done, of in-scope rows |
 |---|---|---|---|---|---|---|---|
-| CNC Machinist Calculator Ultra | 113 | 83 | 15 | 13 (0) | 2 | 0 | 75 % |
+| CNC Machinist Calculator Ultra | 113 | 85 | 17 | 9 (0) | 2 | 0 | 77 % |
 | Machinery's Handbook 31 | 306 | 47 | 95 | 130 (12) | 6 | 28 | 17 % |
 | Engineers' Data Book | 94 | 10 | 27 | 19 (1) | 12 | 26 | 18 % |
 | Engineers Black Book | 80 | 23 | 26 | 30 (9) | 1 | 0 | 29 % |
 | CNC Machining handbook | 83 | 13 | 17 | 49 (0) | 0 | 4 | 16 % |
-| **All** | **676** | **175** | **181** | **241 (22)** | **21** | **58** | **29 %** |
+| **All** | **676** | **177** | **183** | **237 (22)** | **21** | **58** | **30 %** |
 
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
@@ -61,6 +61,8 @@ features are names only.
 **Update (branch `claude/inspection-2`, 2026-11-11):** batch B5 (inspection round 2) is built except thread gauges and measurement over pins for a radius: ANSI B4.1 inch fits (`ansifits`, one full source, so its rows are marked "needs 2nd source"), ISO 286 j/J and sizes up to 3150 mm (`fits`), preferred numbers (`prefnum`), control charts (`ctrlchart`) and sampling plan OC curves (`sampling`; ISO 2859-1 / Z1.4 tables not included). U61, MH79, ED79 done; MH77, MH81, ED81 partial. Summary counts updated for these six rows. Details in `docs/inspection.md`.
 
 **Update (branch `claude/overhaul`, 2026-11-11):** section 1 was re-judged row by row against the 0.2.0 code: Ultra is now 82 done, 16 partial, 13 missing (0 in progress), 2 out of scope, 74 % done of in-scope rows (was 68, 14, 29, 61 %), and the **All** line is re-added with the book lines unchanged. Status changes: U32, U65, U67, U69, U75, U76, U77, U78, U81, U83, U87, U98, U103, U107 missing or partial -> done; U84, U85, U105, U108 missing -> partial. Tool ids and "What's missing" were rewritten for every U row. Cutting-data engines (U1, U2, U28) are still missing. Later on the same branch: U66 partial -> done (milling surface finish and RMS added), so Ultra is 83 done, 15 partial, 13 missing, 75 %.
+
+**Update (branch `claude/advisor`, 2026-11-11):** the speeds and feeds advisors of 0.3.0 are built (`advmill`, `advturn`, `advdrill`, `advream`) on top of the cutting-force tools. U33 missing -> done; U18 partial -> done; U1, U2, U28 missing -> partial; U13 stays partial with less missing. Ultra is now 85 done, 17 partial, 9 missing, 77 %; the All line is updated for these rows only.
 
 "Done, of in-scope rows" = done / (done + partial + missing). Some Data Book
 rows bundle several out-of-scope entries (for example all of section 8), so
@@ -114,8 +116,8 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U1 | Lathe cutting speed and feed recommendations (material, machinability, hardness, insert, strategy) | missing |  | No cutting-data database: `rpm` only converts a speed you already know; `iso513` only names the material groups |
-| U2 | Turning feed and depth-of-cut engine | missing |  | Chip-breaker window and feed or depth-of-cut suggestion |
+| U1 | Lathe cutting speed and feed recommendations (material, machinability, hardness, insert, strategy) | partial | `advturn` | Speed by material for HSS and carbide (one publisher), feed from the nose radius, checked against the lathe. No insert shape or grade picker, no hardness input |
+| U2 | Turning feed and depth-of-cut engine | partial | `advturn` | Feed and depth suggested, lockable, reduced to fit spindle power and torque. No chip-breaker window |
 | U3 | Lathe spindle speed conversion (SFM/Vc and RPM) | done | `rpm` |  |
 | U4 | Lathe feed rate conversion (per rev and per minute) | done | `lathefeed` |  |
 | U5 | Rough pass cut time | done | `roughtime`, `passtime` |  |
@@ -131,12 +133,12 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U13 | Mill speeds and feeds with physics engine (chip thinning, deflection, power) | partial | `cutopt` | Checks a cut you enter against power, torque and deflection; no recommended starting speed or feed for a material and tool, no kc by material |
+| U13 | Mill speeds and feeds with physics engine (chip thinning, deflection, power) | partial | `advmill`, `cutopt` | Starting speed and chip load by material and cutter size, width and depth suggested, chip thinning, power, torque and deflection checks with a limit card. End mills only (no face mill, ball or chamfer tools); no stability chart or tool life in the advisor yet |
 | U14 | Mill spindle speed / SFM | done | `rpm` |  |
 | U15 | Mill feed rate conversion | done | `feed` |  |
 | U16 | Radial chip thinning | done | `chipthin` |  |
 | U17 | Metal removal rate | done | `mrr` (turning), `cutopt` (milling) |  |
-| U18 | Horsepower / machine power | partial | `mrr`, `cutopt` | You have to enter kc yourself; no unit-power or kc table by material |
+| U18 | Horsepower / machine power | done | `mrr`, `cutopt`, `kcforce`, `advmill`, `advturn`, `advdrill` |  |
 | U19 | Ball end mill cusp height | done | `ballcusp` |  |
 | U20 | Ball end mill effective cutting diameter | done | `balleff` |  |
 | U21 | Adaptive feed control (rounded corners) | done | `cornerfeed`, `arcfeed` |  |
@@ -156,12 +158,12 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U28 | Drill cutting speed and feed recommendations (point angle, tool material, coating, coolant, MRR, G-code) | missing |  | No cutting-data database for drilling |
+| U28 | Drill cutting speed and feed recommendations (point angle, tool material, coating, coolant, MRR, G-code) | partial | `advdrill` | Speed by material, feed by diameter, point length, time, removal rate, torque, thrust, power, drilling cycle. No coating factor (none found in an open source); carbide speed is one publisher's factor on the HSS figure |
 | U29 | Drill point length | done | `drillpoint` |  |
 | U30 | Drill chart | done | `drillchart` |  |
 | U31 | Tap drill size (cut and form, % thread 55-85) | done | `tapdrill` |  |
 | U32 | Center drill dimensions / center drill hole depth | done | `spotdepth` |  |
-| U33 | Reaming speeds, feeds and allowance | missing |  | Only a reamer description in `toolguide`; no reaming speeds, feeds or allowance calculator |
+| U33 | Reaming speeds, feeds and allowance | done | `advream` |  |
 | U34 | Gun drill calculators | missing |  |  |
 | U35 | Tapping speed calculators | missing |  | No tapping speed calculator (`tapdrill` and `cycdrill` give hole size and F = pitch x rpm only) |
 | U36 | G84 tap cycle generator | done | `cycdrill` |  |

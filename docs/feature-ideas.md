@@ -52,6 +52,8 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 17 | Vendor data import and cut log | 5 (0.9.0) | to do |
 | 18 | Wire EDM | 3 (0.5.0) | to do |
 
+Built in 0.3.0 so far (branch `claude/advisor`): the cutting-force tools and the milling, turning, drilling and reaming advisors with locks and limit cards. Still to build in stage 1: boring bar and slitting saw from advisor data, the stability lobe chart, tool life in the advisor, tapping speeds, plunge roughing, holder and spindle compliance, the chip-breaking window.
+
 Missing Ultra rows (docs/parity-audit.md) keep the stage the spec gives them: cutting-data advisors for turning, milling and drilling, reaming and tapping speeds in stage 1; gun drill, RPM cylindricity, SAE J499a and milling surface finish with RMS in stage 3; the vibration check in stage 5.
 
 **Vibration check, any sensor:** the check takes a typed frequency and amplitude, a CSV from any accelerometer or data logger (time and one to three axes), or a sound recording, and uses the device's own motion sensor only where one exists. It compares like with like (same machine, same place, same speed) and never depends on one make of sensor. Everything stays on the device.

@@ -737,3 +737,21 @@ f1!(power_from_torque_kw, c::power_from_torque_kw, torque, rpm);
 f1!(turn_work_deflection, c::turn_work_deflection, support, f, a, l, d, di, e_gpa);
 /// Worst deflection of a part in the lathe: which 0 deflection (mm), 1 distance from the chuck (mm).
 #[no_mangle] pub extern "C" fn turn_work_deflection_max(support: f64, f: f64, l: f64, d: f64, di: f64, e_gpa: f64, which: f64) -> f64 { pick(c::turn_work_deflection_max(support, f, l, d, di, e_gpa), which) }
+
+// Speeds and feeds advisor (core/src/advisor.rs)
+f1!(range_pick, c::range_pick, lo, hi, t);
+f1!(lerp_at, c::lerp_at, x0, y0, x1, y1, x);
+f1!(apply_factor, c::apply_factor, x, k);
+f1!(ream_predrill, c::ream_predrill, d, stock);
+f1!(drill_time_min, c::drill_time_min, depth, point, fnr, rpm);
+f1!(mrr_drilling_cm3_min, c::mrr_drilling_cm3_min, d, vf);
+/// Starting width and depth for an end mill: which 0 ae, 1 ap, 2 source of ae, 3 source of ap.
+#[no_mangle] pub extern "C" fn mill_engagement(op: f64, d: f64, flute_len: f64, boldness: f64, which: f64) -> f64 { pick(c::mill_engagement(op, d, flute_len, boldness), which) }
+f1!(advise_mill, c::advise_mill_f, d, z, d_shank, stickout, flute_len, flute_factor, e_gpa, vc, chip, kc11, mc, ae, ap, lock, n_max, vf_max, p_max, t_max, eta, radial_ratio, defl_limit, out);
+f1!(advise_turn, c::advise_turn_f, d, vc, f, ap, kappa, kc11, mc, lock, n_max, p_max, t_max, eta, out);
+/// Twist drill feed per revolution by diameter (inches): which 0 low, 1 high.
+#[no_mangle] pub extern "C" fn drill_feed_range_in(d_in: f64, which: f64) -> f64 { pick(c::drill_feed_range_in(d_in), which) }
+/// Reaming (or any hole tool without a force model): which as in `advise_hole`.
+#[no_mangle] pub extern "C" fn advise_hole(vc: f64, d: f64, fnr: f64, n_max: f64, vf_max: f64, which: f64) -> f64 { pick(c::advise_hole(vc, d, fnr, n_max, vf_max), which) }
+/// Drilling advice with the spindle check: which as in `advise_drill`.
+#[no_mangle] pub extern "C" fn advise_drill(vc: f64, d: f64, fnr: f64, point: f64, kc11: f64, mc: f64, feed_locked: f64, n_max: f64, vf_max: f64, p_max: f64, t_max: f64, eta: f64, which: f64) -> f64 { pick(c::advise_drill(vc, d, fnr, point, kc11, mc, feed_locked, n_max, vf_max, p_max, t_max, eta), which) }

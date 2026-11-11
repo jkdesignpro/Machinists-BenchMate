@@ -597,7 +597,9 @@ pub mod inspect;
 pub use inspect::*;
 pub mod matref;
 pub mod cutforce;
+pub mod advisor;
 pub use cutforce::*;
+pub use advisor::*;
 
 #[cfg(test)]
 mod tests {
