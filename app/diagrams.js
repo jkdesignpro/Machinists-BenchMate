@@ -35,4 +35,25 @@ Object.assign(DIAGRAMS, {
     h += DK.arrow(cx, cy, cx + 34, cy, 'dim') + DK.text(cx + 42, cy - 5, 'X', { cls: 'dimt' }) + DK.arrow(cx, cy, cx, cy - 34, 'dim') + DK.text(cx + 9, cy - 36, 'Y', { cls: 'dimt' });
     return DK.svg(W, H, h, 'Bolt circle with numbered holes');
   },
+  // Rectangular grid: the holes to scale, numbered in drilling order, with the spacings and the path between holes.
+  holegrid(v, sys) {
+    const t = TOOLS.find(x => x.id === 'holegrid'), h = t ? t.holes(v, state.W) : [];
+    if (!h.length) return '';
+    const W = 520, H = 300, u = sys === 'inch' ? 'in' : 'mm';
+    const xs = h.map(p => p[0]), ys = h.map(p => p[1]), x0 = Math.min(...xs), y0 = Math.min(...ys), bw = Math.max(...xs) - x0, bh = Math.max(...ys) - y0;
+    const F = DK.fit(bw || 1, bh || 1, 380, H, 62), X = x => F.x(bw ? x - x0 : 0.5), Y = y => H - F.y(bh ? y - y0 : 0.5);
+    const hr = Math.max(2.5, Math.min(10, 0.28 * F.s * Math.min(Math.abs(v.dx) || 1e9, Math.abs(v.dy) || 1e9, (bw || bh || 1))));
+    let s = '';
+    if (h.length <= 400) s += DK.path('M' + h.map(p => X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join('L'), 'thin');
+    h.forEach((p, i) => {
+      s += DK.circle(X(p[0]), Y(p[1]), hr, i === 0 ? 'tool' : 'part');
+      if (h.length <= 40) s += DK.text(X(p[0]), Y(p[1]) - hr - 4, String(i + 1), { cls: i === 0 ? 'hott' : 'mut', size: 10.5 });
+    });
+    const yb = Y(y0) + hr + 20, xl = X(x0) - hr - 18;
+    if (v.nx > 1 && isFinite(v.dx)) s += DK.dim(X(h[0][0]), yb, X(h[1][0]), yb, DK.n(Math.abs(v.dx), 4) + ' ' + u, { below: true }) + DK.line(X(h[0][0]), Y(y0) + hr + 3, X(h[0][0]), yb + 5, 'dim ext') + DK.line(X(h[1][0]), Y(y0) + hr + 3, X(h[1][0]), yb + 5, 'dim ext');
+    if (v.ny > 1 && isFinite(v.dy)) { const y1 = h[v.nx] ? h[v.nx][1] : h[0][1]; s += DK.dim(xl, Y(h[0][1]), xl, Y(y1), DK.n(Math.abs(v.dy), 4) + ' ' + u) + DK.line(X(x0) - hr - 3, Y(h[0][1]), xl - 5, Y(h[0][1]), 'dim ext') + DK.line(X(x0) - hr - 3, Y(y1), xl - 5, Y(y1), 'dim ext'); }
+    s += DK.text(392, 120, h.length + ' holes', { cls: 'txt', anchor: 'start' });
+    s += DK.text(392, 138, 'Hole 1 is highlighted.', { cls: 'mut', anchor: 'start' }) + DK.text(392, 153, 'The thin line is the', { cls: 'mut', anchor: 'start' }) + DK.text(392, 168, 'drilling order: back', { cls: 'mut', anchor: 'start' }) + DK.text(392, 183, 'and forth, row by row.', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, s, 'Rectangular hole grid with numbered holes and spacings');
+  },
 });

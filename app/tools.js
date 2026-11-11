@@ -1544,6 +1544,41 @@ const TOOLS = [
   source: "Machinery's Handbook (hole circles)",
 },
 {
+  id: 'holegrid', level: 'simple', group: 'Geometry', title: 'Rectangular hole grid',
+  desc: 'X and Y coordinates of holes in rows and columns (or a single line of holes), listed in the order a machine would drill them.',
+  fields: s => [
+    { id: 'nx', label: 'Holes along X (columns)', unit: '', def: 4 },
+    { id: 'ny', label: 'Rows along Y', unit: '', def: 3 },
+    { id: 'dx', label: 'Spacing in X', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
+    { id: 'dy', label: 'Spacing in Y', unit: lenU(s), def: s === 'inch' ? 0.75 : 20 },
+    { level: 'advanced', id: 'x0', label: 'First hole X', unit: lenU(s), def: 0 },
+    { level: 'advanced', id: 'y0', label: 'First hole Y', unit: lenU(s), def: 0 },
+  ],
+  // The core lays the grid out (back and forth, row by row); the screen only reads the list.
+  holes: (v, W) => {
+    if (!(Number.isInteger(v.nx) && Number.isInteger(v.ny) && v.nx >= 1 && v.ny >= 1 && v.nx * v.ny <= 2000 && isFinite(v.dx) && isFinite(v.dy))) return [];
+    const n = W.pattern_grid(v.x0 || 0, v.y0 || 0, v.nx, v.ny, v.nx > 1 ? v.dx : 0, v.ny > 1 ? v.dy : 0), o = [];
+    for (let i = 0; i < n; i++) o.push([W.list_out(2 * i), W.list_out(2 * i + 1)]);
+    return o;
+  },
+  calc: (v, W, s) => {
+    const h = TOOLS.find(t => t.id === 'holegrid').holes(v, W); if (!h.length) return [];
+    const xs = h.map(p => p[0]), ys = h.map(p => p[1]), dp = s === 'inch' ? 4 : 3;
+    return [R('Number of holes', h.length, '', 0), R('First to last hole in X', Math.max(...xs) - Math.min(...xs), lenU(s), dp), R('First to last hole in Y', Math.max(...ys) - Math.min(...ys), lenU(s), dp)];
+  },
+  table: (v, W, s, dpAdj) => {
+    const dp = Math.max(0, Math.min(8, (s === 'inch' ? 4 : 3) + (dpAdj || 0)));
+    const z = x => (Math.abs(x) < 0.5 * Math.pow(10, -dp) ? 0 : x).toFixed(dp);
+    const rows = TOOLS.find(t => t.id === 'holegrid').holes(v, W).map((p, i) => [String(i + 1), z(p[0]), z(p[1])]);
+    return {
+      title: 'Hole positions (' + lenU(s) + '), in drilling order', head: ['Hole', 'X', 'Y'], rows,
+      copies: [['Copy table', 'Hole\tX\tY\n' + rows.map(r => r.join('\t')).join('\n')], ['Copy as X Y lines', rows.map(r => 'X' + r[1] + ' Y' + r[2]).join('\n')]],
+    };
+  },
+  working: 'Hole (i, j) is at x = x0 + i dx, y = y0 + j dy. Rows are listed back and forth (left to right, then right to left) so the machine never rapids the full width between rows.',
+  source: 'Plane geometry (rectangular array); the order is the usual zigzag drilling path.',
+},
+{
   id: 'triangle', level: 'simple', group: 'Geometry', title: 'Triangle solver',
   desc: 'Right or any triangle from three known sides and angles, including the two-solution case (two sides and an angle that is not between them).',
   render: el => renderTriangle(el),

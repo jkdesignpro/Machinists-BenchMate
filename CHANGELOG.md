@@ -39,6 +39,7 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 - **Gauge-block stack**: wear blocks. Enter the size of your wear blocks and the stack is built with one at each end and the fewest blocks from your set between them. The set you own, your own block list and the wear block size are remembered.
 - **Workspace pages**: show the tools as cards or as a compact list (remembered).
 - **Hardness conversion**: a scale picker (choose which scales to list; remembered) and a chart with every scale laid side by side on a common Vickers axis, built from the confirmed table rows, with the converted value marked.
+- **Rectangular hole grid** (new tab in Hole patterns): rows and columns of holes, or a single line, as a table of X and Y in drilling order (back and forth, row by row) with the same two copy buttons, and a drawing with the holes numbered and the path between them.
 ### Changed (improved tools)
 - **Drill size chart**: the nearest-drill finder now takes a diameter in inch or mm (its own unit choice) and shows, for each of the number, letter, fractional and metric series, the nearest drill at or below and above, with the difference in inch and mm and an "exact" mark.
 - The spot and centre drill tool is now its own screen (it was a plain form) so each table value can show its sources.
