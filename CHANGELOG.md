@@ -3,6 +3,8 @@
 All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
+
+## [0.1.0] - 2026-11-11
 ### Added (tooling reference)
 - **Tooling guide** (parity batch B3): tool geometry terms with our own drawings (rake and clearance, ISO entering angle and ANSI lead angle, helix, nose radius, chip breaker, edge hone), tool materials and grades (link to ISO 513), ten coatings with typical use and maximum temperature as printed by five publishers (Oerlikon Balzers, Hartner, GWS Tool Group, Brycoat, Jozef Stefan Institute; confirmed only where two agree, all values shown), end mills, drills and point geometry, reamers, taps, tap limits, saw blade pitch and broken tap removal. Statements carry source keys; single-source ones are marked "needs 2nd source".
 - **Tap pitch diameter limits** (`taplimits`): inch H and L numbers (0.0005 in steps, 0.0010 in band over 1 in to 1-1/2 in) and metric D numbers (0.0005 in per OSG and 0.013 mm per USCTI, both shown), checked against the internal thread class, with a 40 % rule suggestion and OSG's printed recommendation for the sizes in hand.
