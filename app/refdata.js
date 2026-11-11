@@ -306,12 +306,12 @@ async function renderSpotDepth(el) {
 async function renderThreadData(el) {
   const R = await loadRef(el); if (!R) return;
   const W = state.W, opts = threadOptions(R), T = R.threads;
-  const m = RMEM.thd || (RMEM.thd = { key: 'M10x1.5', d: 10, p: 1.5 });
+  const m = RMEM.thd || (RMEM.thd = { key: 'M10x1.5', d: 10, p: 1.5, int: 0 });
   el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f"><span>Thread</span><div class="row"><select id="hk">' + threadSelect(opts, m.key) + '</select></div></label>' +
     '<label class="f cust"><span>Major diameter</span><div class="row"><input id="hd" type="number" step="any"><span class="u">' + uLen() + '</span></div></label>' +
     '<label class="f cust"><span>Pitch' + (inMode() ? ' (threads per inch)' : '') + '</span><div class="row"><input id="hp" type="number" step="any"><span class="u">' + (inMode() ? 'TPI' : 'mm') + '</span></div></label>' +
     '<label class="f cust"><span>Thread system (for tolerances)</span><div class="row"><select id="hs"><option value="metric">ISO metric</option><option value="unified">Unified inch</option></select></div></label></div>' +
-    '<div id="hres"></div><div class="note"><b>Working:</b> Basic profile (ISO 68-1:2023, ASME B1.1-2024): H = 0.866025 P; pitch diameter d2 = D - 0.649519 P; basic minor diameter D1 = D - 1.082532 P (internal thread); ISO external minor diameter d3 = D - 1.226869 P (rounded root used for tolerancing). ' +
+    '<div class="thhist" id="hhist"></div><div id="hres"></div><div class="thgo" id="hgo"></div><div class="note"><b>Working:</b> Basic profile (ISO 68-1:2023, ASME B1.1-2024): H = 0.866025 P; pitch diameter d2 = D - 0.649519 P; basic minor diameter D1 = D - 1.082532 P (internal thread); ISO external minor diameter d3 = D - 1.226869 P (rounded root used for tolerancing). ' +
     'ISO metric tolerances from the ISO 965-1 formulas: Td2(6) = 90 P^0.4 d^0.1 (d = geometric mean of the diameter step), TD2 = 1.32 Td2(6), Td(6) = 180 P^(2/3) - 3.15 P^(-1/2), TD1(6) = 230 P^0.7 (P >= 1 mm) or 433 P - 190 P^1.22, es(g) = -(15 + 11 P), each rounded to the R40 series. The standard\'s own tables (ISO 965-2/-3) are normative and differ from these formulas by one R40 step for some sizes (found for M3, M10, M20, M36, M39, M42 against published tables); BenchMate shows published limits where two publishers print them and marks computed ones. ISO 965-1 was revised in 2026 (ISO 965-1:2026); the formulas here were checked against tables published under the 2013 and earlier editions. ' +
     'Unified: PD tolerance 2A = 0.0015 D^(1/3) + 0.0015 sqrt(LE) + 0.015 P^(2/3) with LE = D (reproduces all 30 class 2A rows checked in a published table), 1A 1.5x, 3A 0.75x, 1B 1.95x, 2B 1.3x, 3B 0.975x; allowance 1A/2A = 0.3 x Td2(2A), 3A/3B none; major tolerance 2A/3A = 0.060 P^(2/3); rounded to 0.0001 in. Class 2B minor diameter limits are computed (rule in the table note); 1B and 3B minor limits are not. TD2 of internal classes is the factor times the unrounded 2A tolerance, then rounded, which is the order that reproduces the published 2B table.<br><b>Sources:</b> thread series and limits as listed below; formulas: ISO 68-1:2023, ISO 965-1:2013/2026 (formula clause), ASME B1.1-2024 (Table 4 title gives the 2A formula).</div><div class="note" id="hsrc"></div>';
   const k = $('#hk', el), hd = $('#hd', el), hp = $('#hp', el), hs = $('#hs', el);
@@ -321,14 +321,43 @@ async function renderThreadData(el) {
     hd.value = +toUser(m.d).toFixed(inMode() ? 4 : 3); hp.value = inMode() ? +(IN_MM / m.p).toFixed(3) : +m.p.toFixed(4);
     hs.value = m.sys || 'metric';
   }
-  function row(label, mm, extra) { return '<tr><td>' + label + (extra || '') + '</td><td class="v">' + fBoth(mm) + '</td></tr>'; }
+  // A small copy button for one value: copies the number as shown, without its unit.
+  const cpy = (txt, what) => { const t = rEsc(what || 'Copy ' + txt); return '<button type="button" class="cpy" data-copy="' + rEsc(txt) + '" title="' + t + '" aria-label="' + t + '">' + icon('copy') + '</button>'; };
+  // Rows with several values (the class tables) copy the whole row, tab separated, for a spreadsheet.
+  const cpyRow = (name, vals) => cpy(vals.join('\t'), 'Copy the ' + name + ' row (tab separated)');
+  function row(label, mm, extra) { return '<tr><td>' + label + (extra || '') + '</td><td class="v">' + fBoth(mm) + cpy(fLen(mm)) + '</td></tr>'; }
+  // Recent threads (last 10 looked up, newest first), kept in this browser. Sizes in mm.
+  const histKey = t => t.key && t.key !== 'custom' ? t.key : 'custom:' + (+t.d.toFixed(4)) + 'x' + (+t.p.toFixed(5)) + ':' + t.sys;
+  const histLabel = t => { const o = t.key !== 'custom' && opts.find(x => x.key === t.key); return o ? o.label : fLen(t.d) + ' ' + uLen() + ' x ' + (t.sys === 'unified' || inMode() ? fx(IN_MM / t.p, 2) + ' TPI' : fx(t.p, 3) + ' mm') + ' (other)'; };
+  const hist = () => { const h = lsJson('bm.thrhist', []); return Array.isArray(h) ? h.filter(t => t && t.d > 0 && t.p > 0) : []; };
+  function remember(t) {
+    const id = histKey(t);
+    lsPut('bm.thrhist', [{ key: t.key, d: t.d, p: t.p, sys: t.sys }].concat(hist().filter(x => histKey(x) !== id)).slice(0, 10));
+    drawHist();
+  }
+  function drawHist() {
+    const box = $('#hhist', el), h = hist();
+    box.innerHTML = h.length ? '<span class="ms">Recent threads</span><div class="fchips">' + h.map((t, i) => '<button type="button" class="fchip" data-i="' + i + '">' + rEsc(histLabel(t)) + '</button>').join('') +
+      '<button type="button" class="btn sm thclr" title="Clear the recent threads">' + icon('trash') + '<span>Clear</span></button></div>' : '';
+    box.querySelectorAll('.fchip').forEach(b => b.onclick = () => {
+      const t = h[+b.dataset.i]; if (!t) return;
+      const std = t.key && t.key !== 'custom' && opts.find(o => o.key === t.key);
+      m.d = t.d; m.p = t.p; m.sys = t.sys; k.value = std ? std.key : 'custom';
+      setCustom(); upd(); remember(t);
+    });
+    const clr = $('.thclr', box); if (clr) clr.onclick = () => { lsPut('bm.thrhist', []); drawHist(); };
+  }
+  let cur = null;   // the thread on screen: { key, d, p, sys, tpi, label }
   function upd() {
     m.key = k.value;
-    let sel = opts.find(o => o.key === k.value), d, p, sys;
-    if (sel) { d = sel.d; p = sel.p; sys = sel.sys; m.d = d; m.p = p; }
-    else { d = fromUser(parseFloat(hd.value)); const pv = parseFloat(hp.value); p = inMode() ? IN_MM / pv : pv; sys = hs.value; m.sys = sys; if (d > 0 && p > 0) { m.d = d; m.p = p; } }
+    let sel = opts.find(o => o.key === k.value), d, p, sys, tpi;
+    if (sel) { d = sel.d; p = sel.p; sys = sel.sys; tpi = sel.tpi; m.d = d; m.p = p; }
+    else { d = fromUser(parseFloat(hd.value)); const pv = parseFloat(hp.value); p = inMode() ? IN_MM / pv : pv; tpi = inMode() ? pv : undefined; sys = hs.value; m.sys = sys; if (d > 0 && p > 0) { m.d = d; m.p = p; } }
     const out = $('#hres', el);
+    cur = null; drawGo();
     if (!(d > 0 && p > 0 && p < d)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter the thread size.</td></tr></table></div>'; return; }
+    cur = { key: sel ? sel.key : 'custom', d, p, sys, tpi, label: sel ? sel.label : histLabel({ key: 'custom', d, p, sys }).replace(' (other)', '') };
+    drawGo();
     let h = '<div class="res"><div class="h">Basic dimensions' + (sel ? ' of ' + rEsc(sel.label) + ' ' + badge(sel.status) + ' <span class="ms">series printed by ' + sel.pubs.map(x => rEsc(pubName(T.sources, x))).join(', ') + '</span>' : '') + '</div><table>' +
       row('Major diameter D', d) + row('Pitch P' + (sys === 'unified' ? ' (' + fx(IN_MM / p, 2) + ' TPI)' : ''), p) + row('Fundamental triangle height H', W.thread_fundamental_h(p)) +
       row('Basic thread height H1 = 5/8 H', W.thread_basic_height(p)) + row('Pitch diameter d2', W.thread_basic_pitch_dia(d, p)) + row('Basic minor diameter D1 (internal)', W.thread_basic_minor_dia(d, p)) +
@@ -343,10 +372,10 @@ async function renderThreadData(el) {
         const pubs = g => g.publishers.map(x => rEsc(pubName(T.sources, x))).join(', ');
         if (pub && pub.status === 'confirmed') {
           const same = Math.abs(pub.value - mm) < 6e-4;
-          return '<td class="v">' + fBoth(pub.value) + '</td><td>' + badge('confirmed') + ' <span class="ms" title="' + rEsc(groupsTitle(T.sources, pub.groups)) + '">published by ' + pubs(pub.groups[0]) + '</span>' +
+          return '<td class="v">' + fBoth(pub.value) + cpy(fLen(pub.value)) + '</td><td>' + badge('confirmed') + ' <span class="ms" title="' + rEsc(groupsTitle(T.sources, pub.groups)) + '">published by ' + pubs(pub.groups[0]) + '</span>' +
             (same ? ' <span class="ms">= formula</span>' : ' <span class="warn">formula gives ' + fLen(mm) + '</span>') + '</td>';
         }
-        let s = '<td class="v">' + fBoth(mm) + '</td><td><span class="ms">' + (note || 'computed from the formulas') + '</span>';
+        let s = '<td class="v">' + fBoth(mm) + cpy(fLen(mm)) + '</td><td><span class="ms">' + (note || 'computed from the formulas') + '</span>';
         if (pub) s += ' ' + badge(pub.status) + ' <span class="ms">published ' + pub.groups.map(g => g.value.toFixed(3) + ' (' + pubs(g) + ')').join(' / ') + '</span>';
         return s + '</td>';
       };
@@ -360,24 +389,41 @@ async function renderThreadData(el) {
       const extC = [['4h', 4, 4], ['6e', 6, 1], ['6f', 6, 2], ['6h', 6, 4], ['8g', 8, 3]], intC = [['5H', 5, 12], ['6G', 6, 11], ['7H', 7, 12]];
       h += '<div class="res" style="margin-top:12px"><div class="h">Other classes, computed from the ISO 965-1 formulas (' + uLen() + '; not checked against a published table)</div><table>' +
         '<tr><td class="ms">External</td><td class="ms">Major max</td><td class="ms">Major min</td><td class="ms">Pitch max</td><td class="ms">Pitch min</td></tr>' +
-        extC.map(([n, g, pos]) => '<tr><td><b>' + n + '</b></td>' + [0, 1, 2, 3].map(i => mmv(W.iso965_limit(d, p, g, pos, i))).join('') + '</tr>').join('') +
+        extC.map(([n, g, pos]) => { const v = [0, 1, 2, 3].map(i => W.iso965_limit(d, p, g, pos, i)); return '<tr><td><b>' + n + '</b>' + cpyRow(n, v.map(x => isFinite(x) ? fLen(x) : '-')) + '</td>' + v.map(mmv).join('') + '</tr>'; }).join('') +
         '<tr><td class="ms">Internal</td><td class="ms">Pitch min</td><td class="ms">Pitch max</td><td class="ms">Minor min</td><td class="ms">Minor max</td></tr>' +
-        intC.map(([n, g, pos]) => '<tr><td><b>' + n + '</b></td>' + [3, 2, 5, 4].map(i => mmv(W.iso965_limit(d, p, g, pos, i))).join('') + '</tr>').join('') +
+        intC.map(([n, g, pos]) => { const v = [3, 2, 5, 4].map(i => W.iso965_limit(d, p, g, pos, i)); return '<tr><td><b>' + n + '</b>' + cpyRow(n, v.map(x => isFinite(x) ? fLen(x) : '-')) + '</td>' + v.map(mmv).join('') + '</tr>'; }).join('') +
         '</table></div><p class="desc">Major tolerance for 4h uses grade 4 (Td(4)); 6e, 6f, 6h use grade 6; 8g uses grade 8. 5H and 7H minor tolerances use TD1 of grades 5 and 7.</p>';
     } else {
       const din = d / IN_MM, pin = p / IN_MM, cls = [[2, '2A', 'checked'], [3, '3A', ''], [1, '1A', ''], [12, '2B', 'checked'], [13, '3B', ''], [11, '1B', '']];
       h += '<div class="res" style="margin-top:12px"><div class="h">Unified classes (computed from ASME B1.1-2024 formulas, inch, rounded as tabulated)</div><table><tr><td class="ms">Class</td><td class="ms">Major max</td><td class="ms">Major min</td><td class="ms">Pitch max</td><td class="ms">Pitch min</td><td class="ms">Minor max</td><td class="ms">Minor min</td><td class="ms">Allowance</td></tr>' +
         cls.map(([c, n, chk]) => { const L = w => W.un_limit(din, pin, c, w); const ext = c < 10;
-          const f = v => '<td class="mv">' + (isFinite(v) ? (inMode() ? v.toFixed(4) : (v * IN_MM).toFixed(3)) : '-') + '</td>';
-          return '<tr><td><b>' + n + '</b>' + (chk ? ' ' + badge('confirmed') : ' <span class="ms">not checked</span>') + '</td>' + f(ext ? L(0) : NaN) + f(L(1)) + f(L(2)) + f(L(3)) + f(c === 12 ? L(7) : NaN) + f(c === 12 ? L(6) : NaN) + f(ext ? L(5) : 0) + '</tr>'; }).join('') +
+          const t = v => isFinite(v) ? (inMode() ? v.toFixed(4) : (v * IN_MM).toFixed(3)) : '-', f = v => '<td class="mv">' + t(v) + '</td>';
+          const vals = [ext ? L(0) : NaN, L(1), L(2), L(3), c === 12 ? L(7) : NaN, c === 12 ? L(6) : NaN, ext ? L(5) : 0];
+          return '<tr><td><b>' + n + '</b>' + cpyRow(n, vals.map(t)) + (chk ? ' ' + badge('confirmed') : ' <span class="ms">not checked</span>') + '</td>' + vals.map(f).join('') + '</tr>'; }).join('') +
         '</table></div><p class="desc">Values in ' + (inMode() ? 'inch' : 'mm (converted from the inch limits)') + '. "Confirmed": the formulas reproduce a published class 2A table (30 rows) and class 2B table (74 rows: pitch and minor limits; exceptions listed in the tests); 1A, 3A, 1B and 3B use the standard\'s class factors but have not been compared with a published table. ' +
         'Internal minor limits (2B): minimum = basic minor diameter; tolerance 0.25 P - 0.40 P^2 for 1/4 in and larger, 0.05 P^(2/3) + 0.03 P / D - 0.002 (kept between 0.120 P and 0.394 P) below 1/4 in. 1B and 3B minor limits are not computed. Internal major minimum = basic major diameter.</p>';
     }
     out.innerHTML = h;
   }
+  // Open a program generator with this thread: major diameter and pitch in the units on screen.
+  function drawGo() {
+    const box = $('#hgo', el);
+    if (!cur) { box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="f"><span>Use this thread in a program</span><div class="row thgor"><div class="seg" id="hint" role="group" aria-label="Internal or external thread">' +
+      [[0, 'External'], [1, 'Internal']].map(([v, t]) => '<button type="button" data-v="' + v + '"' + (+m.int === v ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '>' + t + '</button>').join('') + '</div>' +
+      '<button type="button" class="btn" id="hgomill">Thread mill this</button><button type="button" class="btn" id="hgolathe">Lathe G76 for this</button></div></div>';
+    box.querySelectorAll('#hint button').forEach(b => b.onclick = () => { m.int = +b.dataset.v; drawGo(); });
+    const vals = () => ({ dia: toUser(cur.d), pitch: toUser(cur.p), tpi: cur.sys === 'unified' && cur.tpi > 0 ? cur.tpi : undefined, internal: +m.int === 1, label: cur.label + (+m.int === 1 ? ' internal' : ' external') });
+    $('#hgomill', box).onclick = () => { remember(cur); handoff('cyctmill', vals()); };
+    $('#hgolathe', box).onclick = () => { remember(cur); handoff('cycthread', vals()); };
+  }
   $('#hsrc', el).innerHTML = '<b>Thread series and published limits</b><br>' + sourceList(T.sources);
-  k.onchange = () => { setCustom(); upd(); }; hd.oninput = upd; hp.oninput = upd; hs.onchange = upd;
-  setCustom(); upd();
+  $('#hres', el).addEventListener('click', e => { const b = e.target.closest('button.cpy'); if (b) copyText(b.dataset.copy); });
+  // A thread counts as looked up when it is picked, or when a typed size is finished (change, not every key).
+  const look = () => { if (cur) remember(cur); };
+  k.onchange = () => { setCustom(); upd(); look(); }; hd.oninput = upd; hp.oninput = upd; hs.onchange = () => { upd(); look(); };
+  hd.onchange = look; hp.onchange = look;
+  setCustom(); upd(); drawHist();
 }
 
 // ------------------------------------------------------------------ ISO limits and fits
