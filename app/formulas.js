@@ -246,6 +246,7 @@ const FORMULAS = [
   F('advmill', 'Stability chart: tool as a bar', 'f1 = (1.8751² / 2π) · √(E I / (ρ A L⁴));  k = 3 E I / L³', 'one vibration mode; holder and spindle left out', ['THOM', 'GERE', 'OWN']),
   F('advdrill', 'Drilling advisor: time to depth and removal rate', 't = (depth + point length) / (fn · n);  Q = π/4 · D² · Vf', 'point length = (D / 2) / tan(point / 2)', ['SAN', 'OWN']),
   F('advream', 'Reaming: hole to drill first', 'drill = reamer diameter − stock on the diameter', 'stock from the reamer maker\'s table, or about 3 % of the hole', ['ADVT']),
+  F('advturn', 'Chip breaker range', 'f_lo ≤ fn ≤ f_hi  and  ap_lo ≤ ap ≤ ap_hi', 'the range the insert maker prints for the chip breaker; suggestions are held inside it', ['OWN']),
   F('advplunge', 'Plunge roughing: speed and feed down', 'Vc = k_v · Vc,side;  fz = k_f · fz,side;  Vf = n · z · fz', 'k_v, k_f: the publisher\'s plunging rule (University of Florida 0.75 and 0.25; CGS Tool 1 and 0.35 to 0.5; MIT 1 and under 0.5)', ['UFSF', 'ADVT']),
   F('advplunge', 'Cusp between two plunges', 'h = R − √(R² − (s / 2)²)', 'R: cutter radius; s: spacing between plunges along the wall', ['OWN']),
   F('advplunge', 'Largest spacing that still meets inside the stepover', 's_max = 2 · √(ae · (D − ae)),  D when ae ≥ D / 2', 'ae: stepover; D: cutter diameter', ['OWN']),

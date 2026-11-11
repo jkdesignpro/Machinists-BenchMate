@@ -472,6 +472,19 @@ aT = await advTxt();
 if (!/Tip deflection \(tool and holder\) 0\.0086 mm/.test(aT) || !/from the push test\) 20\.0 N\/µm/.test(aT)) problems.push(`[${where}] push test: "${aT.slice(0, 600)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
+// Chip breaker range in the turning advisor. Nose radius 0.4 mm suggests 0.167 mm/rev and the table depth is 1.0 mm; a range of
+// 0.25 to 0.5 mm/rev and 1.5 to 4 mm holds the suggestions at 0.250 mm/rev and 1.500 mm (inside). A typed feed of 0.1 is below it.
+where = 'advturn chip breaker';
+await open('advturn');
+await advSet('cbf0', '0.25'); await advSet('cbf1', '0.5'); await advSet('cba0', '1.5'); await advSet('cba1', '4');
+aT = await advTxt();
+if (!/held inside the chip breaker range\) 0\.250 mm\/rev/.test(aT) || !/Depth of cut \(suggested: held inside the chip breaker range\) 1\.500 mm/.test(aT) || !/this cut is inside it/.test(aT) || !/The nose radius rule gives 0\.167 mm\/rev/.test(aT)) problems.push(`[${where}] held: "${aT.slice(0, 700)}"`);
+if (!(await page.$('#res .rwidget rect.cbwin'))) problems.push(`[${where}] no chart`);
+await advSet('f', '0.1');
+aT = await advTxt();
+if (!/Feed per revolution \(yours, locked\) 0\.100 mm\/rev/.test(aT) || !/feed below the range/.test(aT) || !/Outside/i.test(aT) || !/Below the chip breaker range/.test(aT)) problems.push(`[${where}] below: "${aT.slice(0, 700)}"`);
+await page.click('#main .tpa button[title^="Reset"]');
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

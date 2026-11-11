@@ -460,6 +460,30 @@ function advReamRun(v, W, s) {
   return r;
 }
 
+// Words for the chip breaker check (core chip_window flags: 1 feed below, 2 feed above, 4 depth below, 8 depth above).
+function advCbWords(fl) {
+  const out = [];
+  if (fl & 1) out.push('feed below the range'); if (fl & 2) out.push('feed above the range');
+  if (fl & 4) out.push('depth below the range'); if (fl & 8) out.push('depth above the range');
+  return out.length ? out.join(', ') : 'this cut is inside it';
+}
+// Chart of the chip breaker's working range (feed across, depth up) with this cut marked. Layout only: every number is an input or a core result.
+function advCbChart(el, r, s) {
+  const Wd = 520, H = 220, x0 = 62, x1 = 500, y0 = 176, y1 = 22, k = r.k, inch = r.inch, dp = inch ? 4 : 3, cb = r.cb;
+  const xmax = Math.max(cb[1] || 0, cb[0] || 0, r.f) * 1.35, ymax = Math.max(cb[3] || 0, cb[2] || 0, r.ap) * 1.35;
+  const X = f => x0 + (x1 - x0) * Math.min(f, xmax) / xmax, Y = a => y0 - (y0 - y1) * Math.min(a, ymax) / ymax;
+  const bx0 = X(cb[0] || 0), bx1 = cb[1] > 0 ? X(cb[1]) : x1, by0 = Y(cb[2] || 0), by1 = cb[3] > 0 ? Y(cb[3]) : y1, inside = !r.cbFlag;
+  let g = DK.line(x0, y0, x1, y0, 'thin') + DK.line(x0, y0, x0, y1 - 6, 'thin');
+  g += '<rect class="cbwin" x="' + bx0.toFixed(1) + '" y="' + by1.toFixed(1) + '" width="' + (bx1 - bx0).toFixed(1) + '" height="' + (by0 - by1).toFixed(1) + '"/>';
+  g += DK.text((bx0 + bx1) / 2, by1 + 15, 'chips break here', { cls: 'mut', anchor: 'middle' });
+  [[cb[0], 0], [cb[1], 0]].forEach(p => { if (p[0] > 0) g += DK.text(X(p[0]), y0 + 15, fmt(p[0] / k, dp), { cls: 'mut', anchor: 'middle' }); });
+  [cb[2], cb[3]].forEach(a => { if (a > 0) g += DK.text(x0 - 6, Y(a) + 4, fmt(a / k, dp), { cls: 'mut', anchor: 'end' }); });
+  g += DK.text(x1, y0 + 30, 'feed, ' + feedRevU(s), { cls: 'mut', anchor: 'end' }) + DK.text(14, (y0 + y1) / 2, 'depth of cut, ' + lenU(s), { cls: 'mut', rot: -90 });
+  g += DK.circle(X(r.f), Y(r.ap), 5, inside ? 'dimf' : 'hotf') + DK.text(X(r.f) + 9, Y(r.ap) - 7, 'this cut', { cls: inside ? 'dimt' : 'hott', anchor: 'start' });
+  el.innerHTML = '<div class="rtabh"><span>Chip breaker range of the insert</span></div>' + DK.svg(Wd, H, g, 'Chip breaker range: feed against depth of cut, with this cut marked') +
+    '<p class="lobenote">The range is the one the insert maker prints for the chip breaker (on the box or in the catalogue), for the material group it was tested in. ' + (inside ? 'This cut is inside it.' : 'This cut is outside it: ' + advCbWords(r.cbFlag) + '.') + ' Suggested feed and depth are held inside the range; a value you lock or a cut reduced for the machine can fall outside.</p>';
+}
+
 function advTurnRun(v, W, s) {
   const inch = s === 'inch', k = inch ? IN_MM : 1, m = advMat(v.mat);
   if (!m || !(v.d > 0)) return null;
@@ -473,7 +497,10 @@ function advTurnRun(v, W, s) {
   // Mitsubishi Materials: a corner radius of 2 to 3 times the feed, so the feed is a third to a half of the radius.
   const fLo = W.apply_factor(re, 1 / 3), fHi = W.apply_factor(re, 1 / 2);
   if (!(vTab > 0)) return { m, tm, entries, none: true, oo };
-  const vc = W.apply_factor(vTab, cool), fSug = W.apply_factor(W.range_pick(fLo, fHi, tA), cool), apSug = 0.040 * IN_MM;
+  // Working range of the insert's chip breaker, from the insert box or the catalogue: [feed from, feed to, depth from, depth to]. Suggestions are held inside it.
+  const cb = [v.cbf0, v.cbf1, v.cba0, v.cba1].map(x => (x > 0 ? x * k : 0)), hasCb = cb.some(x => x > 0);
+  const vc = W.apply_factor(vTab, cool), fNose = W.apply_factor(W.range_pick(fLo, fHi, tA), cool), apTab = 0.040 * IN_MM;
+  const fSug = fNose > 0 ? W.hold_in_range(fNose, cb[0], cb[1]) : (cb[0] > 0 && cb[1] > 0 ? W.range_pick(cb[0], cb[1], tA) : NaN), apSug = W.hold_in_range(apTab, cb[2], cb[3]);
   const fL = v.f > 0, apL = v.ap > 0, f0 = fL ? v.f * k : fSug, ap0 = apL ? v.ap * k : apSug;
   if (!(f0 > 0)) return { m, tm, entries, none: true, oo, needRe: true };
   const g = kcGroup(m.kc), mach = advMachine(v, false), kap = v.kap > 0 ? v.kap : 95;
@@ -482,6 +509,10 @@ function advTurnRun(v, W, s) {
   const r = { m, tm, entries, e, oo, k, inch, g, mach, vTab, cool, vc, fSug, apSug, fL, apL, f0, ap0, re, kap, dmm, fLo, fHi, hasForce: !!g,
     rpm: T(0), vcA: T(1), f: T(2), ap: T(3), h: T(4), kc: T(5), q: T(6), fc: T(7), pNet: T(8), pSp: T(9), pAv: T(10), tq: T(11), useP: T(12), limit: T(13), reduced: T(14), rpmCap: T(15) > 0, rpmTab: T(16) };
   r.over = r.reduced === 4;
+  r.cb = cb; r.hasCb = hasCb; r.cbFlag = hasCb ? W.chip_window(r.f, r.ap, cb[0], cb[1], cb[2], cb[3]) : NaN;
+  r.fHow = !(fNose > 0) ? 'suggested: inside the chip breaker range' : fSug !== fNose ? 'suggested: nose radius rule, held inside the chip breaker range' : 'suggested: nose radius rule, Mitsubishi Materials';
+  r.fNose = fNose; r.fMoved = fNose > 0 && fSug !== fNose && !fL;
+  r.apHow = apSug !== apTab ? 'suggested: held inside the chip breaker range' : 'suggested: the depth the speed table is based on';
   r.redText = r.reduced === 1 ? 'The depth of cut was reduced from ' + fmt(ap0 / k, inch ? 4 : 3) + ' to ' + fmt(r.ap / k, inch ? 4 : 3) + ' ' + lenU(s) + '.' : r.reduced === 3 ? 'Your depth is locked, so the feed was reduced from ' + fmt(f0 / k, inch ? 4 : 3) + ' to ' + fmt(r.f / k, inch ? 4 : 3) + ' ' + feedRevU(s) + '.' : '';
   r.fixText = r.limit === 3 ? 'Take the depth in more passes. Below its base speed the spindle gives torque, not full power; on a geared head a lower gear gives more torque at this speed.' : 'Nothing more to do: the reduced cut fits. More passes at this depth remove the same metal.';
   r.fixRpm = 'Nothing more to do: a small diameter at the top speed of the lathe simply cuts below the table speed.';
@@ -815,7 +846,7 @@ TOOLS.push(
 },
 {
   id: 'advturn', level: 'advanced', group: 'Speeds and feeds', title: 'Turning advisor',
-  pick: { map: { re: 'cr' }, types: ['Turning insert', 'Boring bar', 'Other'] },
+  pick: { map: { re: 'cr', cbf0: 'fn_min', cbf1: 'fn_max', cba0: 'ap_min', cba1: 'ap_max' }, types: ['Turning insert', 'Boring bar', 'Other'] },
   desc: 'Speed, feed and depth of cut for turning or boring from a published speed table and the nose radius of the insert, checked against the lathe for top speed, power and torque, with the finish the feed will leave. Type your own feed or depth and it is locked.',
   fields: s => [
     { id: 'mat', label: 'Work material', unit: '', def: 3, options: ADV_MAT_OPTIONS, wide: true },
@@ -828,6 +859,10 @@ TOOLS.push(
     { id: 'sp', label: 'Speed in the printed range (hard stock: low)', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Low', 'Middle', 'High'] } },
     { id: 'cool', label: 'Coolant', unit: '', def: 1, options: ADV_COOL, wide: true },
     { level: 'advanced', id: 'kap', label: 'Entering angle (90 = square shoulder)', unit: 'deg', def: 95 },
+    { level: 'advanced', id: 'cbf0', label: 'Chip breaker range: feed from (insert box or catalogue)', unit: feedRevU(s), def: '' },
+    { level: 'advanced', id: 'cbf1', label: 'Chip breaker range: feed to', unit: feedRevU(s), def: '' },
+    { level: 'advanced', id: 'cba0', label: 'Chip breaker range: depth of cut from', unit: lenU(s), def: '' },
+    { level: 'advanced', id: 'cba1', label: 'Chip breaker range: depth of cut to', unit: lenU(s), def: '' },
     { level: 'advanced', id: 'src', label: 'Starting speed from', unit: '', def: 0, options: [[0, 'LittleMachineShop turning table'], [9, 'My own speed']] },
     { level: 'advanced', id: 'vown', label: 'Your own cutting speed (wins over the table)', unit: spdU(s), def: '' },
     { level: 'advanced', id: 'nmax', label: 'Top spindle speed (blank = active machine)', unit: 'RPM', def: '' },
@@ -844,8 +879,8 @@ TOOLS.push(
     const lim = (ADV_LIMITS[r.limit] || '').toLowerCase();
     const rows = [
       R('Spindle speed', r.rpm, 'RPM', 0),
-      R('Feed per revolution (' + (r.fL ? 'yours, locked' : r.reduced === 3 ? 'reduced to fit ' + lim : 'suggested: nose radius rule, Mitsubishi Materials') + ')', r.f / k, feedRevU(s), dpF),
-      R('Depth of cut (' + (r.apL ? 'yours, locked' : r.reduced === 1 ? 'reduced from ' + fmt(r.ap0 / k, dpF) + ' to fit ' + lim : 'suggested: the depth the speed table is based on') + ')', r.ap / k, lu, dpF),
+      R('Feed per revolution (' + (r.fL ? 'yours, locked' : r.reduced === 3 ? 'reduced to fit ' + lim : r.fHow) + ')', r.f / k, feedRevU(s), dpF),
+      R('Depth of cut (' + (r.apL ? 'yours, locked' : r.reduced === 1 ? 'reduced from ' + fmt(r.ap0 / k, dpF) + ' to fit ' + lim : r.apHow) + ')', r.ap / k, lu, dpF),
       R('Cutting speed at the diameter', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0),
       R('Removal rate', inch ? r.q / IN3_CM3 : r.q, inch ? 'in3/min' : 'cm3/min', 2),
     ];
@@ -854,6 +889,13 @@ TOOLS.push(
       if (isFinite(r.pSp)) { rows.push(R('Spindle power needed', r.pSp, 'kW', 2)); if (inch) rows.push(R('Spindle power needed', r.pSp * KW_HP, 'hp', 2)); rows.push(R('Spindle torque needed', inch ? r.tq * NM_LBFIN : r.tq, inch ? 'lbf in' : 'N m', inch ? 1 : 2)); }
       rows.push(R('Specific cutting force kc at this chip (Iscar group ' + r.g[0] + ')', r.kc, 'N/mm2', 0));
     } else rows.push(R('Force and power', 'No specific cutting force is published for this material group', '', 0));
+    if (r.hasCb) {
+      const rng = (a, b, u2) => (a > 0 && b > 0 ? fmt(a / k, dpF) + ' to ' + fmt(b / k, dpF) : a > 0 ? 'from ' + fmt(a / k, dpF) : b > 0 ? 'up to ' + fmt(b / k, dpF) : 'not given') + (a > 0 || b > 0 ? ' ' + u2 : '');
+      rows.push(R('Chip breaker range of the insert', 'Feed ' + rng(r.cb[0], r.cb[1], feedRevU(s)) + ', depth ' + rng(r.cb[2], r.cb[3], lu) + ': ' + advCbWords(r.cbFlag), '', 0));
+      if (r.fMoved) rows.push(cfNote('The nose radius rule gives ' + fmt(r.fNose / k, dpF) + ' ' + feedRevU(s) + ', which is outside the chip breaker range, so the suggested feed was moved to the edge of the range. A different nose radius or chip breaker would suit both.'));
+      if (r.cbFlag & 5) rows.push(cfNote('Below the chip breaker range: the chip is too thin or too narrow for the breaker to work, so expect long chips, and at a very low feed the edge rubs instead of cutting (Seco Tools).' + (r.reduced === 1 || r.reduced === 3 ? ' The cut was reduced to fit ' + lim + ': a breaker made for lighter cuts would suit it better.' : '')));
+      if (r.cbFlag & 10) rows.push(cfNote('Above the chip breaker range: the insert is loaded past what the geometry is made for and may break (Seco Tools). Lower the feed or the depth, or use a breaker made for heavier cuts.'));
+    }
     if (r.re > 0) { const ra = W.ra_theoretical(r.f, r.re); rows.push(R('Finish the feed leaves (theoretical Ra)', inch ? ra / IN_MM * 1e6 : ra * 1000, inch ? 'uin' : 'um', inch ? 0 : 2)); }
     rows.push(R('From the table: cutting speed (' + (v.vown > 0 ? 'your own figure' : r.e.pub + (r.cool < 1 ? ', before the coolant factor' : '')) + ')', inch ? r.vTab / FT_M : r.vTab, spdU(s), 0));
     rows.push(R('From the table: spindle speed', r.rpmTab, 'RPM', 0));
@@ -864,7 +906,13 @@ TOOLS.push(
     rows.push(R('Note', ADV_START_NOTE, '', 0));
     return rows;
   },
-  panel: (v, W, s) => { const r = advTurnRun(v, W, s); return !r || r.none ? '' : '<div class="tiles">' + advHoleTiles(r, s) + '</div>' + advHoleCard(r, s, 'feed or depth'); },
+  panel: (v, W, s) => {
+    const r = advTurnRun(v, W, s);
+    if (!r || r.none) return '';
+    const cbT = r.hasCb ? advTile('Chip breaker', r.cbFlag ? 'Outside' : 'Inside', advCbWords(r.cbFlag), r.cbFlag & 10 ? 'over' : r.cbFlag ? 'caution' : 'good') : '';
+    return '<div class="tiles">' + advHoleTiles(r, s) + cbT + '</div>' + advHoleCard(r, s, 'feed or depth');
+  },
+  widget: (v, W, s) => { const r = advTurnRun(v, W, s); return r && !r.none && r.hasCb ? el => advCbChart(el, r, s) : null; },
   table: (v, W, s) => {
     const r = advTurnRun(v, W, s);
     if (!r) return null;
@@ -880,7 +928,7 @@ TOOLS.push(
     return [['Cut time for a pass', 'passtime', { f: r.f / k, rpm: Math.round(r.rpm) }], ['Finish from nose radius and feed', 'finish', { f: r.f / k, r: v.re }],
       ['Tool life and cost per part', 'toollife', { v: Math.round(r.inch ? r.vcA / FT_M : r.vcA) }]];
   },
-  working: 'Order of work. 1: starting cutting speed from the table for the material and tool material; the slider picks a place inside the printed range. 2: feed per revolution from the nose radius: the publisher recommends a corner radius of 2 to 3 times the feed, so the feed is between a third and a half of the radius. 3: depth of cut: the 0.040 in (1.0 mm) the speed table is based on, unless you type your own. 4: coolant factor. 5: n = 1000 Vc / (pi D) at the diameter being cut, held to the lathe\'s top speed. 6: chip thickness h = fn sin(entering angle); kc = kc1.1 x h^(-mc). 7: cutting force Fc = kc x ap x fn; power Pc = Fc x Vc / 60 000 kW; spindle power = Pc / efficiency; torque = P x 60 000 / (2 pi n), against P(n) = min(P_max, T_max x 2 pi n / 60 000). If the spindle is short the depth is reduced; if you locked the depth, the feed; if you locked both, nothing is changed and the card says the cut is over the limit. Theoretical finish Ra = fn^2 / (32 r) x 1000 um, a lower bound.',
+  working: 'Chip breaker range (optional, Advanced): the feed and depth range the insert maker prints for the chip breaker. The suggested feed and depth are held inside it, and the cut is marked inside or outside on a small chart. Order of work. 1: starting cutting speed from the table for the material and tool material; the slider picks a place inside the printed range. 2: feed per revolution from the nose radius: the publisher recommends a corner radius of 2 to 3 times the feed, so the feed is between a third and a half of the radius. 3: depth of cut: the 0.040 in (1.0 mm) the speed table is based on, unless you type your own. 4: coolant factor. 5: n = 1000 Vc / (pi D) at the diameter being cut, held to the lathe\'s top speed. 6: chip thickness h = fn sin(entering angle); kc = kc1.1 x h^(-mc). 7: cutting force Fc = kc x ap x fn; power Pc = Fc x Vc / 60 000 kW; spindle power = Pc / efficiency; torque = P x 60 000 / (2 pi n), against P(n) = min(P_max, T_max x 2 pi n / 60 000). If the spindle is short the depth is reduced; if you locked the depth, the feed; if you locked both, nothing is changed and the card says the cut is over the limit. Theoretical finish Ra = fn^2 / (32 r) x 1000 um, a lower bound.',
   source: 'Speeds: LittleMachineShop, "Cutting Speeds" (turning table: HSS and carbide, for 0.004 in/rev, 0.040 in depth, 180 min tool life). For comparison: Open Oregon, "Manufacturing Processes 4-5", Table 1. Feed from nose radius: Mitsubishi Materials, technical information for turning, "Corner radius" (a corner radius of 2 to 3 times the feed). Forces: Kienzle with kc from the Iscar material groups; power and torque: Sandvik Coromant turning formulas. See docs/sources.md, "Advisor".',
 },
 );

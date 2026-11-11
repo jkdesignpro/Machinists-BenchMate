@@ -409,6 +409,31 @@ pub fn advise_drill(vc: f64, d: f64, fnr: f64, point_deg: f64, kc11: f64, mc: f6
     [rpm, vca, f, rpm * f, table, limit, e.0, drill_torque_nm(d, f, e.0), drill_thrust_n(e.0, d, f, point_deg), e.1, e.2, e.3]
 }
 
+// ---------------- Chip breaker window ----------------
+/// A value held inside a range whose ends are optional: an end that is not given (<= 0) does not bind.
+pub fn hold_in_range(x: f64, lo: f64, hi: f64) -> f64 {
+    if !x.is_finite() { return f64::NAN; }
+    let mut y = x;
+    if pos(lo) && y < lo { y = lo; }
+    if pos(hi) && y > hi { y = hi; }
+    y
+}
+
+/// Where a turning cut sits against the working range of the insert's chip breaker (the
+/// feed and depth range the maker prints for the geometry). Flags added together:
+/// 1 feed below the range, 2 feed above, 4 depth below, 8 depth above; 0 = inside.
+/// An end that is not given (<= 0) is not checked. NaN when no end at all is given.
+pub fn chip_window(f: f64, ap: f64, f_lo: f64, f_hi: f64, ap_lo: f64, ap_hi: f64) -> f64 {
+    if !(pos(f) && pos(ap)) || !(pos(f_lo) || pos(f_hi) || pos(ap_lo) || pos(ap_hi)) { return f64::NAN; }
+    let eps = 1e-9;
+    let mut flags = 0u8;
+    if pos(f_lo) && f < f_lo * (1.0 - eps) { flags |= 1; }
+    if pos(f_hi) && f > f_hi * (1.0 + eps) { flags |= 2; }
+    if pos(ap_lo) && ap < ap_lo * (1.0 - eps) { flags |= 4; }
+    if pos(ap_hi) && ap > ap_hi * (1.0 + eps) { flags |= 8; }
+    flags as f64
+}
+
 // ---------------- Plunge roughing ----------------
 /// Height of the cusp left on the wall between two neighbouring plunges of a cutter of
 /// diameter `d` spaced `step` apart along the wall. The two circles cross midway, so
@@ -851,6 +876,26 @@ mod tests {
         let t = advise_bore(60.0, 20.0, 6.0, 210.0, 0.0, 0.0, 0.0, 0.0, 200.0, 0.0, 0.0);
         assert!(t[6].is_nan() && t[7].is_nan() && t[2].is_nan() && t[5] == 0.0 && close(t[1] / a[1], 160000.0 / (160000.0 - 1296.0), 1e-9));
         assert!(advise_bore(60.0, 20.0, 20.0, 210.0, 2000.0, 0.1, 1.0, 0.0, 0.0, 0.05, 4.0)[0].is_nan());
+    }
+
+    #[test]
+    fn chip_breaker_window() {
+        // range printed on an insert box: feed 0.10 to 0.30 mm/rev, depth 0.5 to 3.0 mm
+        assert_eq!(chip_window(0.2, 1.0, 0.1, 0.3, 0.5, 3.0), 0.0);
+        assert_eq!(chip_window(0.1, 0.5, 0.1, 0.3, 0.5, 3.0), 0.0); // on the edge counts as inside
+        assert_eq!(chip_window(0.05, 1.0, 0.1, 0.3, 0.5, 3.0), 1.0);
+        assert_eq!(chip_window(0.4, 1.0, 0.1, 0.3, 0.5, 3.0), 2.0);
+        assert_eq!(chip_window(0.2, 0.3, 0.1, 0.3, 0.5, 3.0), 4.0);
+        assert_eq!(chip_window(0.4, 4.0, 0.1, 0.3, 0.5, 3.0), 10.0);
+        assert_eq!(chip_window(0.05, 0.3, 0.1, 0.3, 0.5, 3.0), 5.0);
+        // only the feed range given: the depth is not checked; nothing given: no answer
+        assert_eq!(chip_window(0.2, 9.0, 0.1, 0.3, 0.0, 0.0), 0.0);
+        assert!(chip_window(0.2, 1.0, 0.0, 0.0, 0.0, 0.0).is_nan());
+        assert_eq!(hold_in_range(0.05, 0.1, 0.3), 0.1);
+        assert_eq!(hold_in_range(0.4, 0.1, 0.3), 0.3);
+        assert_eq!(hold_in_range(0.2, 0.1, 0.3), 0.2);
+        assert_eq!(hold_in_range(0.4, 0.1, 0.0), 0.4);
+        assert!(hold_in_range(f64::NAN, 0.1, 0.3).is_nan());
     }
 
     #[test]

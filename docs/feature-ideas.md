@@ -13,7 +13,7 @@ Ideas from looking at other machinist tools (G-Wizard, HSMAdvisor, FSWizard, ope
 
 ## Tier 2: useful
 8. **Setup sheet generator.** Tools, offsets, speeds, notes, printable; export to PDF.
-9. **Turning chip-breaking window.** Feed and depth inside the insert's chip-breaker range from imported catalogue data.
+9. **Turning chip-breaking window.** *(Done in the turning advisor: the range is typed from the insert box or catalogue, or saved with the insert in the tool library. Filling it from an imported catalogue comes with the catalogue import.)* Feed and depth inside the insert's chip-breaker range from imported catalogue data.
 10. **Thread extras.** Rolled-thread blank diameter, tap torque estimate, minor-diameter checks for percent engagement, thread depth/infeed tables for G76-style cycles per control profile.
 11. **Inspection helpers.** Functional tolerance stack (worst case and RSS), Cpk from measured parts, temperature compensation for measurements.
 12. **Coolant with refractometer.** Concentration from Brix reading and the coolant's refractive factor; top-up mix.
@@ -52,7 +52,7 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 17 | Vendor data import and cut log | 5 (0.9.0) | to do |
 | 18 | Wire EDM | 3 (0.5.0) | to do |
 
-Built in 0.3.0 so far (branch `claude/advisor`): the cutting-force tools and the milling, turning, drilling and reaming advisors with locks and limit cards. The boring bar and slitting saw pages now take their material data from the advisor. The stability chart with a draggable speed marker is in the milling advisor. The tapping advisor gives a speed and the feed that goes with it. Plunge roughing is its own page with three publishers' rules side by side. The milling and turning advisors open the tool life page with their speed (Taylor exponents stay the user's own figures: no open table was found). The deflection checks take an optional holder and spindle stiffness (typed, or from a push test). Still to build in stage 1: the chip-breaking window.
+Built in 0.3.0 so far (branch `claude/advisor`): the cutting-force tools and the milling, turning, drilling and reaming advisors with locks and limit cards. The boring bar and slitting saw pages now take their material data from the advisor. The stability chart with a draggable speed marker is in the milling advisor. The tapping advisor gives a speed and the feed that goes with it. Plunge roughing is its own page with three publishers' rules side by side. The milling and turning advisors open the tool life page with their speed (Taylor exponents stay the user's own figures: no open table was found). The deflection checks take an optional holder and spindle stiffness (typed, or from a push test). The turning advisor holds its suggestions inside the insert's chip breaker range when you give it one.
 
 Missing Ultra rows (docs/parity-audit.md) keep the stage the spec gives them: cutting-data advisors for turning, milling and drilling, reaming and tapping speeds in stage 1; gun drill, RPM cylindricity, SAE J499a and milling surface finish with RMS in stage 3; the vibration check in stage 5.
 
@@ -73,7 +73,7 @@ State of the tier list above, with the stage for what is still to build.
 | 6 Shop knowledge base | to do | Log what worked for a tool, material and machine, searchable; with the cut log (idea 17) | 5 (0.9.0) |
 | 7 Material equivalents | built | | |
 | 8 Setup sheet generator | built | | |
-| 9 Turning chip-breaking window | to do | Feed and depth inside the insert's chip-breaker range, from imported catalogue data | 1 (0.3.0) |
+| 9 Turning chip-breaking window | built | Filling the range from an imported catalogue (with the catalogue import) | 5 (0.9.0) |
 | 10 Thread extras | part | Rolled-thread blank diameter, tap torque (idea 12), percent engagement check on the minor diameter, infeed tables for G76-style cycles | 1 (0.3.0) and 3 (0.5.0) |
 | 11 Inspection helpers | built | | |
 | 12 Coolant with refractometer | built | | |
