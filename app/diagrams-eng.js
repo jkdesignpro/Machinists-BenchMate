@@ -786,3 +786,405 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Coolant sump: adjust or top up');
   },
 });
+
+// ---------- mechanics ----------
+// Outline of a mechanics section (units, origin lower left, y up) from the shared section fields: { polys, holes, circ }.
+function deSecShape(v) {
+  const a = typeof mkSecArgs === 'function' ? mkSecArgs(v) : null;
+  if (!a || !a.slice(1).some(x => x > 0)) return null;
+  const [sh, p1, p2, p3, p4] = a;
+  const ok = (...x) => x.every(q => q > 0);
+  switch (sh) {
+    case 0: return ok(p1, p2) ? { w: p1, h: p2, poly: [[0, 0], [p1, 0], [p1, p2], [0, p2]] } : null;
+    case 1: return ok(p1, p2, p3) && 2 * p3 < Math.min(p1, p2) ? { w: p1, h: p2, poly: [[0, 0], [p1, 0], [p1, p2], [0, p2]], hole: [[p3, p3], [p1 - p3, p3], [p1 - p3, p2 - p3], [p3, p2 - p3]] } : null;
+    case 2: return ok(p1) ? { w: p1, h: p1, circ: [p1 / 2, 0] } : null;
+    case 3: return ok(p1) && p2 < p1 ? { w: p1, h: p1, circ: [p1 / 2, p2 > 0 ? p2 / 2 : 0] } : null;
+    case 4: { const b = p1, h = p2, tf = p3, tw = p4; if (!ok(b, h, tf, tw) || 2 * tf >= h || tw >= b) return null;
+      const l = (b - tw) / 2, r = (b + tw) / 2; return { w: b, h, poly: [[0, 0], [b, 0], [b, tf], [r, tf], [r, h - tf], [b, h - tf], [b, h], [0, h], [0, h - tf], [l, h - tf], [l, tf], [0, tf]] }; }
+    case 5: { const b = p1, h = p2, tf = p3, tw = p4; if (!ok(b, h, tf, tw) || 2 * tf >= h || tw >= b) return null;
+      return { w: b, h, poly: [[0, 0], [b, 0], [b, tf], [tw, tf], [tw, h - tf], [b, h - tf], [b, h], [0, h]] }; }
+    case 6: { const h = p1, b = p2, t = p3; if (!ok(b, h, t) || t >= Math.min(b, h)) return null;
+      return { w: b, h, poly: [[0, 0], [b, 0], [b, t], [t, t], [t, h], [0, h]] }; }
+    case 7: { const b = p1, h = p2, tf = p3, tw = p4; if (!ok(b, h, tf, tw) || tf >= h || tw >= b) return null;
+      const l = (b - tw) / 2, r = (b + tw) / 2; return { w: b, h, poly: [[0, h], [b, h], [b, h - tf], [r, h - tf], [r, 0], [l, 0], [l, h - tf], [0, h - tf]] }; }
+  }
+  return null;
+}
+// Section drawn at (ox, oy) = screen position of the origin, k px per unit, as a hatched cut face.
+function deSecSvg(S, ox, oy, k, cls) {
+  const X = p => [ox + p[0] * k, oy - p[1] * k];
+  if (S.circ) {
+    const c = X([S.w / 2, S.h / 2]), R = S.circ[0] * k, r = S.circ[1] * k;
+    if (!(r > 0)) return DK.circle(c[0], c[1], R, cls || 'hatch');
+    return '<path class="' + (cls || 'hatch') + '" fill-rule="evenodd" d="' + [R, r].map(q => 'M' + deF(c[0] + q) + ' ' + deF(c[1]) + 'A' + deF(q) + ' ' + deF(q) + ' 0 1 0 ' + deF(c[0] - q) + ' ' + deF(c[1]) + 'A' + deF(q) + ' ' + deF(q) + ' 0 1 0 ' + deF(c[0] + q) + ' ' + deF(c[1]) + 'Z').join('') + '"/>';
+  }
+  const d = pts => 'M' + pts.map(p => X(p).map(deF).join(' ')).join('L') + 'Z';
+  return '<path class="' + (cls || 'hatch') + '" fill-rule="evenodd" d="' + d(S.poly) + (S.hole ? d(S.hole) : '') + '"/>';
+}
+// Centroid symbol: a circle with two filled quarters.
+const deCentroid = (x, y, r) => DK.circle(x, y, r, 'ln') + '<path class="txt" d="M' + deF(x) + ' ' + deF(y) + 'L' + deF(x + r) + ' ' + deF(y) + 'A' + r + ' ' + r + ' 0 0 0 ' + deF(x) + ' ' + deF(y - r) + 'ZM' + deF(x) + ' ' + deF(y) + 'L' + deF(x - r) + ' ' + deF(y) + 'A' + r + ' ' + r + ' 0 0 0 ' + deF(x) + ' ' + deF(y + r) + 'Z"/>';
+
+Object.assign(DIAGRAMS, {
+  // Section: the cut face hatched, centroidal axes through the centroid, principal axis when tilted, sizes and I.
+  section(v, sys, rows) {
+    const W = 520, H = 290, u = mku(sys), S = deSecShape(v);
+    if (!S) return '';
+    const xc = deV(rows, 'Centroid x'), yc = deV(rows, 'Centroid y');
+    if (!deFin(xc) || !deFin(yc)) return '';
+    const k = Math.min(220 / S.w, 210 / S.h), ox = 80 + (220 - S.w * k) / 2, oy = 245 - (210 - S.h * k) / 2;
+    const X = p => [ox + p[0] * k, oy - p[1] * k], c = X([xc, yc]), x0 = ox, x1 = ox + S.w * k, yt = oy - S.h * k;
+    let h = deSecSvg(S, ox, oy, k);
+    h += DK.cl(x0 - 18, c[1], x1 + 22, c[1]) + DK.cl(c[0], yt - 18, c[0], oy + 18);
+    h += DK.text(x1 + 26, c[1] + 4, 'x', { cls: 'txt', anchor: 'start' }) + DK.text(c[0] + 5, yt - 20, 'y', { cls: 'txt', anchor: 'start' });
+    const ang = deV(rows, 'Angle of the I1 axis');
+    if (deFin(ang)) {
+      const t = ang * Math.PI / 180, L = Math.max(S.w, S.h) * k * 0.62;
+      h += DK.line(c[0] - L * Math.cos(t), c[1] + L * Math.sin(t), c[0] + L * Math.cos(t), c[1] - L * Math.sin(t), 'hot') + DK.text(c[0] + (L + 10) * Math.cos(t), c[1] - (L + 10) * Math.sin(t) + 4, '1', { cls: 'hott' });
+      h += DK.angle(c[0], c[1], 34, 0, ang, DK.n(ang, 1) + '°', { hot: true });
+    }
+    h += deCentroid(c[0], c[1], 6);
+    // Overall sizes and the centroid position from the lower left.
+    h += DK.dimH(x0, x1, oy + 26, (S.circ ? 'Ø ' : 'b ') + DK.n(S.w, u.dp), { from: oy, below: true });
+    if (!S.circ) h += deDimV(yt, oy, x0 - 26, 'h ' + DK.n(S.h, u.dp), { from: x0 });
+    if (!S.circ) h += deDimV(c[1], oy, x1 + 44, 'ȳ ' + DK.n(yc, u.dp), { hot: true, from: x1 });
+    if (!S.circ && Math.abs(xc - S.w / 2) > 1e-6 * S.w) h += DK.dimH(x0, c[0], yt - 12, 'x̄ ' + DK.n(xc, u.dp), { hot: true, from: yt });
+    const L = [['A', 'Area A', u.A], ['Ix', 'Ix (about', u.I], ['Iy', 'Iy (about', u.I], ['Sx', 'Sx, top', u.Z], ['r min', 'Least radius', u.L]];
+    let y = 40;
+    L.forEach(q => { const val = deV(rows, q[1]); if (!deFin(val)) return; h += DK.text(392, y, q[0], { cls: 'mut', anchor: 'start' }) + DK.text(422, y, DK.n(val, val >= 1000 ? 0 : 4) + ' ' + q[2], { cls: q[0] === 'Ix' ? 'hott' : 'dimt', anchor: 'start' }); y += 18; });
+    h += deLines(392, y + 10, ['x, y: centroidal axes', deFin(ang) ? '1: principal axis (I1)' : '', 'cut face hatched']);
+    return DK.svg(W, H, h, 'Section with centroid and axes');
+  },
+
+  // Beam: supports, loads, the deflected shape (exaggerated) and the bending moment diagram, with the results.
+  beam(v, sys, rows) {
+    const W = 520, H = 310, u = mku(sys), L = v.L, sup = v.sup;
+    const P = deFin(v.P) ? v.P : 0, wl = deFin(v.w) ? v.w : 0;
+    if (!(L > 0) || !(P || wl) || !state || !state.W) return '';
+    const a = P ? (v.a >= 0 && v.a <= L ? v.a : (sup === 0 ? L : L / 2)) : 0, Wm = state.W;
+    const x0 = 60, x1 = 420, by = 104, X = x => x0 + (x1 - x0) * x / L, N = 80;
+    const ys = [], ms = [];
+    for (let i = 0; i <= N; i++) { const x = L * i / N; ys.push(Wm.mech_beam_at(sup, L, a, P, wl, 1, x, 0)); ms.push(Wm.mech_beam_at(sup, L, a, P, wl, 1, x, 2)); }
+    if (!ys.every(deFin) || !ms.every(deFin)) return '';
+    const ymax = Math.max(...ys.map(Math.abs)) || 1, mmax = Math.max(...ms.map(Math.abs)) || 1;
+    let h = '';
+    // Beam (as a bar of some depth) and the deflected shape.
+    h += DK.rect(x0, by - 5, x1 - x0, 10, 'part');
+    const def = ys.map((y, i) => [X(L * i / N), by + 30 * y / ymax]);
+    h += dePoly(def, 'hot', false);
+    // Supports.
+    if (sup === 0) h += deWall(x0, by - 26, by + 26, true);
+    else if (sup === 1) h += dePinSup(x0, by + 5) + deRollSup(x1, by + 5);
+    else h += deWall(x0, by - 26, by + 26, true) + deWall(x1, by - 26, by + 26, false);
+    // Loads.
+    let lab = '';
+    if (P) { const xp = X(a), up = P < 0; h += up ? deArrow(xp, by + 52, xp, by + 7, 'ln') : deArrow(xp, by - 52, xp, by - 7, 'ln'); lab += DK.text(xp + 6, up ? by + 50 : by - 42, 'P ' + DK.n(v.P, 2) + ' ' + u.F, { cls: 'txt', anchor: xp > 330 ? 'end' : 'start' }); }
+    if (wl) { const yt = by - 26; h += DK.line(x0, yt, x1, yt, 'ln'); for (let i = 0; i <= 12; i++) { const xx = x0 + (x1 - x0) * i / 12; h += deArrow(xx, yt, xx, by - 6, 'thin'); } lab += DK.text(x0 + 4, yt - 6, 'w ' + DK.n(v.w, 3) + ' ' + u.w, { cls: 'txt', anchor: 'start' }); }
+    // Largest deflection.
+    const dmax = deV(rows, 'Largest deflection'), xd = deV(rows, /^at x from the left end$/);
+    let im = 0; ys.forEach((y, i) => { if (Math.abs(y) > Math.abs(ys[im])) im = i; });
+    const dp = def[im];
+    const dx = deClamp(dp[0], 150, 330);
+    lab += DK.circle(dp[0], dp[1], 3, 'hotf') + DK.text(dx, dp[1] + (ys[im] > 0 ? 20 : -10), deFin(dmax) ? 'δ max ' + DK.n(dmax, sys === 'inch' ? 5 : 4) + ' ' + u.L : 'δ (enter E and section)', { cls: 'hott' });
+    void xd;
+    // Reactions.
+    const RL = deV(rows, 'Left reaction'), RR = deV(rows, 'Right reaction');
+    if (deFin(RL)) lab += DK.text(x0 - 6, by + 44, 'R ' + DK.n(RL, 1), { cls: 'dimt', anchor: 'middle' });
+    if (deFin(RR) && sup !== 0) lab += DK.text(x1 + 6, by + 44, 'R ' + DK.n(RR, 1), { cls: 'dimt', anchor: 'middle' });
+    lab += DK.dimH(x0, x1, by + 64, 'L ' + DK.n(L, u.dp) + ' ' + u.L, { below: true });
+    if (P && Math.abs(X(a) - x0) > 36 && Math.abs(X(a) - x1) > 1) lab += DK.dimH(x0, X(a), by - 66, 'a ' + DK.n(a, u.dp), { from: by - 54 });
+    // Bending moment diagram.
+    const my = 262, mh = 34, mp = ms.map((m, i) => [X(L * i / N), my - mh * m / mmax]);
+    h += dePoly([[x0, my]].concat(mp, [[x1, my]]), 'tool') + DK.line(x0 - 6, my, x1 + 6, my, 'thin');
+    const Mx = deV(rows, 'Largest bending moment'), xmRow = rows.filter(r => /^at x from the left end$/.test(r.label))[0];
+    let jm = 0; ms.forEach((m, i) => { if (Math.abs(m) > Math.abs(ms[jm])) jm = i; });
+    lab += DK.text(mp[jm][0] + (mp[jm][0] > 330 ? -6 : 6), mp[jm][1] + (ms[jm] > 0 ? -6 : 14), 'M max ' + (deFin(Mx) ? DK.n(Mx, 2) + ' ' + u.M : ''), { cls: 'hott', anchor: mp[jm][0] > 330 ? 'end' : 'start' });
+    void xmRow;
+    lab += DK.text(x0 - 10, my + 4, 'M', { cls: 'mut', anchor: 'end' }) + DK.text(x1 + 12, by + 4, '', {});
+    const st = deV(rows, 'Largest bending stress');
+    lab += deLines(434, 30, ['shape', 'exaggerated', deFin(st) ? '' : '', ''], {});
+    if (deFin(st)) lab += DK.text(W - 6, 300, 'bending stress ' + DK.n(st, u.sdp) + ' ' + u.S, { cls: 'hott', anchor: 'end' });
+    lab += DK.text(x0 - 10, 300, 'Moment diagram (sagging up)', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, h + lab, 'Beam with loads, deflected shape and moment diagram');
+  },
+
+  // Torsion: the shaft with the torque at both ends, the twist of a surface line and the shear stress across the section.
+  torsion(v, sys, rows) {
+    const W = 520, H = 270, u = mku(sys), inch = sys === 'inch';
+    if (!(v.D > 0)) return '';
+    const di = v.d > 0 && v.d < v.D ? v.d : 0, T = deV(rows, /^Torque/), tau = deV(rows, 'Largest shear stress'), phi = deV(rows, /^Angle of twist$/);
+    const Dp = 96, cy = 120, x0 = 70, x1 = deClamp(v.L > 0 ? x0 + Dp * v.L / v.D : 300, 190, 320), R = Dp / 2;
+    let h = DK.rect(x0, cy - R, x1 - x0, Dp, 'part');
+    if (di > 0) { const r = R * di / v.D; h += DK.line(x0, cy - r, x1, cy - r, 'hid') + DK.line(x0, cy + r, x1, cy + r, 'hid'); }
+    h += DK.cl(x0 - 18, cy, x1 + 18, cy);
+    // A surface line before (dashed) and after twisting (orange), twist drawn exaggerated.
+    const show = deFin(phi) ? deClamp(phi * 8, 18, 70) : 40, b0 = 50; // phi in degrees (first 'Angle of twist' row)
+    const yAt = deg => cy - R * Math.cos(deg * Math.PI / 180);
+    h += DK.line(x0, yAt(b0), x1, yAt(b0), 'ghost') + DK.line(x0, yAt(b0), x1, yAt(b0 - show), 'hot');
+    // Torque arrows round the ends (half ellipses).
+    const tq = (x, sg) => '<path class="ln" d="M' + deF(x) + ' ' + deF(cy - R - 14) + 'A12 ' + deF(R + 14) + ' 0 0 ' + (sg > 0 ? 1 : 0) + ' ' + deF(x) + ' ' + deF(cy + R + 14) + '"/>' + deHead(x - sg * 1, cy + R + 14, sg > 0 ? Math.PI : 0, 'txt');
+    h += tq(x0 - 2, -1) + tq(x1 + 2, 1);
+    let lab = DK.text(x1 + 14, cy - R - 22, 'T', { cls: 'txt', anchor: 'end' }) + DK.text(x0 - 14, cy - R - 22, 'T ' + (deFin(T) ? DK.n(T, 2) + ' ' + (inch ? 'lbf·in' : 'N·m') : '?'), { cls: 'txt', anchor: 'start' });
+    lab += deDimV(cy - R, cy + R, x0 - 40, 'Ø ' + DK.n(v.D, u.dp), { from: x0 - 26 });
+    if (v.L > 0) lab += DK.dimH(x0, x1, cy + R + 36, 'L ' + DK.n(v.L, u.dp) + ' ' + u.L, { from: cy + R + 16, below: true });
+    if (di > 0) lab += DK.text((x0 + x1) / 2, cy + R * di / v.D - 5, 'bore Ø ' + DK.n(di, u.dp), { cls: 'mut' });
+    // End view with the twist angle and the shear stress growing to the rim.
+    const ex = 432, ey = cy - 6, er = 58;
+    h += di > 0 ? '<path class="part" fill-rule="evenodd" d="M' + (ex + er) + ' ' + ey + 'A' + er + ' ' + er + ' 0 1 0 ' + (ex - er) + ' ' + ey + 'A' + er + ' ' + er + ' 0 1 0 ' + (ex + er) + ' ' + ey + 'ZM' + deF(ex + er * di / v.D) + ' ' + ey + 'A' + deF(er * di / v.D) + ' ' + deF(er * di / v.D) + ' 0 1 0 ' + deF(ex - er * di / v.D) + ' ' + ey + 'A' + deF(er * di / v.D) + ' ' + deF(er * di / v.D) + ' 0 1 0 ' + deF(ex + er * di / v.D) + ' ' + ey + 'Z"/>' : DK.circle(ex, ey, er, 'part');
+    h += deCross(ex, ey, er + 10);
+    // Shear stress: linear from the centre (or bore) to the rim, drawn along the horizontal radius.
+    const ri = er * di / v.D;
+    h += dePoly([[ex + ri, ey], [ex + er, ey], [ex + er, ey + 36], [ex + ri, ey + 36 * (ri / er)]], 'tool');
+    lab += DK.text(ex + er + 4, ey + 50, 'τ ' + (deFin(tau) ? DK.n(tau, u.sdp) + ' ' + u.S : 'max'), { cls: 'hott', anchor: 'end' });
+    const t0 = 120, t1 = t0 - show; // the surface line seen end-on, before and after the twist
+    h += DK.line(ex, ey, ex + er * Math.cos(t0 * Math.PI / 180), ey - er * Math.sin(t0 * Math.PI / 180), 'ghost');
+    h += DK.line(ex, ey, ex + er * Math.cos(t1 * Math.PI / 180), ey - er * Math.sin(t1 * Math.PI / 180), 'hot');
+    lab += DK.angle(ex, ey, er * 0.7, t1, t0, 'φ', { hot: true });
+    lab += DK.text(ex, ey + er + 34, 'twist φ ' + (deFin(phi) ? DK.n(phi, 3) + '°' : '(enter G and L)'), { cls: 'hott' });
+    lab += DK.text(ex, ey + er + 50, 'end view, twist exaggerated', { cls: 'mut' });
+    const pw = deRow(rows, /^Power at/);
+    if (pw) lab += DK.text(x0, H - 10, pw.label + ': ' + DK.n(pw.value, pw.dp) + ' ' + pw.unit, { cls: 'txt', anchor: 'start' });
+    return DK.svg(W, H, h + lab, 'Shaft in torsion with twist and shear stress');
+  },
+
+  // Column: the column with its end conditions, the buckled shape and the load, and the critical stress curve with this column on it.
+  column(v, sys, rows) {
+    const W = 520, H = 310, u = mku(sys), K = v.end > 0 ? v.end : v.K;
+    if (!(K > 0 && v.L > 0)) return '';
+    const lam = deV(rows, 'Slenderness K L / r'), Pcr = deV(rows, 'Critical load'), scr = deV(rows, 'Critical stress'), lt = deV(rows, 'Transition slenderness');
+    const cx = 92, yt = 46, yb = 262, Lp = yb - yt;
+    // End conditions from K: fixed bottom unless pinned-pinned; top fixed (0.5), pinned (0.7, 1) or free (2).
+    const kind = K === 0.5 ? 'ff' : K === 0.7 ? 'fp' : K === 2 ? 'fr' : 'pp';
+    const shape = t => { // lateral deflection 0..1 at height fraction t from the bottom
+      if (kind === 'ff') return (1 - Math.cos(2 * Math.PI * t)) / 2;
+      if (kind === 'fr') return 1 - Math.cos(Math.PI * t / 2);
+      if (kind === 'fp') { const b = 4.4934; const f = x => (Math.sin(b * x) - b * x * Math.cos(b) / 1) ; void f; return Math.max(0, (1 - Math.cos(b * (1 - t)) + Math.sin(b * (1 - t)) / b * 0 - (1 - t) * (1 - Math.cos(b)))) / 1.6; }
+      return Math.sin(Math.PI * t);
+    };
+    let h = DK.rect(cx - 7, yt, 14, Lp, 'part'), pts = [];
+    for (let i = 0; i <= 40; i++) { const t = i / 40; pts.push([cx + 34 * shape(t), yb - Lp * t]); }
+    h += dePoly(pts, 'hot', false) + DK.cl(cx, yt - 28, cx, yb + 10);
+    // Supports.
+    if (kind === 'pp') h += dePinSup(cx, yb) + dePoly([[cx, yt], [cx - 9, yt - 14], [cx + 9, yt - 14]], 'part') + deGround(cx - 14, cx + 14, yt - 14, false);
+    else h += deGround(cx - 26, cx + 26, yb, true) + DK.rect(cx - 9, yb - 4, 18, 4, 'part');
+    if (kind === 'ff') h += deGround(cx - 26, cx + 26, yt, false);
+    if (kind === 'fp') h += dePoly([[cx, yt], [cx - 9, yt - 14], [cx + 9, yt - 14]], 'part') + deGround(cx - 14, cx + 14, yt - 14, false);
+    h += deArrow(cx + 2, yt - 44, cx + 2, yt - (kind === 'fr' ? 2 : 16), 'hot');
+    let lab = DK.text(cx + 14, yt - 30, 'P cr ' + (deFin(Pcr) ? DK.n(Pcr, 0) + ' ' + u.F : '?'), { cls: 'hott', anchor: 'start' });
+    lab += deDimV(yt, yb, cx - 46, 'L ' + DK.n(v.L, u.dp), { from: cx - 12 });
+    lab += DK.text(cx + 48, (yt + yb) / 2, 'K ' + DK.n(K, 2), { cls: 'txt', anchor: 'start' }) + DK.text(cx + 48, (yt + yb) / 2 + 15, 'KL ' + DK.n(K * v.L, u.dp), { cls: 'mut', anchor: 'start' });
+    // Critical stress against slenderness.
+    const Wm = state && state.W, E = v.E * u.eK, Sy = v.Sy * u.sK;
+    if (Wm && E > 0 && Sy > 0 && deFin(lam)) {
+      const gx0 = 260, gx1 = 500, gy0 = 236, gy1 = 50, lT = Math.sqrt(2 * Math.PI * Math.PI * E / Sy), lmax = Math.max(2.4 * lT, 1.25 * lam);
+      const Xg = l => gx0 + (gx1 - gx0) * l / lmax, Yg = sg => gy0 - (gy0 - gy1) * Math.min(sg, Sy * 1.08) / (Sy * 1.08);
+      const cur = (f, a, b) => { const p = []; for (let i = 0; i <= 50; i++) { const l = a + (b - a) * i / 50; p.push([Xg(l), Yg(f(l))]); } return p; };
+      lab += DK.line(gx0, gy1 - 8, gx0, gy0, 'thin') + DK.line(gx0, gy0, gx1 + 4, gy0, 'thin');
+      lab += dePoly(cur(l => Wm.mech_euler_stress(E, l), lT * 0.62, lT), 'ghost', false);
+      lab += dePoly(cur(l => Wm.mech_johnson_stress(E, Sy, l), 0, lT).concat(cur(l => Wm.mech_euler_stress(E, l), lT, lmax)), 'ln', false);
+      lab += DK.line(Xg(lT), gy0, Xg(lT), Yg(Sy / 2), 'hid') + DK.text(Xg(lT), gy0 + 14, 'λ₁ ' + DK.n(deFin(lt) ? lt : lT, 0), { cls: 'mut' });
+      lab += DK.text(gx0 - 4, Yg(Sy) + 4, 'Sy', { cls: 'mut', anchor: 'end' }) + DK.line(gx0 - 2, Yg(Sy), gx0 + 4, Yg(Sy), 'thin');
+      lab += DK.text(Xg(lT * 0.35), Yg(Sy) - 8, 'Johnson', { cls: 'mut' }) + DK.text(Xg(Math.min(lT * 1.6, lmax * 0.85)), Yg(Wm.mech_euler_stress(E, Math.min(lT * 1.6, lmax * 0.85))) - 10, 'Euler', { cls: 'mut', anchor: 'start' });
+      const sc = deFin(scr) ? scr * u.sK : (lam < lT ? Wm.mech_johnson_stress(E, Sy, lam) : Wm.mech_euler_stress(E, lam));
+      const px = Xg(Math.min(lam, lmax)), py = Yg(sc);
+      lab += DK.line(px, gy0, px, py, 'hot ext') + DK.circle(px, py, 4.5, 'hotf');
+      lab += DK.text(px + (px > 420 ? -8 : 8), py - 8, 'σ cr ' + (deFin(scr) ? DK.n(scr, u.sdp) + ' ' + u.S : ''), { cls: 'hott', anchor: px > 420 ? 'end' : 'start' });
+      lab += DK.text(px, gy0 + 28, 'KL/r ' + DK.n(lam, 1), { cls: 'hott' }) + DK.text(gx1, gy0 + 28, '', {});
+      lab += DK.text(gx0, gy1 - 16, 'critical stress', { cls: 'mut', anchor: 'start' }) + DK.text(gx1, gy0 + 44, 'slenderness KL / r', { cls: 'mut', anchor: 'end' });
+    } else lab += deLines(260, 120, [deFin(lam) ? 'Slenderness KL/r ' + DK.n(lam, 1) : '', 'Enter E and Sy for the', 'critical stress curve.']);
+    return DK.svg(W, H, h + lab, 'Column buckling: end conditions, shape and critical stress');
+  },
+
+  // Stress concentration: the plate with the hole under tension and the stress across the net section rising to the peak.
+  stressconc(v, sys, rows) {
+    const W = 520, H = 270, u = mku(sys);
+    if (v.case === 1) {
+      if (!(v.W > 0 && v.d > 0 && v.d < v.W)) return '';
+      const kt = deV(rows, 'Kt (on the net'), pk = deV(rows, 'Peak stress at the hole'), sn = deV(rows, 'Net-section stress');
+      const Wp = 170, k = Wp / v.W, cx = 170, cy = 135, r = v.d / 2 * k, x0 = 50, x1 = 290, yt = cy - Wp / 2, yb = cy + Wp / 2;
+      let h = DK.rect(x0, yt, x1 - x0, Wp, 'part') + DK.circle(cx, cy, r, 'ln');
+      h += '<circle class="dk-bg" cx="' + cx + '" cy="' + cy + '" r="' + deF(r) + '" style="fill:var(--panel)"/>' + DK.circle(cx, cy, r, 'ln');
+      h += deCross(cx, cy, r + 10);
+      for (let i = 0; i < 5; i++) { const y = yt + Wp * (i + 0.5) / 5; h += deArrow(x0 - 4, y, x0 - 30, y, 'ln') + deArrow(x1 + 4, y, x1 + 30, y, 'ln'); }
+      // Stress across the section through the hole (upper ligament), shape of the Kirsch solution scaled to the peak.
+      const base = 34, amp = 95, pts = [];
+      for (let i = 0; i <= 30; i++) { const y = r + (Wp / 2 - r) * i / 30, q = r / y, f = 1 + 0.5 * q * q + 1.5 * q ** 4; pts.push([cx + base + (amp - base) * (f - 1) / 2, cy - y]); }
+      h += dePoly([[cx, cy - r]].concat(pts, [[cx, yt]]), 'tool') + DK.line(cx, yt, cx, cy - r, 'hot');
+      let lab = DK.text(cx + amp + 4, cy - r + 4, 'peak ' + (deFin(pk) ? DK.n(pk, u.sdp) + ' ' + u.S : 'Kt × net'), { cls: 'hott', anchor: 'start' });
+      if (deFin(sn)) lab += DK.text(cx + base + 6, yt + 14, 'net ' + DK.n(sn, u.sdp), { cls: 'mut', anchor: 'start' });
+      lab += deDimV(yt, yb, x0 - 44, 'W ' + DK.n(v.W, u.dp), { from: x0 });
+      lab += DK.leader(cx + r * 0.7, cy + r * 0.7, cx + 60, yb + 22, 'Ø d ' + DK.n(v.d, u.dp), { anchor: 'start' });
+      if (v.F > 0) lab += DK.text(x1 + 34, cy - Wp / 2 - 8, 'F ' + DK.n(v.F, 0) + ' ' + u.F, { cls: 'txt', anchor: 'end' });
+      lab += deLines(330, 210, ['Kt ' + (deFin(kt) ? DK.n(kt, 3) : '?') + ' on the net section', 'd/W ' + deT(rows, 'd / W', '') + (v.t > 0 ? ', t ' + DK.n(v.t, u.dp) : '')], { cls: 'txt' });
+      return DK.svg(W, H, h + lab, 'Plate with a hole in tension and the stress peak');
+    }
+    if (v.case === 2) {
+      if (!(v.ea > 0 && v.eb > 0)) return '';
+      const kt = deV(rows, 'Kt = 1'), pk = deV(rows, 'Peak stress at the end');
+      const cx = 170, cy = 135, s = 80 / Math.max(v.ea, v.eb), A = v.ea * s, B = v.eb * s;
+      let h = DK.rect(50, 30, 240, 210, 'part') + '<ellipse class="ln" cx="' + cx + '" cy="' + cy + '" rx="' + deF(B) + '" ry="' + deF(A) + '" style="fill:var(--panel)"/>';
+      h += deCross(cx, cy, Math.max(A, B) + 10);
+      for (let i = 0; i < 5; i++) { const y = 30 + 210 * (i + 0.5) / 5; h += deArrow(46, y, 20, y, 'ln') + deArrow(294, y, 320, y, 'ln'); }
+      h += DK.circle(cx, cy - A, 4, 'hotf') + DK.circle(cx, cy + A, 4, 'hotf');
+      let lab = deDimV(cy - A, cy, cx - B - 16, 'a ' + DK.n(v.ea, u.dp), { from: cx - 4 }) + DK.dimH(cx, cx + B, cy + A + 18, 'b ' + DK.n(v.eb, u.dp), { from: cy, below: true });
+      lab += DK.leader(cx + 3, cy - A - 3, 340, 50, 'peak ' + (deFin(pk) ? DK.n(pk, u.sdp) + ' ' + u.S : 'here'), { anchor: 'start', hot: true });
+      lab += deLines(340, 200, ['Kt = 1 + 2a/b = ' + (deFin(kt) ? DK.n(kt, 3) : '?'), 'a across the load, b along it'], { cls: 'txt' });
+      return DK.svg(W, H, h + lab, 'Elliptical hole in tension');
+    }
+    return '';
+  },
+
+  // Fatigue: alternating against mean stress with the Goodman, Soderberg and Gerber lines, the yield line and the working point.
+  fatigue(v, sys, rows) {
+    const W = 520, H = 310, u = mku(sys);
+    const se = deV(rows, /^Endurance limit Se/), sa = deV(rows, /^Alternating stress/), sm = deV(rows, /^Mean stress/), sut = v.sut, sy = v.sy;
+    if (!(se > 0 && sut > 0)) return '';
+    const x0 = 66, x1 = 440, y0 = 262, y1 = 34, ymax = Math.max(se, sy > 0 ? sy : 0, sa > 0 ? sa : 0) * 1.12, xmax = sut * 1.06;
+    const X = m => x0 + (x1 - x0) * m / xmax, Y = a => y0 - (y0 - y1) * a / ymax;
+    let h = DK.line(x0, y1 - 10, x0, y0, 'ln') + DK.line(x0, y0, x1 + 16, y0, 'ln');
+    if (sy > 0) h += DK.line(X(0), Y(sy), X(sy), Y(0), 'ghost') + DK.line(X(0), Y(se), X(sy), Y(0), 'hid');
+    let g = []; for (let i = 0; i <= 40; i++) { const m = sut * i / 40; g.push([X(m), Y(se * (1 - (m / sut) ** 2))]); }
+    h += dePoly(g, 'thin', false) + DK.line(X(0), Y(se), X(sut), Y(0), 'ln');
+    // Ticks.
+    const tick = (x, y, t, side) => side === 'y' ? DK.line(x0 - 4, y, x0, y, 'ln') + DK.text(x0 - 7, y + 4, t, { cls: 'mut', anchor: 'end' }) : DK.line(x, y0, x, y0 + 4, 'ln') + DK.text(x, y0 + 16, t, { cls: 'mut' });
+    h += tick(0, Y(se), 'Se ' + DK.n(se, u.sdp), 'y') + tick(X(sut), 0, 'Sut', 'x');
+    if (sy > 0) h += tick(0, Y(sy), 'Sy', 'y') + tick(X(sy), 0, 'Sy', 'x');
+    // Labels on the lines.
+    const lbl = (m, a, t, dy) => DK.text(X(m) + 4, Y(a) + (dy || -6), t, { cls: 'mut', anchor: 'start' });
+    h += lbl(sut * 0.62, se * 0.38, 'Goodman', -6);
+    h += lbl(sut * 0.5, se * (1 - 0.25), 'Gerber', -6);
+    if (sy > 0) h += lbl(sy * 0.55, se * 0.45, 'Soderberg', 14) + lbl(sy * 0.2, sy * 0.8 + 0, 'yield', -8);
+    // Working point.
+    let lab = '';
+    if (deFin(sa) && deFin(sm) && sa >= 0) {
+      const px = X(deClamp(sm, -0.0 * sut, xmax)), py = Y(Math.min(sa, ymax));
+      if (sm >= 0) lab += DK.line(X(0), Y(0), px, py, 'dim') ;
+      lab += DK.line(x0, py, px, py, 'hot ext') + DK.line(px, y0, px, py, 'hot ext') + DK.circle(px, py, 5, 'hotf');
+      const n = deV(rows, 'modified Goodman');
+      lab += DK.text(px + (px > 330 ? -10 : 10), py - 10, 'σa ' + DK.n(sa, u.sdp) + ', σm ' + DK.n(sm, u.sdp), { cls: 'hott', anchor: px > 330 ? 'end' : 'start' });
+      if (deFin(n)) lab += DK.text(px + (px > 330 ? -10 : 10), py + 18, 'n Goodman ' + DK.n(n, 2), { cls: 'hott', anchor: px > 330 ? 'end' : 'start' });
+    }
+    lab += DK.text(x0, y1 - 16, 'alternating stress σa (' + u.S + ')', { cls: 'txt', anchor: 'start' }) + DK.text(x1 + 14, y0 + 34, 'mean stress σm', { cls: 'txt', anchor: 'end' });
+    lab += deLines(450, 70, ['solid: Goodman', 'thin: Gerber', 'dashed: Soderberg', 'faint: yield'], {});
+    return DK.svg(W, H, h + lab, 'Fatigue diagram: alternating against mean stress');
+  },
+
+  // Chuck: end view with the jaws, centrifugal force on each jaw and the grip left at speed.
+  chuckforce(v, sys, rows) {
+    const W = 520, H = 290, u = mku(sys), cx = 150, cy = 145;
+    if (!(v.n >= 0)) return '';
+    let h = '', lab = '';
+    if (v.mode === 2) {
+      if (!(v.m > 0 && v.r > 0)) return '';
+      const F = deV(rows, 'Centrifugal force m r'), g = deV(rows, 'multiple of its weight'), R = 100;
+      h += DK.circle(cx, cy, R + 14, 'part') + deCross(cx, cy, R + 26) + DK.line(cx, cy, cx + R * 0.72, cy - R * 0.69, 'ln');
+      const mx = cx + R * 0.72, my = cy - R * 0.69;
+      h += DK.circle(mx, my, 10, 'tool') + deArrow(mx + 8, my - 8, mx + 58, my - 56, 'hot');
+      lab += DK.dim(cx, cy, mx, my, 'r ' + DK.n(v.r, u.dp), { off: 12 }) + DK.text(mx + 62, my - 58, 'F ' + (deFin(F) ? DK.n(F, 1) + ' ' + u.F : ''), { cls: 'hott', anchor: 'start' });
+      lab += deRot(cx, cy, 40, 220, 320, 'ln') + DK.text(cx, cy + 62, DK.n(v.n, 0) + ' rpm', { cls: 'txt' });
+      lab += deLines(320, 200, ['mass ' + DK.n(v.m, 3) + ' ' + u.m, deFin(g) ? 'force = ' + DK.n(g, 1) + ' × its weight' : ''], { cls: 'txt' });
+      return DK.svg(W, H, h + lab, 'Centrifugal force on a rotating mass');
+    }
+    if (!(v.z >= 1 && v.mj > 0 && v.rj > 0)) return '';
+    const z = deClamp(Math.round(v.z), 1, 8), bore = v.grip === 1, R = 112, rp = bore ? 66 : 34;
+    const fc1 = deV(rows, 'Centrifugal force, one jaw'), grip = deV(rows, /^Grip at/), chg = deV(rows, 'Change from standstill');
+    h += DK.circle(cx, cy, R, 'part') + DK.circle(cx, cy, R - 6, 'thin');
+    // The work: a bar (outside grip) or a ring (bore grip).
+    if (bore) h += '<path class="hatch" fill-rule="evenodd" d="M' + (cx + R + 0) + ' ' + cy + 'A' + R + ' ' + R + ' 0 1 0 ' + (cx - R) + ' ' + cy + 'A' + R + ' ' + R + ' 0 1 0 ' + (cx + R) + ' ' + cy + 'ZM' + (cx + rp) + ' ' + cy + 'A' + rp + ' ' + rp + ' 0 1 0 ' + (cx - rp) + ' ' + cy + 'A' + rp + ' ' + rp + ' 0 1 0 ' + (cx + rp) + ' ' + cy + 'Z"/>';
+    else h += DK.circle(cx, cy, rp, 'hatch');
+    const jw = 24, jl = bore ? 40 : 52;
+    for (let i = 0; i < z; i++) {
+      const a = Math.PI / 2 + i * 2 * Math.PI / z, c = Math.cos(a), s = -Math.sin(a), nx = -s, ny = c;
+      const r0 = bore ? rp - jl : rp, r1 = r0 + jl;
+      h += dePoly([[cx + c * r0 + nx * jw / 2, cy + s * r0 + ny * jw / 2], [cx + c * r1 + nx * jw / 2, cy + s * r1 + ny * jw / 2], [cx + c * r1 - nx * jw / 2, cy + s * r1 - ny * jw / 2], [cx + c * r0 - nx * jw / 2, cy + s * r0 - ny * jw / 2]], 'tool');
+      const rg = (r0 + r1) / 2;
+      h += DK.circle(cx + c * rg, cy + s * rg, 2.5, 'hotf') + deArrow(cx + c * (r1 + 4), cy + s * (r1 + 4), cx + c * (r1 + 34), cy + s * (r1 + 34), 'hot');
+      // Grip on the work.
+      const gr = bore ? r0 : r0;
+      h += deArrow(cx + c * (gr + (bore ? -2 : 2) + (bore ? 0 : 0)), cy + s * gr, cx + c * (gr + (bore ? -16 : -16) * (bore ? -1 : 1)), cy + s * (gr + (bore ? 16 : -16)), 'dim');
+    }
+    h += deCross(cx, cy, R + 14);
+    const a0 = Math.PI / 2, rg0 = bore ? rp - jl / 2 : rp + jl / 2;
+    lab += DK.dim(cx, cy, cx + Math.cos(a0 - 0.0) * 0, cy - rg0, '', {});
+    lab += DK.text(cx + 8, cy - rg0 / 2, 'r ' + DK.n(v.rj, u.dp), { cls: 'dimt', anchor: 'start' });
+    lab += DK.text(cx, cy - (bore ? rp : rp + jl) - 42, 'Fc ' + (deFin(fc1) ? DK.n(fc1, 0) + ' ' + u.F : '') + ' each', { cls: 'hott' });
+    lab += deRot(cx, cy, R + 24, 300, 340, 'ln') + DK.text(cx + R * 0.93, cy + R * 0.7 + 20, DK.n(v.n, 0) + ' rpm', { cls: 'txt', anchor: 'start' });
+    const L = [];
+    if (deFin(grip)) L.push(['Grip at speed', DK.n(grip, 0) + ' ' + u.F, 'hott']);
+    if (v.f0 > 0) L.push(['at standstill', DK.n(v.f0, 0) + ' ' + u.F, 'dimt']);
+    if (deFin(chg)) L.push(['change', DK.n(chg, 1) + ' %', chg < 0 ? 'hott' : 'dimt']);
+    const z0 = deV(rows, 'grip reaches zero'), t3 = deV(rows, 'one third');
+    if (deFin(t3)) L.push(['⅓ grip left at', DK.n(t3, 0) + ' rpm', 'dimt']);
+    if (deFin(z0)) L.push(['no grip at', DK.n(z0, 0) + ' rpm', 'dimt']);
+    let y = 50;
+    L.forEach(q => { lab += DK.text(318, y, q[0], { cls: 'mut', anchor: 'start' }) + DK.text(318, y + 16, q[1], { cls: q[2], anchor: 'start', size: q[2] === 'hott' && y === 50 ? 16 : undefined }); y += 38; });
+    lab += DK.text(318, H - 12, (bore ? 'Gripping a bore: speed adds grip' : 'Gripping outside: speed takes grip away'), { cls: 'mut', anchor: 'start' });
+    return DK.svg(W, H, h + lab, 'Chuck jaws with centrifugal force and grip at speed');
+  },
+
+  // Balancing: the rotor between its bearings, the two correction planes, the permissible unbalance and its split.
+  balance(v, sys, rows) {
+    const W = 520, H = 290, u = mku(sys);
+    const U = deV(rows, /^Permissible residual unbalance/), e = deV(rows, 'centre-of-mass offset');
+    if (!deFin(U)) return '';
+    const two = v.hl > 0 && v.hr > 0, cy = 116;
+    const b = two ? v.hl + v.hr : 1, k = two ? 230 / b : 0, cg = two ? 70 + 60 + v.hl * k : 245;
+    const pl = two ? 130 : 245, pr = two ? 130 + b * k : 245, x0 = Math.min(pl, cg) - 70, x1 = Math.max(pr, cg) + 70;
+    let h = DK.line(x0 - 20, cy, x1 + 20, cy, 'ln') + DK.rect(x0 - 20, cy - 6, x1 - x0 + 40, 12, 'part');
+    h += DK.rect(pl - 20, cy - 58, (pr - pl) + 40, 116, 'part', 6);
+    h += DK.cl(x0 - 34, cy, x1 + 34, cy);
+    // Bearings.
+    [x0, x1].forEach(x => { h += dePoly([[x, cy + 6], [x - 11, cy + 26], [x + 11, cy + 26]], 'part') + deGround(x - 16, x + 16, cy + 26); });
+    // Planes and correction masses.
+    const share = [deV(rows, 'Share for plane L'), deV(rows, 'Share for plane R')], cm = [deV(rows, 'Correction mass in plane L'), deV(rows, 'Correction mass in plane R')];
+    const cm1 = deV(rows, 'Correction mass for U_per');
+    const planes = two ? [[pl, 'L', share[0], cm[0]], [pr, 'R', share[1], cm[1]]] : [[pl, '', U, cm1]];
+    let lab = '';
+    planes.forEach((p, i) => {
+      h += DK.line(p[0], cy - 76, p[0], cy + 76, 'hid') + DK.circle(p[0], cy - 46, 6, 'tool');
+      lab += DK.text(p[0], cy - 84, 'plane ' + p[1], { cls: 'txt' });
+      lab += DK.text(p[0], cy + 92, (two ? DK.n(p[2], 1) : DK.n(U, 1)) + ' g·mm', { cls: two ? 'dimt' : 'hott' });
+      if (deFin(p[3])) lab += DK.text(p[0], cy + 107, DK.n(p[3], 3) + ' g at r', { cls: 'mut' });
+      void i;
+    });
+    if (v.rc > 0) lab += deDimV(cy - 46, cy, pl - 28, 'r ' + DK.n(v.rc, u.dp), { from: pl - 8 });
+    // Centre of gravity.
+    lab += deCentroid(cg, cy, 6);
+    if (two) lab += DK.dimH(pl, cg, cy - 100 + 0, 'hL ' + DK.n(v.hl, u.dp), { from: cy - 78 }) + DK.dimH(cg, pr, cy - 100, 'hR ' + DK.n(v.hr, u.dp), { from: cy - 78 });
+    lab += deRot(x1 + 36, cy, 22, 60, 300, 'ln');
+    const G = v.G > 0 ? v.G : v.Gx;
+    lab += DK.text(W - 8, 22, 'U per ' + DK.n(U, 1) + ' g·mm', { cls: 'hott', anchor: 'end', size: 15 });
+    lab += deLines(14, H - 20, ['G ' + DK.n(G, 2) + ' at ' + DK.n(v.n, 0) + ' rpm, rotor ' + DK.n(v.m, 3) + ' ' + u.m + (deFin(e) ? ', e per ' + DK.n(e, 3) + ' µm' : ''), two ? '' : 'Give hL and hR to split U over two planes.'], { cls: 'txt' });
+    return DK.svg(W, H, h + lab, 'Rotor with correction planes and permissible unbalance');
+  },
+
+  // Critical speed: the shaft on its bearings (or overhung) with the discs to scale along it and the first whirling shape.
+  critspeed(v, sys, rows) {
+    const W = 520, H = 270, u = mku(sys);
+    if (!(v.L > 0 && v.D > 0)) return '';
+    const sup = v.sup, x0 = 60, x1 = 440, cy = 120, X = x => x0 + (x1 - x0) * x / v.L, Dp = deClamp(v.D / v.L * (x1 - x0), 6, 20);
+    const ray = deV(rows, 'Rayleigh'), dun = deV(rows, 'Dunkerley'), sag = deV(rows, 'Largest static sag');
+    let h = DK.rect(x0, cy - Dp / 2, x1 - x0, Dp, 'part') + DK.cl(x0 - 20, cy, x1 + 20, cy);
+    // Whirl shape (exaggerated).
+    const pts = []; for (let i = 0; i <= 50; i++) { const t = i / 50; pts.push([x0 + (x1 - x0) * t, cy + 34 * (sup === 0 ? 1 - Math.cos(Math.PI * t / 2) : Math.sin(Math.PI * t))]); }
+    h += dePoly(pts, 'hot', false);
+    if (sup === 0) h += deWall(x0, cy - 34, cy + 34, true);
+    else h += [x0, x1].map(x => dePoly([[x, cy + Dp / 2], [x - 11, cy + Dp / 2 + 18], [x + 11, cy + Dp / 2 + 18]], 'part') + deGround(x - 16, x + 16, cy + Dp / 2 + 18)).join('');
+    let lab = '';
+    const ms = [1, 2, 3].map(i => v['m' + i] > 0 && v['x' + i] >= 0 && v['x' + i] <= v.L ? [v['m' + i], v['x' + i], i] : null).filter(Boolean);
+    const mmax = Math.max(1e-9, ...ms.map(q => q[0]));
+    ms.forEach(q => {
+      const x = X(q[1]), hh = 30 + 50 * Math.cbrt(q[0] / mmax);
+      h += DK.rect(x - 7, cy - hh / 2, 14, hh, 'tool');
+      lab += DK.text(x, cy - hh / 2 - 8, 'm' + q[2] + ' ' + DK.n(q[0], 2) + ' ' + u.m, { cls: 'txt' });
+    });
+    lab += DK.dimH(x0, x1, cy + 74, 'L ' + DK.n(v.L, u.dp) + ' ' + u.L, { from: cy + 30, below: true });
+    if (ms[0]) lab += DK.dimH(x0, X(ms[0][1]), cy + 54, 'x1 ' + DK.n(ms[0][1], u.dp), { from: cy - 10 });
+    lab += DK.text(x1 + 12, cy - 30, 'Ø ' + DK.n(v.D, u.dp), { cls: 'dimt', anchor: 'start' });
+    const L = [];
+    if (deFin(ray)) L.push('Rayleigh ' + DK.n(ray, 0) + ' rpm (upper)');
+    if (deFin(dun)) L.push('Dunkerley ' + DK.n(dun, 0) + ' rpm (lower)');
+    L.forEach((t, i) => { lab += DK.text(14, 22 + i * 18, t, { cls: 'hott', anchor: 'start' }); });
+    lab += deLines(14, H - 24, [deFin(sag) ? 'static sag ' + DK.n(sag, sys === 'inch' ? 5 : 4) + ' ' + u.L : '', 'First whirling shape in orange, exaggerated.']);
+    return DK.svg(W, H, h + lab, 'Shaft critical speed with discs and the whirl shape');
+  },
+});
