@@ -5,7 +5,7 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 ## [Unreleased]
 
 ## [0.3.0] - 2026-11-11
-Stage 1 of the plan: the physics behind speeds and feeds. In progress; built on top of 0.2.0.
+Stage 1 of the plan: the physics behind speeds and feeds. Built on top of 0.2.0.
 
 ### Added (cutting forces)
 - **Specific cutting force (kc)** (Turning and Milling, Speeds and feeds): pick a work material group (39 groups after VDI 3323: steels, stainless, cast irons, aluminium, copper alloys, high temperature alloys, titanium, hardened materials) and get kc at the chip thickness of your cut by Kienzle's formula, kc = kc1.1 x h^(-mc), for turning (feed and entering angle), drilling (feed and point angle) or a chip thickness you type. The table is Iscar's; what Sandvik Coromant and Mitsubishi Materials print for a similar material is shown beside it and never mixed in, because they differ (by half as much again for stainless steel). A graph shows kc against chip thickness with your cut marked.
