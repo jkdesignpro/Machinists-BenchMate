@@ -156,6 +156,16 @@ label.f .row input,label.f .row select{min-width:0;width:100%}
 .rempty{display:flex;gap:10px;align-items:center;padding:22px 18px;color:var(--muted)}
 .tdia{max-width:none;padding:6px 14px 12px;border-top:1px solid var(--line)}
 .tdia svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto;border:0;background:none}
+/* Filter chips, a ready / needs-input chip and a small copy button, for tools that draw their own screens. */
+.fchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.fchip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 11px;font-size:12px;cursor:pointer;color:var(--ink);line-height:1.5}
+.fchip:hover{border-color:var(--accent)}
+.fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.rdy{display:inline-block;font-size:10.5px;font-weight:600;border-radius:999px;padding:1px 8px;border:1px solid var(--ok);color:var(--ok);text-transform:uppercase;letter-spacing:.04em}
+.rdy.no{border-color:var(--warn);color:var(--warn)}
+.cpy{border:0;background:none;color:var(--muted);cursor:pointer;padding:2px 4px;border-radius:4px;vertical-align:middle}
+.cpy:hover{color:var(--accent);background:var(--soft)}
+.cpy svg.ic{width:13px;height:13px}
 .rtab{margin-top:12px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .rtabh{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--soft);border-bottom:1px solid var(--line);font-weight:600;font-size:12px;color:var(--muted)}
 .rtabh span:first-child{flex:1;text-transform:uppercase;letter-spacing:.05em}

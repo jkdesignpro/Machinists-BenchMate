@@ -104,6 +104,11 @@ function openTool(id) {
   const page = PAGES[id] ? id : PAGE_OF[id]; if (!page) return;
   go('#/t/' + page + (page !== id ? '/' + id : ''));
 }
+// One tool can open another with values to start from: handoff('cyctmill', { dia: 10, pitch: 1.5 }).
+// The receiving tool calls takeHandoff('cyctmill') when it draws; it gets the values once, or null.
+let handoffBox = null;
+function handoff(id, vals) { handoffBox = { id, vals }; const was = location.hash; openTool(id); if (location.hash === was) renderMain(); }
+function takeHandoff(id) { if (handoffBox && handoffBox.id === id) { const v = handoffBox.vals; handoffBox = null; return v; } return null; }
 // Kept for the tool files that re-render after a change.
 function renderTool() { renderMain(); }
 function renderList() { renderRail(); }
