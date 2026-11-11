@@ -660,6 +660,50 @@ const TOOLS = [
   source: "Sandvik Coromant turning formulas (n, machining time); Machinery's Handbook.",
 },
 {
+  id: 'partofftime', level: 'advanced', group: 'Turning', title: 'Part-off and groove time',
+  desc: 'Time to part off, face or plunge a groove from a start diameter to an end diameter with feed per revolution, at constant surface speed with a maximum spindle speed (G50 / G92 clamp) or at constant rpm. Below the diameter where the clamp is reached the rpm stays constant, and the time there is worked out separately.',
+  fields: s => [
+    { id: 'd0', label: 'Start diameter', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'd1', label: 'End diameter (0 = to the centre)', unit: lenU(s), def: 0 },
+    { id: 'f', label: 'Feed per revolution', unit: feedRevU(s), def: s === 'inch' ? 0.003 : 0.08 },
+    { id: 'mode', label: 'Spindle', unit: '', def: 1, options: [[1, 'Constant surface speed (G96)'], [0, 'Constant rpm (G97)']] },
+    { id: 'speed', label: s === 'inch' ? 'Surface speed (CSS)' : 'Cutting speed Vc (CSS)', unit: spdU(s), def: s === 'inch' ? 400 : 120, when: v => v.mode === 1 },
+    { id: 'nmax', label: 'Max spindle speed (G50 / G92 clamp; blank = active machine, else none)', unit: 'RPM', def: '', when: v => v.mode === 1 },
+    { id: 'rpm', label: 'Spindle speed', unit: 'RPM', def: '', when: v => v.mode === 0 },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d0 > 0 && v.d1 >= 0 && v.f > 0)) return [];
+    if (!(v.d0 > v.d1)) return [R('Diameters', 'The end diameter must be smaller than the start diameter', '', 0)];
+    const dp = s === 'inch' ? 4 : 2, rows = [];
+    if (v.mode === 0) {
+      if (!(v.rpm > 0)) return [R('Speed', 'Enter the spindle speed', '', 0)];
+      const t = W.partoff_time_rpm(v.d0, v.d1, v.f, v.rpm);
+      return [R('Cutting time', t * 60, 's', 1), R('Cutting time', t, 'min', 3), R('Feed per minute', v.f * v.rpm, feedMinU(s), 2, 'feed')];
+    }
+    if (!(v.speed > 0)) return [R('Speed', 'Enter the cutting speed', '', 0)];
+    const m = typeof Profiles !== 'undefined' ? Profiles.active() : null;
+    const nmax = v.nmax > 0 ? v.nmax : (m && Number(m.rpm_max) > 0 ? Number(m.rpm_max) : 0);
+    const k = s === 'inch' ? 12 : 1000, P = w => W.partoff_time(v.d0, v.d1, v.f, v.speed, nmax, k, w);
+    const t = P(0), t1 = P(1), t2 = P(2), dc = P(3);
+    rows.push(R('Cutting time', t * 60, 's', 1), R('Cutting time', t, 'min', 3));
+    rows.push(R('Spindle speed at the start diameter', P(4), 'RPM', 0, 'rpm'));
+    if (nmax > 0) {
+      rows.push(R('Speed limit used' + (v.nmax > 0 ? '' : ' (active machine)'), nmax, 'RPM', 0));
+      rows.push(R('Diameter where the limit is reached', dc, lenU(s), dp));
+      rows.push(R('Time at constant surface speed (above that diameter)', t1 * 60, 's', 1));
+      rows.push(R('Time at the speed limit (below that diameter)', t2 * 60, 's', 1));
+      rows.push(R('Spindle speed at the end diameter', P(5), 'RPM', 0, 'rpm'));
+    } else {
+      if (v.d1 > 0) rows.push(R('Spindle speed at the end diameter', P(5), 'RPM', 0, 'rpm'));
+      else rows.push(R('Spindle speed at the centre', 'No limit entered: the rpm would rise without end. Enter the G50 / G92 limit or set up a machine.', '', 0));
+    }
+    rows.push(R('Same cut at the start-diameter rpm held constant', W.partoff_time_rpm(v.d0, v.d1, v.f, P(4)) * 60, 's', 1));
+    return rows;
+  },
+  working: 'The tool moves in f x n per minute on the radius, so the diameter falls at 2 f n and t = ∫ dD / (2 f n(D)) from the end to the start diameter. At constant surface speed n = 1000 Vc / (π D) (inch: 12 SFM / (π D)) down to the clamp diameter Dc = 1000 Vc / (π nmax) (inch: 12 SFM / (π nmax)); below Dc the spindle runs at nmax. Integrating each region: above Dc, t1 = π (Da² − Db²) / (4000 f Vc) (inch: π (Da² − Db²) / (48 f SFM)); below Dc, t2 = (Da − Db) / (2 f nmax). Total t = t1 + t2. With no clamp and no limit to the centre the rpm at the centre would be infinite, but the time is still finite (t1 alone). Constant rpm: t = (D0 − D1) / (2 f n). Approach, retract and dwell are not included; add the clearance to the start diameter if you want it counted.',
+  source: 'n = 1000 Vc / (π D): Sandvik Coromant turning formulas. Two regions (constant surface speed down to the radius where the spindle reaches nmax, then nmax): E. Isakov, "Cutting time for facing", Cutting Tool Engineering, 15 Mar 2011 (also: constant surface speed facing takes about half the constant-rpm time); SmartLathe, "Calculation of machining time for facing, parting off and deep grooving on a CNC lathe" (time by integration, separate formula below the clamping diameter). Closed form: own derivation, checked in the Rust core against numerical integration.',
+},
+{
   id: 'boringbar', level: 'advanced', group: 'Turning', title: 'Boring bar deflection',
   pick: { map: { d: 'shank', L: 'stick' }, types: ['Boring bar'] },
   desc: 'Tip deflection of a solid round boring bar under the cutting force, as a cantilever clamped at the holder, for steel, carbide or tungsten heavy metal bars, with the overhang (L/D) guidance published by bar makers.',

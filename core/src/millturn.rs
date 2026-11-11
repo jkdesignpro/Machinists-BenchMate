@@ -168,6 +168,45 @@ pub fn turn_rough(d0: f64, d1: f64, ap_max: f64, len: f64, f: f64, vc: f64, rpm:
     }).collect()
 }
 
+/// Time to part off, face or plunge-groove from diameter `d0` down to `d1`
+/// (d1 = 0 for parting to the centre) at feed `f` per revolution and constant
+/// surface speed `vc`, with the spindle limited to `n_max` rpm (G50 / G92 clamp;
+/// 0 = no limit). `k` makes the units: 1000 for vc in m/min with mm, 12 for
+/// SFM with inches (n = k vc / (pi D)).
+///
+/// The tool moves in at f x n per minute on the radius, so dD/dt = -2 f n(D)
+/// and t = integral from d1 to d0 of dD / (2 f n(D)), with
+/// n(D) = k vc / (pi D) above the clamp diameter Dc = k vc / (pi n_max) and
+/// n_max below it. Above Dc: t = pi (Da^2 - Db^2) / (4 k f vc); below Dc:
+/// t = (Da - Db) / (2 f n_max). Own derivation; the two-region idea is in
+/// Isakov (CTE 2011, Rmin where the spindle reaches nmax) and SmartLathe.
+///
+/// `which`: 0 total minutes, 1 minutes at constant surface speed (above Dc),
+/// 2 minutes at the clamp (below Dc), 3 clamp diameter Dc (0 with no clamp),
+/// 4 rpm at d0, 5 rpm at d1 (n_max at d1 = 0 with a clamp; inf without).
+pub fn partoff_time(d0: f64, d1: f64, f: f64, vc: f64, n_max: f64, k: f64, which: f64) -> f64 {
+    if !(d0 > d1 && d1 >= 0.0 && f > 0.0 && vc > 0.0 && k > 0.0 && n_max >= 0.0) { return f64::NAN; }
+    let dc = if n_max > 0.0 { k * vc / (PI * n_max) } else { 0.0 };
+    let rpm = |d: f64| if d <= dc { n_max } else { k * vc / (PI * d) };
+    // CSS part: from max(d1, dc) to d0 (where d0 > dc); clamped part: from d1 to min(d0, dc).
+    let (a_hi, a_lo) = (d0, d1.max(dc.min(d0)));
+    let t_css = if a_hi > a_lo { PI * (a_hi * a_hi - a_lo * a_lo) / (4.0 * k * f * vc) } else { 0.0 };
+    let (b_hi, b_lo) = (d0.min(dc), d1);
+    let t_clamp = if b_hi > b_lo { (b_hi - b_lo) / (2.0 * f * n_max) } else { 0.0 };
+    match which as i32 {
+        0 => t_css + t_clamp, 1 => t_css, 2 => t_clamp, 3 => dc,
+        4 => rpm(d0), 5 => if d1 > 0.0 || n_max > 0.0 { rpm(d1) } else { f64::INFINITY },
+        _ => f64::NAN,
+    }
+}
+
+/// Time (min) to part off or face from `d0` to `d1` at a constant spindle speed
+/// `n` (G97) and feed `f` per revolution: (d0 - d1) / (2 f n).
+pub fn partoff_time_rpm(d0: f64, d1: f64, f: f64, n: f64) -> f64 {
+    if !(d0 > d1 && d1 >= 0.0 && f > 0.0 && n > 0.0) { return f64::NAN; }
+    (d0 - d1) / (2.0 * f * n)
+}
+
 /// C axis: angular feed (deg/min) for a feed `vf` along the circumference at diameter `d`:
 /// deg/min = vf x 360 / (pi d).
 pub fn c_axis_deg_min(vf: f64, d: f64) -> f64 { vf * 360.0 / (PI * d) }
@@ -369,6 +408,42 @@ mod tests {
         // rpm cap
         let p = turn_rough(50.0, 40.0, 2.0, 100.0, 0.2, 200.0, 0.0, 1400.0);
         assert!(close(p[2].1, 1400.0, 1e-12));
+    }
+
+    #[test]
+    fn partoff() {
+        // No clamp, 50 mm to the centre, 0.1 mm/rev, 150 m/min:
+        // t = pi 2500 / (4 x 1000 x 0.1 x 150) = 0.130900 min.
+        let t = partoff_time(50.0, 0.0, 0.1, 150.0, 0.0, 1000.0, 0.0);
+        assert!(close(t, PI * 2500.0 / 60_000.0, 1e-12));
+        // Isakov (CTE, 2011): facing at constant surface speed takes about half the time of
+        // facing at the constant rpm that speed gives at the start diameter (0.98 vs 1.90 min
+        // in his example, with a spindle limit). Without a limit the ratio is exactly 1/2.
+        let n0 = 1000.0 * 150.0 / (PI * 50.0);
+        assert!(close(t / partoff_time_rpm(50.0, 0.0, 0.1, n0), 0.5, 1e-12));
+        // Inch: 4 in bar, 0.004 ipr, 500 SFM, to the centre: pi 16 / (4 x 12 x 0.004 x 500) = 0.52360 min.
+        assert!(close(partoff_time(4.0, 0.0, 0.004, 500.0, 0.0, 12.0, 0.0), PI * 16.0 / 96.0, 1e-12));
+        // With a 3000 rpm clamp: Dc = 150000 / (pi 3000) = 15.915 mm.
+        let dc = partoff_time(50.0, 0.0, 0.1, 150.0, 3000.0, 1000.0, 3.0);
+        assert!(close(dc, 150_000.0 / (PI * 3000.0), 1e-12));
+        let t1 = partoff_time(50.0, 0.0, 0.1, 150.0, 3000.0, 1000.0, 1.0);
+        let t2 = partoff_time(50.0, 0.0, 0.1, 150.0, 3000.0, 1000.0, 2.0);
+        assert!(close(t1, PI * (2500.0 - dc * dc) / 60_000.0, 1e-12));
+        assert!(close(t2, dc / (2.0 * 0.1 * 3000.0), 1e-12));
+        // Check the closed form by integrating dD / (2 f n(D)) numerically (Simpson, 20000 steps).
+        let n = |d: f64| (150_000.0 / (PI * d)).min(3000.0);
+        let (a, b, m) = (0.0, 50.0, 20_000);
+        let h = (b - a) / m as f64;
+        let g = |d: f64| 1.0 / (2.0 * 0.1 * n(d));
+        let mut s = g(a) + g(b);
+        for i in 1..m { s += g(a + i as f64 * h) * if i % 2 == 1 { 4.0 } else { 2.0 }; }
+        assert!(close(t1 + t2, s * h / 3.0, 1e-7));
+        // Rpm at the ends, and a groove that stays above the clamp diameter (no clamped part).
+        assert!(close(partoff_time(50.0, 0.0, 0.1, 150.0, 3000.0, 1000.0, 5.0), 3000.0, 1e-12));
+        assert!(close(partoff_time(50.0, 30.0, 0.1, 150.0, 3000.0, 1000.0, 2.0), 0.0, 0.0));
+        // A groove entirely below the clamp diameter: constant 3000 rpm.
+        assert!(close(partoff_time(12.0, 4.0, 0.1, 150.0, 3000.0, 1000.0, 0.0), partoff_time_rpm(12.0, 4.0, 0.1, 3000.0), 1e-12));
+        assert!(partoff_time(10.0, 20.0, 0.1, 150.0, 0.0, 1000.0, 0.0).is_nan());
     }
 
     #[test]

@@ -144,6 +144,8 @@ const FORMULAS = [
   F('lathefeed', 'Lathe feed per minute', 'Vf = fn · n', 'Vf: [per min]; fn: feed per rev; n: [rpm]', ['SAN', 'MH']),
   F('roughtime', 'Number of roughing passes', 'N = ⌈(D0 − D1) / (2 · ap_max)⌉', 'D0: stock; D1: finished diameter; ap_max: largest depth per pass', ['SAN']),
   F('roughtime', 'Spindle speed at constant surface speed', 'n = 1000 · Vc / (π · Di), capped at the clamp', 'Di: diameter of the pass; Vc: [m/min]', ['SAN']),
+  F('partofftime', 'Part-off time at constant surface speed', 't = π (Da² − Db²) / (4000 · f · Vc)', 'above the clamp diameter; D [mm]; f [mm/rev]; Vc [m/min]; t [min]', ['OWN', 'SAN']),
+  F('partofftime', 'Clamp diameter and time below it', 'Dc = 1000 · Vc / (π · nmax);  t = (Da − Db) / (2 · f · nmax)', 'nmax: G50 / G92 spindle limit [rpm]', ['OWN', 'SAN']),
   F('boringbar', 'Section of a bar with a coolant hole', 'I = π · (d⁴ − di⁴) / 64', 'd: bar diameter; di: coolant hole', ['GERE']),
   F('boringbar', 'Boring bar deflection', 'δ = F · L³ / (3 E I)', 'F: cutting force; L: overhang; E: modulus; I: second moment', ['GERE', 'ROARK']),
   F('boringbar', 'Turning cutting force', 'Fc = kc · ap · fn', 'Fc: [N]; kc: [N/mm²]; ap: [mm]; fn: [mm/rev]', ['SAN']),
