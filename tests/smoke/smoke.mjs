@@ -532,6 +532,74 @@ if (!/Spindle speed at that diameter\s+424\s+RPM/.test(aT) || !/Power Smoke lath
 await page.click('#main .tpa button[title^="Reset"]');
 await page.evaluate(id => Profiles.remove(id), mrrMach);
 
+// G-code editor and simulator (stage 2 acceptance: steps lathe and mill samples line by line).
+// Mill example: 31 blocks, one per line; after line 10 (N70 G01 Z-3.) the tool is at X10 Y5 Z-3. Lathe example: told from the program
+// (Auto: lathe), 30 blocks; after line 13 (N120 X24. Z-2.) the tool is at X24 Z-2. Renumbering from 100 by 5 makes the tenth numbered
+// block (N100, the first profile block) N135 and the cycle that names it G71 P135 Q170 -> Q is the 15th numbered block: 100 + 14 x 5 = 170.
+// N170 keeps its number, so 26 of the 27 numbered lines change. Inch conversion: X54. = 2.126 in, G96 S180 m/min = 591 ft/min, G21 -> G20. Undo brings the old text back.
+where = 'gsim editor';
+await units('mm');
+await open('gsim');
+{
+  const q = sel => page.$eval(sel, e => e.textContent);
+  const walk = async () => {
+    await page.click('#gsfirst');
+    const seen = [];
+    for (let i = 0; i < 200; i++) {
+      const m = /Block (\d+) of (\d+), line (\d+)/i.exec(await q('#gscur .h'));
+      if (!m) break;
+      seen.push([+m[1], +m[2], +m[3], await q('#gscur table')]);
+      if (m[1] === m[2]) break;
+      await page.click('#gsnext');
+    }
+    return seen;
+  };
+  await page.click('#gsexm'); await page.waitForTimeout(150);
+  let w = await walk();
+  if (w.length !== 31 || w.some((x, i) => x[0] !== i + 1 || x[2] !== i + 1)) problems.push(`[${where}] mill example did not step block by block: ${w.map(x => x[0] + ':' + x[2]).join(' ')}`);
+  if (!/X10\.000 Y5\.000 Z-3\.000/.test((w[9] || [])[3] || '')) problems.push(`[${where}] mill block 10 position: "${((w[9] || [])[3] || '').slice(0, 200)}"`);
+  if (!/Auto: mill/.test(await page.$eval('#gsmach', e => e.selectedOptions[0].textContent))) problems.push(`[${where}] the mill example was not told to be a mill program`);
+  // the view cube and the 3D view
+  await page.click('#gsview button[data-v="3d"]');
+  if (!/3D view/.test(await q('#gsvlab')) || !(await page.$('#gscube'))) problems.push(`[${where}] no 3D view or view cube`);
+  await page.click('#gscube', { position: { x: 48, y: 30 } }); // the top face of the cube in the 3D view
+  if (!(await page.$eval('#gsview button[data-v="xy"]', e => e.classList.contains('on')))) problems.push(`[${where}] a click on the top face of the view cube did not give the top view`);
+  await page.click('#gsexl'); await page.waitForTimeout(150);
+  w = await walk();
+  if (w.length !== 30 || w.some((x, i) => x[0] !== i + 1)) problems.push(`[${where}] lathe example did not step block by block: ${w.map(x => x[0] + ':' + x[2]).join(' ')}`);
+  if (!/X24\.000 Z-2\.000/.test((w[12] || [])[3] || '')) problems.push(`[${where}] lathe block 13 position: "${((w[12] || [])[3] || '').slice(0, 200)}"`);
+  if (!/Auto: lathe/.test(await page.$eval('#gsmach', e => e.selectedOptions[0].textContent)) || (await page.$('#gscube'))) problems.push(`[${where}] the lathe example was not told to be a lathe program`);
+  const text = () => page.inputValue('#gstext');
+  const before = await text();
+  await page.click('#gstidyb');
+  await page.selectOption('#gtnum', '1'); await page.fill('#gtstart', '100'); await page.fill('#gtstep', '5');
+  await page.click('#gtgo'); await page.waitForTimeout(100);
+  let t = await text();
+  if (!/^N130 G71 P135 Q170 U0\.4 W0\.1 F0\.25$/m.test(t) || !/^N135 G00 X20\.$/m.test(t) || !/^N175 G70 P135 Q170$/m.test(t) || !/Tidy: 26 lines changed/i.test(await q('#gsrep'))) problems.push(`[${where}] renumber: "${t.slice(0, 500)}" / "${(await q('#gsrep')).slice(0, 200)}"`);
+  await page.click('#gsundo'); await page.waitForTimeout(100);
+  if ((await text()) !== before) problems.push(`[${where}] undo did not bring the program back`);
+  await page.click('#gsredo'); await page.waitForTimeout(100);
+  if ((await text()) !== t) problems.push(`[${where}] redo did not bring the renumbered program back`);
+  await page.click('#gsundo'); await page.waitForTimeout(100);
+  // insert a line after line 5, then delete it again
+  await page.click('#gslist .gl[data-l="5"]');
+  await page.click('#gsins'); await page.waitForTimeout(100);
+  t = await text();
+  if (t.split('\n').length !== before.split('\n').length + 1 || t.split('\n')[5] !== '' || !/Current line: 6/.test(await q('#gsline'))) problems.push(`[${where}] insert line: line 6 is "${t.split('\n')[5]}", ${await q('#gsline')}`);
+  await page.click('#gsdel'); await page.waitForTimeout(100);
+  if ((await text()) !== before) problems.push(`[${where}] delete line did not remove the inserted line`);
+  // inch conversion
+  await page.click('#gsconvb');
+  if ((await page.inputValue('#gcto')) !== '0') problems.push(`[${where}] a G21 program should be offered a conversion to inch`);
+  await page.click('#gcgo'); await page.waitForTimeout(100);
+  t = await text();
+  if (!/^N10 G20 G40 G99$/m.test(t) || !/^N40 G96 S591 M03$/m.test(t) || !/^N50 G00 X2\.126 Z0\.0787 M08$/m.test(t) || !/^N70 G71 P100 Q170 /m.test(t) || !/Converted to inch: 21 lines changed/i.test(await q('#gsrep')) || !/Lathe cycle/.test(await q('#gsrep'))) problems.push(`[${where}] inch conversion: "${t.slice(0, 500)}" / "${(await q('#gsrep')).slice(0, 300)}"`);
+  if (!/0 errors/.test(await q('#gsmsgs .h'))) problems.push(`[${where}] the converted program has errors in the simulator: ${await q('#gsmsgs .h')}`);
+  await page.click('#gsundo'); await page.waitForTimeout(100);
+  if ((await text()) !== before) problems.push(`[${where}] undo after the conversion`);
+  await page.click('#gsexm'); await page.waitForTimeout(100);
+}
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

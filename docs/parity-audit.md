@@ -250,7 +250,7 @@ Store list is the fuller of the two store lists.
 | U92 | G-code reference | done | `gmcodes` |  |
 | U93 | M-code reference | done | `gmcodes` | Heidenhain, Mazak and Siemens ISO M codes are gaps; builder-specific M codes are flagged |
 | U94 | Custom macro information | partial | `macroref` | Mitsubishi variable ranges and IF/WHILE not yet confirmed |
-| U95 | G-code simulator (2D/3D, cycle time) | partial | `gsim` | 2D backplot with cycle time only; G71 to G76 are reported, not drawn; no 3D |
+| U95 | G-code simulator (2D/3D, cycle time) | partial | `gsim` | Editor with undo, line insert and delete, renumber, strip and inch/mm conversion; 2D and 3D wire backplot with a view cube, step playback, lathe or mill told from the program, cycle time. G71 to G76 are reported, not drawn; no stock removal |
 | U96 | 2D CAD and DXF generator (snapping, angle measure) | partial | `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | Parametric shapes with DXF export; no free sketching, snapping or angle measure |
 
 ### Learning and data

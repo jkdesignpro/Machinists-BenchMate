@@ -668,6 +668,53 @@ pub extern "C" fn gsim_run(len: f64, lathe: f64, ctrl: f64, metric_out: f64, def
 /// Messages ("line TAB level TAB text" per line) into the text buffer; returns the length (text at `text_ptr`).
 #[no_mangle] pub extern "C" fn gsim_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GSIM_MSGS)).clone() }) }
 
+// G-code tidy tools (core/src/gtidy.rs). The program text is written at
+// `gsim_in(len)` as for the backplot. Each call keeps its result text and its
+// messages; read them with `gtidy_text` and `gtidy_msgs` (each returns a
+// length, the text is at `text_ptr`).
+static mut GT_TEXT: String = String::new();
+static mut GT_MSGS: String = String::new();
+fn gt_src(len: f64) -> String {
+    // SAFETY: single-threaded wasm; GSIM_IN is only written by gsim_in.
+    unsafe {
+        let src = &*core::ptr::addr_of!(GSIM_IN);
+        let n = (len.max(0.0) as usize).min(src.len());
+        String::from_utf8_lossy(&src[..n]).into_owned()
+    }
+}
+fn gt_store(text: String, msgs: String) {
+    // SAFETY: single-threaded wasm; the statics are only touched here and by the two readers.
+    unsafe { *core::ptr::addr_of_mut!(GT_TEXT) = text; *core::ptr::addr_of_mut!(GT_MSGS) = msgs; }
+}
+/// Renumber, strip and re-space (see `gtidy::TidyOpts`). numbers: 0 leave, 1
+/// renumber from `start` by `step` (`all` 1: every block), 2 remove; comments
+/// and blank 1 = remove; spacing 0 leave, 1 one space, 2 none; upper 1 =
+/// upper case; lathe 1 = G70 to G73 P and Q are block numbers. Returns the
+/// number of lines changed.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gtidy_run(len: f64, numbers: f64, start: f64, step: f64, all: f64, comments: f64, blank: f64, spacing: f64, upper: f64, lathe: f64) -> f64 {
+    let o = c::gtidy::TidyOpts { numbers: numbers.clamp(0.0, 2.0) as u8, start: start.clamp(0.0, 99_999_999.0) as u32, step: step.clamp(1.0, 1_000_000.0) as u32,
+        all: all != 0.0, comments: comments != 0.0, blank: blank != 0.0, spacing: spacing.clamp(0.0, 2.0) as u8, upper: upper != 0.0, lathe: lathe != 0.0 };
+    let r = c::gtidy::tidy(&gt_src(len), &o);
+    gt_store(r.text, c::gtidy::msgs_text(&r.msgs));
+    r.changed as f64
+}
+/// Convert the program between inch and mm (see `gtidy::convert_units`).
+/// Returns the number of lines changed.
+#[no_mangle] pub extern "C" fn gconv_run(len: f64, to_metric: f64, lathe: f64, int_mode: f64) -> f64 {
+    let r = c::gtidy::convert_units(&gt_src(len), to_metric != 0.0, lathe != 0.0, if int_mode == 1.0 { 1 } else { 0 });
+    gt_store(r.text, c::gtidy::msgs_text(&r.msgs));
+    r.changed as f64
+}
+/// Lathe (1), mill (0) or cannot tell (-1); the reasons are read with `gtidy_msgs`.
+#[no_mangle] pub extern "C" fn gdetect(len: f64) -> f64 {
+    let (k, why) = c::gtidy::detect_machine(&gt_src(len));
+    gt_store(String::new(), why);
+    k as f64
+}
+#[no_mangle] pub extern "C" fn gtidy_text() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GT_TEXT)).clone() }) }
+#[no_mangle] pub extern "C" fn gtidy_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GT_MSGS)).clone() }) }
+
 // Mechanics (core/src/mechanics.rs): unit-consistent unless named.
 use c::mechanics as mech;
 #[no_mangle] pub extern "C" fn mech_section(shape: f64, p1: f64, p2: f64, p3: f64, p4: f64, which: f64) -> f64 { mech::section_flat(shape, p1, p2, p3, p4, which as u32) }

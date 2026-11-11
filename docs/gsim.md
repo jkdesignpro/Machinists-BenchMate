@@ -1,10 +1,12 @@
-# G-code backplot (simulator)
+# G-code editor and simulator
 
-Screen: **G-code backplot (simulator)** (`gsim`), group "G-code cycles", code in
+Screen: **G-code editor and simulator** (`gsim`), group "G-code cycles", code in
 `app/gsim.js`. Parser and simulation: `core/src/gsim.rs`, tests in
 `core/src/gsim/tests.rs`. WebAssembly exports `gsim_*` in `wasm/src/lib.rs`.
 Parity batch A5 (`docs/parity-audit.md`, U95): 2D backplot and cycle-time estimate done;
-3D, stock removal and the remaining canned cycles later.
+stock removal and the remaining canned cycles later. Since 0.4.0 the screen is also an
+editor (undo, insert and delete line, tidy, inch / mm) and has a 3D view with a view cube;
+see "Editor and tidy tools" at the end.
 
 **It is a backplot of the programmed path, not a machine verification.** There is
 no stock, tool shape, cutter or nose radius compensation, machine travel limit,
@@ -119,3 +121,59 @@ counted on the screen.
   codes listed here; Haas lathe G71 single-block form).
 - NIST RS274NGC interpreter, version 3 (Kramer, Proctor, Messina, NISTIR 6556):
   word and comment format, arc end-point radius check.
+
+## Editor and tidy tools (0.4.0)
+
+Code: `core/src/gtidy.rs` (10 tests), exports `gtidy_run`, `gconv_run`, `gdetect`,
+`gtidy_text`, `gtidy_msgs` in `wasm/src/lib.rs`, UI in `app/gsim.js`.
+
+**The view.** The camera is two angles: `az` turns about Z, `el` is the height of the
+eye (90 looks down Z). Screen right r = (cos az, sin az, 0), screen up
+u = (-sin az sin el, cos az sin el, cos el), towards the eye d = r x u. XY is (0, 90),
+XZ (0, 0), YZ (90, 0), 3D (45, 35.264). A point is drawn at (p . r, p . u): a parallel
+projection, so lengths in the screen plane keep their scale and the scale bar stays
+true. This is layout only; every coordinate comes from the core.
+
+**Lathe or mill (Auto).** `detect_machine` adds up signs that only one kind of machine
+uses. Lathe: a four-digit T word (3), G50 with S (3), G71 or G72 with P and Q (3), G96
+(2), G70 with P and Q (2), G92 with F and no Y (2), G32 (2), U or W outside a cycle (1).
+Mill: G43 with H (3), M06 (2), Y words (2), a drilling cycle G81 to G86 with R (2), G41
+or G42 with D (2), G17 (1). The side that leads by 2 or more wins; otherwise the active
+machine profile decides, else mill. The weights are BenchMate's own choice. The page
+prints the signs it found.
+
+**Renumber and strip.** A sequence number is the first word of a block (after a block
+skip `/`). New numbers run from the start by the step over the numbered blocks, or over
+every block (not `%`, the O line, comment-only or blank lines). Blocks that name other
+blocks are followed: P and Q on a lathe G70 to G73 block, P on M97 and M99, and a
+literal number after GOTO. On a mill G73 is peck drilling and its Q is left alone.
+M98 P is a program number and is left alone. A named number that is not in the program
+is reported and left. Removing numbers keeps the named ones. Removing comments keeps the
+first comment on the O line (the program name). Macro statements (`#`, `[`, `=`, IF,
+WHILE, GOTO) are never re-spaced.
+
+**Inch / mm.** Words converted as lengths (x 25.4 or / 25.4): X Y Z U V W I J K, R
+(not on a G68 rotation, not the pass count of a lathe G73), `,C` and `,R`, Q on a mill,
+F (not under G93). S under G96 is a surface speed (x or / 3.28084), except on a G50 or
+G92 block. On a lathe, Q and the P of G74, G75 and the second G76 block are whole numbers
+in least input increments (0.001 mm or 0.0001 in) and are converted as counts; P and Q
+on G70 to G73 are block numbers and are left; D on G71, G72 and G76 is a length with a
+decimal point, a count without. Everything else (A B C H L M N O T, P elsewhere, E) is
+left, and E is reported. Output: 4 decimals in inch, 3 in mm; feeds 6 decimals under
+1 in, 4 decimals under 10 mm. Zero without a decimal point is left as it is.
+
+A length with no decimal point is read as the user says: whole units (pocket calculator
+type) or least input increments. Both readings exist on real controls (FANUC parameter
+3401 bit 0, Haas Setting 162), so the converter does not guess. Every lathe cycle block,
+macro statement, polar or scaling block and E word is listed. The result is run through
+the simulator, whose arc check catches end points and centres that rounding moved apart.
+
+Sources: decimal point reading and the 0.001 mm increment, FANUC decimal point
+programming as reprinted at https://www.mfgrobots.com/Article/equipment/cnc/46531.html ;
+least input increment 0.001 mm and 0.0001 in, Modern Machine Shop,
+https://mmsonline.com/columns/reducing-a-cncs-least-input-increment-value ; G76 P and Q
+with no decimal point, CNC Training Centre, https://www.cnctrainingcentre.com/tag/g76-haas ;
+the lathe cycle formats are those already cited above for the simulator and in
+`docs/cycles.md`. Read 2026-11-11. The Haas Setting 162 page could not be read here and
+is named, not counted.
+

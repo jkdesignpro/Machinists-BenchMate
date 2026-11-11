@@ -4,6 +4,18 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-11
+Stage 2 of the plan: drawings and editors. Built on top of 0.3.0.
+
+### Added (G-code editor and simulator)
+- **G-code editor and simulator** (was "G-code backplot"): the program box is now an editor with **Undo and Redo** (buttons, Ctrl+Z and Ctrl+Y; every tidy, conversion, insert and delete can be undone), **Insert line** and **Delete line** at the current line, and **Save file**. Clicking in the program or in the listing sets the current line and block.
+- **3D view with a view cube**: the mill path can be seen from the top, front, side or in 3D. Drag the 3D view to turn it, click a face of the cube to look straight at it, drag the cube to turn from any view. The origin shows its X, Y and Z axes.
+- **Lathe or mill told from the program** (Machine: Auto): from words only one of them uses, such as T0101, G50 S, G96 and G71 with P and Q against G43 H, M06 and Y words. The page says which signs it found; when there are too few, the active machine decides. You can still pick Mill or Lathe yourself.
+- **Playback speed**: 2, 8 or 30 blocks a second.
+- **Tidy**: renumber the sequence numbers from a start by a step (numbered blocks only, or every block), or remove them; remove comments (the program name on the O line stays) and blank lines; one space between words or none; upper case. Blocks that name other blocks keep working: the P and Q of the lathe cycles G70 to G73, P of M97 and M99 and GOTO follow the new numbers, and numbers that are named are kept when the rest are removed.
+- **Inch / mm**: convert a program between inch and mm. Lengths, feeds and G96 surface speeds are converted, G20 and G21 swapped, and on a lathe the whole-number depths of G74, G75 and G76 are converted as counts of the least input increment. You choose how a length with no decimal point is read (whole units, or least input increments); every lathe cycle block, macro statement and unusual word is listed for you to check. Offsets stored in the control are not in the program and are not converted, and the page says so.
+- `benchmate-core`: new module `gtidy` (`tidy`, `convert_units`, `detect_machine`, `word_num`, `convert_length`, `convert_surface_speed`, `convert_increments`) with 10 tests.
+
 ## [0.3.0] - 2026-11-11
 Stage 1 of the plan: the physics behind speeds and feeds. Built on top of 0.2.0.
 
