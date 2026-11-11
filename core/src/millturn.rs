@@ -209,6 +209,13 @@ pub fn spot_depth(dc: f64, angle_deg: f64) -> f64 {
     dc / 2.0 / (angle_deg.to_radians() / 2.0).tan()
 }
 
+/// Chamfer diameter a pointed tool of included angle `angle` cuts at depth `z`
+/// from its tip: 2 z tan(angle/2) (inverse of `spot_depth`).
+pub fn spot_chamfer_dia(z: f64, angle_deg: f64) -> f64 {
+    if !(z >= 0.0 && angle_deg > 0.0 && angle_deg < 180.0) { return f64::NAN; }
+    2.0 * z * (angle_deg.to_radians() / 2.0).tan()
+}
+
 /// Centre drill depth from its tip for countersink diameter `dc`: the length from the
 /// tip to where the countersink cone starts (`l_pilot`, measured or from the maker),
 /// plus the cone from the pilot diameter `dp` out to dc: l + (dc - dp) / (2 tan(angle/2)).
@@ -376,6 +383,16 @@ mod tests {
         let z = centre_drill_depth(6.0, 2.5, 3.0, 60.0);
         assert!(close(z, 3.0 + 1.75 * 3f64.sqrt(), 1e-12));
         assert!(close(centre_drill_dia(z, 2.5, 3.0, 60.0), 6.0, 1e-12));
+        // spot_chamfer_dia inverts spot_depth
+        assert!(close(spot_chamfer_dia(spot_depth(8.0, 118.0), 118.0), 8.0, 1e-12));
+        assert!(close(spot_chamfer_dia(5.0, 90.0), 10.0, 1e-12));
+        // Table sizes (data/refdata/centredrills-evidence.json):
+        // ISO 866 type A, pilot 2.5 mm, pilot length 3.1 mm (min), full countersink at the
+        // 6.3 mm body: 3.1 + 1.9 / tan 30 = 6.3909 mm.
+        assert!(close(centre_drill_depth(6.3, 2.5, 3.1, 60.0), 3.1 + 1.9 * 3f64.sqrt(), 1e-12));
+        // Inch #3 plain (7/64 pilot and length), 60 deg, 0.200 in countersink:
+        // 0.109375 + 0.090625 / (2 tan 30) = 0.18786 in
+        assert!(close(centre_drill_depth(0.2, 0.109375, 0.109375, 60.0), 0.109375 + 0.090625 / 2.0 * 3f64.sqrt(), 1e-12));
     }
 }
 

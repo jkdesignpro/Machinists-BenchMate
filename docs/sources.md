@@ -116,6 +116,19 @@ Nothing was typed in from memory and no handbook was used. The formulas are in t
   - The 0.0068 rule is therefore labelled a rule of thumb, and the app tells users to use the tap maker's recommended hole.
   - (2026-11-11) North American Tool and Besly state the formula; Balax still prints larger holes for miniature sizes.
 
+### Centre drills (`data/refdata/centredrills-evidence.json`, spot and centre drill tool)
+All accessed 2026-11-11. Inch fractions are stored as exact decimals; consensus as for drills (inch: agree at the coarser printing; metric: agree only when equal).
+- **Inch plain type (#000 to #10, 60 deg; 82 and 90 deg in #1 to #8):** ICS Cutting Tools catalogue p. 114 (https://www.icscuttingtools.com/catalog/page_114.pdf); Greenfield Industries (Cleveland) style 217 via ME Campbell (https://www.mecampbell.com/media/pdf/GREENFE00009_131.pdf); Michigan Drill catalogue 582 (body and drill diameter only); Linear Tools data sheet LDS 1082 via Farnell (https://www.farnell.com/datasheets/2804844.pdf).
+  - Body and pilot diameters: confirmed by two to four publishers for every size.
+  - Pilot length: ICS and Greenfield agree for #1 to #8 (length = pilot diameter). #00 (.025 vs .030) and #0 (1/32 vs .038) differ. #000, #4-1/2, #9 and #10 lengths are single-source (ICS). Linear Tools (UK, BS 328 practice) prints longer pilot lengths for every size; shown as an outlier.
+  - ICS prints the #00 drill diameter as "0.25", a misprint for .025 (its drill length column and the other makers print .025); recorded as .025 with a note.
+- **Inch bell type (#11 to #20, 60 deg with a 120 deg bell chamfer):** Greenfield style 217B; Exact Tooling (https://exacttooling.com/pages/cuttingtools-solidround-combineddrills-countersinks-belltype); Michigan Drill list 587; Linear Tools. #11 to #18 confirmed by three; #20 by two (Exact, Michigan); #19 single-source (Exact). Linear Tools differs on pilot lengths and on the #14 pilot (1/8 vs 7/64).
+- **Metric type A (ISO 866 / DIN 333 A):** ZPS-FN form A page (https://zps-fn.cz/en/drills/detail/centre-drills-60-form-a,-din-333a,-high-speed-steel-hss) and Linear Tools. Body, pilot and smallest pilot length confirmed for all sizes both print (Linear has no 8 mm); the largest pilot length is ZPS only.
+- **Metric type B (ISO 2540):** the public preview of ISO 2540:2016 Table 1 (https://cdn.standards.iteh.ai/samples/64194/2a14d980bea94904bca92bcfb2a6daf7/ISO-2540-2016.pdf); the 1973 edition preview prints the same numbers but is the same standard. TECWERK confirms only the 3.15 mm shank (11.2 mm). Everything else is single-source.
+- **Metric type R (ISO 2541):** the public preview of ISO 2541:2016 Table 1 and the ZPS-FN form R page. Pilot and body diameters confirmed; radius limits single-source and read from a text extract whose headings were misaligned (to be checked against the printed table). The depth for a countersink diameter is not computed for type R.
+- Not found in a free source: where the makers measure the pilot length from (tip, or the parallel part only). The tool assumes from the tip and shows the point length to add otherwise.
+- Standards cited by name: ISO 866:2016, ISO 2540:2016, ISO 2541:2016, DIN 333:1986 (60 deg centre drills, types R, A and B).
+
 ### Threads
 - **[WIKI_ISO]** Wikipedia, "ISO metric screw thread" (preferred sizes from ISO 262). https://en.wikipedia.org/wiki/ISO_metric_screw_thread (accessed 2026-11-10).
 - **[OPTIMAS_M]** Optimas Solutions, ISO metric thread dimensions. https://optimas.com/technical-resources/metric-thread-dimensions (accessed 2026-11-10). Checked against the ISO 68-1 formulas, two basic dimensions look like transposed digits:

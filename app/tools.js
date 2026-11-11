@@ -847,34 +847,10 @@ const TOOLS = [
 },
 {
   id: 'spotdepth', level: 'simple', group: 'Drilling and tapping', title: 'Spot and centre drill depth',
-  pick: { map: { ang: 'point' }, types: ['Spot', 'Drill', 'Chamfer', 'Other'] },
-  desc: 'Depth to program a spot drill, chamfer tool point or centre drill to for a given chamfer (countersink) diameter, or the diameter a depth gives. The centre drill\'s pilot length is yours to measure or take from its maker.',
-  fields: s => [
-    { id: 'mode', label: 'Tool', unit: '', def: 1, options: [[1, 'Spot drill or pointed chamfer tool'], [2, 'Centre drill (pilot and countersink)']] },
-    { id: 'dc', label: 'Chamfer / countersink diameter wanted', unit: lenU(s), def: s === 'inch' ? 0.3 : 8 },
-    { id: 'ang', label: 'Included angle of the point or countersink', unit: 'deg', def: 90 },
-    { id: 'dh', label: 'Hole diameter (optional, for the chamfer width)', unit: lenU(s), def: '' },
-    { id: 'dp', label: 'Centre drill pilot diameter', unit: lenU(s), def: '' },
-    { id: 'lp', label: 'Centre drill: tip to start of the countersink cone', unit: lenU(s), def: '' },
-    { id: 'z', label: 'Or a depth, to get the diameter', unit: lenU(s), def: '' },
-  ],
-  calc: (v, W, s) => {
-    if (!(v.ang > 0 && v.ang < 180)) return [];
-    const rows = [], dp = s === 'inch' ? 4 : 3;
-    if (v.mode === 2) {
-      if (!(v.dp > 0 && v.lp >= 0)) return [R('Centre drill', 'Enter the pilot diameter and the length from the tip to the countersink', '', 0)];
-      if (v.dc > 0) { const z = W.centre_drill_depth(v.dc, v.dp, v.lp, v.ang); rows.push(R('Depth from the tip', isFinite(z) ? z : 'Countersink smaller than the pilot', isFinite(z) ? lenU(s) : '', dp)); }
-      if (v.z > 0) { const d = W.centre_drill_dia(v.z, v.dp, v.lp, v.ang); rows.push(R('Countersink diameter at that depth', isFinite(d) ? d : 'Depth does not reach the countersink', isFinite(d) ? lenU(s) : '', dp)); }
-    } else {
-      if (v.dc > 0) rows.push(R('Depth from the tip', W.spot_depth(v.dc, v.ang), lenU(s), dp));
-      if (v.z > 0) rows.push(R('Chamfer diameter at that depth', 2 * v.z * Math.tan(v.ang * Math.PI / 360), lenU(s), dp));
-    }
-    if (v.dh > 0 && v.dc > v.dh) rows.push(R('Chamfer width on the hole (each side)', (v.dc - v.dh) / 2, lenU(s), dp));
-    return rows;
-  },
-  diagram: (v, s) => typeof mtSpotSvg === 'function' ? mtSpotSvg(v.mode, v.dc, v.ang, v.dp, v.lp) : '',
-  working: 'Pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts (it includes the pilot\'s own point). Program the Z depth to the tool tip; a tip with a flat or radius cuts slightly larger at the same depth.',
-  source: 'Right-triangle geometry of a cone (as in the Drill point length tool).',
+  desc: 'Depth to program a spot drill, chamfer tool point or centre drill to for a given chamfer (countersink) diameter, or the diameter a depth gives. Standard centre drills (inch plain and bell type #000 to #20, metric ISO 866 type A, ISO 2540 type B, ISO 2541 type R) can be picked by size, with every dimension\'s sources.',
+  render: el => renderSpotDepth(el),
+  working: 'Pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts. Standard sizes: see the note under the tool.',
+  source: 'Right-triangle geometry of a cone (as in the Drill point length tool). Centre drill sizes: ICS Cutting Tools, Greenfield (Cleveland), Michigan Drill, Exact Tooling, Linear Tools, ZPS-FN, TECWERK; ISO 2540:2016 and ISO 2541:2016 (public previews); ISO 866, DIN 333 cited by name. See docs/sources.md.',
 },
 {
   id: 'drillchart', level: 'simple', group: 'Drilling and tapping', title: 'Drill size chart',

@@ -182,6 +182,117 @@ async function renderTapDrill(el) {
   setCustomFields(); setType(); upd();
 }
 
+// ------------------------------------------------------------------ spot and centre drill depth
+const CD_FAMS = [
+  ['inch_plain', 'Inch, plain type (#000 to #10)', 'in'],
+  ['inch_bell', 'Inch, bell type (#11 to #20)', 'in'],
+  ['iso866_a', 'Metric type A, ISO 866 / DIN 333 A', 'mm'],
+  ['iso2540_b', 'Metric type B (protecting chamfer), ISO 2540 / DIN 333 B', 'mm'],
+  ['iso2541_r', 'Metric type R (radius form), ISO 2541 / DIN 333 R', 'mm'],
+];
+const CD_FIELD = { body: 'Body (shank) diameter', pilot: 'Pilot (drill) diameter', pilot_len: 'Pilot (drill) length', bell: 'Bell diameter (end of the 60° countersink)',
+  cone: 'Countersink diameter d2 (end of the 60°, start of the 120° chamfer)', l_min: 'Pilot length, smallest', l_max: 'Pilot length, largest', r_max: 'Radius r, largest', r_min: 'Radius r, smallest' };
+async function renderSpotDepth(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, C = R.centredrills;
+  const m = RMEM.spot || (RMEM.spot = { mode: 3, fam: inMode() ? 'inch_plain' : 'iso866_a', size: '', ang: 60, dc: '', z: '', dh: '', dp: '', lp: '', pang: 90 });
+  const num = id => { const x = parseFloat($('#' + id, el).value); return isFinite(x) ? x : NaN; };
+  const inp = (id, label, unit, val) => '<label class="f"><span>' + label + '</span><div class="row"><input id="' + id + '" type="number" step="any" inputmode="decimal" value="' + rEsc(val) + '"><span class="u">' + unit + '</span></div></label>';
+  const memLen = k => m[k] === '' || m[k] === undefined ? '' : String(+toUser(m[k]).toFixed(inMode() ? 4 : 3));
+  function draw() {
+    const fam = C && C.families[m.fam] ? m.fam : 'iso866_a', rows = C ? C.families[fam] : [];
+    if (!rows.find(r => r.size === m.size)) m.size = rows.length ? rows[Math.min(3, rows.length - 1)].size : '';
+    const angs = (C && C.angles[fam]) || [60];
+    if (!angs.includes(+m.ang)) m.ang = angs[0];
+    el.innerHTML = '<div class="grid" style="max-width:760px">' +
+      '<label class="f"><span>Tool</span><div class="row"><select id="sm">' + [[1, 'Spot drill or pointed chamfer tool'], [3, 'Standard centre drill (pick type and size)'], [2, 'Centre drill, your own sizes']].map(o => '<option value="' + o[0] + '"' + (o[0] === m.mode ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></div></label>' +
+      (m.mode === 3 ? '<label class="f"><span>Centre drill type</span><div class="row"><select id="sf">' + CD_FAMS.map(f => '<option value="' + f[0] + '"' + (f[0] === fam ? ' selected' : '') + '>' + f[1] + '</option>').join('') + '</select></div></label>' +
+        '<label class="f"><span>Size</span><div class="row"><select id="ss">' + rows.map(r => '<option value="' + rEsc(r.size) + '"' + (r.size === m.size ? ' selected' : '') + '>' + rEsc(fam.startsWith('inch') ? r.size : r.size + ' mm pilot') + '</option>').join('') + '</select></div></label>' +
+        '<label class="f"><span>Included countersink angle</span><div class="row"><select id="sa">' + angs.map(a => '<option value="' + a + '"' + (+a === +m.ang ? ' selected' : '') + '>' + a + '°</option>').join('') + '</select></div></label>' :
+        inp('sang', 'Included angle of the point or countersink', 'deg', m.pang) +
+        (m.mode === 2 ? inp('sdp', 'Centre drill pilot diameter', uLen(), memLen('dp')) + inp('slp', 'Centre drill: tip to start of the countersink cone', uLen(), memLen('lp')) : '')) +
+      inp('sdc', 'Countersink (chamfer) diameter wanted', uLen(), memLen('dc')) +
+      inp('sz', 'Or a depth from the tip, to get the diameter', uLen(), memLen('z')) +
+      inp('sdh', 'Hole diameter (optional, for the chamfer width)', uLen(), memLen('dh')) +
+      '</div><div id="sres"></div><div id="sdia"></div><div class="note" id="snote"></div>';
+    $('#sm', el).onchange = e => { m.mode = +e.target.value; draw(); };
+    if ($('#sf', el)) $('#sf', el).onchange = e => { m.fam = e.target.value; m.size = ''; draw(); };
+    if ($('#ss', el)) $('#ss', el).onchange = e => { m.size = e.target.value; calc(); };
+    if ($('#sa', el)) $('#sa', el).onchange = e => { m.ang = +e.target.value; calc(); };
+    el.querySelectorAll('input').forEach(i => i.oninput = () => {
+      const k = { sdc: 'dc', sz: 'z', sdh: 'dh', sdp: 'dp', slp: 'lp' }[i.id];
+      if (k) m[k] = i.value === '' ? '' : fromUser(parseFloat(i.value)); else if (i.id === 'sang') m.pang = i.value;
+      calc();
+    });
+    calc();
+  }
+  function calc() {
+    const out = $('#sres', el), dia = $('#sdia', el), note = $('#snote', el), rows = [];
+    const dcU = num('sdc'), zU = num('sz'), dhU = num('sdh'), dpL = inMode() ? 4 : 3;
+    const len = mm => fBoth(mm);
+    let svg = '';
+    if (m.mode !== 3) {
+      const ang = num('sang'), dc = fromUser(dcU), z = fromUser(zU), dh = fromUser(dhU);
+      if (!(ang > 0 && ang < 180)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter an included angle between 0 and 180°.</td></tr></table></div>'; dia.innerHTML = ''; return; }
+      if (m.mode === 2) {
+        const dp = fromUser(num('sdp')), lp = fromUser(num('slp'));
+        if (!(dp > 0 && lp >= 0)) rows.push(['Centre drill', 'Enter the pilot diameter and the length from the tip to the countersink']);
+        else {
+          if (dc > 0) { const zz = W.centre_drill_depth(dc, dp, lp, ang); rows.push(['<b>Depth from the tip</b>', isFinite(zz) ? '<b>' + len(zz) + '</b>' : 'Countersink smaller than the pilot']); }
+          if (z > 0) { const d = W.centre_drill_dia(z, dp, lp, ang); rows.push(['Countersink diameter at that depth', isFinite(d) ? len(d) : 'Depth does not reach the countersink']); }
+          svg = mtSpotSvg(2, dc, ang, dp, lp);
+        }
+      } else {
+        if (dc > 0) rows.push(['<b>Depth from the tip</b>', '<b>' + len(W.spot_depth(dc, ang)) + '</b>']);
+        if (z > 0) rows.push(['Chamfer diameter at that depth', len(W.spot_chamfer_dia(z, ang))]);
+        svg = mtSpotSvg(1, dc, ang);
+      }
+      if (dh > 0 && dc > dh) rows.push(['Chamfer width on the hole (each side)', len((dc - dh) / 2)]);
+      out.innerHTML = '<div class="res"><div class="h">Results</div><table>' + (rows.length ? rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') : '<tr><td class="ms">Enter a countersink diameter or a depth.</td></tr>') + '</table></div>';
+      dia.innerHTML = svg;
+      note.innerHTML = '<b>Working:</b> pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts (it includes the pilot\'s own point). Program the Z depth to the tool tip; a tip with a flat or radius cuts slightly larger at the same depth. Right-triangle geometry of a cone, as in the Drill point length tool.';
+      return;
+    }
+    // Standard centre drill from the table
+    const fam = m.fam, F = C.families[fam], r = F.find(x => x.size === m.size), inch = fam.startsWith('inch');
+    const toMm = v => inch ? v * IN_MM : v, srcs = C.sources, ang = +m.ang;
+    const val = f => r[f] ? toMm(r[f].value) : NaN;
+    const ev = c => badge(c.status) + ' <span class="ms" title="' + rEsc(groupsTitle(srcs, c.groups.map(g => ({ value: inch ? g.value : g.value, publishers: g.publishers })))) + '">' + c.groups.map((g, i) => (i ? '; ' : '') + (c.groups.length > 1 ? (inch ? fx(g.value, 4) + ' in' : g.value + ' mm') + ': ' : '') + g.publishers.map(p => rEsc(pubName(srcs, p))).join(', ')).join('') + '</span>';
+    const dimRows = Object.keys(CD_FIELD).filter(f => r[f]).map(f => '<tr><td>' + CD_FIELD[f] + '</td><td class="v">' + len(val(f)) + '</td><td>' + ev(r[f]) + '</td></tr>').join('') +
+      '<tr><td>Included countersink angle</td><td class="v">' + ang + '°</td><td><span class="ms">' + (fam === 'iso2540_b' ? 'with a 120° protecting chamfer beyond d2' : fam === 'inch_bell' ? 'with a 120° bell chamfer beyond the bell diameter' : fam === 'iso2541_r' ? 'radius form: the profile is an arc, not a cone' : '') + '</span></td></tr>';
+    const dp = val('pilot');
+    const maxDc = fam === 'inch_bell' ? val('bell') : fam === 'iso2540_b' ? val('cone') : val('body');
+    const ls = fam.startsWith('inch') ? [['', val('pilot_len')]] : [['smallest pilot length', val('l_min')], ['largest pilot length', val('l_max')]].filter(x => isFinite(x[1]));
+    const dc = fromUser(dcU), z = fromUser(zU), dh = fromUser(dhU), res = [];
+    if (fam === 'iso2541_r') {
+      res.push(['Depth for a countersink diameter', 'Not worked out for the radius form: the arc touches a 60° lathe centre along a line, and the free sources do not give where the arc starts. Use the tool maker\'s drawing.']);
+    } else if (!(dp > 0) || !ls.length) {
+      res.push(['Depth', 'This size has no pilot length in the sources in hand.']);
+    } else {
+      res.push(['Largest countersink this size can make', len(maxDc)]);
+      ls.forEach(([lab, l]) => res.push(['Depth to that largest countersink' + (lab ? ' <span class="ms">(' + lab + ')</span>' : ''), len(W.centre_drill_depth(maxDc, dp, l, ang))]));
+      if (dc > 0) {
+        if (dc < dp) res.push(['Depth from the tip', 'Countersink smaller than the pilot']);
+        else {
+          ls.forEach(([lab, l]) => res.push(['<b>Depth from the tip</b>' + (lab ? ' <span class="ms">(' + lab + ' ' + fLen(l) + ' ' + uLen() + ')</span>' : ''), '<b>' + len(W.centre_drill_depth(dc, dp, l, ang)) + '</b>']));
+          if (dc > maxDc * (1 + 1e-9)) res.push(['Check', '<span class="warn">Larger than this size can cut (' + fLen(maxDc) + ' ' + uLen() + '): choose a bigger size</span>']);
+          const pt = W.drill_point_length(dp, inch ? 118 : 120);
+          res.push(['If the maker\'s pilot length leaves out the pilot\'s point (' + (inch ? 118 : 120) + '°), add', len(pt)]);
+        }
+      }
+      if (z > 0) ls.forEach(([lab, l]) => { const d = W.centre_drill_dia(z, dp, l, ang); res.push(['Countersink diameter at that depth' + (lab ? ' <span class="ms">(' + lab + ')</span>' : ''), isFinite(d) ? len(Math.min(d, maxDc)) + (d > maxDc ? ' <span class="warn">past the end of the countersink</span>' : '') : 'Depth does not reach the countersink']); });
+      if (dh > 0 && dc > dh) res.push(['Chamfer width on the hole (each side)', len((dc - dh) / 2)]);
+      svg = mtSpotSvg(2, dc > dp ? Math.min(dc, maxDc) : maxDc, ang, dp, ls[0][1]);
+    }
+    out.innerHTML = '<div class="res mtab"><div class="h">' + rEsc((CD_FAMS.find(f => f[0] === fam) || [])[1] || '') + ', size ' + rEsc(m.size) + '</div><table><tr><th>Dimension</th><th style="text-align:right">Value</th><th>Evidence</th></tr>' + dimRows + '</table></div>' +
+      '<div class="res" style="margin-top:12px"><div class="h">Depth</div><table>' + res.map(x => '<tr><td>' + x[0] + '</td><td class="v">' + x[1] + '</td></tr>').join('') + '</table></div>';
+    dia.innerHTML = svg;
+    note.innerHTML = '<b>Working:</b> depth from the tip z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the pilot length, taken as measured from the tip to where the countersink cone starts. The free sources do not draw where the pilot length is measured from; if your maker measures only the parallel part, add the point length shown. Metric types A and B give the pilot length as a range (smallest and largest), so the depth is shown for both. The countersink cannot be larger than the body (plain type, type A), the bell diameter (bell type) or d2 (type B). The radius form (type R) is listed for its sizes only. Program the Z depth to the tool tip and check the first part.<br>' +
+      '<b>Evidence:</b> Confirmed = two or more independent publishers print the same value; One source = a single publisher so far (the type B and type R tables are read from the public preview of the ISO standard only). Inch: ICS Cutting Tools, Greenfield (Cleveland), Michigan Drill and Linear Tools for the plain type; Greenfield, Exact Tooling, Michigan Drill and Linear Tools for the bell type. Linear Tools (UK) prints longer pilot lengths than the US makers for every inch size; they are shown as a differing source, not used. Sizes #00 and #0: ICS and Greenfield print different pilot lengths. Metric type A: ZPS-FN and Linear Tools. Standards cited by name: ISO 866:2016 (type A), ISO 2540:2016 (type B), ISO 2541:2016 (type R), DIN 333:1986.<br><b>Sources:</b><br>' + sourceList(srcs);
+  }
+  draw();
+}
+
 // ------------------------------------------------------------------ thread data
 async function renderThreadData(el) {
   const R = await loadRef(el); if (!R) return;

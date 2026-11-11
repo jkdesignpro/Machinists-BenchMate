@@ -5,6 +5,10 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 ## [Unreleased]
 ### Added
 - **Tap drill size**: thread engagement slider (55 to 85 %, value shown) and a Cut tap / Form tap choice. Each tap type keeps its own engagement, starting at 75 % for cutting and 65 % for forming (USCTI and FM Carbide for cutting; Besly and FM Carbide for forming, quoted as ranges). The result shows the theoretical hole for both tap types and, for each, the nearest number, letter, fractional and metric drill below and above with the difference and the engagement that drill really gives.
+- **Spot and centre drill depth**: pick a standard centre drill by type and size: inch plain (#000 to #10, 60, 82 or 90°) and bell type (#11 to #20), metric type A (ISO 866 / DIN 333 A), type B (ISO 2540) and type R (ISO 2541). Shows body, pilot diameter, pilot length (a range for metric), bell or d2 diameter and included angle, each with its publishers and status, the largest countersink the size can make, the depth to reach your countersink diameter (for both ends of a pilot length range) and the diameter at a depth. Data in `data/refdata/centredrills-evidence.json` from seven publishers and two ISO previews; single-source and differing values are marked.
+- `benchmate-core`: `spot_chamfer_dia` (diameter a pointed tool cuts at a depth; was worked out in the screen) with tests, and table-size tests for `centre_drill_depth`.
+### Changed
+- The spot and centre drill tool is now its own screen (it was a plain form) so each table value can show its sources.
 
 ## [0.1.0] - 2026-11-11
 ### Added (tooling reference)

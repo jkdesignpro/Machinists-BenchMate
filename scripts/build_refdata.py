@@ -285,6 +285,23 @@ def build_tapers():
     return out
 
 
+def build_centredrills():
+    """Centre drills: inch plain and bell type (decimal inch, agree at the coarser printing) and
+    metric types A, B, R (agree only when equal: '1.3' and '1.6' are different lengths)."""
+    ev = load_ev('centredrills-evidence.json')
+    if not ev: return None
+    out = {'sources': sources_of(ev), 'families': {}, 'angles': ev.get('angles', {})}
+    for fam, sec in ev['families'].items():
+        fields = []
+        for rows in sec.values():
+            for r in rows.values():
+                for f in r:
+                    if f not in fields: fields.append(f)
+        ordr = ev['order'][fam]
+        out['families'][fam] = build_series(sec, fields, order=lambda s, o=ordr: (o.index(s) if s in o else len(o), s), exact=not fam.startswith('inch'))
+    return out
+
+
 # ---------------------------------------------------------------- round 3: codes, groups, tables
 def is_rng(v):
     """'0.05-0.152' or '12.5' (all parts numeric)."""
@@ -803,7 +820,13 @@ def main():
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
            'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),
-           'matref': build_matref()}
+           'matref': build_matref(), 'centredrills': build_centredrills()}
+    for fam, rows in (out['centredrills'] or {}).get('families', {}).items():
+        st = collections.Counter(c['status'] for r in rows for f, c in r.items() if f != 'size')
+        print('  centre drills', fam, len(rows), 'sizes', dict(st))
+        for r in rows:
+            for f, c in r.items():
+                if f != 'size' and c['status'] not in ('confirmed', 'review'): print('   ', fam, r['size'], f, c['status'], [(g['value'], g['publishers']) for g in c['groups']])
     out['fasteners'] = build_fasteners(out['drills']['drills'])
     for sec in ('other_threads', 'tapers', 'power_threads'):
         if not out[sec]: continue
