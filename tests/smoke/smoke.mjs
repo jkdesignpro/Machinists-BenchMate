@@ -65,6 +65,23 @@ where = 'search';
 await page.fill('#search', 'thread');
 await page.waitForTimeout(50);
 
+// Drill chart: "#7" (the placeholder's own example) must find number drill 7 only.
+where = 'drillchart #7';
+await page.fill('#search', '');
+await page.dispatchEvent('#search', 'input');
+await page.click('#list button.t[data-id="drillchart"]');
+await page.fill('#dq', '#7');
+await page.dispatchEvent('#dq', 'input');
+const drillRows = await page.$$eval('#dres tr', trs => trs.slice(1).map(tr => tr.querySelector('td').textContent.trim()));
+if (drillRows.length !== 1 || drillRows[0] !== '#7') problems.push(`[${where}] expected only #7, got ${drillRows.length} rows: ${drillRows.slice(0, 5).join(', ')}`);
+
+// Material data: a designation a publisher prints must not also be listed as "unsourced".
+where = 'materials data';
+const mat = JSON.parse(await readFile(path.join(appDir, 'data/materials.json'), 'utf8'));
+const mnorm = v => String(v).replace(/^UNS\s*/i, '').replace(/\s*\([^)]*\)/g, '').replace(/^(EN\s*)?AW\s*-?\s*/i, '').replace(/[\s-]/g, '').toUpperCase();
+for (const m of mat.materials) for (const [k, u] of Object.entries(m.unsourced || {}))
+  if (u && (m.fields[k] || []).some(v => mnorm(v.value) === mnorm(u))) problems.push(`[${where}] ${m.grade} ${k}: "${u}" is printed by a source but listed as unsourced`);
+
 await browser.close();
 server.close();
 if (problems.length) {

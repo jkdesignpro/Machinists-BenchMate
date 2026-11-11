@@ -203,8 +203,12 @@ for (fam, name), r in grades.items():
     status = "differs" if len(strong) >= 2 else "confirmed" if len(strong) == 1 else "review"
     pubs = sorted({sources[p["source"]]["publisher_norm"] for p in r["printed"] if p.get("values")})
     props = build_props(name, r["printed"])
+    # An "unsourced" designation that a publisher does print is not unsourced: the UI would
+    # label it "Not printed by any source yet" next to the same value with its publishers.
+    unsourced = {k: u for k, u in r["unsourced"].items()
+                 if not (u and any(norm(v["value"], k) == norm(u, k) for v in fields.get(k, [])))}
     out.append({"grade": name, "family": fam, "subfamily": r["subfamily"], "iso_group": r["iso_group"], "status": status,
-                "publishers": pubs, "fields": fields, "unsourced": r["unsourced"], "notes": r["notes"], "printed": r["printed"],
+                "publishers": pubs, "fields": fields, "unsourced": unsourced, "notes": r["notes"], "printed": r["printed"],
                 "properties": props})
 
 doc = {"schema": 3, "property_defs": {k: {"label": v["label"], "unit": v["unit"], "mechanical": v["mech"]} for k, v in PROPS.items()}, "families": {k: v for k, v in FAMILY_FIELDS.items()}, "key_field": KEY_FIELD,

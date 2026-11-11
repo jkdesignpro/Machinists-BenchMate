@@ -21632,9 +21632,7 @@ null
 }
 ]
 },
-"unsourced": {
-"uns": "S32205"
-},
+"unsourced": {},
 "notes": [
 "'2205' is a common name, not a true AISI number (TWI).",
 "Atlas prints UNS 'S32250' - transposition typo for S32205 (S32250 would be a different alloy). Otherwise consistent: 1.4462 / 318S13 / SUS 329J3L."
@@ -26006,11 +26004,7 @@ null
 }
 ]
 },
-"unsourced": {
-"en_number": "1.4125",
-"en_name": "X105CrMo17",
-"jis": "SUS440C"
-},
+"unsourced": {},
 "notes": [
 "Aalco prints 'UNS44004' (missing 'S'; typo for S44004). ISSF ISO 15510 aligns 440C with ISO X110Cr17 / '1.4023()' rather than 1.4125 X105CrMo17 - ISO grade is not identical to EN 1.4125. Outokumpu and Kennametal do not list 440C."
 ],
@@ -31905,8 +31899,7 @@ null
 ]
 },
 "unsourced": {
-"uns": "T30402",
-"en_name": "X153CrMoV12"
+"uns": "T30402"
 },
 "notes": [
 "MMC pairs D2 with 1.2601 (a close sister grade); WYS with 1.2379, the usual D2 equivalent. Names printed: X155CrVMo12-1 (WYS), X153CrMoV12 (MMC, for 1.2601).",
@@ -43443,10 +43436,7 @@ null
 }
 ]
 },
-"unsourced": {
-"en_name": "X5CrNiCuNb16-4",
-"jis": "SUS630"
-},
+"unsourced": {},
 "notes": [
 "Consistent. Note Outokumpu footnote: its 1.4542 is also offered as S15500 (15-5PH) - do not read that as equivalence."
 ],
@@ -46361,8 +46351,7 @@ null
 ]
 },
 "unsourced": {
-"uns": "G41400",
-"uk_en": "EN19"
+"uns": "G41400"
 },
 "notes": [
 "MMC pairs 4140 with 1.7223 41CrMo4 (a close sister grade). WYS prints JIS 'SCN440' (typo for SCM440).",
@@ -52181,10 +52170,7 @@ null
 }
 ]
 },
-"unsourced": {
-"jis": "SUS301",
-"bs970": "301S21"
-},
+"unsourced": {},
 "notes": [
 "Lucefin prints JIS 'SUS 302' and KS 'STS 302' for 1.4310/301; Outokumpu and Atlas print SUS 301 / STS 301. Likely Lucefin error (or a looser 'nearest' match). AFNOR: Outokumpu 'Z11 CN 18-08' vs Kennametal 'Z 11 CN 17-08'."
 ],
@@ -52785,10 +52771,7 @@ null
 }
 ]
 },
-"unsourced": {
-"bs970": "320S31",
-"jis": "SUS316Ti"
-},
+"unsourced": {},
 "notes": [
 "UNS DISAGREES THREE WAYS: ISSF, Atlas and Lucefin print S31635; Aalco prints S31625; Outokumpu prints S32100 (which is the UNS for 321 - clear Outokumpu typo). Aalco S31625 is also suspect. BS970: 320S31 (Aalco, Outokumpu, Atlas) vs 320S18 (Kennametal). EN name: Atlas prints old DIN-style 'X10CrNiMoTi18-10' (not the EN 10088 name). GB: old name 0Cr18Ni12Mo2Ti (Outokumpu) vs new 06Cr17Ni12Mo2Ti (Lucefin) - both GB systems."
 ],
@@ -53052,9 +53035,7 @@ null
 }
 ]
 },
-"unsourced": {
-"aisi": "317L"
-},
+"unsourced": {},
 "notes": [
 "TWI pairs 1.4438 with 317 (S31700); the X2 name means low carbon, i.e. 317L-type. Needs a second source.",
 "EN name differs: Kennametal X2CrNiMo18-15-4; Atlas X2CrNiMo18-16 (old DIN); ISSF ISO name X2CrNiMo19-14-4. AFNOR Z3 vs Z2 prefix (Outokumpu vs Kennametal). Outokumpu footnote warns that commercial 317L may not meet 1.4438 Ni range."
@@ -53345,10 +53326,7 @@ null
 }
 ]
 },
-"unsourced": {
-"bs970": "347S31",
-"jis": "SUS347"
-},
+"unsourced": {},
 "notes": [
 "BS970: 347S31 (Outokumpu, Atlas) vs 347S17 (Roymech) vs 314S20 (Kennametal - 314S20 looks wrong, probably a typo; '314' is a different alloy type). Old En: Atlas 58G; Roymech 58F/58G."
 ],
@@ -53586,12 +53564,7 @@ null
 }
 ]
 },
-"unsourced": {
-"aisi": "904L",
-"uns": "N08904",
-"en_number": "1.4539",
-"en_name": "X1NiCrMoCu25-20-5"
-},
+"unsourced": {},
 "notes": [
 "Not yet sourced.",
 "EN name: ISSF X1NiCrMoCu25-20-5 vs Atlas/Kennametal X1NiCrMoCuN25-20-5 (with N). JIS: ISSF prints SUS890L; Outokumpu and Atlas print none. EN 10088 current name should be checked against the standard."
@@ -54476,10 +54449,7 @@ null
 ]
 },
 "unsourced": {
-"aisi": "15-5PH",
-"uns": "S15500",
-"en_number": "1.4545",
-"en_name": "X5CrNiCu15-5"
+"aisi": "15-5PH"
 },
 "notes": [
 "Not yet sourced.",
@@ -55223,7 +55193,6 @@ null
 },
 "unsourced": {
 "uns": "G10400",
-"uk_en": "EN8",
 "jis": "S40C"
 },
 "notes": [
@@ -55683,7 +55652,6 @@ null
 ]
 },
 "unsourced": {
-"en_name": "11SMn37 (EN 10087)",
 "jis": "SUM25"
 },
 "notes": [
@@ -56303,8 +56271,7 @@ null
 ]
 },
 "unsourced": {
-"uns": "G86200",
-"uk_en": "EN362"
+"uns": "G86200"
 },
 "notes": [
 "Consistent: 1.6523 / 805M20. Parker gives old UK 'EN 362'."
@@ -56547,7 +56514,6 @@ null
 ]
 },
 "unsourced": {
-"uk_en": "EN31",
 "bs970": "535A99 also quoted"
 },
 "notes": [
@@ -56729,9 +56695,7 @@ null
 }
 ]
 },
-"unsourced": {
-"uk_en": "EN40B"
-},
+"unsourced": {},
 "notes": [
 "Nitriding steel."
 ],
@@ -56884,9 +56848,7 @@ null
 }
 ]
 },
-"unsourced": {
-"uk_en": "EN41B"
-},
+"unsourced": {},
 "notes": [
 "Nitriding steel."
 ],
@@ -57087,9 +57049,7 @@ null
 }
 ]
 },
-"unsourced": {
-"uk_en": "EN36"
-},
+"unsourced": {},
 "notes": [
 "Case-hardening steel.",
 "EN name for 1.5752: Smiths '14NiCr14' (DIN) vs Parker '15NiCr13' (EN 10084). EN36C = 832M13 / 1.6657 (Roymech)."
@@ -57838,9 +57798,7 @@ null
 }
 ]
 },
-"unsourced": {
-"uns": "T51620"
-},
+"unsourced": {},
 "notes": [
 "EN name for 1.2311: Lucefin '40CrMnMo7' vs Doerrenberg '40CrMnNiMo8-6-4' (the latter is traditionally 1.2738; Doerrenberg says the grades were merged in DIN EN ISO 4957). GB 5CrMnMo (Lucefin) - other references often use 3Cr2Mo for P20; not verified here."
 ],
