@@ -492,7 +492,7 @@ const TOOLS = [
     const rows = [];
     const k = s === 'inch' ? 1e6 : 1000; // in -> microinch, mm -> micrometre
     const u = s === 'inch' ? 'uin' : 'um';
-    if (v.f > 0 && v.r > 0) { rows.push(R('Theoretical Ra', W.ra_theoretical(v.f, v.r) * k, u, 1)); rows.push(R('Theoretical Rt (peak to valley)', W.rt_theoretical(v.f, v.r) * k, u, 1)); }
+    if (v.f > 0 && v.r > 0) { const dp = s === 'inch' ? 1 : 2; rows.push(R('Theoretical Ra', W.ra_theoretical(v.f, v.r) * k, u, dp)); rows.push(R('Theoretical Rt (peak to valley)', W.rt_theoretical(v.f, v.r) * k, u, dp)); }
     if (v.ra > 0 && v.r > 0) rows.push(R('Feed for target Ra', W.feed_for_ra(v.ra / k, v.r), feedRevU(s), 4));
     return rows;
   },
