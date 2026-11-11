@@ -1,7 +1,7 @@
 // Take a screenshot of one screen of the web UI (for checking layouts and drawings by eye).
 // Serves app/ from this checkout on a free port, so it works in any worktree.
 // Usage: node tests/smoke/shot.mjs '#/t/rpm' out.png [--w 1360] [--h 900] [--mode advanced] [--theme light]
-//        [--sys inch] [--sel '.tdia'] [--set speed=250,dia=1.5] [--wait 600]
+//        [--sys inch] [--sel '.tdia'] [--set speed=250,dia=1.5] [--wait 600] [--scale 2]
 //   --sel  screenshot only that element          --set  type values into inputs by data-id first
 // Needs app/benchmate.wasm and app/data (run scripts/build-web.sh, or copy them from a built checkout).
 import http from 'node:http';
@@ -24,7 +24,7 @@ const server = http.createServer(async (req, res) => {
 });
 await new Promise(r => server.listen(0, '127.0.0.1', r));
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: +(opt('w') || 1360), height: +(opt('h') || 900) } });
+const page = await browser.newPage({ viewport: { width: +(opt('w') || 1360), height: +(opt('h') || 900) }, deviceScaleFactor: +(opt('scale') || 1) });
 const errs = [];
 page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
 page.on('pageerror', e => errs.push('uncaught: ' + e.message));
