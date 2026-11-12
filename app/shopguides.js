@@ -170,9 +170,11 @@ const WH_SOURCES = {
   ADSK_FIX: 'S. McGarry, Autodesk Fusion blog, "Understanding the top 10 CNC fixturing types", 2022-03-14',
   HELICAL: 'Helical Solutions, Machining Guidebook, 2016: thin wall milling',
   WPI: 'W. Tian and others, HAAS Machine WPI Quick Guide, Worcester Polytechnic Institute, June 2012',
+  CIMCO_A: 'CIMCO, CNC programming book, appendix A "CNC milling work-holding examples": projects 8 (clamp), 12 (bracket) and 13 (housing) (cimco.com)',
 };
-// The Tormach article and the two CNC Cookbook guides share an author and much of their text.
-const WH_FAMILY = { CCB_VISE: 'WARF', TORM: 'WARF', CCB_CLAMP: 'WARF' };
+// The Tormach article and the two CNC Cookbook guides share an author and much of their text; the two CIMCO
+// keys are one book.
+const WH_FAMILY = { CCB_VISE: 'WARF', TORM: 'WARF', CCB_CLAMP: 'WARF', CIMCO10: 'CIMCO', CIMCO_A: 'CIMCO' };
 const whTags = keys => guideTags(keys, WH_SOURCES, WH_FAMILY);
 const whP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + whTags(keys)) + '</p>';
 
@@ -207,7 +209,7 @@ const WH_SQUARE = [
 
 function renderWorkholding(el) {
   const toc = [['wh-rules', 'Rules'], ['wh-vise', 'The vise'], ['wh-align', 'Align a vise'], ['wh-jaws', 'Jaws'], ['wh-soft', 'Soft jaws'], ['wh-square', 'Square a block'], ['wh-clamps', 'Clamps and plates'],
-    ['wh-thin', 'Thin parts'], ['wh-many', 'Round and many parts'], ['wh-src', 'Sources']];
+    ['wh-thin', 'Thin parts'], ['wh-sides', 'Flanges and angle plates'], ['wh-many', 'Round and many parts'], ['wh-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Holding work on a mill: the vise and its jaws, clamps and fixture plates, thin parts and tape, in our own words with our own drawings. Each statement shows the keys of the sources that confirm it (hover a key); anything not confirmed by two independent publishers is marked <span class="gtbv">to be verified</span>. A part that comes loose is dangerous: when in doubt hold it better and cut lighter.</p>' +
@@ -263,10 +265,18 @@ function renderWorkholding(el) {
     whP('<b>Tabs.</b> Leave the part joined to the stock by small tabs so the stock itself is the fixture, and cut the tabs last.', ['ADSK_FIX']) +
     whP('<b>Thin walls.</b> Take the wall down in steps on alternate sides with lighter and lighter radial cuts (one tool maker gives 50, 30, 15 and then 5 % of the cutter diameter), climb milling.', ['HELICAL']) +
 
+    '<h2 id="wh-sides">Flanges, angle plates and two-sided parts</h2>' +
+    whP('<b>A flange of spare stock.</b> Leave a flange round the part and put the clamps on it. They then bear on metal that will be cut away later, so they can be tightened hard without marking the finished part.', ['CIMCO_A']) +
+    whP('<b>Check for lift.</b> After clamping a plate, try to slide a sheet of paper or a feeler gauge under it. On a fixture, tap the part down with a soft mallet first.', ['CIMCO_A']) +
+    whP('<b>Angle plate.</b> A stiff, ground plate that stands a part on edge so that its ends and sides can be reached. Bolt the plate to the table and set it true, seat a finished face of the part against it and clamp it there, level the part with a square and then with an indicator, and pick up the new zero. Keep the part from standing far beyond the plate and cut lightly: an unsupported edge rings.', ['CIMCO_A']) +
+    whP('<b>Two-sided plate parts on dowels.</b> Cut the first side with a flange left on, and drill dowel holes in the flange. Make a fixture plate with matching dowel holes, turn the part over onto the dowels and clamp it by the flange. The dowels have to stand lower than the finished thickness, so that the facing cutter passes over them.', ['CIMCO_A']) +
+    whP('<b>Shoulder bolts.</b> Once the second side is faced, shoulder bolts through holes in the part locate it and hold it to the fixture while the flange is cut away. Check that each bolt really grips the part.', ['CIMCO_A']) +
+
     '<h2 id="wh-many">Round parts and many parts</h2>' +
     whP('<b>Round work</b> is held in soft jaws cut to its diameter, in a collet block or in a chuck standing on the table.', ['ADSK_FIX', 'CCB_VISE', 'NILS']) +
     whP('<b>Several parts at once.</b> A double-station vise, or several vises in a row, lets one program cut a first and a second operation, or several parts, in one cycle. Vises used together have to be matched in height.', ['ADSK_FIX', 'CCB_VISE']) +
-    whP('Lathe chucks and collets are in the <a href="#/t/cncguide">CNC knowledge guide</a>; chuck grip against speed is in <a href="#/t/chuckforce">chuck jaw force</a>.', null) +
+    whP('<b>Several parts from one bar.</b> Machine all the parts side by side in one piece of bar, then turn the bar over in the vise and face it away until the parts come free.', ['CIMCO_A']) +
+    whP('Lathe chucks and collets are in the <a href="#/t/latheguide">CNC lathe guide</a>; chuck grip against speed is in <a href="#/t/chuckforce">chuck jaw force</a>.', null) +
 
     '<h2 id="wh-src">Sources</h2><ul class="gsl">' + Object.entries(WH_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
     '<p class="desc">Full URLs and access dates are in docs/sources.md, "Workholding guide". No text, figures or tables were copied from the sources.</p>';

@@ -60,6 +60,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, fifth batch, 2026-11-12):** milling toolpath guide (`toolpaths`: from model to part, 2D and 3D, which toolpath for which feature, contour with cutter compensation and a worked example, pockets and slots, chamfer and radius milling, holes, 3D toolpaths, rest machining, tolerances), workholding guide (`workholding`: rules, vise and accessories, aligning a vise, jaws and soft jaws, squaring a block, clamps and fixture plates, thin parts, round parts and many parts) and the chamfer mill calculator (`chamfermill`). CN3, CN37 to CN47, CN56 to CN69, CN71 to CN73 and CN76 done; CN35, CN70 and CN75 partial; CN55 (3D tool compensation) and CN74 (angle plates) stay missing because no source for them was read. Counted from the tables below: 278 done, 215 partial, 103 missing of 596 in-scope rows, 47 %; 259 more rows to done for 90 %. The CNC machining handbook checklist is at 63 of 79, 80 %.
 
+**Update (0.6.0, sixth batch, 2026-11-12):** CNC lathe guide (`latheguide`: the machine, holding the part, bar work, common tools, speeds and feeds, toolpaths in order with the Haas cycles, parting off, live tools), glossary (`glossary`, 108 terms), and in the workholding guide a section on flanges, angle plates, dowels and shoulder bolts for two-sided parts and several parts from one bar. CN49, CN50, CN51, CN53, CN54, CN70, CN74, CN75 and CN82 done; CN70, CN74 and CN75 rest on one source each and are marked so in the app. Counted from the tables below: 287 done, 209 partial, 100 missing of 596 in-scope rows, 48 %; 250 more rows to done for 90 %. The CNC machining handbook checklist is at 72 of 79, 91 %; still open there: CN4, CN6, CN11, CN26, CN35, CN80 (partial) and CN55 (missing).
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -911,12 +913,12 @@ One row per learning objective.
 | CN46 | L7 Drilling and peck drilling | done | `toolpaths`, `cycdrill`, `advdrill` | Spot, drill, peck and the R plane explained; cycle generator and advisor |
 | CN47 | L7 Tapping toolpaths | done | `toolpaths`, `cycdrill`, `advtap` | G84 tapping explained; cycle generator and advisor |
 | CN48 | L8 Lathe coordinate system | done | `cncguide`, `tnrc` | Lathe Z and X, diameter programming, imaginary tip (`claude/cnc-guide`) |
-| CN49 | L8 Lathe workholding | partial | `cncguide` | Chuck speed, stick-out, support; no collet or chuck selection (`claude/cnc-guide`) |
-| CN50 | L8 Common lathe tools | missing | | |
-| CN51 | L8 Lathe speeds and feeds | partial | `rpm`, `passtime` | No recommendations |
+| CN49 | L8 Lathe workholding | done | `latheguide`, `cncguide`, `chuckforce` | Table of eight ways to hold work, chuck against collet, grip, speed and stick-out, bar work |
+| CN50 | L8 Common lathe tools | done | `latheguide`, `insertcode`, `holdercode` | Table of seven tool types, insert shapes with a drawing, nose radius, hand |
+| CN51 | L8 Lathe speeds and feeds | done | `latheguide`, `rpm`, `advturn` | Speed from the diameter, feed per revolution, when to use constant surface speed; starting values in the turning advisor (0.4.0) |
 | CN52 | L8 Constant surface speed | done | `cncguide`, `partofftime` | 0.6.0: G96 and G97, why the rpm climbs, the speed limit word by control (four sources), when fixed rpm is better |
-| CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | partial | `cycg71`, `cycgroove`, `cycthread`, `cyctaper` | Turn, groove, cut-off, thread; no facing or drilling on the lathe |
-| CN54 | L8 Live tools | partial | `machines` | Live-tool speed limit check only |
+| CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | done | `latheguide`, `cycg71`, `cycgroove`, `cycthread`, `cyctaper` | Face, rough, finish, groove, thread, drill and cut off in order with the Haas cycles; parting off in its own section |
+| CN54 | L8 Live tools | done | `latheguide`, `machines` | What live tools are, axial and radial holders, C axis, polar interpolation, Y axis, feed per minute, limits |
 | CN55 | L9 3D tool compensation | missing | | |
 | CN56 | L9 3D cut tolerances | done | `toolpaths` | "3D tolerances": the chain of tolerances and what a tighter one costs (one source, marked) |
 | CN57 | L9 Geometric features in 3D toolpaths | done | `toolpaths` | Steep or shallow decides the finishing pass, with a drawing |
@@ -932,19 +934,19 @@ One row per learning objective.
 | CN67 | App A: 2D contour with cutter compensation | done | `toolpaths` | Worked G41 contour example with lead-in and lead-out |
 | CN68 | App A: vise jaw types; installing and aligning jaws | done | `workholding` | Jaw types table; cutting soft jaws in place |
 | CN69 | App A: making and using soft jaws | done | `workholding` | Cut in place, clamp on a spacer, second operations, keeping parts alike |
-| CN70 | App A: multiple parts from one bar | partial | `workholding` | Several parts in several vises or a double-station vise; nothing on parting many parts from one bar |
+| CN70 | App A: multiple parts from one bar | done | `workholding` | Several parts cut side by side in one bar and freed by facing the back (one source, marked) |
 | CN71 | App A: fixture plates | done | `workholding` | Fixture plates: grid of tapped and dowel holes, plate material |
 | CN72 | App A: clamps and bolts | done | `workholding` | Step clamps with a drawing, heel height (sources differ, both shown), toe clamps |
 | CN73 | App A: thin-walled parts | done | `workholding` | Thin parts: why they are hard, vacuum, tape and glue, sacrificial plate, tabs, thin walls |
-| CN74 | App A: angle plates for multi-sided parts | missing | | |
-| CN75 | App A: shoulder bolts and dowel pins for two-sided parts | partial | `workholding` | Dowel holes in fixture plates and mirror-image soft jaws for second operations; no shoulder bolt and dowel pin procedure |
+| CN74 | App A: angle plates for multi-sided parts | done | `workholding` | Angle plate: what it is and how a part is set on it (one source, marked) |
+| CN75 | App A: shoulder bolts and dowel pins for two-sided parts | done | `workholding` | Dowel pins in a fixture plate for the second side, shoulder bolts while the flange is cut away (one source, marked) |
 | CN76 | App A: double-sided tape | done | `workholding` | Double-sided tape and superglue, with their limits |
 | CN77 | App B: tool length offset with paper | done | `millsetup` | 0.6.0: method A, on the part with paper or a feeler, with its drawbacks |
 | CN78 | App B: tool length offset with a 1-2-3 block from a finished face | done | `millsetup` | 0.6.0: method B with the block standing on a face milled flat |
 | CN79 | App B: tool length offset with a tool probe | done | `millsetup` | 0.6.0: method C, tool setting probe |
 | CN80 | App C: CNC process planning form | partial | `setupsheet` | Setup sheet, no operation-sequence plan |
 | CN81 | App D: G and M code reference | done | `gmcodes` | |
-| CN82 | App E: glossary | missing | | |
+| CN82 | App E: glossary | done | `glossary` | 108 terms in our own words with a search box; 97 link to the page that explains them |
 | CN83 | App F: drill chart and decimal equivalents | done | `drillchart` | |
 
 ## 6. Prioritised build list

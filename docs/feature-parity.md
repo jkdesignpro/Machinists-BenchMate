@@ -88,7 +88,9 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
 | Library | CNC mill setup guide (start-up, control keys, tool lengths four ways, work offsets, first run, adjusting, shut-down) | done (ours, 0.6.0; 13 public sources, single-source statements marked) | `millsetup` | |
 | Library | Milling toolpath guide (model to part, 2D and 3D, features, contour with cutter compensation, pockets, slots, chamfer and radius, holes, 3D toolpaths, rest machining, tolerances) | done (ours, 0.6.0; 7 public sources, single-source statements marked) | `toolpaths` | |
-| Library | Workholding guide (vise and accessories, aligning, jaws and soft jaws, squaring a block, clamps and fixture plates, thin parts, round and many parts) | done (ours, 0.6.0; 9 public sources, single-source statements marked) | `workholding` | |
+| Library | Workholding guide (vise and accessories, aligning, jaws and soft jaws, squaring a block, clamps and fixture plates, flanges and angle plates, thin parts, round and many parts) | done (ours, 0.6.0; 10 public sources, single-source statements marked) | `workholding` | |
+| Library | CNC lathe guide (holding the part, bar work, tools and insert shapes, speeds and feeds, toolpaths with the Haas cycles, parting off, live tools) | done (ours, 0.6.0; 9 public sources, single-source statements marked) | `latheguide` | |
+| Library | Glossary of shop and CNC words | done (ours, 0.6.0; 108 terms in our own words, 97 linked to the page that explains them) | `glossary` | |
 | Milling | Chamfer mill: tip depth, centre offset, cutting diameter, widest chamfer | done (ours, 0.6.0; own cone geometry, drawing to scale) | `chamfermill` | |
 | Library | Tip of the day | done (own tips, Home widget) | `tips.js` | U98 |
 | Library | Assistant, community cut data | missing (assistant: stage 5, optional and off by default; a shared cut library is not in the spec for 0.2 to 1.0) | | U101, U102 |

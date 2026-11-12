@@ -125,7 +125,7 @@ await mode('advanced');
 where = 'drawings';
 const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'symbols', 'gauges', 'calc', 'formulas',
   'machines', 'toollib', 'setupsheet', 'materials', 'tempercolours', 'heattreat', 'plastics', 'metalid',
-  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade', 'holdertorque']);
+  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade', 'holdertorque', 'glossary']);
 await units('inch');
 const noDrawing = [];
 for (const id of meta.tools) {
@@ -1917,12 +1917,42 @@ where = 'toolpaths';
   if (!/110 to 120 %/.test(g.all) || !/1 to 3 degrees/.test(g.all) || !/55 to 65 %/.test(g.all) || !/2 to 5 %/.test(g.all)) problems.push(`[${where}] the tool maker's starting figures are missing`);
   where = 'workholding';
   g = await guide('workholding');
-  if (g.h2 !== 10 || g.svgs !== 2 || g.tabs !== '6,7' || g.srcs !== 9) problems.push(`[${where}] 10 sections, 2 drawings, 5 jaw types, 6 squaring steps, 9 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
-  if (g.untagged !== 0 || g.tagged < 34) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  if (g.h2 !== 11 || g.svgs !== 2 || g.tabs !== '6,7' || g.srcs !== 10) problems.push(`[${where}] 11 sections, 2 drawings, 5 jaw types, 6 squaring steps, 10 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 40) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Parallels are ground steel strips', 'Heel height', 'Vacuum', 'Take the handle off the vise']) if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
   // The Tormach article and the CNC Cookbook guide have one author, so together they count once.
-  for (const k of ['Grip high and little', 'Locate, then clamp', 'Tabs', 'Thin walls']) if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  for (const k of ['Grip high and little', 'Locate, then clamp', 'Tabs', 'Thin walls', 'Angle plate', 'Two-sided plate parts on dowels', 'Several parts from one bar', 'Same pressure each time']) if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
   if (!/the sources differ/.test(g.all) || !/a step or two above level/.test(g.all) || !/about 14 psi/.test(g.all)) problems.push(`[${where}] heel height difference or vacuum figure missing`);
+  // CNC lathe guide: the two trade magazines have one publisher and the two Haas documents count once.
+  where = 'latheguide';
+  g = await guide('latheguide');
+  if (g.h2 !== 9 || g.svgs !== 4 || g.tabs !== '9,8,8' || g.srcs !== 10) problems.push(`[${where}] 9 sections, 4 drawings, tables of 8, 7 and 7 rows, 10 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 38) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Spindle and chuck', 'Chuck or collet', 'Through the spindle', 'On centre', 'Slow the feed near the centre', 'Coolant: the sources differ', 'Axial and radial', 'Milling a shape on the face', 'Feed per minute'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  for (const k of ['Turret', 'Bar puller', 'Puller or feeder', 'Round inserts', 'Do not cross the centre', 'Y axis', 'Codes on Haas', 'Nose radius compensation'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/to be verified/.test(row('Four-jaw chuck')) || /to be verified/.test(row('Collet chuck')) || /to be verified/.test(row('Rough turning and facing'))) problems.push(`[${where}] table rows: one source is flagged, two are not: ${row('Four-jaw chuck')} / ${row('Collet chuck')}`);
+    if (!/G71, the shape between blocks P and Q/.test(row('2 Rough turn')) || !/G75 \(outside or inside\), G74 \(in the face\)/.test(row('4 Groove')) || !/G76 \(the whole thread\), G92/.test(row('5 Thread'))) problems.push(`[${where}] the Haas cycles in the toolpath table: ${row('2 Rough turn')}`);
+  }
+  if (!/within 0\.1 mm \(0\.004 in\)/.test(g.all) || !/within 0\.005 in/.test(g.all) || !/8 to 10 times/.test(g.all) || !/G112/.test(g.all) || !/M133/.test(g.all) || !/1\/16 in to 2\.5 in/.test(g.all)) problems.push(`[${where}] parting off, live tool or collet figures are missing`);
+  // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
+  where = 'glossary';
+  await open('glossary', 150);
+  {
+    const q = async v => { await page.fill('#main [data-k="q"]', v); await page.waitForTimeout(60); return page.evaluate(() => ({ note: document.querySelector('#glres p.desc').innerText, terms: [...document.querySelectorAll('#glres tr td:first-child')].map(t => t.innerText), bad: [...document.querySelectorAll('#glres a[href^="#/t/"]')].map(a => a.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)), links: document.querySelectorAll('#glres a').length })); };
+    let r = await q('');
+    if (r.note !== '108 of 108 terms shown.' || r.terms.length !== 108 || new Set(r.terms).size !== 108) problems.push(`[${where}] 108 different terms: ${r.note} ${r.terms.length}`);
+    if (r.bad.length || r.links < 90) problems.push(`[${where}] every link must open a page: ${r.bad.join(', ')} (${r.links} links)`);
+    r = await q('turret');
+    if (r.terms.join(' | ') !== 'Bar feeder, bar puller | Live tool (driven tool) | Turret') problems.push(`[${where}] search for turret: ${r.terms.join(' | ')}`);
+    r = await q('no such word');
+    if (r.note !== '0 of 108 terms shown.') problems.push(`[${where}] a search with no match: ${r.note}`);
+    await q('');
+  }
   where = 'chamfermill';
   const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
   const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };

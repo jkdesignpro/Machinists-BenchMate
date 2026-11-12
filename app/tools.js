@@ -3384,6 +3384,20 @@ const TOOLS = [
   source: 'CNC Cookbook and Tormach (one author); CIMCO CNC programming book; J. A. Nilsson, Machine Shop Tutorials; M. R. Jennings, Introduction to Machining (CC BY); Autodesk Fusion blog; Helical Solutions Machining Guidebook; WPI Haas quick guide. Listed under the guide and in docs/sources.md.',
 },
 {
+  id: 'latheguide', level: 'advanced', group: 'Guides', title: 'CNC lathe guide',
+  desc: 'Turning on a CNC lathe: the machine, chucks, soft jaws and collets, bar work with a puller or feeder, the common tools and insert shapes, speeds and feeds, the toolpaths in the order they are run with the Haas cycles, parting off, and live tools with the C axis.',
+  render: el => renderLatheGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Cycle numbers are those of the Haas lathe manual read for this page.',
+  source: 'CIMCO CNC programming book, chapter 8; Haas Factory Outlet lathe programming manual (12/2024); Haas cut-off tool sheet; Production Machining and Modern Machine Shop (one publisher); CNC Cookbook; CNC Training Centre; Mitsubishi Materials. See docs/sources.md, "CNC lathe guide".',
+},
+{
+  id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
+  desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
+  render: el => renderGlossary(el),
+  working: 'No calculation: BenchMate\'s own wording. Where a term is explained on another page, the link opens that page and its sources.',
+  source: 'Own definitions. The choice of headwords was compared with the glossary of the CIMCO CNC programming book (appendix E, headwords only). See docs/sources.md, "Glossary".',
+},
+{
   id: 'toolwear', level: 'advanced', group: 'Guides', title: 'Tool wear guide',
   desc: 'Ten ways a cutting edge wears or fails, each with our own drawing, what you see, the causes and what to try: flank wear, crater wear, notch wear, built-up edge, chipping, thermal cracking, plastic deformation, fracture, flaking and chip hammering.',
   render: el => renderToolWear(el),
