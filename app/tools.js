@@ -3412,6 +3412,13 @@ const TOOLS = [
   source: 'WisTech Open Blueprint Reading (CC BY) and Machinist Guides (tolerances); Amesweb, Engineers Edge and Fractory (fits); Starrett, Quality Magazine, Mitutoyo and Travers (surface plates and blocks); Quality Magazine, Mitutoyo and Machinist Guides (micrometers and calipers); Fabrico, Acoem and the Machining FAQ (runout); GD&T Basics, Wevolver and Digital Surf (surface texture). Full list in docs/sources.md, "Measurement guide".',
 },
 {
+  id: 'cutguide', level: 'advanced', group: 'Guides', title: 'Cutting tools guide',
+  desc: 'What the cutting tools are called and what each is for: sixteen kinds of milling cutter, the tool materials from high speed steel to diamond with what each must not cut, the parts of a twist drill, files and filing, broaches with pitch and rise per tooth, and boring tools with their overhang limits.',
+  render: el => renderCutGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'Cutting Tool Engineering, American Machinist, MachineMfg and Wikipedia (milling cutters); CNCCookbook and AIMS Industrial (tool materials); TTE and The Engineers Post (twist drills); USDA Forest Service and Crescent Nicholson (files); American Machinist, Wikipedia and Engineers Edge (broaching); American Machinist and Cutting Tool Engineering (boring). Full list in docs/sources.md, "Cutting tools guide".',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),

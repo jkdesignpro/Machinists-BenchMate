@@ -68,6 +68,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, ninth batch, 2026-11-12):** measurement guide (`measguide`: ways to write a tolerance, the ten preferred fits, surface plates, checking micrometers and calipers, shaft runout, surface texture and lay symbols). MH75, MH78, MH87, MH92, MH94, MH184, ED12 and BB38 done (MH87 was missing); MH90 from missing to partial; notes brought up to date on MH93 and MH95. Counted from the tables below: 327 done, 180 partial, 89 missing of 596 in-scope rows, 55 %. For 90 %, 210 more rows have to reach done.
 
+**Update (0.6.0, tenth batch, 2026-11-12):** cutting tools guide (`cutguide`: kinds of milling cutter, tool materials ranked, twist drill terms, files and filing, broaches, boring tools). MH101, MH103, MH109, MH113, MH129 and BB64 done; MH105 and MH128 from missing to partial. Counted from the tables below: 333 done, 176 partial, 87 missing of 596 in-scope rows, 56 %. For 90 %, 204 more rows have to reach done.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -439,19 +441,19 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH98 | Indexable insert holder identification and selection | partial | `holdercode` | ISO 5608 external holder codes decoded; no selection guide (status corrected on `claude/tooling-ref`) |
 | MH99 | Carbide blanks and carbide-tipped tool styles | missing | | |
 | MH100 | Insert radius compensation (NC); threading insert radius | partial | `tnrc` | Nose radius shifts for chamfers, tapers and arcs, any tip 0-9, G41/G42 explained; no threading insert radius (`claude/cnc-guide`) |
-| MH101 | Cemented carbides, ceramics, superhard materials | partial | `toolguide` | One-paragraph summary of HSS, carbide, cermet, ceramic, CBN, PCD (needs 2nd source); no property data (`claude/tooling-ref`) |
+| MH101 | Cemented carbides, ceramics, superhard materials | done | `toolguide`, `cutguide` | Summary of HSS, carbide, cermet, ceramic, CBN and PCD in `toolguide`; 0.6.0: ranking drawing, hardness at 20 and 600 °C, top temperature and toughness (one source, marked), what each is used for and kept off, two differing temperature figures shown |
 | MH102 | ISO classification of hardmetals (P/M/K/N/S/H) | partial | `materials` (ISO group) | Groups shown on work materials; no grade chart |
-| MH103 | Milling cutters: selection, number of teeth, plain/side/T-slot/angle/shell/end mills | partial | `toolguide` | End mill flutes, end shapes, roughers, variable helix, high-feed; no plain, side, T-slot, angle or shell cutters (`claude/tooling-ref`) |
+| MH103 | Milling cutters: selection, number of teeth, plain/side/T-slot/angle/shell/end mills | done | `toolguide`, `cutguide` | End mill flutes, end shapes, roughers, variable helix and high-feed in `toolguide`; 0.6.0: sixteen cutter kinds (plain, side, staggered, half side, saw, angle, form, face, shell, end, ball, T-slot, Woodruff, dovetail, fly, hollow) with teeth and use, arbor against shank, plunging |
 | MH104 | Metal slitting saws | partial | `slitsaw` | Speeds and feeds; no saw dimensions |
-| MH105 | Keyseat and Woodruff cutters, spline-shaft cutters | missing | | |
+| MH105 | Keyseat and Woodruff cutters, spline-shaft cutters | partial | `cutguide` | 0.6.0: Woodruff keyseat cutter described (what it is and what it cuts); no cutter dimensions, no spline-shaft cutters |
 | MH106 | Cutter grinding: wheel speeds, clearance angles, indicator drop method | missing | | |
 | MH107 | Reamers: types, sizes, difficulties | partial | `toolguide` | Reamer types, flute direction by hole, stock allowance and speed (two sources shown); no reamer sizes or tolerances (`claude/tooling-ref`) |
 | MH108 | Dimensions of centres; countersink and spot drill depths | done | `spotdepth` | Centre drills by type and size (inch plain and bell, ISO 866, ISO 2540, ISO 2541), spot and countersink depths |
-| MH109 | Twist drill terms and types | partial | `toolguide` | Drill types and point angles 118/135/140, split point, spot drill angle; no terms drawing (`claude/tooling-ref`) |
+| MH109 | Twist drill terms and types | done | `toolguide`, `cutguide` | Drill types and point angles 118/135/140, split point, spot drill angle in `toolguide`; 0.6.0: fourteen terms with a drawing, point, helix and lip clearance angles (the last two one source, marked) |
 | MH110 | Drill sizes: fractional, gauge, letter, metric | done | `drillchart` | |
 | MH111 | Taper-shank drills; tolerance on diameter; accuracy of drilled holes | missing | | |
 | MH112 | Counterboring, counterbore sizes for bolts | partial | `shcs` | Counterbore sizes for socket head cap screws only (two makers, shown side by side); no counterboring practice or other head types |
-| MH113 | Boring tools | partial | `boringbar` | Overhang and deflection by bar material; no boring tool types |
+| MH113 | Boring tools | done | `boringbar`, `cutguide` | Overhang and deflection by bar material in `boringbar`; 0.6.0: boring tool types, why holes are bored, overhang limits, insert and cutting data against chatter |
 | MH114 | Taps: forms, marking, series designations, tap terms and dimensions | partial | `toolguide` | Tap types (spiral point, spiral flute, straight, forming) and chamfer lengths; no marking, series or tap dimensions (`claude/tooling-ref`) |
 | MH115 | Tap thread limits (H and D limits), pipe and insert taps | partial | `taplimits` | Inch H and L, metric D numbers computed and checked against 1B/2B/3B and 6H/5H/7H/6G; no pipe or STI tap limits; D minimums only where OSG prints them (`claude/tooling-ref`) |
 | MH116 | Acme and square-threaded taps | missing | | |
@@ -466,8 +468,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH125 | ER and other collets | partial | `holdertorque` | 0.5.0: ER collet nut torque by size, bore and nut (REGO-FIX, with Techniks beside it). No collet dimensions or clamping ranges |
 | MH126 | Portable tool spindles, square drives, hex chucks | out of scope? | | Portable power tools |
 | MH127 | Mounted wheels and points | missing | | |
-| MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | missing | | |
-| MH129 | Files and burs; speeds of rotary burs | partial | `shoptools` | Carbide burr cuts and speeds from two makers; no files |
+| MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | partial | `cutguide` | 0.6.0: runs of teeth, rise per tooth with figures (one source, marked), the two-teeth rule for pitch, tooth proportions, chip breakers, push and pull, rotary broaching; no pitch formula (not readable in the sources), no broach design calculation |
+| MH129 | Files and burs; speeds of rotary burs | done | `shoptools`, `cutguide` | Carbide burr cuts and speeds from two makers in `shoptools`; 0.6.0: files (parts, cuts, grades, shapes, filing practice, care) |
 | MH130 | Knurls and knurling: sizes, formulas for knurled work, tolerances | partial | `knurl` | Blank diameter by four methods with a trial procedure; no tolerances on knurled work |
 | MH131 | Tool wear: flank wear, cratering, chipping, deformation | done | `cncguide` | See U91 (`claude/cnc-guide`) |
 | MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | partial | `shoptools`, `toolguide` | Drill sharpening by hand, faults and web thinning; no carbide tool grinding or diamond wheels |
@@ -847,7 +849,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB61 | Mounted wheels and points | missing | | |
 | BB62 | Tungsten carbide burrs | done | `shoptools` | Cuts and what each is for; speeds by size from two makers, which differ and are both shown |
 | BB63 | Surface coatings (tool coatings) | done | `toolguide` | Ten coatings with use; max temperatures with every publisher value, confirmed only where two agree (`claude/tooling-ref`) |
-| BB64 | Relative position of cutting tool materials | partial | `toolguide` | Tool materials summary; no ranking chart (`claude/tooling-ref`) |
+| BB64 | Relative position of cutting tool materials | done | `toolguide`, `cutguide` | Tool materials summary in `toolguide`; 0.6.0: ranking drawing by hardness with the tough and brittle ends |
 | BB65 | Carbide grades and grade comparison chart | partial | `iso513`, `toolguide` | ISO 513 groups; no maker grade comparison chart (`claude/tooling-ref`) |
 | BB66 | Carbide insert identification | done | `insertcode` |  |
 | BB67 | Quick visual identification of insert shapes | done | `insertcode` | Insert drawn to scale from the code |

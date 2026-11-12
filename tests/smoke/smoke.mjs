@@ -1989,6 +1989,33 @@ where = 'toolpaths';
     if (rows.some(t => /to be verified/.test(t))) problems.push(`[${where}] every table row has two publishers`);
   }
   if (!/40 plus the square of the diagonal in inches divided by 25/.test(g.all) || !/0\.210, 0\.420, 0\.605, 0\.815 and 1\.000 in/.test(g.all) || !/0\.08 mm TIR is 0\.04 mm/.test(g.all) || !/0\.05 mm TIR at 1500 rpm/.test(g.all) || !/at least 90 % of the range/.test(g.all)) problems.push(`[${where}] figures from the sources`);
+  where = 'cutguide';
+  g = await guide('cutguide');
+  if (g.h2 !== 7 || g.svgs !== 5 || g.tabs !== '17,8,15,5,8,6' || g.srcs !== 16) problems.push(`[${where}] 7 sections, 5 drawings, tables of 16, 7, 14, 4, 7 and 5 rows, 16 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 77) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Arbor or shank', 'Shell mills', 'Slab mill', 'Plunging', 'The tough end', 'The hardest', 'High speed steel, how hot', 'Carbide, how hot', 'CBN is used on cast iron', 'Diamond is for', 'Point angle', 'Parts. A file', 'Grades', 'Length counts', 'The push stroke cuts', 'Draw filing', 'Pinning', 'What a broach is', 'Three runs of teeth', 'Pitch. The tooth spacing', 'One pitch or several', 'Push broaches are worked', 'Starting hole', 'Overhang of a steel bar', 'Against chatter, first'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  // Several pages of one publisher count once; the Engineers Edge broaching page follows the Wikipedia text.
+  for (const k of ['Plain cutters, narrow and wide', 'Helical teeth', 'Gear tooth cutters', 'The brittle end', 'Second hardest', 'Cermet', 'Never diamond on steel', 'Helix angle', 'Lip clearance', 'Swiss pattern files', 'Chalk', 'Rise per tooth, in figures', 'Tooth proportions and angles', 'Chip breakers', 'Rotary broaching', 'Broach material', 'Why bore', 'Stiffer bars', 'The insert'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    const flagged = k => /to be verified/.test(row(k));
+    if (!/On the rim and on the sides Slots and grooves/.test(row('Side milling cutter')) || !/Small disc on a shank The seat for a Woodruff key/.test(row('Woodruff')) || !/On the inside, like a thick-walled pipe/.test(row('Hollow mill'))) problems.push(`[${where}] cutter rows: ${row('Side milling cutter')} | ${row('Woodruff')}`);
+    if (!/850 HV 200 HV about 550 °C High/.test(row('High speed steel (M2)')) || !/8000 to 10000 HV breaks down above 600 °C about 600 °C Low/.test(row('Diamond (PCD)')) || !/3500 HV 3200 HV/.test(row('CBN'))) problems.push(`[${where}] hardness rows: ${row('High speed steel (M2)')} | ${row('Diamond (PCD)')}`);
+    if (!/TEP calls it the land, TTE the margin/.test(row('Land or margin')) || !/also called the dead centre/.test(row('Chisel edge')) || !/0\.0001 in \(0\.0025 mm\)/.test(row('Fine boring head'))) problems.push(`[${where}] drill and boring rows: ${row('Land or margin')} | ${row('Fine boring head')}`);
+    for (const k of ['Side milling cutter', 'Face mill', 'End mill', 'T-slot cutter', 'Fly cutter', 'Shank', 'Lip', 'Single cut', 'Double cut', 'Rasp', 'Plain boring bar', 'Fine boring head']) if (flagged(k)) problems.push(`[${where}] a two-publisher row must not be flagged: ${k}`);
+    for (const k of ['Staggered-tooth', 'Slitting saw', 'Angle cutter', 'High speed steel (M2)', 'Cermet', 'Neck', 'Web', 'Curved cut', 'Half round', 'Twin cutter head', 'Damped bar']) if (!flagged(k)) problems.push(`[${where}] a one-publisher row must say to be verified: ${k}`);
+    if (rows.filter(t => /to be verified/.test(t)).length !== 29) problems.push(`[${where}] 29 one-publisher rows: ${rows.filter(t => /to be verified/.test(t)).length}`);
+  }
+  if (!/about 550 °C at the cutting edge by AIMS; CNCC has it keep its hardness to between 600 and 650 °C/.test(g.all) || !/coated carbide 4\.58 times and PCD 5\.24 times/.test(g.all) || !/118° for general work, so each lip stands at 59° to the axis/.test(g.all) || !/00, 0, 1, 2, 3, 4 and 6/.test(g.all) || !/0\.003 to 0\.006 in \(0\.076 to 0\.152 mm\) for surface broaching/.test(g.all) || !/at least two teeth are in the work/.test(g.all) || !/6 diameters or more and a carbide bar 8 or more/.test(g.all) || !/lead angle of 0°, never more than 15°/.test(g.all)) problems.push(`[${where}] figures from the sources`);
+  {
+    const d = await page.$$eval('#main svg.geo', s => s.map(e => e.textContent.replace(/\s+/g, ' ')));
+    if (!/on an arbor/.test(d[0]) || !/Woodruff/.test(d[0]) || !/8000 to 10000/.test(d[1]) || !/rated brittle/.test(d[1]) || !/land \(margin\)/.test(d[2]) || !/118°/.test(d[2]) || !/double cut/.test(d[3]) || !/rise per tooth/.test(d[4]) || !/front pilot/.test(d[4])) problems.push(`[${where}] drawings: ${d.map(t => t.slice(0, 40)).join(' | ')}`);
+    const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
+    if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
+  }
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);
