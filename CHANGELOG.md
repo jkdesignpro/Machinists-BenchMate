@@ -12,6 +12,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (hexagon screws, nuts and washers)
+- New page **Hexagon screws, nuts and washers** (Reference > Fasteners): metric hexagon head height and width across flats (ISO 4014 / ISO 4017), nut width and height (ISO 4032) and plain washer hole, outside diameter and thickness (ISO 7089) for M3 to M36, with a side view of the joint drawn to scale, and inch hexagon nut width and thickness from 1/4 to 1 in. Eight new sources. Where publishers differ (nut height at M6 and M24, washer hole at M10) every printed value is shown.
+- **Spanner and hex key sizes**: a list of the metric and inch widths across flats together in order of size, each converted to the other unit, with the heads each one fits.
+- Not added: inch hexagon bolt head heights. The two free tables that could be read cleanly disagree with each other, so nothing is shown.
+
 ### Added (thread forms and terms)
 - New page **Thread forms and terms** (Reference > Guides): the parts of a thread with a drawing (major, minor and pitch diameter, pitch, crest, root, flank, thread angle), lead, starts and hand, ten thread forms with what each is for and a drawing of six of them, coarse and fine, straight and tapered, classes of fit, and 24 abbreviations found on drawings, taps and gauges. 12 public sources; statements with one publisher are marked.
 
@@ -29,7 +34,13 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (third batch)
 - MH218 (thread forms and definitions), BB6 (abbreviations for standard threads) and BB7 (thread forms used in engineering) from partial to done.
-- 378 done, 170 partial, 48 missing of 596 in-scope rows, 63 %; 159 more rows to done for the 90 % target.
+- Counted after the third batch: 378 done, 170 partial, 48 missing.
+
+### Book audit (fourth batch)
+- MH204 (metric hex screws, bolts, nuts and washers) and BB5 (socket size cross-reference inch and metric) from partial to done.
+- Re-audit: BB49 (bolt and screw heads, types and drives) to done; its note predated the fasteners guide of 0.6.0, which covers eleven head shapes and six drives.
+- MH202 (inch bolts, nuts and washers) stays partial: inch nuts added, bolt heads and washers not.
+- 381 done, 167 partial, 48 missing of 596 in-scope rows, 64 %; 156 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.

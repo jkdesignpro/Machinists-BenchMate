@@ -304,6 +304,14 @@ async function renderClearance(el) {
 }
 
 // ------------------------------------------------------------------ spanner and hex key sizes
+// Cross-reference of the metric and inch widths across flats: every size of the two tables, in order of size.
+function spannerOrder(F) {
+  const W = state.W, by = new Map();
+  const add = (mm, name, inch, use) => { const k = mm.toFixed(3); if (!by.has(k)) by.set(k, { mm, name, inch, uses: [] }); by.get(k).uses.push(use); };
+  F.af_metric.forEach(r => { const seen = {}; ['iso', 'din', 'jis'].forEach(f => { if (r[f]) (seen[r[f].value] = seen[r[f].value] || []).push(f === 'din' ? 'old DIN' : f.toUpperCase()); }); Object.keys(seen).forEach(v => add(+v, fx(+v, +v % 1 ? 1 : 0) + ' mm', false, r.size + ' (' + seen[v].join(', ') + ')')); });
+  F.af_inch.forEach(r => { if (r.hex) { const f = fracText(W, r.hex.value, 16); add(f.val * IN_MM, f.txt, true, inchLabel(r.size) + ' (ASME)'); } });
+  return [...by.values()].sort((a, b) => a.mm - b.mm).map(e => '<tr><td><b>' + rEsc(e.name) + '</b></td><td class="mv">' + fx(e.mm, e.inch ? 4 : (e.mm % 1 ? 1 : 0)) + '</td><td class="mv">' + fx(e.mm / IN_MM, e.inch ? 4 : 3) + '</td><td class="ms">' + rEsc(e.uses.join('; ')) + '</td></tr>').join('');
+}
 async function renderSpanner(el) {
   const R = await loadFast(el); if (!R) return;
   const F = R.fasteners, srcs = F.sources, m = FMEM.span || (FMEM.span = { q: '' });
@@ -314,7 +322,10 @@ async function renderSpanner(el) {
     '<p class="ms">ISO 272 (1982) moved M10, M12, M14 and M22 to 16, 18, 21 and 34 mm; older DIN parts and many tools still use 17, 19, 22 and 32 mm. ' + rEsc(F.af_metric_note || '') + '</p>' +
     '<div class="res mtab" style="margin-top:12px"><div class="h">Inch hexagon heads: width across flats</div><table><tr><th>Size</th><th>Hex head (ASME)</th><th>BS (Whitworth)</th><th>Socket head key</th></tr>' +
     F.af_inch.map(r => { const k = F.shcs_inch.find(x => x.size === r.size); return '<tr><td><b>' + rEsc(inchLabel(r.size)) + '</b></td>' + fCell(srcs, r.hex, inch) + fCell(srcs, r.bs, inch) + fCell(srcs, k && k.key, v => rEsc(v) + ' in') + '</tr>'; }).join('') + '</table></div>' +
-    '<p class="ms">Accu\'s inch list is for hex nuts, which are larger than hex cap screw heads at 7/16 and 9/16 (11/16 and 7/8 against 5/8 and 13/16), so those two rows differ. Heavy hex bolts and nuts are larger again.</p>' + legend +
+    '<p class="ms">Accu\'s inch list is for hex nuts, which are larger than hex cap screw heads at 7/16 and 9/16 (11/16 and 7/8 against 5/8 and 13/16), so those two rows differ. Heavy hex bolts and nuts are larger again.</p>' +
+    '<div class="res mtab" style="margin-top:12px" id="spx"><div class="h">Metric and inch spanner and socket sizes in order of size</div><table><tr><th>Spanner</th><th>mm</th><th>in</th><th>Hexagon heads in the tables above</th></tr>' + spannerOrder(F) + '</table></div>' +
+    '<p class="ms">The list only puts the sizes of the two tables in order, with each size converted to the other unit. It does not say that neighbouring sizes can replace each other. Inch sizes are the ASME hex head column; British Standard (Whitworth) spanners are marked with the bolt size, not the width, and are left out.</p>' + legend +
+    '<p class="ms">Head heights, nut heights and plain washers are in <a href="#/t/hexhw">hexagon screws, nuts and washers</a>.</p>' +
     '<div class="note"><b>Sources:</b> ISO 272:1982 (current; a revision is at DIS stage on iso.org), ASME B18.2.1 and B18.3 (by name only); publishers below.</div><div class="note" id="spsrc"></div>';
   function find() {
     const v = parseFloat($('#sq', el).value); m.q = $('#sq', el).value;
@@ -360,6 +371,72 @@ async function renderTslots(el) {
   }
   $('#ta', el).onchange = upd; upd();
   $('#tssrc', el).innerHTML = srcNote(F, ['EE_TSLOT', 'ITEH_299']);
+}
+
+// ------------------------------------------------------------------ hexagon screws, nuts and plain washers
+// Side view of a bolted joint, to scale in mm apart from the clamped parts: head, parts, washer, nut.
+function hexhwSvg(d, s, k, m, d2, h) {
+  const W = 520, H = 300, grip = 0.8 * d, tail = 0.35 * d;
+  const sc = Math.min(230 / Math.max(d2, s), 215 / (k + grip + h + m + tail)), cx = 215, top = 40;
+  const y1 = top + k * sc, y2 = y1 + grip * sc, y3 = y2 + h * sc, y4 = y3 + m * sc, y5 = y4 + tail * sc;
+  const hs = s / 2 * sc, r = d / 2 * sc, pw = Math.max(d2 / 2 * sc + 46, hs + 46);
+  let g = DK.rect(cx - pw, y1, pw - r, y2 - y1, 'hatch') + DK.rect(cx + r, y1, pw - r, y2 - y1, 'hatch');
+  g += DK.rect(cx - r, y1, 2 * r, y5 - y1, 'tool');
+  g += DK.rect(cx - hs, top, 2 * hs, k * sc, 'part') + DK.line(cx - hs / 2, top, cx - hs / 2, y1, 'thin') + DK.line(cx + hs / 2, top, cx + hs / 2, y1, 'thin');
+  g += DK.rect(cx - d2 / 2 * sc, y2, d2 * sc, h * sc, 'part');
+  g += DK.rect(cx - hs, y3, 2 * hs, m * sc, 'part') + DK.line(cx - hs / 2, y3, cx - hs / 2, y4, 'thin') + DK.line(cx + hs / 2, y3, cx + hs / 2, y4, 'thin');
+  g += DK.cl(cx, top - 26, cx, y5 + 10);
+  g += DK.dimH(cx - hs, cx + hs, top - 16, 's', { from: top });
+  g += DK.dimH(cx - d2 / 2 * sc, cx + d2 / 2 * sc, y5 + 18, 'd2', { from: y3, below: true });
+  const xr = cx + pw + 26;
+  g += DK.dimV(y1, top, xr, 'k', { from: cx + hs }) + DK.dimV(y3, y2, xr, 'h', { from: cx + d2 / 2 * sc }) + DK.dimV(y4, y3, xr + 34, 'm', { from: cx + hs });
+  g += DK.text(cx - pw + 6, (y1 + y2) / 2 + 4, 'clamped parts', { cls: 'mut', anchor: 'start' }) + DK.text(W - 8, H - 8, 'head, washer and nut to scale', { cls: 'mut', anchor: 'end' });
+  return '<div class="tdia" style="max-width:520px;margin-top:12px">' + DK.svg(W, H, g, 'Side view of a hexagon head screw through two parts with a plain washer and a hexagon nut') + '</div>';
+}
+async function renderHexhw(el) {
+  const R = await loadFast(el); if (!R) return;
+  const F = R.fasteners, srcs = F.sources;
+  const m = FMEM.hexhw || (FMEM.hexhw = { sys: 'metric', mk: 'M10', ik: '1/2' });
+  const L = v => mmIn(v), LI = v => inMm(v, 4);
+  const rng = (lo, hi, show, bare) => lo && hi ? '<td class="mv" title="' + rEsc(lo.groups[0].publishers.map(p => pubName(srcs, p)).join(', ')) + '">' + show(lo.value) + ' to ' + show(hi.value) + (bare ? '' : ' ' + badge(lo.status === 'confirmed' && hi.status === 'confirmed' ? 'confirmed' : 'review')) + '</td>' : '<td class="mv">-</td>';
+  const wm = z => F.washer_metric.find(r => r.size === z), nm = z => F.nut_metric.find(r => r.size === z);
+  el.innerHTML = '<div class="grid" style="max-width:760px">' + fld('Series', sel('hs', [['metric', 'Metric (ISO 4017, ISO 4032, ISO 7089)'], ['inch', 'Inch hexagon nuts (ASME B18.2.2)']], m.sys)) + fld('Size', '<select id="hz"></select>') + '</div><div id="hres"></div>' +
+    '<div class="res mtab" style="margin-top:12px"><div class="h">Metric hexagon head (ISO 4014, ISO 4017)</div><table><tr><th>Thread</th><th>Width across flats s</th><th>Head height k (nominal)</th></tr>' +
+    F.hex_metric.map(r => '<tr><td><b>' + rEsc(r.size) + '</b></td>' + fCell(srcs, r.s, L) + fCell(srcs, r.k, L) + '</tr>').join('') + '</table></div>' +
+    '<div class="res mtab" style="margin-top:12px"><div class="h">Metric hexagon nut, style 1 (ISO 4032)</div><table><tr><th>Thread</th><th>Across flats, max</th><th>Across flats, min</th><th>Height m, max</th><th>Height m, min</th></tr>' +
+    F.nut_metric.map(n => '<tr><td><b>' + rEsc(n.size) + '</b></td>' + fCell(srcs, n.s_max, L) + fCell(srcs, n.s_min, L) + fCell(srcs, n.m_max, L) + fCell(srcs, n.m_min, L) + '</tr>').join('') + '</table></div>' +
+    '<div class="res mtab" style="margin-top:12px"><div class="h">Metric plain washer, normal series (ISO 7089)</div><table><tr><th>For thread</th><th>Hole d1</th><th>Outside d2</th><th>Thickness h</th><th>Greatest hole *</th><th>Least outside *</th><th>Thickness range *</th></tr>' +
+    F.washer_metric.map(r => '<tr><td><b>' + rEsc(r.size) + '</b></td>' + fCell(srcs, r.d1, L) + fCell(srcs, r.d2, L) + fCell(srcs, r.h, L) + fCell(srcs, r.d1_max, L, { nobadge: true }) + fCell(srcs, r.d2_min, L, { nobadge: true }) + rng(r.h_min, r.h_max, L, true) + '</tr>').join('') + '</table><p class="ms" style="margin:6px 8px">* One publisher (fasteners.eu, table headed DIN 125).</p></div>' +
+    '<div class="res mtab" style="margin-top:12px"><div class="h">Inch hexagon nuts, coarse-thread sizes</div><table><tr><th>Thread</th><th>Across flats</th><th>Thickness</th></tr>' +
+    F.nut_inch.map(r => '<tr><td><b>' + rEsc(inchLabel(r.size)) + '</b></td>' + fCell(srcs, r.af, v => rEsc(r.af_frac.value) + ' in = ' + LI(v)) + fCell(srcs, r.h, v => rEsc(r.h_frac.value) + ' in = ' + LI(v)) + '</tr>').join('') + '</table></div>' + legend +
+    '<p class="ms">' + rEsc(F.nut_metric_note) + ' ' + rEsc(F.washer_metric_note) + ' ' + rEsc(F.nut_inch_note) + '</p>' +
+    '<div class="note"><b>Working:</b> No calculation: values as printed. The head height is the nominal value; the screw standards put a tolerance on it that the two publishers used here do not both print. ISO 4014 (bolt with a plain shank) and ISO 4017 (threaded to the head) have the same head. Nuts are style 1 (the regular nut). Editions: fasten.it names DIN EN ISO 4032 of 04-2013 and the other publishers name none; a 2023 edition of ISO 4032 is listed in the AFNOR catalogue and the free tables could not be compared with it. The widths across flats of the head also count the publishers of the <a href="#/t/spanner">spanner table</a>, which lists the older DIN and the JIS sizes as well. Hole sizes for these screws are in <a href="#/t/clearance">clearance holes</a> and strengths in <a href="#/t/boltgrade">bolt grades</a>.<br><b>Sources:</b> ISO 4014, ISO 4017, ISO 4032, ISO 7089, DIN 125, ASME B18.2.2 (by name only); publishers below.</div><div class="note" id="hsrc"></div>';
+  const hs = $('#hs', el), hz = $('#hz', el);
+  function sizes() {
+    const met = hs.value === 'metric', cur = met ? m.mk : m.ik;
+    hz.innerHTML = (met ? F.hex_metric : F.nut_inch).map(r => '<option value="' + rEsc(r.size) + '"' + (r.size === cur ? ' selected' : '') + '>' + rEsc(met ? r.size : inchLabel(r.size)) + '</option>').join('');
+  }
+  function upd() {
+    m.sys = hs.value; if (m.sys === 'metric') m.mk = hz.value; else m.ik = hz.value;
+    const z = hz.value, row = (lab, cell) => '<tr><td>' + lab + '</td>' + cell + '</tr>';
+    let h = '';
+    if (m.sys === 'metric') {
+      const r = F.hex_metric.find(x => x.size === z), n = nm(z), w = wm(z); if (!r) return;
+      h = '<div class="res"><div class="h">' + rEsc(z) + ' hexagon head screw, nut and plain washer</div><table>' +
+        row('Head: width across flats s', fCell(srcs, r.s, L)) + row('Head height k (nominal)', fCell(srcs, r.k, L)) +
+        (n ? row('Nut: width across flats, max', fCell(srcs, n.s_max, L)) + row('Nut: width across flats, min', fCell(srcs, n.s_min, L)) + row('Nut height m, max', fCell(srcs, n.m_max, L)) + row('Nut height m, min', fCell(srcs, n.m_min, L)) : '') +
+        (w ? row('Washer: hole d1', fCell(srcs, w.d1, L)) + row('Washer: outside diameter d2', fCell(srcs, w.d2, L)) + row('Washer: thickness h (nominal)', fCell(srcs, w.h, L)) + row('Washer: thickness, least to greatest', rng(w.h_min, w.h_max, L)) : '') + '</table></div>';
+      if (n && w && n.m_max && w.d2 && w.h) h += hexhwSvg(+z.slice(1), r.s.value, r.k.value, n.m_max.value, w.d2.value, w.h.value);
+    } else {
+      const r = F.nut_inch.find(x => x.size === z); if (!r) return;
+      h = '<div class="res"><div class="h">' + rEsc(inchLabel(z)) + ' hexagon nut <span class="ms">(' + pubsOf(srcs, r) + ')</span></div><table>' +
+        row('Width across flats', fCell(srcs, r.af, v => rEsc(r.af_frac.value) + ' in = ' + LI(v))) + row('Thickness', fCell(srcs, r.h, v => rEsc(r.h_frac.value) + ' in = ' + LI(v))) + '</table></div>';
+    }
+    $('#hres', el).innerHTML = h;
+  }
+  $('#hsrc', el).innerHTML = srcNote(F, ['BOLTS_4017', 'FEU_4014', 'FASTENIT_4032', 'WERMAC_NUT', 'OMDL_4032', 'BOLTS_7089', 'FEU_125', 'EUGENE_NUT', 'WIKI_AF', 'ACCU', 'SLS']);
+  hs.onchange = () => { sizes(); upd(); }; hz.onchange = upd;
+  sizes(); upd();
 }
 
 // ------------------------------------------------------------------ keys and keyways

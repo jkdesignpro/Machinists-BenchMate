@@ -701,8 +701,27 @@ def build_fasteners(drills):
     out['keys_inch'] = build_series(ev['keys_inch'], ['range', 'width', 'square_h', 'rect_h'], order=lambda s: frac_in(s.split('-')[0]))
     out['tslots'] = build_series(ev['tslots'], ['b_min', 'b_max', 'c_min', 'c_max', 'h_min', 'h_max', 'bolt'], order=float, exact=True)
     out['tslot_pitch'] = ev['tslot_pitch']
+    # Metric hexagon heads, nuts and plain washers. The ISO widths across flats of the spanner table also count for the head.
+    hm = {pub: {z: dict(r) for z, r in rows.items()} for pub, rows in ev['hex_metric'].items()}
+    hex_sizes = set(z for rows in hm.values() for z in rows)
+    for pub, rows in ev['af_metric'].items():
+        for z, r in rows.items():
+            if z in hex_sizes and r.get('iso'): hm.setdefault(pub, {}).setdefault(z, {})['s'] = r['iso']
+    out['hex_metric'] = build_series(hm, ['k', 's'], order=mnum, exact=True)
+    out['nut_metric'] = build_series(ev['nut_metric'], ['s_max', 's_min', 'm_max', 'm_min'], order=mnum, exact=True)
+    # One publisher prints a single hole and outside diameter, the other least and greatest: compare hole with least, outside with greatest.
+    wm = {}
+    for pub, rows in ev['washer_metric'].items():
+        for z, r in rows.items():
+            q = dict(r)
+            if 'd1_min' in r: q['d1'] = r['d1_min']
+            if 'd2_max' in r: q['d2'] = r['d2_max']
+            wm.setdefault(pub, {})[z] = q
+    out['washer_metric'] = build_series(wm, ['d1', 'd1_max', 'd2', 'd2_min', 'h', 'h_min', 'h_max'], order=mnum, exact=True)
+    ni = {pub: {z: {'af': f"{frac_in(r['af']):.4f}", 'af_frac': r['af'], 'h': f"{frac_in(r['h']):.4f}", 'h_frac': r['h']} for z, r in rows.items()} for pub, rows in ev['nut_inch'].items()}
+    out['nut_inch'] = build_series(ni, ['af', 'af_frac', 'h', 'h_frac'], order=inch_size)
     out['as568'] = build_series(ev['as568'], ['id', 'id_tol', 'cs', 'cs_tol'], order=int)
-    for k in ('torque_friction', 'oring_rules', 'sae_note', 'clearance_metric_note', 'clearance_inch_note', 'af_metric_note', 'keys_inch_note', 'tslot_pitch_source'):
+    for k in ('torque_friction', 'oring_rules', 'sae_note', 'clearance_metric_note', 'clearance_inch_note', 'af_metric_note', 'keys_inch_note', 'tslot_pitch_source', 'washer_metric_note', 'nut_metric_note', 'nut_inch_note'):
         out[k] = ev.get(k)
     # every row must name at least one publisher; record the publishers of each row
     for sec, v in out.items():

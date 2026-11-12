@@ -90,6 +90,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, third batch, 2026-11-12):** thread forms and terms guide (`threadguide`). MH218, BB6 and BB7 from partial to done. Counted from the tables below: 378 done, 170 partial, 48 missing of 596 in-scope rows, 63 %; 159 more rows to done for the 90 % target.
 
+**Update (0.7.0, fourth batch, 2026-11-12):** hexagon screws, nuts and washers (`hexhw`) and the list of spanner sizes in order. MH204 and BB5 from partial to done; BB49 done on re-audit; MH202 stays partial. Counted from the tables below: 381 done, 167 partial, 48 missing of 596 in-scope rows, 64 %; 156 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -577,9 +579,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH199 | Thread tensile-stress area, torque-tension relationships | done | `bolttorque` | Stress area (ISO and Unified), torque-preload relation with the share of each term (`claude/fasteners`) |
 | MH200 | Grade marks, material properties, counterfeit detection | partial | `boltgrade` | ISO 898-1, SAE J429 and ASTM A574 minimums and head marks; no counterfeit detection |
 | MH201 | Working strength, engagement length, breaking force, lock wire | done | `threadstrip`, `fastguide`, `boltgrade`, `bolttorque` | 0.7.0: breaking force from the stress area and your own tensile strength, simplified least engagement (one source, marked) and the rules of thumb with differing sources side by side in `threadstrip`; lock wire in `fastguide`; strengths in `boltgrade`, preload in `bolttorque`. The detailed FED-STD-H28 stripping method is not built (no readable free source) |
-| MH202 | Inch bolts, screws, nuts and washers (dimensions) | partial | `shcs`, `spanner` | Socket head cap screw heads and hex widths across flats only; no full bolt, nut and washer dimensions |
+| MH202 | Inch bolts, screws, nuts and washers (dimensions) | partial | `shcs`, `spanner`, `hexhw` | Socket head cap screw heads and hex widths across flats; 0.7.0: inch nut width and thickness (one publisher); no inch bolt head heights (the free tables disagree) and no inch washers |
 | MH203 | Wrench clearances | missing | | |
-| MH204 | Metric hex screws, bolts, nuts and washers | partial | `spanner` | Widths across flats (ISO 272, old DIN, JIS) only; no head heights, nuts or washers |
+| MH204 | Metric hex screws, bolts, nuts and washers | done | `spanner`, `hexhw` | Widths across flats (ISO 272, old DIN, JIS); 0.7.0: head height, nut width and height, plain washers M3 to M36 with a side view; differing publishers shown |
 | MH205 | Socket head cap screws (inch and metric) | done | `shcs` | ISO 4762 and ASME B18.3 head diameter, height and key (`claude/fasteners`) |
 | MH206 | Clearance holes for bolts, screws and studs (inch and metric) | done | `clearance` | ISO 273 fine/medium/coarse and inch close/normal/free, with disagreements (`claude/fasteners`) |
 | MH207 | Helical coil screw thread inserts (STI) | partial | `sti` | Tapped-hole sizes; no insert lengths or installation data (`claude/threads-3`) |
@@ -810,7 +812,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB2 | Drill size and decimal equivalent chart | done | `drillchart` | |
 | BB3 | Spanner selection chart | done | `spanner` | (`claude/fasteners`) |
 | BB4 | Torque conversion chart | done | `units` | Torque units convert in the unit converter (N·m, lbf·ft, lbf·in, ozf·in, kgf·m, kgf·cm) |
-| BB5 | Socket size cross-reference inch/metric | partial | `spanner` | Lookup of a spanner size against metric and inch heads; no socket cross-reference chart |
+| BB5 | Socket size cross-reference inch/metric | done | `spanner` | Lookup of a spanner size against metric and inch heads; 0.7.0: metric and inch sizes in one list in order of size, each converted to the other unit |
 | BB6 | Abbreviations for standard threads | done | `threaddata`, `threadguide` | 0.7.0: 24 abbreviations (Unified, National, pipe, ACME, British, metric, knuckle, conduit, hand, external and internal) with their sources; one-publisher rows marked |
 | BB7 | Thread forms used in engineering | done | `threaddata`, `pipethreads`, `whitworth`, `acme`, `trapezoidal`, `buttress`, `threadguide` | ACME, trapezoidal and buttress data on their own pages; 0.7.0: overview of ten forms with a drawing of six |
 | BB8 | Types of ground thread taps | partial | `toolguide` | Tap types and chamfers; H limits in `taplimits` (`claude/tooling-ref`) |
@@ -854,7 +856,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB46 | Belt and gear drive calculations | done | `geartrain`, `beltdrive` | 0.6.0: belt drives added |
 | BB47 | V-belt cross sections | missing | | |
 | BB48 | Bolts and nuts identification and grades | done | `boltgrade` | (`claude/fasteners`) |
-| BB49 | Bolt and screw heads, types and drives | partial | `shcs` | Socket head cap screws only; no other head types or drives |
+| BB49 | Bolt and screw heads, types and drives | done | `shcs`, `fastguide`, `hexhw` | Re-audit 0.7.0: eleven head shapes and six drives in the fasteners guide (0.6.0), socket head and hexagon head dimensions on their own pages |
 | BB50 | Weights of round, square and hex bars | done | `weight`, `bar` | Round, hex, square, tube, flat, plate and sheet with material densities |
 | BB51 | Weights of round tubes | done | `weight` |  |
 | BB52 | Weights of sheet metal | done | `weight` |  |

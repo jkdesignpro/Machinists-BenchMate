@@ -2898,10 +2898,17 @@ const TOOLS = [
 },
 {
   id: 'spanner', level: 'simple', group: 'Fasteners', title: 'Spanner and hex key sizes',
-  desc: 'Width across flats for metric (ISO 272, old DIN, JIS) and inch hex heads, and the hex key for socket head cap screws. Type a spanner size to see which threads it fits.',
+  desc: 'Width across flats for metric (ISO 272, old DIN, JIS) and inch hex heads, and the hex key for socket head cap screws. Type a spanner size to see which threads it fits. Metric and inch sizes are also listed together in order of size.',
   render: el => renderSpanner(el),
   working: 'No calculation: values as printed. The lookup matches within 0.05 mm or 0.001 in.',
   source: 'ISO 272:1982, ASME B18.2.1, ASME B18.3 (by name only); Wikipedia, Accu, SLS Bearings and the socket screw publishers.',
+},
+{
+  id: 'hexhw', level: 'simple', group: 'Fasteners', title: 'Hexagon screws, nuts and washers',
+  desc: 'Metric hexagon head height and width across flats (ISO 4014 / ISO 4017), hexagon nut height (ISO 4032) and plain washer sizes (ISO 7089), with a side view to scale; inch hexagon nut sizes. Differing publishers are shown side by side.',
+  render: el => renderHexhw(el),
+  working: 'No calculation: values as printed.',
+  source: 'ISO 4014, ISO 4017, ISO 4032, ISO 7089, DIN 125, ASME B18.2.2 (by name only); BOLTS open parts library, fasteners.eu, fasten.it, Wermac, the omdl library and Eugene Fastener.',
 },
 {
   id: 'tslots', level: 'advanced', group: 'Fasteners', title: 'T-slots',

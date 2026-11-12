@@ -2266,6 +2266,41 @@ where = 'toolpaths';
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
     if (links !== 'threaddata,wires,threadid,multistart,whitworth,pipethreads,acme,trapezoidal,buttress,unseries,unjunr,fastguide') problems.push(`[${where}] links to other pages: ${links}`);
   }
+  // Hexagon screws, nuts and washers: the published rows, both disagreements shown, the drawing, inch nuts.
+  where = 'hexhw';
+  {
+    const txt = async sel => (await page.$eval(sel, e => e.innerText)).replace(/\s+/g, ' ');
+    await units('mm'); await mode('expert'); await open('hexhw', 300);
+    await page.selectOption('#main #hs', 'metric'); await page.selectOption('#main #hz', 'M10'); await page.waitForTimeout(80);
+    let t = await txt('#main #hres');
+    if (!/across flats s 16\.00 mm Confirmed/.test(t) || !/Head height k \(nominal\) 6\.40 mm Confirmed/.test(t) || !/Nut height m, max 8\.40 mm Confirmed/.test(t) || !/Nut height m, min 8\.04 mm Confirmed/.test(t)) problems.push(`[${where}] M10 head and nut (BOLTS, fasteners.eu; Wermac, omdl, fasten.it): ${t}`);
+    if (!/hole d1 10\.00 mm Sources differ also printed: 10\.5 \(fasteners\.eu\)/.test(t) || !/outside diameter d2 20\.00 mm Confirmed/.test(t) || !/thickness h \(nominal\) 2\.00 mm One source/.test(t) || !/least to greatest 1\.80 mm to 2\.20 mm/.test(t)) problems.push(`[${where}] M10 washer, the two printed holes side by side: ${t}`);
+    const dr = await page.$eval('#main #hres .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/clamped parts/.test(dr) || !/d2/.test(dr) || !/to scale/.test(dr)) problems.push(`[${where}] drawing: ${dr}`);
+    await page.selectOption('#main #hz', 'M24'); await page.waitForTimeout(80); t = await txt('#main #hres');
+    if (!/Nut height m, max 21\.50 mm One source differs also printed: 19 \(fasten\.it\)/.test(t) || !/Nut height m, min 20\.20 mm One source differs also printed: 17\.7 \(fasten\.it\)/.test(t) || !/Head height k \(nominal\) 15\.00 mm Confirmed/.test(t)) problems.push(`[${where}] M24: the differing nut height must be shown, not hidden: ${t}`);
+    const tabs = await page.$$eval('#main .mtab table', a => a.map(x => x.rows.length).join(','));
+    if (tabs !== '13,13,13,10') problems.push(`[${where}] table rows (head, nut, washer, inch nut): ${tabs}`);
+    const srcs = await page.$$eval('#main #hsrc b', a => a.length - 1);
+    if (srcs !== 11) problems.push(`[${where}] publishers listed: ${srcs}`);
+    await page.selectOption('#main #hs', 'inch'); await page.selectOption('#main #hz', '1/2'); await page.waitForTimeout(80); t = await txt('#main #hres');
+    if (!/Width across flats 3\/4 in = 19\.05 mm One source/.test(t) || !/Thickness 7\/16 in = 11\.11 mm One source/.test(t) || !/Eugene Fastener/i.test(t)) problems.push(`[${where}] 1/2 inch nut (Eugene Fastener: 3/4 and 7/16): ${t}`);
+    await units('inch'); await open('hexhw', 300); await page.selectOption('#main #hs', 'metric'); await page.selectOption('#main #hz', 'M10'); await page.waitForTimeout(80); t = await txt('#main #hres');
+    if (!/across flats s 0\.6299 in Confirmed/.test(t) || !/Head height k \(nominal\) 0\.2520 in/.test(t)) problems.push(`[${where}] M10 in inch units: ${t}`);
+    await units('mm');
+  }
+
+  // Spanner sizes: metric and inch widths in one list, in order of size.
+  where = 'spanner';
+  {
+    await units('mm'); await open('spanner', 300);
+    const r = await page.$$eval('#main #spx tr', a => a.map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+    const i19 = r.findIndex(x => /^19 mm 19 0\.748 M12 \(old DIN\)/.test(x)), i34 = r.findIndex(x => /^3\/4" 19\.0500 0\.7500 1\/2" \(ASME\)/.test(x)), i13 = r.findIndex(x => /^13 mm 13 0\.512 M8 \(ISO, old DIN\)/.test(x)), i12 = r.findIndex(x => /^1\/2" 12\.7000 0\.5000 5\/16" \(ASME\)/.test(x));
+    if (i19 < 0 || i34 !== i19 + 1 || i13 < 0 || i12 !== i13 - 1) problems.push(`[${where}] order of sizes: 1/2 in before 13 mm, 19 mm before 3/4 in: ${r.slice(10, 26).join(' / ')}`);
+    const mmv = r.slice(1).map(x => parseFloat(x.replace(/^.*?(mm|") /, '')));
+    if (mmv.some((v, i) => i && !(v > mmv[i - 1]))) problems.push(`[${where}] the list must rise in size: ${mmv.join(' ')}`);
+  }
+
   // Thread engagement and breaking force: the published M10 row, the Grade 5 example, both aluminium rules side by side.
   where = 'threadstrip';
   {

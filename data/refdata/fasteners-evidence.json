@@ -216,6 +216,62 @@
    "url": "https://applerubber.com/seal-design-guide/seal-types-and-gland-design/o-ring-installation",
    "accessed": "2026-11-10",
    "note": "Seal maker. Squeeze about 10-40 % static, no more than 30 % dynamic; O-ring volume not over 90 % of the minimum gland void; at least 75 % of the cross-section inside the groove; stretch not over 5 % in the application, not over 100 % while installing."
+  },
+  "BOLTS_4017": {
+   "publisher": "BOLTS open parts library",
+   "title": "ISO 4017, hexagon head screw (dimension table)",
+   "url": "https://boltsparts.github.io/en/parts/standards/ISO4017.html",
+   "accessed": "2026-11-12",
+   "note": "Open library of standard parts for CAD (J. Reinhardt and contributors). Head height k and width across flats s for M1.6 to M64; M3 to M36 recorded. Its width across corners at M10 and M12 belongs to the old 17 and 19 mm heads and is not recorded."
+  },
+  "FEU_4014": {
+   "publisher": "fasteners.eu",
+   "title": "ISO 4014, hexagon head bolts with shank (table headed DIN 931, ISO 4014)",
+   "url": "https://www.fasteners.eu/standards/iso/4014/",
+   "accessed": "2026-11-12",
+   "note": "Fastener trade directory. Head height K (one value per size) recorded. The width across flats row prints the DIN 931 values with the two ISO values in cells of their own, so it is not recorded. ISO 4014 (bolt with shank) and ISO 4017 (threaded to the head) print the same head height."
+  },
+  "FASTENIT_4032": {
+   "publisher": "fasten.it",
+   "title": "DIN EN ISO 4032, hexagon nuts, style 1 (edition 04-2013)",
+   "url": "https://fasten.it/norms/norm/din_en_iso_4032",
+   "accessed": "2026-11-12",
+   "note": "Fastener trade directory. Nut height m max and min and width across flats (nominal). Its M6 (5 / 4.7) and M24 (19 / 17.7) heights differ from the two other publishers; M24 is lower than its own M22 row (19.4 / 18.1). Recorded as printed."
+  },
+  "WERMAC_NUT": {
+   "publisher": "Wermac",
+   "title": "Metric nut dimensions chart, across flats and heights (ISO 4032)",
+   "url": "https://wermac.org/bolts/dimensions_hex-nuts_across-flats-and-heights_din-iso.html",
+   "accessed": "2026-11-12",
+   "note": "Piping reference site. Width across flats max and min and nut height max and min."
+  },
+  "OMDL_4032": {
+   "publisher": "omdl (OpenSCAD mechanical design library)",
+   "title": "ISO 4032 hexagon nut data table, omdl v1.0 documentation",
+   "url": "https://royasutton.github.io/omdl-snapshot/docs/html/omdl-v1.0/group__database__component__fastener__iso__4032.html",
+   "accessed": "2026-11-12",
+   "note": "Documentation of an open design library (R. A. Sutton). Width across flats max and min, width across corners min, thickness max and min."
+  },
+  "BOLTS_7089": {
+   "publisher": "BOLTS open parts library",
+   "title": "EN ISO 7089, plain washer, normal series (dimension table)",
+   "url": "https://boltsparts.github.io/en/parts/standards/EN7089.html",
+   "accessed": "2026-11-12",
+   "note": "One hole diameter d1, one outside diameter d2 and one thickness s per size. Its M10 hole is printed as 10.0, where fasteners.eu prints 10.5; recorded as printed."
+  },
+  "FEU_125": {
+   "publisher": "fasteners.eu",
+   "title": "ISO 7089, plain washers form A (table headed DIN 125)",
+   "url": "https://www.fasteners.eu/standards/ISO/7089/",
+   "accessed": "2026-11-12",
+   "note": "Least and greatest hole diameter, outside diameter and thickness. The page is titled ISO 7089 and its table is headed DIN 125."
+  },
+  "EUGENE_NUT": {
+   "publisher": "Eugene Fastener & Supply",
+   "title": "Hex nut size chart and dimensions (inch finished hex nut chart)",
+   "url": "https://www.eugenefast.com/Home/Page/resources/hex-nut-size-chart-dimensions",
+   "accessed": "2026-11-12",
+   "note": "Distributor. Width across flats and thickness as fractions for coarse-thread sizes; names ASME B18.2.2 for its inch values."
   }
  },
  "iso898": {
@@ -5559,5 +5615,512 @@
    "GLOBAL_ORING": "5",
    "APPLE": "5"
   }
- }
+ },
+ "hex_metric": {
+  "BOLTS_4017": {
+   "M3": {
+    "k": "2.0",
+    "s": "5.5"
+   },
+   "M4": {
+    "k": "2.8",
+    "s": "7"
+   },
+   "M5": {
+    "k": "3.5",
+    "s": "8"
+   },
+   "M6": {
+    "k": "4.0",
+    "s": "10"
+   },
+   "M8": {
+    "k": "5.3",
+    "s": "13"
+   },
+   "M10": {
+    "k": "6.4",
+    "s": "16"
+   },
+   "M12": {
+    "k": "7.5",
+    "s": "18"
+   },
+   "M16": {
+    "k": "10.0",
+    "s": "24"
+   },
+   "M20": {
+    "k": "12.5",
+    "s": "30"
+   },
+   "M24": {
+    "k": "15.0",
+    "s": "36"
+   },
+   "M30": {
+    "k": "18.7",
+    "s": "46"
+   },
+   "M36": {
+    "k": "22.5",
+    "s": "55"
+   }
+  },
+  "FEU_4014": {
+   "M3": {
+    "k": "2"
+   },
+   "M4": {
+    "k": "2.8"
+   },
+   "M5": {
+    "k": "3.5"
+   },
+   "M6": {
+    "k": "4"
+   },
+   "M8": {
+    "k": "5.3"
+   },
+   "M10": {
+    "k": "6.4"
+   },
+   "M12": {
+    "k": "7.5"
+   },
+   "M16": {
+    "k": "10"
+   },
+   "M20": {
+    "k": "12.5"
+   },
+   "M24": {
+    "k": "15"
+   },
+   "M30": {
+    "k": "18.7"
+   },
+   "M36": {
+    "k": "22.5"
+   }
+  }
+ },
+ "nut_metric": {
+  "FASTENIT_4032": {
+   "M3": {
+    "m_max": "2.40",
+    "m_min": "2.15",
+    "s_max": "5.5"
+   },
+   "M4": {
+    "m_max": "3.20",
+    "m_min": "2.90",
+    "s_max": "7"
+   },
+   "M5": {
+    "m_max": "4.70",
+    "m_min": "4.40",
+    "s_max": "8"
+   },
+   "M6": {
+    "m_max": "5",
+    "m_min": "4.7",
+    "s_max": "10"
+   },
+   "M8": {
+    "m_max": "6.80",
+    "m_min": "6.44",
+    "s_max": "13"
+   },
+   "M10": {
+    "m_max": "8.40",
+    "m_min": "8.04",
+    "s_max": "16"
+   },
+   "M12": {
+    "m_max": "10.80",
+    "m_min": "10.37",
+    "s_max": "18"
+   },
+   "M16": {
+    "m_max": "14.80",
+    "m_min": "14.10",
+    "s_max": "24"
+   },
+   "M20": {
+    "m_max": "18",
+    "m_min": "16.90",
+    "s_max": "30"
+   },
+   "M24": {
+    "m_max": "19",
+    "m_min": "17.7",
+    "s_max": "36"
+   },
+   "M30": {
+    "m_max": "25.60",
+    "m_min": "24.30",
+    "s_max": "46"
+   },
+   "M36": {
+    "m_max": "31",
+    "m_min": "29.40",
+    "s_max": "55"
+   }
+  },
+  "WERMAC_NUT": {
+   "M3": {
+    "s_max": "5.50",
+    "s_min": "5.32",
+    "m_max": "2.40",
+    "m_min": "2.15"
+   },
+   "M4": {
+    "s_max": "7.00",
+    "s_min": "6.78",
+    "m_max": "3.2",
+    "m_min": "2.9"
+   },
+   "M5": {
+    "s_max": "8.00",
+    "s_min": "7.78",
+    "m_max": "4.7",
+    "m_min": "4.4"
+   },
+   "M6": {
+    "s_max": "10.00",
+    "s_min": "9.78",
+    "m_max": "5.2",
+    "m_min": "4.9"
+   },
+   "M8": {
+    "s_max": "13.00",
+    "s_min": "12.73",
+    "m_max": "6.80",
+    "m_min": "6.44"
+   },
+   "M10": {
+    "s_max": "16.00",
+    "s_min": "15.73",
+    "m_max": "8.40",
+    "m_min": "8.04"
+   },
+   "M12": {
+    "s_max": "18.00",
+    "s_min": "17.73",
+    "m_max": "10.80",
+    "m_min": "10.37"
+   },
+   "M16": {
+    "s_max": "24.00",
+    "s_min": "23.67",
+    "m_max": "14.8",
+    "m_min": "14.1"
+   },
+   "M20": {
+    "s_max": "30.00",
+    "s_min": "29.16",
+    "m_max": "18.0",
+    "m_min": "16.9"
+   },
+   "M24": {
+    "s_max": "36",
+    "s_min": "35",
+    "m_max": "21.5",
+    "m_min": "20.2"
+   },
+   "M30": {
+    "s_max": "46",
+    "s_min": "45",
+    "m_max": "25.6",
+    "m_min": "24.3"
+   },
+   "M36": {
+    "s_max": "55.0",
+    "s_min": "53.8",
+    "m_max": "31.0",
+    "m_min": "29.4"
+   }
+  },
+  "OMDL_4032": {
+   "M3": {
+    "s_max": "5.5",
+    "s_min": "5.32",
+    "m_max": "2.4",
+    "m_min": "2.15"
+   },
+   "M4": {
+    "s_max": "7",
+    "s_min": "6.78",
+    "m_max": "3.2",
+    "m_min": "2.9"
+   },
+   "M5": {
+    "s_max": "8",
+    "s_min": "7.78",
+    "m_max": "4.7",
+    "m_min": "4.4"
+   },
+   "M6": {
+    "s_max": "10",
+    "s_min": "9.78",
+    "m_max": "5.2",
+    "m_min": "4.9"
+   },
+   "M8": {
+    "s_max": "13",
+    "s_min": "12.73",
+    "m_max": "6.8",
+    "m_min": "6.44"
+   },
+   "M10": {
+    "s_max": "16",
+    "s_min": "15.73",
+    "m_max": "8.4",
+    "m_min": "8.04"
+   },
+   "M12": {
+    "s_max": "18",
+    "s_min": "17.73",
+    "m_max": "10.8",
+    "m_min": "10.37"
+   },
+   "M16": {
+    "s_max": "24",
+    "s_min": "23.67",
+    "m_max": "14.8",
+    "m_min": "14.1"
+   },
+   "M20": {
+    "s_max": "30",
+    "s_min": "29.16",
+    "m_max": "18",
+    "m_min": "16.9"
+   },
+   "M24": {
+    "s_max": "36",
+    "s_min": "35",
+    "m_max": "21.5",
+    "m_min": "20.2"
+   },
+   "M30": {
+    "s_max": "46",
+    "s_min": "45",
+    "m_max": "25.6",
+    "m_min": "24.3"
+   },
+   "M36": {
+    "s_max": "55",
+    "s_min": "53.8",
+    "m_max": "31",
+    "m_min": "29.4"
+   }
+  }
+ },
+ "washer_metric": {
+  "BOLTS_7089": {
+   "M3": {
+    "d1": "3.2",
+    "d2": "7",
+    "h": "0.5"
+   },
+   "M4": {
+    "d1": "4.3",
+    "d2": "9",
+    "h": "0.8"
+   },
+   "M5": {
+    "d1": "5.3",
+    "d2": "10",
+    "h": "1.0"
+   },
+   "M6": {
+    "d1": "6.4",
+    "d2": "12",
+    "h": "1.6"
+   },
+   "M8": {
+    "d1": "8.4",
+    "d2": "16",
+    "h": "1.6"
+   },
+   "M10": {
+    "d1": "10.0",
+    "d2": "20",
+    "h": "2.0"
+   },
+   "M12": {
+    "d1": "13",
+    "d2": "24",
+    "h": "2.5"
+   },
+   "M16": {
+    "d1": "17",
+    "d2": "30",
+    "h": "3"
+   },
+   "M20": {
+    "d1": "21",
+    "d2": "37",
+    "h": "3"
+   },
+   "M24": {
+    "d1": "25",
+    "d2": "44",
+    "h": "4"
+   },
+   "M30": {
+    "d1": "31",
+    "d2": "56",
+    "h": "4"
+   },
+   "M36": {
+    "d1": "37",
+    "d2": "66",
+    "h": "5"
+   }
+  },
+  "FEU_125": {
+   "M3": {
+    "d1_min": "3.2",
+    "d1_max": "3.38",
+    "d2_min": "6.64",
+    "d2_max": "7",
+    "h_min": "0.45",
+    "h_max": "0.55"
+   },
+   "M4": {
+    "d1_min": "4.3",
+    "d1_max": "4.48",
+    "d2_min": "8.64",
+    "d2_max": "9",
+    "h_min": "0.7",
+    "h_max": "0.9"
+   },
+   "M5": {
+    "d1_min": "5.3",
+    "d1_max": "5.48",
+    "d2_min": "9.64",
+    "d2_max": "10",
+    "h_min": "0.9",
+    "h_max": "1.1"
+   },
+   "M6": {
+    "d1_min": "6.4",
+    "d1_max": "6.62",
+    "d2_min": "11.57",
+    "d2_max": "12",
+    "h_min": "1.4",
+    "h_max": "1.8"
+   },
+   "M8": {
+    "d1_min": "8.4",
+    "d1_max": "8.62",
+    "d2_min": "15.57",
+    "d2_max": "16",
+    "h_min": "1.4",
+    "h_max": "1.8"
+   },
+   "M10": {
+    "d1_min": "10.5",
+    "d1_max": "10.77",
+    "d2_min": "19.48",
+    "d2_max": "20",
+    "h_min": "1.8",
+    "h_max": "2.2"
+   },
+   "M12": {
+    "d1_min": "13",
+    "d1_max": "13.27",
+    "d2_min": "23.48",
+    "d2_max": "24",
+    "h_min": "2.3",
+    "h_max": "2.7"
+   },
+   "M16": {
+    "d1_min": "17",
+    "d1_max": "17.27",
+    "d2_min": "29.48",
+    "d2_max": "30",
+    "h_min": "2.7",
+    "h_max": "3.3"
+   },
+   "M20": {
+    "d1_min": "21",
+    "d1_max": "21.33",
+    "d2_min": "36.38",
+    "d2_max": "37",
+    "h_min": "2.7",
+    "h_max": "3.3"
+   },
+   "M24": {
+    "d1_min": "25",
+    "d1_max": "25.33",
+    "d2_min": "43.38",
+    "d2_max": "44",
+    "h_min": "3.7",
+    "h_max": "4.3"
+   },
+   "M30": {
+    "d1_min": "31",
+    "d1_max": "31.39",
+    "d2_min": "55.26",
+    "d2_max": "56",
+    "h_min": "3.7",
+    "h_max": "4.3"
+   },
+   "M36": {
+    "d1_min": "37",
+    "d1_max": "37.62",
+    "d2_min": "64.8",
+    "d2_max": "66",
+    "h_min": "4.4",
+    "h_max": "5.6"
+   }
+  }
+ },
+ "washer_metric_note": "BOLTS prints one hole diameter, one outside diameter and one thickness; fasteners.eu prints the least and greatest of each. The BOLTS hole is compared with the least hole of fasteners.eu and the BOLTS outside diameter with the greatest. They agree in eleven sizes; at M10 the hole is printed as 10.0 by BOLTS and 10.5 by fasteners.eu, and both are shown.",
+ "nut_metric_note": "fasten.it prints the M6 nut height as 5 / 4.7 and the M24 as 19 / 17.7; Wermac and the omdl library both print 5.2 / 4.9 and 21.5 / 20.2. All are shown.",
+ "nut_inch": {
+  "EUGENE_NUT": {
+   "1/4": {
+    "af": "7/16",
+    "h": "7/32"
+   },
+   "5/16": {
+    "af": "1/2",
+    "h": "17/64"
+   },
+   "3/8": {
+    "af": "9/16",
+    "h": "21/64"
+   },
+   "7/16": {
+    "af": "11/16",
+    "h": "3/8"
+   },
+   "1/2": {
+    "af": "3/4",
+    "h": "7/16"
+   },
+   "5/8": {
+    "af": "15/16",
+    "h": "35/64"
+   },
+   "3/4": {
+    "af": "1 1/8",
+    "h": "41/64"
+   },
+   "7/8": {
+    "af": "1 5/16",
+    "h": "3/4"
+   },
+   "1": {
+    "af": "1 1/2",
+    "h": "55/64"
+   }
+  }
+ },
+ "nut_inch_note": "One publisher so far (coarse-thread sizes). No clean second source was found for inch nuts, and the free tables of inch hexagon bolt head heights disagree with each other, so inch bolt heads are not included."
 }
