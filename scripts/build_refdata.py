@@ -492,6 +492,52 @@ def build_holdertorque():
             'pullstud': studs, 'rules': rules, 'gaps': ev['gaps']}
 
 
+def build_threadgauge():
+    """Unified thread gauge X tolerances on pitch diameter (per publisher, with
+    consensus per cell), the side each member's tolerance lies on, and a
+    published chart of gauge pitch diameters for comparison."""
+    ev = load_ev('threadgauge-evidence.json')
+    if not ev: return None
+    S = ev['sources']
+    X = ev['x_pd']
+    tpis = sorted({float(t) for pub in X['printed'].values() for t in pub}, reverse=True)
+    rows = []
+    for t in tpis:
+        key = str(int(t)) if t == int(t) else str(t)
+        cells = []
+        for c in range(len(X['ranges'])):
+            printed = {}
+            for pub, tab in X['printed'].items():
+                if pub not in S: raise SystemExit('threadgauge: unknown source ' + pub)
+                v = tab.get(key)
+                if v is not None and c < len(v) and v[c] is not None:
+                    if not (0.00005 < v[c] < 0.002): raise SystemExit('threadgauge: X tolerance %s %s' % (key, v[c]))
+                    printed[S[pub]['publisher']] = v[c]
+            if not printed: cells.append(None); continue
+            k = consensus(printed)
+            if k['status'] not in ('confirmed', 'review'): raise SystemExit('threadgauge: publishers differ at %s tpi, column %d' % (key, c))
+            cells.append({'v': k['value'], 'status': k['status'], 'pubs': k['groups'][0]['publishers']})
+        rows.append({'tpi': t, 'cells': cells})
+    for c in range(len(X['ranges'])):  # the tolerance never falls as the thread gets coarser
+        col = [r['cells'][c]['v'] for r in rows if r['cells'][c]]
+        if col != sorted(col): raise SystemExit('threadgauge: X column %d should rise as the pitch gets coarser' % c)
+    for r in rows:  # ... nor as the diameter grows
+        vals = [c['v'] for c in r['cells'] if c]
+        if vals != sorted(vals): raise SystemExit('threadgauge: X row %s' % r['tpi'])
+    seen = set()
+    for d in ev['direction']['rows']:
+        for k in d['src']:
+            if k not in S: raise SystemExit('threadgauge: unknown source ' + k)
+        if (d['gauge'], d['member']) in seen or len({S[k]['publisher'] for k in d['src']}) < 2: raise SystemExit('threadgauge: direction rows')
+        seen.add((d['gauge'], d['member']))
+    if len(seen) != 4: raise SystemExit('threadgauge: four gauge members wanted')
+    C = ev['chart']
+    for r in C['rows']:
+        if len(r) != 10 or not (r[3] < r[5] < r[4]) or not (r[7] < r[6] <= r[3]) or not (r[9] < r[8] == r[3]): raise SystemExit('threadgauge: chart row ' + r[0])
+    return {'sources': sources_of(ev), 'ranges': X['ranges'], 'x': rows, 'direction': ev['direction']['rows'],
+            'chart': {k: v for k, v in C.items() if not k.startswith('_')}, 'gaps': ev['gaps']}
+
+
 def build_grinding():
     """Grit sizes (um) per system and wheel marking letters, each with publisher consensus."""
     ev = load_ev('grinding-evidence.json')
@@ -936,7 +982,7 @@ def matref_summary(m):
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
-           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'holdertorque': build_holdertorque(), 'gcodes': build_gcodes(),
+           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'holdertorque': build_holdertorque(), 'threadgauge': build_threadgauge(), 'gcodes': build_gcodes(),
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
            'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),

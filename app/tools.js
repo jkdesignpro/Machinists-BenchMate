@@ -1131,6 +1131,13 @@ const TOOLS = [
   source: 'Sterling Gun Drills catalogue (speed chart, feed table, oil pressure and flow); botek catalogue ELB/ZLB, Type 110 guide values (steels, for comparison); UNISIG deep hole drilling technical reference; Master Fluid Solutions technical bulletin 109; Cutting Tool Engineering, "Conventional thinking", 2016; Hartner, Ingersoll and ISCAR catalogue notes. See docs/sources.md, Gun drilling.',
 },
 {
+  id: 'threadgauge', level: 'advanced', group: 'Threads', title: 'Thread gauge limits (GO and NOT GO)',
+  desc: 'Pitch diameter limits of GO and NOT GO thread plug and ring gauges for Unified threads, classes 2A, 2B, 3A and 3B: which limit of the thread each member is made to, the gauge maker\'s X tolerance and which side it lies on, with a published gauge chart beside the result.',
+  render: el => renderThreadGauge(el),
+  working: 'GO plug: smallest internal pitch diameter, tolerance plus. NOT GO plug: largest, tolerance minus. GO ring: largest external pitch diameter, tolerance minus. NOT GO ring: smallest, tolerance plus. See the note under the tool.',
+  source: 'Thread Check Inc., catalogue p. 52 (X tolerances) and fixed limit gage fact sheet; Royal Oak Gage, class X tolerances; Vermont Gage and Westport standard pitch diameter charts. Thread limits: ASME B1.1 formulas (Thread data tool). ASME B1.2 cited by name. See docs/sources.md, Thread gauge limits.',
+},
+{
   id: 'holdertorque', level: 'advanced', group: 'Setup', title: 'Collet nut and pull stud torque',
   desc: 'How tight to pull an ER collet nut, by collet size, bore and nut, with the most the maker allows, and pull stud (retention knob) torque for 30, 40 and 50 taper holders. Each maker\'s printed figures side by side; they differ, and nothing is averaged.',
   render: el => renderHolderTorque(el),

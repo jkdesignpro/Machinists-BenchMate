@@ -45,6 +45,12 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - Recorded where sources differ: the macro variable number of one tool offset on Fanuc (two sources differ by one).
 - Not found in a readable form, and listed as gaps on the page: Fanuc's own M-code and system variable tables, Haas Next Generation Control variable numbers, Doosan lathe M codes.
 
+### Added (thread gauge limits)
+- New tool **Thread gauge limits (GO and NOT GO)** in Holes and threads > Tapping and thread data, for Unified threads in classes 2A, 2B, 3A and 3B: the pitch diameter each member of a thread plug and a thread ring is made to, the gauge maker's X tolerance for the pitch and diameter, the smallest and largest size of each member, and a drawing of where the gauge zones sit in the thread's tolerance.
+- A gauge maker's pitch diameter chart (15 common sizes) is shown beside the result. It agrees with BenchMate's thread limits in 102 of 105 values; the three that differ by 0.0001 in are shown with a "Chart differs" mark and are not changed (one of them is the 1/4-20 2B maximum already on the list of open questions).
+- Thread data: the note under the Unified classes now says that the 3A and 3B pitch limits have been compared with that chart.
+- Not included: ISO metric gauges (no public table of the ISO 1502 gauge tolerances could be read), setting plugs, wear limits.
+
 ### Added (gauge R&R)
 - New tool **Gauge R&R (average and range method)** in Measure and inspect > Quality. Paste the readings of a study (2 to 5 appraisers, 2 to 4 trials, 2 to 10 parts): repeatability, reproducibility, gauge R&R and part variation, each as a share of the total variation, the gauge R&R against the tolerance, the number of distinct categories, and a bar chart against the 10 % and 30 % guidelines.
 - The constants K1, K2 and K3 are worked out in the core and checked against the published ones; two published examples and a study worked by hand are core tests. Where programs differ (d2 or d2* for the repeatability) the page says which one BenchMate uses.

@@ -812,3 +812,65 @@ async function renderHolderTorque(el) {
   hb.onchange = upd;
   upd();
 }
+
+// ------------------------------------------------------------------ thread gauge limits (Unified, X tolerance)
+// Pitch diameter limits of GO and NOT GO thread plug and ring gauges. The product limits are the core's (the
+// Thread data tool's), the gauge maker's X tolerance is looked up in the published table, and the member's
+// smallest and largest size come from the core. The drawing shows where the gauge zones sit in the product zone.
+async function renderThreadGauge(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, K = R.threadgauge; if (!K) { el.textContent = 'Thread gauge data not built.'; return; }
+  const opts = threadOptions(R).filter(o => o.sys === 'unified');
+  const m = RMEM.threadgauge || (RMEM.threadgauge = { key: '1/4-20 UNC', cls: 2 });
+  if (!opts.some(o => o.key === m.key)) m.key = opts[0].key;
+  const pubs = ks => ks.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ');
+  el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f"><span>Thread (Unified inch)</span><div class="row"><select id="tgk">' + opts.map(o => '<option value="' + rEsc(o.key) + '"' + (o.key === m.key ? ' selected' : '') + '>' + rEsc(o.label) + '</option>').join('') + '</select></div></label>' +
+    '<label class="f"><span>Class</span><div class="row"><select id="tgc"><option value="2">2A external, 2B internal</option><option value="3">3A external, 3B internal</option></select></div></label></div>' +
+    '<div id="tgplot"></div><div id="tgres"></div>' +
+    '<div class="note"><b>Working:</b> each gauge member is made to one limit of the thread it checks, with the gauge maker\'s tolerance all on one side. Thread plug (checks the internal thread): GO is made to the smallest pitch diameter with the tolerance plus, NOT GO (HI) to the largest with the tolerance minus. ' +
+    'Thread ring (checks the external thread): GO is made to the largest pitch diameter with the tolerance minus, NOT GO (LO) to the smallest with the tolerance plus. A new gauge therefore never passes a thread outside its limits, and may reject one that is inside them by less than the gauge tolerance. ' +
+    'The thread\'s limits are the ones the Thread data tool works out from the ASME B1.1 formulas. The X tolerance on pitch diameter is read from the gauge makers\' table by threads per inch and diameter. The GO member must go; the NOT GO member must not. A GO gauge checks pitch diameter, lead and flank angle together over its whole length; a NOT GO gauge checks the pitch diameter only. ' +
+    'Gauges wear: have them calibrated, and a worn GO plug passes threads that are too small (the last sentence is BenchMate\'s own advice).</div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '<br><b>Not covered:</b> ' + K.gaps.map(rEsc).join(' ') + '</div>';
+  const q = id => $('#' + id, el), tk = q('tgk'), tc = q('tgc');
+  tc.value = String(m.cls);
+  const two = v => inMode() ? '<span class="mv">' + fx(v, 4) + ' in</span> <span class="ms">' + fx(v * IN_MM, 4) + ' mm</span>' : '<span class="mv">' + fx(v * IN_MM, 4) + ' mm</span> <span class="ms">' + fx(v, 4) + ' in</span>';
+  function upd() {
+    m.key = tk.value; m.cls = +tc.value;
+    const o = opts.find(x => x.key === m.key), din = o.din, tpi = o.tpi, pin = 1 / tpi, ce = m.cls, ci = m.cls + 10, out = q('tgres'), plot = q('tgplot');
+    const row = K.x.find(r => r.tpi === tpi), ri = K.ranges.findIndex(g => din > g[0] && din <= g[1]), cell = row && ri >= 0 ? row.cells[ri] : null;
+    if (!cell) { plot.innerHTML = ''; out.innerHTML = '<div class="res"><table><tr><td>The gauge makers\' table has no X tolerance for ' + tpi + ' threads per inch at this diameter. Ask the gauge maker.</td></tr></table></div>'; return; }
+    const x = cell.v, lim = { plug: { min: W.un_limit(din, pin, ci, 3), max: W.un_limit(din, pin, ci, 2) }, ring: { min: W.un_limit(din, pin, ce, 3), max: W.un_limit(din, pin, ce, 2) } };
+    const ch = K.chart.rows.find(r => Math.abs(r[1] - din) < 1e-6 && r[2] === tpi);
+    const chartOf = (gauge, member) => !ch ? null : gauge === 'plug' ? (member === 'go' ? ch[3] : ch[m.cls === 2 ? 4 : 5]) : ch[(m.cls === 2 ? 6 : 8) + (member === 'go' ? 0 : 1)];
+    const NAME = { plug: { go: 'GO plug', nogo: 'NOT GO (HI) plug' }, ring: { go: 'GO ring', nogo: 'NOT GO (LO) ring' } };
+    const mem = {};
+    const line = d => {
+      const size = lim[d.gauge][d.limit], lo = W.gauge_member_limit(size, x, d.plus ? 1 : 0, 0), hi = W.gauge_member_limit(size, x, d.plus ? 1 : 0, 1), pc = chartOf(d.gauge, d.member);
+      mem[d.gauge + d.member] = [lo, hi];
+      const cmp = pc === null ? '<span class="ms">size not in the chart</span>' : Math.abs(pc - size) < 5e-5 ? '<span class="badge confirmed">Chart agrees</span> <span class="ms">' + fx(pc, 4) + ' in</span>'
+        : '<span class="badge differs">Chart differs</span> <span class="ms">the chart prints ' + fx(pc, 4) + ' in; the limit worked out here is ' + fx(size, 4) + ' in</span>';
+      return '<tr data-m="' + d.gauge + '-' + d.member + '"><td><b>' + NAME[d.gauge][d.member] + '</b><div class="ms">made to the ' + (d.limit === 'min' ? 'smallest' : 'largest') + ' pitch diameter, tolerance ' + (d.plus ? 'plus' : 'minus') + '</div></td><td>' + two(size) + '</td><td>' + two(lo) + '</td><td>' + two(hi) + '</td><td>' + cmp + '</td></tr>';
+    };
+    const tab = (gauge, title) => '<div class="res mtab" style="max-width:none;margin-top:12px" id="tg' + gauge + '"><div class="h">' + title + '</div><div style="overflow-x:auto"><table><tr><th>Member</th><th>Thread limit</th><th>Gauge pitch diameter, smallest</th><th>largest</th><th>Published chart</th></tr>' +
+      K.direction.filter(d => d.gauge === gauge).map(line).join('') + '</table></div></div>';
+    const chartSrc = ch ? '<p class="ms" style="padding:4px 10px">Published chart: ' + pubs(K.chart.plug_src) + ' for the plug, ' + pubs(K.chart.ring_src) + ' for the ring. It prints the size each member is made to, before the gauge tolerance. Where it differs from the limit worked out here (by 0.0001 in, a rounding step), both are shown and the gauge sizes use the limit worked out here.</p>' : '';
+    const html = '<div class="res" style="margin-top:12px" id="tgx"><table>' + rowsHtml([['X tolerance on pitch diameter', calcCell(two(x), tpi + ' threads per inch, ' + rEsc(K.ranges[ri][2]) + '; ' + cell.pubs.map(rEsc).join(', ') + (cell.status === 'confirmed' ? '' : ' (one source)'))]]) + '</table></div>' +
+      tab('plug', 'Thread plug gauge for ' + rEsc(o.label) + '-' + m.cls + 'B (internal thread)') + tab('ring', 'Thread ring gauge for ' + rEsc(o.label) + '-' + m.cls + 'A (external thread)') + chartSrc;
+    out.innerHTML = html;
+    // Drawing: the product's pitch diameter zone with the two gauge zones at its ends (to scale along the axis).
+    const Wd = 600, L = 150, Rr = 30, bh = 22, T = 30, gap = 46, Hd = T + 2 * bh + gap + 30;
+    const band = (i, title, pr, go, nogo) => {
+      const pad = (pr.max - pr.min) * 0.12, X = v => L + (v - (pr.min - pad)) / (pr.max - pr.min + 2 * pad) * (Wd - L - Rr), y = T + i * (bh + gap);
+      const z = (a, b, cls) => '<rect class="' + cls + '" x="' + X(a).toFixed(1) + '" y="' + y + '" width="' + Math.max(1.5, X(b) - X(a)).toFixed(1) + '" height="' + bh + '"/>';
+      return '<text class="tl" x="' + (L - 8) + '" y="' + (y + 15) + '" text-anchor="end">' + title + '</text>' + z(pr.min, pr.max, 'bar') + z(go[0], go[1], 'tgz') + z(nogo[0], nogo[1], 'tgn') +
+        '<text class="tl" x="' + X((go[0] + go[1]) / 2).toFixed(1) + '" y="' + (y - 5) + '" text-anchor="middle">GO</text><text class="tl" x="' + X((nogo[0] + nogo[1]) / 2).toFixed(1) + '" y="' + (y - 5) + '" text-anchor="middle">NOT GO</text>' +
+        '<text class="tl" x="' + X(pr.min).toFixed(1) + '" y="' + (y + bh + 13) + '" text-anchor="middle">' + fx(inMode() ? pr.min : pr.min * IN_MM, 4) + '</text><text class="tl" x="' + X(pr.max).toFixed(1) + '" y="' + (y + bh + 13) + '" text-anchor="middle">' + fx(inMode() ? pr.max : pr.max * IN_MM, 4) + '</text>';
+    };
+    plot.innerHTML = '<svg class="capplot" viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="Where the gauge tolerance zones sit in the pitch diameter tolerance of the thread"><text class="tl" x="' + L + '" y="12">pitch diameter, ' + (inMode() ? 'in' : 'mm') + '. Pale: the thread; solid: the gauge members</text>' +
+      band(0, 'internal, ' + m.cls + 'B: plug', lim.plug, mem.pluggo, mem.plugnogo) + band(1, 'external, ' + m.cls + 'A: ring', lim.ring, mem.ringgo, mem.ringnogo) + '</svg>';
+  }
+  tk.onchange = upd; tc.onchange = upd;
+  upd();
+}
+

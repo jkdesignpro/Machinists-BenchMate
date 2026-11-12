@@ -173,7 +173,7 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U38 | UNC, UNF, UNEF data and class limits | done | `threaddata` | Classes other than 2A/2B are computed, not checked against published tables; no 1B/3B minor limits |
+| U38 | UNC, UNF, UNEF data and class limits | done | `threaddata` | 3A and 3B pitch limits compared with a gauge chart in 0.5.0 (15 sizes; two values differ by 0.0001 in); 1A and 1B computed, not checked; no 1B/3B minor limits |
 | U39 | UN constant-pitch and UNS (special) threads | done | `unseries`, `threaddata` (custom size) | No 4, 6, 20, 28 or 32-UN lists |
 | U40 | UNJ threads | done | `unjunr` |  |
 | U41 | UNR threads | partial | `unjunr` | UNR rule (root radius at least 0.108 P, external only) is stated; the UNR minor diameter limits are not computed |
@@ -575,7 +575,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH245 | Measuring threads: pitch, lead, thread and ball micrometers | missing | | |
 | MH246 | Three-wire method, best wire sizes, formulas | partial | `wires` | 60, 55, 30, 29 degree; no lead-angle correction (`claude/threads-3`) |
 | MH247 | Wire measurement of Whitworth, ACME, stub ACME, taper and buttress threads | partial | `wires`, `acme`, `trapezoidal` | Whitworth, ACME, Stub ACME and trapezoidal; no taper or buttress wires (`claude/threads-3`) |
-| MH248 | Thread gauges, gauge tolerances | missing | | |
+| MH248 | Thread gauges, gauge tolerances | partial | `threadgauge` | 0.5.0: GO and NOT GO plug and ring pitch diameter limits for Unified 2A, 2B, 3A, 3B with the X tolerance; no metric (ISO 1502), no setting plugs |
 | MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | missing | | |
 | MH250 | Tap drill diameter, percentage of thread, cold form tapping | done | `tapdrill` | |
 | MH251 | Tap and clearance drills; tolerances of tapped holes | done | `tapdrill`, `threaddata`, `clearance` | Clearance holes added in `clearance` (`claude/fasteners`) |

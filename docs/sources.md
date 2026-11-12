@@ -469,6 +469,22 @@ Findings:
 - **Read and not used** (listed on the page with the reason): botek's pressure and quantity charts and its page 21; Hartner's speed table (materials cannot be matched); Ingersoll's speed table (material names missing); ISCAR's speeds, feeds and chart (indexable drills of 10 to 26 mm); Master Fluid Solutions' fill-the-hole flow rule (at gundrill speeds it asks for several times the makers' flow, and more than its own nozzle formula lets a coolant hole pass).
 - **Not readable:** *Cutting Tool Engineering*, "Gundrilling" (January 2012 PDF): the link returned the magazine's front page.
 
+## Thread gauge limits (`data/refdata/threadgauge-evidence.json`, `core/src/threads.rs`, `app/refdata3.js`)
+All accessed 2026-11-12.
+
+- **[TC_TOL]** Thread Check Inc., product catalogue, p. 52, "Gage tolerances". https://www.threadcheck.com/technical-documents/gage-tolerances-pg52.pdf . W and X tolerance tables: pitch diameter by threads per inch for four diameter ranges, major and minor diameter, half angle, lead.
+- **[ROG_X]** Royal Oak Gage, "Class X tolerances". http://www.royaloakgage.com/reference/classX.htm . The X table (to 8 in) and how the tolerances are applied to each gauge member.
+- **[TC_FACT]** Thread Check Inc., Fixed limit gage fact sheet. https://www.threadcheck.com/fixed-limit-gage-fact-sheet/technicalinfo/ . Plus on the GO plug, minus on the NOGO plug; minus on the GO ring, plus on the NOGO ring.
+- **[VG_CHART]** Vermont Gage, Standard pitch diameter chart (catalogue p. 17, copy at Willrich Precision). https://willrich.com/wp-content/uploads/2014/11/Thread-Gage-Pitch-Diameter-Chart.pdf . Plug: GO basic, NOT GO 2B and 3B. Ring: GO and NOT GO for 2A and 3A.
+- **[WP_CHART]** Westport Corporation, Standard pitch diameter chart, thread plug gages. https://westportcorp.com/blogs/thread-plug-gages/standard-pitch-diameter-chart .
+- ASME B1.2 (gauges and gauging for Unified threads) is the standard behind these tables. It is cited by name and was not read.
+
+Findings:
+- **X tolerance on pitch diameter.** Thread Check and Royal Oak print the same value in every cell both have. Only Thread Check prints the 27 threads per inch row and the 8 to 12 in column: those cells are marked single-source. The text of Thread Check's PDF runs the columns together; each row was placed by counting its values, and the placing agrees with Royal Oak's table, which keeps its columns. Thread Check's X table prints "4 1/4" where its W table and Royal Oak print 4 1/2: read as 4 1/2.
+- **Which side the tolerance lies on** (two makers and both charts): GO plug plus, NOT GO plug minus, GO ring minus, NOT GO ring plus. A reading of Vermont Gage's "Fixed Limit Thread Gages" leaflet gave "plus" for the GO ring; its own chart prints "GO = -" for rings, and the leaflet reading is not used.
+- **The chart against the core's thread limits.** 15 sizes by 7 columns (GO basic, NOT GO 2B and 3B, ring GO and NOT GO for 2A and 3A). 102 of 105 values agree. Three differ by 0.0001 in: 6-32 3B maximum (core 0.1205, chart 0.1204, two makers), 1/4-20 2B maximum (core 0.2223, chart 0.2224, two makers; this is the open rounding question already on the list) and 1/2-13 3A minimum (core 0.4462, chart 0.4463, one maker). The core is not changed: the page shows the chart's figure beside the core's with a "Chart differs" mark, and a core test pins the three so that any change shows up. This is also the first comparison of the 3A and 3B limits with a published table.
+- **Not included:** ISO metric gauges (ISO 1502: no public table of the gauge tolerances could be read), setting plugs and W tolerances, wear limits, major and minor diameters of the members, classes 1A and 1B.
+
 ## Collet nut and pull stud torque (`data/refdata/holdertorque-evidence.json`, `app/refdata3.js`)
 All accessed 2026-11-12. Every table used was read twice from the PDF; the two readings agree for every cell used.
 

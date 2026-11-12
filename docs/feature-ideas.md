@@ -46,7 +46,7 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 11 | Drill thrust and torque (`drillforce`) | 1 (0.3.0) | built |
 | 12 | Tap torque (`taptorque`) | 1 (0.3.0) | built |
 | 13 | Gauge R&R (`grr`) | 3 (0.5.0) | built (average and range method) |
-| 14 | Thread gauge limits | 3 (0.5.0) | to do |
+| 14 | Thread gauge limits (`threadgauge`) | 3 (0.5.0) | built for Unified threads; ISO metric gauges (ISO 1502) not included, no public table found |
 | 15 | Rotary axis helper (`rotpoint`, `rotfeed`) | 2 (0.4.0) | built |
 | 16 | Job time and quote | 5 (0.9.0) | to do |
 | 17 | Vendor data import and cut log | 5 (0.9.0) | to do |

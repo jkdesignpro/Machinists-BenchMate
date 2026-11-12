@@ -88,6 +88,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Library | Tips, assistant, community cut data | missing | | U98, U101, U102 |
 | Library | Indexable insert catalogue | done (decode or tap a code together; insert drawn to scale from above and in section; nose radius to the turning advisor, outline to the sketcher) | `insertcode`, `holdercode`, `iso513` | U103 |
 | Shop | Tool library and favourites | done | `toollib` (fill into rpm, feed, arcfeed, helix, deflection, cutopt, drillpoint, tapdrill, finish); star in the side list or by the title | U106, U109 |
+| Threads | Thread gauge limits (not in Ultra; idea 14) | done for Unified (GO and NOT GO plug and ring pitch diameters with the X tolerance, a published chart beside); ISO metric gauges missing (no public table of ISO 1502 tolerances) | `threadgauge` | |
 | Quality | Gauge R&R (not in Ultra; idea 13) | done (average and range method: EV, AV, GRR, PV, percent of total variation and of tolerance, ndc; constants computed and checked against the published ones; ANOVA method not included) | `grr` | |
 | Shop | Collet nut and pull stud torque (not in Ultra; idea 8) | done (ER nut torque by size, bore and nut from the maker's table with a second maker beside it; pull stud torque from three makers side by side, nothing averaged) | `holdertorque` | |
 | Shop | Decimal precision, home dashboard, reorderable menu | missing | | U105, U107, U108 |

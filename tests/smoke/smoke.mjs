@@ -1439,6 +1439,41 @@ where = 'grr';
   if (!/Not a number: abc/.test(await res())) problems.push(`[${where}] a reading that is not a number must be named: ${await res()}`);
   await page.click('#main #grex'); await page.waitForTimeout(100);
 }
+// Thread gauge limits: the member is made to the right limit with the X tolerance on the right side, the X
+// tolerance follows pitch and diameter, the published chart is shown beside (agreeing or differing), and a
+// pitch with no X tolerance at that diameter says so.
+where = 'threadgauge';
+{
+  await units('inch'); await open('threadgauge', 250);
+  const pick = async (id, v) => { await page.selectOption(`#main #${id}`, v); await page.waitForTimeout(60); };
+  const mrow = async k => (await page.innerText(`#main tr[data-m="${k}"]`)).replace(/\s+/g, ' ');
+  const xtol = async () => (await page.innerText('#main #tgx')).replace(/\s+/g, ' ');
+  await pick('tgk', '1/4-20 UNC'); await pick('tgc', '2');
+  let t = [await xtol(), await mrow('plug-go'), await mrow('plug-nogo'), await mrow('ring-go'), await mrow('ring-nogo')];
+  if (!/0\.0003 in 0\.0076 mm 20 threads per inch, to and including 1 1\/2 in; Thread Check Inc\., Royal Oak Gage/.test(t[0]) ||
+      !/GO plug made to the smallest pitch diameter, tolerance plus 0\.2175 in 5\.5245 mm 0\.2175 in 5\.5245 mm 0\.2178 in 5\.5321 mm Chart agrees 0\.2175 in/.test(t[1]) ||
+      !/NOT GO \(HI\) plug made to the largest pitch diameter, tolerance minus 0\.2223 in .* 0\.2220 in .* 0\.2223 in .* Chart differs the chart prints 0\.2224 in; the limit worked out here is 0\.2223 in/.test(t[2]) ||
+      !/GO ring made to the largest pitch diameter, tolerance minus 0\.2164 in .* 0\.2161 in .* 0\.2164 in .* Chart agrees 0\.2164 in/.test(t[3]) ||
+      !/NOT GO \(LO\) ring made to the smallest pitch diameter, tolerance plus 0\.2127 in .* 0\.2127 in .* 0\.2130 in .* Chart agrees 0\.2127 in/.test(t[4]))
+    problems.push(`[${where}] 1/4-20 UNC class 2: ${t.join(' | ')}`);
+  const zones = await page.evaluate(() => [document.querySelectorAll('#tgplot rect.bar').length, document.querySelectorAll('#tgplot rect.tgz').length, document.querySelectorAll('#tgplot rect.tgn').length].join(','));
+  if (zones !== '2,2,2') problems.push(`[${where}] the drawing should show two thread zones with a GO and a NOT GO zone each: ${zones}`);
+  await pick('tgc', '3');
+  t = [await mrow('plug-nogo'), await mrow('ring-nogo')];
+  if (!/tolerance minus 0\.2211 in .* 0\.2208 in .* 0\.2211 in .* Chart agrees 0\.2211 in/.test(t[0]) || !/tolerance plus 0\.2147 in .* 0\.2147 in .* 0\.2150 in .* Chart agrees 0\.2147 in/.test(t[1])) problems.push(`[${where}] 1/4-20 UNC class 3: ${t.join(' | ')}`);
+  await pick('tgk', '1-8 UNC'); await pick('tgc', '2');
+  t = [await xtol(), await mrow('plug-go'), await mrow('plug-nogo')];
+  if (!/0\.0004 in 0\.0102 mm 8 threads per inch, to and including 1 1\/2 in/.test(t[0]) || !/0\.9188 in .* 0\.9188 in .* 0\.9192 in .* Chart agrees/.test(t[1]) || !/0\.9276 in .* 0\.9272 in .* 0\.9276 in .* Chart agrees 0\.9276 in/.test(t[2])) problems.push(`[${where}] 1-8 UNC takes 0.0004 in: ${t.join(' | ')}`);
+  await pick('tgk', '2-4.5 UNC');
+  t = [await xtol(), await mrow('plug-go')];
+  if (!/0\.0005 in 0\.0127 mm 4\.5 threads per inch, above 1 1\/2 in to 4 in/.test(t[0]) || !/size not in the chart/.test(t[1])) problems.push(`[${where}] 2-4.5 UNC is in the second diameter range and not in the chart: ${t.join(' | ')}`);
+  await pick('tgk', '1-1/2-6 UNC');
+  if (!/0\.0004 in .* 6 threads per inch, to and including 1 1\/2 in/.test(await xtol())) problems.push(`[${where}] 1 1/2 in is still in the first range: ${await xtol()}`);
+  await units('mm'); await open('threadgauge', 250);
+  await pick('tgk', '1/4-20 UNC');
+  t = await mrow('plug-go');
+  if (!/5\.5245 mm 0\.2175 in 5\.5245 mm 0\.2175 in 5\.5321 mm 0\.2178 in/.test(t)) problems.push(`[${where}] mm first in metric mode: ${t}`);
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

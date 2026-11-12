@@ -120,6 +120,7 @@ f1!(tap_pct_form, c::tap_pct_form, d, p, hole);
 f1!(iso965_limit, c::iso965_limit_f, d, p, grade, pos, which);
 f1!(iso965_value, c::iso965_value_f, d, p, grade, what);
 f1!(un_limit, c::un_limit_f, d, p, class, which);
+f1!(gauge_member_limit, c::gauge_member_limit, size, tol, plus, which);
 
 // ISO limits and fits (core/src/fits.rs)
 f1!(iso286_step_mean, c::iso286_step_mean, lo, hi);
