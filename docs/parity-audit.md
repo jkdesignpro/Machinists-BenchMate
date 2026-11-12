@@ -66,6 +66,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, eighth batch, 2026-11-12):** materials guide (`matguide`: steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, titanium, magnesium, nickel and zinc alloy names, how the hardness tests work, forms of corrosion, mill certificates). MH50, MH60, MH62, MH63, MH64, MH65, ED51 to ED61, ED63, ED64 and BB56 done (ED58 and ED63 were missing); notes brought up to date on MH53 and MH54, which stay partial. Counted from the tables below: 319 done, 186 partial, 91 missing of 596 in-scope rows, 54 %. For 90 %, 218 more rows have to reach done.
 
+**Update (0.6.0, ninth batch, 2026-11-12):** measurement guide (`measguide`: ways to write a tolerance, the ten preferred fits, surface plates, checking micrometers and calipers, shaft runout, surface texture and lay symbols). MH75, MH78, MH87, MH92, MH94, MH184, ED12 and BB38 done (MH87 was missing); MH90 from missing to partial; notes brought up to date on MH93 and MH95. Counted from the tables below: 327 done, 180 partial, 89 missing of 596 in-scope rows, 55 %. For 90 %, 210 more rows have to reach done.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -406,10 +408,10 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH72 | GD&T, datum referencing, positional tolerance | done | `gdtguide`, `gdtdof`, `gdttp`, `gdtfcf` | |
 | MH73 | GD&T and CAD models, digital product definition | missing | | |
 | MH74 | Checking designs and drawings, arrangement of views | out of scope? | | Design office work |
-| MH75 | Limits and fits basics: unilateral/bilateral tolerances | partial | `fits` | Only via ISO classes |
+| MH75 | Limits and fits basics: unilateral/bilateral tolerances | done | `fits`, `measguide` | 0.6.0: limits, unilateral and bilateral tolerances with a drawing; ISO classes in `fits` |
 | MH76 | Force, expansion and shrink fits; temperatures for shrinkage fits | done | `shrinkfit` | Shrink-fit temperatures (hub heated, shaft cooled, both) and Lame press-fit pressure, stress, torque; inputs are yours (`claude/measure-maths`) |
 | MH77 | ANSI/ASME standard fits (RC, LC, LT, LN, FN) | partial | `ansifits` | All 34 classes 0 to 19.69 in, but only one full table read: 491 of 492 rows need a 2nd source; above 19.69 in not covered (`claude/inspection-2`) |
-| MH78 | ANSI preferred metric limits and fits | partial | `fits` | Any class works; preferred fits not listed |
+| MH78 | ANSI preferred metric limits and fits | done | `fits`, `measguide` | 0.6.0: the ten preferred fits, hole and shaft basis, with what each is for; limits of any class in `fits` |
 | MH79 | ISO metric limits and fits | done | `fits` | j/J and up to 3150 mm added (`claude/inspection-2`) |
 | MH80 | Tolerance stack-up chain, analysis and assignment | partial | `gdtstack` | 1D worst case and RSS; no tolerance assignment |
 | MH81 | Preferred numbers and sizes | partial | `prefnum` | Renard R5 to R80 (R40-only and R80 values single-source); no more-rounded R' and R'' series, no preferred metric sizes (`claude/inspection-2`) |
@@ -418,15 +420,15 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH84 | Measuring tapers with V-block; dimensioning tapers; taper per foot | partial | `taper`, `machinetapers`, `taperrolls` | Taper per foot, angle, over-rolls measurement; no V-block method (`claude/measure-maths`) |
 | MH85 | Measuring angles and dovetail slides | done | `dovetail`, `sinebar`, `taperrolls` |  |
 | MH86 | Measurement over pins and rolls; V-groove; radius of arc | partial | `dovetail`, `taperrolls`, `ballcone` | Dovetails, V-grooves, tapers over rolls, balls in bores; no radius-of-arc over rolls (`claude/measure-maths`) |
-| MH87 | Checking shaft conditions | missing | | |
+| MH87 | Checking shaft conditions | done | `measguide` | 0.6.0: runout of a shaft in V-blocks or between centres with a dial indicator, TIR, bent shaft against off-centre hub (several statements one source, marked) |
 | MH88 | Coordinates for hole circles; chord lengths; hole coordinate tables | done | `bolt` | |
 | MH89 | Gauge blocks and gauge block sets | done | `sinebar` | Gauge-block stack from the sets you own |
-| MH90 | Surface plates, V-blocks, parallels, angle plates and their calibration | missing | | |
+| MH90 | Surface plates, V-blocks, parallels, angle plates and their calibration | partial | `measguide` | 0.6.0: surface plate grades, flatness, care, support and calibration interval (care and intervals from one maker, marked), 1-2-3 blocks; parallels and angle plates in `workholding`; no V-blocks, no calibration method |
 | MH91 | Measurements using light, interferometer | out of scope? | | |
-| MH92 | Micrometers, verniers, dial and digital calipers; their calibration | partial | `scales` | Reading only; no calibration (`claude/measure-maths`) |
-| MH93 | Surface texture: terms, sampling lengths, roughness and waviness parameters | partial | `surface` | Ra, Rz, Rq ratios, N grades and symbols; no waviness parameters or full list of parameters |
-| MH94 | Roughness average values, lay symbols, castings | partial | `finish` | Theoretical Ra/Rt from feed and nose radius only |
-| MH95 | ISO surface finish standards and profiles | partial | `surface` | ISO 21920-1 against ISO 1302 symbols noted; no profile definitions |
+| MH92 | Micrometers, verniers, dial and digital calipers; their calibration | done | `scales`, `measguide` | Reading in `scales`; 0.6.0: checking a micrometer and a caliper against gauge blocks |
+| MH93 | Surface texture: terms, sampling lengths, roughness and waviness parameters | partial | `surface`, `measguide` | Ra, Rz, Rq ratios, N grades and symbols; 0.6.0: roughness, waviness and lay in words, P, R and W profiles, default filters (one source, marked); no waviness parameters or full list of parameters |
+| MH94 | Roughness average values, lay symbols, castings | done | `finish`, `surface`, `measguide` | Typical Ra by process from two publishers in `surface`; 0.6.0: lay symbols; theoretical Ra from feed and nose radius in `finish`. Nothing on castings |
+| MH95 | ISO surface finish standards and profiles | partial | `surface`, `measguide` | ISO 21920-1 against ISO 1302 symbols noted; 0.6.0: where things go in the new symbol and the acceptance rule (one source each, marked); no profile definitions |
 
 ### Tooling and toolmaking
 
@@ -525,7 +527,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH181 | Thread cutting on CNC lathes: depth, infeed, G32, G76, multi-start | partial | `cycthread` | Depth, infeed, G76 and G92; no G32, no multi-start, no tapered threads |
 | MH182 | Subprograms, macros and parametric programming | partial | `macroref` | Macro variables, system variables and statements per control; no worked subprogram examples |
 | MH183 | Axis nomenclature | done | `cncguide` | ISO 841 right-hand rule, mill and lathe axes, rotary axes (`claude/cnc-guide`) |
-| MH184 | Total indicator reading | partial | `runout`, `gdtguide` | Runout and total runout in the GD&T guide, runout against chip load; no measuring procedure |
+| MH184 | Total indicator reading | done | `runout`, `gdtguide`, `measguide` | Runout and total runout in the GD&T guide, runout against chip load; 0.6.0: the measuring procedure |
 | MH185 | CAD/CAM: drawing types, projections, exchange standards | missing | | |
 
 ### Manufacturing processes
@@ -694,7 +696,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED9 | 3.1-3.12 Engineering design process and principles (12 entries) | out of scope? | | Design methodology |
 | ED10 | 4.1 Engineering abbreviations | partial | `abbrev` | Drawing abbreviations only (`claude/measure-maths`) |
 | ED11 | 4.2 Datums and tolerances: principles | done | `gdtguide`, `gdtdof` | |
-| ED12 | 4.3 Toleranced dimensions | partial | `gdtguide`, `gdtstack` | No guide to plus/minus dimensioning |
+| ED12 | 4.3 Toleranced dimensions | done | `gdtguide`, `gdtstack`, `measguide` | 0.6.0: plus and minus dimensioning explained with examples |
 | ED13 | 4.4 General tolerances (ISO 2768) | done | `gentol` | ISO 2768-1 linear, broken edges and angles, five publishers; ISO 2768-2 is withdrawn (`claude/measure-maths`) |
 | ED14 | 4.5 Holes | partial | `fits` | |
 | ED15 | 4.6 Screw threads | done | `threaddata` | |
@@ -819,7 +821,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB35 | Tapers | done | `taper`, `machinetapers` | |
 | BB36 | Taper turning and sine bar formulae | done | `taper`, `sinebar` | 0.6.0: compound slide setting and tailstock set-over added; sine bar and gauge block stack |
 | BB37 | Dividing head / rotary table indexing | done | `indexing` |  |
-| BB38 | Tolerances and preferred fits | partial | `fits` | Preferred fits not listed |
+| BB38 | Tolerances and preferred fits | done | `fits`, `measguide` | 0.6.0: preferred fits listed |
 | BB39 | Fits for shafts and holes | done | `fits` | j5 to j7 and J6 to J8 included |
 | BB40 | Morse, Jacobs and DIN tapers | partial | `machinetapers` | DIN metric tapers missing |
 | BB41 | Milling machine tapers | done | `machinetapers` | |

@@ -1972,6 +1972,23 @@ where = 'toolpaths';
     if (/to be verified/.test(row('W water hardening')) || !/to be verified/.test(row('P mould steels')) || !/to be verified/.test(row('8xxx')) || !/to be verified/.test(row('Leeb')) || !/to be verified/.test(row('Erosion corrosion')) || /to be verified/.test(row('3.1'))) problems.push(`[${where}] table rows: one source is flagged, two are not`);
   }
   if (!/under 0\.25 % in one, 0\.05 to 0\.30 % in the other/.test(g.all) || !/0\.0005 to 0\.003 %/.test(g.all) || !/OS025 is 0\.025 mm/.test(g.all) || !/apex angle of 120 degrees/.test(g.all) || !/about 6 % aluminium and 4 % vanadium/.test(g.all)) problems.push(`[${where}] figures from the sources`);
+  where = 'measguide';
+  g = await guide('measguide');
+  if (g.h2 !== 7 || g.svgs !== 3 || g.tabs !== '5,11,4,8' || g.srcs !== 20) problems.push(`[${where}] 7 sections, 3 drawings, tables of 4, 10, 3 and 7 rows, 20 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 54) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Limit dimensions', 'A unilateral tolerance', 'Three kinds of fit', 'Three grades', 'Overall flatness', 'Repeat reading', 'The standard', 'Micrometer, five points', 'Caliper, outside jaws', 'Total indicator reading', 'Indicator. Fix it', 'How much is too much', 'Lay is the direction'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  // Starrett and the magazine article that repeats its text count once.
+  for (const k of ['Which limit on top', 'Putting them together', 'Grade names and the flatness rule', 'Three supports', 'How often to calibrate', '1-2-3 blocks', 'Flat and parallel, in figures', 'Along the jaw', 'Half the reading', 'Shaft or coupling', 'Three profiles', 'Accepting a surface'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/H7\/g6 G7\/h6 sliding/.test(row('H7/g6')) || !/H8\/f7 F8\/h7 close running/.test(row('H8/f7')) || !/H7\/u6 U7\/h6 force/.test(row('H7/u6')) || !/H7\/s6 S7\/h6 medium drive/.test(row('H7/s6'))) problems.push(`[${where}] preferred fits: ${row('H7/g6')} | ${row('H8/f7')}`);
+    if (!/2\.000 \+0 −0\.005 1\.995 to 2\.000/.test(row('Unilateral')) || !/1\.998 to 2\.001/.test(row('Unequal bilateral')) || !/material removal is required/.test(row('Bar closing the V')) || !/roughly circular/.test(row('C '))) problems.push(`[${where}] tolerance and symbol rows: ${row('Unilateral')} | ${row('C ')}`);
+    if (rows.some(t => /to be verified/.test(t))) problems.push(`[${where}] every table row has two publishers`);
+  }
+  if (!/40 plus the square of the diagonal in inches divided by 25/.test(g.all) || !/0\.210, 0\.420, 0\.605, 0\.815 and 1\.000 in/.test(g.all) || !/0\.08 mm TIR is 0\.04 mm/.test(g.all) || !/0\.05 mm TIR at 1500 rpm/.test(g.all) || !/at least 90 % of the range/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);

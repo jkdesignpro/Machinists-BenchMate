@@ -3405,6 +3405,13 @@ const TOOLS = [
   source: 'Engineering ToolBox, Machine Design and Wikipedia (steel numbers); Matmatch and Tata Steel (carbon classes); eFunda, Total Materia and the open textbook Metallurgy, CC BY (tool steels); Outokumpu and Aalco (stainless); Acme Foundry and Wikipedia (cast iron); ESAB, Hydro, AlCircle, Xometry, Total Materia and Righton Blackburns (aluminium); Total Materia and National Bronze (copper tempers); Online Metals, eFunda, White Industries, Dynacast and Aludiecasting (other metals); Matmatch, Wevolver, UNSW, Missouri S&T and Welding Advisers (hardness tests); AMPP and TWI (corrosion); Projectmaterials and What Is Piping (certificates). Full list in docs/sources.md, "Materials guide".',
 },
 {
+  id: 'measguide', level: 'advanced', group: 'Guides', title: 'Measurement guide',
+  desc: 'Inspection practice: the ways a tolerance is written, the ten preferred metric fits and what each is for, surface plate grades and care, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout with V-blocks and a dial indicator, and the surface texture and lay symbols on a drawing.',
+  render: el => renderMeasGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'WisTech Open Blueprint Reading (CC BY) and Machinist Guides (tolerances); Amesweb, Engineers Edge and Fractory (fits); Starrett, Quality Magazine, Mitutoyo and Travers (surface plates and blocks); Quality Magazine, Mitutoyo and Machinist Guides (micrometers and calipers); Fabrico, Acoem and the Machining FAQ (runout); GD&T Basics, Wevolver and Digital Surf (surface texture). Full list in docs/sources.md, "Measurement guide".',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),
