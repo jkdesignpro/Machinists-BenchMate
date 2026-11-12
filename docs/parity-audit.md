@@ -64,6 +64,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, seventh batch, 2026-11-12):** shop tools guide (`shoptools`: sharpening twist drills, grinding lathe tool bits, hacksaw and band saw blades, hole saw speeds, carbide burrs, choosing a cutting fluid, grinding wheel shapes, dressing and truing). BB18, BB24, BB25, BB27, BB28, BB60, BB62, BB80, MH157 and MH163 done; MH129 and MH164 from missing to partial; notes brought up to date on BB26, MH132, MH156 and MH158. Re-audit: MH179 and MH180 are done by the milling toolpath guide and the CNC lathe guide. Counted from the tables below: 299 done, 204 partial, 93 missing of 596 in-scope rows, 50 %; 238 more rows to done for 90 %.
 
+**Update (0.6.0, eighth batch, 2026-11-12):** materials guide (`matguide`: steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, titanium, magnesium, nickel and zinc alloy names, how the hardness tests work, forms of corrosion, mill certificates). MH50, MH60, MH62, MH63, MH64, MH65, ED51 to ED61, ED63, ED64 and BB56 done (ED58 and ED63 were missing); notes brought up to date on MH53 and MH54, which stay partial. Counted from the tables below: 319 done, 186 partial, 91 missing of 596 in-scope rows, 54 %. For 90 %, 218 more rows have to reach done.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -374,22 +376,22 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH47 | Properties of wood | out of scope? | | |
 | MH48 | Tabulated properties of ceramics, plastics, investment-casting and powder metal alloys | partial | `materials` | 5 plastics; no ceramics, casting or PM alloys |
 | MH49 | Elastic properties; effect of temperature on strength | partial | `materials` | E for 27 entries; no temperature effect |
-| MH50 | Standard steels: classification, AISI/SAE/UNS numbering | partial | `materials` | Equivalents only; no numbering-system explainer |
+| MH50 | Standard steels: classification, AISI/SAE/UNS numbering | done | `materials`, `matguide` | 0.6.0: numbering explained in the materials guide (digits, 17 series, letters L, B, H); equivalents in `materials`. UNS numbers are not explained |
 | MH51 | Identifying metals | partial | `metalid` | Spark, magnet and chip tests (one source); no chemical spot tests |
 | MH52 | Compositions of carbon, alloy and stainless steels | partial | `materials` | 0.5.0: 37 grades, limits from two public sources each where found (see docs/material-equivalents.md) |
-| MH53 | Applications and mechanical properties of steels | partial | `materials` | Properties for some grades; no applications |
-| MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials` | 10 tool-steel grades as equivalents; no selection guide, faults or heat treatment |
+| MH53 | Applications and mechanical properties of steels | partial | `materials`, `matguide` | Properties for some grades; uses by carbon class in the materials guide; no applications by grade |
+| MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials`, `matguide` | 10 tool-steel grades as equivalents; 0.6.0: the letter groups with an example grade, quench, hardness and machinability rating (one source for the figures); no selection guide by job, faults or heat treatment |
 | MH55 | Tool steel mill forms, machining allowances, decarburization limits | missing | | |
 | MH56 | Heat treatment: definitions, hardness and hardenability | partial | `heattreat` | Terms in our words (7 of 12 used by two publishers); no hardness and hardenability theory |
 | MH57 | Hardening, quenching, tempering temperatures, annealing, normalising | partial | `heattreat`, `tempercolours` | 12 steels side by side (2 confirmed, 16 differ); no tempering-hardness tables (no two sources agree) |
 | MH58 | Case hardening: carburising, nitriding, flame and induction hardening | partial | `heattreat` | Terms and 4340 nitriding only; no case depth or process data |
 | MH59 | Heat treating high-speed steels; subzero treatment | missing | | |
-| MH60 | Hardness tests: Brinell, Rockwell, Vickers, Knoop, Shore, Mohs, durometer | partial | `hardness` | Conversion between scales only; the test methods are not described |
+| MH60 | Hardness tests: Brinell, Rockwell, Vickers, Knoop, Shore, Mohs, durometer | done | `hardness`, `matguide` | 0.6.0: how Brinell, Rockwell, Vickers, Knoop, Leeb, Shore and Mohs work (indenter, load, what is measured); conversion in `hardness` |
 | MH61 | Comparison of hardness scales | done | `hardness` | Steel, approximate |
-| MH62 | Nonferrous: copper alloys | partial | `materials` | 12 copper alloys; no temper explainer |
-| MH63 | Aluminium: temper designations, alloy designations, heat-treatability | partial | `materials` | Grades only; no temper (T6, H32...) explainer |
-| MH64 | Magnesium, nickel, titanium alloys | partial | `materials` | Ni and Ti present; no magnesium |
-| MH65 | Corrosion types and galvanic corrosion | partial | `galvanic` | Galvanic series and two-metal check; no other corrosion types |
+| MH62 | Nonferrous: copper alloys | done | `materials`, `matguide` | 12 copper alloys; 0.6.0: temper classes, H00 to H10, annealed, grain size and as-manufactured tempers |
+| MH63 | Aluminium: temper designations, alloy designations, heat-treatability | done | `materials`, `matguide` | 0.6.0: series, heat-treatability, F O H W T, H digits, T1 to T10, T651 and the stress-relief codes |
+| MH64 | Magnesium, nickel, titanium alloys | done | `materials`, `matguide` | Ni and Ti grades in `materials`; 0.6.0: titanium grades, nickel families and the magnesium naming rule with tempers. No magnesium grades in the materials table |
+| MH65 | Corrosion types and galvanic corrosion | done | `galvanic`, `matguide` | Galvanic series and two-metal check; 0.6.0: eight forms of corrosion (two of them one source, marked) |
 | MH66 | Plastics: families, properties, design analysis | partial | `materials`, `plastics` | 12 plastics with service temperature and expansion; no design data |
 | MH67 | Plastics processing (thermoforming, moulding) and additive manufacturing | out of scope? | | |
 | MH68 | Machining plastics | done | `plastics` | Makers' turning data side by side, annealing, notes (`claude/materials-ref`) |
@@ -731,20 +733,20 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED48 | 10 Fluid equipment: turbines, refrigeration, diesel engines, heat exchangers, pumps (6 entries) | out of scope | | |
 | ED49 | 11 Pressure vessels and flanges (7 entries) | out of scope | | |
 | ED50 | 12.1 Crystals: order and disorder | out of scope? | | |
-| ED51 | 12.2 Carbon steels | partial | `materials` | 0.5.0: compositions for nine carbon steels; no heat treatment per grade |
-| ED52 | 12.3 Low-alloy steels | partial | `materials` | |
-| ED53 | 12.4 Alloy steels | partial | `materials` | |
-| ED54 | 12.5 Cast iron | partial | `materials` | |
-| ED55 | 12.6 Stainless steels | partial | `materials` | |
-| ED56 | 12.7 Non-ferrous alloys | partial | `materials` | |
-| ED57 | 12.8 Nickel alloys | partial | `materials` | |
-| ED58 | 12.9 Zinc alloys | missing | | |
-| ED59 | 12.10 Copper alloys | partial | `materials` | |
-| ED60 | 12.11 Aluminium alloys | partial | `materials` | No temper explainer |
-| ED61 | 12.12 Titanium alloys | partial | `materials` | |
+| ED51 | 12.2 Carbon steels | done | `materials`, `matguide` | 0.5.0: compositions for nine carbon steels; 0.6.0: carbon classes with properties and uses, numbering; heat treatment of some grades in `heattreat` |
+| ED52 | 12.3 Low-alloy steels | done | `materials`, `matguide` | 0.6.0: the alloy series and what each number means |
+| ED53 | 12.4 Alloy steels | done | `materials`, `matguide` | 0.6.0: as ED52, with tool steel groups |
+| ED54 | 12.5 Cast iron | done | `materials`, `matguide` | 0.6.0: grey, ductile, white and malleable iron: form of the carbon, behaviour, uses |
+| ED55 | 12.6 Stainless steels | done | `materials`, `matguide` | 0.6.0: five families, magnetism, hardening, typical grades (grades one source, marked) |
+| ED56 | 12.7 Non-ferrous alloys | done | `materials`, `matguide` | 0.6.0: aluminium, copper, titanium, magnesium, nickel and zinc sections |
+| ED57 | 12.8 Nickel alloys | done | `materials`, `matguide` | 0.6.0: four families, what each resists, machining behaviour (one source, marked) |
+| ED58 | 12.9 Zinc alloys | done | `matguide` | 0.6.0: Zamak and ZA families and what the names mean; no property table |
+| ED59 | 12.10 Copper alloys | done | `materials`, `matguide` | 0.6.0: temper designations; 12 alloys in `materials` |
+| ED60 | 12.11 Aluminium alloys | done | `materials`, `matguide` | 0.6.0: series and tempers explained |
+| ED61 | 12.12 Titanium alloys | done | `materials`, `matguide` | 0.6.0: grades 1 to 5 and 23, structure classes (one source, marked) |
 | ED62 | 12.13 Engineering plastics | partial | `materials`, `plastics` | 12 plastics in `plastics` |
-| ED63 | 12.14 Material traceability and documentation (certificates) | missing | | Reading a mill cert |
-| ED64 | 12.15 Corrosion | partial | `galvanic` | Galvanic corrosion only |
+| ED63 | 12.14 Material traceability and documentation (certificates) | done | `matguide` | 0.6.0: EN 10204 types 2.1 to 3.2, what is on a certificate, checking the heat number |
+| ED64 | 12.15 Corrosion | done | `galvanic`, `matguide` | 0.6.0: eight forms of corrosion; galvanic check in `galvanic` |
 | ED65 | 13.1 Screw fasteners | partial | `bolttorque`, `boltgrade` | Torque, preload and grades; no joint stiffness or fatigue |
 | ED66 | 13.2 Bearings | partial | `bearinglife` | Rating life only |
 | ED67 | 13.3 Ball and roller bearings | partial | `bearinglife` | Rating life only; no types, designations or fits |
@@ -835,7 +837,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB53 | Symbols for elements; viscosity chart | missing | | Low priority |
 | BB54 | Physical properties of metals and compounds | partial | `materials` | |
 | BB55 | Sheet metal and wire gauges; bend allowance | done | `bend`, `gauges` | 0.6.0: gauge tables added |
-| BB56 | Workshop metals | partial | `materials` | |
+| BB56 | Workshop metals | done | `materials`, `matguide` | 0.6.0: families of steel, cast iron, stainless and non-ferrous metals in the materials guide |
 | BB57 | Workpiece material comparison table | done | `materials` | |
 | BB58 | Engineering plastics | partial | `materials` | 5 plastics |
 | BB59 | Engineering adhesives | missing | | |

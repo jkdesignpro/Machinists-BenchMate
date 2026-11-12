@@ -1956,6 +1956,22 @@ where = 'toolpaths';
     if (/to be verified/.test(row('Neat (straight) oil')) || !/to be verified/.test(row('Semi-synthetic')) || !/to be verified/.test(row('Point too flat'))) problems.push(`[${where}] table rows: one source is flagged, two are not`);
   }
   if (!/8 to 12 degrees/.test(g.all) || !/6 to 9 degrees/.test(g.all) || !/20 to 50 %/.test(g.all) || !/first 100 square inches/.test(g.all) || !/about 27 to 30 m\/min/.test(g.all) || !/12 000 to 18 000 against 4 000 to 10 000/.test(g.all)) problems.push(`[${where}] drill clearance, break-in, hole saw or burr figures are missing`);
+  where = 'matguide';
+  g = await guide('matguide');
+  if (g.h2 !== 11 || g.svgs !== 3 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,9,5' || g.srcs !== 38) problems.push(`[${where}] 11 sections, 3 drawings, 13 tables, 38 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 77) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Four digits', 'First digit', 'A letter in the middle', 'Low, medium and high carbon', 'W, O and A name the quench', 'Austenitic grades are not hardened', 'Two ways to strength', 'H tempers, second digit', 'T651 is', 'On extrusions a fourth digit', 'Grain size tempers', 'Titanium grade 5', 'The letters', 'The number in a ZA name', 'Rockwell scales', 'Vickers angle, sources differ', 'Check the heat number first'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  for (const k of ['Lead content', 'H at the end', 'Carbon. Tool steels', 'Machinability falls', 'What makes it stainless', 'Grades. Ferritic', 'Silicon decides', 'The other digits', 'T73 is', 'Grade 23', 'Order and serial letter', 'Monel holds', 'Machining nickel alloys', 'Zamak 3 and Zamak 5', 'Crevices', 'Then compare with the order'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/chromium-molybdenum Cr 0\.50 to 0\.95 %, Mo 0\.12 to 0\.30 %/.test(row('41xx')) || !/Ni 1\.82 %, Cr 0\.50 to 0\.80 %, Mo 0\.25 %/.test(row('43xx')) || !/Cr 1\.45 %/.test(row('52xxx'))) problems.push(`[${where}] steel series: ${row('41xx')} | ${row('43xx')} | ${row('52xxx')}`);
+    if (!/solution heat treated, artificially aged/.test(row('T6 ')) || !/1\/2 hard/.test(row('H02')) || !/sources differ/.test(row('4xxx')) || !/136 degrees between opposite faces/.test(row('Vickers')) || !/10 kgf minor load, then 60, 100 or 150 kgf/.test(row('Rockwell'))) problems.push(`[${where}] tempers and hardness rows: ${row('T6 ')} | ${row('H02')} | ${row('4xxx')}`);
+    if (/to be verified/.test(row('W water hardening')) || !/to be verified/.test(row('P mould steels')) || !/to be verified/.test(row('8xxx')) || !/to be verified/.test(row('Leeb')) || !/to be verified/.test(row('Erosion corrosion')) || /to be verified/.test(row('3.1'))) problems.push(`[${where}] table rows: one source is flagged, two are not`);
+  }
+  if (!/under 0\.25 % in one, 0\.05 to 0\.30 % in the other/.test(g.all) || !/0\.0005 to 0\.003 %/.test(g.all) || !/OS025 is 0\.025 mm/.test(g.all) || !/apex angle of 120 degrees/.test(g.all) || !/about 6 % aluminium and 4 % vanadium/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);

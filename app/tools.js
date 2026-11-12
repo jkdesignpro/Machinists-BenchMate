@@ -3398,6 +3398,13 @@ const TOOLS = [
   source: 'TTE work instruction and the Machinery Repairman manual (drills); J. A. Nilsson and mini-lathe.com (tool bits); Introduction to Machining (CC BY), Tameson, Fastenal, Sawblade.com, Modern Machine Shop (saws); RUKO chart at AutomationDirect and Remora Electrical (hole saws); Klingspor and Amana Tool (burrs); American Machinist and FUCHS (fluids); Palmgren and Norton in Modern Machine Shop (dressing). See docs/sources.md, "Shop tools guide".',
 },
 {
+  id: 'matguide', level: 'advanced', group: 'Guides', title: 'Materials guide',
+  desc: 'How to read what is stamped on the bar and printed on the certificate: SAE and AISI steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, titanium, magnesium, nickel and zinc alloy names, how each hardness test works, the forms of corrosion, and the mill certificate.',
+  render: el => renderMatGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'Engineering ToolBox, Machine Design and Wikipedia (steel numbers); Matmatch and Tata Steel (carbon classes); eFunda, Total Materia and the open textbook Metallurgy, CC BY (tool steels); Outokumpu and Aalco (stainless); Acme Foundry and Wikipedia (cast iron); ESAB, Hydro, AlCircle, Xometry, Total Materia and Righton Blackburns (aluminium); Total Materia and National Bronze (copper tempers); Online Metals, eFunda, White Industries, Dynacast and Aludiecasting (other metals); Matmatch, Wevolver, UNSW, Missouri S&T and Welding Advisers (hardness tests); AMPP and TWI (corrosion); Projectmaterials and What Is Piping (certificates). Full list in docs/sources.md, "Materials guide".',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),
