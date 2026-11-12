@@ -784,6 +784,36 @@ Keys are the ones shown in the app. Every statement carries its keys; one with f
 - **Sources differ, both shown:** the edge finder speed (about 1000 rpm in [TRAV], under 750 rpm in [WPI]).
 - **Read and not used:** Tormach knowledge base, "Setting up work and tool offsets on Tormach mills" (the page only links to a video); a GitBook shutdown page for a router with another control.
 
+## Milling toolpath guide (`app/shopguides.js`, tool `toolpaths`), accessed 2026-11-12
+Keys are the ones shown in the app. Every statement carries its keys; one with fewer than two independent publishers is shown as "to be verified" automatically. The two Autodesk pages count as one publisher.
+- **[ADSK_2D]** M. Deans, Autodesk Fusion blog, "10 milling toolpaths for your first 2D CNC machining project", 2018-06-28, https://www.autodesk.com/products/fusion-360/blog/10-2d-cnc-milling-toolpaths : what 2D means, stepover and stepdown, stock to leave, lead-in and lead-out, facing, contour and wear compensation, pocket entry and clearing, slots, chamfer and radius milling, spot drilling, drilling, tapping.
+- **[ADSK_3D]** Autodesk, Inventor CAM 2020 help, "3D machining strategies", https://help.autodesk.com/cloudhelp/2020/ENU/INVCAM/files/GUID-16189902-F8F4-4854-BEE6-46E49F5671E0.htm : the 3D toolpaths by name and where each suits (parallel, contour, scallop, spiral, radial, horizontal, pencil), steep against shallow areas, rest machining, 3+2 positioning.
+- **[MITCBA]** MIT Center for Bits and Atoms class page, "Toolpath planning with Fusion 360" (no author or date), https://tourlomousis.pages.cba.mit.edu/fabclass-recitation-toolpath-planning : the chain from model to G-code (setup, toolpaths, simulation, post-processor), 2D against 3D, clearing a pocket.
+- **[HELICAL]** Helical Solutions, *Machining Guidebook: quick reference eBook for CNC milling practices and techniques*, 2016, https://web.mae.ufl.edu/designlab/Advanced%20Manufacturing/Helical_Machining_Guidebook.pdf : radial and axial depth of cut, arc lead-in, helix and ramp entry with the maker's starting figures (helix diameter 110 to 120 % of the cutter, ramp 1 to 3 degrees), inside corners, deep pockets, slotting (cutter 55 to 65 % of the slot width), finishing walls (2 to 5 % radial), thin walls. Pages 4 and 5 of the PDF came through partly garbled and nothing was taken from them.
+- **[MEC]** MecSoft Corporation, "Best practices in 3 axis machining" (eBook, undated), https://mecsoft.com/wp-content/uploads/2017/11/MecSoft-Ebook-Best-Practices-in-3-Axis-Machining.pdf : rough, semi-finish, finish and clean-up in that order, stock allowance, steep and shallow areas, ball-nose and corner-radius cutters, rest machining, the tolerances that add up in a 3D toolpath.
+- **[LCNC_TC]** LinuxCNC documentation, "Tool compensation", https://linuxcnc.org/docs/stable/html/gcode/tool-compensation.html : cutter radius compensation, the entry move, what the control refuses.
+- **[HFO_MP]** Haas Factory Outlet (Productivity Inc.), Haas Mill Programming manual, revised 06/26 (see the CNC knowledge guide above): G41 and G42, G40, canned cycles G81 to G84 and the R plane.
+- **Own work:** the eight-line G41 example for a 60 x 40 block is ours, written to the rules in [LCNC_TC] and [HFO_MP]; it has not been run on a machine and the page says to prove it like any other program.
+- **Not readable, not counted:** Purdue University's mill toolpath guide (robots.txt disallows fetching) and the FreeCAD wiki page for the CAM workbench (access denied).
+- **Not covered:** 3D tool compensation (parity row CN55); no source for it was read.
+
+## Chamfer mill calculator (`core/src/millturn.rs` `chamfer_mill`, tool `chamfermill`)
+Own geometry of a cone with a flat tip of diameter t and included angle A, run along a top edge with a clearance c between the tip and the wall: tip depth below the top face Z = (w + c) / tan(A/2); tool centre from the wall = t/2 + c; chamfer depth down the wall = w / tan(A/2); cutting diameter at the top of the chamfer = t + 2 (w + c); widest chamfer the cutter reaches = D/2 - t/2 - c. No published table is used. The core test checks a 90 degree tool (depth equals width plus clearance) and a 60 degree tool (1 / tan 30 degrees = 1.7321) by hand.
+
+## Workholding guide (`app/shopguides.js`, tool `workholding`), accessed 2026-11-12
+Keys are the ones shown in the app. The Tormach article is by the author of the two CNC Cookbook guides and shares much of their text, so the three count as one publisher.
+- **[CCB_VISE]** CNC Cookbook, "Machinist vise: complete guide", modified 2024-03-18, https://cnccookbook.com/machinist-vise-complete-guide : vise parts, parallels, vise stops, gripping high on little material, aligning one vise and two, jaw types, round work, several vises.
+- **[TORM]** B. Warfield, Tormach, "The beginner's complete guide to machinist vises", https://tormach.com/articles/the-beginners-complete-guide-to-machinist-vises : the same ground as [CCB_VISE]; soft jaws for second operations.
+- **[CCB_CLAMP]** CNC Cookbook, "Easy guide to CNC fixture clamps", modified 2024-02-01, https://cnccookbook.com/easy-guide-to-cnc-clamps : step clamps and heel blocks, toe clamps, fixture plates, tape and superglue.
+- **[CIMCO10]** CIMCO, CNC programming book, chapter 10 "Vise and accessories", https://www.cimco.com/docs/cncbook/en/Ch10_ViseAndAccessories.html : fixed and moving jaw, parallels, vise stop, even clamping force, removing the handle, aligning the vise, cutting soft jaws on a spacer.
+- **[NILS]** J. A. Nilsson, Machine Shop Tutorials, "Work holding secrets", https://jonilsson.github.io/machine-shop-tutorials/fundamentals/work_holding_secrets : locate then clamp, where clamps go, cleanliness, indicating a vise, soft jaws, clamps kept level, fixture plates, thin parts, vacuum (about 14 psi at most), sacrificial plates, the limits of glue and tape.
+- **[JENN]** M. R. Jennings, *Introduction to Machining*, 9.11 "Block squaring" (Washington open textbook, CC BY 4.0), https://openwa.pressbooks.pub/intromachining1/chapter/wa9-11/ : the six steps of squaring a block, retold in our own words.
+- **[ADSK_FIX]** S. McGarry, Autodesk Fusion blog, "Understanding the top 10 CNC fixturing types", 2022-03-14, https://www.autodesk.com/products/fusion-360/blog/understanding-the-top-10-cnc-fixturing-types/ : soft jaws and part-to-part variation, fixture plates, vacuum, tape and glue, tabs, round work, several parts at once.
+- **[HELICAL]** as in the milling toolpath guide: thin wall milling.
+- **[WPI]** as in the CNC mill setup guide: take the handle off the vise.
+- **Sources differ, both shown:** the height of the heel of a step clamp ([CCB_CLAMP] sets it a step or two above level, [NILS] keeps the clamp level).
+- **Not covered:** angle plates (CN74), parting several parts from one bar (CN70) and the shoulder bolt and dowel pin method for two-sided parts (CN75); no source for them was read.
+
 ## Measurement and shop maths (`core/src/measure.rs`, `core/src/units.rs`, `core/src/expr.rs`, `app/maths.js`, `data/refdata/iso2768-evidence.json`, `data/refdata/abbrev-evidence.json`)
 Web sources accessed 2026-11-11 unless stated. Book titles are cited by name only; nothing is copied from them.
 ### Formulas and worked examples

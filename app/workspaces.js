@@ -66,7 +66,7 @@ const WORKSPACES = [
     ['Engagement', ['chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
     ['Tool behaviour', ['deflection', 'runout', 'chatter'], 'wave'],
     ['Tool holding', ['holdertorque', 'machinetapers'], 'nut'],
-    ['Other milling', ['surfacefin', 'slitsaw', 'indexing'], 'saw'],
+    ['Other milling', ['surfacefin', 'chamfermill', 'slitsaw', 'indexing'], 'saw'],
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
     ['Drilling', ['advdrill', 'advream', 'advtap', 'gundrill', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
@@ -105,7 +105,7 @@ const WORKSPACES = [
     ['Fasteners', ['boltgrade', 'bolttorque', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
     ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife', 'spring', 'beltdrive', 'chaindrive', 'taperpin'], 'bearing'],
     ['Shop', ['coolant', 'economics', 'abbrev'], 'drop'],
-    ['Guides', ['cncguide', 'millsetup', 'toolwear', 'toolguide'], 'book'],
+    ['Guides', ['cncguide', 'millsetup', 'toolpaths', 'workholding', 'toolwear', 'toolguide'], 'book'],
   ] },
 ];
 // Listed on the Home rail rather than in a workspace.

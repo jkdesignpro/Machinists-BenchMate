@@ -1004,6 +1004,24 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'A cylindrical tank with flat ends and the liquid in it: diameter, depth of liquid, length');
   },
 
+  // Chamfer mill on an outside edge, section view to scale: tip depth below the top face and centre distance from the wall.
+  chamfermill(v, sys, rows) {
+    const W = 520, H = 260, u = dcU(sys);
+    const z = dcRow(rows, 'Tip below the top face'), x0 = dcRow(rows, 'Tool centre out from the wall'), hh = dcRow(rows, 'Chamfer depth down the wall'), dt = dcRow(rows, 'Cutting diameter at the top');
+    if (!dcOk(z) || !dcOk(hh) || !dcOk(dt) || !dcOk(v.w) || !(x0 >= 0)) return '';
+    const tip = v.tip > 0 ? v.tip : 0, t = Math.tan(dcRad(v.ang / 2));
+    const rmax = v.d > dt ? v.d / 2 : dt / 2 * 1.25, hc = (rmax - tip / 2) / t, tot = Math.max(hc * 1.4, z * 1.25);
+    const sc = Math.min(165 / tot, 200 / (2 * rmax)), ax = 330, ty = 205, topY = ty - z * sc, wallX = ax - x0 * sc;
+    let h = DK.poly([[40, topY], [wallX - v.w * sc, topY], [wallX, topY + hh * sc], [wallX, 240], [40, 240]], 'part');
+    h += DK.poly([[ax - tip / 2 * sc, ty], [ax + tip / 2 * sc, ty], [ax + rmax * sc, ty - hc * sc], [ax + rmax * sc, ty - tot * sc], [ax - rmax * sc, ty - tot * sc], [ax - rmax * sc, ty - hc * sc]], 'tool');
+    h += DK.cl(ax, ty - tot * sc - 10, ax, ty + 12);
+    h += dcDimV(topY, ty, ax + rmax * sc + 34, 'Z ' + dcN(z), { from: ax });
+    h += DK.dimH(wallX, ax, ty + 30, dcN(x0), { from: ty });
+    h += DK.dimH(wallX - v.w * sc, wallX, topY - 16, 'w ' + dcN(v.w), { from: topY });
+    h += dcLines(44, topY + 26, ['part']) + dcLines(40, 22, ['section through the edge, to scale, ' + u, 'the cutting is done on the cone, clear of the tip']);
+    return DK.svg(W, H, h, 'Chamfer mill cutting a chamfer on an outside edge: depth of the tip below the top face and distance of the tool centre from the wall');
+  },
+
   // Taper pin: side view to scale, large end on the left.
   taperpin(v, sys, rows) {
     const W = 520, H = 220, u = dcU(sys), dp = sys === 'inch' ? 4 : 3;

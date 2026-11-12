@@ -164,6 +164,7 @@ const FORMULAS = [
   F('chipthin', 'Maximum chip thickness', 'hex = fz · sin φ  (fz once φ ≥ 90°)', 'hex: max chip; fz: feed per tooth; φ: engagement angle', ['ALT']),
   F('cornerfeed', 'Engagement in an inside corner', 'cos φ = ((R − ae)² − (R − r)² − r²) / (2 r (R − r))', 'R: finished wall radius; ae: radial width; r: tool radius', ['OWN', 'ALT']),
   F('cornerfeed', 'Engagement round a boss', 'cos φ = ((R + r)² + r² − (R + ae)²) / (2 r (R + r))', 'R: finished wall radius; ae: radial width; r: tool radius', ['OWN', 'ALT']),
+  F('chamfermill', 'Chamfer mill depth and offset', 'Z = (w + c) / tan(A/2);  x = t/2 + c;  D = t + 2 (w + c)', 'Z: tip below the top face; x: tool centre from the wall; D: cutting diameter at the top; w: chamfer width; c: clearance past the tip; t: tip flat diameter; A: included angle', ['OWN']),
   F('ballcusp', 'Ball-nose cusp height', 'h = R − √(R² − (s/2)²)  ≈ s² / (8R)', 'h: cusp; R: ball radius; s: stepover', ['OWN', 'IMCO']),
   F('ballcusp', 'Stepover for a cusp', 's = 2 · √(2 R h − h²)', 's: stepover; R: ball radius; h: cusp', ['OWN', 'IMCO']),
   F('balleff', 'Ball-nose effective diameter', 'De = 2 · √(ap · (D − ap))   (axis normal to the surface)', 'De: effective diameter; ap: depth of cut; D: ball diameter', ['ISCAR', 'IMCO']),
@@ -449,7 +450,7 @@ const FORMULAS = [
 
 // Tools that only show reference data (no formula of their own).
 const FORMULA_EXEMPT = ['holdercode', 'iso513', 'drillchart', 'tapdrill', 'gritconv', 'wheelcode', 'threaddata', 'pipethreads', 'whitworth', 'fits', 'surface', 'hardness',
-  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'millsetup', 'toolguide', 'formulas',
+  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'millsetup', 'toolpaths', 'workholding', 'toolguide', 'formulas',
   'tempercolours', 'heattreat', 'plastics', 'metalid'];
 
 // Library screen. FLIB.g is a group name, '' for all, or FLIB_FAV for the favourites.

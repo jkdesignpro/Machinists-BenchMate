@@ -58,6 +58,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, fourth batch, 2026-11-12):** CNC mill setup guide (`millsetup`: start-up, control keys, loading tools, four tool length methods, work offsets, first run, adjusting, shut-down), and in the CNC guide: units, program characters, spindle direction, constant surface speed, chip load. CN5, CN7, CN9, CN17, CN18, CN19, CN23, CN25, CN27 to CN34, CN52 and CN77 to CN79 done; CN26 partial. Counted from the tables below: 248 done, 223 partial, 125 missing of 596 in-scope rows, 42 %; 289 more rows to done for 90 %.
 
+**Update (0.6.0, fifth batch, 2026-11-12):** milling toolpath guide (`toolpaths`: from model to part, 2D and 3D, which toolpath for which feature, contour with cutter compensation and a worked example, pockets and slots, chamfer and radius milling, holes, 3D toolpaths, rest machining, tolerances), workholding guide (`workholding`: rules, vise and accessories, aligning a vise, jaws and soft jaws, squaring a block, clamps and fixture plates, thin parts, round parts and many parts) and the chamfer mill calculator (`chamfermill`). CN3, CN37 to CN47, CN56 to CN69, CN71 to CN73 and CN76 done; CN35, CN70 and CN75 partial; CN55 (3D tool compensation) and CN74 (angle plates) stay missing because no source for them was read. Counted from the tables below: 278 done, 215 partial, 103 missing of 596 in-scope rows, 47 %; 259 more rows to done for 90 %. The CNC machining handbook checklist is at 63 of 79, 80 %.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -863,7 +865,7 @@ One row per learning objective.
 |---|---|---|---|---|
 | CN1 | L1 Course goals, audience, tools, lessons, resources | out of scope? | | Course administration |
 | CN2 | L1 Subtractive vs additive rapid prototyping | out of scope? | | |
-| CN3 | L1 Overall CAD/CAM/CNC process | missing | | Explainer |
+| CN3 | L1 Overall CAD/CAM/CNC process | done | `toolpaths`, `millsetup` | "From model to part" in the milling toolpath guide (CAD, CAM setup, toolpaths, simulation, post-processor; one source, marked), with the machine side in the mill setup guide |
 | CN4 | L2 Shop safety awareness, rules, clothing, conduct | partial | `cncguide` | Short safety page (guards, dress, chips, coolant, lock-out); points to HSE/OSHA, not a full course (`claude/cnc-guide`) |
 | CN5 | L2 Safety precautions when running a new CNC program | done | `millsetup`, `cncguide` | 0.6.0: first-run steps with sources: plot, cut air, slow rapids, stop above the part and compare distance to go, single block |
 | CN6 | L3 Common CNC tools | partial | `toolguide` | End mills, drills, reamers, taps described; no course-specific tool list (`claude/tooling-ref`) |
@@ -895,19 +897,19 @@ One row per learning objective.
 | CN32 | L6 Run a new program safely | done | `millsetup` | 0.6.0: plot, cut air, rapids at 25 or 5 %, stop above the part, single block, every tool |
 | CN33 | L6 Adjust offsets for wear and deflection | done | `millsetup`, `deflection` | 0.6.0: sizes brought in with the diameter and length registers, wear column, which way to change; deflection note (own reasoning, marked) and the calculator |
 | CN34 | L6 Shut down | done | `millsetup` | 0.6.0: part and tool out, chips, wipe down, power off by the manual |
-| CN35 | L7 2.5D, 3D and 4-axis parts | missing | | |
+| CN35 | L7 2.5D, 3D and 4-axis parts | partial | `toolpaths` | 2D (2.5D), 3D and 3+2 positioning explained; no continuous 4-axis work |
 | CN36 | L7 CAD/CAM graphics views | out of scope? | | CAM software usage |
-| CN37 | L7 Identifying 2D machining features | missing | | |
-| CN38 | L7 Machining parameters for 2D toolpaths (stepover, stepdown) | missing | | |
-| CN39 | L7 Facing toolpaths | missing | | |
-| CN40 | L7 2D contour toolpaths | missing | | |
-| CN41 | L7 Cutter diameter compensation rules | partial | `cncguide`, `tnrc` | G41/G42 sides and entry/exit rules; no mill contour worked example (`claude/cnc-guide`) |
-| CN42 | L7 Pocketing toolpaths | missing | | |
-| CN43 | L7 Slot milling | missing | | |
-| CN44 | L7 Chamfer milling | missing | | Chamfer mill depth for width |
-| CN45 | L7 Radius milling | missing | | |
-| CN46 | L7 Drilling and peck drilling | partial | `cycdrill`, `advdrill` | Cycle generator and advisor; no toolpath explainer |
-| CN47 | L7 Tapping toolpaths | partial | `cycdrill`, `advtap` | Cycle generator and advisor; no toolpath explainer |
+| CN37 | L7 Identifying 2D machining features | done | `toolpaths` | Feature table and drawing: which toolpath for which feature |
+| CN38 | L7 Machining parameters for 2D toolpaths (stepover, stepdown) | done | `toolpaths`, `chipthin` | Stepover, stepdown, stock to leave, lead-in and lead-out |
+| CN39 | L7 Facing toolpaths | done | `toolpaths` | Facing: start off the part, cut a little below the face, roughing passes for uneven stock (one source, marked) |
+| CN40 | L7 2D contour toolpaths | done | `toolpaths` | Contour section with lead-in, lead-out and a worked G-code example |
+| CN41 | L7 Cutter diameter compensation rules | done | `toolpaths`, `cncguide`, `tnrc` | Rules for G41 and G42 plus an 8-line mill contour example for a 60 x 40 block |
+| CN42 | L7 Pocketing toolpaths | done | `toolpaths`, `helix` | Getting in (helix, ramp, plunge), clearing, inside corners, deep pockets |
+| CN43 | L7 Slot milling | done | `toolpaths` | Slots: cutter narrower than the slot, ramp in, finish each wall |
+| CN44 | L7 Chamfer milling | done | `toolpaths`, `chamfermill` | Guide paragraph and the chamfer mill calculator (tip depth, centre offset, cutting diameter) |
+| CN45 | L7 Radius milling | done | `toolpaths` | Radius milling paragraph (one source, marked) |
+| CN46 | L7 Drilling and peck drilling | done | `toolpaths`, `cycdrill`, `advdrill` | Spot, drill, peck and the R plane explained; cycle generator and advisor |
+| CN47 | L7 Tapping toolpaths | done | `toolpaths`, `cycdrill`, `advtap` | G84 tapping explained; cycle generator and advisor |
 | CN48 | L8 Lathe coordinate system | done | `cncguide`, `tnrc` | Lathe Z and X, diameter programming, imaginary tip (`claude/cnc-guide`) |
 | CN49 | L8 Lathe workholding | partial | `cncguide` | Chuck speed, stick-out, support; no collet or chuck selection (`claude/cnc-guide`) |
 | CN50 | L8 Common lathe tools | missing | | |
@@ -916,27 +918,27 @@ One row per learning objective.
 | CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | partial | `cycg71`, `cycgroove`, `cycthread`, `cyctaper` | Turn, groove, cut-off, thread; no facing or drilling on the lathe |
 | CN54 | L8 Live tools | partial | `machines` | Live-tool speed limit check only |
 | CN55 | L9 3D tool compensation | missing | | |
-| CN56 | L9 3D cut tolerances | missing | | |
-| CN57 | L9 Geometric features in 3D toolpaths | missing | | |
-| CN58 | L9 3D roughing toolpaths | missing | | |
-| CN59 | L9 3D finishing toolpaths (and scallop height) | partial | `ballcusp` | Cusp (scallop) height and stepover; no finishing strategies |
-| CN60 | L9 Rest milling | missing | | |
-| CN61 | L9 Pencil milling | missing | | |
-| CN62 | L10 CNC workholding components | partial | `cncguide` | Locate then clamp, vise on parallels; no fixture plate or clamp kit detail (`claude/cnc-guide`) |
-| CN63 | L10 CNC vise parts and accessories | partial | `cncguide` | Vise practice paragraph (`claude/cnc-guide`) |
-| CN64 | L10 Hard, step and soft jaws | partial | `cncguide` | Soft jaws mentioned only (`claude/cnc-guide`) |
-| CN65 | App A: align a vise | partial | `cncguide` | One paragraph in Workholding basics; no step-by-step procedure |
-| CN66 | App A: square a block | missing | | |
-| CN67 | App A: 2D contour with cutter compensation | missing | | |
-| CN68 | App A: vise jaw types; installing and aligning jaws | partial | `cncguide` | One paragraph in Workholding basics; no jaw types or installing |
-| CN69 | App A: making and using soft jaws | partial | `cncguide` | Soft jaws named in Workholding basics; no procedure |
-| CN70 | App A: multiple parts from one bar | missing | | |
-| CN71 | App A: fixture plates | missing | | |
-| CN72 | App A: clamps and bolts | missing | | |
-| CN73 | App A: thin-walled parts | partial | `cncguide` | One paragraph in Workholding basics |
+| CN56 | L9 3D cut tolerances | done | `toolpaths` | "3D tolerances": the chain of tolerances and what a tighter one costs (one source, marked) |
+| CN57 | L9 Geometric features in 3D toolpaths | done | `toolpaths` | Steep or shallow decides the finishing pass, with a drawing |
+| CN58 | L9 3D roughing toolpaths | done | `toolpaths` | 3D roughing in the order of work and the 3D toolpath table |
+| CN59 | L9 3D finishing toolpaths (and scallop height) | done | `toolpaths`, `ballcusp` | Seven 3D toolpaths in a table; cusp (scallop) height tool |
+| CN60 | L9 Rest milling | done | `toolpaths` | Rest machining |
+| CN61 | L9 Pencil milling | done | `toolpaths` | Pencil passes (one source, marked) |
+| CN62 | L10 CNC workholding components | done | `workholding`, `cncguide` | Rules for every setup, vise, clamps, fixture plates |
+| CN63 | L10 CNC vise parts and accessories | done | `workholding` | Vise parts, parallels, vise stop, handle, with a drawing |
+| CN64 | L10 Hard, step and soft jaws | done | `workholding` | Table of five jaw types (hard, step, soft and others) |
+| CN65 | App A: align a vise | done | `workholding` | Three-step procedure with an indicator; two vises in line |
+| CN66 | App A: square a block | done | `workholding` | Six-step table (one source, marked) |
+| CN67 | App A: 2D contour with cutter compensation | done | `toolpaths` | Worked G41 contour example with lead-in and lead-out |
+| CN68 | App A: vise jaw types; installing and aligning jaws | done | `workholding` | Jaw types table; cutting soft jaws in place |
+| CN69 | App A: making and using soft jaws | done | `workholding` | Cut in place, clamp on a spacer, second operations, keeping parts alike |
+| CN70 | App A: multiple parts from one bar | partial | `workholding` | Several parts in several vises or a double-station vise; nothing on parting many parts from one bar |
+| CN71 | App A: fixture plates | done | `workholding` | Fixture plates: grid of tapped and dowel holes, plate material |
+| CN72 | App A: clamps and bolts | done | `workholding` | Step clamps with a drawing, heel height (sources differ, both shown), toe clamps |
+| CN73 | App A: thin-walled parts | done | `workholding` | Thin parts: why they are hard, vacuum, tape and glue, sacrificial plate, tabs, thin walls |
 | CN74 | App A: angle plates for multi-sided parts | missing | | |
-| CN75 | App A: shoulder bolts and dowel pins for two-sided parts | missing | | |
-| CN76 | App A: double-sided tape | missing | | |
+| CN75 | App A: shoulder bolts and dowel pins for two-sided parts | partial | `workholding` | Dowel holes in fixture plates and mirror-image soft jaws for second operations; no shoulder bolt and dowel pin procedure |
+| CN76 | App A: double-sided tape | done | `workholding` | Double-sided tape and superglue, with their limits |
 | CN77 | App B: tool length offset with paper | done | `millsetup` | 0.6.0: method A, on the part with paper or a feeler, with its drawbacks |
 | CN78 | App B: tool length offset with a 1-2-3 block from a finished face | done | `millsetup` | 0.6.0: method B with the block standing on a face milled flat |
 | CN79 | App B: tool length offset with a tool probe | done | `millsetup` | 0.6.0: method C, tool setting probe |

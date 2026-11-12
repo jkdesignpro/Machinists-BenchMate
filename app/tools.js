@@ -451,6 +451,38 @@ const TOOLS = [
   source: 'Engagement and chip thickness: Altintas, Manufacturing Automation, Ch. 2; arc feed: Sandvik Coromant milling formulas (circular interpolation). The arc engagement is derived here by the law of cosines and checked in the core tests against a brute-force sample of the tool circle.',
 },
 {
+  id: 'chamfermill', level: 'advanced', group: 'Milling', title: 'Chamfer mill: depth and offset',
+  desc: 'Where to put a chamfer mill to cut a chamfer of a given width on an outside edge: the depth of the tip below the top face and the distance of the tool centre from the wall, keeping the tip clear of the cut, with the cutting diameter for the speed and the widest chamfer the tool can reach.',
+  fields: s => [
+    { id: 'w', label: 'Chamfer width (along the top face)', unit: lenU(s), def: s === 'inch' ? 0.03 : 1 },
+    { id: 'ang', label: 'Tool included angle', unit: 'deg', def: 90, options: [[60, '60 deg'], [82, '82 deg'], [90, '90 deg (45 deg chamfer)'], [100, '100 deg'], [120, '120 deg']] },
+    { id: 'tip', label: 'Tip flat diameter (0 for a sharp point)', unit: lenU(s), def: 0 },
+    { id: 'c', label: 'Clearance past the tip', unit: lenU(s), def: s === 'inch' ? 0.02 : 0.5 },
+    { id: 'd', label: 'Cutter diameter (optional)', unit: lenU(s), def: '', level: 'advanced' },
+  ],
+  calc: (v, W, s) => {
+    const c = v.c > 0 ? v.c : 0, tip = v.tip > 0 ? v.tip : 0, d = v.d > 0 ? v.d : 0;
+    const z = W.chamfer_mill(v.w, v.ang, tip, c, d, 0);
+    if (!isFinite(z)) return [];
+    const rows = [R('Tip below the top face (Z depth)', z, lenU(s), 4), R('Tool centre out from the wall', W.chamfer_mill(v.w, v.ang, tip, c, d, 1), lenU(s), 4),
+      R('Chamfer depth down the wall', W.chamfer_mill(v.w, v.ang, tip, c, d, 4), lenU(s), 4), R('Cutting diameter at the top of the chamfer', W.chamfer_mill(v.w, v.ang, tip, c, d, 3), lenU(s), 4)];
+    if (d > 0) {
+      const max = W.chamfer_mill(v.w, v.ang, tip, c, d, 2);
+      if (isFinite(max)) {
+        rows.push(R('Widest chamfer this cutter reaches', max, lenU(s), 4));
+        if (v.w > max) rows.push(R('Note', 'The chamfer is wider than this cutter can reach with that clearance: use a larger cutter or less clearance', '', 0));
+      } else rows.push(R('Note', 'The cutter diameter must be larger than the tip flat', '', 0));
+    }
+    rows.push(R('Note', 'Work out the speed from the cutting diameter shown, not the cutter diameter. With cutter compensation, program the wall and put the centre distance in as the tool radius', '', 0));
+    return rows;
+  },
+  working: 'A chamfer mill is a cone. Its radius at a height z above the tip is tip/2 + z tan(angle/2). Put the bottom of the chamfer on the cone a clearance c out from the edge of the tip flat, so the tip itself does not cut: the tool centre is then tip/2 + c out from the wall, and the tip is (w + c) / tan(angle/2) below the top face. The chamfer runs w / tan(angle/2) down the wall; the cone is tip + 2 (w + c) across where it meets the top face.',
+  source: 'BenchMate geometry of a cone, with tests in core/src/millturn.rs. The limit radius - tip radius - clearance for the chamfer width matches the depth rule printed in M. Deans, "10 milling toolpaths for your first 2D CNC machining project", Autodesk Fusion blog, 2018.',
+  proof: [{ name: '1.5 mm chamfer, 90 degree tool with a 2 mm tip flat, 0.5 mm clearance, 10 mm cutter', sys: 'mm', vals: { w: 1.5, ang: 90, tip: 2, c: 0.5, d: 10 },
+    expect: [['Tip below the top face (Z depth)', 'mm', 2, 1e-9], ['Tool centre out from the wall', 'mm', 1.5, 1e-9], ['Cutting diameter at the top of the chamfer', 'mm', 6, 1e-9], ['Widest chamfer this cutter reaches', 'mm', 3.5, 1e-9]],
+    source: 'Cone geometry: at 45 degrees a side the tool is as wide as it is deep.', note: 'Radius at the bottom of the chamfer 1 + 0.5 = 1.5 mm (the centre distance); at the top 1.5 + 1.5 = 3 mm, so 6 mm across; depth (1.5 + 0.5) / tan 45 = 2 mm; reach 5 - 1 - 0.5 = 3.5 mm.' }],
+},
+{
   id: 'ballcusp', level: 'advanced', group: 'Milling', title: 'Ball-nose cusp height and stepover',
   pick: { map: { d: 'dia' }, types: ['Ball end mill', 'Other'] },
   desc: 'Scallop (cusp) height left between passes of a ball-nose tool on a flat or gently curved surface, or the stepover for the cusp you want.',
@@ -3336,6 +3368,20 @@ const TOOLS = [
   render: el => renderMillSetup(el),
   working: 'Reference only, in our own words. Key names are those of the Haas control, which the public guides read for this page describe. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Your machine manual governs.',
   source: 'Haas Factory Outlet mill operator and programming manuals; Worcester Polytechnic Institute Haas quick guide; Virasak, Manufacturing Processes 4-5; camInstructor; Hurco WinMax help; Travers Tool and Protool on edge finders; LinuxCNC documentation; CIMCO CNC programming book. Listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'toolpaths', level: 'advanced', group: 'Guides', title: 'Milling toolpath guide',
+  desc: 'What each milling toolpath is for and how to set it up: from model to part, 2D and 3D, stepover and stepdown, facing, contours with cutter compensation, pockets and slots and how to enter them, chamfer and radius milling, spot, drill and tap, 3D roughing and finishing, rest machining, pencil passes and tolerances.',
+  render: el => renderToolpaths(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. The G-code example is one to adapt, not a proven program.',
+  source: 'Autodesk Fusion blog and Inventor CAM help; MIT Center for Bits and Atoms class page; Helical Solutions Machining Guidebook (2016); MecSoft, Best practices in 3 axis machining; LinuxCNC documentation; Haas Factory Outlet mill programming manual. Listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'workholding', level: 'advanced', group: 'Guides', title: 'Workholding guide',
+  desc: 'Holding work on a mill: the rules, the vise and its accessories, aligning a vise, hard, step and soft jaws, making soft jaws, squaring a block, clamps and fixture plates, thin parts, tape and glue, round parts and several parts at once.',
+  render: el => renderWorkholding(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers.',
+  source: 'CNC Cookbook and Tormach (one author); CIMCO CNC programming book; J. A. Nilsson, Machine Shop Tutorials; M. R. Jennings, Introduction to Machining (CC BY); Autodesk Fusion blog; Helical Solutions Machining Guidebook; WPI Haas quick guide. Listed under the guide and in docs/sources.md.',
 },
 {
   id: 'toolwear', level: 'advanced', group: 'Guides', title: 'Tool wear guide',

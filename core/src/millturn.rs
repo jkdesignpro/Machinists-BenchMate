@@ -305,6 +305,28 @@ pub fn spot_chamfer_dia(z: f64, angle_deg: f64) -> f64 {
     2.0 * z * (angle_deg.to_radians() / 2.0).tan()
 }
 
+/// Chamfer mill on an outside edge. `w`: width of the chamfer along the top face;
+/// `angle_deg`: included angle of the tool; `tip`: diameter of the flat at the tip (0 for a
+/// sharp point); `clear`: how far out from the edge of the tip flat, measured radially, the
+/// bottom of the chamfer sits on the cutting edge (so that the tip does no cutting);
+/// `dia`: cutter diameter (used by `which` 2 only). `which`: 0 depth of the tip below the top
+/// face, (w + clear) / tan(angle/2); 1 distance of the tool centre line from the wall under
+/// the chamfer, tip/2 + clear; 2 the widest chamfer the cutter can reach with that clearance,
+/// dia/2 - tip/2 - clear; 3 cutting diameter at the top of the chamfer, tip + 2 (w + clear);
+/// 4 depth of the chamfer down the wall, w / tan(angle/2).
+pub fn chamfer_mill(w: f64, angle_deg: f64, tip: f64, clear: f64, dia: f64, which: f64) -> f64 {
+    if !(w > 0.0 && angle_deg > 0.0 && angle_deg < 180.0 && tip >= 0.0 && clear >= 0.0) { return f64::NAN; }
+    let t = (angle_deg.to_radians() / 2.0).tan();
+    match which as i32 {
+        0 => (w + clear) / t,
+        1 => tip / 2.0 + clear,
+        2 => if dia > tip { dia / 2.0 - tip / 2.0 - clear } else { f64::NAN },
+        3 => tip + 2.0 * (w + clear),
+        4 => w / t,
+        _ => f64::NAN,
+    }
+}
+
 /// Centre drill depth from its tip for countersink diameter `dc`: the length from the
 /// tip to where the countersink cone starts (`l_pilot`, measured or from the maker),
 /// plus the cone from the pilot diameter `dp` out to dc: l + (dc - dp) / (2 tan(angle/2)).
@@ -562,5 +584,26 @@ mod tests {
         // 0.109375 + 0.090625 / (2 tan 30) = 0.18786 in
         assert!(close(centre_drill_depth(0.2, 0.109375, 0.109375, 60.0), 0.109375 + 0.090625 / 2.0 * 3f64.sqrt(), 1e-12));
     }
+    // Chamfer mill: own geometry of a cone. A 90 degree tool cuts as deep as it cuts wide; the radius of the
+    // cone at height z above the tip is tip/2 + z tan(angle/2), checked here at the bottom and top of the chamfer.
+    #[test]
+    fn chamfer_mill_geometry() {
+        let close = |a: f64, b: f64| assert!((a - b).abs() < 1e-12, "{a} vs {b}");
+        close(chamfer_mill(1.0, 90.0, 0.0, 0.5, 0.0, 0.0), 1.5);
+        close(chamfer_mill(1.0, 90.0, 0.0, 0.5, 0.0, 1.0), 0.5);
+        close(chamfer_mill(1.0, 90.0, 0.0, 0.0, 0.0, 4.0), 1.0);
+        close(chamfer_mill(1.0, 60.0, 0.0, 0.0, 0.0, 0.0), 3.0_f64.sqrt());
+        close(chamfer_mill(1.0, 120.0, 0.0, 0.0, 0.0, 4.0), 1.0 / 3.0_f64.sqrt());
+        // Tip flat 2, clearance 0.5, chamfer 1.5 with a 90 degree, 10 mm tool.
+        let (w, a, tip, c, d) = (1.5, 90.0, 2.0, 0.5, 10.0);
+        let z = chamfer_mill(w, a, tip, c, d, 0.0); let x0 = chamfer_mill(w, a, tip, c, d, 1.0);
+        let r = |h: f64| tip / 2.0 + h * (a.to_radians() / 2.0).tan();
+        close(r(z - chamfer_mill(w, a, tip, c, d, 4.0)), x0);      // bottom of the chamfer is on the wall
+        close(r(z), x0 + w);                                         // top of the chamfer is w in from the wall
+        close(chamfer_mill(w, a, tip, c, d, 3.0), 2.0 * (x0 + w));  // cutting diameter there
+        close(chamfer_mill(w, a, tip, c, d, 2.0), 3.5);             // 5 - 1 - 0.5
+        assert!(chamfer_mill(0.0, 90.0, 0.0, 0.0, 0.0, 0.0).is_nan());
+        assert!(chamfer_mill(1.0, 180.0, 0.0, 0.0, 0.0, 0.0).is_nan());
+        assert!(chamfer_mill(1.0, 90.0, 2.0, 0.0, 1.0, 2.0).is_nan());
+    }
 }
-

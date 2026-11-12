@@ -83,10 +83,13 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Grinding | Cylindricity error from RPM | done (wheel to work rpm ratio: whole numbers and simple fractions flagged, work speeds to avoid, wheel wear, chatter mark count; rule from one author, marked single-source) | `grindratio` | U58 |
 | Gears/splines | Spur gear data, ISO 4156, ANSI B92.1 | done (spur gear data and measurement; involute splines with basic dimensions and pin measurement, fit class tolerances not shown) | `spurgear`, `gearmeasure`, `spline` | U83-U85 |
 | Gears/splines | SAE J499a parallel side splines | done (4, 6, 10 and 16 splines, fits A, B and C: width, depth, small diameter, torque capacity, section to scale; formulas from one publisher, checked against 37 printed values and marked so) | `saespline` | U86 |
-| Library | Formula library | done (177 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
+| Library | Formula library | done (312 entries, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
 | Library | Tool wear information | done (ten wear types with our own drawings, causes and remedies from two makers; two types have one source and are marked) | `toolwear`, `cncguide` | U91 |
 | Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
 | Library | CNC mill setup guide (start-up, control keys, tool lengths four ways, work offsets, first run, adjusting, shut-down) | done (ours, 0.6.0; 13 public sources, single-source statements marked) | `millsetup` | |
+| Library | Milling toolpath guide (model to part, 2D and 3D, features, contour with cutter compensation, pockets, slots, chamfer and radius, holes, 3D toolpaths, rest machining, tolerances) | done (ours, 0.6.0; 7 public sources, single-source statements marked) | `toolpaths` | |
+| Library | Workholding guide (vise and accessories, aligning, jaws and soft jaws, squaring a block, clamps and fixture plates, thin parts, round and many parts) | done (ours, 0.6.0; 9 public sources, single-source statements marked) | `workholding` | |
+| Milling | Chamfer mill: tip depth, centre offset, cutting diameter, widest chamfer | done (ours, 0.6.0; own cone geometry, drawing to scale) | `chamfermill` | |
 | Library | Tip of the day | done (own tips, Home widget) | `tips.js` | U98 |
 | Library | Assistant, community cut data | missing (assistant: stage 5, optional and off by default; a shared cut library is not in the spec for 0.2 to 1.0) | | U101, U102 |
 | Library | Indexable insert catalogue | done (decode or tap a code together; insert drawn to scale from above and in section; nose radius to the turning advisor, outline to the sketcher) | `insertcode`, `holdercode`, `iso513` | U103 |

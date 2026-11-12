@@ -1895,6 +1895,54 @@ where = 'millsetup';
   if (c.units !== false || c.m3 !== false || c.css !== false || c.limit !== false || c.chip !== false) problems.push(`[${where}] units, M03, surface speed, the speed limit and chip load each have two publishers: ${JSON.stringify(c)}`);
   if (c.seen !== true) problems.push(`[${where}] the viewpoint for clockwise has one source and must say so: ${c.seen}`);
 }
+// Milling toolpath guide and workholding guide: every statement carries source keys and a one-publisher
+// statement says so; the chamfer mill calculator (own cone geometry, tested in the core) with its drawing.
+where = 'toolpaths';
+{
+  const guide = async id => { await open(id, 200); return page.evaluate(() => {
+    const ps = [...document.querySelectorAll('#main p')].filter(p => !p.classList.contains('desc') && !p.closest('.whyb'));
+    const txt = p => p.innerText.replace(/\s+/g, ' ');
+    const flag = ps.map(p => [txt(p).slice(0, 120), /to be verified/.test(txt(p))]);
+    return { h2: document.querySelectorAll('#main h2').length, svgs: document.querySelectorAll('#main svg.geo').length, untagged: ps.filter(p => !p.querySelector('abbr.gsrc') && !p.querySelector('a')).length, tagged: ps.filter(p => p.querySelector('abbr.gsrc')).length,
+      tabs: [...document.querySelectorAll('#main table.gtab')].map(t => t.querySelectorAll('tr').length).join(','), srcs: document.querySelectorAll('#main ul.gsl li').length, flag, code: document.querySelector('#main pre.gcode')?.innerText || '', all: document.querySelector('#main').innerText.replace(/\s+/g, ' ') };
+  }); };
+  // Is the statement that starts with these words marked "to be verified"? undefined when there is no such statement.
+  const tbv = (g, start) => (g.flag.find(f => f[0].startsWith(start)) || [])[1];
+  let g = await guide('toolpaths');
+  if (g.h2 !== 12 || g.svgs !== 3 || g.tabs !== '9,8' || g.srcs !== 8) problems.push(`[${where}] 12 sections, 3 drawings, tables of 8 and 7 rows, 8 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 32) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Stepover is how far', 'Rules for G41 and G42', 'Getting in', 'Slots', 'Steep or shallow decides']) if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  for (const k of ['The chain', 'Pencil passes run a small tool', 'Inside corners', 'Deep pockets']) if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  if (!/G41 D1 X0\. Y-6\. F300\./.test(g.code) || !/G40 X-12\. Y-12\./.test(g.code) || g.code.split('\n').length !== 8) problems.push(`[${where}] the cutter compensation example: ${g.code}`);
+  if (!/110 to 120 %/.test(g.all) || !/1 to 3 degrees/.test(g.all) || !/55 to 65 %/.test(g.all) || !/2 to 5 %/.test(g.all)) problems.push(`[${where}] the tool maker's starting figures are missing`);
+  where = 'workholding';
+  g = await guide('workholding');
+  if (g.h2 !== 10 || g.svgs !== 2 || g.tabs !== '6,7' || g.srcs !== 9) problems.push(`[${where}] 10 sections, 2 drawings, 5 jaw types, 6 squaring steps, 9 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 34) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Parallels are ground steel strips', 'Heel height', 'Vacuum', 'Take the handle off the vise']) if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  // The Tormach article and the CNC Cookbook guide have one author, so together they count once.
+  for (const k of ['Grip high and little', 'Locate, then clamp', 'Tabs', 'Thin walls']) if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  if (!/the sources differ/.test(g.all) || !/a step or two above level/.test(g.all) || !/about 14 psi/.test(g.all)) problems.push(`[${where}] heel height difference or vacuum figure missing`);
+  where = 'chamfermill';
+  const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+  const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+  await units('mm'); await open('chamfermill', 150);
+  await put('w', '1.5'); await page.selectOption('#main [data-id="ang"]', '90'); await put('tip', '2'); await put('c', '0.5'); await put('d', '10');
+  let t = await rows();
+  if (!/Tip below the top face \(Z depth\) 2\.0000 mm/i.test(t) || !/Tool centre out from the wall 1\.5000 mm/.test(t) || !/Chamfer depth down the wall 1\.5000 mm/.test(t) || !/Cutting diameter at the top of the chamfer 6\.0000 mm/.test(t) || !/Widest chamfer this cutter reaches 3\.5000 mm/.test(t))
+    problems.push(`[${where}] 1.5 chamfer, 90 deg, tip 2, clearance 0.5, cutter 10: ${t}`);
+  let d = await page.$eval('#main .tdia svg', e => e.textContent.replace(/\s+/g, ' '));
+  if (!/Z 2/.test(d) || !/w 1\.5/.test(d) || !/1\.5/.test(d)) problems.push(`[${where}] drawing: ${d}`);
+  await page.selectOption('#main [data-id="ang"]', '60'); await put('tip', '0'); await put('c', '0'); await put('w', '1'); t = await rows();
+  // A 60 degree tool: depth = 1 / tan 30 = 1.7321.
+  if (!/Tip below the top face \(Z depth\) 1\.7321 mm/i.test(t)) problems.push(`[${where}] 60 degree tool, 1 mm chamfer is 1.7321 deep: ${t}`);
+  await put('w', '6'); t = await rows();
+  if (!/wider than this cutter can reach/.test(t)) problems.push(`[${where}] a chamfer wider than the cutter reaches must be flagged: ${t}`);
+  await put('w', '0'); t = await rows();
+  if (/Tip below/i.test(t)) problems.push(`[${where}] no result without a width: ${t}`);
+  await put('w', '1'); await page.selectOption('#main [data-id="ang"]', '90'); await put('c', '0.5'); await put('d', '');
+  await units('inch');
+}
 where = 'machinetapers jarno';
 {
   await units('inch'); await open('machinetapers', 200);
