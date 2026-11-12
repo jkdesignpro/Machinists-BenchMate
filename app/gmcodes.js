@@ -46,7 +46,7 @@ function gmTags(r, G) {
   gmTagCache.set(key, t); return t;
 }
 // Order matters: the more specific names are tried first.
-const GM_MATCH_ORDER = ['siemens-iso', 'meldas', 'mitsubishi', 'siemens', 'fanuc', 'haas', 'heidenhain', 'okuma', 'mazak', 'generic'];
+const GM_MATCH_ORDER = ['siemens-iso', 'meldas', 'mitsubishi', 'siemens', 'fanuc', 'haas', 'heidenhain', 'okuma', 'mazak', 'doosan', 'dmg', 'generic'];
 
 // Control id for the active machine profile, from its free-text "Control" field.
 function gmProfileCtrl(G) {
@@ -79,6 +79,7 @@ function gmSort(a, b) {
 const GM_KIND = { maker: 'maker', builder: 'machine builder', distributor: "maker's distributor", standard: 'public standard report', secondary: 'independent' };
 function gmBadge(G, row) {
   const kinds = row.src.map(s => (G.sources[s.s] || {}).kind);
+  if (row.status === 'single') return '<span class="badge differs" title="One independent source and no maker document: check it on the control before relying on it">One source</span>';
   if (row.status === 'confirmed') return '<span class="badge confirmed" title="Two independent public sources agree">Two sources</span>';
   if (kinds.includes('standard')) return '<span class="badge confirmed" title="Printed in a public standard or report">Public report</span>';
   if (kinds.includes('builder')) return '<span class="badge confirmed" title="Printed in the machine builder\'s document">Builder</span>';
@@ -278,27 +279,53 @@ async function renderGmCodes(el) {
   draw();
 }
 
+// Numbers a search names: "#3003", "3003" or "#5021-#5025" find the rows whose ranges hold them.
+function gmVarHit(row, low) {
+  const nums = (low.match(/\d+/g) || []).map(Number);
+  return nums.length > 0 && nums.every(n => row.ranges.some(([a, b]) => n >= a && n <= b));
+}
+
 async function renderMacroRef(el) {
   const R = await loadRef(el); if (!R) return;
   const G = R.gcodes; if (!G) { el.textContent = 'G-code data not found (run scripts/build-web.sh).'; return; }
+  const SV = G.sysvars || [];
   if (!GMUI.mctrl) GMUI.mctrl = gmProfileCtrl(G) || 'fanuc';
-  const withMacro = Object.keys(G.controls).filter(id => G.macro.some(m => m.ctrl === id) || (G.gaps[id] || []).length);
+  const withMacro = Object.keys(G.controls).filter(id => G.macro.some(m => m.ctrl === id) || SV.some(v => v.ctrl === id) || (G.gaps[id] || []).length);
   if (!withMacro.includes(GMUI.mctrl)) GMUI.mctrl = 'fanuc';
   el.innerHTML = '<div class="mfilter gmf"><label class="gml"><span class="ms">Control</span><select id="mrc">' +
     withMacro.map(id => '<option value="' + id + '"' + (id === GMUI.mctrl ? ' selected' : '') + '>' + rEsc(G.controls[id].name) + '</option>').join('') + '</select></label>' +
-    '<label class="gml"><span class="ms">Search</span><input id="mrq" type="search" placeholder="WHILE, #500, GOTO, R parameter ..."></label></div>' +
-    '<div id="mrres"></div><div id="mrnotes"></div><div id="mrsrc" class="note"></div>';
+    '<label class="gml"><span class="ms">Search</span><input id="mrq" type="search" placeholder="WHILE, #3000, 5023, offset, timer ..."></label></div>' +
+    '<div id="mrres"></div><div id="mrsv"></div><div id="mrnotes"></div><div id="mrsrc" class="note"></div>';
   const c = $('#mrc', el), q = $('#mrq', el); q.value = GMUI.mq;
   function draw() {
     GMUI.mctrl = c.value; GMUI.mq = q.value;
     const low = q.value.trim().toLowerCase();
     const rows = G.macro.filter(m => m.ctrl === GMUI.mctrl && (!low || (m.topic + ' ' + m.text).toLowerCase().includes(low)));
+    const all = SV.filter(v => v.ctrl === GMUI.mctrl);
+    // A search made only of a number (with or without #) is a variable number: match it against the ranges.
+    const numOnly = /^#?\d+(\s*(-|to)\s*#?\d+)?$/.test(low);
+    const vars = all.filter(v => !low || (numOnly ? gmVarHit(v, low) : (v.group + ' ' + v.var + ' ' + v.text).toLowerCase().includes(low)));
     $('#mrres', el).innerHTML = (rows.length ? '<div class="res mtab"><table><tr><th>Topic</th><th>What it does (in our words)</th><th>Source</th></tr>' + rows.map(m =>
       '<tr><td><b>' + rEsc(m.topic) + '</b></td><td>' + rEsc(m.text) + '</td><td>' + gmBadge(G, m) + gmSrc(G, m) + '</td></tr>').join('') + '</table></div>'
-      : '<p class="warn">' + (low ? 'Nothing matches.' : 'No macro facts confirmed for this control yet: see the gaps below.') + '</p>') +
+      : '<p class="warn">' + (low ? 'No macro fact matches.' : 'No macro facts confirmed for this control yet: see the gaps below.') + '</p>') +
       '<p class="desc">Macro syntax differs between controls even when the idea is the same (Haas prints WH where Fanuc prints WHILE; Siemens uses R parameters and IF / ENDIF blocks; Heidenhain uses Q parameters; Okuma uses VC variables). Never move a macro between controls without checking each line.</p>';
+    let h = '';
+    if (all.length) {
+      h = '<div class="res mtab gmbox" id="mrsvt"><div class="h">System variables: ' + rEsc(G.controls[GMUI.mctrl].short) + ' <span class="ms">(' + vars.length + ' of ' + all.length + ')</span></div>';
+      if (vars.length) {
+        h += '<table><tr><th>Variable</th><th>What it holds (in our words)</th><th>Source</th></tr>';
+        let grp = '';
+        for (const v of vars) {
+          if (v.group !== grp) { grp = v.group; h += '<tr class="svgrp"><td colspan="3"><b>' + rEsc(grp) + '</b></td></tr>'; }
+          h += '<tr><td class="mv svv">' + rEsc(v.var.replace(/-/g, ' to ')) + '</td><td>' + rEsc(v.text) + '</td><td>' + gmBadge(G, v) + gmSrc(G, v) + '</td></tr>';
+        }
+        h += '</table>';
+      } else h += '<p class="warn">No system variable matches. A number that is not in this list is not confirmed for this control: it is not borrowed from another control.</p>';
+      h += '<p class="desc">A system variable reads or changes the control itself. The numbers depend on the control model, its options and the machine builder, and a wrong write can change an offset or an output: read a variable back and compare it with the screen before a program writes to it. "One source" rows have no maker document behind them.</p></div>';
+    } else if (!rows.length || low) h = '<p class="desc" id="mrsvt">No system variables confirmed for ' + rEsc(G.controls[GMUI.mctrl].short) + ' yet.</p>';
+    $('#mrsv', el).innerHTML = h;
     $('#mrnotes', el).innerHTML = gmNotes(G, GMUI.mctrl, 'macro');
-    const ids = new Set(); rows.forEach(m => m.src.forEach(s => ids.add(s.s)));
+    const ids = new Set(); rows.forEach(m => m.src.forEach(s => ids.add(s.s))); vars.forEach(v => v.src.forEach(s => ids.add(s.s)));
     G.disagreements.filter(d => d.ctrl === GMUI.mctrl && /macro|variable/i.test(d.topic)).forEach(d => d.src.forEach(s => ids.add(s.s)));
     $('#mrsrc', el).innerHTML = '<b>Sources for this view</b><br>' + gmSourceList(G, ids);
   }

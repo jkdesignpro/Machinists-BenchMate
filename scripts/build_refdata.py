@@ -507,8 +507,28 @@ def build_gcodes():
                 seen.add(key)
             if sec != 'disagreements':
                 r['status'] = gm_status(srcs, r)
+    # System variables: a row may rest on one independent source, and is then marked "one source".
+    # 'ranges' lists every number or range named in 'var', so a search for a number finds its row.
+    seen_sv = set()
+    for r in ev.get('sysvars', []):
+        if r['ctrl'] not in ctrls: raise SystemExit(f"sysvars: unknown control {r['ctrl']}")
+        if not r.get('src') or not r.get('text') or not r.get('group'): raise SystemExit(f"sysvars {r['ctrl']} {r.get('var')}: group, text and source needed")
+        for x in r['src']:
+            if x['s'] not in srcs: raise SystemExit(f"sysvars {r['ctrl']}: unknown source {x['s']}")
+        rng = [(int(a), int(b or a)) for a, b in re.findall(r'#(\d+)(?:-#(\d+))?', r['var'])]
+        if not rng or any(a > b for a, b in rng): raise SystemExit(f"sysvars {r['ctrl']}: bad variable {r['var']}")
+        if re.sub(r'#\d+(-#\d+)?', '', r['var']).strip(' ()'): raise SystemExit(f"sysvars {r['ctrl']}: bad variable text {r['var']}")
+        key = (r['ctrl'], r['var'])
+        if key in seen_sv: raise SystemExit(f'duplicate system variable {key}')
+        seen_sv.add(key)
+        r['ranges'] = [list(x) for x in rng]
+        kinds = {srcs[x['s']]['kind'] for x in r['src']}
+        fams = {srcs[x['s']].get('family', x['s']) for x in r['src']}
+        r['status'] = 'maker' if kinds & PRIMARY else 'confirmed' if len(fams) >= 2 else 'single'
+    for c in ev['gaps']:
+        if c not in ctrls: raise SystemExit(f'gaps: unknown control {c}')
     return {'sources': srcs, 'controls': ctrls, 'codes': ev['codes'], 'macro': ev['macro'],
-            'disagreements': ev['disagreements'], 'gaps': ev['gaps']}
+            'sysvars': ev.get('sysvars', []), 'disagreements': ev['disagreements'], 'gaps': ev['gaps']}
 
 
 # ---------------------------------------------------------------- fasteners and machine elements

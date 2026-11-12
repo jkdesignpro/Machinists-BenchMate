@@ -48,7 +48,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Threads | Plating and anodize allowance | partial (allowance and before-coating limits; no special-size tables) | `coating` | U44 |
 | Threads | Trapezoidal, buttress, multi-start | done (basic dimensions; no tolerances) | `trapezoidal`, `buttress`, `multistart` | |
 | Reference | ISO fits and tolerances | partial (no j/J, up to 500 mm) | `fits` | U61 |
-| Reference | G-code and M-code reference per control dialect, custom macros | done (G/M codes, ten controls with sources and compare) / partial (macros: Mitsubishi and Heidenhain thin) | `gmcodes`, `macroref` | U92-U94 |
+| Reference | G-code and M-code reference per control dialect, custom macros | done (G/M codes, twelve controls and builders with sources and compare; macro facts and system variables searchable by number; gaps listed on the page: Mitsubishi and Heidenhain macros are thin, Fanuc system variables partly from one source) | `gmcodes`, `macroref` | U92-U94 |
 | Reference | Material properties | partial (properties, no SFM/machinability data; round 2 in progress) | `materials` | U82 |
 | Reference | Material weight | partial (bar only; full tool in progress on `claude/geometry`) | `bar` | U81 |
 | Reference | Hardness conversion | missing (in progress, `claude/ref-data-3`) | | U67 |

@@ -470,7 +470,7 @@ Findings:
 - **Not readable:** *Cutting Tool Engineering*, "Gundrilling" (January 2012 PDF): the link returned the magazine's front page.
 
 ## G and M codes, macros (`data/refdata/gcodes-evidence.json`, `app/gmcodes.js`)
-Full list with editions, sections, coverage counts, gaps and disagreements: **`docs/gm-codes.md`**. All accessed 2026-11-10. Summary:
+Full list with editions, sections, coverage counts, gaps and disagreements: **`docs/gm-codes.md`**. All accessed 2026-11-10; the 0.5.0 additions (macro system variables from the Haas 96-8000 Rev AC mill manual and, for Fanuc, Tornos, CNCCookbook and cncmacrosimulator.com; builders' M-code lists from the Doosan HP5100 maintenance manual, the Mori Seiki NL user's manual and the Mazak INTEGREX e programming manual) were read on 2026-11-12. Summary:
 - **Standards cited:** ISO 6983-1:2009 (program format and address words), by name only. **[NIST]** T. R. Kramer, F. M. Proctor, E. Messina, *The NIST RS274NGC Interpreter - Version 3*, NISTIR 6556, 2000 (public domain), Tables 4 and 5, section 3.6.
 - **[LCNC_OV] [LCNC_M]** LinuxCNC G-code overview (modal groups) and M-code pages.
 - **Fanuc:** [FAN_M] 0i-F Plus Operator's Manual (Machining Center), B-64694EN-2/01; [FAN_T] 0i-F lathe manual, B-64604EN-1/01 (public copies on manualmachine.com); [MFG_FT] [MFG_F31] mfgrobots.com lists; [TIE] TIE / fanucworld list; [IMD_SYS] Industrial Monitor Direct A/B/C article.

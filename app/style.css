@@ -224,6 +224,8 @@ svg.geo .gacc{fill:color-mix(in srgb,var(--accent) 22%,var(--panel));stroke:var(
 .gml input{width:220px;max-width:100%}
 .gml select{max-width:100%}
 .gmbox{margin-top:12px}
+tr.svgrp td{background:var(--raise);font-size:11.5px;letter-spacing:.03em;text-transform:uppercase}
+td.svv{white-space:normal;min-width:118px}
 .gmhr{border:0;border-top:1px solid var(--soft);margin:5px 0}
 .gmcmp td{width:44%}
 .gmcmp td:first-child{width:12%}

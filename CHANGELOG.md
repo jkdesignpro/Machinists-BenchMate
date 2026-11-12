@@ -37,6 +37,14 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - Each card says whether it is gradual wear (flank and crater wear) or damage whose cause should be found.
 - The CNC guide's tool wear section shows the same ten entries with the new drawings and links to the new page.
 
+### Added (M codes per builder, macro system variables)
+- **Macro reference: system variables.** A table of system variables per control under the macro facts, grouped (kinds of variable, inputs and outputs, tool data, alarm and timers, control state, modal values, positions, work offsets, settings, pallets). Type a number in the search box (5023, #3000) and the row whose range holds it is shown. Haas: 70 rows from the maker's mill manual (the control before the Next Generation Control). Fanuc: 19 rows, of which 10 have one source only and carry an orange "One source" badge.
+- A number that is not listed for a control is reported as not confirmed, never taken from another control: Haas and Fanuc use the #2001 block for different things (length offset on Haas, length wear on Fanuc), and the page shows both.
+- **G and M codes: three builders' M-code lists.** Doosan (HP5100 horizontal machining centre, 118 codes), DMG MORI (Mori Seiki NL lathes, 44 codes) and Mazak (INTEGREX e, 47 codes), each from the builder's own manual. They show why an M code must be checked per machine: M29 is rigid tapping on the Doosan list and switches the in-position check off on the Mori Seiki list.
+- A machine profile whose control text names Doosan, DN Solutions, DMG or Mori now opens that builder's list.
+- Recorded where sources differ: the macro variable number of one tool offset on Fanuc (two sources differ by one).
+- Not found in a readable form, and listed as gaps on the page: Fanuc's own M-code and system variable tables, Haas Next Generation Control variable numbers, Doosan lathe M codes.
+
 ### Fixed
 - Knurling: the pitch round the circumference of a diagonal knurl was worked out in the page script. It now comes from the Rust core like every other number.
 

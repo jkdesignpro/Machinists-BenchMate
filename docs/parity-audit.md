@@ -248,8 +248,8 @@ Store list is the fuller of the two store lists.
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | U92 | G-code reference | done | `gmcodes` |  |
-| U93 | M-code reference | done | `gmcodes` | Heidenhain, Mazak and Siemens ISO M codes are gaps; builder-specific M codes are flagged |
-| U94 | Custom macro information | partial | `macroref` | Mitsubishi variable ranges and IF/WHILE not yet confirmed |
+| U93 | M-code reference | done | `gmcodes` | 0.5.0: builders' lists added for Doosan (HP5100), DMG MORI (Mori Seiki NL) and Mazak (INTEGREX e). Heidenhain and Siemens ISO M codes are gaps; Fanuc's own M-code chapter could not be read |
+| U94 | Custom macro information | done | `macroref` | 0.5.0: system variables searchable by number (Haas 70 rows from the maker; Fanuc 19 rows, 10 of them marked one source). Mitsubishi variable ranges and IF/WHILE not yet confirmed (listed as gaps on the page) |
 | U95 | G-code simulator (2D/3D, cycle time) | partial | `gsim` | Editor with undo, line insert and delete, renumber, strip and inch/mm conversion; 2D and 3D wire backplot with a view cube, step playback, lathe or mill told from the program, cycle time. G71 to G76 are reported, not drawn; no stock removal |
 | U96 | 2D CAD and DXF generator (snapping, angle measure) | yes | `sketch`, `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | 0.4.0: 2D sketcher with points, lines, arcs, circles, rectangles and text on layers, nine snaps including tangent and square, typed points, measure, angle between two lines, undo, DXF in and out; plus the parametric shapes. No trim, fillet, offset or DIMENSION entities (left out on purpose, docs/cad-dxf.md) |
 

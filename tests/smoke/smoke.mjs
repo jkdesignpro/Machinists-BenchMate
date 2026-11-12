@@ -1285,6 +1285,52 @@ where = 'toolwear';
   const n = await page.$$eval('#main .cnwd svg.dk', a => a.length);
   if (n !== 10) problems.push(`[${where}] the CNC guide should show the same ten wear drawings, got ${n}`);
 }
+// Macro system variables: searchable by number per control; a one-source row says so; a number that is not
+// listed is not borrowed from another control. Builders' M-code lists (Doosan, DMG MORI, Mazak) are separate.
+where = 'sysvars';
+{
+  await open('macroref', 300);
+  const sv = async (ctrl, q) => {
+    await page.selectOption('#mrc', ctrl);
+    await page.fill('#mrq', q); await page.dispatchEvent('#mrq', 'input'); await page.waitForTimeout(60);
+    return page.$eval('#mrsv', e => e.innerText.replace(/\s+/g, ' '));
+  };
+  let t = await sv('haas', '5023');
+  if (!/\(1 of 70\)/i.test(t) || !/#5021 to #5025 Present machine position/.test(t) || !/Maker/.test(t)) problems.push(`[${where}] Haas 5023 should find the machine position row: ${t.slice(0, 160)}`);
+  t = await sv('haas', '#2001');
+  if (!/#2001 to #2200 Tool length offsets \(H\)/.test(t)) problems.push(`[${where}] Haas #2001 is the tool length offset block: ${t.slice(0, 160)}`);
+  t = await sv('fanuc', '2001');
+  if (!/\(#2001 to #2200\) Machining centre: tool length wear/.test(t) || !/Two sources/.test(t)) problems.push(`[${where}] Fanuc #2001 is the tool length wear block, from two sources: ${t.slice(0, 200)}`);
+  t = await sv('fanuc', '#3901');
+  if (!/Number of parts machined/.test(t) || !/One source/.test(t)) problems.push(`[${where}] Fanuc #3901 has one source and should say so: ${t.slice(0, 160)}`);
+  t = await sv('fanuc', '8500');
+  if (!/\(0 of \d+\)/i.test(t) || !/not borrowed from another control/.test(t)) problems.push(`[${where}] a Haas-only number must not show for Fanuc: ${t.slice(0, 160)}`);
+  t = await sv('haas', 'timer');
+  if (!/#3001 Millisecond timer/.test(t) || /#5021/.test(t)) problems.push(`[${where}] a word search should filter the Haas list: ${t.slice(0, 160)}`);
+  t = await sv('okuma', '');
+  if (!/No system variables confirmed for Okuma/.test(t) && t.trim() !== '') problems.push(`[${where}] Okuma has no system variable rows: ${t.slice(0, 120)}`);
+  await sv('fanuc', '');
+  const disF = await page.$eval('#mrnotes', e => e.innerText.replace(/\s+/g, ' '));
+  if (!/Macro variable number for one tool offset/i.test(disF) || !/#11201/.test(disF)) problems.push(`[${where}] the tool offset numbering difference should be shown for Fanuc`);
+  await page.fill('#mrq', ''); await page.dispatchEvent('#mrq', 'input');
+
+  await open('gmcodes', 300);
+  const mrow = async (ctrl, q) => {
+    await page.selectOption('#gmc', ctrl);
+    await page.fill('#gmq', q); await page.dispatchEvent('#gmq', 'input'); await page.waitForTimeout(60);
+    return page.$$eval('#gmres tr.gmrow', rs => rs.map(r => r.innerText.replace(/\s+/g, ' ')).join(' ; '));
+  };
+  const want = [['doosan', 'M29', /Rigid tapping mode on/], ['dmg', 'M29', /In-position check invalid/], ['mazak', 'M203', /Turning spindle 1 start, forward/],
+    ['doosan', 'M60', /Pallet change/], ['dmg', 'M25', /Tailstock spindle out/], ['mazak', 'M08', /Flood coolant on/]];
+  for (const [ctrl, code, re] of want) {
+    const r = await mrow(ctrl, code);
+    if (!re.test(r)) problems.push(`[${where}] ${ctrl} ${code}: ${r.slice(0, 140)}`);
+  }
+  const counts = await page.evaluate(async () => { const G = (await (await fetch('data/refdata.json')).json()).gcodes; const n = c => G.codes.filter(r => r.ctrl === c && r.kind === 'M').length; return [n('doosan'), n('dmg'), n('mazak'), G.sysvars.length].join(','); });
+  if (counts !== '118,44,47,89') problems.push(`[${where}] M rows for Doosan, DMG MORI, Mazak and system variable rows: ${counts}`);
+  await page.fill('#gmq', ''); await page.dispatchEvent('#gmq', 'input');
+  await page.selectOption('#gmc', 'haas');
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');
