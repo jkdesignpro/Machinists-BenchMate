@@ -5,7 +5,7 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 ## [Unreleased]
 
 ## [0.5.0] - 2026-11-12
-Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
+Stage 3 of the plan: the extras. Built on top of 0.4.0.
 
 ### Changed (knurling: four methods)
 - Knurling blank diameter now has a Method box with four ways to a blank:
