@@ -31,6 +31,7 @@ f1!(thread_best_wire, c::thread_best_wire, pitch);
 f1!(thread_three_wire_m, c::thread_three_wire_m, e, wire, pitch);
 
 f1!(spindle_power_available_kw, c::spindle_power_available_kw, rpm, p_max, t_max);
+f1!(share_of, c::share_of, x, limit);
 f1!(torque_for_power_nm, c::torque_for_power_nm, p, rpm);
 f1!(arc_feed_internal, c::arc_feed_internal, fe, part_r, tool_r);
 f1!(arc_feed_external, c::arc_feed_external, fe, part_r, tool_r);
@@ -55,8 +56,11 @@ f1!(tangential_force_n, c::tangential_force_n, pc, vc);
 f1!(engagement_angle_deg, c::engagement_angle_deg, ae, d);
 f1!(chip_thickness_max, c::chip_thickness_max, fz, ae, d);
 f1!(chip_thickness_mean, c::chip_thickness_mean, fz, ae, d);
-f1!(cut_check, c::cut_check_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, out);
-f1!(cut_optimise, c::cut_optimise_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, vary_ae, out);
+f1!(cut_check, c::cut_check_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, holder_k, out);
+f1!(holder_deflection_mm, c::holder_deflection_mm, f, k);
+f1!(stiffness_n_um, c::stiffness_n_um, f, defl);
+f1!(tool_and_holder_deflection_mm, c::tool_and_holder_deflection_mm, f, stickout, flute, d_shank, d_flute, e_gpa, k);
+f1!(cut_optimise, c::cut_optimise_f, d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, ratio, f_direct, defl_limit, p_max, t_max, holder_k, vary_ae, out);
 
 // GD&T: internal 1 = hole/slot, 0 = pin/boss; mc 0 RFS, 1 MMC, 2 LMC.
 f1!(gdt_mmc_size, c::mmc_size_f, lower, upper, internal);
@@ -383,6 +387,7 @@ f1!(cusp_height, c::cusp_height, r, s);
 f1!(stepover_for_cusp, c::stepover_for_cusp, r, h);
 f1!(ball_eff_dia, c::ball_eff_dia, d, ap, tilt);
 f1!(ball_min_dia, c::ball_min_dia, d, ap, tilt);
+f1!(speed_at_nominal_dia, c::speed_at_nominal_dia, vc, d, de);
 f1!(runout_chip_max, c::runout_chip_max, fz, tir, z);
 f1!(runout_fz_for_max, c::runout_fz_for_max, target, tir, z);
 f1!(cutter_approach, c::cutter_approach, d, ae);
@@ -445,6 +450,13 @@ static mut CHAT_FRAMES: f64 = 0.0;
     set_out(p.into_iter().flat_map(|(f, a)| [f, a, c::harmonic_order(f, rpm / 60.0, tol)]).collect()); n as f64 }
 f1!(tooth_pass_hz, c::tooth_pass_hz, rpm, z);
 f1!(stable_rpm, c::stable_rpm, fc, z, lobe);
+// Stability chart (core/src/lobes.rs)
+f1!(cantilever_fn_hz, c::cantilever_fn_hz, d, l, e_gpa, rho);
+f1!(cantilever_tip_stiffness, c::cantilever_tip_stiffness, d, l, e_gpa);
+f1!(ks_resultant, c::ks_resultant, kc, beta);
+f1!(lobe_critical_depth, c::lobe_critical_depth, k, zeta, ks, beta, nt_star);
+/// Stability limit at a spindle speed: which 0 limiting depth (mm), 1 chatter frequency (Hz), 2 lobe number.
+#[no_mangle] pub extern "C" fn lobe_limit_at_rpm(k: f64, zeta: f64, fn_hz: f64, ks: f64, beta: f64, nt_star: f64, nt: f64, rpm: f64, which: f64) -> f64 { pick(c::lobe_limit_at_rpm(k, zeta, fn_hz, ks, beta, nt_star, nt, rpm), which) }
 f1!(chatter_ratio, c::chatter_ratio, fc, rpm, z);
 f1!(harmonic_order, c::harmonic_order, f, base, tol);
 
@@ -719,3 +731,52 @@ f1!(galv_diff, c::matref::galvanic_difference, a, b);
 #[no_mangle] pub extern "C" fn galv_anode(a: f64, b: f64, index_scale: f64) -> f64 { c::matref::galvanic_anode(a, b, index_scale != 0.0) as f64 }
 /// 1 when the difference is within the limit, else 0.
 #[no_mangle] pub extern "C" fn galv_within(diff: f64, limit: f64) -> f64 { if c::matref::galvanic_within(diff, limit) { 1.0 } else { 0.0 } }
+
+// Cutting forces (core/src/cutforce.rs)
+f1!(kienzle_kc, c::kienzle_kc, kc11, mc, h);
+f1!(lead_chip_thickness, c::lead_chip_thickness, f, kappa);
+f1!(lead_feed_for_chip, c::lead_feed_for_chip, h, kappa);
+f1!(round_insert_kappa_deg, c::round_insert_kappa_deg, ic, ap);
+f1!(round_insert_hex, c::round_insert_hex, fz, ic, ap);
+f1!(round_insert_fz_for_hex, c::round_insert_fz_for_hex, hex, ic, ap);
+f1!(drill_chip_thickness, c::drill_chip_thickness, fnr, point);
+f1!(drill_power_kw, c::drill_power_kw, vc, d, fnr, kc);
+f1!(drill_torque_nm, c::drill_torque_nm, d, fnr, kc);
+f1!(drill_thrust_n, c::drill_thrust_n, kc, d, fnr, point);
+f1!(tap_torque_nm, c::tap_torque_nm, kc, pitch, d);
+f1!(form_tap_torque_nm, c::form_tap_torque_nm, kf, pitch, d);
+f1!(power_from_torque_kw, c::power_from_torque_kw, torque, rpm);
+f1!(turn_work_deflection, c::turn_work_deflection, support, f, a, l, d, di, e_gpa);
+/// Worst deflection of a part in the lathe: which 0 deflection (mm), 1 distance from the chuck (mm).
+#[no_mangle] pub extern "C" fn turn_work_deflection_max(support: f64, f: f64, l: f64, d: f64, di: f64, e_gpa: f64, which: f64) -> f64 { pick(c::turn_work_deflection_max(support, f, l, d, di, e_gpa), which) }
+
+// Speeds and feeds advisor (core/src/advisor.rs)
+f1!(range_pick, c::range_pick, lo, hi, t);
+f1!(lerp_at, c::lerp_at, x0, y0, x1, y1, x);
+f1!(apply_factor, c::apply_factor, x, k);
+f1!(ream_predrill, c::ream_predrill, d, stock);
+f1!(drill_time_min, c::drill_time_min, depth, point, fnr, rpm);
+f1!(mrr_drilling_cm3_min, c::mrr_drilling_cm3_min, d, vf);
+/// Starting width and depth for an end mill: which 0 ae, 1 ap, 2 source of ae, 3 source of ap.
+#[no_mangle] pub extern "C" fn mill_engagement(op: f64, d: f64, flute_len: f64, boldness: f64, which: f64) -> f64 { pick(c::mill_engagement(op, d, flute_len, boldness), which) }
+f1!(advise_mill, c::advise_mill_f, d, z, d_shank, stickout, flute_len, flute_factor, e_gpa, vc, chip, kc11, mc, ae, ap, lock, n_max, vf_max, p_max, t_max, eta, radial_ratio, defl_limit, holder_k, out);
+f1!(advise_turn, c::advise_turn_f, d, vc, f, ap, kappa, kc11, mc, lock, n_max, p_max, t_max, eta, out);
+/// Twist drill feed per revolution by diameter (inches): which 0 low, 1 high.
+#[no_mangle] pub extern "C" fn drill_feed_range_in(d_in: f64, which: f64) -> f64 { pick(c::drill_feed_range_in(d_in), which) }
+/// Reaming (or any hole tool without a force model): which as in `advise_hole`.
+#[no_mangle] pub extern "C" fn advise_hole(vc: f64, d: f64, fnr: f64, n_max: f64, vf_max: f64, which: f64) -> f64 { pick(c::advise_hole(vc, d, fnr, n_max, vf_max), which) }
+f1!(hold_in_range, c::hold_in_range, x, lo, hi);
+f1!(chip_window, c::chip_window, f, ap, f_lo, f_hi, ap_lo, ap_hi);
+/// Plunge roughing advice: which 0 rpm, 1 cutting speed reached, 2 feed per tooth, 3 feed rate down, 4 rpm before the cap, 5 limit, 6 kc, 7 removal rate, 8 spindle power, 9 power available, 10 share of it, 11 reduced.
+#[no_mangle] pub extern "C" fn advise_plunge(vc: f64, d: f64, z: f64, fz: f64, ae: f64, step: f64, kc11: f64, mc: f64, fz_locked: f64, n_max: f64, vf_max: f64, p_max: f64, t_max: f64, eta: f64, which: f64) -> f64 { pick(c::advise_plunge(vc, d, z, fz, ae, step, kc11, mc, fz_locked, n_max, vf_max, p_max, t_max, eta), which) }
+f1!(plunge_cusp, c::plunge_cusp, d, step);
+f1!(plunge_max_step, c::plunge_max_step, d, ae);
+f1!(plunge_count, c::plunge_count, len, step);
+f1!(plunge_rough_time_min, c::plunge_rough_time_min, depth, vf, count);
+/// Tapping advice: which 0 rpm, 1 cutting speed reached, 2 feed rate, 3 rpm the table asks for, 4 limit.
+#[no_mangle] pub extern "C" fn advise_tap(vc: f64, d: f64, pitch: f64, n_max: f64, vf_max: f64, which: f64) -> f64 { pick(c::advise_tap(vc, d, pitch, n_max, vf_max), which) }
+f1!(tap_time_min, c::tap_time_min, depth, pitch, rpm);
+/// Boring bar advice: which 0 force, 1 deflection, 2 share of the allowed deflection, 3 L/D, 4 share of the guidance, 5 limit, 6 depth used, 7 deepest depth, 8 reduced, 9 overhang at which the starting depth fits.
+#[no_mangle] pub extern "C" fn advise_bore(l: f64, d: f64, di: f64, e_gpa: f64, kc: f64, fnr: f64, ap: f64, ap_locked: f64, f_known: f64, defl_limit: f64, ld_guide: f64, which: f64) -> f64 { pick(c::advise_bore(l, d, di, e_gpa, kc, fnr, ap, ap_locked, f_known, defl_limit, ld_guide), which) }
+/// Drilling advice with the spindle check: which as in `advise_drill`.
+#[no_mangle] pub extern "C" fn advise_drill(vc: f64, d: f64, fnr: f64, point: f64, kc11: f64, mc: f64, feed_locked: f64, n_max: f64, vf_max: f64, p_max: f64, t_max: f64, eta: f64, which: f64) -> f64 { pick(c::advise_drill(vc, d, fnr, point, kc11, mc, feed_locked, n_max, vf_max, p_max, t_max, eta), which) }

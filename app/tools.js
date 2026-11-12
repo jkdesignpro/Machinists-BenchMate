@@ -26,8 +26,32 @@ const BAR_LD = {
   1: [['Seco Tools', '4'], ['Kennametal', '3'], ['Cutwel', '4']],
   2: [['Seco Tools', '8'], ['Kennametal', '6'], ['Cutwel', '6-8']],
   3: [['Seco Tools', '6'], ['Kennametal', '6']],
-  damped: [['Seco Tools (Steadyline)', '10'], ['Kennametal', '10 or more']],
-};
+  damped: [['Seco Tools (Steadyline)', '10'], ['Kennametal', '10 or more']],};
+BAR_E[4] = { gpa: 210, name: 'Steel (plain bar of the same size)', src: 'Ovako data for 4140 / 42CrMo4' };
+BAR_LD[4] = BAR_LD.damped;
+// One evaluation of the boring bar page, shared by the rows, the suggestions, the panel and the send buttons.
+// The material table, kc groups and card helpers are in app/advisor.js and app/cutforce.js (loaded later, used at run time).
+function bbRun(v, W, s) {
+  const inch = s === 'inch', k = inch ? IN_MM : 1, fk = inch ? LBF_N : 1, ef = eField(s);
+  if (!(v.d > 0 && v.L > 0)) return null;
+  const p = BAR_E[v.mat], e = v.E > 0 ? v.E * ef.k : (p ? p.gpa : NaN);
+  if (!(e > 0)) return { err: ["Young's modulus", 'Enter E for your bar (from its maker)'] };
+  const di = v.di > 0 ? v.di * k : 0, d = v.d * k, L = v.L * k;
+  if (di >= d) return { err: ['Coolant hole', 'Must be smaller than the bar'] };
+  const m = v.wm > 0 ? advMat(v.wm) : null, g = m ? kcGroup(m.kc) : null, kap = v.kap > 0 ? v.kap : 95;
+  const re = v.re > 0 ? v.re * k : NaN, tA = (isFinite(v.ag) ? v.ag : 50) / 100;
+  const fSug = W.range_pick(W.apply_factor(re, 1 / 3), W.apply_factor(re, 1 / 2), tA), fL = v.f > 0, f = fL ? v.f * k : fSug;
+  const kc = v.kc > 0 ? v.kc : (g && f > 0 ? W.kienzle_kc(g[5], g[6] != null ? g[6] : 0, W.lead_chip_thickness(f, kap)) : NaN);
+  const lim = v.lim > 0 ? v.lim * k : advDeflDefault(v.cut === 3 ? 3 : 1);
+  const guide = BAR_LD[p ? v.mat : 0] || [], ldG = guide.length ? Math.min(...guide.map(x => parseFloat(x[1]))) : 0;
+  const apL = v.ap > 0, apStart = 0.040 * IN_MM, ap0 = apL ? v.ap * k : apStart, Fk = v.F > 0 ? v.F * fk : 0;
+  const kcA = kc > 0 ? kc : 0, fA = f > 0 ? f : 0;
+  const B = i => W.advise_bore(L, d, di, e, kcA, fA, ap0, apL ? 1 : 0, Fk, lim, ldG, i);
+  const sAp = W.advise_bore(L, d, di, e, kcA, fA, apStart, 0, 0, lim, ldG, 6);
+  return { inch, k, p, e, d, di, L, m, g, kc, f, fL, fSug, lim, limOwn: v.lim > 0, guide, ldG, apL, ap0, typed: Fk > 0, sAp: isFinite(sAp) ? sAp : apStart,
+    wmNone: !(v.wm > 0) && !(v.kc > 0), noKc: !!m && !g && !(v.kc > 0),
+    force: B(0), defl: B(1), shareD: B(2), ld: B(3), shareL: B(4), limit: B(5), ap: B(6), apMax: B(7), reduced: B(8) > 0, lFit: B(9) };
+}
 const eField = s => s === 'inch' ? { u: 'Mpsi', k: MPSI_GPA, dp: 1 } : { u: 'GPa', k: 1, dp: 0 };
 // Effective (equivalent solid) diameter of the fluted part as a fraction of D.
 // Blank by default unless a verified source is recorded in docs/sources.md.
@@ -100,19 +124,21 @@ const TOOLS = [
 },
 {
   id: 'mrr', level: 'advanced', group: 'Speeds and feeds', title: 'Material removal rate and power',
-  desc: 'Turning MRR with an optional power estimate. Specific cutting force kc is yours to enter; BenchMate does not guess it.',
+  desc: 'Removal rate in turning, with the power it takes when you enter the specific cutting force kc (the Specific cutting force page gives it for a material). With a machine picked, the power is compared with what its spindle has at the speed of the cut.',
   fields: s => s === 'inch' ? [
     { id: 'speed', label: 'Surface speed', unit: 'SFM', def: 300 },
     { id: 'doc', label: 'Depth of cut', unit: 'in', def: 0.05 },
     { id: 'f', label: 'Feed', unit: 'in/rev', def: 0.005 },
     { id: 'kc', label: 'Specific cutting force kc (optional)', unit: 'N/mm2', def: '' },
     { id: 'eta', label: 'Machine efficiency', unit: '0-1', def: 0.8 },
+    { id: 'dia', label: 'Diameter being cut (optional: checks the active machine at that speed)', unit: 'in', def: '' },
   ] : [
     { id: 'speed', label: 'Cutting speed Vc', unit: 'm/min', def: 200 },
     { id: 'doc', label: 'Depth of cut ap', unit: 'mm', def: 2 },
     { id: 'f', label: 'Feed fn', unit: 'mm/rev', def: 0.2 },
     { id: 'kc', label: 'Specific cutting force kc (optional)', unit: 'N/mm2', def: '' },
     { id: 'eta', label: 'Machine efficiency', unit: '0-1', def: 0.8 },
+    { id: 'dia', label: 'Diameter being cut (optional: checks the active machine at that speed)', unit: 'mm', def: '' },
   ],
   calc: (v, W, s) => {
     if (!(v.speed > 0 && v.doc > 0 && v.f > 0)) return [];
@@ -120,10 +146,22 @@ const TOOLS = [
     let q;
     if (s === 'inch') { q = W.mrr_turning_in3_min(v.speed, v.doc, v.f); rows.push(R('Material removal rate', q, 'in3/min', 3)); q = q * 16.387064; }
     else { q = W.mrr_turning_cm3_min(v.speed, v.doc, v.f); rows.push(R('Material removal rate', q, 'cm3/min', 2)); }
-    if (v.kc > 0 && v.eta > 0) { const kw = W.power_kw(q, v.kc, v.eta); rows.push(R('Power at the spindle', kw, 'kW', 2, 'power_kw')); rows.push(R('Power at the spindle', kw * 1.34102, 'hp', 2)); }
+    if (v.kc > 0 && v.eta > 0) { const kw = W.power_kw(q, v.kc, v.eta); rows.push(R('Power at the spindle', kw, 'kW', 2, 'power_kw')); rows.push(R('Power at the spindle', kw * 1.34102, 'hp', 2));
+      // The active machine: its power at the speed this diameter needs (constant torque up to the base speed, constant power above it).
+      const m = typeof advMachine === 'function' ? advMachine(v, false) : null;
+      if (m && m.p > 0) {
+        const n = v.dia > 0 ? (s === 'inch' ? W.rpm_from_sfm(v.speed, v.dia) : W.rpm_from_vc(v.speed, v.dia)) : NaN;
+        const pAv = n > 0 ? W.spindle_power_available_kw(n, m.p, m.t) : m.p, use = W.share_of(kw, pAv);
+        if (n > 0) rows.push(R('Spindle speed at that diameter', n, 'RPM', 0));
+        rows.push(R(n > 0 ? 'Power ' + m.name + ' has at that speed' : 'Rated spindle power of ' + m.name + ' (enter the diameter to check it at the speed of the cut)', pAv, 'kW', 2));
+        rows.push(R('Share of that power', use * 100, '%', 0));
+        if (n > 0 && m.n > 0 && n > m.n) rows.push(R('Top speed', 'This diameter needs ' + fmt(n, 0) + ' RPM, more than the top speed of ' + m.name + ' (' + fmt(m.n, 0) + ' RPM): the cut will run slower and take less power than shown', '', 0));
+        if (use > 1.0005) rows.push(R('Over the limit', n > 0 && pAv < m.p ? 'Below the base speed the spindle gives torque, not full power: ' + fmt(pAv, 2) + ' kW here. Reduce the depth of cut or the feed, or cut at a higher speed if the tool allows.' : 'The cut needs more power than the spindle has. Reduce the depth of cut or the feed.', '', 0));
+      } else rows.push(R('Machine check', 'Pick a machine with its spindle power in the title bar to see the share of its power this cut uses', '', 0));
+    }
     return rows;
   },
-  working: 'Metric Q = Vc x ap x f (cm3/min). Inch Q = 12 x SFM x DOC x IPR. Power Pc = Q x kc / (60 000 x eta), Q in cm3/min, kc in N/mm2.',
+  working: 'Metric Q = Vc x ap x f (cm3/min). Inch Q = 12 x SFM x DOC x IPR. Power Pc = Q x kc / (60 000 x eta), Q in cm3/min, kc in N/mm2. Machine check: n = 1000 Vc / (pi D) at the diameter being cut; the spindle has P(n) = min(P_max, T_max x 2 pi n / 60 000) kW at that speed; the share is the power at the spindle over P(n).',
   source: "Sandvik Coromant formulas and definitions; Machinery's Handbook",
 },
 {
@@ -228,10 +266,14 @@ const TOOLS = [
     { id: 'pc', label: 'Or net cutting power at the cut', unit: 'kW', def: '' },
     { id: 'vc', label: s === 'inch' ? 'Surface speed' : 'Cutting speed Vc', unit: spdU(s), def: '' },
     { id: 'ratio', label: 'Radial / tangential force ratio Fr/Ft', unit: '', def: '' },
+    { level: 'advanced', id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = active machine, else rigid)', unit: 'N/µm', def: '' },
+    { level: 'advanced', id: 'pf', label: 'Or a push test: force on the holder', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { level: 'advanced', id: 'pd', label: 'Push test: indicator reading at the holder', unit: lenU(s), def: '' },
   ]),
   calc: (v, W, s) => {
     const g = toolGeom(v, s), k = s === 'inch' ? IN_MM : 1, fU = s === 'inch' ? 'lbf' : 'N', fk = s === 'inch' ? LBF_N : 1;
     if (!(g.d > 0 && g.L > 0 && g.e > 0)) return [];
+    const khT = v.pf > 0 && v.pd > 0 ? W.stiffness_n_um(v.pf * fk, v.pd * k) : NaN, khA = advHolderK(v), kh = v.kh > 0 ? v.kh : khT > 0 ? khT : khA[0];
     const rows = [R("Young's modulus used (" + g.eSrc + ')', g.eShow, g.eU, g.eDp)];
     const ds = g.dsh || g.d;
     if (g.lf > 0 && !(g.kf > 0)) return rows.concat([R('Flute section', 'Enter the effective flute diameter / D (see the note below), or blank the flute length to treat the tool as solid', '', 0)]);
@@ -246,13 +288,18 @@ const TOOLS = [
       else rows.push(R('Radial force', 'Enter the Fr/Ft ratio for your cut', '', 0));
     }
     if (F > 0) {
-      const d = W.tool_deflection_mm(F, g.L, g.lf, ds, df, g.e);
-      rows.push(R('Tip deflection', d / k, lenU(s), s === 'inch' ? 5 : 4));
+      const dT = W.tool_deflection_mm(F, g.L, g.lf, ds, df, g.e), d = W.tool_and_holder_deflection_mm(F, g.L, g.lf, ds, df, g.e, kh);
+      rows.push(R(kh > 0 ? 'Tip deflection (tool and holder)' : 'Tip deflection', d / k, lenU(s), s === 'inch' ? 5 : 4));
       rows.push(R('Tip deflection', s === 'inch' ? d / k * 1000 : d * 1000, s === 'inch' ? 'thou' : 'um', s === 'inch' ? 2 : 1));
+      if (kh > 0) {
+        rows.push(R('Of which the tool bending', dT / k, lenU(s), s === 'inch' ? 5 : 4), R('Of which the holder and spindle giving way', W.holder_deflection_mm(F, kh) / k, lenU(s), s === 'inch' ? 5 : 4));
+        rows.push(R('Holder and spindle stiffness used (' + (v.kh > 0 ? 'entered' : khT > 0 ? 'from the push test' : 'from ' + khA[1]) + ')', kh, 'N/µm', 1));
+      }
     }
+    if (!(kh > 0)) rows.push(R('Holder and spindle', 'Taken as rigid. A real holder and spindle give a little: in Advanced enter their stiffness, or a push test (pull on the holder with a known force and read an indicator on it).', '', 0));
     return rows;
   },
-  working: 'I = pi d^4 / 64. Two-section cantilever, load F at the tip, stick-out L, fluted length a from the tip: deflection = F / (3 E) x [ (L^3 - a^3) / I_shank + a^3 / I_flute ]. With no flutes (or equal diameters) this is F L^3 / (3 E I). Force from power: Ft = Pc x 60 000 / Vc (Pc in kW at the cut, Vc in m/min, Ft in N); Fr = (Fr/Ft) x Ft. The effective flute diameter is an approximation for the reduced section of the fluted part. Holder, collet and spindle flex are not included, so a real setup deflects more. The load is put at the tip, which overstates deflection a little for shallow cuts. E presets: solid carbide 580 GPa (Ceratizit grade CTS20L, 10% Co; carbide grades span about 490-670 GPa in Tungaloy and Ceratizit grade tables, so use your tool maker\'s figure if you have it); HSS 219 GPa (voestalpine data sheet for M2, 1.3343, at 20 C). The effective flute diameter / D is left blank: enter your tool maker\'s figure or your own measured value.',
+  working: 'I = pi d^4 / 64. Two-section cantilever, load F at the tip, stick-out L, fluted length a from the tip: deflection = F / (3 E) x [ (L^3 - a^3) / I_shank + a^3 / I_flute ]. With no flutes (or equal diameters) this is F L^3 / (3 E I). Force from power: Ft = Pc x 60 000 / Vc (Pc in kW at the cut, Vc in m/min, Ft in N); Fr = (Fr/Ft) x Ft. The effective flute diameter is an approximation for the reduced section of the fluted part. Holder, collet and spindle flex are left out unless you enter a stiffness k for them (N/um at the holder face): then the holder face moves F / k and that is added to the bending of the tool (springs in series). A push test gives k = force / indicator reading. Only the sideways give is covered, not the tilt of the holder, so a real setup still deflects a little more. The load is put at the tip, which overstates deflection a little for shallow cuts. E presets: solid carbide 580 GPa (Ceratizit grade CTS20L, 10% Co; carbide grades span about 490-670 GPa in Tungaloy and Ceratizit grade tables, so use your tool maker\'s figure if you have it); HSS 219 GPa (voestalpine data sheet for M2, 1.3343, at 20 C). The effective flute diameter / D is left blank: enter your tool maker\'s figure or your own measured value.',
   source: "Cantilever and stepped (nonprismatic) beam deflection: Gere and Goodno, Mechanics of Materials; Roark's Formulas for Stress and Strain (Ch. 8). Equivalent flute diameter concept: Kops and Vo, CIRP Annals 1990. Force from power: Sandvik Coromant milling formulas. E presets: Ceratizit and voestalpine grade data (docs/sources.md).",
 },
 {
@@ -275,6 +322,7 @@ const TOOLS = [
     { id: 'lim', label: 'Deflection limit', unit: lenU(s), def: '' },
     { id: 'pmax', label: 'Spindle power limit (blank = active machine)', unit: 'kW', def: '' },
     { id: 'tmax', label: 'Spindle torque limit (blank = active machine)', unit: 'N·m', def: '' },
+    { id: 'kh', label: 'Holder and spindle stiffness at the holder face (blank = active machine, else rigid)', unit: 'N/µm', def: '' },
   ]),
   calc: (v, W, s) => {
     const g = toolGeom(v, s), k = s === 'inch' ? IN_MM : 1, fk = s === 'inch' ? LBF_N : 1, fU = s === 'inch' ? 'lbf' : 'N';
@@ -287,7 +335,7 @@ const TOOLS = [
     const tmax = v.tmax > 0 ? v.tmax : (m ? mnum(m.torque_nm) : 0);
     const pSrc = v.pmax > 0 ? 'entered' : (m && pmax > 0 ? m.name : '');
     const z0 = x => x > 0 ? x : 0;
-    const args = ap => [g.d, g.dsh, z0(g.L), g.lf, g.kf, z0(g.e), v.z, v.ae * k, ap, v.fz * k, vc, z0(v.kc), z0(v.eta), z0(v.ratio), z0(v.F) * fk, z0(v.lim) * k, pmax, tmax];
+    const args = ap => [g.d, g.dsh, z0(g.L), g.lf, g.kf, z0(g.e), v.z, v.ae * k, ap, v.fz * k, vc, z0(v.kc), z0(v.eta), z0(v.ratio), z0(v.F) * fk, z0(v.lim) * k, pmax, tmax, advHolderK(v)[0]];
     const a = args(v.ap * k), C = i => W.cut_check(...a, i);
     const rpm = C(0), vf = C(1), q = C(2), pNet = C(3), pSp = C(4), tq = C(5), ft = C(6), fr = C(7), defl = C(8), pAv = C(9), bind = C(10);
     const rows = [
@@ -310,7 +358,7 @@ const TOOLS = [
     if (g.lf > 0 && !(g.kf > 0)) rows.push(R('Deflection', 'Enter the effective flute diameter / D, or blank the flute length', '', 0));
     else if (isFinite(defl)) {
       rows.push(R("Young's modulus used (" + g.eSrc + ')', g.eShow, g.eU, g.eDp));
-      rows.push(R('Tool tip deflection', defl / k, lenU(s), s === 'inch' ? 5 : 4));
+      rows.push(R(advHolderK(v)[0] > 0 ? 'Tool tip deflection (tool bending and the holder giving way)' : 'Tool tip deflection (holder and spindle taken as rigid)', defl / k, lenU(s), s === 'inch' ? 5 : 4));
     }
     else if (!(v.F > 0 || v.ratio > 0)) rows.push(R('Deflection', 'Enter the Fr/Ft ratio or the radial force', '', 0));
     if (pmax > 0) rows.push(R('Spindle power available at this speed (' + pSrc + ')', pAv, 'kW', 3));
@@ -733,42 +781,73 @@ const TOOLS = [
   source: 'n = 1000 Vc / (π D): Sandvik Coromant turning formulas. Two regions (constant surface speed down to the radius where the spindle reaches nmax, then nmax): E. Isakov, "Cutting time for facing", Cutting Tool Engineering, 15 Mar 2011 (also: constant surface speed facing takes about half the constant-rpm time); SmartLathe, "Calculation of machining time for facing, parting off and deep grooving on a CNC lathe" (time by integration, separate formula below the clamping diameter). Closed form: own derivation, checked in the Rust core against numerical integration.',
 },
 {
-  id: 'boringbar', level: 'advanced', group: 'Turning', title: 'Boring bar deflection',
-  pick: { map: { d: 'shank', L: 'stick' }, types: ['Boring bar'] },
-  desc: 'Tip deflection of a solid round boring bar under the cutting force, as a cantilever clamped at the holder, for steel, carbide or tungsten heavy metal bars, with the overhang (L/D) guidance published by bar makers.',
+  id: 'boringbar', level: 'advanced', group: 'Turning', title: 'Boring bar: overhang and deflection',
+  pick: { map: { d: 'shank', L: 'stick', re: 'cr' }, types: ['Boring bar'] },
+  desc: 'How far a boring bar bends under the cut and how that compares with the overhang the bar makers allow, for steel, carbide, heavy metal and damped bars. Pick the work material and the advisor works out the cutting force, suggests a feed and the deepest cut the bar will take, and says what limits the cut. Drag the overhang and watch the bar bend.',
   fields: s => [
-    { id: 'mat', label: 'Bar material (sets E)', unit: '', def: 1, options: [[1, 'Steel'], [2, 'Solid carbide'], [3, 'Tungsten heavy metal'], [0, 'Other: enter E below']] },
-    { level: 'advanced', id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
+    { id: 'mat', label: 'Bar (sets E and the overhang guidance)', unit: '', def: 1, options: [[1, 'Steel'], [2, 'Solid carbide'], [3, 'Tungsten heavy metal'], [4, 'Damped (anti-vibration) steel bar'], [0, 'Other: enter E below']], wide: true },
     { id: 'd', label: 'Bar diameter', unit: lenU(s), def: s === 'inch' ? 0.75 : 20 },
     { id: 'di', label: 'Coolant hole diameter (blank = none)', unit: lenU(s), def: '' },
     { id: 'L', label: 'Overhang (holder face to cutting edge)', unit: lenU(s), def: s === 'inch' ? 2.25 : 60 },
-    { id: 'F', label: 'Tangential cutting force (if known)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
-    { id: 'kc', label: 'Or specific cutting force kc', unit: 'N/mm2', def: '' },
-    { id: 'ap', label: 'with depth of cut ap', unit: lenU(s), def: '' },
-    { id: 'f', label: 'and feed per rev', unit: feedRevU(s), def: '' },
-    { id: 'Fr', label: 'Radial force (optional)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { id: 'ld', label: 'Overhang in bar diameters', unit: '', def: '', slider: { min: 1, max: 14, step: 0.1, suffix: ' x D' } },
+    { id: 'wm', label: 'Work material (for the cutting force)', unit: '', def: 3, options: [[0, 'Not picked: type the force or kc (Advanced)']].concat(ADV_MAT_OPTIONS), wide: true },
+    { id: 're', label: 'Nose radius of the insert', unit: lenU(s), def: s === 'inch' ? 0.0156 : 0.4 },
+    { id: 'cut', label: 'Kind of cut', unit: '', def: 1, options: s === 'inch' ? [[1, 'Roughing: 0.05 mm (about 0.002 in) allowed at the tip'], [3, 'Finishing: 0.01 mm (about 0.0004 in) allowed at the tip']] : [[1, 'Roughing: 0.05 mm allowed at the tip'], [3, 'Finishing: 0.01 mm allowed at the tip']], wide: true },
+    { id: 'f', label: 'Feed per revolution (blank = suggested)', unit: feedRevU(s), def: '', lock: true },
+    { id: 'ap', label: 'Depth of cut (blank = suggested)', unit: lenU(s), def: '', lock: true },
+    { id: 'ag', label: 'Feed for the nose radius (fine finish: low)', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['A third of the radius', 'Middle', 'Half the radius'] } },
+    { level: 'advanced', id: 'lim', label: 'Deflection allowed at the tip (blank = by kind of cut)', unit: lenU(s), def: '' },
+    { level: 'advanced', id: 'kap', label: 'Entering angle', unit: 'deg', def: 95 },
+    { level: 'advanced', id: 'kc', label: 'Your own specific cutting force kc (wins over the material)', unit: 'N/mm2', def: '' },
+    { level: 'advanced', id: 'F', label: 'Tangential cutting force, if known (wins over all)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { level: 'advanced', id: 'Fr', label: 'Radial force (optional)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { level: 'advanced', id: 'E', label: "Young's modulus E (blank = preset)", unit: eField(s).u, def: '' },
   ],
+  pairs: [['L', 'ld', v => v.L / v.d, (v, W) => W.apply_factor(v.ld, v.d), 'both']],
+  suggest: (v, W, s) => { const r = bbRun(v, W, s); return r && !r.err ? { f: r.fSug / r.k, ap: r.sAp / r.k } : {}; },
   calc: (v, W, s) => {
-    const k = s === 'inch' ? IN_MM : 1, fk = s === 'inch' ? LBF_N : 1, fU = s === 'inch' ? 'lbf' : 'N', ef = eField(s);
-    if (!(v.d > 0 && v.L > 0)) return [];
-    const p = BAR_E[v.mat], e = v.E > 0 ? v.E * ef.k : (p ? p.gpa : NaN);
-    if (!(e > 0)) return [R("Young's modulus", 'Enter E for your bar (from its maker)', '', 0)];
-    const di = v.di > 0 ? v.di * k : 0, d = v.d * k, L = v.L * k;
-    if (di >= d) return [R('Coolant hole', 'Must be smaller than the bar', '', 0)];
-    const rows = [R("Young's modulus used (" + (v.E > 0 ? 'as entered' : p.name + ' preset, ' + p.src) + ')', e / ef.k, ef.u, ef.dp), R('Overhang L/D', v.L / v.d, 'x D', 2)];
-    let F = v.F > 0 ? v.F * fk : NaN;
-    if (!(F > 0) && v.kc > 0 && v.ap > 0 && v.f > 0) { F = W.turning_force(v.kc, v.ap * k, v.f * k); rows.push(R('Tangential force Fc = kc ap fn', F / fk, fU, 1)); }
-    const dU = s === 'inch' ? 'thou' : 'um', dk = s === 'inch' ? 1000 / IN_MM : 1000;
-    if (F > 0) { const dt = W.boring_bar_deflection(F, L, d, di, e); rows.push(R('Tip deflection, tangential (edge drops below centre)', dt * dk, dU, s === 'inch' ? 2 : 1)); if (v.Fr > 0) { const dr = W.boring_bar_deflection(v.Fr * fk, L, d, di, e); rows.push(R('Tip deflection, radial (bore comes out small)', dr * dk, dU, s === 'inch' ? 2 : 1)); rows.push(R('Combined tip deflection', Math.hypot(dt, dr) * dk, dU, s === 'inch' ? 2 : 1)); } }
-    else rows.push(R('Deflection', 'Enter the force, or kc with ap and feed', '', 0));
-    const g = BAR_LD[p ? v.mat : 0] || [];
-    g.forEach(([who, ld]) => rows.push(R('Overhang guidance: ' + who, 'up to ' + ld + ' x D', '', 0)));
-    const lim = g.length ? Math.min(...g.map(x => parseFloat(x[1]))) : NaN;
-    if (v.L / v.d > lim) rows.push(R('Check', 'Overhang is past the smallest published guidance for this bar material (' + lim + ' x D); damped bars are made for ' + BAR_LD.damped.map(x => x[0] + ' ' + x[1] + ' x D').join(', '), '', 0));
+    const r = bbRun(v, W, s);
+    if (!r) return [];
+    if (r.err) return [R(r.err[0], r.err[1], '', 0)];
+    const inch = r.inch, k = r.k, fk = inch ? LBF_N : 1, fU = inch ? 'lbf' : 'N', ef = eField(s), lu = lenU(s), dpF = inch ? 4 : 3;
+    const dU = inch ? 'thou' : 'um', dk = inch ? 1000 / IN_MM : 1000, dd = inch ? 2 : 1, rows = [];
+    if (isFinite(r.defl)) {
+      rows.push(R('Tip deflection, tangential (edge drops below centre)', r.defl * dk, dU, dd));
+      rows.push(R('Share of the allowed deflection (' + fmt(r.lim * dk, dd) + ' ' + dU + (r.limOwn ? '' : ", BenchMate's starting figure") + ')', r.shareD * 100, '%', 0));
+    } else rows.push(R('Deflection', r.wmNone ? 'Pick the work material, or type kc or the force (Advanced)' : r.noKc ? 'No specific cutting force is published for this material group: type kc or the force (Advanced)' : 'Enter the nose radius, or type the feed', '', 0));
+    rows.push(R('Overhang L/D', r.ld, 'x D', 2));
+    if (!r.typed && isFinite(r.ap)) {
+      rows.push(R('Depth of cut (' + (r.apL ? 'yours, locked' : r.reduced ? 'reduced from ' + fmt(r.ap0 / k, dpF) + ' ' + lu + ' to fit the deflection' : 'suggested: the depth the turning speed table is based on') + ')', r.ap / k, lu, dpF));
+      rows.push(R('Feed per revolution (' + (r.fL ? 'yours, locked' : 'suggested: nose radius rule, Mitsubishi Materials') + ')', r.f / k, feedRevU(s), dpF));
+    }
+    if (isFinite(r.force)) rows.push(R(r.typed ? 'Tangential force (as entered)' : 'Tangential force Fc = kc ap fn', r.force / fk, fU, 1));
+    if (!r.typed && isFinite(r.apMax)) rows.push(R('Deepest cut inside the allowed deflection, at this feed', r.apMax / k, lu, dpF));
+    if (!r.typed && isFinite(r.kc)) rows.push(R(v.kc > 0 ? 'Specific cutting force kc (your own)' : 'Specific cutting force kc at this chip (Iscar group ' + r.g[0] + ')', r.kc, 'N/mm2', 0));
+    if (isFinite(r.defl) && v.Fr > 0) { const dr = W.boring_bar_deflection(v.Fr * fk, r.L, r.d, r.di, r.e); rows.push(R('Tip deflection, radial (bore comes out small)', dr * dk, dU, dd)); rows.push(R('Combined tip deflection', Math.hypot(r.defl, dr) * dk, dU, dd)); }
+    rows.push(R("Young's modulus used (" + (v.E > 0 ? 'as entered' : r.p.name + ' preset, ' + r.p.src) + ')', r.e / ef.k, ef.u, ef.dp));
+    r.guide.forEach(([who, ld]) => rows.push(R('Overhang guidance: ' + who, 'up to ' + ld + ' x D', '', 0)));
+    if (r.ldG > 0 && r.ld > r.ldG) rows.push(R('Check', 'Overhang is past the smallest published guidance for this bar (' + r.ldG + ' x D)' + (v.mat === 4 ? '' : '; damped bars are made for ' + BAR_LD.damped.map(x => x[0] + ' ' + x[1] + ' x D').join(', ')), '', 0));
+    if (v.mat === 4) rows.push(cfNote('Damped bar: the deflection is worked out as for a plain steel bar of the same diameter. The damper is there to stop chatter at a long overhang; ask the maker for the stiffness of your bar.'));
+    if (!r.typed && isFinite(r.defl)) rows.push(R('Note', ADV_START_NOTE, '', 0));
     return rows;
   },
-  working: 'I = pi (d^4 - di^4) / 64 (solid round bar, optional coolant hole; flats ground on the bar are ignored, so a real bar is a little softer). Tip deflection = F L^3 / (3 E I), clamped rigidly at the holder face: holder, clamping and spindle flex are not included, so the real bar deflects more. Fc = kc x ap x fn. E presets: steel 210 GPa (Ovako data for 4140 / 42CrMo4, in the BenchMate material data), solid carbide 580 GPa (Ceratizit grade CTS20L, 10% Co; use your bar maker\'s figure), tungsten heavy metal 360 GPa (Plansee Densimet D176). The guidance values are each maker\'s own rule of thumb for chatter-free boring, shown side by side because they differ.',
-  source: "Gere and Goodno, Mechanics of Materials (cantilever); Sandvik Coromant (Fc = kc ap fn); E: Ovako, Ceratizit, Plansee W-MMC brochure 09.2021; overhang guidance: Seco Tools (2019), Kennametal (The basics of boring), Cutwel (Expert guide to boring bars). See docs/sources.md.",
+  panel: (v, W, s) => {
+    const r = bbRun(v, W, s);
+    if (!r || r.err) return '';
+    const inch = r.inch, k = r.k, lu = lenU(s), dU = inch ? 'thou' : 'um', dk = inch ? 1000 / IN_MM : 1000, dd = inch ? 2 : 1, f = (x, dp) => fmt(x, dp), L3 = inch ? 3 : 1;
+    let tiles = advTile('Overhang', f(r.ld, 1) + ' x D', r.ldG > 0 ? advPct(r.shareL) + ' of ' + r.ldG + ' x D, the lowest figure the makers print for this bar' : 'no published guidance for this bar', r.ldG > 0 ? advBand(r.shareL) : '');
+    tiles += isFinite(r.shareD) ? advTile('Deflection', f(r.defl * dk, dd) + ' ' + dU, advPct(r.shareD) + ' of ' + f(r.lim * dk, dd) + ' ' + dU + (r.limOwn ? '' : ' (starting figure)'), advBand(r.shareD)) : advTile('Deflection', 'not worked out', 'needs the cutting force', '');
+    const shorter = r.ldG > 0 ? f(W.apply_factor(r.ldG, r.d) / k, L3) + ' ' + lu : '', alt = v.mat === 1 ? ' or change to a carbide bar (' + BAR_LD[2].map(x => x[0] + ' ' + x[1]).join(', ') + ' x D) or a damped bar.' : v.mat === 4 ? '. Use the largest bar that fits the bore.' : ' or change to a damped bar (' + BAR_LD.damped.map(x => x[0] + ' ' + x[1]).join(', ') + ' x D).';
+    let card;
+    if (r.limit === 9) card = advCard('Overhang', 'The bar sticks out ' + f(r.ld, 1) + ' times its diameter. The lowest figure the bar makers print for this kind of bar is ' + r.ldG + ' x D: past that, expect chatter.' + (r.reduced ? ' The depth of cut was also reduced to ' + f(r.ap / k, inch ? 4 : 3) + ' ' + lu + ' to hold the deflection.' : ''), 'Shorten the overhang to ' + shorter + ' or less,' + alt, r.shareL > 1.0005);
+    else if (r.limit === 1 && r.reduced) card = advCard('Bar deflection', 'At ' + f(r.ap0 / k, inch ? 4 : 3) + ' ' + lu + ' deep the tip would be pushed more than the ' + f(r.lim * dk, dd) + ' ' + dU + ' allowed, so the depth of cut was reduced to ' + f(r.ap / k, inch ? 4 : 3) + ' ' + lu + '.', 'Shorten the overhang: deflection goes with its cube. At ' + f(r.lFit / k, L3) + ' ' + lu + ' the full depth fits.');
+    else if (r.limit === 1) card = advCard('Bar deflection', (r.typed ? 'With this force' : 'Your depth is locked, so nothing was changed:') + ' the tip is pushed ' + f(r.defl * dk, dd) + ' ' + dU + ', more than the ' + f(r.lim * dk, dd) + ' ' + dU + ' allowed.', (r.typed ? '' : 'Unlock the depth (the deepest cut inside the limit is ' + f(r.apMax / k, inch ? 4 : 3) + ' ' + lu + '), or shorten ') + (r.typed ? 'Shorten ' : '') + 'the overhang to ' + f(r.lFit / k, L3) + ' ' + lu + '.', true);
+    else card = advCard('Nothing', isFinite(r.shareD) ? 'The overhang is inside the bar makers\' guidance and the tip deflection is inside the ' + f(r.lim * dk, dd) + ' ' + dU + ' allowed.' : 'The overhang is inside the bar makers\' guidance. The deflection is not worked out without a cutting force.', '');
+    return '<div class="tiles">' + tiles + '</div>' + card;
+  },
+  sends: (v, W, s) => { const r = bbRun(v, W, s); return r && !r.err && !r.typed && isFinite(r.ap) && v.wm > 0 ? [['Turning advisor: speed for this cut', 'advturn', { mat: v.wm, re: v.re, f: r.f / r.k, ap: r.ap / r.k }]] : []; },
+  working: 'I = pi (d^4 - di^4) / 64 (solid round bar, optional coolant hole; flats ground on the bar are ignored, so a real bar is a little softer). Tip deflection = F L^3 / (3 E I), clamped rigidly at the holder face: holder, clamping and spindle flex are not included, so the real bar deflects more. Force: Fc = kc x ap x fn, with kc = kc1.1 x h^(-mc) at the chip thickness h = fn sin(entering angle) for the work material, or your own kc or force. Feed suggested from the nose radius (a corner radius of 2 to 3 times the feed). Depth suggested: the 0.040 in (1.0 mm) the turning speed table is based on, reduced to the deepest cut that keeps the tip inside the allowed deflection, ap = allowed deflection / (deflection for 1 mm of depth). A depth you type is locked and never changed. Overhang that fits a depth: L = cube root of (3 E I x allowed deflection / F). The card names the overhang when L/D is past the lowest figure the bar makers print for that kind of bar, the deflection when the tip is pushed more than allowed, and the larger share when both are passed. E presets: steel 210 GPa (Ovako data for 4140 / 42CrMo4, in the BenchMate material data), solid carbide 580 GPa (Ceratizit grade CTS20L, 10% Co; use your bar maker\'s figure), tungsten heavy metal 360 GPa (Plansee Densimet D176); a damped bar is taken as a plain steel bar. The guidance values are each maker\'s own rule of thumb for chatter-free boring, shown side by side because they differ. The allowed deflection (0.05 mm roughing, 0.01 mm finishing) is BenchMate\'s own starting figure.',
+  source: "Gere and Goodno, Mechanics of Materials (cantilever); Sandvik Coromant (Fc = kc ap fn); kc: Iscar material groups; feed from nose radius: Mitsubishi Materials, Corner radius; E: Ovako, Ceratizit, Plansee W-MMC brochure 09.2021; overhang guidance: Seco Tools (2019), Kennametal (The basics of boring), Cutwel (Expert guide to boring bars). See docs/sources.md.",
 },
 {
   id: 'caxis', level: 'advanced', group: 'Turning', title: 'C-axis (polar) feed',
@@ -812,37 +891,57 @@ const TOOLS = [
 {
   id: 'slitsaw', level: 'advanced', group: 'Sawing', title: 'Slitting saw speeds and feeds',
   pick: { map: { D: 'dia', z: 'flutes' } },
-  desc: 'Spindle speed, table feed, chip thickness and cut time for a slitting or slotting saw from the saw maker\'s cutting speed and feed per tooth. A slot shallower than half the saw diameter thins the chip; the screen shows how much.',
+  desc: 'Spindle speed, table feed, chip thickness and cut time for a slitting or slotting saw. Pick the work material and the saw material for a starting speed and feed per tooth from a saw maker\'s sheet, or type your saw maker\'s own figures: a typed value is locked. A slot shallower than half the saw diameter thins the chip; the screen shows how much.',
   fields: s => [
+    { id: 'wm', label: 'Work material', unit: '', def: 3, options: [[0, 'Not picked: type the saw maker\'s speed and feed']].concat(ADV_MAT_OPTIONS), wide: true },
+    { id: 'tm', label: 'Saw material', unit: '', def: 2, options: [[2, 'High speed steel (HSS)'], [1, 'Solid carbide or carbide-tipped']] },
     { id: 'D', label: 'Saw diameter', unit: lenU(s), def: s === 'inch' ? 3 : 80 },
-    { id: 'z', label: 'Number of teeth', unit: '', def: '' },
+    { id: 'z', label: 'Number of teeth', unit: '', def: 32 },
     { id: 'ae', label: 'Depth of slot (radial)', unit: lenU(s), def: s === 'inch' ? 0.25 : 6 },
-    { id: 'speed', label: s === 'inch' ? 'Surface speed (saw maker)' : 'Cutting speed Vc (saw maker)', unit: spdU(s), def: '' },
-    { id: 'fz', label: 'Feed per tooth (saw maker)', unit: lenU(s), def: '' },
+    { id: 'speed', label: (s === 'inch' ? 'Surface speed' : 'Cutting speed Vc') + ' (blank = suggested)', unit: spdU(s), def: '', lock: true },
+    { id: 'fz', label: 'Feed per tooth (blank = suggested)', unit: lenU(s), def: '', lock: true },
+    { id: 'sp', label: 'Speed in the printed range (soft stock: high, hard: low)', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Low', 'Middle', 'High'] } },
+    { id: 'ag', label: 'Feed per tooth in the printed range', unit: '', def: 50, slider: { min: 0, max: 100, step: 5, labels: ['Gentle', 'Middle', 'Aggressive'] } },
     { id: 'hex', label: 'Or target chip thickness hex', unit: lenU(s), def: '' },
     { id: 'L', label: 'Length of slot (for time)', unit: lenU(s), def: '' },
   ],
+  suggest: (v, W, s) => { const a = v.wm > 0 ? advSaw(W, v.wm, v.tm, v.sp, v.ag) : null; return a ? { speed: s === 'inch' ? a.vc / FT_M : a.vc, fz: s === 'inch' ? a.chip / IN_MM : a.chip } : {}; },
   calc: (v, W, s) => {
     if (!(v.D > 0 && v.ae > 0)) return [];
-    const rows = [], dp = s === 'inch' ? 5 : 4;
-    const n = v.speed > 0 ? (s === 'inch' ? W.rpm_from_sfm(v.speed, v.D) : W.rpm_from_vc(v.speed, v.D)) : NaN;
+    const inch = s === 'inch', rows = [], dp = inch ? 5 : 4, a = v.wm > 0 ? advSaw(W, v.wm, v.tm, v.sp, v.ag) : null;
+    const speed = v.speed > 0 ? v.speed : a ? (inch ? a.vc / FT_M : a.vc) : NaN, fzIn = v.fz > 0 ? v.fz : a ? (inch ? a.chip / IN_MM : a.chip) : NaN;
+    const n = speed > 0 ? (inch ? W.rpm_from_sfm(speed, v.D) : W.rpm_from_vc(speed, v.D)) : NaN;
     if (n > 0) rows.push(R('Spindle speed', n, 'RPM', 0, 'rpm'));
-    const k = W.rctf(v.ae, v.D);
+    const k = W.rctf(v.ae, v.D), fz = v.hex > 0 ? v.hex * k : fzIn;
+    let vf = NaN;
+    if (fz > 0 && n > 0 && v.z > 0) { vf = W.table_feed(n, fz, v.z); rows.push(R('Table feed', vf, feedMinU(s), 2, 'feed')); }
+    if (speed > 0) rows.push(R((inch ? 'Surface speed' : 'Cutting speed') + ' (' + (v.speed > 0 ? 'yours, locked' : 'suggested: Gaylee, ' + a.row[0]) + ')', speed, spdU(s), 0));
+    if (fz > 0) {
+      if (v.hex > 0) rows.push(R('Feed per tooth for that chip', fz, lenU(s), dp));
+      else { rows.push(R('Feed per tooth (' + (v.fz > 0 ? 'yours, locked' : 'suggested: Gaylee, ' + (v.tm === 1 ? 'carbide' : 'HSS') + ' saws') + ')', fz, lenU(s), dp)); rows.push(R('Max chip thickness hex', fz / k, lenU(s), dp)); }
+    }
     rows.push(R('Chip thinning factor (RCTF)', k, 'x', 3));
     if (v.z > 0) rows.push(R('Teeth in the cut at once', W.teeth_engaged(v.z, v.ae, v.D), '', 2));
-    const fz = v.hex > 0 ? v.hex * k : v.fz;
-    if (fz > 0) {
-      if (v.hex > 0) rows.push(R('Feed per tooth for that chip', fz, lenU(s), dp)); else rows.push(R('Max chip thickness hex', fz / k, lenU(s), dp));
-      if (n > 0 && v.z > 0) {
-        const vf = W.table_feed(n, fz, v.z); rows.push(R('Table feed', vf, feedMinU(s), 2, 'feed'));
-        const app = W.cutter_approach(v.D, v.ae); rows.push(R('Approach to full depth', app, lenU(s), s === 'inch' ? 3 : 2));
-        if (v.L > 0) rows.push(R('Cut time (slot plus approach)', (v.L + app) / vf, 'min', 3));
-      }
+    if (vf > 0) {
+      const app = W.cutter_approach(v.D, v.ae); rows.push(R('Approach to full depth', app, lenU(s), inch ? 3 : 2));
+      if (v.L > 0) rows.push(R('Cut time (slot plus approach)', (v.L + app) / vf, 'min', 3));
+    }
+    if (!(speed > 0)) rows.push(R('Speed and feed', v.wm > 0 ? 'The saw sheet has no row for this material: type your saw maker\'s speed and feed per tooth' : 'Pick the work material, or type your saw maker\'s speed and feed per tooth', '', 0));
+    if (a && !(v.speed > 0 && (v.fz > 0 || v.hex > 0))) {
+      rows.push(cfNote('The saw sheet prints one wide speed range for the whole hardness range of a material group (' + a.row[0] + (a.row[1] ? ', ' + a.row[1] : '') + '): soft stock takes the high end, hard stock the low end. One publisher. Your saw maker\'s own figures are better: type them in.'));
+      rows.push(R('Note', ADV_START_NOTE, '', 0));
     }
     return rows;
   },
-  working: 'n = 1000 Vc / (pi D) (inch 12 SFM / (pi D)). Vf = n x z x fz. Engagement phi = acos(1 - 2 ae / D), hex = fz sin(phi) for ae < D/2, so fz = hex / sin(phi) for a target chip. Teeth in the cut = z phi / 360 deg. Approach = sqrt(ae (D - ae)), the distance the saw centre travels from first touch to full depth. Speeds and chip loads come from the saw maker; BenchMate does not guess them.',
-  source: 'Sandvik Coromant milling formulas (n, Vf); Machining Doctor (RCTF); Altintas, Ch. 2 (chip thickness); approach by circle geometry.',
+  table: (v, W, s) => {
+    const a = v.wm > 0 ? advSaw(W, v.wm, v.tm, v.sp, v.ag) : null;
+    if (!a) return null;
+    const inch = s === 'inch', sp = x => fmt(inch ? x : x * FT_M, 0), fd = x => fmt(inch ? x : x * IN_MM, inch ? 4 : 3), r = a.row, t = v.tm === 1 ? 1 : 2;
+    const line = (name, lo, hi, tt) => ['Gaylee Corporation', r[0] + (r[1] ? ' (' + r[1] + ')' : '') + ', ' + name, sp(lo) + ' to ' + sp(hi) + ' ' + spdU(s), fd(ADV_SAW_FZ[tt][0]) + ' to ' + fd(ADV_SAW_FZ[tt][1]) + ' ' + lenU(s), tt === t && !(v.speed > 0) ? 'used' : ''];
+    return { title: 'What the saw sheet prints for this material', head: ['Publisher', 'Row as printed', 'Speed', 'Feed per tooth (all materials)', ''], rows: [line('carbide saws', r[2], r[3], 1), line('HSS saws', r[4], r[5], 2)], text: true };
+  },
+  working: 'Starting speed: the saw maker\'s sheet prints a speed range for each material group, for carbide and for HSS saws; the slider picks a place inside it. Feed per tooth: the sheet prints one range for all materials (carbide saws 0.0002 to 0.0015 in, HSS saws 0.002 to 0.006 in); the slider picks a place inside it. A speed or feed you type is locked and used as it is. n = 1000 Vc / (pi D) (inch 12 SFM / (pi D)). Vf = n x z x fz. Engagement phi = acos(1 - 2 ae / D), hex = fz sin(phi) for ae < D/2, so fz = hex / sin(phi) for a target chip. Teeth in the cut = z phi / 360 deg. Approach = sqrt(ae (D - ae)), the distance the saw centre travels from first touch to full depth.',
+  source: 'Starting speeds and feeds: Gaylee Corporation, "Cutting speed recommendations: circular saws" (solid carbide, carbide-tipped and HSS saws; material groups after the Machining Data Handbook); the carbide column is reprinted by Kyocera as "Slitting saw parameters". One publisher. Sandvik Coromant milling formulas (n, Vf); Machining Doctor (RCTF); Altintas, Ch. 2 (chip thickness); approach by circle geometry. See docs/sources.md, "Advisor".',
 },
 {
   id: 'bandsaw', level: 'advanced', group: 'Sawing', title: 'Bandsaw cut time',

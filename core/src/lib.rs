@@ -165,6 +165,13 @@ pub fn spindle_power_available_kw(rpm: f64, p_max_kw: f64, torque_max_nm: f64) -
     p_max_kw.min(torque_max_nm * 2.0 * PI * rpm / 60_000.0)
 }
 
+/// Share of a limit that a value uses: `x / limit` (1 = at the limit). NaN
+/// when there is no limit to compare with.
+pub fn share_of(x: f64, limit: f64) -> f64 {
+    if !(x.is_finite() && limit.is_finite() && limit > 0.0) { return f64::NAN; }
+    x / limit
+}
+
 /// Spindle torque needed for a cutting power (kW) at a speed (RPM), N*m:
 /// `T = P * 60 000 / (2 * pi * n)`.
 pub fn torque_for_power_nm(power_kw: f64, rpm: f64) -> f64 {
@@ -345,6 +352,27 @@ pub fn stepped_cantilever_tip_deflection(f: f64, l: f64, a: f64, e: f64, i_root:
     f / (3.0 * e) * ((l.powi(3) - a.powi(3)) / i_root + a.powi(3) / i_tip)
 }
 
+/// Sideways movement of the holder face under a side force, mm: the holder, its taper and
+/// the spindle bearings taken together as one spring of stiffness `k_n_um` (N/um) measured at
+/// the holder face, `delta = F / k` (Hooke's law; springs in series add their deflections, so
+/// this is added to the tool's own bending). 0 when no stiffness is given: a rigid holder.
+/// Only the sideways give is covered; the tilt of the holder, which grows with stick-out, is not.
+pub fn holder_deflection_mm(f_n: f64, k_n_um: f64) -> f64 {
+    if k_n_um > 0.0 && k_n_um.is_finite() && f_n.is_finite() { f_n / (k_n_um * 1000.0) } else { 0.0 }
+}
+
+/// Tip movement of the tool with the holder's give added: [`tool_deflection_mm`] plus
+/// [`holder_deflection_mm`] (springs in series).
+pub fn tool_and_holder_deflection_mm(f_n: f64, stickout_mm: f64, flute_mm: f64, d_shank_mm: f64, d_flute_mm: f64, e_gpa: f64, k_n_um: f64) -> f64 {
+    tool_deflection_mm(f_n, stickout_mm, flute_mm, d_shank_mm, d_flute_mm, e_gpa) + holder_deflection_mm(f_n, k_n_um)
+}
+
+/// Stiffness from a push test, N/um: a known force `f_n` (N) and the indicator reading
+/// `defl_mm` (mm) it causes, `k = F / delta`.
+pub fn stiffness_n_um(f_n: f64, defl_mm: f64) -> f64 {
+    if f_n > 0.0 && defl_mm > 0.0 && f_n.is_finite() && defl_mm.is_finite() { f_n / (defl_mm * 1000.0) } else { f64::NAN }
+}
+
 /// End-mill tip deflection, mm, modelled as a stepped cantilever clamped at
 /// the holder face: solid shank of diameter `d_shank_mm` from the holder to
 /// the start of the flutes, then the fluted length `flute_mm` with an
@@ -409,6 +437,7 @@ pub struct CutInput {
     pub defl_limit: f64,   // mm (optional)
     pub p_max: f64,        // machine continuous power, kW (optional)
     pub t_max: f64,        // machine max torque, N*m (optional)
+    pub holder_k: f64,     // holder and spindle stiffness at the holder face, N/um (optional: not given = rigid)
 }
 
 /// Results of [`cut_check`]. NaN where an input needed for it was not given.
@@ -472,7 +501,7 @@ pub fn cut_check(c: &CutInput) -> CutResult {
                    else if given(c.flute_factor) { Some((c.flute_len, c.flute_factor * c.d)) }
                    else { None };
         if let Some((lf, df)) = geom {
-            r.defl = tool_deflection_mm(r.fr, c.stickout, lf, ds, df, c.e_gpa);
+            r.defl = tool_deflection_mm(r.fr, c.stickout, lf, ds, df, c.e_gpa) + holder_deflection_mm(r.fr, c.holder_k);
         }
     }
     if r.defl.is_finite() && given(c.defl_limit) { r.used[LIMIT_DEFLECTION as usize] = r.defl / c.defl_limit; }
@@ -530,8 +559,8 @@ pub fn cut_optimise(c: &CutInput, vary_ae: bool) -> (f64, u8) {
 #[allow(clippy::too_many_arguments)]
 pub fn cut_check_f(d: f64, d_shank: f64, stickout: f64, flute_len: f64, flute_factor: f64, e_gpa: f64, z: f64,
                    ae: f64, ap: f64, fz: f64, vc: f64, kc: f64, eta: f64, radial_ratio: f64, f_direct: f64,
-                   defl_limit: f64, p_max: f64, t_max: f64, out: f64) -> f64 {
-    let c = CutInput { d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, radial_ratio, f_direct, defl_limit, p_max, t_max };
+                   defl_limit: f64, p_max: f64, t_max: f64, holder_k: f64, out: f64) -> f64 {
+    let c = CutInput { d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, radial_ratio, f_direct, defl_limit, p_max, t_max, holder_k };
     let r = cut_check(&c);
     match out as i32 {
         0 => r.rpm, 1 => r.vf, 2 => r.q, 3 => r.p_net, 4 => r.p_spindle, 5 => r.torque,
@@ -546,8 +575,8 @@ pub fn cut_check_f(d: f64, d_shank: f64, stickout: f64, flute_len: f64, flute_fa
 #[allow(clippy::too_many_arguments)]
 pub fn cut_optimise_f(d: f64, d_shank: f64, stickout: f64, flute_len: f64, flute_factor: f64, e_gpa: f64, z: f64,
                       ae: f64, ap: f64, fz: f64, vc: f64, kc: f64, eta: f64, radial_ratio: f64, f_direct: f64,
-                      defl_limit: f64, p_max: f64, t_max: f64, vary_ae: f64, out: f64) -> f64 {
-    let c = CutInput { d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, radial_ratio, f_direct, defl_limit, p_max, t_max };
+                      defl_limit: f64, p_max: f64, t_max: f64, holder_k: f64, vary_ae: f64, out: f64) -> f64 {
+    let c = CutInput { d, d_shank, stickout, flute_len, flute_factor, e_gpa, z, ae, ap, fz, vc, kc, eta, radial_ratio, f_direct, defl_limit, p_max, t_max, holder_k };
     let (x, k) = cut_optimise(&c, vary_ae > 0.5);
     if out > 0.5 { k as f64 } else { x }
 }
@@ -596,6 +625,12 @@ pub mod mechanics;
 pub mod inspect;
 pub use inspect::*;
 pub mod matref;
+pub mod cutforce;
+pub mod advisor;
+pub mod lobes;
+pub use cutforce::*;
+pub use advisor::*;
+pub use lobes::*;
 
 #[cfg(test)]
 mod tests {
@@ -639,6 +674,9 @@ mod tests {
         // at 500 RPM: 2.61799 kW (torque limited)
         close(spindle_power_available_kw(500.0, 3.7, 50.0), 2.617994, 1e-6);
         close(spindle_power_available_kw(500.0, 3.7, 0.0), 3.7, 1e-12);
+        // share of a limit: 2.5 kW of the 2.617994 kW available at 500 RPM
+        close(share_of(2.5, spindle_power_available_kw(500.0, 3.7, 50.0)), 0.954930, 1e-6);
+        assert!(share_of(2.5, 0.0).is_nan() && share_of(f64::NAN, 1.0).is_nan());
         close(torque_for_power_nm(2.617994, 500.0), 50.0, 1e-4);
     }
     #[test] fn bolt() {
@@ -752,7 +790,7 @@ mod tests {
     fn sample() -> CutInput {
         CutInput { d: 10.0, d_shank: 0.0, stickout: 40.0, flute_len: 25.0, flute_factor: 0.8, e_gpa: 600.0, z: 4.0,
                    ae: 2.5, ap: 10.0, fz: 0.05, vc: 150.0, kc: 1800.0, eta: 0.8, radial_ratio: 0.4, f_direct: 0.0,
-                   defl_limit: 0.02, p_max: 3.7, t_max: 20.0 }
+                   defl_limit: 0.02, p_max: 3.7, t_max: 20.0, holder_k: 0.0 }
     }
     #[test] fn cut_check_example() {
         let r = cut_check(&sample());
@@ -792,8 +830,20 @@ mod tests {
         let mut c = sample(); c.flute_factor = 0.0;
         assert!(cut_check(&c).defl.is_nan());
         // f64 wrapper
-        close(cut_check_f(10.0, 0.0, 40.0, 25.0, 0.8, 600.0, 4.0, 2.5, 10.0, 0.05, 150.0, 1800.0, 0.8, 0.4, 0.0, 0.02, 3.7, 20.0, 8.0), 0.0112211, 1e-7);
-        close(cut_optimise_f(10.0, 0.0, 40.0, 25.0, 0.8, 600.0, 4.0, 2.5, 10.0, 0.05, 150.0, 1800.0, 0.8, 0.4, 0.0, 0.02, 3.7, 20.0, 0.0, 1.0), 1.0, 0.0);
+        close(cut_check_f(10.0, 0.0, 40.0, 25.0, 0.8, 600.0, 4.0, 2.5, 10.0, 0.05, 150.0, 1800.0, 0.8, 0.4, 0.0, 0.02, 3.7, 20.0, 0.0, 8.0), 0.0112211, 1e-7);
+        close(cut_optimise_f(10.0, 0.0, 40.0, 25.0, 0.8, 600.0, 4.0, 2.5, 10.0, 0.05, 150.0, 1800.0, 0.8, 0.4, 0.0, 0.02, 3.7, 20.0, 0.0, 0.0, 1.0), 1.0, 0.0);
+        // Holder and spindle as a spring at the holder face: 20 N/um under Fr = 114.591559 N gives 5.7296 um, added to the
+        // tool's own 0.0112211 mm: 0.0169507 mm. The deflection limit of 0.02 then allows ap = 10 x 0.02 / 0.0169507 = 11.799.
+        close(holder_deflection_mm(114.591559, 20.0), 0.0057295780, 1e-9);
+        close(tool_and_holder_deflection_mm(100.0, 40.0, 25.0, 10.0, 8.0, 600.0, 20.0), 0.00979228 + 0.005, 1e-8);
+        assert_eq!(holder_deflection_mm(100.0, 0.0), 0.0);
+        close(stiffness_n_um(200.0, 0.01), 20.0, 1e-12);
+        assert!(stiffness_n_um(200.0, 0.0).is_nan());
+        let mut c = sample(); c.holder_k = 20.0;
+        close(cut_check(&c).defl, 0.0169507, 1e-6);
+        let (ap, k) = cut_optimise(&c, false);
+        close(ap, 11.799, 1e-3); assert_eq!(k, LIMIT_DEFLECTION);
+        close(cut_check_f(10.0, 0.0, 40.0, 25.0, 0.8, 600.0, 4.0, 2.5, 10.0, 0.05, 150.0, 1800.0, 0.8, 0.4, 0.0, 0.02, 3.7, 20.0, 20.0, 8.0), 0.0169507, 1e-6);
     }
     // Torque-limited (python3): Vc 20 -> n = 636.620; Vf = 127.324; Q = 3.183099;
     // spindle 3.183099*1800/60000/0.8 = 0.119366 kW; T_max 0.5 N*m gives

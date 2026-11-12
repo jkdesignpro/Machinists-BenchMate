@@ -239,7 +239,7 @@ Object.assign(DIAGRAMS, {
       isFinite(E.value) ? 'E ' + dcN(E.value) + ' ' + E.unit : '',
       dcOk(sec) ? 'flute section Ø ' + dcN(sec) + ' ' + u : dcOk(sol) ? 'solid section Ø ' + dcN(sol) + ' ' + u : '',
     ]);
-    h += dcLines(334, 236, ['Bent shape exaggerated;', 'holder and spindle flex', 'are not included.']);
+    h += dcLines(334, 236, dcRow(rows, 'Holder and spindle stiffness used') > 0 ? ['Bent shape exaggerated;', 'the holder giving way', 'is included.'] : ['Bent shape exaggerated;', 'holder and spindle flex', 'are not included.']);
     return DK.svg(W, H, h, 'Tool deflection: stick-out, side force and tip deflection');
   },
 
@@ -698,7 +698,9 @@ Object.assign(DIAGRAMS, {
   // Boring bar: section through the bore, the bar clamped in its holder, the cutting force at the tip and the bent bar (exaggerated).
   boringbar(v, sys, rows) {
     const W = 520, H = 280, u = dcU(sys), ok = dcOk(v.d) && dcOk(v.L), s = ok ? Math.min(290 / v.L, 52 / v.d) : 1;
-    const Lp = ok ? v.L * s : 250, dp = ok ? Math.max(10, v.d * s) : 40, cy = 128, xh = Math.min(420, 236 + Lp / 2), xt = xh - Lp, rb = dp / 2 + 24, e = 16;
+    const Lp = ok ? v.L * s : 250, dp = ok ? Math.max(10, v.d * s) : 40, cy = 128, xh = Math.min(420, 236 + Lp / 2), xt = xh - Lp, rb = dp / 2 + 24;
+    // The bend drawn grows with the share of the allowed deflection (a core result), so the bar visibly bends as the overhang is dragged.
+    const sh = dcRow(rows, 'Share of the allowed deflection'), e = dcOk(sh) ? dcClamp(3 + 0.17 * sh, 3, 30) : 16;
     const dt = dcRow(rows, 'Tip deflection, tangential'), dr = dcRow(rows, 'Tip deflection, radial'), ld = dcRow(rows, 'Overhang L/D'), du = sys === 'inch' ? 'thou' : 'µm';
     const F = dcOk(v.F) ? v.F : dcRow(rows, 'Tangential force Fc'), fU = sys === 'inch' ? 'lbf' : 'N';
     let h = DK.rect(xt - 36, cy - rb - 30, Math.max(20, xh - 60 - xt + 36), 30, 'hatch') + DK.rect(xt - 36, cy + rb, Math.max(20, xh - 60 - xt + 36), 30, 'hatch');
@@ -712,7 +714,7 @@ Object.assign(DIAGRAMS, {
     h += dcDimV(cy, cy + e, xt - 18, '', { hot: true, from: xt - 2 }) + DK.text(xt - 24, cy + e + 18, 'δ', { cls: 'hott', anchor: 'end' });
     h += DK.dimH(xt, xh, 24, 'overhang ' + dcL(v.L, u, 'L') + (dcOk(ld) ? ' = ' + dcN(ld, 2) + ' × D' : ''), { from: cy - dp / 2 - 2 });
     h += dcDimV(cy - dp / 2, cy + dp / 2, xh - 22, '', { from: xh - 22 }) + DK.leader(xh - 22, cy + dp / 2, xh - 6, cy + rb + 44, 'Ø ' + dcL(v.d, u, 'd'), { anchor: 'start' });
-    h += DK.text(20, H - 38, dcOk(dt) ? 'δ ' + dcN(dt) + ' ' + du + ' at the edge (tangential)' : 'δ: enter the force, or kc with ap and feed', { cls: 'hott', anchor: 'start' });
+    h += DK.text(20, H - 38, dcOk(dt) ? 'δ ' + dcN(dt) + ' ' + du + ' at the edge (tangential)' + (dcOk(sh) ? ', ' + dcN(sh, 0) + ' % of the allowed' : '') : 'δ: pick the work material, or type the force', { cls: 'hott', anchor: 'start' });
     if (dcOk(dr)) h += DK.text(20, H - 22, 'radial ' + dcN(dr) + ' ' + du + ', combined ' + dcN(dcRow(rows, 'Combined tip deflection')) + ' ' + du, { cls: 'mut', anchor: 'start' });
     const chk = dcStr(rows, 'Check');
     h += DK.text(20, H - 6, chk ? 'Past the bar makers\' overhang guidance: see the results.' : 'Bent shape exaggerated; holder flex not included.', { cls: 'mut', anchor: 'start' });

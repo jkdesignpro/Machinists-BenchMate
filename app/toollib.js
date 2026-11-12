@@ -26,6 +26,10 @@ const ToolLib = (() => {
     ['oal', 'Overall length', 'len', ''],
     ['stick', 'Stick-out from the holder', 'len', ''],
     ['cr', 'Corner radius / nose radius', 'len', ''],
+    ['fn_min', 'Chip breaker range: feed per rev from (inserts)', 'len', ''],
+    ['fn_max', 'Chip breaker range: feed per rev to', 'len', ''],
+    ['ap_min', 'Chip breaker range: depth of cut from', 'len', ''],
+    ['ap_max', 'Chip breaker range: depth of cut to', 'len', ''],
     ['point', 'Point angle (drills)', 'deg', ''],
     ['pitch', 'Thread pitch (taps, thread mills): mm, or TPI for an inch tool', 'pitch', ''],
     ['material', 'Tool material', 'materials', ''],
@@ -34,7 +38,7 @@ const ToolLib = (() => {
     ['part', 'Part number', 'text', ''],
     ['notes', 'Notes', 'text', ''],
   ];
-  const LEN = ['dia', 'shank', 'flute_len', 'oal', 'stick', 'cr'];
+  const LEN = ['dia', 'shank', 'flute_len', 'oal', 'stick', 'cr', 'fn_min', 'fn_max', 'ap_min', 'ap_max'];
   const newId = () => 't' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
   const same = (a, b) => FIELDS.every(([k]) => String(a[k] ?? '') === String(b[k] ?? ''));
   const describe = t => {
