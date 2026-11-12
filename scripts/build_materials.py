@@ -9,7 +9,8 @@ how many independent publishers print each one, and gives each grade a status:
                publishers and no other value for it has 2+ publishers
   differs    - two or more values each have 2+ publishers (sources disagree)
   review     - fewer than 2 independent publishers so far
-Material properties (density, E, Rm, Rp0.2, elongation, hardness, thermal
+Chemical composition limits are printed per source row under "composition" (see
+build_comp). Material properties (density, E, Rm, Rp0.2, elongation, hardness, thermal
 expansion, thermal conductivity, machinability) are printed per source row under
 "properties"; see PROPS below and docs/material-equivalents.md for the rules.
 Run: python3 scripts/build_materials.py
@@ -164,6 +165,60 @@ def build_props(name, printed):
     res.sort(key=lambda x: (order.index(x["prop"]), x["cond"], x["basis"]))
     return res
 
+# ---------------------------------------------------------------- composition
+# A printed record may carry "composition": {"basis", "elements": {symbol: limit}, "verbatim", "note"}.
+# A limit is written as the source's table reads: "0.38-0.43" (range), "max 0.035", "min 0.15",
+# "0.25" (a single nominal value), or "text ..." for a rule such as 5x(C+N). Two sources agree on
+# an element only when both ends are the same number (0.03 and 0.030 are the same number); nothing
+# is averaged and a maximum never agrees with a range. Element order for the chart: carbon first,
+# then the usual order of a mill certificate.
+ELEMENTS = ["C", "Mn", "Si", "P", "S", "Cr", "Ni", "Mo", "N", "Cu", "Al", "Ti", "Nb", "V", "W", "Co", "Pb", "Bi", "Mg", "Zn", "Fe", "Sn", "Be", "B"]
+
+def parse_limit(txt, where):
+    t = txt.strip()
+    if t.startswith("text "): return {"min": None, "max": None, "text": t[5:].strip()}
+    m = re.fullmatch(r"(max|min)\s+(\d+(?:\.\d+)?)", t)
+    if m: return {"min": float(m.group(2)) if m.group(1) == "min" else None, "max": float(m.group(2)) if m.group(1) == "max" else None, "text": None}
+    m = re.fullmatch(r"(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)", t)
+    if m:
+        a, b = float(m.group(1)), float(m.group(2))
+        if a >= b: raise SystemExit(f"{where}: range {txt!r} is not low-high")
+        return {"min": a, "max": b, "text": None}
+    if re.fullmatch(r"\d+(?:\.\d+)?", t): return {"min": float(t), "max": float(t), "text": None}
+    raise SystemExit(f"{where}: cannot read limit {txt!r}")
+
+def build_comp(name, printed):
+    els = collections.OrderedDict()
+    recs = []
+    for p in printed:
+        c = p.get("composition")
+        if not c: continue
+        where = f"{name} / {p['source']} / composition"
+        if not c.get("basis") or not c.get("verbatim") or not c.get("elements"): raise SystemExit(f"{where}: basis, elements and verbatim are required")
+        pub = sources[p["source"]]["publisher_norm"]
+        recs.append({"source": p["source"], "publisher": pub, "basis": c["basis"], "printed_as": p.get("printed_as"), "note": c.get("note")})
+        for el, txt in c["elements"].items():
+            if el not in ELEMENTS: raise SystemExit(f"{where}: unknown element {el!r}")
+            lim = parse_limit(txt, f"{where} / {el}")
+            if lim["max"] is not None and lim["max"] > 100: raise SystemExit(f"{where}: {el} over 100 %")
+            vals = els.setdefault(el, [])
+            for v in vals:
+                if (v["min"], v["max"], v["text"]) == (lim["min"], lim["max"], lim["text"]):
+                    if pub not in v["publishers"]: v["publishers"].append(pub)
+                    v["printed"].append({"source": p["source"], "publisher": pub, "as": txt}); break
+            else:
+                vals.append(dict(lim, publishers=[pub], printed=[{"source": p["source"], "publisher": pub, "as": txt}]))
+    if not recs: return None
+    out = []
+    for el in sorted(els, key=ELEMENTS.index):
+        vals = sorted(els[el], key=lambda v: -len(v["publishers"]))
+        strong = [v for v in vals if len(v["publishers"]) >= 2]
+        allpubs = {x for v in vals for x in v["publishers"]}
+        status = ("differs" if len(strong) >= 2 or (not strong and len(vals) >= 2 and len(allpubs) >= 2)
+                  else "confirmed" if len(strong) == 1 else "review")
+        out.append({"el": el, "status": status, "values": vals})
+    return {"elements": out, "records": recs, "publisher_count": len({r["publisher"] for r in recs})}
+
 sources, grades = {}, collections.OrderedDict()
 for f in sorted(EVID.glob("*.json")):
     d = json.loads(f.read_text())
@@ -209,7 +264,7 @@ for (fam, name), r in grades.items():
                  if not (u and any(norm(v["value"], k) == norm(u, k) for v in fields.get(k, [])))}
     out.append({"grade": name, "family": fam, "subfamily": r["subfamily"], "iso_group": r["iso_group"], "status": status,
                 "publishers": pubs, "fields": fields, "unsourced": unsourced, "notes": r["notes"], "printed": r["printed"],
-                "properties": props})
+                "properties": props, "composition": build_comp(name, r["printed"])})
 
 doc = {"schema": 3, "property_defs": {k: {"label": v["label"], "unit": v["unit"], "mechanical": v["mech"]} for k, v in PROPS.items()}, "families": {k: v for k, v in FAMILY_FIELDS.items()}, "key_field": KEY_FIELD,
        "sources": {k: {kk: vv for kk, vv in s.items()} for k, s in sources.items()}, "materials": out}
@@ -222,6 +277,10 @@ print(len(withp), "grades with properties;", sum(len(m["properties"]) for m in o
 pc = collections.Counter((pp["prop"], pp["status"]) for m in out for pp in m["properties"])
 for k in PROPS:
     print(f"  {k:13}", ", ".join(f"{st} {pc[(k, st)]}" for st in ("confirmed", "differs", "review") if pc[(k, st)]) or "-")
+
+withc = [m for m in out if m["composition"]]
+cc = collections.Counter(e["status"] for m in withc for e in m["composition"]["elements"])
+print(len(withc), "grades with composition;", ", ".join(f"{k} {v}" for k, v in sorted(cc.items())), "(element rows)")
 
 # Reference list of every material source, for docs.
 lines = ["# Material data sources", "", "Generated by scripts/build_materials.py from data/evidence/. Every document used, grouped by publisher.", ""]

@@ -232,7 +232,7 @@ Store list is the fuller of the two store lists.
 | U79 | Unit converter | done | `units`, `fraction` |  |
 | U80 | Scientific calculator | done | `calc` |  |
 | U81 | Material weight | done | `weight`, `bar` | No angle, channel or beam sections |
-| U82 | Material property search with SFM data | partial | `materials` | Properties exist; no cutting speed, SFM or machinability data per grade |
+| U82 | Material property search with SFM data | partial | `materials` | 0.5.0: material card with a composition chart (37 steels), machinability rings and the property table. Composition for non-ferrous grades and tool steels, and cutting speed per grade, are still missing |
 | U83 | Spur gear data | done | `spurgear`, `gearmeasure` |  |
 | U84 | Involute splines per ANSI B92.1 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
 | U85 | Involute splines per ISO 4156 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
@@ -349,7 +349,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH49 | Elastic properties; effect of temperature on strength | partial | `materials` | E for 27 entries; no temperature effect |
 | MH50 | Standard steels: classification, AISI/SAE/UNS numbering | partial | `materials` | Equivalents only; no numbering-system explainer |
 | MH51 | Identifying metals | partial | `metalid` | Spark, magnet and chip tests (one source); no chemical spot tests |
-| MH52 | Compositions of carbon, alloy and stainless steels | missing | | Chemistry not stored |
+| MH52 | Compositions of carbon, alloy and stainless steels | partial | `materials` | 0.5.0: 37 grades, limits from two public sources each where found (see docs/material-equivalents.md) |
 | MH53 | Applications and mechanical properties of steels | partial | `materials` | Properties for some grades; no applications |
 | MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials` | 10 tool-steel grades as equivalents; no selection guide, faults or heat treatment |
 | MH55 | Tool steel mill forms, machining allowances, decarburization limits | missing | | |
@@ -704,7 +704,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED48 | 10 Fluid equipment: turbines, refrigeration, diesel engines, heat exchangers, pumps (6 entries) | out of scope | | |
 | ED49 | 11 Pressure vessels and flanges (7 entries) | out of scope | | |
 | ED50 | 12.1 Crystals: order and disorder | out of scope? | | |
-| ED51 | 12.2 Carbon steels | partial | `materials` | No compositions, heat treatment |
+| ED51 | 12.2 Carbon steels | partial | `materials` | 0.5.0: compositions for nine carbon steels; no heat treatment per grade |
 | ED52 | 12.3 Low-alloy steels | partial | `materials` | |
 | ED53 | 12.4 Alloy steels | partial | `materials` | |
 | ED54 | 12.5 Cast iron | partial | `materials` | |

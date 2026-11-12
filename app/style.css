@@ -64,6 +64,20 @@ tr.over td{background:color-mix(in srgb,var(--warn) 12%,transparent)}
 .mrow{cursor:pointer}.mrow:hover td{background:var(--soft)}
 .kv{display:inline-block;margin:0 10px 3px 0;font-family:var(--mono);font-size:11.5px}
 .kv i{font-family:var(--sans);font-style:normal;color:var(--muted);font-size:10.5px}
+.mcardh{margin:16px 0 0;font:700 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.mcomp td.cbc{width:44%;min-width:150px}
+svg.cbar{display:block;width:100%;height:12px}
+.cb-track{fill:var(--soft)}
+.cb-lo{fill:var(--line)}
+.cb-max{fill:var(--accent);opacity:.28}
+.cb-rng{fill:var(--accent)}
+.mrings{display:flex;flex-wrap:wrap;gap:10px 22px;padding:10px}
+.mrc{display:flex;gap:10px;align-items:center;max-width:330px}
+svg.mring{width:84px;height:84px;flex:none}
+.mr-track{fill:none;stroke:var(--soft);stroke-width:8}
+.mr-arc{fill:none;stroke:var(--accent);stroke-width:8}
+.mr-ref{stroke:var(--ink);stroke-width:2}
+svg.mring text{fill:var(--digit);font:700 17px var(--mono)}
 .verb{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--soft);padding:3px 6px;border-radius:3px;margin-top:3px;white-space:pre-wrap}
 
 /* GD&T: symbols, diagrams, guide, frame builder. Colours only from tokens. */

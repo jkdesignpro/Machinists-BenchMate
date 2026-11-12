@@ -45,6 +45,12 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - Recorded where sources differ: the macro variable number of one tool offset on Fanuc (two sources differ by one).
 - Not found in a readable form, and listed as gaps on the page: Fanuc's own M-code and system variable tables, Haas Next Generation Control variable numbers, Doosan lathe M codes.
 
+### Added (material card: composition and machinability)
+- **Material equivalents: click a grade for its material card.** A composition chart, machinability rings and the property table, above what each source prints.
+- **Composition chart.** One row per element with the limits as printed (a range, a maximum or a minimum), a bar, how many publishers print that limit and a status. 37 steels so far: nine carbon and free-cutting steels, 4130, 4140, 4340, 8620, 52100 and 23 stainless grades. Where two sources print different limits (304 carbon and chromium, 52100, silicon of the alloy steels) both are shown.
+- **Machinability rings.** One ring per printed rating, with its condition, its reference material and the publisher. 31 steels on the "AISI 1212 = 100 %" scale from two tables; ratings for different conditions are never merged, so 1018 shows 70 % (cold drawn) and 78 % (condition not stated).
+- Not started, and said so on the card: composition of aluminium, copper, titanium, nickel and cast iron grades and of tool steels.
+
 ### Fixed
 - Knurling: the pitch round the circumference of a diagonal knurl was worked out in the page script. It now comes from the Rust core like every other number.
 

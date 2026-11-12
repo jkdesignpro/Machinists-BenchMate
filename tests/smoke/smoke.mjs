@@ -1331,6 +1331,43 @@ where = 'sysvars';
   await page.fill('#gmq', ''); await page.dispatchEvent('#gmq', 'input');
   await page.selectOption('#gmc', 'haas');
 }
+// Material card: composition chart (limits as printed, per element, with the publisher count), machinability
+// rings (one per printed rating, never merged across conditions) and the property table.
+where = 'material card';
+{
+  await open('materials', 300);
+  const card = async grade => {
+    await page.fill('#msearch', grade); await page.dispatchEvent('#msearch', 'input'); await page.waitForTimeout(80);
+    await page.evaluate(g => [...document.querySelectorAll('#main .mrow')].find(r => r.querySelector('b').textContent === g).click(), grade);
+    await page.waitForTimeout(120);
+    return page.evaluate(() => ({
+      comp: [...document.querySelectorAll('#mcomp tr[data-el]')].map(r => r.dataset.el + ': ' + r.cells[1].innerText.replace(/\s+/g, ' ') + ' [' + r.cells[3].innerText.trim() + ']' + (r.querySelector('svg.cbar rect.cb-rng') ? ' bar' : '')).join(' ; '),
+      none: document.querySelector('#mcomp') ? document.querySelector('#mcomp').innerText.replace(/\s+/g, ' ') : '',
+      rings: [...document.querySelectorAll('#mmach .mrc')].map(c => c.innerText.replace(/\s+/g, ' ')).join(' ; '),
+      arcs: [...document.querySelectorAll('#mmach circle.mr-arc')].map(c => c.getAttribute('stroke-dasharray').split(' ')[0]).join(','),
+      props: !!document.querySelector('#mev .mprops'), head: document.querySelector('#mcard') ? document.querySelector('#mcard').innerText : '' }));
+  };
+  let c = await card('4140');
+  if (!/C: 0\.38 to 0\.43 2 \[Confirmed\] bar/.test(c.comp) || !/Si: 0\.15 to 0\.35 1 TimkenSteel 0\.2 to 0\.35 1 Nickel Institute \[Sources differ\]/.test(c.comp) || !/Mo: 0\.15 to 0\.25 2 \[Confirmed\]/.test(c.comp) || !/P: 0\.035 max 2/.test(c.comp))
+    problems.push(`[${where}] 4140 composition: ${c.comp}`);
+  if (c.comp.split(' ; ').length !== 7 || !c.props || !/Material card: 4140/i.test(c.head)) problems.push(`[${where}] 4140 should have 7 elements, the property table and the card heading: ${c.comp.split(' ; ').length} ${c.props} ${c.head}`);
+  if (!/^66 66 % 1 Annealed AISI 1212 = 100 % Engineers Edge ; 66 66 % 1 Annealed, cold drawn AISI 1212 = 100 % Metals Service Center Institute$/.test(c.rings)) problems.push(`[${where}] 4140 machinability rings: ${c.rings}`);
+  if (c.arcs !== '62.2,62.2') problems.push(`[${where}] a 66 % ring should be drawn a third of the way round (62.2 of 188.5): ${c.arcs}`);
+  c = await card('304');
+  if (!/C: 0\.08 max 1 Specialty Steel Industry of North America 0\.07 max 1 Atlas Steels \[Sources differ\]/.test(c.comp) || !/Ni: 8 to 10\.5 2 \[Confirmed\]/.test(c.comp) || !/Si: 0\.75 max 1 \[Needs 2nd source\]/.test(c.comp))
+    problems.push(`[${where}] 304 composition: ${c.comp}`);
+  c = await card('1018');
+  if (!/70 % 1 Cold drawn/.test(c.rings) || !/78 % 1 Not stated/.test(c.rings)) problems.push(`[${where}] 1018 has two ratings that must both show: ${c.rings}`);
+  c = await card('12L14');
+  if (!/Pb: 0\.15 to 0\.35 1 \[Needs 2nd source\]/.test(c.comp) || !/170 %/.test(c.rings)) problems.push(`[${where}] 12L14: ${c.comp} / ${c.rings}`);
+  c = await card('321');
+  if (!/Ti: 5x\(C\+N\) min 1 Specialty Steel Industry of North America 5x\(C\+N\) min, 0\.70 max 1 Atlas Steels \[Sources differ\]/.test(c.comp)) problems.push(`[${where}] 321 titanium rule: ${c.comp}`);
+  c = await card('6082');
+  if (!/No source with a composition table/.test(c.none) || c.rings) problems.push(`[${where}] 6082 has no composition yet and should say so: ${c.none.slice(0, 120)}`);
+  const nComp = await page.evaluate(async () => (await (await fetch('data/materials.json')).json()).materials.filter(m => m.composition).length);
+  if (nComp !== 37) problems.push(`[${where}] grades with a composition: ${nComp}`);
+  await page.fill('#msearch', ''); await page.dispatchEvent('#msearch', 'input');
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');
