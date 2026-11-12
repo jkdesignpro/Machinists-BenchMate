@@ -3440,6 +3440,13 @@ const TOOLS = [
   source: 'McGill University and DraftAid (kinds of drawing, sections); Wikipedia and a Washington State open textbook (sheet sizes); Werk24 (title block); What Is Piping and a university lecture (lines); Xometry Pro and GD&T Basics (projection); TU Darmstadt (views, sections, scales); Miller Electric, WeldGuru, Clause5, Material Welding and STRUCTURE Magazine (welding symbols); Get It Made, GibbsCAM and Industrial Monitor Direct (CAD files); Sigmetrix and ETMM (model-based definition); DEVELOP3D (BS 8888). Full list in docs/sources.md, "Drawings and weld symbols guide".',
 },
 {
+  id: 'procguide', level: 'advanced', group: 'Guides', title: 'Special processes and finishing guide',
+  desc: 'The processes a shop sends out or meets on a drawing: water jet, laser, plasma and flame cutting of plate (what each cuts, heat-affected zone, thickness), sinker, wire and hole drilling EDM, ultrasonic, abrasive flow, electron beam and photochemical machining, polishing, buffing compounds and wire brushes, black oxide, phosphate and chromate conversion coatings, anodising Types I to III and how much the part grows, decorative and hard chrome, zinc, cadmium, nickel and electroless nickel plating, hydrogen embrittlement, thermal spraying. Three drawings.',
+  render: el => renderProcGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
+  source: 'The Open University (OpenLearn Manupedia), Hypertherm, Fractory, The Fabricator, Techni Waterjet and Wikipedia (cutting plate); Modern Machine Shop and Xometry (EDM); Wikipedia, Artizono, Extrude Hone AFM and E-Fab (other processes); Products Finishing, Empire Abrasives, Wikipedia, United Abrasives and Weiler Abrasives (polishing, buffing, brushing); PCI Magazine, eFunda, Gleco Plating and Finishing.com (conversion coatings, anodising); Wikipedia and Richconn (chrome plating); Protolabs and EPI (other plating); TWI and WeldGuru (thermal spraying). Full list with URLs in docs/sources.md.',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),

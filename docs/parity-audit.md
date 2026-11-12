@@ -76,6 +76,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, thirteenth batch, 2026-11-12):** drawings and weld symbols guide (`drawguide`: kinds of drawing, sheets and title block, lines, views, sections, welding symbols, CAD files and model-based definition, standards). MH69, MH73, MH185, MH194, ED86 and BB71 from missing to done. Counted from the tables below: 350 done, 177 partial, 69 missing of 596 in-scope rows, 59 %. For 90 %, 187 more rows have to reach done.
 
+**Update (0.6.0, fourteenth batch, 2026-11-12):** special processes and finishing guide (`procguide`: cutting plate, EDM, other special processes, polishing, buffing and brushing, conversion coatings, anodising, plating and thermal spraying). MH173, MH196 and ED92 from missing to done; MH189 and MH197 from partial to done. Counted from the tables below: 355 done, 175 partial, 66 missing of 596 in-scope rows, 60 %. For 90 %, 182 more rows have to reach done.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -524,7 +526,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH170 | Offhand, belt grinding and abrasive cutting | done | `abrasguide`, `shoptools` | 0.6.0: belt grinding (contact wheel, platen, slack belt, speed, wheel hardness, grit, backing) and cut-off wheels (one source, marked); offhand sharpening of drills and tool bits in `shoptools` |
 | MH171 | Honing | done | `abrasguide` | 0.6.0: motions and crosshatch with drawing, speed, stock, what it holds, abrasives, oil, single-pass and plateau honing; two points where the sources differ show both |
 | MH172 | Laps and lapping | done | `abrasguide` | 0.6.0: principle with drawing, lap softer than the work, abrasives, stock, pressure, speed, grit, conditioning rings, flatness in light bands |
-| MH173 | Nontraditional: water jet, ultrasonic, abrasive flow, laser, plasma, electron beam | missing | | Low priority |
+| MH173 | Nontraditional: water jet, ultrasonic, abrasive flow, laser, plasma, electron beam | done | `procguide` | 0.6.0: water jet, abrasive water jet, laser, plasma and oxyfuel (what each cuts, heat-affected zone, thickness source by source), ultrasonic, abrasive flow and photochemical machining; electron beam from one source, marked; two drawings |
 | MH174 | CNC introduction, coordinate geometry, word address format, program structure | partial | `cncguide` | Axes, coordinate systems, block and word format, modal groups, program order; no coordinate geometry worked examples (`claude/cnc-guide`) |
 | MH175 | M-codes, G20/G21, G90/G91, S, F, inverse time feed, T | done | `gmcodes`, `rotfeed` | G and M codes per control with modal groups; inverse time feed in the rotary feed tool |
 | MH176 | Tool nose radius compensation | done | `tnrc` | Hand compensation and G41/G42 with tip numbers (`claude/cnc-guide`) |
@@ -545,15 +547,15 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH186 | Sheet metal: shearing, blanking force, stripper force | missing | | Low priority |
 | MH187 | Sheet metal bending (bend allowance) | done | `bend` |  |
 | MH188 | Stretch forming, dies, presses, tube bending | out of scope? | | Press shop, not machining |
-| MH189 | EDM: terms, process, wire EDM | partial | `edmoffset`, `edmtaper`, `edmtime` | Wire EDM kerf, offset, corner radius, taper and cut time (0.5.0). Sinker EDM and rate tables not covered |
+| MH189 | EDM: terms, process, wire EDM | done | `edmoffset`, `edmtaper`, `edmtime`, `procguide` | Wire EDM kerf, offset, corner radius, taper and cut time (0.5.0); 0.6.0: how EDM cuts, sinker, wire and hole drilling EDM, electrodes, recast layer (wire and hole drilling rows one source, marked). No removal rate tables |
 | MH190 | Metal casting, moulding and extrusion | out of scope | | Casting process detail |
 | MH191 | Powder metallurgy and metal additive manufacturing | out of scope? | | |
 | MH192 | Soldering and brazing | out of scope? | | Joining, like welding |
 | MH193 | Welding processes | out of scope | | |
 | MH194 | Weld and welding symbols | done | `drawguide` | 0.6.0: parts of the symbol, arrow side and other side, fillet and groove welds, supplementary symbols, what ISO 2553 does differently, with a drawing; no full chart of every symbol |
 | MH195 | Nondestructive testing | out of scope? | | |
-| MH196 | Finishing: brushing, polishing, buffing, etching | missing | | Low priority |
-| MH197 | Conversion coatings, anodising, plating, flame spraying | partial | `coating` | Plating and coating allowance on threads only |
+| MH196 | Finishing: brushing, polishing, buffing, etching | done | `procguide` | 0.6.0: polishing and buffing (grit steps, cut and colour buff, table of compounds, wheels), wire brushes, photochemical etching; electropolishing named only |
+| MH197 | Conversion coatings, anodising, plating, flame spraying | done | `coating`, `procguide` | Coating allowance on threads in `coating`; 0.6.0: black oxide, phosphate and chromate, passivation, anodising Types I to III with growth and a drawing, chrome, zinc, cadmium, nickel and electroless nickel plating, hydrogen embrittlement, thermal spraying; thicknesses quoted source by source, many statements one source, marked |
 
 ### Fasteners
 
@@ -784,7 +786,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED89 | 17.1-17.6 Non-destructive testing | out of scope? | | |
 | ED90 | 18.1 Painting | out of scope? | | |
 | ED91 | 18.2 Galvanizing | out of scope? | | |
-| ED92 | 18.3 Chrome plating | missing | | Plating allowance; low priority |
+| ED92 | 18.3 Chrome plating | done | `procguide` | 0.6.0: decorative and hard chrome, thickness and hardness from two sources (they differ, both shown), grinding after plating and edge build-up (one source, marked); thread allowance in `coating` |
 | ED93 | 18.4 Rubber linings | out of scope? | | |
 | ED94 | 19 Metallurgical terms | missing | | Glossary |
 
