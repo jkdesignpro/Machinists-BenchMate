@@ -419,6 +419,31 @@ All were accessed 2026-11-10.
 - **Dorian DP table.** It prints 23.6 TPI at 30 deg for 64 DP, where the formula gives 23.5; the other rows agree. Not used.
 - **Diameter growth** for form knurling is empirical and differs by maker: Dorian by TPI in inch, Hommel+Keller by material, diameter and pitch in mm. It is not tabulated; the tool tells the user to make a trial.
 
+### Four methods (0.5.0, all accessed 2026-11-12)
+The page now offers four ways to a blank: (1) a diametral pitch knurl, (2) a circular pitch knurl (mm or TPI), (3) measuring the knurl you have, from a print or from the wheel, and (4) trial and error with a tick-off procedure. The steps of the procedure are in BenchMate's own words; each names the sources it rests on, and `scripts/build_refdata.py` marks a step `confirmed` (two publishers), `single` or `own` (BenchMate's advice, said so on the page).
+
+- **[SHERLINE]** Sherline Products, knurling tool holder instructions (P/N 3004). https://sherline.com/wp-content/uploads/2023/03/3004inst_20tpi_temp.pdf
+- **[GENSWISS]** GenSwiss, knurling tips. https://genswiss.com/media/wysiwyg/support/pdf/knurlingtips.pdf
+- **[HOFFMAN]** Conrad Hoffman, knurling notes (personal site). https://conradhoffman.com/knurling.htm
+- **[PJS_ANSI]** pjsminilathe, "ANSI" knurling page (personal site quoting ANSI/ASME B94.6-1984; the standard itself was not read). https://sites.google.com/site/pjsminilathe/making-chips/knurling/ansi
+- **[PJS_TECH]** pjsminilathe, knurling techniques. https://sites.google.com/site/pjsminilathe/making-chips/knurling/techniques (same author as PJS_ANSI: the two count as one publisher).
+
+Findings:
+- **Diametral pitches 64, 96, 128, 160** are now printed by two sources (Dorian; ANSI B94.6 as quoted by pjsminilathe).
+- **Checks (core tests `knurl_measure_and_count`, `knurl_trial`).**
+  - Hoffman's print example: 75 spaces in 3.535 in is 0.0471 in; one tooth is 0.015 in of diameter; 5/8 in stock holds 41 teeth; blank 0.615 in. BenchMate: 0.04713, 0.0150, 41, 0.6151.
+  - ANSI 96 DP wheel, 3/4 in nominal: 72 teeth, major diameter 0.7440 in, circular pitch 0.0325 in at the outside and 0.0327 in nominal; 96 DP on 1/2 in is 48 teeth. BenchMate: 0.03246, 0.03272, 48.
+- **Measuring the wheel is approximate, and the page says so.** Pi x diameter over the teeth / teeth gives the pitch at the outside of the wheel, which for the ANSI wheel above is 0.8 % under the nominal pitch (teeth / diameter reads 96.77 where the wheel is 96 DP). Single source (PJS_ANSI). The page tells the user to use the DP method when the figure sits a little above a standard DP, or to make a print.
+- **A print gives the pitch round the work whatever the pattern**, when it is measured along the direction of rolling. This is geometry (the wheel rolls on the work without slipping), not a quoted statement; Hoffman's example does not discuss diagonal knurls.
+- **The 0.005 in step.** Dorian gives it for a knurl that double tracks. Sherline gives the same amount, up or down, for a diameter that does not knurl properly, and prints ".1 mm" beside it; 0.005 in is 0.127 mm, which is what the core returns.
+- **Speed: the sources differ and all are shown.** Sherline: about 100 rpm for 1/2 in of soft material. pjsminilathe: 150 to 200 rpm (the lowest speed of a mini lathe). GenSwiss, for production knurling: not above about 150 sfm (50 m/min), about 50 sfm (15 m/min) for harder steels and stainless. 100 rpm on 1/2 in is about 13 sfm, so the hobby figures are far below the production limit. Nothing is averaged; the step says to start slow.
+- **Double tracking and infeed.** GenSwiss: tracking is usually settled after one full turn of the part, and more infeed usually cures double tracking on bump and cut knurling. pjsminilathe and Hoffman: turn the spindle by hand with light pressure first.
+- **Growth** is still not tabulated. The trial method takes it from the trial piece (knurled diameter less blank) and gives the blank for a wanted finished diameter at that growth, with a warning that the new blank has to track too. GenSwiss: 0.0005 in of blank variation shows as about 0.001 in on the knurled diameter.
+- **Not used.**
+  - The Sherline chart "Approximate increase in knurled diameters": the columns did not come through in order when the PDF was read.
+  - Industrial Monitor Direct, knowledge base page on knurling cast iron: contradicts itself on the sign of the diameter allowance and on its units.
+- **Own advice, marked as such on the page:** chamfer the scrap piece; write down the blank, speed and growth that worked.
+
 ## G and M codes, macros (`data/refdata/gcodes-evidence.json`, `app/gmcodes.js`)
 Full list with editions, sections, coverage counts, gaps and disagreements: **`docs/gm-codes.md`**. All accessed 2026-11-10. Summary:
 - **Standards cited:** ISO 6983-1:2009 (program format and address words), by name only. **[NIST]** T. R. Kramer, F. M. Proctor, E. Messina, *The NIST RS274NGC Interpreter - Version 3*, NISTIR 6556, 2000 (public domain), Tables 4 and 5, section 3.6.

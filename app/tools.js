@@ -599,10 +599,10 @@ const TOOLS = [
 },
 {
   id: 'knurl', level: 'advanced', group: 'Turning', title: 'Knurling blank diameter',
-  desc: 'Blank diameter for a whole number of knurl teeth, straight or 30 degree diagonal and diamond, with pitch in mm, TPI or diametral pitch.',
+  desc: 'Blank diameter for a whole number of knurl teeth by four methods: diametral pitch, circular pitch (mm or TPI), measuring the knurl you have, and trial and error with a tick-off procedure. Straight or 30 degree diagonal and diamond.',
   render: el => renderKnurl(el),
-  working: 'D = n p / (pi cos h); p = 25.4 / TPI mm or pi / DP in. See the note under the tool.',
-  source: 'Dorian Tool and Hommel+Keller (Zeus) knurling catalogues; DIN 82:1973-01, DIN 403.',
+  working: 'D = n p / (pi cos h); p = 25.4 / TPI mm or pi / DP in; from a print p = span / spaces; from a wheel p = pi d / teeth. See the note under the tool.',
+  source: 'Dorian Tool and Hommel+Keller (Zeus) knurling catalogues; Sherline and GenSwiss knurling instructions; C. Hoffman and pjsminilathe (quoting ANSI/ASME B94.6-1984); DIN 82:1973-01, DIN 403.',
 },
 {
   id: 'passtime', level: 'simple', group: 'Turning', title: 'Cut time for a pass',

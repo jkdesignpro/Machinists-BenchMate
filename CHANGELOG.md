@@ -4,6 +4,22 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-12
+Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
+
+### Changed (knurling: four methods)
+- Knurling blank diameter now has a Method box with four ways to a blank:
+  1. diametral pitch knurl (64, 96, 128, 160 DP);
+  2. circular pitch knurl (mm or TPI);
+  3. measure and count the knurl you have: from a print (spaces counted and the length they cover) or from the wheel (teeth and diameter over the teeth, marked approximate);
+  4. trial and error: a nine-step tick-off procedure, each step with its reason and its sources, plus the next blanks to try (0.005 in, 0.127 mm, either way), the growth measured on the trial piece and the blank for a wanted finished diameter at that growth.
+- Ticks and typed values stay while the app is open and survive a change of units.
+- New sources: Sherline, GenSwiss, Conrad Hoffman and pjsminilathe (quoting ANSI/ASME B94.6-1984). The diametral pitches now have two sources. Where the sources differ on speed, all figures are shown. Two things read and not used are listed on the page.
+- `benchmate-core` `tooling`: `knurl_pitch_around`, `knurl_pitch_from_print`, `knurl_pitch_from_wheel`, `knurl_dp_from_wheel`, `knurl_growth`, `knurl_blank_for_finish`, `knurl_trial_step_mm`; tests `knurl_measure_and_count` (Hoffman's print example and the ANSI 96 DP wheel) and `knurl_trial`.
+
+### Fixed
+- Knurling: the pitch round the circumference of a diagonal knurl was worked out in the page script. It now comes from the Rust core like every other number.
+
 ## [0.4.0] - 2026-11-12
 Stage 2 of the plan: drawings and editors. Built on top of 0.3.0.
 

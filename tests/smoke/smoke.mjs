@@ -1108,6 +1108,64 @@ where = 'snippets';
   await page.evaluate(() => { SNIP_CTRL.v = null; });
 }
 
+// Knurling: four methods. The published examples must come out, the method fields must swap, and the
+// tick-off procedure must keep its ticks and name a source (or say it has none) on every step.
+where = 'knurl';
+{
+  await units('inch');
+  await open('knurl', 150);
+  const set = async (id, v) => { const q = `#main #${id}`; await page.fill(q, String(v)); await page.dispatchEvent(q, 'input'); await page.waitForTimeout(30); };
+  const pick = async (id, v) => { await page.selectOption(`#main #${id}`, v); await page.waitForTimeout(40); };
+  const res = () => page.$eval('#main #kres', e => e.innerText.replace(/\s+/g, ' '));
+  const has = async (re, what) => { const t = await res(); if (!re.test(t)) problems.push(`[${where}] ${what}: ${t}`); };
+  const shown = async id => page.$eval(`#main #${id}`, e => !!e.offsetParent);
+  // 1. diametral pitch: 96 DP on 1/2 in is 48 teeth (ANSI B94.6 as quoted), 0.0327 in pitch
+  await pick('km', 'dp'); await set('kdp', 96); await set('kd', 0.5);
+  await has(/Circular pitch p 0\.0327 in/, '96 DP is 0.0327 in');
+  await has(/Teeth on the wanted diameter 48\.00/, '96 DP on 0.5 in is 48 teeth');
+  if (await shown('kp') || await shown('kl') || await shown('ktb')) problems.push(`[${where}] the DP method shows fields of another method`);
+  // 2. circular pitch: Dorian, 20 TPI at 30 degrees is 17.32 TPI round the work (0.0577 in)
+  await pick('km', 'cp'); await pick('ks', 'tpi'); await set('kp', 20); await pick('kf', '30');
+  await has(/Pitch around the circumference 0\.0577 in/, '20 TPI at 30 deg is 0.0577 in round the work');
+  if (!(await shown('kf')) || await shown('kdp')) problems.push(`[${where}] the circular pitch method shows the wrong fields`);
+  // 3. measure and count, print: Hoffman, 75 spaces in 3.535 in, 5/8 in stock, 41 teeth, 0.615 in
+  await pick('km', 'count'); await pick('kh', 'print'); await set('kl', 75); await set('kspan', 3.535); await set('kd', 0.625);
+  await has(/Circular pitch p 0\.0471 in .*Blank for 41 teeth 0\.6151 in .*Steps between whole tooth counts 0\.0150 in/, 'the Hoffman print example should give 0.0471, 41 teeth, 0.6151, 0.0150');
+  if (await shown('kf')) problems.push(`[${where}] measure and count should not ask for the pattern`);
+  // wheel: 72 teeth over 0.744 in (ANSI 96 DP wheel) is 0.0325 in and 96.77 per inch of diameter
+  await pick('kh', 'wheel'); await set('kl', 72); await set('kspan', 0.744);
+  await has(/Circular pitch p 0\.0325 in .*Teeth per inch of wheel diameter 96\.77 .*Approximate\..*one source.*64, 96, 128, 160/, 'the ANSI wheel example should give 0.0325 and 96.77, marked approximate and single-source');
+  // back to the print: its own numbers are kept
+  await pick('kh', 'print');
+  if (await page.inputValue('#main #kl') !== '75' || await page.inputValue('#main #kspan') !== '3.535') problems.push(`[${where}] the print values were lost when switching to the wheel and back`);
+  // 4. trial and error
+  await pick('km', 'trial');
+  await has(/Enter the blank you tried/, 'trial with no blank should ask for it');
+  await set('ktb', 0.615);
+  await has(/try next 0\.6100 in .*or 0\.6200 in/, 'a 0.615 blank should offer 0.610 and 0.620');
+  await set('ktk', 0.635); await set('ktf', 0.65);
+  await has(/Growth on this trial piece 0\.0200 in .*Blank for the finished diameter 0\.6300 in .*try the new blank on scrap/, 'growth 0.020 and blank 0.630 for 0.650 finished');
+  await set('ktk', 0.6);
+  await has(/Check the two diameters/, 'a knurled diameter under the blank should be questioned');
+  const steps = await page.$$eval('#main #ktick li', a => a.map(li => li.innerText.replace(/\s+/g, ' ')));
+  if (steps.length !== 9) problems.push(`[${where}] expected 9 steps, got ${steps.length}`);
+  for (const [n, t] of steps.entries()) if (!/\[[^\]]+\]$/.test(t)) problems.push(`[${where}] step ${n + 1} does not name its sources: ${t}`);
+  if (!/no source\]$/.test(steps[8] || '')) problems.push(`[${where}] the last step should be marked as BenchMate's own advice: ${steps[8]}`);
+  if (!/Dorian Tool, Sherline Products\]$/.test(steps[5] || '')) problems.push(`[${where}] the 0.005 in step should name Dorian and Sherline: ${steps[5]}`);
+  await page.click('#main #ktick li:nth-child(1) input'); await page.click('#main #ktick li:nth-child(4) input');
+  if (!/^2 of 9/.test(await page.textContent('#main #kdone'))) problems.push(`[${where}] two ticks should count as 2 of 9`);
+  // ticks and values survive a change of units (values are kept in mm)
+  await units('mm'); await open('knurl', 150);
+  if (await page.inputValue('#main #km') !== 'trial' || !/^2 of 9/.test(await page.textContent('#main #kdone'))) problems.push(`[${where}] method or ticks lost on a change of units`);
+  if (await page.inputValue('#main #ktb') !== '15.621') problems.push(`[${where}] 0.615 in should show as 15.621 mm, got ${await page.inputValue('#main #ktb')}`);
+  await has(/try next 15\.494 mm .*or 15\.748 mm/, 'the step is 0.127 mm either way');
+  await page.click('#main #kclr');
+  if (!/^0 of 9/.test(await page.textContent('#main #kdone'))) problems.push(`[${where}] Clear the ticks should clear them`);
+  await pick('km', 'cp'); await pick('ks', 'mm'); await pick('kf', '0'); await set('kp', 1); await set('kd', 20);
+  await has(/Teeth on the wanted diameter 62\.83 .*Blank for 62 teeth 19\.735 mm/, '1 mm pitch on 20 mm is 62.83 teeth, blank 19.735 for 62');
+  const src = await page.$eval('#main', e => e.innerText);
+  for (const w of ['Sherline', 'GenSwiss', 'Conrad Hoffman', 'pjsminilathe', 'Read and not used', 'Industrial Monitor Direct']) if (!src.includes(w)) problems.push(`[${where}] the sources note should name ${w}`);
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

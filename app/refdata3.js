@@ -528,44 +528,124 @@ async function renderHardness(el) {
 }
 
 // ------------------------------------------------------------------ knurling
+// Four ways to a blank diameter: a diametral pitch knurl, a circular pitch
+// knurl, measuring the knurl you have (print or wheel), and trial and error
+// with a tick-off procedure. All numbers come from the Rust core; the steps
+// and their sources come from data/refdata/knurl-evidence.json.
 async function renderKnurl(el) {
   const R = await loadRef(el); if (!R) return;
   const W = state.W, K = R.knurl; if (!K) { el.textContent = 'Knurl data not built.'; return; }
-  const m = RMEM.knurl || (RMEM.knurl = { sys: 'mm', p: 1.0, form: 0, d: 20 });
+  const m = RMEM.knurl || (RMEM.knurl = { meth: inMode() ? 'dp' : 'cp', sys: 'mm', p: 1.0, dp: 96, form: 0, d: 20, how: 'print', span: null, lines: '', wd: null, wt: '', tb: null, tk: null, tf: null, ticks: [] });
+  const lenF = (id, lab, hint) => '<label class="f"><span>' + lab + '</span><div class="row"><input id="' + id + '" type="number" step="any" inputmode="decimal"' + (hint ? ' placeholder="' + hint + '"' : '') + '><span class="u">' + uLen() + '</span></div></label>';
+  const srcTag = st => st.status === 'own' ? 'BenchMate\'s advice, no source' : st.src.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ') + (st.status === 'single' ? ' (one source)' : '');
   el.innerHTML = '<div class="grid" style="max-width:760px">' +
-    '<label class="f"><span>Pitch given as</span><div class="row"><select id="ks"><option value="mm">Circular pitch, mm (DIN 82 / DIN 403)</option><option value="tpi">Teeth per inch, TPI (circular pitch)</option><option value="dp">Diametral pitch, DP (teeth per inch of diameter)</option></select></div></label>' +
-    '<label class="f"><span>Pitch</span><div class="row"><input id="kp" type="number" step="any" inputmode="decimal" list="kpl"><datalist id="kpl"></datalist><span class="u" id="kpu"></span></div></label>' +
-    '<label class="f"><span>Pattern</span><div class="row"><select id="kf"><option value="0">Straight (teeth parallel to the axis)</option><option value="30">Diagonal or diamond, 30 deg teeth</option></select></div></label>' +
-    '<label class="f"><span>Wanted diameter (finished or blank)</span><div class="row"><input id="kd" type="number" step="any" inputmode="decimal"><span class="u">' + uLen() + '</span></div></label></div><div id="kres"></div>' +
-    '<div class="note"><b>Working:</b> a knurl tracks cleanly when a whole number of teeth fits around the blank. With circular pitch p measured square to the teeth and the teeth at angle h to the axis, the pitch around the circumference is p / cos h, so teeth n = pi D cos h / p and the blank for n teeth is D = n p / (pi cos h). TPI knurls have p = 1/TPI in (25.4 / TPI mm); a diametral pitch knurl has p = pi / DP in, which makes D = n / DP for a straight knurl. Both are computed by the Rust core and checked against the Dorian and Hommel+Keller examples. ' +
-    'In practice the makers say to start from the computed blank and adjust by trial: if the knurl double tracks, change the diameter by about 0.005 in (0.13 mm) or go to the next whole tooth count. A formed knurl raises the diameter (material is pushed up), by an amount that depends on pitch, material and form, so the blank is turned below the finished size; cut knurling barely changes the diameter. These allowances are approximations from the makers\' tables, not computed here. ' +
-    'The standard metric pitches in DIN 403 are 0.5, 0.6, 0.8, 1.0, 1.2 and 1.6 mm. In the US the common diametral pitches are 64, 96, 128 and 160 DP, chosen so that standard fractional blanks hold whole tooth counts (96 and 160 DP on 1/32 in steps, 64 and 128 DP on 1/64 in steps, per Dorian).' +
-    '<br><b>Standards:</b> DIN 82:1973-01 (knurls; current per DIN Media), DIN 403 (knurling wheels; edition not confirmed here). US practice (TPI and DP knurls) follows the makers\' catalogues.</div><div class="note" id="kpitch"></div><div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '</div>';
-  const ks = $('#ks', el), kp = $('#kp', el), kf = $('#kf', el), kd = $('#kd', el);
+    '<label class="f" style="grid-column:1/-1"><span>Method</span><div class="row"><select id="km"><option value="dp">1. Diametral pitch knurl (DP, ANSI/ASME B94.6)</option><option value="cp">2. Circular pitch knurl (mm or TPI)</option><option value="count">3. Measure and count the knurl you have</option><option value="trial">4. Trial and error, step by step</option></select></div></label></div>' +
+    '<div class="grid kmeth" data-m="dp" style="max-width:760px"><label class="f"><span>Diametral pitch</span><div class="row"><input id="kdp" type="number" step="any" inputmode="decimal" list="kdpl"><datalist id="kdpl">' + K.pitches_dp.map(v => '<option value="' + v + '">').join('') + '</datalist><span class="u">DP</span></div></label></div>' +
+    '<div class="grid kmeth" data-m="cp" style="max-width:760px"><label class="f"><span>Pitch given as</span><div class="row"><select id="ks"><option value="mm">Circular pitch, mm (DIN 82 / DIN 403)</option><option value="tpi">Teeth per inch, TPI (circular pitch)</option></select></div></label>' +
+    '<label class="f"><span>Pitch</span><div class="row"><input id="kp" type="number" step="any" inputmode="decimal" list="kpl"><datalist id="kpl"></datalist><span class="u" id="kpu"></span></div></label></div>' +
+    '<div class="grid kmeth" data-m="count" style="max-width:760px"><label class="f"><span>Measured from</span><div class="row"><select id="kh"><option value="print">A print: roll the wheel along paper, count the spaces</option><option value="wheel">The wheel: count its teeth, measure over them</option></select></div></label>' +
+    '<label class="f"><span id="kll"></span><div class="row"><input id="kl" type="number" step="1" min="1" inputmode="numeric"></div></label>' + lenF('kspan', '<span id="ksl"></span>') + '</div>' +
+    '<div class="grid kmeth" data-m="dp cp" style="max-width:760px"><label class="f"><span>Pattern</span><div class="row"><select id="kf"><option value="0">Straight (teeth parallel to the axis)</option><option value="30">Diagonal or diamond, 30 deg teeth</option></select></div></label></div>' +
+    '<div class="grid kmeth" data-m="dp cp count" style="max-width:760px">' + lenF('kd', 'Wanted diameter (finished or blank)') + '</div>' +
+    '<div class="kmeth" data-m="trial"><ol class="ktick" id="ktick">' + K.trial_steps.map((st, n) => '<li><label class="chk"><input type="checkbox" data-n="' + n + '"><span><b>' + rEsc(st.t) + '</b></span></label><div class="ms">' + rEsc(st.why) + ' <i>[' + srcTag(st) + ']</i></div></li>').join('') + '</ol>' +
+    '<p><button class="btn" id="kclr" type="button">Clear the ticks</button> <span class="ms" id="kdone"></span></p>' +
+    '<div class="grid" style="max-width:760px">' + lenF('ktb', 'Blank you tried') + lenF('ktk', 'Knurled diameter measured', 'after step 8') + lenF('ktf', 'Finished diameter wanted', 'optional') + '</div></div>' +
+    '<div id="kres"></div>' +
+    '<div class="note"><b>Working:</b> a knurl tracks cleanly when a whole number of teeth fits around the blank. With circular pitch p measured square to the teeth and the teeth at angle h to the axis, the pitch around the circumference is p / cos h, so teeth n = pi D cos h / p and the blank for n teeth is D = n p / (pi cos h). TPI knurls have p = 1/TPI in (25.4 / TPI mm); a diametral pitch knurl has p = pi / DP in, which makes D = n / DP for a straight knurl. ' +
+    '<b>Measure and count:</b> a print of the wheel rolled along paper gives the pitch in the direction of rolling, p = span / spaces counted, which is the pitch around the work whatever the pattern, so D = n p / pi. Count 50 to 100 spaces to keep the error small. A wheel measured over its teeth gives p = pi d / teeth at its outside; on an ANSI diametral pitch wheel that reads a little low (see the result), so prefer the print or the maker\'s DP. ' +
+    '<b>Trial and error:</b> no pitch is needed. The page gives the next blanks to try (about 0.005 in, 0.13 mm, either way), the growth measured on the trial piece and the blank that gives the finished size at that growth. All numbers are computed by the Rust core and checked against the Dorian, Hommel+Keller, Hoffman and ANSI wheel examples. ' +
+    'A formed knurl raises the diameter (material is pushed up), by an amount that depends on pitch, material and form, so the blank is turned below the finished size; cut knurling barely changes the diameter. The makers\' allowance tables are approximations and are not tabulated here. ' +
+    'The standard metric pitches in DIN 403 are 0.5, 0.6, 0.8, 1.0, 1.2 and 1.6 mm. In the US the diametral pitches are 64, 96, 128 and 160 DP (' + (K.pitches_dp_status === 'confirmed' ? 'two sources' : 'one source') + '), chosen so that standard fractional blanks hold whole tooth counts (96 and 160 DP on 1/32 in steps, 64 and 128 DP on 1/64 in steps, per Dorian).' +
+    '<br><b>Standards:</b> DIN 82:1973-01 (knurls; current per DIN Media), DIN 403 (knurling wheels; edition not confirmed here). ANSI/ASME B94.6-1984 (knurling) is quoted from a secondary page; the standard itself was not read.</div><div class="note" id="kpitch"></div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + (K.not_used && K.not_used.length ? '<br><b>Read and not used:</b> ' + K.not_used.map(x => rEsc(x.publisher) + ', ' + rEsc(x.title) + ': ' + rEsc(x.why)).join(' ') : '') + '</div>';
+  const q = id => $('#' + id, el), km = q('km'), ks = q('ks'), kp = q('kp'), kf = q('kf'), kdp = q('kdp'), kh = q('kh'), kl = q('kl');
   $('#kpitch', el).innerHTML = '<b>Metric pitches offered by the two makers:</b> ' + K.pitches_mm.map(x => x.p.toFixed(1) + ' mm ' + (x.status === 'confirmed' ? '(both)' : '(' + rEsc(pubName(K.sources, x.publishers[0])) + ')')).join(', ') + '.';
+  // A length box bound to m[key] in mm: the stored value is kept exactly until the user types another.
+  function bindLen(id, key) {
+    const inp = q(id), orig = m[key], shown = orig > 0 ? String(+toUser(orig).toFixed(inMode() ? 4 : 3)) : '';
+    inp.value = shown; inp.oninput = upd;
+    return () => { const v = parseFloat(inp.value); m[key] = inp.value === shown ? orig : (v > 0 ? fromUser(v) : null); return m[key]; };
+  }
   function setUnits() {
-    $('#kpu', el).textContent = { mm: 'mm', tpi: 'TPI', dp: 'DP' }[ks.value];
-    $('#kpl', el).innerHTML = (ks.value === 'mm' ? K.pitches_mm.map(x => x.p) : ks.value === 'dp' ? K.pitches_dp : [10, 12, 14, 16, 20, 21, 25, 30, 33, 35, 40, 50]).map(v => '<option value="' + v + '">').join('');
+    $('#kpu', el).textContent = { mm: 'mm', tpi: 'TPI' }[ks.value];
+    $('#kpl', el).innerHTML = (ks.value === 'mm' ? K.pitches_mm.map(x => x.p) : [10, 12, 14, 16, 20, 21, 25, 30, 33, 35, 40, 50]).map(v => '<option value="' + v + '">').join('');
   }
-  ks.value = m.sys; kf.value = String(m.form); kp.value = m.p; kd.value = +toUser(m.d).toFixed(inMode() ? 4 : 3);
-  const d0 = kd.value;
-  function upd() {
-    m.sys = ks.value; m.form = +kf.value; m.p = parseFloat(kp.value);
-    const v = parseFloat(kp.value), dv = parseFloat(kd.value), out = $('#kres', el);
-    if (!(v > 0 && dv > 0)) { out.innerHTML = ''; return; }
-    const dmm = kd.value === d0 ? m.d : fromUser(dv); m.d = dmm;
-    const pmm = ks.value === 'mm' ? v : ks.value === 'tpi' ? IN_MM / v : W.knurl_dp_to_cp(v) * IN_MM;
-    const h = +kf.value, nx = W.knurl_teeth_exact(dmm, pmm, h), n0 = Math.max(1, Math.floor(nx)), n1 = Math.ceil(nx);
-    const d1 = W.knurl_blank_dia(pmm, n0, h), d2 = W.knurl_blank_dia(pmm, n1, h);
-    out.innerHTML = '<div class="res"><table>' + rowsHtml([
-      ['Circular pitch p (square to the teeth)', calcCell(fBoth(pmm), ks.value === 'mm' ? 'as entered' : ks.value === 'tpi' ? '25.4 / TPI mm' : 'pi / DP in')],
-      ['Pitch around the circumference', calcCell(fBoth(pmm / Math.cos(h * Math.PI / 180)), h ? 'p / cos ' + h + ' deg' : 'straight: equal to p')],
-      ['Teeth on the wanted diameter', calcCell(fx(nx, 2), 'pi D cos h / p')],
-      ['Blank for ' + n0 + ' teeth', calcCell(fBoth(d1), 'D = n p / (pi cos h), smaller')],
-      ['Blank for ' + n1 + ' teeth', calcCell(fBoth(d2), 'larger')],
+  function setHow() {
+    q('kll').textContent = kh.value === 'print' ? 'Spaces counted on the print' : 'Teeth on the wheel';
+    q('ksl').textContent = kh.value === 'print' ? 'Length they cover, along the direction of rolling' : 'Wheel diameter over the teeth';
+    kl.value = kh.value === 'print' ? m.lines : m.wt;
+    getSpan = bindLen('kspan', kh.value === 'print' ? 'span' : 'wd');
+  }
+  function setMeth() { for (const d of el.querySelectorAll('.kmeth')) d.hidden = !d.dataset.m.split(' ').includes(km.value); }
+  if (m.sys === 'dp') { m.sys = 'tpi'; }
+  km.value = m.meth; ks.value = m.sys; kf.value = String(m.form); kp.value = m.p; kdp.value = m.dp; kh.value = m.how;
+  let getSpan = null;
+  const getD = bindLen('kd', 'd'), getTb = bindLen('ktb', 'tb'), getTk = bindLen('ktk', 'tk'), getTf = bindLen('ktf', 'tf');
+  const ticks = [...el.querySelectorAll('#ktick input')];
+  function showTicks() {
+    ticks.forEach((c, n) => { c.checked = !!m.ticks[n]; c.closest('li').classList.toggle('done', c.checked); });
+    q('kdone').textContent = ticks.filter(c => c.checked).length + ' of ' + ticks.length + ' steps ticked';
+  }
+  ticks.forEach((c, n) => { c.onchange = () => { m.ticks[n] = c.checked; showTicks(); }; });
+  q('kclr').onclick = () => { m.ticks = []; showTicks(); };
+  function blankRows(pmm, h, dmm, how) {
+    const nx = W.knurl_teeth_exact(dmm, pmm, h), n0 = Math.max(1, Math.floor(nx)), n1 = Math.ceil(nx);
+    return [
+      ['Circular pitch p' + (h ? ' (square to the teeth)' : ''), calcCell(fBoth(pmm), how)],
+      ['Pitch around the circumference', calcCell(fBoth(W.knurl_pitch_around(pmm, h)), h ? 'p / cos ' + h + ' deg' : 'equal to p')],
+      ['Teeth on the wanted diameter', calcCell(fx(nx, 2), h ? 'pi D cos h / p' : 'pi D / p')],
+      ['Blank for ' + n0 + ' teeth', calcCell(fBoth(W.knurl_blank_dia(pmm, n0, h)), h ? 'D = n p / (pi cos h), smaller' : 'D = n p / pi, smaller')],
+      ['Blank for ' + n1 + ' teeth', calcCell(fBoth(W.knurl_blank_dia(pmm, n1, h)), 'larger')],
       ['Steps between whole tooth counts', calcCell(fBoth(W.knurl_blank_dia(pmm, 1, h)), 'one tooth more or less')],
-    ]) + '</table><p class="desc">Turn the blank to one of the two diameters (or adjust by trial), then knurl. For a formed knurl allow for the raise of diameter; check with a test piece.</p></div>';
+    ];
   }
-  ks.onchange = () => { setUnits(); kp.value = ks.value === 'mm' ? 1.0 : ks.value === 'tpi' ? 20 : 96; upd(); }; kp.oninput = upd; kf.onchange = upd; kd.oninput = upd;
-  setUnits(); upd();
+  const tail = '<p class="desc">Turn the blank to one of the two diameters, then knurl. If it does not track, go on with method 4 from that diameter. For a formed knurl allow for the raise of diameter; check with a test piece.</p>';
+  function upd() {
+    m.meth = km.value; m.sys = ks.value; m.form = +kf.value; m.how = kh.value;
+    if (parseFloat(kp.value) > 0) m.p = parseFloat(kp.value);
+    if (parseFloat(kdp.value) > 0) m.dp = parseFloat(kdp.value);
+    const out = q('kres'), dmm = getD(), h = +kf.value, nl = parseFloat(kl.value), span = getSpan();
+    if (km.value === 'count') { if (kh.value === 'print') m.lines = kl.value; else m.wt = kl.value; }
+    let rows = null, extra = '';
+    if (km.value === 'dp') {
+      const v = parseFloat(kdp.value);
+      if (v > 0 && dmm > 0) rows = blankRows(W.knurl_dp_to_cp(v) * IN_MM, h, dmm, 'pi / DP in');
+    } else if (km.value === 'cp') {
+      const v = parseFloat(kp.value);
+      if (v > 0 && dmm > 0) rows = blankRows(ks.value === 'mm' ? v : IN_MM / v, h, dmm, ks.value === 'mm' ? 'as entered' : '25.4 / TPI mm');
+    } else if (km.value === 'count') {
+      if (nl >= 1 && span > 0) {
+        const print = kh.value === 'print', pmm = print ? W.knurl_pitch_from_print(span, nl) : W.knurl_pitch_from_wheel(span, nl);
+        rows = dmm > 0 ? blankRows(pmm, 0, dmm, print ? 'span / spaces' : 'pi d / teeth, at the outside of the wheel')
+          : [['Circular pitch p', calcCell(fBoth(pmm), print ? 'span / spaces' : 'pi d / teeth')]];
+        if (!print) {
+          const X = K.ansi_wheel_example;
+          rows.push(['Teeth per inch of wheel diameter', calcCell(fx(W.knurl_dp_from_wheel(span / IN_MM, nl), 2), 'teeth / diameter in inch')]);
+          extra = '<p class="desc"><b>Approximate.</b> ' + (X ? 'An ANSI ' + rEsc(X.dp) + ' DP wheel of ' + rEsc(X.nominal_in) + ' in nominal size measures ' + rEsc(X.major_in) + ' in over its ' + rEsc(X.teeth) + ' teeth (' + rEsc(pubName(K.sources, X.src[0])) + ', one source), which gives ' + fx(W.knurl_dp_from_wheel(+X.major_in, +X.teeth), 1) + ' on this line and a pitch of ' + rEsc(X.cp_outside_in) + ' in where the nominal pitch is ' + rEsc(X.cp_nominal_in) + ' in. ' : '') +
+            'So a value a little above one of the standard diametral pitches (' + K.pitches_dp.join(', ') + ') points to that pitch: then use method 1 with it. Otherwise make a print, which measures the pitch the work sees.</p>';
+        } else extra = '<p class="desc">Measure along the direction the wheel rolled, not square to the lines of a diagonal knurl. Keep the pitch with the knurl: it does not change.</p>';
+      }
+    } else {
+      const tb = getTb(), tk = getTk(), tf = getTf(), st = W.knurl_trial_step_mm();
+      rows = [];
+      if (tb > 0) {
+        rows.push(['If it double tracks, try next', calcCell(fBoth(W.knurl_blank_for_finish(tb, st)), 'blank less ' + fx(st / IN_MM, 3) + ' in (' + fx(st, 3) + ' mm)')]);
+        rows.push(['or', calcCell(fBoth(W.knurl_blank_for_finish(tb, -st)), 'blank plus the same step')]);
+        if (tk > 0) {
+          const g = W.knurl_growth(tk, tb);
+          rows.push(['Growth on this trial piece', calcCell(fBoth(g), 'knurled diameter less blank')]);
+          if (tf > 0) rows.push(['Blank for the finished diameter', calcCell(fBoth(W.knurl_blank_for_finish(tf, g)), 'finished diameter less the growth')]);
+          if (g < 0) extra = '<p class="desc"><b>Check the two diameters:</b> the knurled diameter is smaller than the blank. A formed knurl raises the diameter; a cut knurl barely changes it.</p>';
+          else if (tf > 0) extra = '<p class="desc">Tracking depends on the diameter, so try the new blank on scrap as well before the job. The growth holds only for the same knurl, material and depth.</p>';
+        }
+      }
+      if (!rows.length) { out.innerHTML = '<p class="desc">Enter the blank you tried to get the next diameters to try.</p>'; return; }
+    }
+    out.innerHTML = rows ? '<div class="res"><table>' + rowsHtml(rows) + '</table>' + extra + (km.value === 'trial' ? '' : tail) + '</div>' : '';
+  }
+  km.onchange = () => { setMeth(); upd(); };
+  ks.onchange = () => { setUnits(); kp.value = ks.value === 'mm' ? 1.0 : 20; upd(); };
+  kh.onchange = () => { m.how = kh.value; setHow(); upd(); };
+  kp.oninput = upd; kdp.oninput = upd; kf.onchange = upd; kl.oninput = upd;
+  setUnits(); setHow(); setMeth(); showTicks(); upd();
 }

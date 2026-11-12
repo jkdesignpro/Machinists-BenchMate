@@ -54,7 +54,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Reference | Hardness conversion | missing (in progress, `claude/ref-data-3`) | | U67 |
 | Reference | Thermal expansion | done (measurement correction, growth, shrink-fit temperatures, press-fit pressure) | `tempcomp`, `shrinkfit` | U68 |
 | Reference | Socket head cap screw holes (counterbore and clearance) | done (metric and inch; publisher disagreements shown) | `shcs`, `clearance` | U71 |
-| Reference | Knurling, reaming | missing | | U87, U33 |
+| Reference | Knurling, reaming | done (knurl blank by four methods: diametral pitch, circular pitch, measure and count, trial and error with a tick-off procedure; reaming speeds, feeds and allowance) | `knurl`, `advream` | U87, U33 |
 | Fasteners | Bolt grades, torque and preload (VDI 2230), spanner sizes, T-slots | done (beyond Ultra; friction always user-entered) | `boltgrade`, `bolttorque`, `spanner`, `tslots` | MH198-MH212 (section 2) |
 | Machine elements | Keys and keyways, O-ring glands, bearing L10 | partial (no Woodruff, no ISO 3601 G series, no bearing fits) | `keys`, `oring`, `bearinglife` | MH285, MH288, MH294 (section 2) |
 | Geometry | Bolt circle | done | `bolt` | U72 |

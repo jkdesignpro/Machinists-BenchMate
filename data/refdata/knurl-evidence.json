@@ -13,6 +13,41 @@
    "url": "https://cdn.shopify.com/s/files/1/0564/9065/5778/files/HOMMEL_KELLER_ZEUS_kataloog_2021.pdf",
    "accessed": "2026-11-10",
    "note": "Maker. CP pitch = 25.4 / TPI mm; DP pitch = pi x 25.4 / DP mm; DIN 403 pitches; form knurling enlarges the diameter (empirical table by material and pitch); cut knurling barely changes it."
+  },
+  "SHERLINE": {
+   "publisher": "Sherline Products",
+   "title": "Knurling tool holder instructions (P/N 3004), 20 TPI knurls",
+   "url": "https://sherline.com/wp-content/uploads/2023/03/3004inst_20tpi_temp.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker of small lathes. The starting diameter is best found by trial and error on a scrap piece of similar material; change the diameter up or down by about .005 in (printed with '.1 mm' beside it; 0.005 in is 0.127 mm) when the knurl does not come out right; plenty of cutting oil; slow speed, about 100 rpm for 1/2 in diameter of soft material. Its chart of the increase in knurled diameter did not read cleanly and is not used."
+  },
+  "GENSWISS": {
+   "publisher": "GenSwiss",
+   "title": "Knurling tips",
+   "url": "https://genswiss.com/media/wysiwyg/support/pdf/knurlingtips.pdf",
+   "accessed": "2026-11-12",
+   "note": "Tool supplier. Tracking is usually settled after one full turn of the part; double tracking can usually be cured by more infeed on bump or cut knurling; bump infeed .001 to .004 in per revolution (0.025 to 0.1 mm), finished in 5 to 20 revolutions; .0005 in of blank variation shows as about .001 in on the knurled diameter; some trial and error is needed; not above about 150 sfm (50 m/min), about 50 sfm (15 m/min) for harder steels and stainless."
+  },
+  "HOFFMAN": {
+   "publisher": "Conrad Hoffman",
+   "title": "Knurling (notes on getting a knurl to track)",
+   "url": "https://conradhoffman.com/knurling.htm",
+   "accessed": "2026-11-12",
+   "note": "Personal site of a machinist. Print the knurl, count the lines and measure their span: 75 lines in 3.535 in is 0.0471 in; the blank must be a whole multiple of pitch / pi (0.015 in); 5/8 in stock holds 41, blank 0.615 in. Turn the spindle by hand with mild pressure to get a clean impression, then raise the pressure to full depth; plenty of oil."
+  },
+  "PJS_ANSI": {
+   "publisher": "pjsminilathe (personal site)",
+   "title": "Knurling: ANSI standard knurls",
+   "url": "https://sites.google.com/site/pjsminilathe/making-chips/knurling/ansi",
+   "accessed": "2026-11-12",
+   "note": "Personal site quoting ANSI/ASME B94.6-1984 (the standard itself was not read). Diametral pitches 64, 96, 128 and 160, 96 preferred; teeth on the work = DP x work diameter (1/2 in at 96 DP is 48); a 3/4 in nominal 96 DP wheel has 72 teeth, major diameter .7440 in, circular pitch .0325 at the outside and .0327 nominal."
+  },
+  "PJS_TECH": {
+   "publisher": "pjsminilathe (personal site)",
+   "title": "Knurling: techniques",
+   "url": "https://sites.google.com/site/pjsminilathe/making-chips/knurling/techniques",
+   "accessed": "2026-11-12",
+   "note": "Same author as the ANSI page, so not an independent second source for it. Get within .001 to .002 in of the calculated diameter; turn the chuck by hand about two full revolutions and inspect for double tracking; lowest speed (150 to 200 rpm); light machine oil on the wheels and pins."
   }
  },
  "pitches_mm": {
@@ -49,6 +84,12 @@
    "96",
    "128",
    "160"
+  ],
+  "PJS_ANSI": [
+   "64",
+   "96",
+   "128",
+   "160"
   ]
  },
  "din403_mm": [
@@ -58,5 +99,116 @@
   "1.0",
   "1.2",
   "1.6"
+ ],
+ "not_used": [
+  {
+   "publisher": "Industrial Monitor Direct",
+   "title": "Knowledge base page on knurling cast iron",
+   "accessed": "2026-11-12",
+   "why": "The page contradicts itself on the sign of the diameter allowance and on its units. Nothing is taken from it."
+  },
+  {
+   "publisher": "Sherline Products",
+   "title": "Chart 'Approximate increase in knurled diameters' in the 3004 instructions",
+   "accessed": "2026-11-12",
+   "why": "The columns did not come through in order when the PDF was read, so the figures are not tabulated."
+  }
+ ],
+ "ansi_wheel_example": {
+  "src": [
+   "PJS_ANSI"
+  ],
+  "nominal_in": "0.750",
+  "major_in": "0.7440",
+  "teeth": "72",
+  "dp": "96",
+  "cp_outside_in": "0.0325",
+  "cp_nominal_in": "0.0327"
+ },
+ "print_example": {
+  "src": [
+   "HOFFMAN"
+  ],
+  "lines": "75",
+  "span_in": "3.535",
+  "pitch_in": "0.0471",
+  "per_tooth_dia_in": "0.015",
+  "stock_in": "0.625",
+  "teeth": "41",
+  "blank_in": "0.615"
+ },
+ "trial_steps": [
+  {
+   "t": "Take a scrap piece of the same material as the job and chamfer its end.",
+   "why": "The right blank is best found on scrap of similar material. The chamfer is BenchMate's advice, so the knurl starts on a clean edge.",
+   "src": [
+    "SHERLINE",
+    "GENSWISS"
+   ]
+  },
+  {
+   "t": "Turn it to the diameter you want to try, measure it and write the diameter down.",
+   "why": "If you have a calculated blank from one of the other methods, get within 0.001 to 0.002 in (0.03 to 0.05 mm) of it. Hold the blank closely from part to part: 0.0005 in on the blank shows as about 0.001 in on the knurled diameter.",
+   "src": [
+    "PJS_TECH",
+    "GENSWISS"
+   ]
+  },
+  {
+   "t": "Oil the knurls and the work, and set a slow speed.",
+   "why": "The sources differ on speed. For small manual lathes: about 100 rpm for 1/2 in of soft material (Sherline), 150 to 200 rpm (pjsminilathe). For production knurling GenSwiss gives an upper limit of about 150 sfm (50 m/min), and about 50 sfm (15 m/min) for harder steels and stainless. Start slow.",
+   "src": [
+    "SHERLINE",
+    "PJS_TECH",
+    "GENSWISS",
+    "HOFFMAN"
+   ]
+  },
+  {
+   "t": "Bring the knurl up until it just touches, add light pressure and turn the spindle by hand about two turns.",
+   "why": "A light first impression shows whether the knurl tracks before the piece is spoiled.",
+   "src": [
+    "PJS_TECH",
+    "HOFFMAN"
+   ]
+  },
+  {
+   "t": "Look at the marks: one clean set of lines, even across the width of the wheel, means it tracks.",
+   "why": "Tracking is usually settled after one full turn of the part. A second set of lines between the first is double tracking.",
+   "src": [
+    "GENSWISS",
+    "PJS_TECH"
+   ]
+  },
+  {
+   "t": "If it double tracks, first try a firmer first bite. If it still does, change the blank by about 0.005 in (0.13 mm), up or down, and start again at step 2.",
+   "why": "More infeed usually cures double tracking on bump and cut knurling (GenSwiss). The 0.005 in step is Dorian's for a knurl that double tracks; Sherline gives the same amount, up or down, for a diameter that does not knurl properly.",
+   "src": [
+    "GENSWISS",
+    "DORIAN",
+    "SHERLINE"
+   ]
+  },
+  {
+   "t": "When it tracks, start the spindle and go to full depth in as few turns as you can, with plenty of oil.",
+   "why": "Bump knurling: 0.001 to 0.004 in per revolution (0.025 to 0.1 mm), finished in 5 to 20 revolutions (GenSwiss). Oil washes the chips out and keeps the knurls from seizing on their pins (Hoffman).",
+   "src": [
+    "GENSWISS",
+    "HOFFMAN"
+   ]
+  },
+  {
+   "t": "Measure the knurled diameter and enter it below to get the growth.",
+   "why": "Form knurling raises the diameter by an amount that depends on pitch, material and depth; cut knurling barely changes it. The makers' allowance tables are approximate, so the trial piece is the measure.",
+   "src": [
+    "HOMMEL_KELLER",
+    "SHERLINE"
+   ]
+  },
+  {
+   "t": "Write down the blank, speed and growth that worked for this knurl and material.",
+   "why": "BenchMate's advice: the next job with the same knurl and material then starts from a diameter that is known to track.",
+   "src": []
+  }
  ]
 }

@@ -389,7 +389,26 @@ def build_knurl():
     for pub, lst in ev['pitches_mm'].items():
         for v in lst: pubs[float(v)].append(pub)
     return {'sources': sources_of(ev), 'pitches_mm': [{'p': p, 'publishers': pubs[p], 'status': 'confirmed' if len(pubs[p]) >= 2 else 'review'} for p in sorted(pubs)],
-            'pitches_dp': [float(x) for x in ev['pitches_dp']['DORIAN']], 'din403_mm': [float(x) for x in ev['din403_mm']]}
+            'pitches_dp': [float(x) for x in ev['pitches_dp']['DORIAN']], 'din403_mm': [float(x) for x in ev['din403_mm']],
+            'pitches_dp_status': 'confirmed' if all(sorted(v) == sorted(ev['pitches_dp']['DORIAN']) for v in ev['pitches_dp'].values()) and len(ev['pitches_dp']) >= 2 else 'review',
+            'pitches_dp_publishers': sorted(ev['pitches_dp']),
+            'trial_steps': knurl_steps(ev), 'ansi_wheel_example': ev.get('ansi_wheel_example'),
+            'print_example': ev.get('print_example'), 'not_used': ev.get('not_used', [])}
+
+
+def knurl_steps(ev):
+    """Tick-off steps of the trial and error method. Every source key must exist;
+    a step with two or more independent publishers is 'confirmed', with one it is
+    'single', with none it is BenchMate's own advice ('own'). The two pjsminilathe
+    pages are one publisher."""
+    out = []
+    for st in ev.get('trial_steps', []):
+        for k in st['src']:
+            if k not in ev['sources']: raise SystemExit('knurl trial step: unknown source ' + k)
+        pubs = {ev['sources'][k]['publisher'] for k in st['src']}
+        out.append({'t': st['t'], 'why': st['why'], 'src': st['src'],
+                    'status': 'confirmed' if len(pubs) >= 2 else 'single' if pubs else 'own'})
+    return out
 
 
 def build_grinding():

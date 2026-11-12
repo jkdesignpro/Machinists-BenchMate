@@ -443,6 +443,13 @@ f1!(lerp, c::lerp, x, x0, y0, x1, y1);
 f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
 f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
 f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
+f1!(knurl_pitch_around, c::knurl_pitch_around, p_normal, helix_deg);
+f1!(knurl_pitch_from_print, c::knurl_pitch_from_print, span, lines);
+f1!(knurl_pitch_from_wheel, c::knurl_pitch_from_wheel, dia, teeth);
+f1!(knurl_dp_from_wheel, c::knurl_dp_from_wheel, dia_in, teeth);
+f1!(knurl_growth, c::knurl_growth, d_knurled, d_blank);
+f1!(knurl_blank_for_finish, c::knurl_blank_for_finish, d_finished, growth);
+#[no_mangle] pub extern "C" fn knurl_trial_step_mm() -> f64 { c::knurl_trial_step_mm() }
 f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);
 f1!(profile_rq_over_ra, c::profile_rq_over_ra, kind);
 f1!(rq_ra_convert, c::rq_ra_convert, x, kind, inverse);

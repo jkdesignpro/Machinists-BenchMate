@@ -237,7 +237,7 @@ Store list is the fuller of the two store lists.
 | U84 | Involute splines per ANSI B92.1 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
 | U85 | Involute splines per ISO 4156 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
 | U86 | SAE J499a splines | missing |  | SAE J499a splines are not in `spline` |
-| U87 | Knurl calculator | done | `knurl` |  |
+| U87 | Knurl calculator | done | `knurl` | 0.5.0: four methods (diametral pitch, circular pitch, measure and count, trial and error with a tick-off procedure) |
 | U88 | Keyway broach program generator | done | `cycbroach` |  |
 | U89 | Coolant concentration | done | `coolconc`, `coolmix` |  |
 | U90 | Bandsaw cut time | done | `bandsaw` |  |

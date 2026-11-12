@@ -475,3 +475,12 @@ details.cysnipd{margin-top:12px;max-width:760px}
 .gexp .gtab{margin:8px 0}
 .gexp .gtab td.v{font-family:var(--mono);text-align:right}
 .gdl{margin:8px 0}.gdl dt{font-weight:600;margin-top:6px}.gdl dd{margin:2px 0 4px;line-height:1.5}
+
+/* Knurling: tick-off procedure of the trial and error method */
+ol.ktick{margin:8px 0 8px 0;padding-left:26px;max-width:760px}
+ol.ktick li{margin:0 0 8px 0;padding:2px 0}
+ol.ktick li .chk{align-items:flex-start;gap:8px;cursor:pointer}
+ol.ktick li .chk input{margin-top:3px;flex:0 0 auto}
+ol.ktick li .ms{display:block;margin:2px 0 0 22px}
+ol.ktick li.done b{text-decoration:line-through;opacity:.6}
+.kmeth[hidden]{display:none}
