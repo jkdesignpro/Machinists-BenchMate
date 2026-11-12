@@ -1,0 +1,1145 @@
+{
+ "_note": "Gun drilling starting values. Tables are transcribed from the makers' PDFs, each read twice on 2026-11-12. Nothing is averaged; where makers differ both are shown.",
+ "sources": {
+  "STERLING": {
+   "publisher": "Sterling Gun Drills",
+   "title": "Gun drill catalogue, 'Speeds and Feeds' (speed chart, approximate feed rate, oil pressure and GPM)",
+   "url": "https://productivity.com/wp-content/uploads/pdfs/Sterling%20Gun%20Drill%20Catalog.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker. Speed chart by material and hardness for high pressure and for spray mist; feed per revolution by diameter in six material columns; oil pressure, flow and maximum unsupported length by diameter; RPM = SFM / 0.262 / diameter; over 30:1 reduce the feed by 20 %. The column headings of the feed table are broken up in the PDF text: see docs/sources.md for how they were read."
+  },
+  "BOTEK": {
+   "publisher": "botek Praezisionsbohrtechnik",
+   "title": "Catalogue ELB/ZLB (single-flute and two-flute gundrills), guide values for Type 110, pp. 20-21",
+   "url": "https://botek.de/downloads/en/Catalog_ELB_ZLB_E.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker. Cutting speed ranges for four steel groups and feed ranges by drill diameter (p. 20). The coolant pressure and quantity recommendations are charts and could not be read. Page 21 (other materials) has no diameter column in the text and is not used."
+  },
+  "UNISIG": {
+   "publisher": "UNISIG",
+   "title": "Deep hole drilling technical reference",
+   "url": "https://stagingxx.unisig.com/wp-content/uploads/2016/08/UNISIG-Deep-Hole-Drilling-Technical-Reference.pdf",
+   "accessed": "2026-11-12",
+   "note": "Machine builder. Approximate starting coolant flow for deep hole drilling in general: 3.7 to 4.5 l/min per mm of tool diameter (25 to 30 gal/min per inch); 'parameter values change by tooling type'. Speed and feed are left to the tool maker."
+  },
+  "MASTERFLUID": {
+   "publisher": "Master Fluid Solutions",
+   "title": "Technical bulletin 109, Gun drilling (2014, revised 2020)",
+   "url": "https://www.masterfluids.com/na/en-us/technical-information/tb.php?tbid=109",
+   "accessed": "2026-11-12",
+   "note": "Coolant maker. Water-based coolant: supply enough per drill revolution to fill the drilled hole; volume in gallons = 0.785 x diameter^2 x depth / 231, flow = volume x rpm (3/8 in x 8 in at 300 rpm is about 1.1 GPM). Oils run at a lower flow. The single coolant hole is about one quarter of the drill diameter. Checked and not shown on the page: see 'Read and not used'."
+  },
+  "CTE2016": {
+   "publisher": "Cutting Tool Engineering (K. Hanson)",
+   "title": "Conventional thinking (gundrilling on conventional machines), 1 Jan 2016",
+   "url": "https://ctemag.com/node/21113",
+   "accessed": "2026-11-12",
+   "note": "Trade magazine quoting makers. Drill Masters Eldorado: 200 to 400 psi may do on drills 2 in and larger, 1,500 psi and higher for tiny holes; 10 to 12 % emulsion. UNISIG: 1,000 psi (69 bar) is common on Swiss-type lathes, most gundrilling machines give two to three times that. Sterling: a 0.250 in gundrill in steel might feed at 0.0005 ipr; pilot hole 1 to 2 diameters deep and 0.0005 to 0.0010 in larger than the gundrill. Star SU: straightness typically 0.001 in per inch of depth. Iscar: keep the fluid at 70 to 75 F, not above 130 F."
+  },
+  "HARTNER": {
+   "publisher": "Hartner (Kyocera Unimerco print)",
+   "title": "Catalogue pages 474-475, single-fluted deep hole drills",
+   "url": "https://imageservice.kyocera-unimerco.com/imageandfile/getpdf/hartner_474-475.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker. Pilot hole 1.5 x D deep, tolerance H8; enter the pilot hole at about 200 rev/min and 500 mm/min; soluble oil with at least 10 % oil. Its speed table could not be matched to materials in the PDF text and is not used."
+  },
+  "INGERSOLL": {
+   "publisher": "Ingersoll Cutting Tools",
+   "title": "Catalogue excerpts, gun drills",
+   "url": "https://ssl.ingersoll-imc.com/resources/pdf/cat-002-2-excerpts-gun-drills.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker. Pilot hole length 1.5 x D; water-soluble concentration under 8 % not acceptable, 10 to 12 % acceptable, 12 to 15 % preferred. Its speed table is by material number without the names in the text and is not used."
+  },
+  "ISCAR": {
+   "publisher": "ISCAR",
+   "title": "Machining conditions for indexable gundrills (e-catalogue information sheet 4448)",
+   "url": "https://www.iscar.com/eCatalog/Ecat/datafileENM/INFO/4448.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker. Filter the coolant to under 20 um; keep it at 20 to 22 C (above 50 C it stops working); 10 to 15 % concentration. Its speeds and feeds are for indexable drills of 10 to 26 mm, a different tool, and its pressure chart is a picture: neither is used."
+  }
+ },
+ "speed_sfm": {
+  "src": "STERLING",
+  "columns": [
+   "hp",
+   "mist"
+  ],
+  "column_names": {
+   "hp": "High pressure (gun drill machine or the same pressure)",
+   "mist": "Spray mist, or high EP coolant at not less than one third of the machine pressure"
+  },
+  "groups": [
+   {
+    "id": "lc",
+    "name": "Low to medium carbon steel (C1010 to 1550)",
+    "feed": "c1",
+    "botek": 0,
+    "rows": [
+     [
+      "12-17",
+      330,
+      220
+     ],
+     [
+      "17-22",
+      280,
+      190
+     ],
+     [
+      "22-27",
+      230,
+      160
+     ],
+     [
+      "27-32",
+      180,
+      130
+     ],
+     [
+      "32-37",
+      130,
+      100
+     ],
+     [
+      "37-42",
+      100,
+      70
+     ]
+    ],
+    "adjust": []
+   },
+   {
+    "id": "alloy",
+    "name": "Alloy steels (4000, 5000, 8000 series)",
+    "feed": "c2",
+    "botek": 1,
+    "rows": [
+     [
+      "17-22",
+      280,
+      190
+     ],
+     [
+      "22-27",
+      230,
+      160
+     ],
+     [
+      "27-32",
+      180,
+      130
+     ],
+     [
+      "32-37",
+      130,
+      100
+     ],
+     [
+      "37-42",
+      80,
+      70
+     ]
+    ],
+    "adjust": []
+   },
+   {
+    "id": "tool",
+    "name": "Tool steels (D, S, M, O, H, P series)",
+    "feed": "c2",
+    "botek": 1,
+    "rows": [
+     [
+      "17-22",
+      250,
+      160
+     ],
+     [
+      "22-27",
+      200,
+      130
+     ],
+     [
+      "27-32",
+      150,
+      100
+     ],
+     [
+      "32-37",
+      100,
+      70
+     ]
+    ],
+    "adjust": []
+   },
+   {
+    "id": "ss400",
+    "name": "Stainless steel, 400 series",
+    "feed": "c2",
+    "botek": 2,
+    "verify": true,
+    "feed_note": "The feed table names 416 stainless in this column.",
+    "rows": [
+     [
+      "12-17",
+      280,
+      170
+     ],
+     [
+      "17-22",
+      240,
+      150
+     ],
+     [
+      "22-27",
+      200,
+      130
+     ],
+     [
+      "27-32",
+      160,
+      110
+     ],
+     [
+      "32-37",
+      120,
+      90
+     ],
+     [
+      "37-42",
+      100,
+      80
+     ]
+    ],
+    "adjust": [
+     [
+      "Free machining",
+      30
+     ]
+    ]
+   },
+   {
+    "id": "ss300",
+    "name": "Stainless steel, 300 series and PH",
+    "feed": "c3",
+    "botek": 3,
+    "verify": true,
+    "rows": [
+     [
+      "17-17 (as printed; probably 12-17)",
+      230,
+      150
+     ],
+     [
+      "17-22",
+      200,
+      130
+     ],
+     [
+      "22-27",
+      170,
+      110
+     ],
+     [
+      "27-32",
+      140,
+      90
+     ],
+     [
+      "32-37",
+      110,
+      70
+     ],
+     [
+      "37-42",
+      80,
+      50
+     ]
+    ],
+    "adjust": [
+     [
+      "Free machining",
+      30
+     ]
+    ]
+   },
+   {
+    "id": "gci",
+    "name": "Cast iron, grey",
+    "feed": "c4",
+    "rows": [
+     [
+      "12-17",
+      400,
+      260
+     ],
+     [
+      "17-22",
+      350,
+      220
+     ],
+     [
+      "22-27",
+      300,
+      180
+     ],
+     [
+      "27-32",
+      250,
+      140
+     ]
+    ],
+    "adjust": [
+     [
+      "With free carbides",
+      -50
+     ],
+     [
+      "Ni-Resist",
+      -60
+     ]
+    ]
+   },
+   {
+    "id": "dci",
+    "name": "Cast iron, ductile (nodular)",
+    "feed": "c5",
+    "rows": [
+     [
+      "12-17",
+      300,
+      200
+     ],
+     [
+      "17-22",
+      250,
+      170
+     ],
+     [
+      "22-27",
+      200,
+      140
+     ],
+     [
+      "27-32",
+      150,
+      110
+     ],
+     [
+      "32-37",
+      100,
+      80
+     ]
+    ],
+    "adjust": [
+     [
+      "Ductile Ni-Resist",
+      -50
+     ]
+    ]
+   },
+   {
+    "id": "cu",
+    "name": "Copper alloys (beryllium, nickel based)",
+    "feed": "c6",
+    "verify": true,
+    "feed_note": "The feed table has no column for this group by name; the 'non-ferrous alloys, difficult to chip' column is offered.",
+    "rows": [
+     [
+      "12-22",
+      200,
+      130
+     ],
+     [
+      "22-32",
+      130,
+      90
+     ],
+     [
+      "32-37",
+      60,
+      50
+     ]
+    ],
+    "adjust": []
+   },
+   {
+    "id": "ti",
+    "name": "Titanium (6Al-4V and some others)",
+    "feed": "c3",
+    "verify": true,
+    "rows": [
+     [
+      "12-17",
+      260,
+      150
+     ],
+     [
+      "17-22",
+      220,
+      130
+     ],
+     [
+      "22-27",
+      180,
+      110
+     ],
+     [
+      "27-32",
+      140,
+      90
+     ],
+     [
+      "32-37",
+      100,
+      70
+     ],
+     [
+      "37-42",
+      60,
+      50
+     ]
+    ],
+    "adjust": []
+   },
+   {
+    "id": "ni",
+    "name": "High temperature alloys, nickel based",
+    "feed": "c3",
+    "verify": true,
+    "rows": [
+     [
+      "12-22",
+      120,
+      80
+     ],
+     [
+      "22-32",
+      90,
+      60
+     ],
+     [
+      "32-42",
+      60,
+      40
+     ]
+    ],
+    "adjust": [
+     [
+      "Cobalt base",
+      -40
+     ],
+     [
+      "Iron base",
+      20
+     ]
+    ]
+   },
+   {
+    "id": "soft",
+    "name": "Soft alloys (non-ferrous: aluminium, copper, free brass, magnesium)",
+    "feed": "c4",
+    "feed_note": "Free-cutting aluminium shares the grey cast iron column; for alloys that are difficult to chip choose the last column.",
+    "rows": [
+     [
+      "All conditions",
+      600,
+      400
+     ]
+    ],
+    "adjust": [],
+    "mist_note": "or the toolholder limit"
+   }
+  ]
+ },
+ "feed_in_rev": {
+  "src": "STERLING",
+  "columns": {
+   "c1": "Steels, low and medium carbon",
+   "c2": "Steels: alloy, tool, 416 stainless",
+   "c3": "Stainless 300 series, titanium, high temperature nickel alloys",
+   "c4": "Cast iron, grey; aluminium, free cutting",
+   "c5": "Cast iron, ductile (nodular)",
+   "c6": "Non-ferrous alloys, difficult to chip"
+  },
+  "rows": [
+   [
+    0.125,
+    0.00015,
+    0.00015,
+    0.0001,
+    0.00015,
+    0.00015,
+    0.0001
+   ],
+   [
+    0.187,
+    0.0003,
+    0.0003,
+    0.0002,
+    0.0003,
+    0.0003,
+    0.0002
+   ],
+   [
+    0.25,
+    0.00045,
+    0.00045,
+    0.0003,
+    0.0005,
+    0.0005,
+    0.0003
+   ],
+   [
+    0.375,
+    0.0007,
+    0.0006,
+    0.0005,
+    0.0013,
+    0.001,
+    0.0005
+   ],
+   [
+    0.5,
+    0.0008,
+    0.0007,
+    0.0006,
+    0.002,
+    0.0015,
+    0.0007
+   ],
+   [
+    0.625,
+    0.001,
+    0.0009,
+    0.0007,
+    0.0025,
+    0.002,
+    0.0009
+   ],
+   [
+    0.75,
+    0.0013,
+    0.0011,
+    0.0008,
+    0.003,
+    0.0025,
+    0.0011
+   ],
+   [
+    1.0,
+    0.0018,
+    0.0015,
+    0.001,
+    0.004,
+    0.003,
+    0.0015
+   ]
+  ],
+  "long_ratio": 30,
+  "long_pct": -20
+ },
+ "coolant": {
+  "src": "STERLING",
+  "fields": [
+   "dia_in",
+   "psi",
+   "gpm_single",
+   "gpm_twin",
+   "unsupported_high_sfm_in",
+   "unsupported_low_sfm_in"
+  ],
+  "rows": [
+   [
+    0.125,
+    1500,
+    1.0,
+    null,
+    3,
+    6
+   ],
+   [
+    0.187,
+    1150,
+    1.8,
+    null,
+    6,
+    12
+   ],
+   [
+    0.25,
+    925,
+    2.3,
+    3.0,
+    8,
+    16
+   ],
+   [
+    0.375,
+    675,
+    4.5,
+    6.0,
+    12,
+    24
+   ],
+   [
+    0.5,
+    525,
+    7.0,
+    7.5,
+    16,
+    32
+   ],
+   [
+    0.625,
+    450,
+    9.0,
+    9.0,
+    20,
+    40
+   ],
+   [
+    0.75,
+    400,
+    11.5,
+    11.0,
+    24,
+    48
+   ],
+   [
+    1.0,
+    250,
+    17.0,
+    14.0,
+    32,
+    64
+   ]
+  ]
+ },
+ "botek": {
+  "src": "BOTEK",
+  "groups": [
+   "Structural and carbon steel, low-alloy steel, under 900 N/mm2",
+   "Alloyed tempering, tool and nitriding steel, over 900 N/mm2",
+   "Stainless steel, ferritic and martensitic, 13 to 25 % Cr",
+   "Stainless steel, austenitic, Ni over 8 %, 18 to 25 % Cr"
+  ],
+  "vc_m_min": [
+   [
+    70,
+    100
+   ],
+   [
+    60,
+    80
+   ],
+   [
+    40,
+    80
+   ],
+   [
+    30,
+    60
+   ]
+  ],
+  "_label_note": "In the PDF text the diameter labels of the rows under 10 mm carry a stray '1' ('11.85 - 12.49', '6.00 - 16.99'). They are read as 1.85-2.49 ... 9.00-9.99: the upper limits then run 2.49, 2.99 ... 9.99 without a gap up to the clean row 10.00-11.99, and Type 110 starts at 1.85 mm.",
+  "feed_mm_rev": [
+   [
+    1.85,
+    2.49,
+    [
+     0.0019,
+     0.006
+    ],
+    [
+     0.0019,
+     0.0078
+    ],
+    [
+     0.0019,
+     0.0039
+    ],
+    [
+     0.0016,
+     0.0029
+    ]
+   ],
+   [
+    2.5,
+    2.99,
+    [
+     0.0025,
+     0.0094
+    ],
+    [
+     0.0033,
+     0.0119
+    ],
+    [
+     0.0038,
+     0.0064
+    ],
+    [
+     0.0025,
+     0.0046
+    ]
+   ],
+   [
+    3.0,
+    3.49,
+    [
+     0.0034,
+     0.0128
+    ],
+    [
+     0.0053,
+     0.0157
+    ],
+    [
+     0.0049,
+     0.0089
+    ],
+    [
+     0.0037,
+     0.0063
+    ]
+   ],
+   [
+    3.5,
+    3.99,
+    [
+     0.0045,
+     0.0165
+    ],
+    [
+     0.007,
+     0.0196
+    ],
+    [
+     0.007,
+     0.0122
+    ],
+    [
+     0.005,
+     0.0081
+    ]
+   ],
+   [
+    4.0,
+    4.49,
+    [
+     0.0056,
+     0.0211
+    ],
+    [
+     0.0089,
+     0.0236
+    ],
+    [
+     0.008,
+     0.0157
+    ],
+    [
+     0.007,
+     0.0098
+    ]
+   ],
+   [
+    4.5,
+    4.99,
+    [
+     0.0069,
+     0.0254
+    ],
+    [
+     0.0102,
+     0.0274
+    ],
+    [
+     0.0098,
+     0.0189
+    ],
+    [
+     0.0089,
+     0.0118
+    ]
+   ],
+   [
+    5.0,
+    5.99,
+    [
+     0.0089,
+     0.0295
+    ],
+    [
+     0.0125,
+     0.0316
+    ],
+    [
+     0.0118,
+     0.0222
+    ],
+    [
+     0.0113,
+     0.0136
+    ]
+   ],
+   [
+    6.0,
+    6.99,
+    [
+     0.011,
+     0.0364
+    ],
+    [
+     0.015,
+     0.0393
+    ],
+    [
+     0.0143,
+     0.0276
+    ],
+    [
+     0.014,
+     0.017
+    ]
+   ],
+   [
+    7.0,
+    7.99,
+    [
+     0.0133,
+     0.0431
+    ],
+    [
+     0.0175,
+     0.0467
+    ],
+    [
+     0.0163,
+     0.0343
+    ],
+    [
+     0.016,
+     0.0205
+    ]
+   ],
+   [
+    8.0,
+    8.99,
+    [
+     0.0157,
+     0.0495
+    ],
+    [
+     0.02,
+     0.055
+    ],
+    [
+     0.0183,
+     0.0405
+    ],
+    [
+     0.018,
+     0.0243
+    ]
+   ],
+   [
+    9.0,
+    9.99,
+    [
+     0.0184,
+     0.0565
+    ],
+    [
+     0.0225,
+     0.0632
+    ],
+    [
+     0.0212,
+     0.0466
+    ],
+    [
+     0.02,
+     0.0283
+    ]
+   ],
+   [
+    10.0,
+    11.99,
+    [
+     0.023,
+     0.063
+    ],
+    [
+     0.025,
+     0.071
+    ],
+    [
+     0.026,
+     0.053
+    ],
+    [
+     0.025,
+     0.032
+    ]
+   ],
+   [
+    12.0,
+    13.99,
+    [
+     0.027,
+     0.076
+    ],
+    [
+     0.031,
+     0.086
+    ],
+    [
+     0.032,
+     0.065
+    ],
+    [
+     0.03,
+     0.041
+    ]
+   ],
+   [
+    14.0,
+    15.99,
+    [
+     0.032,
+     0.09
+    ],
+    [
+     0.035,
+     0.102
+    ],
+    [
+     0.038,
+     0.077
+    ],
+    [
+     0.035,
+     0.05
+    ]
+   ],
+   [
+    16.0,
+    17.99,
+    [
+     0.036,
+     0.103
+    ],
+    [
+     0.039,
+     0.119
+    ],
+    [
+     0.045,
+     0.09
+    ],
+    [
+     0.041,
+     0.059
+    ]
+   ],
+   [
+    18.0,
+    19.99,
+    [
+     0.041,
+     0.116
+    ],
+    [
+     0.044,
+     0.135
+    ],
+    [
+     0.053,
+     0.105
+    ],
+    [
+     0.048,
+     0.071
+    ]
+   ],
+   [
+    20.0,
+    23.99,
+    [
+     0.051,
+     0.13
+    ],
+    [
+     0.049,
+     0.153
+    ],
+    [
+     0.068,
+     0.119
+    ],
+    [
+     0.06,
+     0.083
+    ]
+   ],
+   [
+    24.0,
+    27.99,
+    [
+     0.06,
+     0.157
+    ],
+    [
+     0.054,
+     0.185
+    ],
+    [
+     0.083,
+     0.143
+    ],
+    [
+     0.073,
+     0.106
+    ]
+   ],
+   [
+    28.0,
+    31.99,
+    [
+     0.07,
+     0.184
+    ],
+    [
+     0.059,
+     0.217
+    ],
+    [
+     0.1,
+     0.168
+    ],
+    [
+     0.087,
+     0.127
+    ]
+   ],
+   [
+    32.0,
+    null,
+    [
+     0.085,
+     0.211
+    ],
+    [
+     0.063,
+     0.247
+    ],
+    [
+     0.125,
+     0.193
+    ],
+    [
+     0.107,
+     0.151
+    ]
+   ]
+  ]
+ },
+ "unisig_flow": {
+  "src": "UNISIG",
+  "l_min_per_mm": [
+   3.7,
+   4.5
+  ],
+  "gpm_per_in": [
+   25,
+   30
+  ]
+ },
+ "rules": [
+  {
+   "t": "Start in a guide bushing or a pilot hole. Pilot hole: 1 to 2 diameters deep and 0.0005 to 0.0010 in (0.013 to 0.025 mm) larger than the gundrill (Sterling, quoted in Cutting Tool Engineering); 1.5 x D deep (Hartner, to H8; Ingersoll).",
+   "src": [
+    "CTE2016",
+    "HARTNER",
+    "INGERSOLL"
+   ]
+  },
+  {
+   "t": "Do not run a gundrill at speed outside the hole: it whips. Sterling's table gives the longest unsupported length by diameter; Hartner says to enter the pilot hole at about 200 rev/min and 500 mm/min.",
+   "src": [
+    "STERLING",
+    "HARTNER"
+   ]
+  },
+  {
+   "t": "Flow matters more than pressure: the chips leave only if enough coolant reaches the tip. Pressure rises as the drill gets smaller: 200 to 400 psi can be enough on 2 in drills, 1,500 psi and more on very small ones (Drill Masters Eldorado); about 1,000 psi (69 bar) is common on Swiss-type lathes and most gundrilling machines give two to three times that (UNISIG).",
+   "src": [
+    "BOTEK",
+    "UNISIG",
+    "CTE2016"
+   ]
+  },
+  {
+   "t": "Water-soluble coolant: 10 to 12 % (Drill Masters Eldorado; Ingersoll calls 10 to 12 % acceptable and 12 to 15 % preferred, under 8 % not acceptable), 10 to 15 % (ISCAR), at least 10 % oil (Hartner). botek rates deep-hole drilling oil as highly suitable and emulsion as suitable to a limited degree.",
+   "src": [
+    "CTE2016",
+    "INGERSOLL",
+    "ISCAR",
+    "HARTNER",
+    "BOTEK"
+   ]
+  },
+  {
+   "t": "Keep the coolant clean and cool: filtered to under 20 um and at 20 to 22 C (ISCAR); 70 to 75 F and not above 130 F (ISCAR, quoted in Cutting Tool Engineering).",
+   "src": [
+    "ISCAR",
+    "CTE2016"
+   ]
+  },
+  {
+   "t": "Over 30 diameters deep, reduce the feed by 20 % (Sterling). The page does this when a depth is entered.",
+   "src": [
+    "STERLING"
+   ]
+  },
+  {
+   "t": "Straightness to expect: typically 0.001 in per inch of depth (Star SU, quoted in Cutting Tool Engineering).",
+   "src": [
+    "CTE2016"
+   ]
+  }
+ ],
+ "not_used": [
+  {
+   "publisher": "botek",
+   "title": "Coolant pressure and coolant quantity for Type 110 (pp. 20-21)",
+   "why": "Charts by diameter and depth; no numbers in the text. This is why the pressure and flow table has one source."
+  },
+  {
+   "publisher": "botek",
+   "title": "Guide values, p. 21 (cast iron, non-ferrous, hardened steel and others)",
+   "why": "Six speed ranges under fifteen material headings and no diameter column in the text: cannot be matched."
+  },
+  {
+   "publisher": "Hartner",
+   "title": "Cutting speed table, pp. 474-475",
+   "why": "The feed columns read cleanly but the materials they belong to do not."
+  },
+  {
+   "publisher": "Ingersoll",
+   "title": "Speed table by material number",
+   "why": "The material names are not in the text and rows 29 to 41 are empty."
+  },
+  {
+   "publisher": "ISCAR",
+   "title": "Speeds, feeds and the pressure and flow chart of sheet 4448",
+   "why": "For indexable gundrills of 10 to 26 mm, a different tool; most feed cells and the chart did not come through."
+  },
+  {
+   "publisher": "Master Fluid Solutions",
+   "title": "Fill-the-hole flow rule and nozzle formula (technical bulletin 109)",
+   "why": "Both examples are reproduced by the core tests, but the rule is not shown: at gundrill speeds it asks for several times the makers' flow (32 gal/min for a 1/2 in drill 16.5 in deep at 2,284 rpm, where Sterling gives 7), more than a coolant hole of a quarter of the diameter passes by the bulletin's own nozzle formula (about 10.7 gal/min at 525 psi)."
+  }
+ ]
+}

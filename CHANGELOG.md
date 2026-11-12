@@ -23,6 +23,14 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - The rule comes from one author (J. Badger, Cutting Tool Engineering, three columns) and is marked single-source; a 2006 paper supports the mechanism. The limit for "close to" (0.02) is BenchMate's own and is shown as such. Two small differences from the printed examples are explained in `docs/sources.md`.
 - `benchmate-core` `grinding`: `rpm_ratio`, `rpm_ratio_class`, `rpm_ratio_off_whole`, `rpm_ratio_off_fraction`, `work_rpm_for_ratio`, `marks_frequency_hz`, `wave_spacing` and helpers; tests on both published examples and on the author's good and bad ratios. Own drawing; two proofs on the page.
 
+### Added (gun drilling)
+- New tool **Gun drilling: speed, feed, coolant pressure and flow** in Holes and threads > Drilling, for single-flute gundrills from 0.125 to 1.000 in (3.18 to 25.4 mm).
+- Cutting speed by material and hardness (eleven material groups, for high pressure and for spray mist, with the maker's percentage adjustments), rpm, feed per revolution by diameter, feed rate and time, coolant pressure and flow, and the longest unsupported drill length.
+- The tables are Sterling Gun Drills'. For the steels, botek's guide ranges are shown on their own rows; where the two makers differ both stay visible. The pressure and flow table has one source and says so; UNISIG's general starting flow is shown beside it.
+- Over 30 diameters deep the feed is cut by 20 % (Sterling). Between table sizes values are taken on a straight line; outside the table nothing is given.
+- Seven "before you drill" notes (pilot hole or bushing, whip, pressure, coolant concentration, filtering and temperature, depth, straightness), each with its sources. Five things read and not used are listed with the reason.
+- New core module `deephole` with tests; evidence file `data/refdata/gundrill-evidence.json` with build checks (tables complete, rising or falling as they must, no gap in botek's diameter rows). Own drawing.
+
 ### Fixed
 - Knurling: the pitch round the circumference of a diagonal knurl was worked out in the page script. It now comes from the Rust core like every other number.
 

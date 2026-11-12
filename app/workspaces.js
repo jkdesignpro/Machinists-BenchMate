@@ -66,7 +66,7 @@ const WORKSPACES = [
     ['Other milling', ['surfacefin', 'slitsaw', 'indexing'], 'saw'],
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
-    ['Drilling', ['advdrill', 'advream', 'advtap', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
+    ['Drilling', ['advdrill', 'advream', 'advtap', 'gundrill', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
     ['Tapping and thread data', ['threaddata', 'threadid', 'taplimits', 'wires', 'sti', 'coating', 'multistart'], 'tap'],
     ['Thread standards', ['pipethreads', 'whitworth', 'acme', 'trapezoidal', 'buttress', 'unseries', 'unm', 'unjunr'], 'thread'],
     ['Thread programs', ['threadprog'], 'code'],

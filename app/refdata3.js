@@ -649,3 +649,102 @@ async function renderKnurl(el) {
   kp.oninput = upd; kdp.oninput = upd; kf.onchange = upd; kl.oninput = upd;
   setUnits(); setHow(); setMeth(); showTicks(); upd();
 }
+
+// ------------------------------------------------------------------ gun drilling
+// Starting speed, feed, coolant pressure and flow for a single-flute gundrill. The tables are one maker's
+// (Sterling), with a second maker's ranges (botek) beside them for the steels and nothing merged. Lookups and
+// unit conversion happen here; every calculated number comes from the Rust core.
+async function renderGunDrill(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, K = R.gundrill; if (!K) { el.textContent = 'Gun drilling data not built.'; return; }
+  const m = RMEM.gundrill || (RMEM.gundrill = { d: 12.7, g: 'lc', h: 0, a: -1, c: 'hp', f: 'c1', depth: null });
+  const GAL_L = 3.785411784, PSI_BAR = 0.0689475729, FCOL = Object.keys(K.feed.columns);
+  const lenF = (id, lab, hint) => '<label class="f"><span>' + lab + '</span><div class="row"><input id="' + id + '" type="number" step="any" inputmode="decimal"' + (hint ? ' placeholder="' + hint + '"' : '') + '><span class="u">' + uLen() + '</span></div></label>';
+  const sel = (id, lab) => '<label class="f"><span>' + lab + '</span><div class="row"><select id="' + id + '"></select></div></label>';
+  el.innerHTML = '<div class="grid" style="max-width:760px">' + lenF('gdd', 'Drill diameter') + sel('gdm', 'Material') + sel('gdh', 'Hardness, HRC') + sel('gda', 'Speed adjustment') +
+    '<label class="f"><span>Coolant delivery</span><div class="row"><select id="gdc">' + K.speed.columns.map(c => '<option value="' + c + '">' + rEsc(K.speed.column_names[c]) + '</option>').join('') + '</select></div></label>' +
+    sel('gdf', 'Feed column of the table') + lenF('gdl', 'Hole depth', 'optional') + '</div><div id="gdres"></div>' +
+    '<div class="note"><b>Working:</b> the speed comes from Sterling\'s chart by material and hardness; rpm = 12 x SFM / (pi x D in). The feed per revolution comes from Sterling\'s table by diameter, and the pressure, flow and longest unsupported length from its oil table; between two table sizes the value is taken on a straight line, and outside the table (0.125 to 1.000 in) nothing is given. Feed rate = feed x rpm. Over 30 diameters deep the feed is cut by 20 %. ' +
+    'For the steels, botek\'s guide ranges for the same diameter are shown beside Sterling\'s figure and not mixed with it. The two makers do not agree everywhere: Sterling\'s feeds sit at or under the low end of botek\'s ranges. Start low and listen to the chips. ' +
+    'The pressure and flow table has one source (botek and ISCAR give theirs as charts that could not be read). UNISIG\'s starting flow per unit of diameter, for deep hole drilling in general, is shown beside it; it is higher, and UNISIG says it varies by tool type. These are starting values, not limits: the tool maker\'s data for your drill comes first.</div>' +
+    '<div class="note"><b>Before you drill</b><ul class="gdrules">' + K.rules.map(r => '<li>' + rEsc(r.t) + ' <i>[' + r.src.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ') + (r.status === 'single' ? ', one source' : '') + ']</i></li>').join('') + '</ul></div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '<br><b>Read and not used:</b> ' + K.not_used.map(x => rEsc(x.publisher) + ', ' + rEsc(x.title) + ': ' + rEsc(x.why)).join(' ') + '</div>';
+  const q = id => $('#' + id, el), gm = q('gdm'), gh = q('gdh'), ga = q('gda'), gc = q('gdc'), gf = q('gdf');
+  const grp = () => K.speed.groups.find(g => g.id === gm.value) || K.speed.groups[0];
+  function bindLen(id, key) {
+    const inp = q(id), orig = m[key], shown = orig > 0 ? String(+toUser(orig).toFixed(inMode() ? 4 : 3)) : '';
+    inp.value = shown; inp.oninput = upd;
+    return () => { const v = parseFloat(inp.value); m[key] = inp.value === shown ? orig : (v > 0 ? fromUser(v) : null); return m[key]; };
+  }
+  gm.innerHTML = K.speed.groups.map(g => '<option value="' + g.id + '">' + rEsc(g.name) + '</option>').join('');
+  gf.innerHTML = FCOL.map(c => '<option value="' + c + '">' + rEsc(K.feed.columns[c]) + '</option>').join('');
+  function fillGroup(keep) {
+    const G = grp();
+    gh.innerHTML = G.rows.map((r, n) => '<option value="' + n + '">' + rEsc(r[0]) + '</option>').join('');
+    ga.innerHTML = '<option value="-1">None</option>' + G.adjust.map((a, n) => '<option value="' + n + '">' + rEsc(a[0]) + ': ' + (a[1] > 0 ? '+' : '') + a[1] + ' %</option>').join('');
+    ga.disabled = !G.adjust.length;
+    if (keep) { gh.value = String(Math.min(m.h, G.rows.length - 1)); ga.value = String(m.a < G.adjust.length ? m.a : -1); gf.value = m.f; }
+    else { gh.value = '0'; ga.value = '-1'; gf.value = G.feed; }
+  }
+  // Straight line between the two table rows that bracket x (column c); null outside the table or where a cell is empty.
+  function tab(rows, x, c) {
+    if (!(x >= rows[0][0] && x <= rows[rows.length - 1][0])) return null;
+    for (let i = 0; i < rows.length - 1; i++) if (x >= rows[i][0] && x <= rows[i + 1][0]) {
+      if (rows[i][c] === null || rows[i + 1][c] === null) return x === rows[i + 1][0] ? rows[i + 1][c] : x === rows[i][0] ? rows[i][c] : null;
+      return W.lerp(x, rows[i][0], rows[i][c], rows[i + 1][0], rows[i + 1][c]);
+    }
+    return null;
+  }
+  const two = (a, ua, da, b, ub, db) => '<span class="mv">' + fx(a, da) + ' ' + ua + '</span> <span class="ms">' + fx(b, db) + ' ' + ub + '</span>';
+  const rng = (a0, a1, ua, da, b0, b1, ub, db) => '<span class="mv">' + fx(a0, da) + ' to ' + fx(a1, da) + ' ' + ua + '</span> <span class="ms">' + fx(b0, db) + ' to ' + fx(b1, db) + ' ' + ub + '</span>';
+  const lng = i => inMode() ? two(i, 'in', 1, i * IN_MM, 'mm', 0) : two(i * IN_MM, 'mm', 0, i, 'in', 1);
+  const spd = sfm => inMode() ? two(sfm, 'SFM', 0, sfm * FT_M, 'm/min', 1) : two(sfm * FT_M, 'm/min', 1, sfm, 'SFM', 0);
+  const fdr = f => inMode() ? two(f, 'in/rev', 5, f * IN_MM, 'mm/rev', 4) : two(f * IN_MM, 'mm/rev', 4, f, 'in/rev', 5);
+  const fdm = f => inMode() ? two(f, 'in/min', 2, f * IN_MM, 'mm/min', 1) : two(f * IN_MM, 'mm/min', 1, f, 'in/min', 2);
+  const prs = p => inMode() ? two(p, 'psi', 0, p * PSI_BAR, 'bar', 1) : two(p * PSI_BAR, 'bar', 1, p, 'psi', 0);
+  const flw = g => inMode() ? two(g, 'gal/min', 1, g * GAL_L, 'l/min', 1) : two(g * GAL_L, 'l/min', 1, g, 'gal/min', 1);
+  const getD = bindLen('gdd', 'd'), getL = bindLen('gdl', 'depth');
+  function upd() {
+    const G = grp(); m.g = G.id; m.h = +gh.value; m.a = +ga.value; m.c = gc.value; m.f = gf.value;
+    const dmm = getD(), depth = getL(), out = q('gdres');
+    if (!(dmm > 0)) { out.innerHTML = ''; return; }
+    const din = dmm / IN_MM, row = G.rows[m.h], sfm0 = row[1 + K.speed.columns.indexOf(m.c)], adj = m.a >= 0 ? G.adjust[m.a] : null;
+    const sfm = adj ? W.pct_adjust(sfm0, adj[1]) : sfm0, rpm = W.rpm_from_sfm(sfm, din), ST = rEsc(pubName(K.sources, K.speed.src));
+    const rows = [['Cutting speed', calcCell(spd(sfm), ST + ': ' + rEsc(row[0]) + ' HRC' + (adj ? ', ' + rEsc(adj[0].toLowerCase()) + ' ' + (adj[1] > 0 ? '+' : '') + adj[1] + ' %' : '') + (m.c === 'mist' && G.mist_note ? ', ' + rEsc(G.mist_note) : ''))]];
+    const bk = G.botek !== undefined ? K.botek : null;
+    if (bk) { const v = bk.vc_m_min[G.botek]; rows.push(['botek, for comparison', calcCell(inMode() ? rng(v[0] / FT_M, v[1] / FT_M, 'SFM', 0, v[0], v[1], 'm/min', 0) : rng(v[0], v[1], 'm/min', 0, v[0] / FT_M, v[1] / FT_M, 'SFM', 0), 'guide range for: ' + rEsc(bk.groups[G.botek]))]); }
+    rows.push(['Spindle speed', calcCell('<span class="mv">' + fx(rpm, 0) + ' rpm</span>', '12 x SFM / (pi x D)')]);
+    const ratio = depth > 0 ? W.depth_ratio(depth, dmm) : NaN, f0 = tab(K.feed.rows, din, 1 + FCOL.indexOf(m.f));
+    if (ratio > 0) rows.push(['Depth in diameters', calcCell('<span class="mv">' + fx(ratio, 1) + ' x D</span>', 'depth / diameter')]);
+    if (f0 === null) rows.push(['Feed per revolution', '<td class="v" colspan="2">Outside ' + ST + '\'s table (0.125 to 1.000 in, 3.18 to 25.4 mm). Use the drill maker\'s data.</td>']);
+    else {
+      const f = ratio > 0 ? W.gundrill_feed_for_depth(f0, ratio, K.feed.long_ratio, K.feed.long_pct) : f0, cut = f !== f0;
+      rows.push(['Feed per revolution', calcCell(fdr(f), ST + ', column "' + rEsc(K.feed.columns[m.f]) + '"' + (cut ? '; cut by ' + (-K.feed.long_pct) + ' % because the hole is over ' + K.feed.long_ratio + ' diameters deep' : ''))]);
+      if (bk) {
+        const br = bk.feed_mm_rev.find(r => dmm >= r[0] - 1e-9 && (r[1] === null || dmm < r[1] + 0.01 - 1e-9));
+        if (br) { const rg = br[2 + G.botek]; rows.push(['botek, for comparison', calcCell(inMode() ? rng(rg[0] / IN_MM, rg[1] / IN_MM, 'in/rev', 5, rg[0], rg[1], 'mm/rev', 4) : rng(rg[0], rg[1], 'mm/rev', 4, rg[0] / IN_MM, rg[1] / IN_MM, 'in/rev', 5), 'guide range for ' + fx(br[0], 2) + (br[1] === null ? ' mm and over' : ' to ' + fx(br[1], 2) + ' mm'))]); }
+        else rows.push(['botek, for comparison', '<td class="v" colspan="2">No row for this diameter (the table starts at 1.85 mm).</td>']);
+      }
+      rows.push(['Feed rate', calcCell(fdm(W.table_feed(rpm, f, 1)), 'feed x rpm')]);
+      if (depth > 0) rows.push(['Time to drill the depth', calcCell('<span class="mv">' + fx(W.drill_time_min(depth / IN_MM, 0, f, rpm), 2) + ' min</span>', 'depth / feed rate')]);
+    }
+    const psi = tab(K.coolant.rows, din, 1), gpm = tab(K.coolant.rows, din, 2), gtw = tab(K.coolant.rows, din, 3), uh = tab(K.coolant.rows, din, 4), ul = tab(K.coolant.rows, din, 5);
+    if (psi === null) rows.push(['Coolant pressure and flow', '<td class="v" colspan="2">Outside ' + ST + '\'s table (0.125 to 1.000 in, 3.18 to 25.4 mm).</td>']);
+    else {
+      rows.push(['Coolant pressure', calcCell(prs(psi), ST + ', gun drill machine with oil; one source')], ['Coolant flow, single flute', calcCell(flw(gpm), 'per spindle; one source')]);
+      if (gtw !== null) rows.push(['Coolant flow, twin flute', calcCell(flw(gtw), 'per spindle; one source')]);
+      rows.push(['Longest unsupported drill length', calcCell(lng(uh), 'at high SFM')], ['', calcCell(lng(ul), 'at low SFM')]);
+    }
+    const U = K.unisig_flow;
+    const u0 = W.flow_per_dia(U.gpm_per_in[0], din), u1 = W.flow_per_dia(U.gpm_per_in[1], din), l0 = W.flow_per_dia(U.l_min_per_mm[0], dmm), l1 = W.flow_per_dia(U.l_min_per_mm[1], dmm);
+    rows.push(['UNISIG starting flow, any deep hole tool', calcCell(inMode() ? rng(u0, u1, 'gal/min', 1, l0, l1, 'l/min', 1) : rng(l0, l1, 'l/min', 1, u0, u1, 'gal/min', 1), U.gpm_per_in.join(' to ') + ' gal/min per inch, ' + U.l_min_per_mm.join(' to ') + ' l/min per mm of diameter; it varies by tool type')]);
+    out.innerHTML = '<div class="res"><table>' + rowsHtml(rows) + '</table>' +
+      (G.verify ? '<p class="desc"><b>' + ST + ' marks this material:</b> ask the drill maker to verify the application before relying on these values.</p>' : '') +
+      (G.feed_note ? '<p class="desc">' + rEsc(G.feed_note) + '</p>' : '') +
+      (m.c === 'mist' ? '<p class="desc">Spray mist: the speed is from the spray mist column. ' + ST + ' gives the feed table for spray mist at 100 psi and more as well; the pressure and flow rows are for a gun drill machine with oil.</p>' : '') + '</div>';
+  }
+  gm.value = m.g; gc.value = m.c; fillGroup(true);
+  gm.onchange = () => { fillGroup(false); upd(); };
+  gh.onchange = upd; ga.onchange = upd; gc.onchange = upd; gf.onchange = upd;
+  upd();
+}

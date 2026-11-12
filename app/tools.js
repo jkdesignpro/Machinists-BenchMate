@@ -1124,6 +1124,13 @@ const TOOLS = [
   source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
 },
 {
+  id: 'gundrill', level: 'advanced', group: 'Drilling and tapping', title: 'Gun drilling: speed, feed, coolant pressure and flow',
+  desc: 'Starting values for a single-flute gundrill: cutting speed by material and hardness, feed per revolution by diameter, coolant pressure and flow, the longest unsupported drill length and the time to drill. One maker\'s tables with a second maker\'s ranges beside them for the steels.',
+  render: el => renderGunDrill(el),
+  working: 'rpm = 12 x SFM / (pi x D in); feed rate = feed per revolution x rpm; over 30 diameters deep the feed is cut by 20 %; table values between two sizes are taken on a straight line. See the note under the tool.',
+  source: 'Sterling Gun Drills catalogue (speed chart, feed table, oil pressure and flow); botek catalogue ELB/ZLB, Type 110 guide values (steels, for comparison); UNISIG deep hole drilling technical reference; Master Fluid Solutions technical bulletin 109; Cutting Tool Engineering, "Conventional thinking", 2016; Hartner, Ingersoll and ISCAR catalogue notes. See docs/sources.md, Gun drilling.',
+},
+{
   id: 'grindratio', level: 'advanced', group: 'Grinding', title: 'Wheel to work rpm ratio (waviness check)',
   desc: 'Cylindrical grinding: the wheel rpm divided by the work rpm. At a whole-number ratio a wheel that runs out or is out of balance puts its waves in the same place on every turn of the work. Shows the ratio, how close it is to a whole number or a simple fraction, the work speeds to stay away from, what happens as the wheel wears, and what a count of chatter marks points to.',
   fields: s => [

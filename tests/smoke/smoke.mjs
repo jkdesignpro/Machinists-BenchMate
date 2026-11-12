@@ -1207,6 +1207,60 @@ where = 'grindratio';
   await has(/Spacing of those waves round the work 0\.0877 in/, 'spacing of 71.62 waves on 2 in is 0.0877 in');
   await has(/Wheel, once per revolution 47\.75 Hz/, 'the wheel turns at 47.75 Hz');
 }
+// Gun drilling: the maker's table values, straight-line values between table sizes, nothing outside the table,
+// the second maker's ranges beside them, the 20 % cut over 30 diameters and the percentage speed adjustments.
+where = 'gundrill';
+{
+  await units('inch');
+  await open('gundrill', 150);
+  const set = async (id, v) => { const q = `#main #${id}`; await page.fill(q, String(v)); await page.dispatchEvent(q, 'input'); await page.waitForTimeout(30); };
+  const pick = async (id, v) => { await page.selectOption(`#main #${id}`, v); await page.waitForTimeout(40); };
+  const res = () => page.$eval('#main #gdres', e => e.innerText.replace(/\s+/g, ' '));
+  const has = async (re, what) => { const t = await res(); if (!re.test(t)) problems.push(`[${where}] ${what}: ${t}`); };
+  // 1/2 in drill, low to medium carbon steel 12-17 HRC, high pressure: Sterling 330 SFM, 0.0008 in/rev, 525 psi, 7.0 gal/min
+  await has(/Cutting speed 330 SFM 100\.6 m\/min Sterling Gun Drills: 12-17 HRC/, 'default speed 330 SFM');
+  await has(/botek, for comparison 230 to 328 SFM 70 to 100 m\/min guide range for: Structural and carbon steel/, 'botek speed range 70 to 100 m/min');
+  await has(/Spindle speed 2521 rpm/, '330 SFM on 0.5 in is 2521 rpm');
+  await has(/Feed per revolution 0\.00080 in\/rev 0\.0203 mm\/rev Sterling Gun Drills, column "Steels, low and medium carbon"/, 'feed 0.0008 in/rev');
+  await has(/botek, for comparison 0\.00106 to 0\.00299 in\/rev 0\.0270 to 0\.0760 mm\/rev guide range for 12\.00 to 13\.99 mm/, 'botek feed range for 12.7 mm');
+  await has(/Feed rate 2\.02 in\/min 51\.2 mm\/min/, 'feed rate 2.02 in/min');
+  await has(/Coolant pressure 525 psi 36\.2 bar .*one source.*Coolant flow, single flute 7\.0 gal\/min 26\.5 l\/min .*Coolant flow, twin flute 7\.5 gal\/min .*Longest unsupported drill length 16\.0 in 406 mm at high SFM 32\.0 in 813 mm at low SFM/, 'coolant row of the 0.500 in size');
+  await has(/UNISIG starting flow, any deep hole tool 12\.5 to 15\.0 gal\/min 47\.0 to 57\.1 l\/min/, 'UNISIG 25 to 30 gal/min per inch');
+  if (/Time to drill|Depth in diameters/.test(await res())) problems.push(`[${where}] no depth entered: no depth rows expected`);
+  // between two table sizes: 0.300 in is 0.4 of the way from 0.250 to 0.375: 0.00055 in/rev, 825 psi, 3.2 gal/min
+  await set('gdd', 0.3);
+  await has(/Feed per revolution 0\.00055 in\/rev/, '0.300 in should give 0.00055 in/rev');
+  await has(/Coolant pressure 825 psi .*single flute 3\.2 gal\/min/, '0.300 in should give 825 psi and 3.2 gal/min');
+  // outside the table nothing is made up
+  await set('gdd', 1.5);
+  await has(/Feed per revolution Outside Sterling Gun Drills's table .*Coolant pressure and flow Outside Sterling Gun Drills's table/, '1.5 in is outside the table');
+  if (/Feed rate|single flute/.test(await res())) problems.push(`[${where}] outside the table there should be no feed rate or flow`);
+  await set('gdd', 0.1);
+  await has(/Feed per revolution Outside/, '0.100 in is under the table');
+  // deep hole: 0.5 in x 16 in is 32 diameters, the feed is cut by 20 % to 0.00064, 16 / (0.00064 x 2521) = 9.92 min
+  await set('gdd', 0.5); await set('gdl', 16);
+  await has(/Depth in diameters 32\.0 x D .*Feed per revolution 0\.00064 in\/rev .*cut by 20 % because the hole is over 30 diameters deep.*Time to drill the depth 9\.92 min/, '32 diameters deep: 0.00064 in/rev and 9.92 min');
+  await set('gdl', 15);
+  await has(/Depth in diameters 30\.0 x D .*Feed per revolution 0\.00080 in\/rev 0\.0203 mm\/rev Sterling Gun Drills, column "Steels, low and medium carbon" botek/, 'exactly 30 diameters: no cut');
+  // stainless 300, free machining +30 %, spray mist: 150 x 1.3 = 195 SFM; the feed column follows the material; the maker's warning shows
+  await pick('gdm', 'ss300'); await pick('gda', '0'); await pick('gdc', 'mist');
+  await has(/Cutting speed 195 SFM .*17-17 \(as printed; probably 12-17\) HRC, free machining \+30 %/, 'stainless 300 free machining on spray mist is 195 SFM');
+  await has(/guide range for: Stainless steel, austenitic.*column "Stainless 300 series, titanium, high temperature nickel alloys".*marks this material.*Spray mist:/, 'stainless: feed column, botek group, verify note and mist note');
+  if (await page.inputValue('#main #gdf') !== 'c3') problems.push(`[${where}] the feed column should follow the material`);
+  // grey cast iron has no botek rows and its own adjustments
+  await pick('gdm', 'gci'); await pick('gdc', 'hp'); await pick('gda', '1');
+  await has(/Cutting speed 160 SFM .*ni-resist -60 %/, 'grey iron Ni-Resist is 400 less 60 % = 160 SFM');
+  if (/botek/.test(await res())) problems.push(`[${where}] no botek rows expected for cast iron`);
+  // mm: 6 mm in low carbon steel: botek row 6.00 to 6.99 mm
+  await units('mm'); await open('gundrill', 150);
+  await pick('gdm', 'lc'); await set('gdd', 6); await set('gdl', '');
+  await has(/botek, for comparison 0\.0110 to 0\.0364 mm\/rev .*guide range for 6\.00 to 6\.99 mm/, 'botek row for 6 mm');
+  await has(/Coolant pressure 67\.2 bar 974 psi/, '6 mm is 974 psi by the straight line between 0.187 and 0.250 in');
+  const rules = await page.$$eval('#main ul.gdrules li', a => a.map(li => li.innerText.replace(/\s+/g, ' ')));
+  if (rules.length !== 7 || rules.some(t => !/\[[^\]]+\]$/.test(t))) problems.push(`[${where}] seven rules, each naming its sources: ${rules.length}`);
+  const txt = await page.$eval('#main', e => e.innerText);
+  for (const w of ['Read and not used', 'Master Fluid Solutions', 'UNISIG', 'botek', 'Hartner', 'Ingersoll', 'ISCAR']) if (!txt.includes(w)) problems.push(`[${where}] the sources note should name ${w}`);
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

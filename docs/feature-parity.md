@@ -34,7 +34,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Drilling | Drill speed/feed recommendations | missing | | U28 |
 | Drilling | Drill point length | done | `drillpoint` | U29 |
 | Drilling | Center drill depth / spot drill depth | partial (depth both ways; no centre drill size table) | `spotdepth` | U32 |
-| Drilling | Reaming, gun drill, tapping speed | missing | | U33-U35 |
+| Drilling | Reaming, gun drill, tapping speed | done (reaming, gun drilling) / partial (tapping speed: one publisher's table) | `advream`, `gundrill`, `advtap` | U33-U35 |
 | Reference | Drill chart (fraction, number, letter, metric) | done | `drillchart` | U30 |
 | Reference | Tap drill sizes (cut and form) | done | `tapdrill` | U31 |
 | Reference | Thread data and limits: UNC/UNF/UNEF, metric M | done | `threaddata` | U38, U43, U52 |

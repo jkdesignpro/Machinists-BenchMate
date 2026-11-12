@@ -411,6 +411,45 @@ def knurl_steps(ev):
     return out
 
 
+def build_gundrill():
+    """Gun drilling starting values. One maker's tables (Sterling) with a second
+    maker's ranges (botek) beside them for the steels; nothing is merged. Checks
+    that the tables are complete and rise or fall the way such tables must."""
+    ev = load_ev('gundrill-evidence.json')
+    if not ev: return None
+    S = ev['sources']
+    def need(k):
+        if k not in S: raise SystemExit('gundrill: unknown source ' + k)
+    for sec in ('speed_sfm', 'feed_in_rev', 'coolant', 'botek', 'unisig_flow'): need(ev[sec]['src'])
+    cols = ev['feed_in_rev']['columns']
+    for g in ev['speed_sfm']['groups']:
+        if g['feed'] not in cols: raise SystemExit('gundrill: feed column of ' + g['id'])
+        for r in g['rows']:
+            if not (r[1] > r[2] > 0): raise SystemExit('gundrill: speed row ' + g['id'] + ' ' + r[0])
+        hp = [r[1] for r in g['rows']]
+        if hp != sorted(hp, reverse=True): raise SystemExit('gundrill: speeds of ' + g['id'] + ' should fall with hardness')
+    fr = ev['feed_in_rev']['rows']
+    if any(len(r) != 7 for r in fr) or [r[0] for r in fr] != sorted(r[0] for r in fr): raise SystemExit('gundrill: feed rows')
+    for c in range(1, 7):
+        v = [r[c] for r in fr]
+        if v != sorted(v): raise SystemExit('gundrill: feed column %d should rise with diameter' % c)
+    cr = ev['coolant']['rows']
+    if [r[1] for r in cr] != sorted((r[1] for r in cr), reverse=True) or [r[2] for r in cr] != sorted(r[2] for r in cr): raise SystemExit('gundrill: coolant rows')
+    bf = ev['botek']['feed_mm_rev']
+    for i, r in enumerate(bf):
+        if i and abs(r[0] - bf[i - 1][1] - 0.01) > 1e-9: raise SystemExit('gundrill: botek diameter rows leave a gap at %s' % r[0])
+        for lo, hi in r[2:]:
+            if not (0 < lo < hi): raise SystemExit('gundrill: botek feed range at %s' % r[0])
+    rules = []
+    for st in ev['rules']:
+        for k in st['src']: need(k)
+        pubs = {S[k]['publisher'] for k in st['src']}
+        rules.append({'t': st['t'], 'src': st['src'], 'status': 'confirmed' if len(pubs) >= 2 else 'single'})
+    return {'sources': sources_of(ev), 'speed': ev['speed_sfm'], 'feed': ev['feed_in_rev'], 'coolant': ev['coolant'],
+            'botek': {k: v for k, v in ev['botek'].items() if not k.startswith('_')}, 'unisig_flow': ev['unisig_flow'],
+            'rules': rules, 'not_used': ev['not_used']}
+
+
 def build_grinding():
     """Grit sizes (um) per system and wheel marking letters, each with publisher consensus."""
     ev = load_ev('grinding-evidence.json')
@@ -835,7 +874,7 @@ def matref_summary(m):
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
-           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes(),
+           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'gcodes': build_gcodes(),
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
            'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),

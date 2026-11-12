@@ -444,6 +444,31 @@ Findings:
   - Industrial Monitor Direct, knowledge base page on knurling cast iron: contradicts itself on the sign of the diameter allowance and on its units.
 - **Own advice, marked as such on the page:** chamfer the scrap piece; write down the blank, speed and growth that worked.
 
+## Gun drilling (`data/refdata/gundrill-evidence.json`, `core/src/deephole.rs`, `app/refdata3.js`)
+All accessed 2026-11-12. Every table used was read twice from the PDF; the two readings agree cell for cell.
+
+- **[STERLING]** Sterling Gun Drills, catalogue, "Speeds and Feeds". https://productivity.com/wp-content/uploads/pdfs/Sterling%20Gun%20Drill%20Catalog.pdf . Speed chart (SFM by material and hardness, for high pressure and for spray mist, with percentage adjustments), approximate feed rate (in/rev by diameter, six material columns), oil pressure, flow and longest unsupported length by diameter, RPM = SFM / 0.262 / diameter, "drill lengths over 30:1: reduce feed rate by 20 %".
+- **[BOTEK]** botek, catalogue ELB/ZLB, guide values for Type 110, pp. 20-21. https://botek.de/downloads/en/Catalog_ELB_ZLB_E.pdf . Cutting speed ranges for four steel groups and feed ranges by drill diameter (p. 20).
+- **[UNISIG]** UNISIG, Deep hole drilling technical reference. https://stagingxx.unisig.com/wp-content/uploads/2016/08/UNISIG-Deep-Hole-Drilling-Technical-Reference.pdf . Starting coolant flow 3.7 to 4.5 l/min per mm of tool diameter (25 to 30 gal/min per inch), "parameter values change by tooling type".
+- **[MASTERFLUID]** Master Fluid Solutions, technical bulletin 109, "Gun drilling". https://www.masterfluids.com/na/en-us/technical-information/tb.php?tbid=109
+- **[CTE2016]** K. Hanson, "Conventional thinking", *Cutting Tool Engineering*, 1 Jan 2016. https://ctemag.com/node/21113 . Quotes Drill Masters Eldorado, Sterling, UNISIG, Star SU and Iscar.
+- **[HARTNER]** Hartner catalogue pages 474-475. https://imageservice.kyocera-unimerco.com/imageandfile/getpdf/hartner_474-475.pdf
+- **[INGERSOLL]** Ingersoll Cutting Tools, gun drill catalogue excerpts. https://ssl.ingersoll-imc.com/resources/pdf/cat-002-2-excerpts-gun-drills.pdf
+- **[ISCAR]** ISCAR e-catalogue information sheet 4448. https://www.iscar.com/eCatalog/Ecat/datafileENM/INFO/4448.pdf
+
+Findings:
+- **One maker's tables, a second maker beside them.** Speed, feed, pressure and flow come from Sterling, the only source whose tables could be read whole. For the four steel groups botek's guide ranges are shown on their own rows. Nothing is averaged.
+- **The makers differ, and the page says so.** Sterling's speeds sit at or above the top of botek's ranges (low carbon steel 330 SFM = 100.6 m/min against 70 to 100; stainless 300 series 230 SFM = 70 m/min against 30 to 60). Sterling's feeds sit at or under the bottom of botek's (1/2 in in carbon steel: 0.0203 mm/rev against 0.027 to 0.076).
+- **Pressure and flow have one source.** botek and ISCAR print theirs as charts, which could not be read. Two statements quoted in [CTE2016] bracket Sterling's table: 1,500 psi and more for very small drills, 200 to 400 psi on drills of 2 in and over (Drill Masters Eldorado). UNISIG's flow figure, for deep hole drilling in general, is about twice Sterling's at 1/2 in (12.5 to 15 against 7 gal/min) and is shown on its own row.
+- **Cross-check of the feed table.** [CTE2016] quotes Sterling: "a 0.250 in gundrill in steel might feed at just 0.0005 ipr"; the table gives 0.00045.
+- **How the feed column headings were read.** The PDF text breaks the headings into fragments. Read in column order they are: steels, low and medium carbon | steels: alloy, tool, 416 stainless | stainless 300 series, titanium, high temperature nickel alloys | cast iron, grey; aluminium, free cutting | cast iron, ductile (nodular) | non-ferrous alloys, difficult to chip. The page lets the user change the column.
+- **"17-17" in the stainless 300 chart** is shown as printed, with "probably 12-17" beside it.
+- **botek's diameter labels under 10 mm** carry a stray "1" in the PDF text ("11.85 - 12.49", "6.00 - 16.99"). They are read as 1.85-2.49 up to 9.00-9.99: the limits then run without a gap into the clean row 10.00-11.99 (the build checks this), and Type 110 starts at 1.85 mm.
+- **Between table sizes** the value is taken on a straight line (BenchMate's choice, said on the page). Outside 0.125 to 1.000 in nothing is given.
+- **Checks (core tests in `deephole.rs`).** Master Fluid Solutions' two worked examples (1.1 GPM, 9.5 GPM); Sterling's rpm formula against the core's (0.262 against pi / 12); UNISIG's metric and inch flow figures agree with each other (3.7 to 4.5 l/min per mm is 24.8 to 30.2 gal/min per inch).
+- **Read and not used** (listed on the page with the reason): botek's pressure and quantity charts and its page 21; Hartner's speed table (materials cannot be matched); Ingersoll's speed table (material names missing); ISCAR's speeds, feeds and chart (indexable drills of 10 to 26 mm); Master Fluid Solutions' fill-the-hole flow rule (at gundrill speeds it asks for several times the makers' flow, and more than its own nozzle formula lets a coolant hole pass).
+- **Not readable:** *Cutting Tool Engineering*, "Gundrilling" (January 2012 PDF): the link returned the magazine's front page.
+
 ## G and M codes, macros (`data/refdata/gcodes-evidence.json`, `app/gmcodes.js`)
 Full list with editions, sections, coverage counts, gaps and disagreements: **`docs/gm-codes.md`**. All accessed 2026-11-10. Summary:
 - **Standards cited:** ISO 6983-1:2009 (program format and address words), by name only. **[NIST]** T. R. Kramer, F. M. Proctor, E. Messina, *The NIST RS274NGC Interpreter - Version 3*, NISTIR 6556, 2000 (public domain), Tables 4 and 5, section 3.6.

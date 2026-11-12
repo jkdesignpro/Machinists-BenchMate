@@ -164,7 +164,7 @@ Store list is the fuller of the two store lists.
 | U31 | Tap drill size (cut and form, % thread 55-85) | done | `tapdrill` |  |
 | U32 | Center drill dimensions / center drill hole depth | done | `spotdepth` |  |
 | U33 | Reaming speeds, feeds and allowance | done | `advream` |  |
-| U34 | Gun drill calculators | missing |  |  |
+| U34 | Gun drill calculators | done | `gundrill` | 0.5.0: speed, feed, coolant pressure and flow, unsupported length, time; Sterling's tables with botek's ranges beside them for the steels |
 | U35 | Tapping speed calculators | partial | `advtap` | Tapping advisor: speed from one publisher's table for general purpose cutting taps, held to the machine's top speed and feed, feed = pitch x rpm, time, tapping cycle. No speeds for forming taps or by tap coating; no second publisher found (`claude/advisor`) |
 | U36 | G84 tap cycle generator | done | `cycdrill` |  |
 | U37 | G81/G82/G83/G73 drill cycle generator | done | `cycdrill` |  |
