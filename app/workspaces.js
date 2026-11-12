@@ -94,6 +94,7 @@ const WORKSPACES = [
     ['Cycle generators', ['cycdrill', 'threadprog', 'cyctaper', 'cycgroove', 'cycg71', 'cycbroach', 'engrave'], 'code'],
     ['Simulate and draw', ['gsim', 'sketch', 'holepattern', 'dxfshapes'], 'play'],
     ['Setup', ['setupsheet', 'tnrc', 'offsetadj'], 'sheet'],
+    ['Rotary axis', ['rotpoint', 'rotfeed'], 'angle'],
   ] },
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
     ['Materials', ['materials', 'hardness', 'heattreat', 'tempercolours', 'galvanic', 'plastics', 'metalid'], 'material'],

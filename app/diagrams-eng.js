@@ -1301,3 +1301,52 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h + lab, 'Shaft critical speed with discs and the whirl shape');
   },
 });
+
+// Rotary axis: where a point goes. Seen from the + end of the rotary axis looking back along it:
+// the centre line, the point before and after, and the way the part turns. The other two axes are
+// drawn right and up in the order that makes a right-hand turn counter-clockwise on the page.
+Object.assign(DIAGRAMS, {
+  rotpoint(v, sys, rows) {
+    const W = 520, H = 356, cx = 250, cy = 158, RM = 110, u = deU(sys), dp = deDp(sys);
+    const ax = [0, 1, 2].includes(v.axis) ? v.axis : 0, names = 'XYZ', iu = (ax + 1) % 3, iw = (ax + 2) % 3;
+    const p0 = [v.x, v.y, v.z], c = [deFin(v.cx) ? v.cx : 0, deFin(v.cy) ? v.cy : 0, deFin(v.cz) ? v.cz : 0];
+    const p1 = [deV(rows, 'Point after the move: X'), deV(rows, 'Point after the move: Y'), deV(rows, 'Point after the move: Z')];
+    const rad = deV(rows, 'Distance of the point from the axis'), live = p1.every(deFin) && rad > 0;
+    let s = DK.cl(cx - RM - 40, cy, cx + RM + 40, cy) + DK.cl(cx, cy - RM - 30, cx, cy + RM + 30);
+    s += deArrow(cx + RM + 22, cy, cx + RM + 44, cy, 'thin') + DK.text(cx + RM + 50, cy + 4, '+' + names[iu], { anchor: 'start', cls: 'mut' });
+    s += deArrow(cx, cy - RM - 14, cx, cy - RM - 34, 'thin') + DK.text(cx + 8, cy - RM - 26, '+' + names[iw], { anchor: 'start', cls: 'mut' });
+    s += DK.circle(cx, cy, 3, 'ln') + DK.text(cx - 8, cy + 16, 'axis ' + 'ABC'[ax], { anchor: 'end', cls: 'mut' });
+    if (live) {
+      const k = RM / rad, P = p => [cx + (p[iu] - c[iu]) * k, cy - (p[iw] - c[iw]) * k], a = P(p0), b = P(p1);
+      s += '<circle class="thin" id="rpcirc" fill="none" stroke-dasharray="5 4" cx="' + cx + '" cy="' + cy + '" r="' + RM + '"/>';
+      s += DK.line(cx, cy, a[0], a[1], 'thin') + DK.line(cx, cy, b[0], b[1], 'hot');
+      s += '<circle class="ln" id="rpa" cx="' + deF(a[0]) + '" cy="' + deF(a[1]) + '" r="4.5"/>' + '<circle class="hotf" id="rpb" cx="' + deF(b[0]) + '" cy="' + deF(b[1]) + '" r="4.5"/>';
+      const a0 = Math.atan2(cy - a[1], a[0] - cx) * 180 / Math.PI, turn = (v.dir === 1 ? 1 : -1) * v.deg;
+      if (Math.abs(turn) > 0.5) { const sw = deClamp(turn, -330, 330); s += deRot(cx, cy, RM * 0.45, a0, a0 + sw, 'hot'); }
+      const lab = (q, t, cls, id) => DK.text(q[0] + (q[0] >= cx ? 10 : -10), q[1] + (q[1] <= cy ? -8 : 16), t, { anchor: q[0] >= cx ? 'start' : 'end', cls });
+      s += lab(a, 'at 0', 'mut') + lab(b, 'at ' + 'ABC'[ax] + DK.n(v.deg, 3), 'hott');
+      s += deLines(14, H - 32, [names[iu] + ' ' + DK.n(p1[iu], dp) + ', ' + names[iw] + ' ' + DK.n(p1[iw], dp) + ' ' + u + ' after the move; ' + names[ax] + ' stays ' + DK.n(p1[ax], dp),
+        'Distance from the axis ' + DK.n(rad, dp) + ' ' + u + '. Seen from the + end of ' + names[ax] + ', looking back along it.']);
+    } else s += deLines(14, H - 32, [rad === 0 ? 'The point is on the centre line of the axis: it does not move.' : 'Enter the point and the angle.', 'Seen from the + end of ' + names[ax] + ', looking back along it.']);
+    return DK.svg(W, H, s, 'A point on the part before and after the rotary axis turns, seen along the axis');
+  },
+
+  // Rotary axis feed: the surface of the part unrolled flat. Across: the move along the axis.
+  // Up: the length round the part. The cut is the sloping line. Fixed proportions; labels carry the numbers.
+  rotfeed(v, sys, rows) {
+    const W = 520, H = 300, u = deU(sys), dp = deDp(sys);
+    const arc = deV(rows, 'Length round the part'), len = deV(rows, 'Length of the cut'), f = deV(rows, 'Inverse time feed word'), t = deV(rows, 'Time for the block');
+    const lin = deFin(v.lin) ? Math.abs(v.lin) : 0, live = deFin(arc) && arc > 0;
+    const x0 = 120, y0 = 206, bw = 250, bh = 150;
+    let wpx = bw, hpx = bh;
+    if (live && lin > 0) { const k = Math.min(bw / lin, bh / arc); wpx = deClamp(lin * k, 36, bw); hpx = deClamp(arc * k, 36, bh); }
+    else if (live) wpx = 0;
+    let s = DK.rect(x0, y0 - bh, bw, bh, 'thin') + DK.text(x0 + bw, y0 - bh - 8, 'surface of the part, unrolled flat', { anchor: 'end', cls: 'mut' });
+    s += DK.line(x0, y0, x0 + wpx, y0 - hpx, 'hot') + DK.circle(x0, y0, 3.5, 'hotf') + deHead(x0 + wpx, y0 - hpx, Math.atan2(-hpx, wpx), 'hotf');
+    s += deDimV(y0, y0 - hpx, x0 - 26, live ? 'round ' + DK.n(arc, dp) : 'round the part');
+    if (wpx > 0) s += DK.dimH(x0, x0 + wpx, y0 + 28, live && lin > 0 ? 'along ' + DK.n(lin, dp) : 'along the axis', { from: y0, below: true });
+    if (live) s += DK.text(x0 + wpx / 2 + 14, y0 - hpx / 2 + 4, 'cut ' + DK.n(deFin(len) ? len : arc, dp) + ' ' + u, { anchor: 'start', cls: 'hott' });
+    s += deLines(14, H - 16, [deFin(f) ? 'G93 F' + DK.n(f, 3) + ': the block takes 1/F minutes' + (deFin(t) ? ' (' + DK.n(t, 2) + ' s)' : '') : 'Give the feed and the angle to see the inverse time feed word.']);
+    return DK.svg(W, H, s, 'The cut on the unrolled surface of the part: length round the part, move along the axis, and the cut as the sloping line');
+  },
+});

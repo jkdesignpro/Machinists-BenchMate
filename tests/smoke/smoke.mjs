@@ -924,6 +924,76 @@ where = 'engrave';
   if (!(await page.$('#main #engcredit')) || !/Dr\. A\. V\. Hershey/.test(await page.$eval('#main #engcredit', e => e.textContent)) || !/James Hurt/.test(await page.$eval('#main #engcredit', e => e.textContent))) problems.push(`[${where}] the font acknowledgement is not on the page`);
 }
 
+// Rotary axis helper: a point turned about A, B and C, both ways round, with the centre line off zero; the drawing
+// keeps both points on the same circle; the feed page gives degrees per minute, the helix length and the G93 word.
+where = 'rotpoint';
+{
+  await units('mm');
+  await mode('advanced');
+  await open('rotpoint', 80);
+  const set = async (k, v) => { const q = `#main [data-id="${k}"]`; if (await page.$eval(q, e => e.tagName === 'SELECT')) await page.selectOption(q, String(v)); else { await page.fill(q, String(v)); await page.dispatchEvent(q, 'input'); } await page.waitForTimeout(30); };
+  const rows = () => page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).join(' ; '));
+  const has = async (re, what) => { const t = await rows(); if (!re.test(t)) problems.push(`[${where}] ${what}: ${t}`); };
+  // defaults: A to 90 with the table carrying the part; (25, 10, 40) goes to Y 40, Z -10; 41.231 from the axis; chord 58.310
+  await has(/move: X 25\.000 mm ; .*move: Y 40\.000 mm ; .*move: Z -10\.000 mm/i, 'A90 on a table should give Y 40, Z -10');
+  await has(/\(does not change\) 41\.231 mm/, 'distance from the axis should be 41.231');
+  await has(/point moved 58\.310 mm/, 'chord should be 58.310');
+  await has(/the part turns clockwise by 90 degrees/, 'a table turning plus is clockwise seen from the + end');
+  // the other way round
+  await set('dir', 1);
+  await has(/move: Y -40\.000 mm ; .*move: Z 10\.000 mm/, 'right-hand A90 should give Y -40, Z 10');
+  await has(/the part turns counter-clockwise by 90 degrees/, 'right-hand plus is counter-clockwise seen from the + end');
+  // the drawing: both points on the dashed circle, the turned one where the numbers say (Y to the right, Z up)
+  const g = await page.evaluate(() => { const q = i => document.querySelector('#main .tdia svg #' + i), n = (e, a) => +e.getAttribute(a); const c = q('rpcirc'), a = q('rpa'), b = q('rpb'); return c && a && b ? { cx: n(c, 'cx'), cy: n(c, 'cy'), r: n(c, 'r'), ax: n(a, 'cx'), ay: n(a, 'cy'), bx: n(b, 'cx'), by: n(b, 'cy') } : null; });
+  if (!g) problems.push(`[${where}] the drawing has no points`);
+  else {
+    const k = g.r / Math.hypot(10, 40), d = (x, y) => Math.hypot(x - g.cx, y - g.cy);
+    if (Math.abs(d(g.ax, g.ay) - g.r) > 0.2 || Math.abs(d(g.bx, g.by) - g.r) > 0.2) problems.push(`[${where}] the points are not on the circle: ${JSON.stringify(g)}`);
+    if (Math.abs(g.ax - (g.cx + 10 * k)) > 0.2 || Math.abs(g.ay - (g.cy - 40 * k)) > 0.2 || Math.abs(g.bx - (g.cx - 40 * k)) > 0.2 || Math.abs(g.by - (g.cy - 10 * k)) > 0.2) problems.push(`[${where}] the points are drawn in the wrong place: ${JSON.stringify(g)}`);
+  }
+  // B and C by the right-hand rule: B90 takes (25, 10, 40) to X 40, Z -25; C90 takes it to X -10, Y 25
+  await set('axis', 1);
+  await has(/move: X 40\.000 mm ; .*move: Y 10\.000 mm ; .*move: Z -25\.000 mm/i, 'right-hand B90 should give X 40, Z -25');
+  if (await page.$('#main [data-id="cy"]') && await page.isVisible('#main [data-id="cy"]')) problems.push(`[${where}] the Y of the centre line is asked for on a B axis`);
+  await set('axis', 2);
+  await has(/move: X -10\.000 mm ; .*move: Y 25\.000 mm ; .*move: Z 40\.000 mm/i, 'right-hand C90 should give X -10, Y 25');
+  // centre line off zero: A about Y 10, Z 0 takes the point (0, 40) from the centre line to (-40, 0) from it
+  await set('axis', 0); await set('cy', 10);
+  await has(/move: Y -30\.000 mm ; .*move: Z 0\.000 mm ; .*\(does not change\) 40\.000 mm/, 'A90 about Y 10 should give Y -30, Z 0, 40 from the axis');
+  // a full turn brings the point back; no angle is no move
+  await set('deg', 360);
+  await has(/move: Y 10\.000 mm ; .*move: Z 40\.000 mm ; .*point moved 0\.000 mm/, 'a full turn should bring the point back');
+  await set('deg', 90); await set('cy', 0); await set('dir', 0);
+}
+where = 'rotfeed';
+{
+  await units('inch');
+  await open('rotfeed', 80);
+  const set = async (k, v) => { const q = `#main [data-id="${k}"]`; await page.fill(q, String(v)); await page.dispatchEvent(q, 'input'); await page.waitForTimeout(30); };
+  const rows = () => page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).join(' ; '));
+  const has = async (re, what) => { const t = await rows(); if (!re.test(t)) problems.push(`[${where}] ${what}: ${t}`); };
+  // the Fadal manual example: 4 in diameter, 90 degrees while X moves 3 in, 25 in/min
+  await has(/only turns 716\.20 deg\/min/i, '25 in/min on 4 in is 716.20 deg/min');
+  await has(/round the part 3\.1416 in ; .*at once\) 4\.3439 in ; Time for the block 10\.43 s ; .*F 5\.755 1\/min ; .*during the block 517\.97 deg\/min/, 'the Fadal example should give 4.3439, 10.43 s, F5.755, 517.97');
+  await has(/Controls differ/, 'the G94 row should say controls differ');
+  const cap = await page.$eval('#main .tdia svg', e => e.textContent.replace(/\s+/g, ' '));
+  if (!/round 3\.1416/.test(cap) || !/along 3/.test(cap) || !/cut 4\.3439 in/.test(cap) || !/G93 F5\.755/.test(cap)) problems.push(`[${where}] the drawing does not carry the numbers: ${cap}`);
+  // degrees per minute typed: 360 deg/min on 4 in is one turn a minute = 12.566 in/min along the surface
+  await set('dpm', 360);
+  const fv = await page.inputValue('#main [data-id="feed"]');
+  if (Math.abs(+fv - 12.566) > 0.001) problems.push(`[${where}] 360 deg/min on 4 in should fill 12.566 in/min, got ${fv}`);
+  // a block that only turns: no helix row, the time is the arc at the feed, F = feed / arc
+  await set('feed', 25); await set('lin', 0);
+  const t = await rows();
+  if (/at once/.test(t) || /Controls differ/.test(t) || !/Time for the block 7\.54 s/.test(t) || !/F 7\.958 1\/min/.test(t)) problems.push(`[${where}] a turn-only block should take 7.54 s with F7.958: ${t}`);
+  // mm: 600 mm/min on 100 mm is 687.55 deg/min
+  await units('mm');
+  await open('rotfeed', 80);
+  await has(/only turns 687\.55 deg\/min/i, '600 mm/min on 100 mm is 687.55 deg/min');
+  await units('inch'); await open('rotfeed', 60); await set('lin', 3);
+  await units('mm');
+}
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

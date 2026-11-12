@@ -422,6 +422,16 @@ pub extern "C" fn engrave_program(len: f64, metric: f64, ctrl: f64, prog: f64, t
         Some(l) => set_text(c::dxf::write_doc(&c::engrave::doc(l), if metric != 0.0 { c::dxf::Units::Mm } else { c::dxf::Units::Inch }, if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 })),
         None => set_text(String::new()),
     } }
+// Rotary axis helper (core/src/rotary.rs)
+f1!(rot_part_point, c::rotary::part_point_f, axis, deg, x, y, z, cx, cy, cz, part_right_hand, which);
+f1!(rot_arc_length, c::rotary::arc_length, radius, deg);
+f1!(rot_angle_for_length, c::rotary::angle_for_length, radius, length);
+f1!(rot_deg_per_min, c::rotary::deg_per_min, surface_feed, radius);
+f1!(rot_surface_feed, c::rotary::surface_feed, deg_per_min, radius);
+f1!(rot_move_length, c::rotary::move_length, radius, deg, linear);
+f1!(rot_move_time_s, c::rotary::move_time_s, surface_feed, length);
+f1!(rot_inverse_time_f, c::rotary::inverse_time_f, surface_feed, length);
+f1!(rot_rotary_rate, c::rotary::rotary_rate, surface_feed, length, deg);
 f1!(engrave_v_width, c::engrave::v_width, depth, angle_deg, flat);
 f1!(engrave_v_depth, c::engrave::v_depth, width, angle_deg, flat);
 f1!(knurl_blank_dia_cp, c::knurl_blank_dia_cp, p, n);

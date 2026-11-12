@@ -2,7 +2,7 @@
 
 A free, open-source (AGPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. For all machinists and all machines: mills, lathes, Swiss-type and more.
 
-**Status:** v0.4.0 in progress (on a pull request, on top of 0.3.0 and 0.2.0). 169 tools on 136 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
+**Status:** v0.4.0 in progress (on a pull request, on top of 0.3.0 and 0.2.0). 172 tools on 139 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
 
 ## How the app is organised
 - **Modes** (top bar): **Simple** shows 16 everyday tools with only their main inputs; **Advanced** shows every tool; **Expert** also opens every working, constant and evidence table. A mode never changes a calculation.
@@ -74,6 +74,8 @@ Process capability (Cp, Cpk, Pp, Ppk, expected ppm, histogram with normal fit) f
 Program generators for drilling and tapping (G81, G82, G83, G73, G84 rigid or floating) on a bolt circle, grid or pasted holes with CSV export; thread milling (internal/external, climb/conventional, arc-in/out, optional G41/G42, several passes); lathe threading with G76 or G92 passes and an infeed table (constant volume, constant depth, custom, minimum cut, spring passes); taper turning and boring; groove and cut-off with CSS; keyway broaching; G71/G70 from a simple profile. Output for a generic ISO 6983 / Fanuc-style control and for Haas; other controls are shown as not yet supported until their syntax is confirmed. Each program has a backplot, an estimated cycle time and a check against the active machine. Always prove out a generated program in single block. See `docs/cycles.md`.
 
 **Text engraving** (0.4.0): type a text, pick one of nine stroke letter styles (the Hershey fonts) and see it to scale on a straight line or round a circle, mirrored if wanted; size, length engraved, line width of a pointed cutter, the program for Generic ISO / Fanuc-style or Haas, and the strokes on to the simulator, the sketcher or a DXF file. See `docs/engraving.md`.
+
+**Rotary axis helper** (0.4.0): where a point on the part goes when A, B or C turns (with the centre line of the axis anywhere, either direction of plus, and a drawing along the axis), and the feed of a rotary block: degrees per minute for a surface feed at a diameter, the length and time of a cut that turns and moves along at once, and the inverse time (G93) feed word. Checked against the Fadal manual's worked example. See `docs/rotary.md`.
 
 **G-code editor and simulator**: paste, type or load a mill or lathe program (Generic ISO / Fanuc-style or Haas; lathe or mill is told from the program) and see the programmed path from the top, front or side or in 3D with a view cube (lathe: Z against X radius), rapids dashed and feeds solid, stepping block by block with the line highlighted. Edit with undo and redo, insert and delete lines, renumber or remove sequence numbers (cycle and GOTO references follow), strip comments and spaces, and convert between inch and mm with every doubtful block listed; feed and rapid distance, extents, an estimated cycle time (acceleration ignored) and every error with its line number, including arcs whose end radius does not match. Mill drilling cycles and lathe G70/G90/G92/G94 are drawn; G71-G76 roughing and threading are reported as not simulated yet. A backplot, not a machine verification. See `docs/gsim.md`.
 

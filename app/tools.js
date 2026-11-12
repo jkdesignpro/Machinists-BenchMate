@@ -1813,6 +1813,68 @@ const TOOLS = [
   source: 'Letters: the Hershey fonts (Dr. A. V. Hershey; data format by James Hurt, Cognition, Inc.), as SVG fonts prepared by Windell H. Oskay and shipped with Inkscape; use notice in each file in data/fonts/hershey and on the Fedora licensing wiki (Hershey font licence). Program: plain G00/G01 moves, the same header as the drilling cycles (FANUC Series 0i-F Plus Operator\'s Manual; Haas Mill Programming Workbook). Pointed cutter line width: BenchMate geometry, checked against the FlatCAM groove table (60 degrees, 0.1 flat, 0.05 deep: 0.158) and the Calculator Academy chamfer example (82 degrees, 5.0 to 9.4 at 2.53 deep). See docs/engraving.md.',
 },
 {
+  id: 'rotpoint', level: 'advanced', group: 'G-code cycles', title: 'Rotary axis: where a point goes',
+  desc: 'A point on the part at A0 (or B0, C0): where it is after the rotary axis turns. For picking up a feature on another face, moving a work offset, or checking a program. All lengths in one unit.',
+  fields: s => [
+    { id: 'axis', label: 'Rotary axis', unit: '', def: 0, options: [[0, 'A (turns about X)'], [1, 'B (turns about Y)'], [2, 'C (turns about Z)']] },
+    { id: 'deg', label: 'Angle the axis is sent to (from 0)', unit: 'deg', def: 90 },
+    { id: 'x', label: 'Point on the part at 0: X', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
+    { id: 'y', label: 'Point Y', unit: lenU(s), def: s === 'inch' ? 0.5 : 10 },
+    { id: 'z', label: 'Point Z', unit: lenU(s), def: s === 'inch' ? 1.5 : 40 },
+    { id: 'cx', label: 'Centre line of the rotary axis: X', unit: lenU(s), def: 0, when: v => v.axis !== 0 },
+    { id: 'cy', label: 'Centre line of the rotary axis: Y', unit: lenU(s), def: 0, when: v => v.axis !== 1 },
+    { id: 'cz', label: 'Centre line of the rotary axis: Z', unit: lenU(s), def: 0, when: v => v.axis !== 2 },
+    { id: 'dir', label: 'A positive angle turns the part', unit: '', def: 0, options: [[0, 'against the right-hand rule (table carries the part)'], [1, 'by the right-hand rule']] },
+  ],
+  calc: (v, W, s) => {
+    if (![v.deg, v.x, v.y, v.z].every(isFinite)) return [];
+    const c = k => (isFinite(v[k]) ? v[k] : 0), dp = s === 'inch' ? 4 : 3, u = lenU(s);
+    const t = i => W.rot_part_point(v.axis, v.deg, v.x, v.y, v.z, c('cx'), c('cy'), c('cz'), v.dir, i);
+    const ax = 'XYZ'[v.axis], name = 'ABC'[v.axis];
+    const cw = (v.dir === 1) === (v.deg < 0);   // how the part turns as seen from the + end of the axis
+    return [R('Point after the move: X', t(0), u, dp), R('Point after the move: Y', t(1), u, dp), R('Point after the move: Z', t(2), u, dp),
+      R('Distance of the point from the axis (does not change)', t(3), u, dp), R('Straight-line distance the point moved', t(4), u, dp),
+      R('In words', v.deg === 0 ? 'No move' : 'Seen from the + end of ' + ax + ' looking back along it, the part turns ' + (cw ? 'clockwise' : 'counter-clockwise') + ' by ' + DK.n(Math.abs(v.deg), 3) + ' degrees', '', 0),
+      R('Check on the machine', 'Jog ' + name + ' a few degrees plus and watch the part. If it turns the other way from the drawing, change the last box.', '', 0)];
+  },
+  working: 'The point turns about the centre line of the rotary axis; its coordinate along that axis and its distance from the axis do not change. Right-hand rule about X by an angle a: Y\' = Y cos a - Z sin a, Z\' = Y sin a + Z cos a (about Y: Z, X in place of Y, Z; about Z: X, Y), with Y and Z measured from the centre line. ISO 841 defines positive A, B and C by the right-hand screw rule for the tool relative to the work, so a table that carries the work turns the other way: the part point turns by minus the angle. Machine builders do not always follow the standard, so the direction is a box you set and check by jogging.',
+  source: 'Axis names and directions: ISO 841:1974 (public preview; clauses 2.1, 2.6, 6.1, 6.2, 10) and the BobCAD-CAM help page on the right-hand rule (which also says builders do not always follow it). Rotation about an axis: Wikipedia, "Rotation matrix" (basic 3D rotations, counter-clockwise when the axis points at the observer) and MathWorks rotx (matrix and a worked example, reproduced by the core tests). See docs/rotary.md.',
+  proof: [{ name: 'A 30 degree right-hand turn about X', sys: 'mm', vals: { axis: 0, deg: 30, x: 2, y: -2, z: 4, cy: 0, cz: 0, dir: 1 }, expect: [['Point after the move: Y', 'mm', -3.7321, 5e-5], ['Point after the move: Z', 'mm', 2.4641, 5e-5]],
+    source: 'MathWorks documentation, rotx: rotx(30) applied to the vector (2, -2, 4) gives (2.0000, -3.7321, 2.4641).', note: 'The example turns the point itself by the right-hand rule, so the last box is set that way.' }],
+},
+{
+  id: 'rotfeed', level: 'advanced', group: 'G-code cycles', title: 'Rotary axis feed',
+  desc: 'Feed for a block that turns a rotary axis: degrees per minute for the surface feed you want at a diameter, the length of a cut that turns and moves along the axis at once, its time, and the inverse time (G93) feed word.',
+  fields: s => [
+    { id: 'd', label: 'Diameter where the tool cuts', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
+    { id: 'feed', label: 'Feed wanted along the surface', unit: feedMinU(s), def: s === 'inch' ? 25 : 600 },
+    { id: 'dpm', label: 'Rotary feed, turn-only block', unit: 'deg/min', def: '' },
+    { id: 'deg', label: 'Angle turned in the block', unit: 'deg', def: 90 },
+    { id: 'lin', label: 'Move along the rotary axis in the same block (0 = none)', unit: lenU(s), def: s === 'inch' ? 3 : 75 },
+  ],
+  pairs: [['feed', 'dpm', (v, W) => W.rot_deg_per_min(v.feed, v.d / 2), (v, W) => W.rot_surface_feed(v.dpm, v.d / 2)]],
+  calc: (v, W, s) => {
+    if (!(v.d > 0)) return [];
+    const r = v.d / 2, dp = s === 'inch' ? 4 : 3, u = lenU(s), rows = [];
+    const feed = v.feed > 0 ? v.feed : (v.dpm > 0 ? W.rot_surface_feed(v.dpm, r) : NaN);
+    if (feed > 0) rows.push(R('Rotary feed for a block that only turns', W.rot_deg_per_min(feed, r), 'deg/min', 2), R('Feed along the surface', feed, feedMinU(s), s === 'inch' ? 3 : 1));
+    rows.push(R('One degree on this diameter is', W.rot_arc_length(r, 1), u, dp + 1));
+    if (!(isFinite(v.deg) && v.deg !== 0)) return rows;
+    const lin = isFinite(v.lin) ? v.lin : 0, len = W.rot_move_length(r, v.deg, lin);
+    rows.push(R('Length round the part', W.rot_arc_length(r, v.deg), u, dp));
+    if (lin !== 0) rows.push(R('Length of the cut (round and along at once)', len, u, dp));
+    if (!(feed > 0)) return rows;
+    rows.push(R('Time for the block', W.rot_move_time_s(feed, len), 's', 2), R('Inverse time feed word (G93): F', W.rot_inverse_time_f(feed, len), '1/min', 3));
+    if (lin !== 0) rows.push(R('Rotary speed during the block', W.rot_rotary_rate(feed, len, v.deg), 'deg/min', 2),
+      R('Feed word in G94 for this block', 'Controls differ. The Fadal manual reads F as the degrees per minute above; other controls read it in other ways. The inverse time word means the same on every control that has G93. Check your manual.', '', 0));
+    return rows;
+  },
+  working: 'Round the part, a length s at radius r is an angle s / r (radians), so a surface feed f is f x 180 / (pi x r) degrees per minute. A block that turns the part by an angle while the tool moves a length L along the rotary axis cuts a helix: length = sqrt((r x angle)^2 + L^2). Time = length / feed. In inverse time mode (G93) the F word is 1 / minutes the block takes = feed / length, and every cutting block needs its own F. The diameter is where the tool tip cuts, not the stock size.',
+  source: 'Fadal user manual, section 12 "Rotary axes" (actual move distance, degrees per minute and inverse time feed, with a worked example); Industrial Monitor Direct knowledge base, "CNC rotary axis feedrate sync with linear axis" (the same distance formula and X feed = A deg/min x pi x D / 360); CNC Cookbook, "Feed rate mode G-codes G93, G94 and G95" (a G93 block takes 1/F minutes; F on every cutting block); Haas UK, "Inverse time feed mode (G93)" (60 / F seconds). See docs/rotary.md.',
+  proof: [{ name: 'A 4 in diameter, A turns 90 degrees while X moves 3 in, at 25 in/min', sys: 'inch', vals: { d: 4, feed: 25, dpm: '', deg: 90, lin: 3 }, expect: [['Length of the cut', 'in', 4.3439, 5e-5], ['Inverse time feed word', '1/min', 5.755, 0.0005], ['Rotary speed during the block', 'deg/min', 517.97, 0.01]],
+    source: 'Fadal user manual, section 12, Rotary axes: actual move distance 4.3439, feed 517.97 degrees per minute, inverse time feed 5.755 (the sample program rounds it to F5.76).' }],
+},
+{
   id: 'cycbroach', level: 'expert', group: 'G-code cycles', title: 'Keyway broaching program',
   desc: 'Keyway broaching (slotting) strokes on a lathe or a mill with the spindle locked: stroke, depth per stroke, lift on the return stroke and spring strokes.',
   render: el => renderBroachCycle(el),

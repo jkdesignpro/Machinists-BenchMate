@@ -608,6 +608,7 @@ pub mod cad;
 pub mod tooling;
 pub mod insert;
 pub mod engrave;
+pub mod rotary;
 pub use tooling::*;
 pub mod fasteners;
 pub use fasteners::*;

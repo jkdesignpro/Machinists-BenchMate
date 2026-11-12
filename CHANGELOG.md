@@ -56,6 +56,14 @@ Stage 2 of the plan: drawings and editors. Built on top of 0.3.0.
 - `benchmate-core`: new module `engrave` (SVG font reader, layout, stroke order, lengths, drawing) with 10 tests; `gcode::gen_engrave` with 2 golden programs and 3 more tests, one of which engraves every font and reads the program back in the simulator. wasm exports `engrave_font`, `engrave_layout`, `engrave_info`, `engrave_missing`, `engrave_program`, `engrave_dxf`, `engrave_v_width`, `engrave_v_depth`.
 - The G-code editor and simulator can now be handed a finished program by another page.
 
+### Added (rotary axis helper)
+- **Rotary axis: where a point goes** (Programming, Rotary axis): a point on the part at A0, B0 or C0, the centre line of the axis and the angle it is sent to give the X, Y, Z of the point after the move, its distance from the axis, the straight-line distance it moved and the turn in words. The drawing looks along the axis from its + end and shows the point before and after, to scale, on the circle it travels.
+- **Which way is plus** is a box, not a guess: ISO 841 states positive A, B and C for the tool relative to the work, so a table that carries the part turns the other way (the default), and builders do not always follow the standard. A row tells you to jog the axis a few degrees plus and compare with the drawing.
+- **Rotary axis feed** (same section): for a diameter and the feed wanted along the surface, the degrees per minute of a block that only turns (type either, the other is filled), the length round the part, the length of a cut that turns and moves along the axis in one block, its time, the inverse time (G93) feed word and the rotary speed during the block. The drawing is the surface unrolled flat with the cut as the sloping line.
+- The feed page reproduces the worked example of the Fadal user manual (4 in diameter, 90 degrees with 3 in along, 25 in/min: 4.3439 in, 517.97 degrees per minute, F5.755) and is checked against four more published values. Two lines on one source page that disagree with its own formula are recorded in `docs/rotary.md` and not used.
+- No G94 feed word is printed for a block that turns and moves at once: controls read it differently and only one reading has a source. The page says so and gives the G93 word, which means the same on every control that has it.
+- `benchmate-core`: new module `rotary` (`rotate_point`, `part_point`, `radius_from_axis`, `arc_length`, `angle_for_length`, `deg_per_min`, `surface_feed`, `move_length`, `move_time_s`, `inverse_time_f`, `rotary_rate`) with 5 tests. New document `docs/rotary.md`.
+
 ### Fixed
 - Insert designation: the type letter G (as in CNMG) showed no fixing hole, because no maker key that could be read printed it. ISO 3364 does.
 - DXF text strings: a caret in a text is written as caret and space, as the DXF reference asks, so it is not read as a control character.

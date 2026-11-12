@@ -47,7 +47,7 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 12 | Tap torque (`taptorque`) | 1 (0.3.0) | built |
 | 13 | Gauge R&R | 3 (0.5.0) | to do |
 | 14 | Thread gauge limits | 3 (0.5.0) | to do |
-| 15 | Rotary axis helper | 2 (0.4.0) | to do |
+| 15 | Rotary axis helper (`rotpoint`, `rotfeed`) | 2 (0.4.0) | built |
 | 16 | Job time and quote | 5 (0.9.0) | to do |
 | 17 | Vendor data import and cut log | 5 (0.9.0) | to do |
 | 18 | Wire EDM | 3 (0.5.0) | to do |
