@@ -105,7 +105,7 @@ const WORKSPACES = [
     ['Fasteners', ['boltgrade', 'bolttorque', 'threadstrip', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
     ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife', 'spring', 'beltdrive', 'chaindrive', 'tackle', 'taperpin'], 'bearing'],
     ['Shop', ['coolant', 'economics', 'depreciation', 'abbrev'], 'drop'],
-    ['Guides', ['cncguide', 'millsetup', 'toolpaths', 'workholding', 'latheguide', 'shoptools', 'matguide', 'measguide', 'cutguide', 'bearguide', 'abrasguide', 'drawguide', 'procguide', 'elemguide', 'driveguide', 'fastguide', 'toolwear', 'toolguide', 'glossary'], 'book'],
+    ['Guides', ['cncguide', 'millsetup', 'toolpaths', 'workholding', 'latheguide', 'shoptools', 'matguide', 'measguide', 'cutguide', 'bearguide', 'abrasguide', 'drawguide', 'procguide', 'elemguide', 'driveguide', 'fastguide', 'threadguide', 'toolwear', 'toolguide', 'glossary'], 'book'],
   ] },
 ];
 // Listed on the Home rail rather than in a workspace.

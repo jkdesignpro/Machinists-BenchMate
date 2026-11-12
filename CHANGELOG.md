@@ -12,6 +12,9 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (thread forms and terms)
+- New page **Thread forms and terms** (Reference > Guides): the parts of a thread with a drawing (major, minor and pitch diameter, pitch, crest, root, flank, thread angle), lead, starts and hand, ten thread forms with what each is for and a drawing of six of them, coarse and fine, straight and tapered, classes of fit, and 24 abbreviations found on drawings, taps and gauges. 12 public sources; statements with one publisher are marked.
+
 ### Added (shop maths 2)
 - New tool **Depreciation schedule** (Shop > Shop helpers): straight line, declining balance (double declining by default, never below the salvage value) and sum of the years' digits, with every year listed and the book value drawn as bars. Three published schedules are reproduced.
 - New tool **Block and tackle** (Reference > Machine elements): pull on the rope from the load and the rope parts that carry the moving block, with your own efficiency if you enter one (never filled in), and the rope hauled in for a lift, with a diagram. Not a rigging calculation.
@@ -22,7 +25,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 ### Book audit (second batch)
 - MH24 (depreciation), MH133 (sieves and mesh), ED75 (pulley mechanisms) and BB29 (3-4-5 rule and rise for an angle) from partial to done.
 - Re-audit of rows whose notes were out of date: MH145 (facing at constant surface speed has been in `partofftime` since 0.2.0), MH177 (the G and M code reference, the backplot with helical arcs, arc feed and helical interpolation cover it) and CN11 (the advisors give starting speeds and feeds by material) from partial to done.
-- 375 done, 173 partial, 48 missing of 596 in-scope rows, 63 %; 162 more rows to done for the 90 % target.
+- Counted after the second batch: 375 done, 173 partial, 48 missing.
+
+### Book audit (third batch)
+- MH218 (thread forms and definitions), BB6 (abbreviations for standard threads) and BB7 (thread forms used in engineering) from partial to done.
+- 378 done, 170 partial, 48 missing of 596 in-scope rows, 63 %; 159 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.

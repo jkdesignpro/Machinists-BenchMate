@@ -2232,6 +2232,40 @@ where = 'toolpaths';
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
     if (links !== 'threadstrip,boltgrade,bolttorque,sti,bearguide,spanner,shcs,clearance,taperpin,whitworth,pipethreads') problems.push(`[${where}] links to other pages: ${links}`);
   }
+  where = 'threadguide';
+  g = await guide('threadguide');
+  if (g.h2 !== 6 || g.svgs !== 2 || g.tabs !== '11,25' || g.srcs !== 12) problems.push(`[${where}] 6 sections, 2 drawings, tables of 10 and 24 rows, 12 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 24) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Major diameter. The largest', 'Minor diameter. The smallest', 'Pitch diameter. The diameter', 'Pitch. The distance along', 'Crest and root', 'Thread angle. The angle between', 'Depth of thread', 'Lead. The distance the nut', 'On a single-start thread', 'ACME against square'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  // Seven Wikipedia articles count once.
+  for (const k of ['On a sharp V it lies midway', 'Flank. The surface between', 'A sharp 60° V is 0.866', 'Starts. With more than one', 'Multi-start threads are used', 'Hand. A right-hand thread', 'The price is more friction', 'How a trapezoidal thread is written', 'How a knuckle thread is written', 'Coarse and fine say only', 'Straight and tapered', 'Classes of Unified threads', 'AFT Fasteners lists 2A and 3A', 'How a Unified thread is written'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/^V \(ISO metric, Unified\) 60° A triangle with the tips cut off/.test(row('V (ISO')) || !/^Whitworth \(BSW, BSF\) 55° Rounded crests and roots/.test(row('Whitworth')) || !/^British Association \(BA\) 47\.5°/.test(row('British Association')) || !/^ACME 29° Leadscrews and other power screws; works with a split nut\. Wikipedia: flat crests and roots, a basic height of half the pitch/.test(row('ACME 29')) || !/basic height of 0\.3 of the pitch/.test(row('Stub ACME')) || !/^Metric trapezoidal \(Tr\) 30°/.test(row('Metric trapezoidal')))
+      problems.push(`[${where}] form rows: ${row('V (ISO')} | ${row('Whitworth')} | ${row('ACME 29')} | ${row('Stub ACME')}`);
+    if (!/The least friction of all forms/.test(row('Square')) || !/Engineers Post: depth and thickness are each half the pitch/.test(row('Square')) || !/up to 7° off; the other flank often 45° Takes thrust in one direction/.test(row('Buttress')) || !/30° \(DIN 405\) Fully rounded crests and roots/.test(row('Knuckle')))
+      problems.push(`[${where}] square, buttress and knuckle rows: ${row('Square')} | ${row('Buttress')} | ${row('Knuckle')}`);
+    if (!/^UNC Unified coarse/.test(row('UNC')) || !/^UNEF Unified extra fine/.test(row('UNEF')) || !/AFT Fasteners: Unified with a rounded root\. Wikipedia: external threads only/.test(row('UNR')) || !/^NPT American taper pipe thread/.test(row('NPT ')) || !/^NPTF Dryseal taper pipe thread/.test(row('NPTF')) || !/^ACME-G, ACME-C ACME general purpose and ACME centralizing/.test(row('ACME-G')) || !/^Pg Steel conduit thread \(Panzergewinde\), 80°/.test(row('Pg')) || !/^TPI Threads per inch/.test(row('TPI')))
+      problems.push(`[${where}] abbreviation rows: ${row('UNC')} | ${row('UNR')} | ${row('NPT ')} | ${row('Pg')}`);
+    const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
+    if (fl !== 'Pipe Stub Metric Buttress Knuckle UNEF UNS NF NPTF NPSC NPSM NGT BA M Tr Rd G Pg ET,') problems.push(`[${where}] the rows with one publisher: ${fl}`);
+  }
+  if (!/Tr 60×18\(P9\)LH has a lead of 18 mm and a pitch of 9 mm, so two starts, and is left-hand/.test(g.all) || !/Rd 20 × 1\/8"/.test(g.all) || !/#6-32 UNC 2B/.test(g.all) || !/0\.866 of the pitch deep/.test(g.all) || !/lead = pitch × number of starts/.test(g.all) || !/the left pedal of a bicycle/.test(g.all))
+    problems.push(`[${where}] figures and examples quoted from the sources are missing`);
+  {
+    const d = await page.$$eval('#main svg.geo', s => s.map(e => e.textContent.replace(/\s+/g, ' ')));
+    if (!/pitch/.test(d[0]) || !/crest/.test(d[0]) || !/root/.test(d[0]) || !/flank/.test(d[0]) || !/thread angle/.test(d[0]) || !/half of the major \(M\), pitch \(P\) and minor \(m\) diameters/.test(d[0]) || !/Whitworth/.test(d[1]) || !/Buttress/.test(d[1]) || !/Knuckle \(round\)/.test(d[1]) || !/Square/.test(d[1])) problems.push(`[${where}] drawings: ${d.map(t => t.slice(0, 60)).join(' | ')}`);
+    // The crests of the terms drawing must lie above the pitch line and the roots below it, and the pitch dimension must span exactly one tooth.
+    const f = await page.$$eval('#main svg.geo', s => { const p = [...s[0].querySelectorAll('path')]; const prof = p[1].getAttribute('d'), pl = p[2].getAttribute('d'), dim = p[4].getAttribute('d'); return { crest: +prof.match(/^M30 (\d+)/)[1], depth: +prof.match(/l22 (\d+)/)[1], line: +pl.match(/M22 (\d+)/)[1], span: dim.match(/M(\d+) \d+H(\d+)/).slice(1).map(Number) }; });
+    if (!(f.crest < f.line && f.line < f.crest + f.depth && f.span[1] - f.span[0] === 60)) problems.push(`[${where}] the terms drawing is drawn wrongly: ${JSON.stringify(f)}`);
+    const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
+    if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
+    const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
+    if (links !== 'threaddata,wires,threadid,multistart,whitworth,pipethreads,acme,trapezoidal,buttress,unseries,unjunr,fastguide') problems.push(`[${where}] links to other pages: ${links}`);
+  }
   // Thread engagement and breaking force: the published M10 row, the Grade 5 example, both aluminium rules side by side.
   where = 'threadstrip';
   {

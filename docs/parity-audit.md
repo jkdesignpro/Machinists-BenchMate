@@ -88,6 +88,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, second batch, 2026-11-12):** shop maths 2 (`depreciation`, `tackle`, `squaring`) and the sieve table in `abrasguide`. MH24, MH133, ED75 and BB29 from partial to done. Re-audit of three rows whose notes were out of date: MH145, MH177 and CN11 from partial to done (what they asked for was already in the app). Counted from the tables below: 375 done, 173 partial, 48 missing of 596 in-scope rows, 63 %; 162 more rows to done for the 90 % target.
 
+**Update (0.7.0, third batch, 2026-11-12):** thread forms and terms guide (`threadguide`). MH218, BB6 and BB7 from partial to done. Counted from the tables below: 378 done, 170 partial, 48 missing of 596 in-scope rows, 63 %; 159 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -596,7 +598,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH218 | Screw thread forms and definitions | partial | `threaddata` | Data, no forms overview |
+| MH218 | Screw thread forms and definitions | done | `threaddata`, `threadguide` | 0.7.0: the parts of a thread with a drawing, lead, starts and hand, ten thread forms with angles, uses and a drawing of six; data on the pages of each thread |
 | MH219 | Unified threads: form, series (coarse, fine, extra-fine), classes, designation | done | `threaddata` | |
 | MH220 | Unified constant-pitch series (4 to 28 threads) and UNS | partial | `unseries`, `threaddata` (custom) | 8, 12 and 16-UN lists only (`claude/threads-3`) |
 | MH221 | Coated 60-degree threads | partial | `coating` | Allowance and before-coating pitch diameter limits; no coated-thread tables (`claude/threads-3`) |
@@ -809,8 +811,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB3 | Spanner selection chart | done | `spanner` | (`claude/fasteners`) |
 | BB4 | Torque conversion chart | done | `units` | Torque units convert in the unit converter (N·m, lbf·ft, lbf·in, ozf·in, kgf·m, kgf·cm) |
 | BB5 | Socket size cross-reference inch/metric | partial | `spanner` | Lookup of a spanner size against metric and inch heads; no socket cross-reference chart |
-| BB6 | Abbreviations for standard threads | partial | `threaddata` | Series names only |
-| BB7 | Thread forms used in engineering | partial | `threaddata`, `pipethreads`, `whitworth`, `acme`, `trapezoidal`, `buttress` | ACME, trapezoidal and buttress added; no forms overview drawing (`claude/threads-3`) |
+| BB6 | Abbreviations for standard threads | done | `threaddata`, `threadguide` | 0.7.0: 24 abbreviations (Unified, National, pipe, ACME, British, metric, knuckle, conduit, hand, external and internal) with their sources; one-publisher rows marked |
+| BB7 | Thread forms used in engineering | done | `threaddata`, `pipethreads`, `whitworth`, `acme`, `trapezoidal`, `buttress`, `threadguide` | ACME, trapezoidal and buttress data on their own pages; 0.7.0: overview of ten forms with a drawing of six |
 | BB8 | Types of ground thread taps | partial | `toolguide` | Tap types and chamfers; H limits in `taplimits` (`claude/tooling-ref`) |
 | BB9 | Colour-coded high-performance taps and applications | missing | | Maker-specific; low priority |
 | BB10 | Tapping drill formulae | done | `tapdrill` | |

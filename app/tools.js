@@ -3608,6 +3608,13 @@ const TOOLS = [
   source: 'Nord-Lock and a university shop (engagement); Machine Design, Fastener Engineering and Essentra (locking); Wikipedia and the FAA (safety wire); Wikipedia, Tameson and bolts.co.uk (set screws); Accu and Essentra (heads and drives); Machine Design, Essentra and Specialty Bolt (tapping screws); Machine Design and Fastener Engineering (pins); Wikipedia and Rotor Clip (retaining rings); the Aircraft Engine Historical Society and Wikipedia (British fasteners). Full list with URLs in docs/sources.md.',
 },
 {
+  id: 'threadguide', level: 'advanced', group: 'Guides', title: 'Thread forms and terms',
+  desc: 'What the parts of a screw thread are called (major, minor and pitch diameter, pitch, lead, crest, root, flank, thread angle), single and multi-start, right and left hand, the common thread forms with a drawing of each and what it is for, coarse and fine, straight and tapered, classes of fit, and the abbreviations found on drawings, taps and gauges.',
+  render: el => renderThreadGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where a statement joins two sources, each part names its source.',
+  source: 'Wikipedia (seven articles, counted as one publisher), Kelston Actuation and The Engineers Post (terms and forms); Engineers Edge and AFT Fasteners (abbreviations). Full list in docs/sources.md, Thread forms and terms guide.',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),

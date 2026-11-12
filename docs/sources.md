@@ -1195,6 +1195,28 @@ Found on the way: the tensile stress area in the core returned the square of a n
 - **Squaring a corner** (`squaring`): Math Open Reference, "3:4:5 triangle" (no author, 2011), https://www.mathopenref.com/triangle345.html : a 3:4:5 triangle is right-angled, multiples stay so, checking a corner with 3, 4 and 5. A Concord Carpenter, R. Robillard, "The 3-4-5 method for squaring corners", 2018-06-16, https://www.aconcordcarpenter.com/?p=472 : the method step by step, the multiples 6-8-10 to 15-20-25, larger triangles for larger work. Pythagoras, the law of cosines and the tangent are the ones already cited for the triangle solver (OpenStax, Algebra and Trigonometry 2e).
 - Read and not used: a Purdue equation sheet and a King Saud University answer key on machining economics (both came through garbled, formulas "reconstructed" by the reader); one page that labels the fastest-production speed as the lowest-cost speed. OpenExamPrep (R. Chen, "Economics of machining and tool life optimisation", 2026) and FormulaDen (tool life for minimum production time) agree with the tool life for fastest production that `toollife` already had: T = (1/n - 1) x tool change time; OpenExamPrep's example (n 0.25, C 150, 3 min: 9 min and 86.6 m/min) matches.
 
+
+## Thread forms and terms guide (`app/threadguide.js`, tool `threadguide`), accessed 2026-11-12
+Keys are the ones shown in the app. The seven Wikipedia articles count as one publisher.
+- **[WP_ST]** Wikipedia, "Screw thread" (CC BY-SA), https://en.wikipedia.org/wiki/Screw_thread : major, minor and pitch diameter, pitch, lead and starts, thread angle, depth of a sharp V and of a full thread, hand, straight and tapered, coarse and fine, the V and Whitworth forms.
+- **[WP_TA]** Wikipedia, "Thread angle" (CC BY-SA), https://en.wikipedia.org/wiki/Thread_angle : definition and the table of angles (V 60, Whitworth 55, pipe threads, knuckle 30, ACME 29, trapezoidal 30, buttress 45, BA 47.5, Pg 80) with the letter codes.
+- **[WP_TR]** Wikipedia, "Trapezoidal thread form" (CC BY-SA), https://en.wikipedia.org/wiki/Trapezoidal_thread_form : ACME and metric trapezoidal, what they are used for, ACME against square, Stub ACME, general purpose and centralizing, how a Tr thread is written.
+- **[WP_SQ]** Wikipedia, "Square thread form" (CC BY-SA), https://en.wikipedia.org/wiki/Square_thread_form : efficiency, no radial load, hard to cut, no take-up of wear.
+- **[WP_BUT]** Wikipedia, "Buttress thread" (CC BY-SA), https://en.wikipedia.org/wiki/Buttress_thread : the two flank angles, thrust in one direction, uses. It names no standard.
+- **[WP_KN]** Wikipedia, "Knuckle thread" (CC BY-SA), https://en.wikipedia.org/wiki/Knuckle_thread : shape, DIN 405, how it is written.
+- **[WP_UTS]** Wikipedia, "Unified Thread Standard" (CC BY-SA), https://en.wikipedia.org/wiki/Unified_Thread_Standard : UNC, UNF, UNEF, UNS, classes A and B, how a thread is written.
+- **[KEL]** Kelston Actuation Ltd, knowledge base, "Screw thread terms" (no author or date shown), https://www.kelstonactuation.com/knowledge-base/screw-thread-terms : major, minor and pitch diameter, pitch, lead, crest, root, thread angle, multi-start threads.
+- **[TEP]** The Engineers Post, Saif M., "Types of screw threads and screw thread terminology", 2018-07-31, updated 2023-09-27, https://theengineerspost.com/screw-thread-terminology-types-of-screw-threads : crest, root, flank, depth, lead; V, square and ACME threads with their uses.
+- **[EE_DES]** Engineers Edge, "ANSI screw thread designations and symbols A - N", https://www.engineersedge.com/manufacturing/thread-designations-symbols.htm : the table came through partial and partly garbled; only the eight rows that were clean are used (ACME-C, ACME-G, NC, NGT, NPT, NPTF, NPSC, NPSM).
+- **[AFT_AB]** AFT Fasteners, "Common fastener related abbreviations", https://www.aftfasteners.com/common-fastener-related-abbreviations/ : UNC, UNF, NC, NF, UNR, NPT, BSW, BSF, TPI, LH, RH, ET, IT and the classes of fit.
+- **[EH_BR]** Aircraft Engine Historical Society, G. White, "British fastening systems" (URL under the fasteners guide): Whitworth 55 degrees with rounded crests and roots, BA 47.5 degrees.
+
+Joined statements name the source of each part (the ACME and square rows of the forms table, the UNR row). Buttress, knuckle, Stub ACME, metric trapezoidal and most pipe thread abbreviations rest on one publisher and are marked.
+
+Not used: the Tyler and profile columns of Wikipedia's tables (images or garbled); the modified square thread (not covered by the sources read); UN, UNJ and MJ (not defined in the sources read; UNJ and UNR have their own page with other sources).
+
+The two drawings are BenchMate's own and are not to scale.
+
 ## Glossary (`app/latheguide.js`, tool `glossary`)
 108 terms, each defined in BenchMate's own words. 97 link to the page of the app that explains the term, and that page carries the sources. The other 11 (burr, gouge, HSM, ID and OD, indicator, overcut, spindle, spring pass, tailstock, tool changer, undercut) are plain shop meanings with no figures in them. The choice of headwords was compared with the 43 headwords of the glossary in the CIMCO CNC programming book (appendix E, https://www.cimco.com/documentation/online/cncbook/en/AppxE_Glossary.html , read 2026-11-12, headwords only; no definition was read or copied). "Job" is left out because its meaning belongs to one CAM system.
 
