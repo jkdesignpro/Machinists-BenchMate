@@ -676,6 +676,23 @@ f1!(tackle_rope_pulled, c::tackle_rope_pulled, lift, parts);
 f1!(square_diagonal, c::square_diagonal, a, b);
 f1!(corner_angle_deg, c::corner_angle_deg, a, b, diagonal);
 f1!(rise_for_angle, c::rise_for_angle, run, angle_deg);
+f1!(interp_fraction, c::interp_fraction, x1, x2, x);
+f1!(bilinear, c::bilinear, x1, x2, y1, y2, q11, q21, q12, q22, x, y, which);
+f1!(normal_share_below, c::normal_share_below, x, mean, sigma);
+f1!(normal_share_between, c::normal_share_between, lo, hi, mean, sigma);
+f1!(normal_share_within, c::normal_share_within, k);
+f1!(normal_z, c::normal_z, x, mean, sigma);
+f1!(normal_share_above, c::normal_share_above, x, mean, sigma);
+f1!(normal_share_outside, c::normal_share_outside, lo, hi, mean, sigma);
+f1!(normal_value_for_share, c::normal_value_for_share, p, mean, sigma);
+f1!(normal_z_for_share, c::normal_z_for_share, p);
+f1!(line_two_points, c::line_two_points, x1, y1, x2, y2, which);
+f1!(point_line_distance, c::point_line_distance, x0, y0, x1, y1, x2, y2);
+/// Line and circle: which 0 number of points, 1 xa, 2 ya, 3 xb, 4 yb.
+#[no_mangle] pub extern "C" fn line_circle(x1: f64, y1: f64, x2: f64, y2: f64, cx: f64, cy: f64, r: f64, which: f64) -> f64 { pick(c::line_circle(x1, y1, x2, y2, cx, cy, r), which) }
+f1!(ellipse_prop, c::ellipse_prop, a, b, x, which);
+f1!(parabola_prop, c::parabola_prop, w, d, x, which);
+f1!(hyperbola_prop, c::hyperbola_prop, a, b, x, which);
 #[no_mangle] #[allow(clippy::too_many_arguments)]
 pub extern "C" fn machine_hourly_rate(price: f64, resale: f64, years: f64, interest: f64, hours: f64, fixed: f64, kw: f64, load: f64, kwh: f64, labour: f64, which: f64) -> f64 {
     c::machine_hourly_rate(price, resale, years, interest, hours, fixed, kw, load, kwh, labour, which as u32) }

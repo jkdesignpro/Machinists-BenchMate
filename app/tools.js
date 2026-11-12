@@ -2085,6 +2085,93 @@ const TOOLS = [
   source: 'Geosurab surveying notes, calculation of area of irregular figures (worked example 843.33 m²); Maths at Home, Simpson\'s 1/3 rule (worked example 4053 m²); Class Mathematics, the trapezoidal rule (worked example 760 m²). See docs/sources.md, Areas and volumes by rule.',
 },
 {
+  id: 'linecirc', level: 'advanced', group: 'Geometry', title: 'Line and circle (coordinates)',
+  desc: 'A line through two points: length, angle, slope and where it crosses the axes. With a circle: the distance from the centre to the line, whether the line misses, touches or cuts the circle, and the points where they meet, drawn to scale.',
+  fields: s => [
+    { id: 'x1', label: 'Point 1, X', unit: lenU(s), def: -10 },
+    { id: 'y1', label: 'Point 1, Y', unit: lenU(s), def: 11 },
+    { id: 'x2', label: 'Point 2, X', unit: lenU(s), def: 10 },
+    { id: 'y2', label: 'Point 2, Y', unit: lenU(s), def: -9 },
+    { id: 'cx', label: 'Circle centre, X (optional)', unit: lenU(s), def: 3 },
+    { id: 'cy', label: 'Circle centre, Y', unit: lenU(s), def: -5 },
+    { id: 'r', label: 'Circle radius', unit: lenU(s), def: 3 },
+  ],
+  calc: (v, W, s) => {
+    if (![v.x1, v.y1, v.x2, v.y2].every(isFinite)) return [];
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3, L = w => W.line_two_points(v.x1, v.y1, v.x2, v.y2, w);
+    if (!isFinite(L(0))) return [R('Inputs', 'the two points must not be the same', '', 0)];
+    const rows = [R('Length between the two points', L(0), u, dp), R('Angle of the line from the X axis', L(1), 'deg', 4)];
+    rows.push(isFinite(L(2)) ? R('Slope (rise in Y for 1 along X)', L(2), '', 5) : R('Slope', 'the line is parallel to the Y axis', '', 0));
+    if (isFinite(L(3))) rows.push(R('Crosses the Y axis (X = 0) at Y', L(3), u, dp));
+    if (isFinite(L(4))) rows.push(R('Crosses the X axis (Y = 0) at X', L(4), u, dp));
+    if ([v.cx, v.cy, v.r].every(isFinite)) {
+      if (!(v.r > 0)) return rows.concat([R('Circle', 'the radius must be more than 0', '', 0)]);
+      const C = w => W.line_circle(v.x1, v.y1, v.x2, v.y2, v.cx, v.cy, v.r, w), n = C(0);
+      rows.push(R('Distance from the circle centre to the line', W.point_line_distance(v.cx, v.cy, v.x1, v.y1, v.x2, v.y2), u, dp));
+      if (n === 0) rows.push(R('Line and circle', 'the line misses the circle', '', 0));
+      else if (n === 1) rows.push(R('Line and circle', 'the line touches the circle (tangent)', '', 0), R('Tangent point, X', C(1), u, dp), R('Tangent point, Y', C(2), u, dp));
+      else rows.push(R('Line and circle', 'the line cuts the circle at two points', '', 0), R('First point, X', C(1), u, dp), R('First point, Y', C(2), u, dp), R('Second point, X', C(3), u, dp), R('Second point, Y', C(4), u, dp),
+        R('Chord between the two points', W.line_two_points(C(1), C(2), C(3), C(4), 0), u, dp));
+      if (n === 2) rows.push(R('Note', 'First and second are in the direction from point 1 to point 2. The line is taken as endless: a meeting point can lie beyond your two points.', '', 0));
+    }
+    return rows;
+  },
+  working: 'Angle = atan2(Y2 − Y1, X2 − X1). Distance from a point to the line through two points: |(X2 − X1)(Y1 − Y0) − (X1 − X0)(Y2 − Y1)| / length. The line misses the circle when that distance is more than the radius, touches it when equal and cuts it when less; the two points lie half a chord, √(r² − distance²), either side of the foot of the perpendicular from the centre.',
+  source: 'Distance from a point to a line: Wolfram MathWorld, "Point-Line Distance, 2-Dimensional" and Mathwords, "Circle-line intersection". Miss, touch or cut by comparing the distance with the radius: Mathwords; by the sign of the discriminant: MathWorld, "Circle-Line Intersection". Worked cases: Rosetta Code, "Line circle intersection" and Mathwords. The half-chord construction is our own working of the same geometry, checked against those cases in the core tests. See docs/sources.md, Shop maths 3.',
+  proof: [
+    { name: 'Centre (3, -5), radius 3, line (-10, 11) to (10, -9)', sys: 'mm', vals: { x1: -10, y1: 11, x2: 10, y2: -9, cx: 3, cy: -5, r: 3 },
+      expect: [['First point, X', 'mm', 3, 0.000001], ['First point, Y', 'mm', -2, 0.000001], ['Second point, X', 'mm', 6, 0.000001], ['Second point, Y', 'mm', -5, 0.000001]], source: 'Rosetta Code, Line circle intersection: (3, -2) and (6, -5).' },
+    { name: 'y = x + 1 and the circle of radius 5 at the origin', sys: 'mm', vals: { x1: 0, y1: 1, x2: 1, y2: 2, cx: 0, cy: 0, r: 5 },
+      expect: [['First point, X', 'mm', -4, 0.000001], ['First point, Y', 'mm', -3, 0.000001], ['Second point, X', 'mm', 3, 0.000001], ['Second point, Y', 'mm', 4, 0.000001], ['Angle of the line from the X axis', 'deg', 45, 0.000001]], source: 'Mathwords, worked example 1: (-4, -3) and (3, 4).' },
+    { name: 'y = 3x + 10 and the circle of radius 3 at the origin', sys: 'mm', vals: { x1: 0, y1: 10, x2: 1, y2: 13, cx: 0, cy: 0, r: 3 },
+      expect: [['Distance from the circle centre to the line', 'mm', 3.162, 0.001]], source: 'Mathwords, worked example 2: distance √10 = 3.16, more than the radius, no intersection.' },
+  ],
+},
+{
+  id: 'conics', level: 'advanced', group: 'Geometry', title: 'Ellipse, parabola and hyperbola',
+  desc: 'Ellipse from its two half-axes (foci, eccentricity, a point on the curve), parabola from the width and depth of a dish (focal length, a point on the curve, length along the curve) and hyperbola from its two half-axes (foci, eccentricity, asymptotes, a point on the curve), each with a drawing.',
+  fields: s => [
+    { id: 'k', label: 'Curve', unit: '', def: 0, options: [[0, 'Ellipse'], [1, 'Parabola'], [2, 'Hyperbola']] },
+    { id: 'a', label: 'Half-axis a (the longer one for an ellipse)', unit: lenU(s), def: 5, when: v => v.k !== 1 },
+    { id: 'b', label: 'Half-axis b', unit: lenU(s), def: 3, when: v => v.k !== 1 },
+    { id: 'w', label: 'Width across the dish', unit: lenU(s), def: 2, when: v => v.k === 1 },
+    { id: 'd', label: 'Depth of the dish', unit: lenU(s), def: 2, when: v => v.k === 1 },
+    { id: 'x', label: 'X from the centre line, for a point on the curve (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3, rows = [];
+    if (v.k === 1) {
+      if (!(v.w > 0 && v.d > 0)) return [];
+      const f = W.parabola_prop(v.w, v.d, 0, 0);
+      rows.push(R('Focal length (vertex to focus)', f, u, dp), R('Width of the curve at the focus (latus rectum)', W.parabola_prop(v.w, v.d, 0, 3), u, dp), R('Length along the curve, rim to rim (one source)', W.parabola_prop(v.w, v.d, 0, 4), u, dp));
+      if (isFinite(v.x)) rows.push(R('Height of the curve above the vertex at X', W.parabola_prop(f, 0, v.x, 1), u, dp), R('Length along the curve from the vertex to X (one source)', W.parabola_prop(f, 0, v.x, 2), u, dp));
+      rows.push(R('Note', 'The curve is y = x² / (4 × focal length), with the vertex at the bottom of the dish. Every point of it is as far from the focus as from the directrix, a line one focal length below the vertex.', '', 0));
+      return rows;
+    }
+    if (!(v.a > 0 && v.b > 0)) return [];
+    if (v.k === 0) {
+      if (v.b > v.a) return [R('Inputs', 'enter the longer half-axis as a', '', 0)];
+      const E = w => W.ellipse_prop(v.a, v.b, isFinite(v.x) ? v.x : 0, w);
+      rows.push(R('Centre to each focus, c', E(0), u, dp), R('Eccentricity c / a', E(1), '', 5), R('Half-width of the curve at a focus', E(3), u, dp));
+      if (isFinite(v.x)) rows.push(isFinite(E(2)) ? R('Y of the curve at X (above and below the long axis)', E(2), u, dp) : R('X', 'lies beyond the end of the ellipse', '', 0));
+      rows.push(R('Note', 'The two distances from any point of the ellipse to the foci add up to 2a. Area and perimeter are in Areas and volumes.', '', 0));
+      return rows;
+    }
+    const H = w => W.hyperbola_prop(v.a, v.b, isFinite(v.x) ? v.x : 0, w);
+    rows.push(R('Centre to each focus, c', H(0), u, dp), R('Eccentricity c / a', H(1), '', 5), R('Angle of the asymptotes from the X axis', H(2), 'deg', 4), R('Slope of the asymptotes, b / a', H(4), '', 5));
+    if (isFinite(v.x)) rows.push(isFinite(H(3)) ? R('Y of the curve at X (above and below the axis)', H(3), u, dp) : R('X', 'lies between the two branches: the curve starts at X = a', '', 0));
+    rows.push(R('Note', 'The two distances from any point of the hyperbola to the foci differ by 2a. Far from the centre the curve runs along the asymptotes.', '', 0));
+    return rows;
+  },
+  working: 'Ellipse x²/a² + y²/b² = 1: c = √(a² − b²), eccentricity c / a, y = b √(1 − x²/a²). Parabola y = x²/(4f): a dish of width w and depth d has f = w²/(16 d); length along the curve from the vertex to x: f (t √(1 + t²) + asinh t) with t = x / (2f). Hyperbola x²/a² − y²/b² = 1: c = √(a² + b²), eccentricity c / a, asymptotes y = ± (b/a) x, y = b √(x²/a² − 1).',
+  source: 'Wolfram MathWorld, "Ellipse", "Parabola" and "Hyperbola"; NUM8ERS, "AP Precalculus: Conic Sections" (the same relations for c, the eccentricity, the focal length of a parabola and the asymptotes, with worked examples). The length along a parabola is from MathWorld only. The focal length from width and depth is our own step from y = x²/(4f) at the rim. See docs/sources.md, Shop maths 3.',
+  proof: [
+    { name: 'Ellipse a = 5, b = 3', sys: 'mm', vals: { k: 0, a: 5, b: 3, x: 4 }, expect: [['Centre to each focus, c', 'mm', 4, 0.000001], ['Eccentricity c / a', '', 0.8, 0.000001], ['Y of the curve at X (above and below the long axis)', 'mm', 1.8, 0.000001]], source: 'NUM8ERS, worked example 2: a = 5, b = 3, c = 4, foci 4 either side of the centre.' },
+    { name: 'Hyperbola a = 4, b = 3', sys: 'mm', vals: { k: 2, a: 4, b: 3 }, expect: [['Centre to each focus, c', 'mm', 5, 0.000001], ['Slope of the asymptotes, b / a', '', 0.75, 0.000001]], source: 'NUM8ERS, worked example 3: c = 5, asymptotes of slope 3/4.' },
+    { name: 'Parabola y = 2x²: a dish 2 wide and 2 deep', sys: 'mm', vals: { k: 1, w: 2, d: 2 }, expect: [['Focal length (vertex to focus)', 'mm', 0.125, 0.000001]], source: 'NUM8ERS, worked example 1: y = 2(x − 3)² + 1 has the focal length 1/8.' },
+  ],
+},
+{
   id: 'compound', level: 'advanced', group: 'Geometry', title: 'Compound angles',
   desc: 'True angle and slope direction of a face tilted two ways, from the two drawing (apparent) angles or two successive tilts, and the settings for a swivel and tilt, a compound sine plate or the two views.',
   render: el => renderCompound(el),
@@ -2519,6 +2606,45 @@ const TOOLS = [
   source: 'NIST/SEMATECH e-Handbook of Statistical Methods, 6.1.6 (capability indices, ppm table, ~50 values) and 6.3.2 (d2) (public domain); Minitab support, methods and formulas for normal capability analysis (within and overall sigma). Pp/Ppk as the same formulas on the overall sigma: one source read, to be verified. Normal tail: Numerical Recipes erfc. See docs/shop-helpers.md.',
 },
 {
+  id: 'normdist', level: 'advanced', group: 'Inspection and quality', title: 'Normal distribution: share between limits',
+  desc: 'For a mean and a standard deviation: the share of parts below a limit, above a limit and between two limits, as a percentage and in parts per million, the standard score z of each limit, and the value below which a given share falls. Drawn on the bell curve.',
+  fields: s => [
+    { id: 'mean', label: 'Mean', unit: '', def: 20.05 },
+    { id: 'sd', label: 'Standard deviation', unit: '', def: 0.02 },
+    { id: 'lo', label: 'Lower limit (optional)', unit: '', def: 20.03 },
+    { id: 'hi', label: 'Upper limit (optional)', unit: '', def: 20.08 },
+    { id: 'p', label: 'Share to find a value for (optional)', unit: '%', def: '' },
+  ],
+  calc: (v, W) => {
+    if (!isFinite(v.mean) || !isFinite(v.sd)) return [];
+    if (!(v.sd > 0)) return [R('Inputs', 'the standard deviation must be more than 0', '', 0)];
+    const rows = [], hasLo = isFinite(v.lo), hasHi = isFinite(v.hi);
+    if (hasLo && hasHi && !(v.hi > v.lo)) return [R('Inputs', 'the upper limit must be above the lower limit', '', 0)];
+    const below = W.normal_share_below(v.lo, v.mean, v.sd), above = W.normal_share_above(v.hi, v.mean, v.sd);   // shares as fractions; shown as % and ppm
+    if (hasLo && hasHi) rows.push(R('Share between the limits', W.normal_share_between(v.lo, v.hi, v.mean, v.sd) * 100, '%', 4), R('Outside the limits', W.normal_share_outside(v.lo, v.hi, v.mean, v.sd) * 1e6, 'ppm', 1));
+    if (hasLo) rows.push(R('Share below the lower limit', below * 100, '%', 4), R('Below the lower limit', below * 1e6, 'ppm', 1), R('z of the lower limit', W.normal_z(v.lo, v.mean, v.sd), '', 3));
+    if (hasHi) rows.push(R('Share above the upper limit', above * 100, '%', 4), R('Above the upper limit', above * 1e6, 'ppm', 1), R('z of the upper limit', W.normal_z(v.hi, v.mean, v.sd), '', 3));
+    if (isFinite(v.p)) {
+      const z = W.normal_z_for_share(v.p / 100);
+      if (isFinite(z)) rows.push(R('Value with ' + v.p + ' % of the parts below it', W.normal_value_for_share(v.p / 100, v.mean, v.sd), '', 4), R('z for that share', z, '', 3));
+      else rows.push(R('Share', 'must be more than 0 % and less than 100 %', '', 0));
+    }
+    [1, 2, 3].forEach(k => rows.push(R('Within ' + k + ' standard deviation' + (k > 1 ? 's' : '') + ' of the mean', W.normal_share_within(k) * 100, '%', 2)));
+    rows.push(R('Note', 'True only as far as the measurements follow a normal distribution and the mean and standard deviation are known well. Far out in the tails real processes rarely follow the curve, so treat very small ppm figures as a guide.', '', 0));
+    return rows;
+  },
+  working: 'z = (limit − mean) / standard deviation. The share below a limit is the area under the standard normal curve to the left of z; between two limits it is the difference of the two areas. Within k standard deviations: erf(k / √2). The value for a share is found by searching for the z with that area.',
+  source: 'Interactive Mathematics (IntMath), "Normal probability distributions": z = (X − μ)/σ, areas within 1, 2 and 3 standard deviations, worked examples. Wikipedia, "68–95–99.7 rule": erf(n/√2) and the table of shares. Area under the curve: complementary error function as in the process capability tool. See docs/sources.md, Shop maths 3.',
+  proof: [
+    { name: 'Lathe parts, mean 20.05 mm, standard deviation 0.02 mm, limits 20.03 and 20.08', sys: 'mm', vals: { mean: 20.05, sd: 0.02, lo: 20.03, hi: 20.08 },
+      expect: [['Share between the limits', '%', 77.45, 0.005], ['z of the lower limit', '', -1, 0.0000001], ['z of the upper limit', '', 1.5, 0.0000001]], source: 'IntMath, example 5 (a): 0.7745.' },
+    { name: 'Same parts, below 20.01', sys: 'mm', vals: { mean: 20.05, sd: 0.02, lo: 20.01, hi: '' }, expect: [['Share below the lower limit', '%', 2.28, 0.005]], source: 'IntMath, example 5 (c): 0.0228.' },
+    { name: 'Standard normal, above z = 1.06', sys: 'mm', vals: { mean: 0, sd: 1, lo: '', hi: 1.06 }, expect: [['Share above the upper limit', '%', 14.46, 0.005]], source: 'IntMath, example 4 (a): 0.1446.' },
+    { name: 'Within 2 standard deviations', sys: 'mm', vals: { mean: 0, sd: 1, lo: -2, hi: 2 }, expect: [['Share between the limits', '%', 95.4499736, 0.00002]], source: 'Wikipedia, 68–95–99.7 rule: 0.954499736103642.' },
+    { name: 'Top 5 % of mean 3.25, standard deviation 0.60', sys: 'mm', vals: { mean: 3.25, sd: 0.6, lo: '', hi: '', p: 95 }, expect: [['Value with 95 % of the parts below it', '', 4.237, 0.001]], source: 'IntMath, example 6 (b): about 4.24 (4.237).' },
+  ],
+},
+{
   id: 'ctrlchart', level: 'expert', group: 'Inspection and quality', title: 'Control charts (X-bar/R, individuals)',
   desc: 'Individuals and moving range, or X-bar and R charts for subgroups of 2 to 10, from pasted measurements: centre lines, control limits, the charts with points beyond a limit marked, and the A2, D3, D4 constants checked against two tables.',
   render: el => renderCtrlChart(el),
@@ -2710,6 +2836,66 @@ const TOOLS = [
   render: el => renderEconomics(el),
   working: 'CRF = i(1+i)^n / ((1+i)^n - 1); capital per year = (P - S) CRF + S i. Break-even = fixed / (price - variable). Payback = I / A; discounted n = -ln(1 - I i / A) / ln(1 + i); NPV = A (1 - (1+i)^-n) / i + S (1+i)^-n - I.',
   source: "Engineering economy interest formulas (Machinery's Handbook 'engineering economics', by name); see docs/sources.md.",
+},
+{
+  id: 'interp', level: 'simple', group: 'Shop helpers', title: 'Interpolation (one-way and two-way)',
+  desc: 'A value between two rows of a table (straight-line interpolation), the reverse, and a value inside a cell of a two-way table from its four corners, with a drawing. Says when the point lies outside the known values.',
+  fields: s => [
+    { id: 'm', label: 'What to find', unit: '', def: 0, options: [[0, 'y at x, between two rows'], [1, 'x at y, between two rows'], [2, 'Value inside a two-way table cell']] },
+    { id: 'x1', label: 'First x', unit: '', def: 20 },
+    { id: 'x2', label: 'Second x', unit: '', def: 30 },
+    { id: 'y1', label: 'y at the first x', unit: '', def: 5, when: v => v.m !== 2 },
+    { id: 'y2', label: 'y at the second x', unit: '', def: 7, when: v => v.m !== 2 },
+    { id: 'ya', label: 'First y', unit: '', def: 100, when: v => v.m === 2 },
+    { id: 'yb', label: 'Second y', unit: '', def: 200, when: v => v.m === 2 },
+    { id: 'q11', label: 'Table value at first x, first y', unit: '', def: 5, when: v => v.m === 2 },
+    { id: 'q21', label: 'Table value at second x, first y', unit: '', def: 7, when: v => v.m === 2 },
+    { id: 'q12', label: 'Table value at first x, second y', unit: '', def: 9, when: v => v.m === 2 },
+    { id: 'q22', label: 'Table value at second x, second y', unit: '', def: 12, when: v => v.m === 2 },
+    { id: 'x', label: 'x wanted', unit: '', def: 25, when: v => v.m !== 1 },
+    { id: 'yg', label: 'y given', unit: '', def: 6, when: v => v.m === 1 },
+    { id: 'y', label: 'y wanted', unit: '', def: 150, when: v => v.m === 2 },
+  ],
+  calc: (v, W) => {
+    const fin = (...a) => a.every(isFinite), rows = [];
+    const out = t => t < 0 || t > 1;
+    if (v.m === 2) {
+      if (!fin(v.x1, v.x2, v.ya, v.yb, v.q11, v.q21, v.q12, v.q22, v.x, v.y)) return [];
+      const B = w => W.bilinear(v.x1, v.x2, v.ya, v.yb, v.q11, v.q21, v.q12, v.q22, v.x, v.y, w);
+      if (!isFinite(B(0))) return [R('Inputs', 'the two x values must differ, and so must the two y values', '', 0)];
+      const tx = W.interp_fraction(v.x1, v.x2, v.x), ty = W.interp_fraction(v.ya, v.yb, v.y);
+      rows.push(R('Value at x and y', B(0), '', 4), R('On the first-y edge, at x', B(1), '', 4), R('On the second-y edge, at x', B(2), '', 4),
+        R('Fraction of the way from the first x to the second', tx, '', 4), R('Fraction of the way from the first y to the second', ty, '', 4));
+      if (out(tx) || out(ty)) rows.push(R('Warning', 'The point lies outside the cell, so this is an extrapolation: the table says nothing about how the value behaves out there.', '', 0));
+      rows.push(R('Note', 'Straight lines are assumed between the four corners. Interpolating along y first gives the same value.', '', 0));
+      return rows;
+    }
+    if (!fin(v.x1, v.x2, v.y1, v.y2)) return [];
+    if (v.m === 0) {
+      if (!isFinite(v.x)) return [];
+      const t = W.interp_fraction(v.x1, v.x2, v.x);
+      if (!isFinite(t)) return [R('Inputs', 'the two x values must differ', '', 0)];
+      rows.push(R('y at x', W.interpolate(v.x1, v.y1, v.x2, v.y2, v.x), '', 4), R('Fraction of the way from the first x to the second', t, '', 4));
+      if (out(t)) rows.push(R('Warning', 'x lies outside the two known values, so this is an extrapolation: the straight line is carried on past what is known.', '', 0));
+    } else {
+      if (!isFinite(v.yg)) return [];
+      const t = W.interp_fraction(v.y1, v.y2, v.yg);
+      if (!isFinite(t)) return [R('Inputs', 'the two y values must differ to find x from y', '', 0)];
+      rows.push(R('x at y', W.interpolate(v.y1, v.x1, v.y2, v.x2, v.yg), '', 4), R('Fraction of the way from the first y to the second', t, '', 4));
+      if (out(t)) rows.push(R('Warning', 'y lies outside the two known values, so this is an extrapolation: the straight line is carried on past what is known.', '', 0));
+    }
+    rows.push(R('Note', 'A straight line is assumed between the two rows. The closer the rows, the smaller the error for a curved relationship.', '', 0));
+    return rows;
+  },
+  working: 'One-way: y = y1 + (x − x1)(y2 − y1) / (x2 − x1); the reverse swaps x and y. Two-way: the same step along x on the first-y edge and on the second-y edge, then once more along y between the two results.',
+  source: 'One-way: mathcheck, "Linear interpolation calculator" and FIRGELLI Automations, "Interpolation calculator, linear" (R. Dickson, 2026). Two-way: mathcheck, "Bilinear interpolation calculator" (formula) and Omni Calculator, "Bilinear interpolation calculator" (A. Szczepanek; method and worked example). See docs/sources.md, Shop maths 3.',
+  proof: [
+    { name: 'Between (2, 4) and (8, 16) at x = 5', sys: 'mm', vals: { m: 0, x1: 2, y1: 4, x2: 8, y2: 16, x: 5 }, expect: [['y at x', '', 10, 0.000001]], source: 'FIRGELLI Automations, simple example: 10.' },
+    { name: 'Reverse: between (1, 2) and (3, 8), y = 5', sys: 'mm', vals: { m: 1, x1: 1, y1: 2, x2: 3, y2: 8, yg: 5 }, expect: [['x at y', '', 2, 0.000001]], source: 'mathcheck: (1, 2) and (3, 8) give y = 5 at x = 2.' },
+    { name: 'Two-way table, x 20 and 30, y 100 and 200', sys: 'mm', vals: { m: 2, x1: 20, x2: 30, ya: 100, yb: 200, q11: 5, q21: 7, q12: 9, q22: 12, x: 25, y: 150 },
+      expect: [['Value at x and y', '', 8.25, 0.000001], ['On the first-y edge, at x', '', 6, 0.000001], ['On the second-y edge, at x', '', 10.5, 0.000001]], source: 'mathcheck, two-way table lookup: edges 6 and 10.5, value 8.25.' },
+    { name: 'Two-way, Omni example', sys: 'mm', vals: { m: 2, x1: 0, x2: 4, ya: 1, yb: 3, q11: 12, q21: 0, q12: -4, q22: 8, x: 1, y: 2 }, expect: [['Value at x and y', '', 4, 0.000001]], source: 'Omni Calculator: 12, 0, -4 and 8 at the corners, point (1, 2): 4.' },
+  ],
 },
 {
   id: 'depreciation', level: 'advanced', group: 'Shop helpers', title: 'Depreciation schedule',

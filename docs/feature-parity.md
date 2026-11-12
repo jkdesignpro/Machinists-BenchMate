@@ -107,6 +107,11 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Economics | Depreciation schedule (straight line, declining balance, sum of the years' digits; three published schedules reproduced) | done (ours, 0.7.0) | `depreciation` | |
 | Machine elements | Block and tackle (ideal pull, pull at your own efficiency, rope hauled in; efficiency form and rope hauled in from one source each, marked) | done (ours, 0.7.0) | `tackle` | |
 | Geometry | Squaring a corner: 3-4-5 rule for any legs, corner angle from a measured diagonal, rise for an angle | done (ours, 0.7.0) | `squaring` | |
+| Shop maths | Interpolation: one-way, reverse and two-way (bilinear), with a warning outside the known values | done (ours, 0.7.0; five published examples reproduced) | `interp` | MH19 |
+| Quality | Normal distribution: share below, above and between limits, standard score, value for a share | done (ours, 0.7.0; published examples reproduced) | `normdist` | MH22 |
+| Geometry | Line and circle in coordinates: length, angle, slope, distance from a point, tangent and cutting points | done (ours, 0.7.0; six published cases reproduced) | `linecirc` | MH6 |
+| Geometry | Ellipse, parabola and hyperbola: foci, eccentricity, focal length of a dish, asymptotes, points on the curve | done (ours, 0.7.0; parabola length from one source, marked) | `conics` | MH6 |
+| Shop maths | Trig identities in the formula library (nine groups) | done (ours, 0.7.0; two publishers) | `formulas` | MH13 |
 | Library | Glossary of shop and CNC words | done (ours, 0.6.0; 108 terms in our own words, 97 linked to the page that explains them) | `glossary` | |
 | Milling | Chamfer mill: tip depth, centre offset, cutting diameter, widest chamfer | done (ours, 0.6.0; own cone geometry, drawing to scale) | `chamfermill` | |
 | Library | Tip of the day | done (own tips, Home widget) | `tips.js` | U98 |

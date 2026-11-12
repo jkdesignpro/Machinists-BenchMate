@@ -2378,6 +2378,92 @@ where = 'toolpaths';
     if (!/diagonal 1500/.test(ds) || !/to scale/.test(ds)) problems.push(`[${where}] drawing: ${ds}`);
     await mode('advanced');
   }
+  // Shop maths 3: interpolation, normal shares, line and circle, conics; each against a published example.
+  where = 'interp';
+  {
+    const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+    const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+    const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, String(v)); await page.waitForTimeout(80); };
+    const drawing = async () => page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    await units('mm'); await mode('expert'); await open('interp', 150);
+    await pick('m', 0); await put('x1', '2'); await put('y1', '4'); await put('x2', '8'); await put('y2', '16'); await put('x', '5');
+    let t = await rows();
+    if (!/y at x 10\.0000/i.test(t) || !/first x to the second 0\.5000/.test(t) || /Warning/.test(t)) problems.push(`[${where}] (2, 4) and (8, 16) at 5 give 10 (FIRGELLI): ${t}`);
+    await put('x', '11'); t = await rows();
+    if (!/y at x 22\.0000/i.test(t) || !/Warning x lies outside the two known values/.test(t)) problems.push(`[${where}] outside the two rows must warn: ${t}`);
+    await put('x2', '2'); t = await rows();
+    if (!/the two x values must differ/.test(t)) problems.push(`[${where}] equal x values must be refused: ${t}`);
+    await put('x1', '20'); await put('y1', '5'); await put('x2', '30'); await put('y2', '7'); await put('x', '25');
+    let d = await drawing();
+    if (!/\(20, 5\)/.test(d) || !/\(30, 7\)/.test(d) || !/y 6/.test(d)) problems.push(`[${where}] drawing, one-way: ${d}`);
+    await pick('m', 1); await put('yg', '6'); t = await rows();
+    if (!/x at y 25\.0000/i.test(t)) problems.push(`[${where}] reverse, y = 6 gives x = 25: ${t}`);
+    await pick('m', 2); t = await rows();
+    if (!/Value at x and y 8\.2500/i.test(t) || !/first-y edge, at x 6\.0000/.test(t) || !/second-y edge, at x 10\.5000/.test(t) || !/along y first gives the same value/.test(t)) problems.push(`[${where}] two-way table 5, 7, 9, 12 at (25, 150) gives 8.25 (mathcheck): ${t}`);
+    d = await drawing();
+    if (!/8\.25/.test(d) || !/10\.5/.test(d) || !/not to scale/.test(d)) problems.push(`[${where}] drawing, two-way: ${d}`);
+    await put('x', '35'); t = await rows();
+    if (!/Warning The point lies outside the cell/.test(t)) problems.push(`[${where}] a point outside the cell must warn: ${t}`);
+    await put('x', '25'); await pick('m', 0);
+
+    where = 'normdist';
+    await open('normdist', 150); await put('mean', '20.05'); await put('sd', '0.02'); await put('lo', '20.03'); await put('hi', '20.08'); await put('p', '');
+    t = await rows();
+    if (!/Share between the limits 77\.45\d\d %/i.test(t) || !/z of the lower limit -1\.000/.test(t) || !/z of the upper limit 1\.500/.test(t) || !/Within 2 standard deviations of the mean 95\.45 %/.test(t) || !/Within 3 standard deviations of the mean 99\.73 %/.test(t)) problems.push(`[${where}] lathe parts 20.03 to 20.08 (IntMath: 0.7745): ${t}`);
+    d = await drawing();
+    if (!/lower 20\.03/.test(d) || !/upper 20\.08/.test(d) || !/77\.45 %/.test(d) || !/between the limits/.test(d)) problems.push(`[${where}] drawing: ${d}`);
+    await put('lo', '20.01'); await put('hi', ''); t = await rows();
+    if (!/Share below the lower limit 2\.275\d %/i.test(t) || /between the limits/i.test(t)) problems.push(`[${where}] below 20.01 (IntMath: 0.0228): ${t}`);
+    await put('lo', ''); await put('mean', '3.25'); await put('sd', '0.6'); await put('p', '95'); t = await rows();
+    if (!/Value with 95 % of the parts below it 4\.23\d\d/i.test(t) || !/z for that share 1\.645/.test(t)) problems.push(`[${where}] the top 5 % starts at about 4.237 (IntMath): ${t}`);
+    await put('p', '100'); t = await rows();
+    if (!/must be more than 0 % and less than 100 %/.test(t)) problems.push(`[${where}] a share of 100 % must be refused: ${t}`);
+    await put('sd', '0'); t = await rows();
+    if (!/standard deviation must be more than 0/.test(t)) problems.push(`[${where}] a zero standard deviation must be refused: ${t}`);
+    await put('mean', '20.05'); await put('sd', '0.02'); await put('lo', '20.03'); await put('hi', '20.08'); await put('p', '');
+
+    where = 'linecirc';
+    await open('linecirc', 150); await put('x1', '-10'); await put('y1', '11'); await put('x2', '10'); await put('y2', '-9'); await put('cx', '3'); await put('cy', '-5'); await put('r', '3');
+    t = await rows();
+    if (!/First point, X 3\.000 mm/.test(t) || !/First point, Y -2\.000 mm/.test(t) || !/Second point, X 6\.000 mm/.test(t) || !/Second point, Y -5\.000 mm/.test(t) || !/Angle of the line from the X axis -45\.0000 deg/.test(t) || !/Chord between the two points 4\.243 mm/.test(t)) problems.push(`[${where}] Rosetta Code case (3, -2) and (6, -5): ${t}`);
+    d = await drawing();
+    if (!/\(3, -2\)/.test(d) || !/\(6, -5\)/.test(d) || !/to scale, mm, Y upwards/.test(d)) problems.push(`[${where}] drawing: ${d}`);
+    await put('x1', '5'); await put('y1', '0'); await put('x2', '5'); await put('y2', '20'); await put('cx', '10'); await put('cy', '10'); await put('r', '5'); t = await rows();
+    if (!/the line touches the circle \(tangent\)/.test(t) || !/Tangent point, X 5\.000 mm/.test(t) || !/Tangent point, Y 10\.000 mm/.test(t) || !/parallel to the Y axis/.test(t)) problems.push(`[${where}] the line x = 5 touches the circle at (5, 10) (Rosetta Code): ${t}`);
+    await put('x1', '0'); await put('y1', '10'); await put('x2', '1'); await put('y2', '13'); await put('cx', '0'); await put('cy', '0'); await put('r', '3'); t = await rows();
+    if (!/Distance from the circle centre to the line 3\.162 mm/.test(t) || !/the line misses the circle/.test(t) || /First point/.test(t)) problems.push(`[${where}] y = 3x + 10 misses the circle of radius 3 (Mathwords): ${t}`);
+    await put('x2', '0'); await put('y2', '10'); t = await rows();
+    if (!/the two points must not be the same/.test(t)) problems.push(`[${where}] two equal points must be refused: ${t}`);
+    await put('x1', '-10'); await put('y1', '11'); await put('x2', '10'); await put('y2', '-9'); await put('cx', '3'); await put('cy', '-5'); await put('r', '3');
+
+    where = 'conics';
+    await open('conics', 150); await pick('k', 0); await put('a', '5'); await put('b', '3'); await put('x', '4'); t = await rows();
+    if (!/Centre to each focus, c 4\.000 mm/i.test(t) || !/Eccentricity c \/ a 0\.80000/.test(t) || !/Y of the curve at X \(above and below the long axis\) 1\.800 mm/.test(t)) problems.push(`[${where}] ellipse 5 and 3 has c = 4 (NUM8ERS): ${t}`);
+    d = await drawing();
+    if (!/focus/.test(d) || !/a 5/.test(d) || !/c 4/.test(d)) problems.push(`[${where}] ellipse drawing: ${d}`);
+    await put('a', '2'); t = await rows();
+    if (!/enter the longer half-axis as a/.test(t)) problems.push(`[${where}] a shorter than b must be refused for an ellipse: ${t}`);
+    await put('a', '4'); await pick('k', 2); await put('x', ''); t = await rows();
+    if (!/Centre to each focus, c 5\.000 mm/i.test(t) || !/Eccentricity c \/ a 1\.25000/.test(t) || !/Slope of the asymptotes, b \/ a 0\.75000/.test(t)) problems.push(`[${where}] hyperbola 4 and 3 has c = 5 and slope 3/4 (NUM8ERS): ${t}`);
+    d = await drawing();
+    if (!/asymptote/.test(d) || !/focus/.test(d)) problems.push(`[${where}] hyperbola drawing: ${d}`);
+    await put('x', '2'); t = await rows();
+    if (!/lies between the two branches/.test(t)) problems.push(`[${where}] a point between the branches must be refused: ${t}`);
+    await put('x', ''); await pick('k', 1); await put('w', '2'); await put('d', '2'); t = await rows();
+    if (!/Focal length \(vertex to focus\) 0\.125 mm/i.test(t) || !/latus rectum\) 0\.500 mm/.test(t) || !/rim to rim \(one source\) 4\.647 mm/.test(t)) problems.push(`[${where}] the dish of y = 2x² has the focal length 1/8 (NUM8ERS): ${t}`);
+    d = await drawing();
+    if (!/width 2/.test(d) || !/depth 2/.test(d) || !/focus, 0\.125 above the vertex/.test(d)) problems.push(`[${where}] parabola drawing: ${d}`);
+    await pick('k', 0); await put('a', '5'); await put('b', '3');
+
+    // Formula library: the trig identities can be found by name.
+    where = 'formulas';
+    await open('formulas', 200);
+    const fq = await page.$('#main input[type="search"]');
+    if (fq) { await fq.fill('Trig identities'); await fq.dispatchEvent('input'); await page.waitForTimeout(150); const ft = (await page.$eval('#main', e => e.innerText)).replace(/\s+/g, ' '); if (!/sum and difference of two angles/i.test(ft) || !/sin 2A = 2 sin A cos A/.test(ft) || !/Joyce/.test(ft)) problems.push(`[${where}] trig identities in the formula library: ${ft.slice(0, 400)}`); await fq.fill(''); await fq.dispatchEvent('input'); }
+    else problems.push(`[${where}] no search box in the formula library`);
+    await mode('advanced');
+  }
+
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);

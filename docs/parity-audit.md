@@ -92,6 +92,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, fourth batch, 2026-11-12):** hexagon screws, nuts and washers (`hexhw`) and the list of spanner sizes in order. MH204 and BB5 from partial to done; BB49 done on re-audit; MH202 stays partial. Counted from the tables below: 381 done, 167 partial, 48 missing of 596 in-scope rows, 64 %; 156 more rows to done for the 90 % target.
 
+**Update (0.7.0, fifth batch, 2026-11-12):** shop maths 3 (`interp`, `normdist`, `linecirc`, `conics`) and the trig identities in the formula library. MH6, MH13, MH19 and MH22 from partial to done. Counted from the tables below: 385 done, 163 partial, 48 missing of 596 in-scope rows, 65 %; 152 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -348,23 +350,23 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH3 | Prime factorization and prime/factor tables | done | `calc` | Prime factors of any whole number to 10^12, worked out, so no printed tables are needed |
 | MH4 | Algebra: expressions, equations, rearranging formulas, polynomials, quadratic/cubic | out of scope? | | Maths teaching, not a machining tool |
 | MH5 | Functions, logarithms, sequences | out of scope? | | |
-| MH6 | Analytic geometry: lines, slopes, circle, ellipse, sphere, parabola, hyperbola | partial | `arc`, `fillet` | Circle through three points, chord and sagitta, fillet and tangent points; no line and circle intersections, ellipse, parabola or hyperbola |
+| MH6 | Analytic geometry: lines, slopes, circle, ellipse, sphere, parabola, hyperbola | done | `arc`, `fillet`, `linecirc`, `conics`, `figures` | Circle through three points, chord and sagitta, fillets; 0.7.0: line through two points, distance from a point, line and circle meeting points, ellipse, parabola and hyperbola; sphere in `figures` |
 | MH7 | Complex numbers | out of scope? | | |
 | MH8 | Pure geometry propositions and geometric constructions | missing | | |
 | MH9 | Area and volume rules (prismoidal, Pappus, irregular areas, tank contents) | done | `figures`, `prismoid`, `irregular`, `tankvol` | 0.6.0: prismoidal formula, irregular areas by the trapezoidal and Simpson's rules, contents of a lying or standing cylindrical tank; torus (Pappus), frustum and cap in `figures` |
 | MH10 | Dimensions of plane figures, polygons, segments of a circle | done | `figures`, `arc` | Squares, rectangles, parallelograms, trapezoids, circles, rings, ellipses, regular polygons, sectors; segments in `arc` (`claude/measure-maths`) |
 | MH11 | Circles and squares of equal area; diagonals of squares and hexagons | done | `figures` | 0.6.0: side of the square and diameter of the circle of equal area; across corners and flats of any regular polygon |
 | MH12 | Volumes of solids | done | `figures` | Cube, box, cylinder, tube, cone, frustum, sphere, cap, pyramid, torus, hex bar (`claude/measure-maths`) |
-| MH13 | Trigonometry: angle measure, ratios, laws of sines and cosines, identities | partial | `triangle`, `calc` | Laws of sines and cosines in the triangle solver, any trig value in the calculator, degrees, minutes and seconds; no list of identities |
+| MH13 | Trigonometry: angle measure, ratios, laws of sines and cosines, identities | done | `triangle`, `calc`, `formulas` | Laws of sines and cosines in the triangle solver, any trig value in the calculator; 0.7.0: nine groups of identities in the formula library |
 | MH14 | Solution of right and oblique triangles | done | `triangle` |  |
 | MH15 | Angular measure conversion (degrees-minutes-seconds, radians) | done | `calc`, `units` | Decimal degrees, DMS, radians, gon, revolutions (`claude/measure-maths`) |
 | MH16 | Trig function values, versed sine, involute functions | done | `calc` | 0.6.0: versed sine, coversed sine, exsecant, secant, cosecant and cotangent added; any value is worked out, so no printed tables are needed |
 | MH17 | Spherical trigonometry | out of scope? | | |
 | MH18 | Compound angles | done | `compound` | True angle from apparent angles or two tilts; swivel-and-tilt and compound sine plate settings (`claude/measure-maths`) |
-| MH19 | Interpolation | partial | `calc` | Linear interpolation only (`claude/measure-maths`) |
+| MH19 | Interpolation | done | `calc`, `interp` | 0.7.0: one-way, reverse and two-way interpolation with a warning when extrapolating |
 | MH20 | Matrices | out of scope? | | |
 | MH21 | Calculus, Newton's method, series | out of scope? | | |
-| MH22 | Statistics: probability and normal distribution | partial | `capability` | Normal fit and ppm only |
+| MH22 | Statistics: probability and normal distribution | done | `capability`, `normdist` | Normal fit and ppm in `capability`; 0.7.0: shares below, above and between limits, standard score, value for a share |
 | MH23 | Applying statistics: minimum number of tests, comparing averages | missing | | |
 | MH24 | Engineering economics: interest, present value, annuities, depreciation | done | `economics`, `depreciation` | Capital recovery factor, machine hourly rate, break-even, payback, discounted payback, NPV; 0.7.0: depreciation schedules by straight line, declining balance and sum of the years' digits (units of production not built) |
 

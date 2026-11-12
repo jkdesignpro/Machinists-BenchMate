@@ -577,6 +577,160 @@ pub fn rise_for_angle(run: f64, angle_deg: f64) -> f64 {
     if run > 0.0 && angle_deg > -90.0 && angle_deg < 90.0 { run * angle_deg.to_radians().tan() } else { f64::NAN }
 }
 
+// ---------------------------------------------------------------- shop maths 3: interpolation, normal shares, lines, circles, conics
+/// Fraction of the way from x1 to x2 at which x lies: (x - x1) / (x2 - x1). Below 0 or above 1 is outside the two points.
+pub fn interp_fraction(x1: f64, x2: f64, x: f64) -> f64 {
+    if x1 == x2 || !(x1.is_finite() && x2.is_finite() && x.is_finite()) { return f64::NAN; }
+    (x - x1) / (x2 - x1)
+}
+
+/// Two-way (bilinear) interpolation in a table cell. q11 at (x1, y1), q21 at (x2, y1), q12 at (x1, y2), q22 at (x2, y2).
+/// which 0: value at (x, y); 1: value on the y1 edge at x; 2: value on the y2 edge at x.
+pub fn bilinear(x1: f64, x2: f64, y1: f64, y2: f64, q11: f64, q21: f64, q12: f64, q22: f64, x: f64, y: f64, which: f64) -> f64 {
+    let tx = interp_fraction(x1, x2, x);
+    let ty = interp_fraction(y1, y2, y);
+    if !(tx.is_finite() && ty.is_finite() && q11.is_finite() && q21.is_finite() && q12.is_finite() && q22.is_finite()) { return f64::NAN; }
+    let r1 = q11 + tx * (q21 - q11);
+    let r2 = q12 + tx * (q22 - q12);
+    match which as i32 { 1 => r1, 2 => r2, _ => r1 + ty * (r2 - r1) }
+}
+
+/// Share of a normal population below x.
+pub fn normal_share_below(x: f64, mean: f64, sigma: f64) -> f64 {
+    if !(sigma > 0.0) || !(x.is_finite() && mean.is_finite()) { return f64::NAN; }
+    crate::shop::normal_upper_tail((mean - x) / sigma)
+}
+
+/// Share of a normal population between lo and hi (lo < hi).
+pub fn normal_share_between(lo: f64, hi: f64, mean: f64, sigma: f64) -> f64 {
+    if !(hi > lo) { return f64::NAN; }
+    normal_share_below(hi, mean, sigma) - normal_share_below(lo, mean, sigma)
+}
+
+/// Standard score of x: (x - mean) / sigma.
+pub fn normal_z(x: f64, mean: f64, sigma: f64) -> f64 {
+    if !(sigma > 0.0) || !(x.is_finite() && mean.is_finite()) { return f64::NAN; }
+    (x - mean) / sigma
+}
+
+/// Share of a normal population above x.
+pub fn normal_share_above(x: f64, mean: f64, sigma: f64) -> f64 { normal_share_below(-x, -mean, sigma) }
+
+/// Share of a normal population outside lo to hi (below lo plus above hi).
+pub fn normal_share_outside(lo: f64, hi: f64, mean: f64, sigma: f64) -> f64 {
+    if !(hi > lo) { return f64::NAN; }
+    normal_share_below(lo, mean, sigma) + normal_share_above(hi, mean, sigma)
+}
+
+/// Value below which the share p of a normal population lies: mean + z sigma.
+pub fn normal_value_for_share(p: f64, mean: f64, sigma: f64) -> f64 {
+    if !(sigma > 0.0) || !mean.is_finite() { return f64::NAN; }
+    mean + normal_z_for_share(p) * sigma
+}
+
+/// Share of a normal population within k standard deviations of the mean: erf(k / sqrt 2).
+pub fn normal_share_within(k: f64) -> f64 {
+    if !(k >= 0.0) { return f64::NAN; }
+    1.0 - 2.0 * crate::shop::normal_upper_tail(k)
+}
+
+/// Standard score z below which the share p of a normal population lies (0 < p < 1), by bisection on the tail area.
+pub fn normal_z_for_share(p: f64) -> f64 {
+    if !(p > 0.0 && p < 1.0) { return f64::NAN; }
+    let (mut lo, mut hi) = (-40.0_f64, 40.0_f64);
+    for _ in 0..200 {
+        let mid = 0.5 * (lo + hi);
+        if 1.0 - crate::shop::normal_upper_tail(mid) < p { lo = mid } else { hi = mid }
+    }
+    0.5 * (lo + hi)
+}
+
+/// Line through (x1, y1) and (x2, y2): which 0 length between the points, 1 angle from the X axis in degrees (-180 to 180),
+/// 2 slope dy/dx (NaN when vertical), 3 Y where it crosses X = 0 (NaN when vertical), 4 X where it crosses Y = 0 (NaN when horizontal).
+pub fn line_two_points(x1: f64, y1: f64, x2: f64, y2: f64, which: f64) -> f64 {
+    let (dx, dy) = (x2 - x1, y2 - y1);
+    if !(dx.is_finite() && dy.is_finite()) || (dx == 0.0 && dy == 0.0) { return f64::NAN; }
+    match which as i32 {
+        0 => dx.hypot(dy),
+        1 => dy.atan2(dx).to_degrees(),
+        2 => if dx == 0.0 { f64::NAN } else { dy / dx },
+        3 => if dx == 0.0 { f64::NAN } else { y1 - x1 * dy / dx },
+        _ => if dy == 0.0 { f64::NAN } else { x1 - y1 * dx / dy },
+    }
+}
+
+/// Perpendicular distance from (x0, y0) to the line through (x1, y1) and (x2, y2).
+pub fn point_line_distance(x0: f64, y0: f64, x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
+    let (dx, dy) = (x2 - x1, y2 - y1);
+    let len = dx.hypot(dy);
+    if !(len > 0.0) || !(x0.is_finite() && y0.is_finite()) { return f64::NAN; }
+    (dx * (y1 - y0) - (x1 - x0) * dy).abs() / len
+}
+
+/// Where the line through (x1, y1) and (x2, y2) meets the circle of radius r at (cx, cy).
+/// Returns [n, xa, ya, xb, yb]: n = 0 no point, 1 tangent (a = b), 2 two points, a first in the direction from point 1 to point 2.
+/// The line counts as tangent when its distance from the centre equals r within one part in a thousand million.
+pub fn line_circle(x1: f64, y1: f64, x2: f64, y2: f64, cx: f64, cy: f64, r: f64) -> [f64; 5] {
+    let nan = [f64::NAN; 5];
+    let (dx, dy) = (x2 - x1, y2 - y1);
+    let len = dx.hypot(dy);
+    if !(len > 0.0) || !(r > 0.0) || !(cx.is_finite() && cy.is_finite()) { return nan; }
+    let (ux, uy) = (dx / len, dy / len);
+    // Foot of the perpendicular from the centre, then half the chord along the line.
+    let t = (cx - x1) * ux + (cy - y1) * uy;
+    let (fx, fy) = (x1 + t * ux, y1 + t * uy);
+    let d = (fx - cx).hypot(fy - cy);
+    let tol = 1e-9 * r.max(len);
+    if d > r + tol { return [0.0, f64::NAN, f64::NAN, f64::NAN, f64::NAN]; }
+    if (d - r).abs() <= tol { return [1.0, fx, fy, fx, fy]; }
+    let h = (r * r - d * d).sqrt();
+    [2.0, fx - h * ux, fy - h * uy, fx + h * ux, fy + h * uy]
+}
+
+/// Ellipse with semi-axes a >= b > 0: which 0 distance c from the centre to a focus, 1 eccentricity c / a,
+/// 2 y on the curve at x (|x| <= a), 3 distance from the centre to the curve at the focus position (b^2 / a).
+pub fn ellipse_prop(a: f64, b: f64, x: f64, which: f64) -> f64 {
+    if !(b > 0.0 && a >= b) { return f64::NAN; }
+    let c = (a * a - b * b).sqrt();
+    match which as i32 {
+        0 => c,
+        1 => c / a,
+        2 => if x.abs() <= a { b * (1.0 - x * x / (a * a)).sqrt() } else { f64::NAN },
+        _ => b * b / a,
+    }
+}
+
+/// Parabola y = x^2 / (4 f) with its vertex at the origin. which 0: focal length f of a dish of width w and depth d (w^2 / (16 d));
+/// 1 height y at x for focal length f (pass f as w); 2 arc length from the vertex to x for focal length f (pass f as w);
+/// 3 width of the curve at the focus (latus rectum, 4 f) of the dish; 4 length along the curve from rim to rim of the dish.
+pub fn parabola_prop(w: f64, d: f64, x: f64, which: f64) -> f64 {
+    match which as i32 {
+        0 => if w > 0.0 && d > 0.0 { w * w / (16.0 * d) } else { f64::NAN },
+        1 => if w > 0.0 && x.is_finite() { x * x / (4.0 * w) } else { f64::NAN },
+        3 => 4.0 * parabola_prop(w, d, 0.0, 0.0),
+        4 => 2.0 * parabola_prop(parabola_prop(w, d, 0.0, 0.0), 0.0, w / 2.0, 2.0),
+        _ => {
+            if !(w > 0.0) || !x.is_finite() { return f64::NAN; }
+            let t = x.abs() / (2.0 * w);
+            w * (t * (1.0 + t * t).sqrt() + t.asinh())
+        }
+    }
+}
+
+/// Hyperbola x^2/a^2 - y^2/b^2 = 1: which 0 distance c from the centre to a focus, 1 eccentricity c / a,
+/// 2 angle of the asymptotes from the X axis in degrees, 3 y on the curve at x (|x| >= a), 4 slope of the asymptotes b / a.
+pub fn hyperbola_prop(a: f64, b: f64, x: f64, which: f64) -> f64 {
+    if !(a > 0.0 && b > 0.0) { return f64::NAN; }
+    let c = a.hypot(b);
+    match which as i32 {
+        0 => c,
+        1 => c / a,
+        2 => (b / a).atan().to_degrees(),
+        4 => b / a,
+        _ => if x.abs() >= a { b * (x * x / (a * a) - 1.0).sqrt() } else { f64::NAN },
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -925,5 +1079,86 @@ mod tests {
         // Rise over a run: 45 degrees rises as much as it runs; 1 degree over 100 rises 1.7455.
         assert!((rise_for_angle(100.0, 45.0) - 100.0).abs() < 1e-9 && (rise_for_angle(100.0, 1.0) - 1.745506).abs() < 1e-5);
         assert!(rise_for_angle(100.0, 90.0).is_nan());
+    }
+
+    #[test] fn interpolation_reproduces_the_published_examples() {
+        // mathcheck: (1, 2) and (3, 8) at x = 2 give 5 with t = 1/2; at x = 5 give 14 (outside the points).
+        assert!((crate::expr::interpolate(1.0, 2.0, 3.0, 8.0, 2.0) - 5.0).abs() < 1e-12);
+        assert!((interp_fraction(1.0, 3.0, 2.0) - 0.5).abs() < 1e-12);
+        assert!((crate::expr::interpolate(1.0, 2.0, 3.0, 8.0, 5.0) - 14.0).abs() < 1e-12);
+        assert!(interp_fraction(1.0, 3.0, 5.0) > 1.0);
+        // FIRGELLI: (2, 4) and (8, 16) at 5 give 10; (2.5, 15.0) and (4.0, 35.0) at 3.2 give 24.33.
+        assert!((crate::expr::interpolate(2.0, 4.0, 8.0, 16.0, 5.0) - 10.0).abs() < 1e-12);
+        assert!((crate::expr::interpolate(2.5, 15.0, 4.0, 35.0, 3.2) - 24.33).abs() < 0.005);
+        // mathcheck two-way table: x 20 and 30, y 100 and 200, corners 5, 7, 9, 12, at (25, 150): edges 6 and 10.5, value 8.25.
+        let b = |w| bilinear(20.0, 30.0, 100.0, 200.0, 5.0, 7.0, 9.0, 12.0, 25.0, 150.0, w);
+        assert!((b(1.0) - 6.0).abs() < 1e-12 && (b(2.0) - 10.5).abs() < 1e-12 && (b(0.0) - 8.25).abs() < 1e-12);
+        assert!((bilinear(0.0, 1.0, 0.0, 1.0, -2.0, 0.5, 1.0, -1.0, 0.2, 0.8, 0.0) - 0.18).abs() < 1e-12);
+        // Omni Calculator: 12 at (0, 1), 0 at (4, 1), -4 at (0, 3), 8 at (4, 3); at (1, 2) the value is 4.
+        assert!((bilinear(0.0, 4.0, 1.0, 3.0, 12.0, 0.0, -4.0, 8.0, 1.0, 2.0, 0.0) - 4.0).abs() < 1e-12);
+        assert!(bilinear(1.0, 1.0, 0.0, 1.0, 1.0, 2.0, 3.0, 4.0, 1.0, 0.5, 0.0).is_nan());
+    }
+
+    #[test] fn normal_shares_reproduce_the_published_figures() {
+        // Wikipedia, 68-95-99.7 rule: shares within 1, 2, 3 and 6 standard deviations.
+        for (k, f) in [(1.0, 0.682689492137086), (1.5, 0.866385597462284), (2.0, 0.954499736103642), (3.0, 0.997300203936740), (4.0, 0.999936657516334)] {
+            assert!((normal_share_within(k) - f).abs() < 2e-7, "{k}");
+        }
+        assert!((1.0 - normal_share_within(6.0) - 1.973175e-9).abs() < 1e-14);
+        // IntMath, lathe parts: mean 20.05 mm, standard deviation 0.02 mm.
+        assert!((normal_share_between(20.03, 20.08, 20.05, 0.02) - 0.7745).abs() < 5e-5);
+        // Printed 0.1498 from a four-figure table (0.3413 - 0.1915); the exact share is 0.14988.
+        assert!((normal_share_between(20.06, 20.07, 20.05, 0.02) - 0.1498).abs() < 1.5e-4);
+        assert!((normal_share_below(20.01, 20.05, 0.02) - 0.0228).abs() < 5e-5);
+        assert!((1.0 - normal_share_below(20.09, 20.05, 0.02) - 0.0228).abs() < 5e-5);
+        // IntMath: P(Z > 1.06) = 0.1446; P(Z < -2.15) = 0.0158.
+        assert!((1.0 - normal_share_below(1.06, 0.0, 1.0) - 0.1446).abs() < 5e-5);
+        assert!((normal_share_below(-2.15, 0.0, 1.0) - 0.0158).abs() < 5e-5);
+        // IntMath: the lowest 3 % lies below z = -1.88; the top 5 % of mean 3.25, SD 0.60 starts at about 4.237.
+        assert!((normal_z_for_share(0.03) + 1.88).abs() < 0.005);
+        assert!((3.25 + 0.60 * normal_z_for_share(0.95) - 4.237).abs() < 0.001);
+        assert!(normal_z_for_share(0.5).abs() < 1e-7);
+        assert!((normal_z(20.08, 20.05, 0.02) - 1.5).abs() < 1e-9 && (normal_share_above(20.09, 20.05, 0.02) - 0.0228).abs() < 5e-5);
+        assert!((normal_share_outside(-2.0, 2.0, 0.0, 1.0) - (1.0 - 0.954499736103642)).abs() < 2e-7);
+        assert!((normal_value_for_share(0.03, 10.0, 2.0) - 6.24).abs() < 0.005);
+        assert!(normal_z_for_share(0.0).is_nan() && normal_share_below(1.0, 0.0, 0.0).is_nan());
+    }
+
+    #[test] fn lines_circles_and_conics_reproduce_the_published_examples() {
+        let near = |a: f64, b: f64| (a - b).abs() < 1e-9;
+        // Rosetta Code: centre (3, -5), radius 3, line (-10, 11) to (10, -9): (3, -2) and (6, -5).
+        let p = line_circle(-10.0, 11.0, 10.0, -9.0, 3.0, -5.0, 3.0);
+        assert!(p[0] == 2.0 && near(p[1], 3.0) && near(p[2], -2.0) && near(p[3], 6.0) && near(p[4], -5.0));
+        // Rosetta Code: centre (4, 2), radius 5, line (6, 3) to (10, 7): (1, -2) and (8, 5).
+        let p = line_circle(6.0, 3.0, 10.0, 7.0, 4.0, 2.0, 5.0);
+        assert!(p[0] == 2.0 && near(p[1], 1.0) && near(p[2], -2.0) && near(p[3], 8.0) && near(p[4], 5.0));
+        // Rosetta Code: centre (0, 0), radius 4, the vertical line through (0, -3) and (0, 6): (0, -4) and (0, 4).
+        let p = line_circle(0.0, -3.0, 0.0, 6.0, 0.0, 0.0, 4.0);
+        assert!(p[0] == 2.0 && near(p[1], 0.0) && near(p[2], -4.0) && near(p[3], 0.0) && near(p[4], 4.0));
+        // Rosetta Code: centre (10, 10), radius 5, the line x = 5 touches at (5, 10).
+        let p = line_circle(5.0, 0.0, 5.0, 20.0, 10.0, 10.0, 5.0);
+        assert!(p[0] == 1.0 && near(p[1], 5.0) && near(p[2], 10.0));
+        // Mathwords: y = x + 1 and x^2 + y^2 = 25 meet at (-4, -3) and (3, 4); y = 3x + 10 misses x^2 + y^2 = 9 (distance 3.16).
+        let p = line_circle(0.0, 1.0, 1.0, 2.0, 0.0, 0.0, 5.0);
+        assert!(p[0] == 2.0 && near(p[1], -4.0) && near(p[2], -3.0) && near(p[3], 3.0) && near(p[4], 4.0));
+        assert!(line_circle(0.0, 10.0, 1.0, 13.0, 0.0, 0.0, 3.0)[0] == 0.0);
+        assert!((point_line_distance(0.0, 0.0, 0.0, 10.0, 1.0, 13.0) - 10.0_f64.sqrt()).abs() < 1e-12);
+        // Line through (0, 1) and (1, 2): 45 degrees, slope 1, crosses Y at 1 and X at -1.
+        assert!(near(line_two_points(0.0, 1.0, 1.0, 2.0, 1.0), 45.0) && near(line_two_points(0.0, 1.0, 1.0, 2.0, 2.0), 1.0));
+        assert!(near(line_two_points(0.0, 1.0, 1.0, 2.0, 3.0), 1.0) && near(line_two_points(0.0, 1.0, 1.0, 2.0, 4.0), -1.0));
+        assert!(line_two_points(2.0, 0.0, 2.0, 5.0, 2.0).is_nan() && near(line_two_points(2.0, 0.0, 2.0, 5.0, 0.0), 5.0));
+        // NUM8ERS: ellipse a = 5, b = 3 has c = 4; hyperbola a = 4, b = 3 has c = 5 and asymptotes of slope 3/4.
+        assert!(near(ellipse_prop(5.0, 3.0, 0.0, 0.0), 4.0) && near(ellipse_prop(5.0, 3.0, 0.0, 1.0), 0.8));
+        assert!(near(ellipse_prop(5.0, 3.0, 4.0, 2.0), 1.8) && near(ellipse_prop(5.0, 3.0, 0.0, 3.0), 1.8));
+        assert!(ellipse_prop(3.0, 5.0, 0.0, 0.0).is_nan() && ellipse_prop(5.0, 3.0, 6.0, 2.0).is_nan());
+        assert!(near(hyperbola_prop(4.0, 3.0, 0.0, 0.0), 5.0) && near(hyperbola_prop(4.0, 3.0, 0.0, 1.0), 1.25));
+        assert!(near(hyperbola_prop(4.0, 3.0, 0.0, 2.0).to_radians().tan(), 0.75) && near(hyperbola_prop(4.0, 3.0, 5.0, 3.0), 2.25));
+        assert!(near(hyperbola_prop(4.0, 3.0, 0.0, 4.0), 0.75));
+        assert!(hyperbola_prop(4.0, 3.0, 3.0, 3.0).is_nan());
+        // NUM8ERS: y = 2 x^2 has the focal length 1/8. A dish 2 wide is then 2 deep.
+        assert!(near(parabola_prop(2.0, 2.0, 0.0, 0.0), 0.125) && near(parabola_prop(0.125, 0.0, 1.0, 1.0), 2.0));
+        assert!(near(parabola_prop(2.0, 2.0, 0.0, 3.0), 0.5) && near(parabola_prop(4.0, 1.0, 0.0, 4.0), 2.0 * 2.295587149384));
+        // MathWorld arc length s = a (t sqrt(1 + t^2) + asinh t) with y = 2 a t: at t = 1 (the end of the latus rectum), a = 1: 2.295587.
+        assert!((parabola_prop(1.0, 0.0, 2.0, 2.0) - 2.295587149).abs() < 1e-8);
     }
 }
