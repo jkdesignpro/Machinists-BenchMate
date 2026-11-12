@@ -5,7 +5,7 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 ## [Unreleased]
 
 ## [0.6.0] - 2026-11-12
-Stage 4 of the plan, part 1: book references. Built on top of 0.5.0. In progress.
+Stage 4 of the plan, part 1: book references, in seventeen batches. Built on top of 0.5.0. The book audit (docs/parity-audit.md) stands at 367 done, 181 partial and 48 missing of 596 in-scope rows, 62 %; the target of 90 % is carried on in 0.7.0 and 0.8.0.
 
 ### Added (springs, belts and chains)
 - New tool **Compression spring: rate, load and stress** (Reference > Machine elements): from the wire diameter, outside diameter, active coils and the kind of ends it gives the spring rate, spring index, Wahl stress factor, total coils, solid length and pitch, and the load and shear stress at solid, for a load or at a length, with the spring drawn to scale. Modulus of rigidity from two spring makers (two materials from one maker, marked), or your own. Checked against a published worked example.
@@ -15,11 +15,6 @@ Stage 4 of the plan, part 1: book references. Built on top of 0.5.0. In progress
 
 ### Added (machine tapers)
 - **Machine tapers** has two more families: **Jarno** No. 2 to 20 (two publishers print the same table and a third the rule behind it: large end N/8 in, small end N/10 in, length N/2 in) and **Brown & Sharpe** No. 1 to 18. For Brown & Sharpe the two publishers print the same small ends but different plug lengths, and so different large ends, for No. 4, 5, 7, 9, 10 and 11: both are shown with "Sources differ". No. 16 to 18 and the taper per foot come from one publisher and say so.
-
-### Added (gauges, pins, gear cutters)
-- New page **Sheet metal and wire gauges** (Shop maths > Stock and sheet metal): what a gauge number is in inches and mm for steel (Manufacturers' Standard), galvanized, stainless and aluminium sheet and the US Standard gauge, and for wire the American wire gauge (worked out from its rule), the British Standard Wire Gauge and the tube wall and strip series. Each table value is shown as two publishers print it; the three places where they differ show both.
-- New tool **Taper pins (inch series)** (Reference > Machine elements): No. 7/0 to No. 14, large end with commercial and precision limits, and the small end diameter for the length of the pin, with a drawing. The sizes come from one supplier's sheet of the standard and say so.
-- **Spur gear data** shows the number of the involute form cutter (set of eight) for each gear: the diametral pitch series in inch mode, the module series, which is numbered the other way round, in mm mode.
 
 ### Added (gauges, pins, gear cutters)
 - New page **Sheet metal and wire gauges** (Shop maths > Stock and sheet metal): what a gauge number is in inches and mm for steel (Manufacturers' Standard), galvanized, stainless and aluminium sheet and the US Standard gauge, and for wire the American wire gauge (worked out from its rule), the British Standard Wire Gauge and the tube wall and strip series. Each table value is shown as two publishers print it; the three places where they differ show both.
