@@ -1891,9 +1891,9 @@ const TOOLS = [
 },
 {
   id: 'gdtfcf', level: 'advanced', group: 'GD&T', title: 'Feature control frame builder',
-  desc: 'Build a feature control frame, see it drawn, read it in plain English, and get a warning for combinations that are invalid or doubtful.',
+  desc: 'Build a feature control frame, see it drawn, and have it read out in plain words: said aloud, the demand in one sentence, each box in turn, the tolerance at each size, how it is checked. Warns about combinations that are invalid or doubtful.',
   render: el => renderFcfBuilder(el),
-  working: 'The checks cover the common rules (datums on form tolerances, MMC on surfaces, runout at MMC, diameter zones, modifier use, datum order). They are not a full standards review.',
+  working: 'The read-out is built from the boxes of the frame, left to right, using the same confirmed statements as the reference guide. With the size limits typed, the bonus, the tolerance allowed at each limit and the virtual condition come from the same formulas as the bonus calculator. The checks cover the common rules (datums on form tolerances, MMC on surfaces, runout at MMC, diameter zones, modifier use, datum order). They are not a full standards review.',
   source: 'Rules as confirmed in docs/gdt.md (Geometric Learning Systems Y14.5-2018 chart, GD&T Basics, KEYENCE, University of Illinois ME 170 notes, Mitutoyo, Skill-Lync).',
 },
 {

@@ -795,6 +795,75 @@ where = 'spline';
   await units('mm');
 }
 
+// Feature control frame builder: the frame is read out in plain words, with the sizes worked by the core,
+// and hands its values on to the bonus, true position and unequal profile calculators.
+where = 'gdtfcf';
+{
+  await units('mm');
+  await mode('advanced');
+  await open('gdtfcf', 80);
+  const set = async (k, v) => { await page.evaluate(([k, v]) => { const i = document.querySelector('#main [data-k="' + k + '"]'); if (i.type === 'checkbox') i.checked = v; else i.value = v; i.dispatchEvent(new Event(i.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); }, [k, v]); await page.waitForTimeout(40); };
+  const txt = sel => page.$eval('#main ' + sel, e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
+  // default frame: position, diameter 0.25 at MMC, to A, B, C
+  if ((await txt('#fcfsay')) !== '“Position, within a diameter of 0.25, at maximum material condition, to datum A, datum B and datum C.”') problems.push(`[${where}] spoken frame is wrong: ${await txt('#fcfsay')}`);
+  if (!/axis .* must lie within a cylindrical zone 0\.25 in diameter, centred on the true position/.test(await txt('#fcfmain'))) problems.push(`[${where}] the demand sentence is wrong: ${await txt('#fcfmain')}`);
+  const boxes = await page.$$eval('#main #fcfboxes tr', trs => trs.length - 1);
+  if (boxes !== 6) problems.push(`[${where}] expected 6 boxes read out (symbol, value, M, A, B, C), got ${boxes}`);
+  if (!/primary/.test(await txt('#fcfboxes')) || !/tertiary/.test(await txt('#fcfboxes')) || !/bonus tolerance/.test(await txt('#fcfboxes'))) problems.push(`[${where}] box meanings are missing`);
+  if (await page.$('#main #fcfsizes')) problems.push(`[${where}] the size table should wait for the size limits`);
+  if (!(await page.$('#main #fcfexp .gzone svg'))) problems.push(`[${where}] the zone sketch is missing`);
+  // hole 10.0 to 10.2: MMC 10.00 with 0.25, LMC 10.20 with bonus 0.20 and 0.45; virtual condition 9.75
+  await set('lo', '10.0'); await set('hi', '10.2');
+  const sz = await txt('#fcfsizes'), gsz = await txt('#fcfexp .gsz');
+  if (!/At maximum material 10\.00 0\.00 0\.25 At least material 10\.20 0\.20 0\.45/.test(sz)) problems.push(`[${where}] hole size table is wrong: ${sz}`);
+  if (!/Virtual condition 9\.75/.test(gsz) || !/gauge pin/.test(gsz)) problems.push(`[${where}] hole virtual condition should be 9.75 with a gauge pin: ${gsz}`);
+  // the same limits as a pin: MMC is the largest size, virtual condition 10.45
+  await set('int', '0');
+  const szp = await txt('#fcfsizes'), gszp = await txt('#fcfexp .gsz');
+  if (!/At maximum material 10\.20 0\.00 0\.25 At least material 10\.00 0\.20 0\.45/.test(szp) || !/Virtual condition 10\.45/.test(gszp)) problems.push(`[${where}] pin sizes are wrong: ${szp} ${gszp}`);
+  // LMC on the hole: the tolerance holds at 10.20 and grows towards 10.00; boundary 10.45
+  await set('int', '1'); await set('mc', 'L');
+  const szl = await txt('#fcfsizes'), gszl = await txt('#fcfexp .gsz');
+  if (!/At least material 10\.20 0\.00 0\.25 At maximum material 10\.00 0\.20 0\.45/.test(szl) || !/Virtual condition 10\.45/.test(gszl)) problems.push(`[${where}] LMC sizes are wrong: ${szl} ${gszl}`);
+  if (!/at least material condition/.test(await txt('#fcfsay'))) problems.push(`[${where}] LMC is not said aloud`);
+  // no modifier: no bonus, said so
+  await set('mc', '');
+  if (await page.$('#main #fcfsizes')) problems.push(`[${where}] no size table without a material condition`);
+  if (!/tolerance stays 0\.25 at every size/.test(await txt('#fcfexp .gsz')) || !/with no bonus/.test(await txt('#fcfboxes'))) problems.push(`[${where}] RFS should say there is no bonus`);
+  // hand over to the bonus calculator and the true position check
+  await set('mc', 'M');
+  await page.click('#main #fcfbonus'); await page.waitForTimeout(80);
+  const bv = await page.evaluate(() => ({ h: location.hash, lo: document.querySelector('#main [data-id="lo"]').value, hi: document.querySelector('#main [data-id="hi"]').value, tol: document.querySelector('#main [data-id="tol"]').value, mc: document.querySelector('#main [data-id="mc"]').value, int: document.querySelector('#main [data-id="int"]').value }));
+  if (!/gdtbonus/.test(bv.h) || +bv.lo !== 10 || +bv.hi !== 10.2 || +bv.tol !== 0.25 || bv.mc !== '1' || bv.int !== '1') problems.push(`[${where}] bonus calculator did not get the frame values: ${JSON.stringify(bv)}`);
+  await open('gdtfcf', 80);
+  await page.click('#main #fcftp'); await page.waitForTimeout(80);
+  const tv = await page.evaluate(() => ({ h: location.hash, tol: document.querySelector('#main [data-id="tol"]').value, mc: document.querySelector('#main [data-id="mc"]').value }));
+  if (!/gdttp/.test(tv.h) || +tv.tol !== 0.25 || tv.mc !== '1') problems.push(`[${where}] true position check did not get the frame values: ${JSON.stringify(tv)}`);
+  // profile of a surface with U: said aloud, read box by box, linked to the unequal zone calculator (expert tool)
+  await mode('expert');
+  await open('gdtfcf', 80);
+  await set('ch', 'profile_surface'); await set('val', '0.4'); await set('u', true); await set('uv', '0.1');
+  if (!/Profile of a surface, within 0\.4, unequally disposed, 0\.1 of it outside the material, to datum A/.test(await txt('#fcfsay'))) problems.push(`[${where}] unequal profile is not said aloud: ${await txt('#fcfsay')}`);
+  if (!/of the total 0\.4, 0\.1 lies outside the material/.test(await txt('#fcfboxes')) || !(await page.$('#main #fcfunote'))) problems.push(`[${where}] unequal profile box or sketch note is missing`);
+  if (await page.$('#main #fcfbonus')) problems.push(`[${where}] a surface profile has no bonus to link to`);
+  await page.click('#main #fcfu'); await page.waitForTimeout(80);
+  const uv = await page.evaluate(() => ({ h: location.hash, t: document.querySelector('#main [data-id="t"]').value, u: document.querySelector('#main [data-id="u"]').value }));
+  if (!/gdtprofu/.test(uv.h) || +uv.t !== 0.4 || +uv.u !== 0.1) problems.push(`[${where}] unequal profile calculator did not get the frame values: ${JSON.stringify(uv)}`);
+  // an invalid frame (flatness with a datum) is still read out, under a warning
+  await open('gdtfcf', 80);
+  await set('u', false); await set('ch', 'flatness');
+  await page.evaluate(() => { const d = document.querySelector('#main [data-dl="0"]'); d.value = 'A'; d.dispatchEvent(new Event('change', { bubbles: true })); });
+  await page.waitForTimeout(40);
+  if (!/Fix the invalid items first/.test(await txt('#fcfexp')) || !/Flatness, within 0\.4, to datum A\./.test(await txt('#fcfsay'))) problems.push(`[${where}] an invalid frame should be read as it stands, under a warning: ${await txt('#fcfsay')}`);
+  // total runout: the value is an indicator movement, not a diameter
+  await set('ch', 'total_runout');
+  if (!/full indicator movement of 0\.4 over the whole surface/.test(await txt('#fcfmain')) || !/Not a diameter/.test(await txt('#fcfboxes'))) problems.push(`[${where}] runout read-out is wrong: ${await txt('#fcfmain')}`);
+  // leave the builder as it started
+  await set('ch', 'position'); await set('zone', 'dia'); await set('fos', '1'); await set('val', '0.25'); await set('mc', 'M'); await set('lo', ''); await set('hi', '');
+  await page.evaluate(() => { ['A', 'B', 'C'].forEach((l, i) => { const d = document.querySelector('#main [data-dl="' + i + '"]'); d.value = l; d.dispatchEvent(new Event('change', { bubbles: true })); }); });
+  await mode('advanced');
+}
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

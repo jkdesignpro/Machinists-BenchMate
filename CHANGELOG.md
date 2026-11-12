@@ -41,6 +41,12 @@ Stage 2 of the plan: drawings and editors. Built on top of 0.3.0.
 - **The drawing matches the computed dimensions**, by test: the thickness measured on the drawn profile at the pitch circle is the calculator's value, the pin centre is where the measurement over or between pins puts it, and the contact point is half a pin diameter from the centre (core test over four splines, external and internal, even and odd tooth counts; page test on the drawn picture, also with a typed thickness and space width).
 - `benchmate-core`: `gears::space_view` and `space_view_flat` with 2 tests; wasm export `gear_space_view`.
 
+### Added (feature control frame read out in plain words)
+- **Feature control frame builder: the frame is read out.** The plain English paragraph has become a full read-out of the frame as built: the frame as it is said aloud, left to right; the demand in one sentence beside a sketch of the tolerance zone; the set-up order of the datums; a table that takes each box of the frame in turn and says what it means (the diameter sign, each modifier, each datum and its boundary); how the tolerance is usually checked and what is easy to get wrong. No quiz.
+- **Worked sizes.** Type the size limits of the hole or pin and the read-out shows the actual size, bonus and tolerance allowed at maximum and at least material, and the virtual condition with the gauge it stands for. The numbers come from the core, the same formulas as the bonus calculator.
+- **Linked on.** Buttons send the frame's values to the bonus and virtual condition calculator, the true position check and the unequal profile zone calculator, and open the datum explainer and the guide.
+- An invalid frame is still read box by box, under a warning that it has no defined meaning.
+
 ### Fixed
 - Insert designation: the type letter G (as in CNMG) showed no fixing hole, because no maker key that could be read printed it. ISO 3364 does.
 - DXF text strings: a caret in a text is written as caret and space, as the DXF reference asks, so it is not read as a control character.

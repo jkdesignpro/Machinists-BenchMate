@@ -220,8 +220,8 @@ Contents:
    position from measured X/Y (diametral), position to coordinate
    tolerance conversion, fixed and floating fastener formulas, composite
    position, profile zone offset, simple stack-ups.
-7. Feature control frame builder: assemble a frame, BenchMate explains it in
-   plain English and flags invalid combinations.
+7. Feature control frame builder: assemble a frame, BenchMate reads it out in
+   plain words, box by box, and flags invalid combinations.
 8. ASME/ISO symbol comparison table.
 
 Accuracy rule: every statement about the standards is checked against at

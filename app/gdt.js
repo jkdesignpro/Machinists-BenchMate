@@ -350,7 +350,7 @@ function renderGdtGuide(el) {
 }
 
 // ---------- Feature control frame builder ----------
-const FCF_STATE = { std: 'asme', ch: 'position', fos: 1, zone: 'dia', val: '0.25', mc: 'M', p: false, ph: '', f: false, t: false, u: false, uv: '', st: false, cf: false, d: [['A', ''], ['B', ''], ['C', '']] };
+const FCF_STATE = { std: 'asme', ch: 'position', fos: 1, zone: 'dia', val: '0.25', mc: 'M', p: false, ph: '', f: false, t: false, u: false, uv: '', st: false, cf: false, d: [['A', ''], ['B', ''], ['C', '']], int: 1, lo: '', hi: '' };
 
 function fcfCheck(s) {
   const c = CHAR[s.ch], out = [];
@@ -409,8 +409,9 @@ function fcfHtml(s) {
   return (s.cf ? '<div class="gtx gcf">CF</div>' : '') + '<div class="fcf">' + cells.join('') + '</div>';
 }
 
-function fcfExplain(s) {
-  const c = CHAR[s.ch], ds = s.d.filter(x => x[0]);
+// The one sentence that says what the frame demands: what must lie in which zone.
+function fcfSentence(s) {
+  const ds = s.d.filter(x => x[0]);
   const v = s.val || '?';
   const what = s.fos ? (s.zone === 'width' ? 'The derived median plane of the feature' : 'The axis (derived median line) of the feature') : 'Every point of the surface';
   let zone;
@@ -418,7 +419,7 @@ function fcfExplain(s) {
   else if (s.zone === 'sdia') zone = 'a spherical zone ' + v + ' in diameter';
   else if (s.ch === 'circularity') zone = 'two concentric circles ' + v + ' apart (radially) in each cross-section';
   else if (s.ch === 'cylindricity') zone = 'two coaxial cylinders ' + v + ' apart (radially)';
-  else if (s.ch.startsWith('profile')) zone = 'a zone ' + v + ' wide around the true profile' + (s.u ? ', unequally disposed (' + (s.uv || '?') + ' of it on the side named by the U modifier convention)' : ', split equally each side');
+  else if (s.ch.startsWith('profile')) zone = 'a zone ' + v + ' wide around the true profile' + (s.u ? ', unequally disposed: ' + (s.uv || '?') + ' of it outside the material and the rest inside' : ', split equally each side');
   else if (s.ch.endsWith('runout')) zone = 'a full indicator movement of ' + v;
   else zone = 'two parallel ' + (s.ch === 'straightness' && !s.fos ? 'lines' : 'planes') + ' ' + v + ' apart';
   const rel = {
@@ -432,17 +433,86 @@ function fcfExplain(s) {
     concentricity: ', centred on the datum axis', symmetry: ', centred on the datum centre plane',
   }[s.ch];
   const verb = s.ch.endsWith('runout') ? 'must show no more than ' : 'must lie within ';
-  let t = '<p>' + what + ' ' + verb + zone + rel + '.</p>';
-  if (ds.length) t += '<p>Datum reference frame: ' + ds.map(([l, m], i) => '<b>' + gesc(l) + '</b> ' + ['primary', 'secondary', 'tertiary'][i] + (m === 'M' ? ' (at MMB: the part may shift if the datum feature departs from its MMB)' : m === 'L' ? ' (at LMB)' : '')).join(', ') + '. Set the part up on them in this order, not in alphabetical order.</p>';
-  if (s.mc === 'M') t += '<p>At MMC: the ' + v + ' applies when the feature is at its maximum material size. Every bit the actual size moves towards LMC is added as bonus tolerance. A functional gauge at the virtual condition can check it.</p>';
-  if (s.mc === 'L') t += '<p>At LMC: the ' + v + ' applies at the least material size; bonus grows as the feature moves towards MMC. Typically protects a minimum wall.</p>';
-  if (!s.mc && s.fos && c.mc) t += '<p>No material condition modifier: the tolerance applies at any actual size (RFS), with no bonus.</p>';
-  if (s.p) t += '<p>Projected: the zone extends ' + (s.ph ? gesc(s.ph) + ' ' : '') + 'above the part, where the mating part sits.</p>';
-  if (s.f) t += '<p>Free state: checked with the part unrestrained.</p>';
-  if (s.t) t += '<p>Tangent plane: only the plane touching the high points must lie in the zone.</p>';
-  if (s.cf) t += '<p>CF: the interrupted features are treated as one continuous feature.</p>';
-  if (s.st) t += '<p>Statistical: the tolerance relies on statistical process control.</p>';
-  return t;
+  return what + ' ' + verb + zone + rel + '.';
+}
+
+// The frame as it is said aloud, left to right.
+function fcfSpoken(s) {
+  const c = CHAR[s.ch], ds = s.d.filter(x => x[0]), iso = s.std === 'iso', v = s.val || '?';
+  let t = c.name.replace(/ \(.*\)$/, '');
+  t += s.zone === 'dia' ? ', within a diameter of ' + v : s.zone === 'sdia' ? ', within a spherical diameter of ' + v : ', within ' + v;
+  if (s.u) t += ', unequally disposed, ' + (s.uv || '?') + ' of it outside the material';
+  if (s.mc === 'M') t += iso ? ', with the maximum material requirement' : ', at maximum material condition';
+  if (s.mc === 'L') t += iso ? ', with the least material requirement' : ', at least material condition';
+  if (s.p) t += ', projected' + (s.ph ? ' ' + s.ph : '');
+  if (s.f) t += ', in the free state';
+  if (s.t) t += ', tangent plane';
+  if (s.st) t += ', statistical tolerance';
+  if (ds.length) t += ', to ' + ds.map(([l, m], i) => 'datum ' + l + (m === 'M' ? ' at maximum material boundary' : m === 'L' ? ' at least material boundary' : '')).join(ds.length === 2 ? ' and ' : ', ').replace(/, (?=[^,]*$)/, ds.length > 2 ? ' and ' : ', ');
+  return (s.cf ? 'Continuous feature. ' : '') + t + '.';
+}
+
+// Each box of the frame with what it says, left to right: [box as drawn, meaning].
+function fcfBoxes(s) {
+  const c = CHAR[s.ch], ds = s.d.filter(x => x[0]), v = gesc(s.val || '?'), rows = [];
+  const tx = t => '<span class="gtx">' + t + '</span>';
+  rows.push([sym(c.id), '<b>' + gesc(c.name) + '</b>, a ' + c.cat.toLowerCase() + ' tolerance. ' + gesc(c.controls)]);
+  rows.push([(s.zone === 'dia' ? sym('dia', 'in') : s.zone === 'sdia' ? tx('S') + sym('dia', 'in') : '') + tx(v),
+    s.zone === 'dia' ? 'The zone is a cylinder ' + v + ' across. The diameter sign is what makes it round: without it the zone would be two parallel planes.'
+      : s.zone === 'sdia' ? 'The zone is a sphere ' + v + ' across.'
+      : c.cat === 'Runout' ? 'The total indicator movement allowed, ' + v + '. Not a diameter: it is read on one side as the part turns.'
+      : s.ch === 'circularity' || s.ch === 'cylindricity' ? 'The zone is ' + v + ' wide, measured on the radius, not on the diameter.'
+      : 'The zone is ' + v + ' wide in total' + (s.ch.startsWith('profile') && !s.u ? ', half of it each side of the true profile.' : '.')]);
+  if (s.u) rows.push([circled('U') + tx(gesc(s.uv || '?')), 'Unequal profile: of the total ' + v + ', ' + gesc(s.uv || '?') + ' lies outside the material (the side that adds material) and the rest inside.']);
+  if (s.mc === 'M') rows.push([circled('M'), 'The ' + v + ' holds when the feature is at its maximum material size (smallest hole, largest pin). As the actual size moves away from that, the difference is added as bonus tolerance.']);
+  if (s.mc === 'L') rows.push([circled('L'), 'The ' + v + ' holds when the feature is at its least material size (largest hole, smallest pin). Bonus grows as the size moves towards maximum material. Used to protect a minimum wall.']);
+  if (!s.mc && s.fos && c.mc) rows.push([tx('(nothing)'), 'No material condition sign: the ' + v + ' applies whatever the actual size is, with no bonus.']);
+  if (s.p) rows.push([circled('P') + (s.ph ? tx(gesc(s.ph)) : ''), 'Projected zone: the zone stands ' + (s.ph ? gesc(s.ph) + ' ' : '') + 'above the part, where the mating part sits, instead of inside the hole. It limits how far a stud or screw can lean.']);
+  if (s.f) rows.push([circled('F'), 'Free state: the tolerance applies with the part unrestrained, not clamped.']);
+  if (s.t) rows.push([circled('T'), 'Tangent plane: only the plane resting on the high points of the surface must lie in the zone, not every point.']);
+  if (s.st) rows.push([stBox(), 'Statistical tolerance: the value relies on the feature being made under statistical process control.']);
+  ds.forEach(([l, m], i) => rows.push([tx(gesc(l)) + (m ? circled(m) : ''),
+    '<b>Datum ' + gesc(l) + '</b>, ' + ['primary: the part is located on it first.', 'secondary: next, without coming off the primary.', 'tertiary: last, to stop whatever movement is left.'][i] +
+    (m === 'M' ? ' At maximum material boundary: the gauge or fixture element is made at that fixed size, so the part may shift on it when the datum feature is not at that size. That shift is not added to the tolerance.' : m === 'L' ? ' At least material boundary.' : '')]));
+  if (s.cf) rows.unshift([tx('CF'), 'Continuous feature: the interrupted surfaces are treated as one feature.']);
+  return rows;
+}
+
+// Worked numbers for a feature of size with MMC or LMC, when the size limits are typed. All from the Rust core.
+function fcfSizes(s) {
+  const W = state.W, lo = parseFloat(s.lo), hi = parseFloat(s.hi), tol = parseFloat(s.val), mc = s.mc === 'M' ? 1 : s.mc === 'L' ? 2 : 0;
+  if (!s.fos || !CHAR[s.ch].mc) return '';
+  if (s.lo === '' && s.hi === '') return '<p class="desc">Type the size limits of the feature above to see the tolerance at each size' + (mc ? ', the bonus and the virtual condition.' : '.') + '</p>';
+  if (!(lo > 0 && hi > lo && tol > 0)) return '<p class="warn">Size limits: the upper limit must be greater than the lower, and both greater than zero.</p>';
+  const dpn = Math.min(6, Math.max(...[s.lo, s.hi, s.val].map(x => (String(x).split('.')[1] || '').length))), f = x => x.toFixed(dpn);
+  const kind = s.int ? 'hole' : 'pin';
+  if (!mc) return '<p>With your sizes: the ' + kind + ' may be anywhere from ' + f(lo) + ' to ' + f(hi) + ' and the tolerance stays ' + f(tol) + ' at every size.</p>';
+  const mmc = W.gdt_mmc_size(lo, hi, s.int), lmc = W.gdt_lmc_size(lo, hi, s.int);
+  const row = (name, size) => '<tr><td>' + name + '</td><td class="v">' + f(size) + '</td><td class="v">' + f(W.gdt_bonus(lo, hi, size, s.int, mc)) + '</td><td class="v">' + f(W.gdt_total_tol(tol, lo, hi, size, s.int, mc)) + '</td></tr>';
+  const vc = W.gdt_virtual_condition(lo, hi, tol, s.int, mc);
+  return '<table class="gtab" id="fcfsizes"><tr><th>With your sizes (' + kind + ')</th><th>Actual size</th><th>Bonus</th><th>Tolerance allowed</th></tr>' +
+    row(mc === 1 ? 'At maximum material' : 'At least material', mc === 1 ? mmc : lmc) + row(mc === 1 ? 'At least material' : 'At maximum material', mc === 1 ? lmc : mmc) + '</table>' +
+    '<p>Virtual condition <b>' + f(vc) + '</b>: the boundary the ' + kind + ' never crosses' + (mc === 1 ? '. A functional gauge ' + (s.int ? 'pin' : 'hole') + ' of that size, located from the datums, checks the ' + CHAR[s.ch].name.toLowerCase().replace(/ \(.*\)$/, '') + '. The size limits are still measured separately.' : '.') + '</p>';
+}
+
+// The full read-out: said aloud, the demand in one sentence with the zone sketch, each box in turn,
+// worked sizes, what it controls, how it is checked and what goes wrong. No quiz.
+function fcfReadout(s) {
+  const c = CHAR[s.ch], ds = s.d.filter(x => x[0]);
+  const sizes = fcfSizes(s);
+  return '<p class="gsay" id="fcfsay">“' + gesc(fcfSpoken(s)) + '”</p>' +
+    '<div class="gread"><div><p id="fcfmain"><b>What it demands.</b> ' + fcfSentence(s) + '</p>' +
+    (ds.length ? '<p><b>Set-up.</b> Locate the part on ' + ds.map(([l]) => gesc(l)).join(', then ') + ', in that order. The order is the order of the boxes, not of the alphabet, and changing it can change the result.</p>' : '<p><b>No datums.</b> The zone is not tied to any other feature: it may sit wherever it fits the feature best.</p>') +
+    '</div><div class="gzone">' + zoneDiagram(s.ch) + (s.u ? '<p class="desc" id="fcfunote">Sketch shows the equal case. With U the zone is moved off centre as the frame says.</p>' : '') + '</div></div>' +
+    '<table class="gtab" id="fcfboxes"><tr><th>Box</th><th>What it says</th></tr>' + fcfBoxes(s).map(([b, t]) => '<tr><td class="gsc">' + b + '</td><td>' + t + '</td></tr>').join('') + '</table>' +
+    (sizes ? '<div class="gsz">' + sizes + '</div>' : '') +
+    '<dl class="gdl"><dt>How it is usually checked</dt><dd>' + gesc(c.inspect) + '</dd><dt>Easy to get wrong</dt><dd>' + gesc(c.mistakes) + '</dd></dl>' +
+    '<p class="desc">Zone and datum rules as confirmed in the sources tagged; the checking notes are common shop practice from the same sources, not requirements of the standards. ' + srcTags(c.src) + '</p>' +
+    '<div class="mfilter gmods">' + (s.fos && c.mc ? '<button class="btn" id="fcfbonus" title="Opens the bonus and virtual condition calculator with this tolerance, modifier and the sizes typed here">Bonus and virtual condition</button>' : '') +
+    (s.ch === 'position' ? '<button class="btn" id="fcftp" title="Opens the true position check with this tolerance and modifier">Check a measured position</button>' : '') +
+    (s.u && s.ch.startsWith('profile') ? '<button class="btn" id="fcfu" title="Opens the unequal profile calculator with these two values">Unequal zone limits</button>' : '') +
+    (ds.length ? '<button class="btn" id="fcfdof" title="Which movements each datum stops">Datums and degrees of freedom</button>' : '') +
+    '<button class="btn" id="fcfguide" title="The reference guide entry for this characteristic">Guide</button></div>';
 }
 
 function renderFcfBuilder(el) {
@@ -456,6 +526,9 @@ function renderFcfBuilder(el) {
     '<label class="f"><span>Zone shape</span><div class="row"><select data-k="zone">' + opt([['width', 'Width (no symbol)'], ['dia', 'Diameter'], ['sdia', 'Spherical diameter']], s.zone) + '</select></div></label>' +
     '<label class="f"><span>Tolerance value</span><div class="row"><input data-k="val" type="text" inputmode="decimal" value="' + gesc(s.val) + '"></div></label>' +
     '<label class="f"><span>Material condition</span><div class="row"><select data-k="mc">' + opt([['', 'None (RFS)'], ['M', 'MMC (M)'], ['L', 'LMC (L)']], s.mc) + '</select></div></label>' +
+    '<label class="f"><span>Feature (for the sizes below)</span><div class="row"><select data-k="int">' + opt([[1, 'Hole or slot'], [0, 'Pin or tab']], s.int) + '</select></div></label>' +
+    '<label class="f"><span>Size lower limit (optional)</span><div class="row"><input data-k="lo" type="text" inputmode="decimal" value="' + gesc(s.lo) + '"></div></label>' +
+    '<label class="f"><span>Size upper limit (optional)</span><div class="row"><input data-k="hi" type="text" inputmode="decimal" value="' + gesc(s.hi) + '"></div></label>' +
     [0, 1, 2].map(i => '<label class="f"><span>' + ['Primary', 'Secondary', 'Tertiary'][i] + ' datum</span><div class="row"><select data-dl="' + i + '">' + opt(letters, s.d[i][0]) + '</select><select data-dm="' + i + '">' + opt([['', 'RMB'], ['M', 'MMB'], ['L', 'LMB']], s.d[i][1]) + '</select></div></label>').join('') +
     '</div><div class="mfilter gmods">' +
     [['p', 'Projected (P)'], ['f', 'Free state (F)'], ['t', 'Tangent plane (T)'], ['u', 'Unequal profile (U)'], ['st', 'Statistical (ST)'], ['cf', 'Continuous feature (CF)']].map(([k, t]) => '<label class="chk"><input type="checkbox" data-k="' + k + '"' + (s[k] ? ' checked' : '') + '>' + t + '</label>').join('') +
@@ -463,17 +536,24 @@ function renderFcfBuilder(el) {
     '<label class="chk">Unequal offset <input data-k="uv" type="text" inputmode="decimal" style="width:70px" value="' + gesc(s.uv) + '"></label>' +
     '</div><div class="res" style="max-width:none"><div class="h">Frame</div><div class="gframe" id="fcfout"></div></div>' +
     '<div class="res" style="max-width:none;margin-top:12px"><div class="h">Checks</div><div id="fcfchk"></div></div>' +
-    '<div class="res" style="max-width:none;margin-top:12px"><div class="h">In plain English</div><div class="gexp" id="fcfexp"></div></div>';
+    '<div class="res" style="max-width:none;margin-top:12px"><div class="h">Read out in plain words</div><div class="gexp" id="fcfexp"></div></div>';
   const draw = () => {
     el.querySelector('#fcfout').innerHTML = fcfHtml(s);
     const chk = fcfCheck(s);
     el.querySelector('#fcfchk').innerHTML = '<table>' + (chk.length ? chk.map(x => '<tr class="' + (x.lvl === 'err' ? 'over' : '') + '"><td style="width:70px" class="' + (x.lvl === 'err' ? 'gerr' : 'warn') + '">' + (x.lvl === 'err' ? 'Invalid' : 'Note') + '</td><td>' + gesc(x.m) + ' ' + srcTags(x.k || [], x.tbv) + '</td></tr>').join('') : '<tr><td class="gok">No problems found by the checks BenchMate knows. This is not a full standards review.</td></tr>') + '</table>';
-    el.querySelector('#fcfexp').innerHTML = chk.some(x => x.lvl === 'err') ? '<p class="warn">Fix the invalid items first; an invalid frame has no defined meaning.</p>' + fcfExplain(s) : fcfExplain(s);
+    el.querySelector('#fcfexp').innerHTML = (chk.some(x => x.lvl === 'err') ? '<p class="warn">Fix the invalid items first; an invalid frame has no defined meaning. What follows reads the boxes as they stand.</p>' : '') + fcfReadout(s);
+    const on = (id, fn) => { const b = el.querySelector('#' + id); if (b) b.onclick = fn; };
+    const mc = s.mc === 'M' ? 1 : s.mc === 'L' ? 2 : 0, num = x => (parseFloat(x) > 0 ? parseFloat(x) : undefined);
+    on('fcfbonus', () => sendTo('gdtbonus', { int: s.int, mc, lo: num(s.lo), hi: num(s.hi), tol: num(s.val) }));
+    on('fcftp', () => sendTo('gdttp', { tol: num(s.val), mc, int: s.int }));
+    on('fcfu', () => sendTo('gdtprofu', { t: num(s.val), u: parseFloat(s.uv) >= 0 ? parseFloat(s.uv) : undefined }));
+    on('fcfdof', () => openTool('gdtdof'));
+    on('fcfguide', () => openTool('gdtguide'));
   };
   el.querySelectorAll('[data-k]').forEach(i => {
     i.oninput = i.onchange = () => {
       const k = i.dataset.k;
-      s[k] = i.type === 'checkbox' ? i.checked : (k === 'fos' ? +i.value : i.value);
+      s[k] = i.type === 'checkbox' ? i.checked : (k === 'fos' || k === 'int' ? +i.value : i.value);
       if (k === 'ch') { // sensible defaults when the characteristic changes
         const c = CHAR[s.ch];
         if (!c.mc) s.mc = '';

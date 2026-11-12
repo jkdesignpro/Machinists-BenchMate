@@ -209,7 +209,7 @@ Store list is the fuller of the two store lists.
 | U61 | ISO 286 fits and tolerances | done | `fits` |  |
 | U62 | True position with MMC/LMC bonus | done | `gdttp`, `gdtbonus` |  |
 | U63 | GD&T learning centre (without quizzes) | done | `gdtguide`, `gdtdof` | Quiz part is out of scope |
-| U64 | Feature control frame builder | done | `gdtfcf` |  |
+| U64 | Feature control frame builder | done | `gdtfcf` | Reads the built frame out in plain words (0.4.0); no quiz |
 | U65 | Gauge block stack | done | `sinebar` |  |
 | U66 | Surface finish (lathe, mill, conversions) | done | `surface`, `finish`, `millfinish` | Ra and Rz are deliberately not converted; RMS (Rq) is given for a sine profile with the measured ranges; milling finish covers a floor with a corner radius and a wall, not a sharp-cornered end mill floor or wiper flats |
 | U67 | Hardness conversions | done | `hardness` | Unalloyed and low alloy steels only, approximate |
