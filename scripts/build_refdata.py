@@ -450,6 +450,48 @@ def build_gundrill():
             'rules': rules, 'not_used': ev['not_used']}
 
 
+def build_holdertorque():
+    """Collet nut and pull stud torque. Each maker's figures for its own holders,
+    side by side; nothing is merged. Checks that every row names a known source,
+    that the bore ranges of a collet size run upwards without overlapping and
+    that the torque never falls as the bore grows."""
+    ev = load_ev('holdertorque-evidence.json')
+    if not ev: return None
+    S = ev['sources']
+    def need(k):
+        if k not in S: raise SystemExit('holdertorque: unknown source ' + k)
+    E = ev['er']
+    need(E['src']); need(E['ceiling_src']); need(ev['techniks_nut']['src'])
+    if not (0 < E['ceiling_pct'] <= 50): raise SystemExit('holdertorque: ceiling percent')
+    last = {}
+    for size, mb, lo, hi, std, mini in E['rows']:
+        if not (0 < lo <= hi) or (std is None and mini is None): raise SystemExit('holdertorque: row %s %s' % (size, lo))
+        if size in last:
+            plo, phi, pstd, pmini = last[size]
+            if lo <= phi: raise SystemExit('holdertorque: bore ranges of %s overlap at %s' % (size, lo))
+            for a, b in ((pstd, std), (pmini, mini)):
+                if (a is None) != (b is None) or (a is not None and b < a): raise SystemExit('holdertorque: torque of %s at %s' % (size, lo))
+        last[size] = (lo, hi, std, mini)
+    sizes = list(last)
+    for size, nut, t in ev['techniks_nut']['rows']:
+        if not (t > 0 and nut): raise SystemExit('holdertorque: Techniks row ' + size)
+    studs = []
+    for r in ev['pullstud']['rows']:
+        for v in r['v']:
+            need(v['src'])
+            if v['unit'] not in ('Nm', 'ftlb') or not (0 < v['lo'] <= v['hi']): raise SystemExit('holdertorque: pull stud ' + r['taper'])
+        pubs = [S[v['src']]['publisher'] for v in r['v']]
+        if len(set(pubs)) != len(pubs): raise SystemExit('holdertorque: one figure per maker for ' + r['taper'])
+        studs.append({'taper': r['taper'], 'v': r['v'], 'status': 'single' if len(pubs) == 1 else 'differs'})
+    rules = []
+    for st in ev['rules']:
+        for k in st['src']: need(k)
+        rules.append({'t': st['t'], 'src': st['src'], 'status': 'confirmed' if len({S[k]['publisher'] for k in st['src']}) >= 2 else 'single'})
+    return {'sources': sources_of(ev), 'er': {k: v for k, v in E.items() if not k.startswith('_')}, 'sizes': sizes,
+            'techniks_nut': {k: v for k, v in ev['techniks_nut'].items() if not k.startswith('_')},
+            'pullstud': studs, 'rules': rules, 'gaps': ev['gaps']}
+
+
 def build_grinding():
     """Grit sizes (um) per system and wheel marking letters, each with publisher consensus."""
     ev = load_ev('grinding-evidence.json')
@@ -894,7 +936,7 @@ def matref_summary(m):
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
-           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'gcodes': build_gcodes(),
+           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'holdertorque': build_holdertorque(), 'gcodes': build_gcodes(),
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
            'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),

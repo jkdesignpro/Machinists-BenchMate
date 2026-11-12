@@ -1131,6 +1131,13 @@ const TOOLS = [
   source: 'Sterling Gun Drills catalogue (speed chart, feed table, oil pressure and flow); botek catalogue ELB/ZLB, Type 110 guide values (steels, for comparison); UNISIG deep hole drilling technical reference; Master Fluid Solutions technical bulletin 109; Cutting Tool Engineering, "Conventional thinking", 2016; Hartner, Ingersoll and ISCAR catalogue notes. See docs/sources.md, Gun drilling.',
 },
 {
+  id: 'holdertorque', level: 'advanced', group: 'Setup', title: 'Collet nut and pull stud torque',
+  desc: 'How tight to pull an ER collet nut, by collet size, bore and nut, with the most the maker allows, and pull stud (retention knob) torque for 30, 40 and 50 taper holders. Each maker\'s printed figures side by side; they differ, and nothing is averaged.',
+  render: el => renderHolderTorque(el),
+  working: 'The recommended torque is read from the maker\'s table (N·m); the ceiling is the recommended torque plus 25 %; N·m and lbf·ft are converted with 1 lbf·ft = 1.3558 N·m. See the note under the tool.',
+  source: 'REGO-FIX, recommended tightening torque for Hi-Q/ER clamping nuts and maximum torques for retention knobs (catalogue pp. 293 to 294); REGO-FIX, ER Technical Information, Section 14, Edition 9/2009 (the 25 % rule); Techniks torque specifications chart; MariTool retention knob FAQ. See docs/sources.md, Collet nut and pull stud torque.',
+},
+{
   id: 'grindratio', level: 'advanced', group: 'Grinding', title: 'Wheel to work rpm ratio (waviness check)',
   desc: 'Cylindrical grinding: the wheel rpm divided by the work rpm. At a whole-number ratio a wheel that runs out or is out of balance puts its waves in the same place on every turn of the work. Shows the ratio, how close it is to a whole number or a simple fraction, the work speeds to stay away from, what happens as the wheel wears, and what a count of chatter marks points to.',
   fields: s => [

@@ -125,7 +125,7 @@ await mode('advanced');
 where = 'drawings';
 const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'calc', 'formulas',
   'machines', 'toollib', 'setupsheet', 'materials', 'tempercolours', 'heattreat', 'plastics', 'metalid',
-  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade']);
+  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade', 'holdertorque']);
 await units('inch');
 const noDrawing = [];
 for (const id of meta.tools) {
@@ -1367,6 +1367,42 @@ where = 'material card';
   const nComp = await page.evaluate(async () => (await (await fetch('data/materials.json')).json()).materials.filter(m => m.composition).length);
   if (nComp !== 37) problems.push(`[${where}] grades with a composition: ${nComp}`);
   await page.fill('#msearch', ''); await page.dispatchEvent('#msearch', 'input');
+}
+// Collet nut and pull stud torque: the maker's table by size, bore and nut, the 25 % ceiling from the core,
+// the second maker beside it, and the pull stud table with every maker's figure and nothing merged.
+where = 'holdertorque';
+{
+  await units('mm'); await open('holdertorque', 200);
+  const pick = async (id, v) => { await page.selectOption(`#main #${id}`, v); await page.waitForTimeout(50); };
+  const res = async () => (await page.innerText('#main #htres')).replace(/\s+/g, ' ');
+  const nuts = () => page.$$eval('#main #htn option', o => o.map(x => x.value).join(','));
+  await pick('htz', 'ER 16'); await pick('htn', 'std');
+  let t = await res();
+  if (!/Recommended torque 56 N·m 41\.3 lbf·ft REGO-FIX: ER 16, bore 5 to 10 mm, Standard nut .*printed as 56 Nm Do not go over 70 N·m 51\.6 lbf·ft recommended \+ 25 %/.test(t) || !/Techniks, for comparison 61 N·m 45 lbf·ft slotted or hex nut; printed as 45 ft\/lbs/.test(t))
+    problems.push(`[${where}] ER 16, 5 to 10 mm, standard nut: ${t}`);
+  await pick('htb', String(await page.$$eval('#main #htb option', o => o.find(x => /^1\.5 to 3\.5 mm/.test(x.textContent)).value)));
+  t = await res();
+  if (!/Recommended torque 20 N·m 14\.8 lbf·ft/.test(t) || !/Do not go over 25 N·m 18\.4 lbf·ft/.test(t)) problems.push(`[${where}] a small bore takes less torque (ER 16, 1.5 to 3.5 mm is 20 N·m): ${t}`);
+  await pick('htn', 'mini'); t = await res();
+  if (!/Recommended torque 24 N·m 17\.7 lbf·ft/.test(t) || !/Do not go over 30 N·m 22\.1 lbf·ft/.test(t)) problems.push(`[${where}] ER 16 mini nut, largest bore: ${t}`);
+  await pick('htz', 'ER 32'); t = await res();
+  if (await nuts() !== 'std' || !/Recommended torque 136 N·m 100\.3 lbf·ft/.test(t) || !/Do not go over 170 N·m 125\.4 lbf·ft/.test(t) || !/Techniks, for comparison 151\.9 N·m 112 lbf·ft/.test(t))
+    problems.push(`[${where}] ER 32 has no mini nut figure and takes 136 N·m: ${await nuts()} ${t}`);
+  await pick('htz', 'ER 8'); t = await res();
+  if (await nuts() !== 'mini' || !/Recommended torque 6 N·m 4\.4 lbf·ft/.test(t) || !/Do not go over 7\.5 N·m 5\.5 lbf·ft/.test(t)) problems.push(`[${where}] ER 8 is printed for the mini nut only, 6 N·m: ${await nuts()} ${t}`);
+  await pick('htz', 'ER 50'); t = await res();
+  if (!/Recommended torque 240 N·m 177 lbf·ft/.test(t) || !/Techniks, for comparison No figure for this size/.test(t)) problems.push(`[${where}] ER 50: ${t}`);
+  const all = await page.evaluate(() => ({ n: document.querySelectorAll('#htallt tr').length - 1, hit: [...document.querySelectorAll('#htallt tr.hit')].map(r => r.innerText.replace(/\s+/g, ' ')).join('|'),
+    stud: [...document.querySelectorAll('#htstud tr[data-taper]')].map(r => r.innerText.replace(/\s+/g, ' ')).join(' ; ') }));
+  if (all.n !== 22 || !/^ER 50 6 to 36 mm 240 N·m 177 lbf·ft not printed$/.test(all.hit)) problems.push(`[${where}] full table: ${all.n} rows, marked row: ${all.hit}`);
+  if (!/40 taper 50 N·m 36\.9 lbf·ft as printed: 50 Nm, maximum 103 N·m 76 lbf·ft as printed: 76 ft-lb 61 to 74\.6 N·m 45 to 55 lbf·ft as printed: 45 to 55 ft-lb Sources differ/.test(all.stud) ||
+      !/ISO 20 not printed 27\.1 N·m 20 lbf·ft as printed: 20 ft-lb not printed One source/.test(all.stud) || !/50 taper 100 N·m 73\.8 lbf·ft as printed: 100 Nm, maximum 134\.2 N·m 99 lbf·ft/.test(all.stud))
+    problems.push(`[${where}] pull stud table must show each maker's figure as printed: ${all.stud}`);
+  await pick('htz', 'ER 16');
+  await units('inch'); await open('holdertorque', 200);
+  t = await res();
+  const opt = await page.$eval('#main #htb', e => e.options[e.selectedIndex].textContent);
+  if (!/Recommended torque 41\.3 lbf·ft 56 N·m/.test(t) || !/Do not go over 51\.6 lbf·ft 70 N·m/.test(t) || opt !== '5 to 10 mm (0.197 to 0.394 in)') problems.push(`[${where}] inch: ${opt} / ${t}`);
 }
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';

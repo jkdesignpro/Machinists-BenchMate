@@ -40,7 +40,7 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 5 | Print a page and copy a link with the numbers | 0 (0.2.0) | built |
 | 6 | G-code tidy tools (renumber, strip, convert) | 2 (0.4.0) | built, in the G-code editor and simulator (`gsim`) |
 | 7 | Text engraving with the Hershey fonts (`engrave`) | 2 (0.4.0) | built |
-| 8 | Collet and pull stud torque | 3 (0.5.0) | to do |
+| 8 | Collet and pull stud torque (`holdertorque`) | 3 (0.5.0) | built |
 | 9 | Slender part deflection (`slender`) | 1 (0.3.0) | built |
 | 10 | High-feed chip thinning (`leadthin`) | 1 (0.3.0) | built |
 | 11 | Drill thrust and torque (`drillforce`) | 1 (0.3.0) | built |

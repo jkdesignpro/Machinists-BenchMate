@@ -1,0 +1,429 @@
+{
+ "_note": "Collet nut and pull stud (retention knob) tightening torque. Tables transcribed from the makers' own sheets on 2026-11-12, each read twice. The figures are each maker's for its own holders; nothing is averaged, and where makers differ every figure is shown.",
+ "sources": {
+  "REGO_TQ": {
+   "publisher": "REGO-FIX",
+   "title": "Technical information: recommended tightening torque for Hi-Q/ER and micRun clamping nuts; maximum torques for retention knobs (catalogue pp. 293 to 294)",
+   "url": "https://usa.rego-fix.com/rego_torque.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker (the ER collet is REGO-FIX's design). Torque in Nm by collet size and bore for each nut type, for ER standard and ER-UP collets. Used: the columns ER / ERC (hex and slotted nut) and ERM / ERMC (mini nut), read twice with the same figures. Not transcribed: ERB, ERMX, ERAX and MS nuts, ER-GB tapping collets and the micRun (MR) tables. The sheet's own ft-lbs table is rounded and is not used; ft-lb figures on the page are converted from the Nm table. Retention knobs: maximum 25, 50 and 100 Nm for SK, BT and CAT 30, 40 and 50."
+  },
+  "REGO_TI09": {
+   "publisher": "REGO-FIX",
+   "title": "ER Technical Information, Section 14, 'Clamping nuts tightening torque', Edition 9/2009, pp. 14.03 to 14.04",
+   "url": "https://www.productivity.com/wp-content/uploads/2015/05/Rego-Fix-Technical-Information-Catalog-Section.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker, earlier edition, ft-lbs only. Source of the rule that the maximum torque must not be more than 25 % above the recommended torque. Its figures are the current sheet's rounded to ft-lbs for most rows; some rows differ (ER 11, 3 to 7 mm: 20 ft-lbs then, 24 Nm = 17.7 ft-lb now) and some bore ranges were changed. The current sheet is used."
+  },
+  "TECHNIKS": {
+   "publisher": "Techniks",
+   "title": "Torque specifications chart (collet chucks, retention knobs)",
+   "url": "https://www.eoasaw.com/wp-content/uploads/TECHNIKS-TORQUE-SPECIFICATIONS-CHART.pdf",
+   "accessed": "2026-11-12",
+   "note": "Maker. One torque in ft/lbs per collet size and nut type, with no bore ranges and no word on whether the figure is a recommendation or a maximum. Retention knob torque by taper. The milling chuck and end mill holder sections are not used."
+  },
+  "MARITOOL": {
+   "publisher": "MariTool",
+   "title": "Retention knobs, frequently asked questions",
+   "url": "https://www.maritool.com/faq/Retention-Knobs",
+   "accessed": "2026-11-12",
+   "note": "Maker. Pull stud torque ranges in ft lbs for 30, 40 and 50 taper ('for high torque, high strength, and normal models'), light oil only, check the torque in scheduled maintenance, replace studs at least every three years."
+  }
+ },
+ "er": {
+  "src": "REGO_TQ",
+  "nuts": [
+   {
+    "id": "std",
+    "name": "Standard nut (Hi-Q/ER, Hi-Q/ERC)"
+   },
+   {
+    "id": "mini",
+    "name": "Mini nut (Hi-Q/ERM, Hi-Q/ERMC)"
+   }
+  ],
+  "ceiling_pct": 25,
+  "ceiling_src": "REGO_TI09",
+  "_rows": "size, micro-bore collet (MB) or not, smallest bore mm, largest bore mm, Nm with the standard nut, Nm with the mini nut. null: the sheet prints a dash.",
+  "rows": [
+   [
+    "ER 8",
+    true,
+    0.2,
+    0.9,
+    null,
+    6
+   ],
+   [
+    "ER 8",
+    false,
+    1.0,
+    5.0,
+    null,
+    6
+   ],
+   [
+    "ER 11",
+    true,
+    0.2,
+    0.9,
+    8,
+    8
+   ],
+   [
+    "ER 11",
+    false,
+    1.0,
+    2.9,
+    8,
+    8
+   ],
+   [
+    "ER 11",
+    false,
+    3.0,
+    7.0,
+    24,
+    16
+   ],
+   [
+    "ER 16",
+    true,
+    0.2,
+    0.9,
+    8,
+    8
+   ],
+   [
+    "ER 16",
+    false,
+    1.0,
+    1.0,
+    8,
+    8
+   ],
+   [
+    "ER 16",
+    false,
+    1.5,
+    3.5,
+    20,
+    20
+   ],
+   [
+    "ER 16",
+    false,
+    4.0,
+    4.5,
+    40,
+    24
+   ],
+   [
+    "ER 16",
+    false,
+    5.0,
+    10.0,
+    56,
+    24
+   ],
+   [
+    "ER 20",
+    false,
+    1.0,
+    1.0,
+    16,
+    16
+   ],
+   [
+    "ER 20",
+    false,
+    1.5,
+    6.5,
+    32,
+    28
+   ],
+   [
+    "ER 20",
+    false,
+    7.0,
+    13.0,
+    80,
+    28
+   ],
+   [
+    "ER 25",
+    false,
+    1.0,
+    3.5,
+    24,
+    24
+   ],
+   [
+    "ER 25",
+    false,
+    4.0,
+    4.5,
+    56,
+    32
+   ],
+   [
+    "ER 25",
+    false,
+    5.0,
+    7.5,
+    80,
+    32
+   ],
+   [
+    "ER 25",
+    false,
+    8.0,
+    17.0,
+    104,
+    32
+   ],
+   [
+    "ER 32",
+    false,
+    2.0,
+    2.5,
+    24,
+    null
+   ],
+   [
+    "ER 32",
+    false,
+    3.0,
+    7.5,
+    136,
+    null
+   ],
+   [
+    "ER 32",
+    false,
+    8.0,
+    22.0,
+    136,
+    null
+   ],
+   [
+    "ER 40",
+    false,
+    3.0,
+    26.0,
+    176,
+    null
+   ],
+   [
+    "ER 50",
+    false,
+    6.0,
+    36.0,
+    240,
+    null
+   ]
+  ]
+ },
+ "techniks_nut": {
+  "src": "TECHNIKS",
+  "_rows": "collet size, nut as printed, ft/lbs",
+  "rows": [
+   [
+    "ER 8",
+    "slotted or hex nut",
+    7
+   ],
+   [
+    "ER 11",
+    "slotted or hex nut",
+    20
+   ],
+   [
+    "ER 16",
+    "castle nut",
+    20
+   ],
+   [
+    "ER 16",
+    "slotted or hex nut",
+    45
+   ],
+   [
+    "ER 20",
+    "slotted or hex nut",
+    67
+   ],
+   [
+    "ER 25",
+    "slotted nut",
+    85
+   ],
+   [
+    "ER 25",
+    "mini nut, castle",
+    25
+   ],
+   [
+    "ER 32",
+    "slotted nut",
+    112
+   ],
+   [
+    "ER 40",
+    "slotted nut",
+    126
+   ],
+   [
+    "TG 75",
+    "hex nut",
+    90
+   ],
+   [
+    "TG 100",
+    "hex nut",
+    90
+   ],
+   [
+    "SYOZ 25 / TG 100",
+    "hook nut",
+    90
+   ]
+  ]
+ },
+ "pullstud": {
+  "_rows": "per taper: each maker's figure as printed. unit Nm or ftlb; lo and hi are the same for a single figure; kind is 'max' where the maker calls it a maximum.",
+  "rows": [
+   {
+    "taper": "ISO 20",
+    "v": [
+     {
+      "src": "TECHNIKS",
+      "as": "ISO 20 Taper",
+      "unit": "ftlb",
+      "lo": 20,
+      "hi": 20
+     }
+    ]
+   },
+   {
+    "taper": "30 taper",
+    "v": [
+     {
+      "src": "REGO_TQ",
+      "as": "SK, BT, CAT 30",
+      "unit": "Nm",
+      "lo": 25,
+      "hi": 25,
+      "kind": "max"
+     },
+     {
+      "src": "MARITOOL",
+      "as": "BT30 and ISO30",
+      "unit": "ftlb",
+      "lo": 20,
+      "hi": 25
+     },
+     {
+      "src": "TECHNIKS",
+      "as": "BT 30 Taper, ISO 30 Taper",
+      "unit": "ftlb",
+      "lo": 36,
+      "hi": 36
+     }
+    ]
+   },
+   {
+    "taper": "40 taper",
+    "v": [
+     {
+      "src": "REGO_TQ",
+      "as": "SK, BT, CAT 40",
+      "unit": "Nm",
+      "lo": 50,
+      "hi": 50,
+      "kind": "max"
+     },
+     {
+      "src": "MARITOOL",
+      "as": "CAT40 or BT40",
+      "unit": "ftlb",
+      "lo": 45,
+      "hi": 55
+     },
+     {
+      "src": "TECHNIKS",
+      "as": "All 40 Taper",
+      "unit": "ftlb",
+      "lo": 76,
+      "hi": 76
+     }
+    ]
+   },
+   {
+    "taper": "50 taper",
+    "v": [
+     {
+      "src": "REGO_TQ",
+      "as": "SK, BT, CAT 50",
+      "unit": "Nm",
+      "lo": 100,
+      "hi": 100,
+      "kind": "max"
+     },
+     {
+      "src": "MARITOOL",
+      "as": "CAT50 or BT50",
+      "unit": "ftlb",
+      "lo": 75,
+      "hi": 90
+     },
+     {
+      "src": "TECHNIKS",
+      "as": "CAT 50 Taper, BT 50 Taper",
+      "unit": "ftlb",
+      "lo": 99,
+      "hi": 99
+     }
+    ]
+   }
+  ]
+ },
+ "rules": [
+  {
+   "t": "Tighten a collet nut with a torque wrench or a torque block, not by feel.",
+   "src": [
+    "REGO_TQ"
+   ]
+  },
+  {
+   "t": "The most a collet nut should see is 25 % above the recommended torque. More torque means more stress on the holder and can damage it.",
+   "src": [
+    "REGO_TI09"
+   ]
+  },
+  {
+   "t": "Too much torque on a pull stud can deform the small end of the taper, and the holder then runs out in the spindle.",
+   "src": [
+    "REGO_TQ"
+   ]
+  },
+  {
+   "t": "No grease or anti-seize on the pull stud thread; light oil is fine.",
+   "src": [
+    "MARITOOL"
+   ]
+  },
+  {
+   "t": "Check pull stud torque as part of scheduled maintenance. Replace pull studs at least every three years, and about every year on several shifts, many tool changes or heavy cuts with long or heavy tools.",
+   "src": [
+    "MARITOOL"
+   ]
+  }
+ ],
+ "gaps": [
+  "REGO-FIX nuts ERB, ERMX, ERAX and MS, ER-GB tapping collets and the micRun (MR) system: printed on the same sheet, not transcribed.",
+  "TG, DA and other collet systems: only the Techniks figure for TG 75 and TG 100.",
+  "HSK, Capto and KM holders have no pull stud; their clamping is not covered.",
+  "Machine builders' own pull stud figures are not included; the builder's figure for your spindle comes first."
+ ]
+}

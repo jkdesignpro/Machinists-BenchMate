@@ -748,3 +748,67 @@ async function renderGunDrill(el) {
   gh.onchange = upd; ga.onchange = upd; gc.onchange = upd; gf.onchange = upd;
   upd();
 }
+
+// ------------------------------------------------------------------ collet nut and pull stud torque
+// Each maker's printed figures for its own holders, side by side and never merged. Lookups and unit conversion
+// happen here; the one calculated number (the ceiling, a percentage above the recommended torque) is the core's.
+async function renderHolderTorque(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, K = R.holdertorque; if (!K) { el.textContent = 'Holder torque data not built.'; return; }
+  const m = RMEM.holdertorque || (RMEM.holdertorque = { size: 'ER 16', nut: 'std', row: -1 });
+  const E = K.er, RG = rEsc(pubName(K.sources, E.src)), TK = rEsc(pubName(K.sources, K.techniks_nut.src));
+  const num = v => String(+v.toFixed(1));
+  // v in N·m: the user's unit first, the other beside it.
+  const tq = nm => inMode() ? '<span class="mv">' + num(nm / NM_LBFT) + ' lbf·ft</span> <span class="ms">' + num(nm) + ' N·m</span>'
+    : '<span class="mv">' + num(nm) + ' N·m</span> <span class="ms">' + num(nm / NM_LBFT) + ' lbf·ft</span>';
+  const tqr = (lo, hi) => lo === hi ? tq(lo) : inMode() ? '<span class="mv">' + num(lo / NM_LBFT) + ' to ' + num(hi / NM_LBFT) + ' lbf·ft</span> <span class="ms">' + num(lo) + ' to ' + num(hi) + ' N·m</span>'
+    : '<span class="mv">' + num(lo) + ' to ' + num(hi) + ' N·m</span> <span class="ms">' + num(lo / NM_LBFT) + ' to ' + num(hi / NM_LBFT) + ' lbf·ft</span>';
+  const nm = v => v.unit === 'Nm' ? [v.lo, v.hi] : [v.lo * NM_LBFT, v.hi * NM_LBFT];
+  const printed = v => (v.lo === v.hi ? v.lo : v.lo + ' to ' + v.hi) + (v.unit === 'Nm' ? ' Nm' : ' ft-lb') + (v.kind === 'max' ? ', maximum' : '');
+  const bore = r => (r[2] === r[3] ? num(r[2]) : num(r[2]) + ' to ' + num(r[3])) + ' mm' + (r[1] ? ', micro-bore (MB) collet' : '');
+  const boreIn = r => r[2] === r[3] ? fx(r[2] / IN_MM, 3) + ' in' : fx(r[2] / IN_MM, 3) + ' to ' + fx(r[3] / IN_MM, 3) + ' in';
+  const col = nut => nut === 'mini' ? 5 : 4;
+  const sel = (id, lab) => '<label class="f"><span>' + lab + '</span><div class="row"><select id="' + id + '"></select></div></label>';
+  const pubs = Object.keys(K.sources).filter(k => K.pullstud.some(r => r.v.some(v => v.src === k)));
+  const studCell = (r, k) => { const v = r.v.find(x => x.src === k); if (!v) return '<td class="ms">not printed</td>'; const [a, b] = nm(v); return '<td title="' + rEsc(v.as + ': ' + printed(v)) + '">' + tqr(a, b) + '<div class="ms">as printed: ' + rEsc(printed(v)) + '</div></td>'; };
+  el.innerHTML = '<div class="grid" style="max-width:760px">' + sel('htz', 'Collet size') + sel('htn', 'Clamping nut') + sel('htb', 'Collet bore (the size marked on the collet)') + '</div><div id="htres"></div>' +
+    '<div class="res mtab" style="max-width:none;margin-top:12px" id="htall"><div class="h">' + RG + ': ER collet nut torque, every row</div><div style="overflow-x:auto"><table id="htallt"></table></div></div>' +
+    '<div class="res mtab" style="max-width:none;margin-top:12px" id="htstud"><div class="h">Pull stud (retention knob) torque, by maker</div><div style="overflow-x:auto"><table><tr><th>Taper</th>' + pubs.map(k => '<th>' + rEsc(pubName(K.sources, k)) + '</th>').join('') + '<th>Status</th></tr>' +
+    K.pullstud.map(r => '<tr data-taper="' + rEsc(r.taper) + '"><td><b>' + rEsc(r.taper) + '</b></td>' + pubs.map(k => studCell(r, k)).join('') + '<td><span class="badge differs">' + (r.status === 'single' ? 'One source' : 'Sources differ') + '</span></td></tr>').join('') + '</table></div>' +
+    '<p class="ms" style="padding:4px 10px">The makers do not agree, and not by a little: compare the figures in the 40 taper row. ' + RG + ' prints its figure as a maximum. Nothing here is averaged. Use the figure of the maker of your pull stud and holder, or the machine builder\'s figure for your spindle, and tighten with a torque wrench in a holder fixture.</p></div>' +
+    '<div class="note"><b>Working:</b> the recommended torque is read from ' + RG + '\'s table by collet size, bore and nut; it is for ' + RG + '\'s nuts with standard ER and ER-UP collets. The ceiling is the recommended torque plus ' + E.ceiling_pct + ' %, the most ' + RG + ' allows. N·m and lbf·ft are converted (1 lbf·ft = 1.3558 N·m); the table is printed in N·m. ' +
+    TK + ' prints one figure per collet size, with no bore ranges; it is shown beside the first and not mixed with it. A small bore takes much less torque than a large one in the same nut: a 3 mm collet in an ER 16 takes 20 N·m, a 10 mm collet 56 N·m. Another maker\'s nut, a coated or bearing nut, or a sealed collet can need a different torque: the maker\'s sheet for your nut comes first.</div>' +
+    '<div class="note"><b>Good practice</b><ul class="gdrules">' + K.rules.map(r => '<li>' + rEsc(r.t) + ' <i>[' + r.src.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ') + (r.status === 'single' ? ', one source' : '') + ']</i></li>').join('') + '</ul></div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '<br><b>Not covered:</b> ' + K.gaps.map(rEsc).join(' ') + '</div>';
+  const q = id => $('#' + id, el), hz = q('htz'), hn = q('htn'), hb = q('htb');
+  hz.innerHTML = K.sizes.map(z => '<option>' + rEsc(z) + '</option>').join('');
+  const rowsOf = () => E.rows.map((r, i) => [r, i]).filter(([r]) => r[0] === hz.value);
+  function fillNut() {
+    const have = E.nuts.filter(n => rowsOf().some(([r]) => r[col(n.id)] !== null));
+    hn.innerHTML = have.map(n => '<option value="' + n.id + '">' + rEsc(n.name) + '</option>').join('');
+    hn.value = have.some(n => n.id === m.nut) ? m.nut : have[0].id;
+  }
+  function fillBore() {
+    const rows = rowsOf().filter(([r]) => r[col(hn.value)] !== null);
+    hb.innerHTML = rows.map(([r, i]) => '<option value="' + i + '">' + rEsc(bore(r)) + (inMode() ? ' (' + boreIn(r) + ')' : '') + '</option>').join('');
+    hb.value = String(rows.some(([, i]) => i === m.row) ? m.row : rows[rows.length - 1][1]);
+  }
+  function upd() {
+    m.size = hz.value; m.nut = hn.value; m.row = +hb.value;
+    const r = E.rows[m.row], v = r[col(m.nut)], nutName = E.nuts.find(n => n.id === m.nut).name;
+    const rows = [['Recommended torque', calcCell(tq(v), RG + ': ' + rEsc(r[0]) + ', bore ' + rEsc(bore(r)) + ', ' + rEsc(nutName) + '; printed as ' + v + ' Nm')],
+      ['Do not go over', calcCell(tq(W.pct_adjust(v, E.ceiling_pct)), 'recommended + ' + E.ceiling_pct + ' % (' + rEsc(pubName(K.sources, E.ceiling_src)) + ', 2009 edition)')]];
+    const tk = K.techniks_nut.rows.filter(t => t[0] === r[0]);
+    tk.forEach(t => rows.push([TK + ', for comparison', calcCell(tq(t[2] * NM_LBFT), rEsc(t[1]) + '; printed as ' + t[2] + ' ft/lbs, one figure for every bore')]));
+    if (!tk.length) rows.push([TK + ', for comparison', '<td class="v" colspan="2">No figure for this size.</td>']);
+    q('htres').innerHTML = '<div class="res"><table>' + rowsHtml(rows) + '</table></div>';
+    q('htallt').innerHTML = '<tr><th>Collet</th><th>Bore</th>' + E.nuts.map(n => '<th>' + rEsc(n.name) + '</th>').join('') + '</tr>' +
+      E.rows.map((x, i) => '<tr' + (i === m.row ? ' class="hit"' : '') + '><td><b>' + rEsc(x[0]) + '</b></td><td>' + rEsc(bore(x)) + '</td>' + E.nuts.map(n => '<td>' + (x[col(n.id)] === null ? '<span class="ms">not printed</span>' : tq(x[col(n.id)])) + '</td>').join('') + '</tr>').join('');
+  }
+  hz.value = K.sizes.includes(m.size) ? m.size : K.sizes[0];
+  fillNut(); fillBore();
+  hz.onchange = () => { m.row = -1; fillNut(); fillBore(); upd(); };
+  hn.onchange = () => { m.nut = hn.value; m.row = -1; fillBore(); upd(); };
+  hb.onchange = upd;
+  upd();
+}

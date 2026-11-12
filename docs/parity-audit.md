@@ -432,7 +432,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH122 | Spindle noses, draw-in bolts, V-flange shanks and retention knobs | partial | `machinetapers` | Retention knob standard references only; no dimensions |
 | MH123 | Plug and ring gauges for tapers | missing | | |
 | MH124 | R8 collet | done | `machinetapers` | |
-| MH125 | ER and other collets | missing | | |
+| MH125 | ER and other collets | partial | `holdertorque` | 0.5.0: ER collet nut torque by size, bore and nut (REGO-FIX, with Techniks beside it). No collet dimensions or clamping ranges |
 | MH126 | Portable tool spindles, square drives, hex chucks | out of scope? | | Portable power tools |
 | MH127 | Mounted wheels and points | missing | | |
 | MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | missing | | |
@@ -794,7 +794,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB39 | Fits for shafts and holes | partial | `fits` | No j/J |
 | BB40 | Morse, Jacobs and DIN tapers | partial | `machinetapers` | DIN metric tapers missing |
 | BB41 | Milling machine tapers | done | `machinetapers` | |
-| BB42 | Pull studs and retention knobs | partial | `machinetapers` | Standard references only, no dimensions |
+| BB42 | Pull studs and retention knobs | partial | `machinetapers`, `holdertorque` | Standard references only, no dimensions. 0.5.0: tightening torque by taper from three makers, shown side by side |
 | BB43 | T-slots | done | `tslots` | (`claude/fasteners`) |
 | BB44 | Keys and keyways | partial | `keys` | Parallel keys metric and inch; no Woodruff |
 | BB45 | Spur gear calculations | missing | | |

@@ -54,7 +54,7 @@ const HUBS = {
 const WORKSPACES = [
   { id: 'turning', name: 'Turning', icon: 'turning', blurb: 'Speeds, inserts, boring bars, tapers and cut times for lathe work.', sections: [
     ['Speeds and feeds', ['advturn', 'rpm', 'feeds', 'mrr', 'kcforce', 'toollife'], 'gauge'],
-    ['Tooling', ['inserts', 'boringbar', 'tnrc'], 'insert'],
+    ['Tooling', ['inserts', 'boringbar', 'tnrc', 'holdertorque'], 'insert'],
     ['Operations', ['turntime', 'taper', 'surfacefin', 'knurl'], 'turning'],
     ['Programs', ['cycg71', 'cycgroove', 'cyctaper', 'threadprog'], 'code'],
     ['Stock and workholding', ['bar', 'chuckforce', 'slender', 'changegears'], 'material'],
@@ -63,6 +63,7 @@ const WORKSPACES = [
     ['Speeds and feeds', ['advmill', 'advplunge', 'rpm', 'feeds', 'mrr', 'kcforce', 'cutopt', 'toollife'], 'gauge'],
     ['Engagement', ['chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
     ['Tool behaviour', ['deflection', 'runout', 'chatter'], 'wave'],
+    ['Tool holding', ['holdertorque', 'machinetapers'], 'nut'],
     ['Other milling', ['surfacefin', 'slitsaw', 'indexing'], 'saw'],
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
@@ -118,7 +119,7 @@ const PAGE_ICON = {
   taper: 'angle', knurl: 'surface', formulas: 'book', gmcodes: 'code', materials: 'material', bolttorque: 'nut', oring: 'bearing',
   setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart',
   spline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',
-  abbrev: 'drawing', economics: 'bars', mrr: 'bars', toollife: 'clock', cutopt: 'gauge', runout: 'gauge', indexing: 'gear', grindratio: 'wave',
+  abbrev: 'drawing', economics: 'bars', mrr: 'bars', toollife: 'clock', cutopt: 'gauge', runout: 'gauge', indexing: 'gear', grindratio: 'wave', holdertorque: 'nut',
 };
 
 // ---- Derived tables ----

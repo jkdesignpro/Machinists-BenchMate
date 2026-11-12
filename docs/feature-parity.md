@@ -88,6 +88,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Library | Tips, assistant, community cut data | missing | | U98, U101, U102 |
 | Library | Indexable insert catalogue | done (decode or tap a code together; insert drawn to scale from above and in section; nose radius to the turning advisor, outline to the sketcher) | `insertcode`, `holdercode`, `iso513` | U103 |
 | Shop | Tool library and favourites | done | `toollib` (fill into rpm, feed, arcfeed, helix, deflection, cutopt, drillpoint, tapdrill, finish); star in the side list or by the title | U106, U109 |
+| Shop | Collet nut and pull stud torque (not in Ultra; idea 8) | done (ER nut torque by size, bore and nut from the maker's table with a second maker beside it; pull stud torque from three makers side by side, nothing averaged) | `holdertorque` | |
 | Shop | Decimal precision, home dashboard, reorderable menu | missing | | U105, U107, U108 |
 | Platform | Inch/metric toggle | done | `app.js` | U104 |
 | Platform | Offline, web/desktop link | partial (local web app; no installable offline build) | | U110, U111 |

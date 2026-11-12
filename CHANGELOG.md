@@ -45,6 +45,11 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - Recorded where sources differ: the macro variable number of one tool offset on Fanuc (two sources differ by one).
 - Not found in a readable form, and listed as gaps on the page: Fanuc's own M-code and system variable tables, Haas Next Generation Control variable numbers, Doosan lathe M codes.
 
+### Added (collet nut and pull stud torque)
+- New tool **Collet nut and pull stud torque** in Turning > Tooling and Milling > Tool holding. Pick the ER collet size, the nut and the collet bore: the recommended torque from REGO-FIX's table (ER 8 to ER 50, standard and mini nut), the most the maker allows (25 % more), and Techniks' figure for the same size beside it. A small bore takes much less torque than a large one in the same nut, which is why the page asks for it.
+- **Pull stud (retention knob) torque** for ISO 20 and 30, 40 and 50 taper holders from three makers (REGO-FIX, MariTool, Techniks), each as printed and in both units. They differ widely (40 taper: 50 N·m maximum, 45 to 55 ft-lb, 76 ft-lb), so all three are shown and nothing is averaged.
+- Not covered, and said so on the page: other nut types and tapping collets, TG and DA collets, HSK and other holders without a pull stud, machine builders' own figures.
+
 ### Added (material card: composition and machinability)
 - **Material equivalents: click a grade for its material card.** A composition chart, machinability rings and the property table, above what each source prints.
 - **Composition chart.** One row per element with the limits as printed (a range, a maximum or a minimum), a bar, how many publishers print that limit and a status. 37 steels so far: nine carbon and free-cutting steels, 4130, 4140, 4340, 8620, 52100 and 23 stainless grades. Where two sources print different limits (304 carbon and chromium, 52100, silicon of the alloy steels) both are shown.
