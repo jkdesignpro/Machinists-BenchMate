@@ -1082,6 +1082,33 @@ Read and not used: an MSC page on abrasive brushes that returned only an index.
 
 The three drawings are BenchMate's own and are not to scale.
 
+
+## Machine elements guide (`app/elemguide.js`, tool `elemguide`), accessed 2026-11-12
+Keys are the ones shown in the app. Pages of one publisher count once: the six Wikipedia articles and the two KHK papers.
+- **[WP_FR]** Wikipedia, "Friction" (CC BY-SA), https://en.wikipedia.org/wiki/Friction : the laws of dry friction, the coefficient, static and kinetic friction, angle of friction, typical range, table of approximate coefficients.
+- **[MISUMI]** MISUMI USA blog, S. Bredemann, "Coefficient of friction", updated 2025-08-15, https://blog.misumiusa.com/coefficient-of-friction/ : definition, static and kinetic, what the values vary with, table of coefficients. Its table is headed "dry" but holds oiled and greased rows; each row was used as labelled.
+- **[GUNT]** G.U.N.T., "Engineering mechanics, statics: static and kinetic friction", https://www.gunt.de/images/download/static_kinetic_friction_english.pdf : Coulomb's law, the limit of static friction, kinetic below static, four typical coefficients (not said whether static or kinetic).
+- **[WP_BL]** Wikipedia, "Backlash (engineering)" (CC BY-SA), https://en.wikipedia.org/wiki/Backlash_(gear) : what backlash is, why gears need it, how it is made and shared, rule of thumb, gear trains, anti-backlash gears, leadscrews, CNC compensation.
+- **[KHK_BL]** KHK-USA, B. Dengel, "A primer on backlash, its purpose in gear designs", https://www.khkgears.us/media/1224/a-primer-on-backlash-and-its-purpose-in-gear-designs.pdf : definition, why it is needed, sharing the allowance, the effect of centre distance and pressure angle, why not to close the centres. The web page that links to it is only a teaser.
+- **[KHK_GM]** KHK-USA, B. Dengel, "What are you made of?", Gear Solutions, February 2018, https://www.khkgears.us/media/1217/what-are-you-made-of.pdf : gear materials and where each is used, worm and wheel pairing, plastics. The same author's "Making sense out of gear materials" (https://gearsolutions.com/features/making-sense-out-of-gear-materials/) and "Gear materials: what to use and when" (https://newequipment.com/21277460) repeat it and count with it; their line on heat-treating stainless racks conflicts with another line of the same text and was not used.
+- **[MMFG]** MachineMfg, "Choosing gear materials: essential factors to consider" (no author or date shown), https://machinemfg.com/selecting-gear-materials : steels, cast iron and plastics for gears, heat treatments, hardness figures, the hardness difference between mating gears.
+- **[WP_CAM]** Wikipedia, "Cam (mechanism)" (CC BY-SA), https://en.wikipedia.org/wiki/Cam_lobe : what a cam does, displacement diagram, plate, cylindrical, face and linear cams, base circle, prime circle.
+- **[RCET]** Course material "ME3491 Theory of machines" (no author shown), https://rcet.org.in/uploads/academics/regulation2021/rohini_28170639992.pdf : kinds of cam and follower, cam terms, follower motions.
+- **[IGETIT]** i GET IT, S. Tholiya, "Cam and follower mechanism", 2024-03-18, https://myigetit.com/tech/cam-and-follower-mechanism/ : kinds of cam and follower with what each follower is good for, cam terms.
+- **[WP_PB]** Wikipedia, "Plain bearing" (CC BY-SA), https://en.wikipedia.org/wiki/Plain_bearing : forms, materials, lubrication, table of pressure, speed and PV limits. Its speed for polyacetal is printed as 5 m/s beside 100 sfm, which do not match; that row was not used.
+- **[GS_PB]** GlobalSpec, "Plain bearings and sleeve bearings information", https://www.globalspec.com/learnmore/mechanical_components/bearings_bushings/bushings_sleeve_bearings : sleeve, flanged and lined bushings, sintered bronze, PV, what the speed rating depends on, clearance and press fit.
+- **[ARM]** Armoloy, "Plain bush bearings: selection, failures, fixes", 2026-01-15, https://armoloy.com/plain-bush-bearings-selection-failures-fixes/ : which material where, shaft finish, length, press fit, lubrication, failures.
+- **[WP_LS]** Wikipedia, "Leadscrew" (CC BY-SA), https://en.wikipedia.org/wiki/Leadscrew : what a leadscrew is, thread forms, for and against, self-locking, friction coefficients for screw and nut, critical speed.
+- **[WP_BSC]** Wikipedia, "Ball screw" (CC BY-SA), https://en.wikipedia.org/wiki/Ball_screw : how it works, efficiency against an Acme screw, back-driving, preload, rolled and ground screws, dirt.
+- **[MD_BS]** Machine Design, "Ballscrews vs. lead screws", 2008-01-01 (comments from five makers, no single author), https://www.machinedesign.com/archive/article/21827028/ballscrews-vs-lead-screws : efficiency, back-driving and self-locking, duty, cost. Its makers contradict each other on load capacity; nothing on that is shown.
+- **[ROTON]** Roton Products, Screw University, "Efficiency and backdriving", https://roton.com/screw-university/screw-actions/screw-backdriving-efficiency : drive and back-drive efficiency, two worked lead angles, the friction coefficient assumed for a bronze nut, ball screw efficiency.
+
+Differences shown in the app, not resolved: coefficients of friction where the two tables differ (steel on steel dry and lubricated, brass on steel, PTFE on steel); the efficiency of a leadscrew (20 to 25 % for an Acme screw against 45 % and 65 % at two lead angles).
+
+Read and not used: which way the follower of a cylindrical cam moves (two sources put it differently). Not read: a course text on cams at rajagiritech.ac.in (robots disallowed) and one at indusuni.ac.in (the link returned the university home page).
+
+The three drawings are BenchMate's own and are not to scale.
+
 ## Glossary (`app/latheguide.js`, tool `glossary`)
 108 terms, each defined in BenchMate's own words. 97 link to the page of the app that explains the term, and that page carries the sources. The other 11 (burr, gouge, HSM, ID and OD, indicator, overcut, spindle, spring pass, tailstock, tool changer, undercut) are plain shop meanings with no figures in them. The choice of headwords was compared with the 43 headwords of the glossary in the CIMCO CNC programming book (appendix E, https://www.cimco.com/documentation/online/cncbook/en/AppxE_Glossary.html , read 2026-11-12, headwords only; no definition was read or copied). "Job" is left out because its meaning belongs to one CAM system.
 

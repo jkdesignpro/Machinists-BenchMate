@@ -78,6 +78,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, fourteenth batch, 2026-11-12):** special processes and finishing guide (`procguide`: cutting plate, EDM, other special processes, polishing, buffing and brushing, conversion coatings, anodising, plating and thermal spraying). MH173, MH196 and ED92 from missing to done; MH189 and MH197 from partial to done. Counted from the tables below: 355 done, 175 partial, 66 missing of 596 in-scope rows, 60 %. For 90 %, 182 more rows have to reach done.
 
+**Update (0.6.0, fifteenth batch, 2026-11-12):** machine elements guide (`elemguide`: friction, backlash, gear materials, cams, plain bearings, leadscrews and ball screws). MH26, ED69, MH266, MH275, ED73 and MH291 from missing to done; MH280 and MH282 from missing to partial. Counted from the tables below: 361 done, 177 partial, 58 missing of 596 in-scope rows, 61 %. For 90 %, 176 more rows have to reach done.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -359,7 +361,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | MH25 | Mechanics terms, units, force systems, couples | out of scope? | | |
-| MH26 | Friction laws and coefficients | missing | | Clamping and workholding friction |
+| MH26 | Friction laws and coefficients | done | `elemguide` | 0.6.0: the laws of dry friction, static and kinetic, angle of friction, table of ten pairs with the coefficients of each source (three rows one source, marked); bolt friction in `bolttorque` |
 | MH27 | Simple mechanisms: levers, wedge, pulleys, screw, Geneva, toggle | out of scope? | | Toggle/screw clamps could matter for fixtures |
 | MH28 | Pendulums | out of scope? | | |
 | MH29 | Velocity, acceleration, work, energy, momentum, power | out of scope? | | |
@@ -639,7 +641,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH263 | Centre distance, tooth thickness, chordal addendum and thickness | done | `spurgear`, `gearmeasure` |  |
 | MH264 | Gear milling cutters (involute cutter numbers) | partial | `spurgear` | 0.6.0: cutter number of the set of eight for each gear, diametral pitch and module series; no half-number cutters, no cutter dimensions |
 | MH265 | Contact ratio, undercut, minimum teeth, enlarged pinions | done | `spurgear` | Contact ratio, fewest teeth and smallest profile shift without undercut |
-| MH266 | Backlash | missing | | |
+| MH266 | Backlash | done | `elemguide` | 0.6.0: what backlash is, why gears need it, how it is made and shared, rule of thumb and centre distance (one source each, marked), gear trains, anti-backlash gears, leadscrews and CNC compensation |
 | MH267 | Internal gears | partial | `gearmeasure` | Measurement between pins for internal gears; no internal gear geometry or interference checks |
 | MH268 | British and ISO gear standards; addendum modification | missing | | |
 | MH269 | Hypoid and bevel gears | missing | | |
@@ -648,19 +650,19 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH272 | Elliptic, planetary and ratchet gearing | partial | `planetary` | Planetary sets; no elliptic or ratchet gearing |
 | MH273 | Module system gear design | done | `spurgear` |  |
 | MH274 | Checking gear sizes: over wires/balls, chordal measurement | done | `gearmeasure` |  |
-| MH275 | Gear materials | missing | | |
+| MH275 | Gear materials | done | `elemguide` | 0.6.0: seven materials with where each is used, worm and wheel pairing, plastics, heat treatment and hardness (details one source each, marked) |
 | MH276 | Involute splines (ANSI B92.1) | partial | `spline` | Basic (nominal) dimensions and pin measurement; fit class tolerances not shown |
 | MH277 | Metric module splines (ISO 4156) | partial | `spline` | Basic (nominal) dimensions and pin measurement; fit class tolerances not shown |
 | MH278 | Straight splines; polygon shaft connections | partial | `saespline` | 0.5.0: SAE parallel side splines (largest sizes, torque capacity; one publisher); no polygon connections |
 | MH279 | Spline inspection with gauges and pins | partial | `spline` | Pins only; no gauges |
-| MH280 | Cams and cam design; cam milling | missing | | |
+| MH280 | Cams and cam design; cam milling | partial | `elemguide` | 0.6.0: kinds of cam and follower, base circle, pitch curve, prime circle, pressure angle, rise, dwell and return, displacement diagram with a drawing; no cam design calculations, no cam milling |
 
 ### Machine elements
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | MH281 | Plain bearings: types, design, lubrication | out of scope? | | Design rather than machining |
-| MH282 | Plain bearings: machining bores, hardness and finish; bearing materials | missing | | |
+| MH282 | Plain bearings: machining bores, hardness and finish; bearing materials | partial | `elemguide` | 0.6.0: forms, materials, PV limits (one source, marked), shaft hardness and finish, clearance and press fit, lubrication, failures; no data for machining the bores |
 | MH283 | Rolling bearings: types, designation, tolerances | done | `bearguide` | 0.6.0: nine types with what each carries, bearing numbers (type code, series, bore number, suffixes), tolerance classes ISO, DIN and ABEC; no tolerance tables |
 | MH284 | Shaft and housing fits for bearings; mounting | done | `bearguide` | 0.6.0: which ring gets the tight fit, classes named by the sources for four cases, effects of loose and tight fits, C3, checking the seats; mounting cold and with heat, temperature limits; limits of each class in `fits` |
 | MH285 | Bearing load ratings and life (L10) | partial | `bearinglife` | ISO 281 basic rating life L10 and equivalent load with your X and Y; no modified life (aISO) or static safety factor |
@@ -669,7 +671,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH288 | Keys and keyseats (metric, inch, Woodruff), keyseat depths | partial | `keys` | Metric (DIN 6885-1 / ISO 773) and inch (ASME B17.1) parallel keys and keyseat depths; no Woodruff (no second source) |
 | MH289 | Belts and pulleys (flat, V, synchronous) | partial | `beltdrive` | 0.6.0: open belt length (exact and short formula), centre distance from a length, ratio, speeds, wrap; no V-belt sections, standard lengths or power ratings |
 | MH290 | Transmission chains and sprockets | partial | `chaindrive` | 0.6.0: chain length in pitches (even), centre distance, pitch by ANSI chain number, sprocket pitch diameters, wrap; no load ratings or tooth form |
-| MH291 | Ball and ACME leadscrews | missing | | |
+| MH291 | Ball and ACME leadscrews | done | `elemguide`, `acme`, `trapezoidal` | 0.6.0: leadscrew against ball screw (efficiency with both figures shown, self-locking, back-driving, backlash and preload, cost), thread forms, rolled and ground, critical speed rule (one source, marked); thread sizes in `acme` and `trapezoidal` |
 | MH292 | Electric motors | missing | | |
 | MH293 | Adhesives and sealants, retaining compounds, threadlocking | partial | `bearguide` | 0.6.0: threadlocker colours, strength, fastener size, taking apart, cure and application (cure and application one source, marked); no retaining compound selection, no sealants or structural adhesives |
 | MH294 | O-rings and glands | partial | `oring` | AS568 sizes and a squeeze, stretch and fill check; no ISO 3601-1 G series, no -9xx sizes, no back-up rings |
@@ -763,11 +765,11 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED66 | 13.2 Bearings | done | `bearinglife`, `bearguide` | Rating life in `bearinglife`; 0.6.0: types, fits and mounting |
 | ED67 | 13.3 Ball and roller bearings | done | `bearinglife`, `bearguide` | Rating life in `bearinglife`; 0.6.0: types, designations, tolerance classes and fits |
 | ED68 | 13.4 Bearing lifetime | done | `bearinglife` | Basic rating life L10 (`claude/fasteners`) |
-| ED69 | 13.5 Coefficient of friction | missing | | |
+| ED69 | 13.5 Coefficient of friction | done | `elemguide` | 0.6.0: as MH26 |
 | ED70 | 13.6 Gear trains | done | `geartrain` |  |
 | ED71 | 13.7 Seals | done | `oring`, `bearguide` | O-ring glands in `oring`; 0.6.0: radial shaft seals (shaft roughness, lead, hardness, housing bore, fitting; mostly one source, marked). No mechanical face seals |
 | ED72 | 13.8 Shaft couplings | out of scope? | | |
-| ED73 | 13.9 Cam mechanisms | missing | | |
+| ED73 | 13.9 Cam mechanisms | done | `elemguide` | 0.6.0: as MH280: kinds of cam and follower, terms, displacement diagram, follower motions named (one source, marked) |
 | ED74 | 13.10 Clutches | out of scope? | | |
 | ED75 | 13.11 Pulley mechanisms | partial | `beltdrive` | 0.6.0: belt length, ratio and wrap for two pulleys; no rope and block pulley systems |
 | ED76 | 13.12 Drive types | partial | `beltdrive`, `chaindrive`, `geartrain` | 0.6.0: belt, chain and gear drives each have a calculator; no comparison of drive types |

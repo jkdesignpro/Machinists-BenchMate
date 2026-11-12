@@ -3447,6 +3447,13 @@ const TOOLS = [
   source: 'The Open University (OpenLearn Manupedia), Hypertherm, Fractory, The Fabricator, Techni Waterjet and Wikipedia (cutting plate); Modern Machine Shop and Xometry (EDM); Wikipedia, Artizono, Extrude Hone AFM and E-Fab (other processes); Products Finishing, Empire Abrasives, Wikipedia, United Abrasives and Weiler Abrasives (polishing, buffing, brushing); PCI Magazine, eFunda, Gleco Plating and Finishing.com (conversion coatings, anodising); Wikipedia and Richconn (chrome plating); Protolabs and EPI (other plating); TWI and WeldGuru (thermal spraying). Full list with URLs in docs/sources.md.',
 },
 {
+  id: 'elemguide', level: 'advanced', group: 'Guides', title: 'Machine elements guide',
+  desc: 'Friction (the laws, static and kinetic, a table of coefficients quoted source by source), backlash in gears and screws (why it is needed, how it is made, anti-backlash gears, compensation), gear materials and their heat treatment, cams and followers (kinds, base circle, pitch curve, pressure angle, rise, dwell and return), plain bearings (forms, materials, PV limits, shaft and clearance), leadscrews against ball screws (efficiency, self-locking, back-driving, preload). Three drawings.',
+  render: el => renderElemGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
+  source: 'Wikipedia, MISUMI and G.U.N.T. (friction); Wikipedia and KHK (backlash); KHK and MachineMfg (gear materials); Wikipedia, a course text and i GET IT (cams); Wikipedia, GlobalSpec and Armoloy (plain bearings); Wikipedia, Machine Design and Roton (leadscrews and ball screws). Full list with URLs in docs/sources.md.',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),
