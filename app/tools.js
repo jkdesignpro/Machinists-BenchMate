@@ -3391,6 +3391,13 @@ const TOOLS = [
   source: 'CIMCO CNC programming book, chapter 8; Haas Factory Outlet lathe programming manual (12/2024); Haas cut-off tool sheet; Production Machining and Modern Machine Shop (one publisher); CNC Cookbook; CNC Training Centre; Mitsubishi Materials. See docs/sources.md, "CNC lathe guide".',
 },
 {
+  id: 'shoptools', level: 'advanced', group: 'Guides', title: 'Shop tools guide',
+  desc: 'Bench and toolroom practice: sharpening twist drills and what a badly ground point does, grinding lathe tool bits, hacksaw and band saw blades and breaking a blade in, hole saw speeds from two charts, carbide burr speeds, choosing a cutting fluid, grinding wheel shapes, dressing and truing.',
+  render: el => renderShopTools(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Speeds are printed as the two charts give them, side by side; the cutting speed for hole saws in mild steel is our arithmetic from both charts.',
+  source: 'TTE work instruction and the Machinery Repairman manual (drills); J. A. Nilsson and mini-lathe.com (tool bits); Introduction to Machining (CC BY), Tameson, Fastenal, Sawblade.com, Modern Machine Shop (saws); RUKO chart at AutomationDirect and Remora Electrical (hole saws); Klingspor and Amana Tool (burrs); American Machinist and FUCHS (fluids); Palmgren and Norton in Modern Machine Shop (dressing). See docs/sources.md, "Shop tools guide".',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),

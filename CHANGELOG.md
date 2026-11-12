@@ -26,6 +26,9 @@ Stage 4 of the plan, part 1: book references. Built on top of 0.5.0. In progress
 - New tool **Taper pins (inch series)** (Reference > Machine elements): No. 7/0 to No. 14, large end with commercial and precision limits, and the small end diameter for the length of the pin, with a drawing. The sizes come from one supplier's sheet of the standard and say so.
 - **Spur gear data** shows the number of the involute form cutter (set of eight) for each gear: the diametral pitch series in inch mode, the module series, which is numbered the other way round, in mm mode.
 
+### Added (shop tools)
+- New page **Shop tools guide** (Reference > Guides): sharpening a twist drill by hand and what each grinding fault does to the hole, grinding a lathe tool bit, hacksaw and band saw blades with blade break-in and a fault table, hole saw speeds for four diameters from two charts side by side, carbide burr cuts and speeds, choosing between neat oil, emulsion, semi-synthetic and synthetic fluid, and grinding wheel shapes, dressing and truing. Eight sections, three drawings, 18 public sources. Where two charts or suppliers give different figures both are shown.
+
 ### Added (CNC lathe and glossary)
 - New page **CNC lathe guide** (Reference > Guides): the machine, eight ways to hold the work and when a collet beats a chuck, bar work with a puller or a feeder, the common tools and insert shapes, speeds and feeds, the toolpaths in the order they are run with the Haas cycle for each, parting off (centre height, overhang, feed near the centre, coolant) and live tools with the C axis. Nine sections, four drawings, nine public sources. Four points where the sources give different figures show both.
 - New page **Glossary** (Reference > Guides): 108 shop and CNC words in plain language with a search box. 97 of them link to the page that explains the term.

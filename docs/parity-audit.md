@@ -62,6 +62,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, sixth batch, 2026-11-12):** CNC lathe guide (`latheguide`: the machine, holding the part, bar work, common tools, speeds and feeds, toolpaths in order with the Haas cycles, parting off, live tools), glossary (`glossary`, 108 terms), and in the workholding guide a section on flanges, angle plates, dowels and shoulder bolts for two-sided parts and several parts from one bar. CN49, CN50, CN51, CN53, CN54, CN70, CN74, CN75 and CN82 done; CN70, CN74 and CN75 rest on one source each and are marked so in the app. Counted from the tables below: 287 done, 209 partial, 100 missing of 596 in-scope rows, 48 %; 250 more rows to done for 90 %. The CNC machining handbook checklist is at 72 of 79, 91 %; still open there: CN4, CN6, CN11, CN26, CN35, CN80 (partial) and CN55 (missing).
 
+**Update (0.6.0, seventh batch, 2026-11-12):** shop tools guide (`shoptools`: sharpening twist drills, grinding lathe tool bits, hacksaw and band saw blades, hole saw speeds, carbide burrs, choosing a cutting fluid, grinding wheel shapes, dressing and truing). BB18, BB24, BB25, BB27, BB28, BB60, BB62, BB80, MH157 and MH163 done; MH129 and MH164 from missing to partial; notes brought up to date on BB26, MH132, MH156 and MH158. Re-audit: MH179 and MH180 are done by the milling toolpath guide and the CNC lathe guide. Counted from the tables below: 299 done, 204 partial, 93 missing of 596 in-scope rows, 50 %; 238 more rows to done for 90 %.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -461,10 +463,10 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH126 | Portable tool spindles, square drives, hex chucks | out of scope? | | Portable power tools |
 | MH127 | Mounted wheels and points | missing | | |
 | MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | missing | | |
-| MH129 | Files and burs; speeds of rotary burs | missing | | |
+| MH129 | Files and burs; speeds of rotary burs | partial | `shoptools` | Carbide burr cuts and speeds from two makers; no files |
 | MH130 | Knurls and knurling: sizes, formulas for knurled work, tolerances | partial | `knurl` | Blank diameter by four methods with a trial procedure; no tolerances on knurled work |
 | MH131 | Tool wear: flank wear, cratering, chipping, deformation | done | `cncguide` | See U91 (`claude/cnc-guide`) |
-| MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | partial | `toolguide` | Drill point geometry, point angles and split points; no sharpening procedure, carbide tool grinding or diamond wheels |
+| MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | partial | `shoptools`, `toolguide` | Drill sharpening by hand, faults and web thinning; no carbide tool grinding or diamond wheels |
 | MH133 | Sieves, mesh and abrasive grit numbers | partial | `gritconv` | Grit size conversion per publisher; no sieve and mesh table |
 
 ### Machining operations
@@ -493,15 +495,15 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH153 | Machine settings and calculation of costs (all operations incl. grinding) | partial | `toollife` | Single tool only |
 | MH154 | High-speed machining econometrics, chip geometry in milling, mean chip thickness | partial | `cutopt` | Mean chip thickness only |
 | MH155 | Automatic screw machines: knurling, cams, speeds, stock | partial | `bar` | Bar stock per part only; cam work missing |
-| MH156 | Band saw blade selection, speeds, feeds, break-in | partial | `sawtpi`, `bandsaw` | 3-teeth-in-cut pitch rule (two sources) and cut time; no speeds or break-in (`claude/tooling-ref`) |
-| MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | partial | `coolconc`, `coolmix` | Concentration and mixing only; no fluid selection |
-| MH158 | Metalworking fluids: classes, maintenance, exposure | partial | `coolconc`, `coolmix` | Concentration and mix only |
+| MH156 | Band saw blade selection, speeds, feeds, break-in | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch rule, blade types, break-in, fault table and cut time; no band speeds by material |
+| MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | done | `shoptools`, `coolconc`, `coolmix` | Neat oil, emulsion, semi-synthetic and synthetic compared; which for slow heavy work and which for fast cutting; by material |
+| MH158 | Metalworking fluids: classes, maintenance, exposure | partial | `shoptools`, `coolconc`, `coolmix` | Classes, concentration and mixing, care of mixed fluids; no exposure limits or sump maintenance schedule |
 | MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | missing | | |
 | MH160 | Machining non-metals (hard rubber, laminates) | partial | `plastics` | Machining plastics; no hard rubber or laminates |
 | MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | missing | | |
 | MH162 | Grinding data selection and grindability groups | missing | | |
-| MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | partial | `wheelcode`, `gritconv` | Abrasives, bonds, grade, structure and markings decoded with sources; no wheel shapes or selection guide (`claude/calcs-3`) |
-| MH164 | Dressing and truing; diamond sizes | missing | | |
+| MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | done | `shoptools`, `wheelcode`, `gritconv` | Markings decoded; shapes by type number, choice of abrasive, grit and grade (the choice rests on one source, marked) |
+| MH164 | Dressing and truing; diamond sizes | partial | `shoptools` | Dressing against truing, when to dress, open and closed dressing, the tools; no diamond sizes |
 | MH165 | Diamond wheels: shapes, designations, selection | missing | | |
 | MH166 | Grinding wheel safety and safe operating speeds | partial | `grindspeed`, `wheelcode` | Speed check against the marked max speed and the rule to obey it; no full safety code (`claude/calcs-3`) |
 | MH167 | Cylindrical grinding (traverse, plunge, high speed, troubles) | partial | `grindtime`, `grindspeed` | Traverse and plunge time, speed ratio, equivalent diameter; no high-speed grinding or troubleshooting (`claude/calcs-3`) |
@@ -516,8 +518,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH176 | Tool nose radius compensation | done | `tnrc` | Hand compensation and G41/G42 with tip numbers (`claude/cnc-guide`) |
 | MH177 | Rapid, linear, circular and helical interpolation | partial | `helix`, `arcfeed` | Feed maths only; no G-code reference or output |
 | MH178 | Work offsets, tool length offsets, cutter radius offsets | done | `cncguide` | Work offsets (G54-G59 and extended), tool length, cutter radius and wear offsets explained (`claude/cnc-guide`) |
-| MH179 | Fixed (canned) cycles for holes | partial | `cycdrill` | Generator for G81/G82/G83/G73/G84; no reference text on the cycles |
-| MH180 | Contouring, turning and boring on CNC | missing | | |
+| MH179 | Fixed (canned) cycles for holes | done | `toolpaths`, `cycdrill` | Re-audit: G81, G82, G83, the R plane with G98 and G99, and G84 explained in the milling toolpath guide (0.6.0); generator for the blocks |
+| MH180 | Contouring, turning and boring on CNC | done | `toolpaths`, `latheguide` | Re-audit: contouring with cutter compensation in the milling toolpath guide; turning and boring in the CNC lathe guide (0.6.0) |
 | MH181 | Thread cutting on CNC lathes: depth, infeed, G32, G76, multi-start | partial | `cycthread` | Depth, infeed, G76 and G92; no G32, no multi-start, no tapered threads |
 | MH182 | Subprograms, macros and parametric programming | partial | `macroref` | Macro variables, system variables and statements per control; no worked subprogram examples |
 | MH183 | Axis nomenclature | done | `cncguide` | ISO 841 right-hand rule, mill and lathe axes, rotary axes (`claude/cnc-guide`) |
@@ -795,17 +797,17 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB15 | Drill sizes for screw extractors, self-tappers | missing | | |
 | BB16 | Drill sizes for socket head screws | done | `shcs`, `clearance` | (`claude/fasteners`) |
 | BB17 | Hole coordinates | done | `bolt` | |
-| BB18 | Drill point sharpening and effects of bad grinding | partial | `toolguide` | Point geometry and angles; no sharpening procedure or faults from bad grinding |
+| BB18 | Drill point sharpening and effects of bad grinding | done | `shoptools`, `toolguide` | Hand sharpening step by step, lip clearance, the chisel edge check, a table of five grinding faults and their effects, web thinning |
 | BB19 | Drill point geometry by material | partial | `toolguide` | Point angle by material (118 general, 135 harder, over 140 very hard); no full geometry table (`claude/tooling-ref`) |
 | BB20 | Speeds and feeds for HSS twist drills | partial | `advdrill` | Speed by material and feed by diameter; not a full table |
 | BB21 | Speeds and feeds for solid carbide drills | partial | `advdrill` | Carbide speeds from one publisher |
 | BB22 | End mills | partial | `toolguide` | Types, flutes by material, end shapes, roughers; no dimensions (`claude/tooling-ref`) |
 | BB23 | Cutting speed to RPM conversion | done | `rpm` | |
-| BB24 | Hole saws and recommended speeds | missing |  | Not built: no two independent hole saw speed charts compared (`claude/tooling-ref`) |
-| BB25 | Hacksaw and power saw blade selection | partial | `sawtpi` | Pitch from the 3-teeth rule; no hacksaw blade chart (`claude/tooling-ref`) |
-| BB26 | Bandsaw blade selection | partial | `sawtpi`, `bandsaw` | Pitch selection (min 3 teeth confirmed, upper rule shown from two makers) and cut time; no blade width or speed chart (`claude/tooling-ref`) |
-| BB27 | Sharpening HSS toolbits | missing | | |
-| BB28 | Lubricants and coolants for cutting tools | partial | `coolconc`, `coolmix` | No selection guide |
+| BB24 | Hole saws and recommended speeds | done | `shoptools`, `rpm` | Speeds for four diameters and five materials from two charts side by side; the cutting speed in mild steel worked out from both |
+| BB25 | Hacksaw and power saw blade selection | done | `shoptools`, `sawtpi` | Hacksaw blades of 18, 24 and 32 teeth per inch, the three-teeth rule, fitting and tension; pitch calculator |
+| BB26 | Bandsaw blade selection | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch selection, blade types, break-in (two suppliers, figures differ), fault table and cut time; no blade width or speed chart |
+| BB27 | Sharpening HSS toolbits | done | `shoptools` | Order of grinding, relief and rake by material, nose radius, cooling, wheel and finishing, with a drawing (two guides) |
+| BB28 | Lubricants and coolants for cutting tools | done | `shoptools`, `coolconc`, `coolmix` | Table of four kinds of fluid and where each suits, the rule by speed and by material, care of mixed fluids |
 | BB29 | Trigonometry, Pythagoras, rise per degree, 3-4-5 rule | partial | `triangle` | Triangle solver; no rise per degree or 3-4-5 rule |
 | BB30 | Geometrical construction | missing | | |
 | BB31 | Formulae for dimensions of plane figures | done | `figures` | (`claude/measure-maths`) |
@@ -837,9 +839,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB57 | Workpiece material comparison table | done | `materials` | |
 | BB58 | Engineering plastics | partial | `materials` | 5 plastics |
 | BB59 | Engineering adhesives | missing | | |
-| BB60 | Grinding wheels: markings, specs, shapes, faces | partial | `wheelcode` | Markings and specs decoded; no shapes or faces (`claude/calcs-3`) |
+| BB60 | Grinding wheels: markings, specs, shapes, faces | done | `shoptools`, `wheelcode` | Markings decoded; eight shapes by type number with a drawing of six, the face of the wheel, choice of abrasive, grit and grade |
 | BB61 | Mounted wheels and points | missing | | |
-| BB62 | Tungsten carbide burrs | missing | | |
+| BB62 | Tungsten carbide burrs | done | `shoptools` | Cuts and what each is for; speeds by size from two makers, which differ and are both shown |
 | BB63 | Surface coatings (tool coatings) | done | `toolguide` | Ten coatings with use; max temperatures with every publisher value, confirmed only where two agree (`claude/tooling-ref`) |
 | BB64 | Relative position of cutting tool materials | partial | `toolguide` | Tool materials summary; no ranking chart (`claude/tooling-ref`) |
 | BB65 | Carbide grades and grade comparison chart | partial | `iso513`, `toolguide` | ISO 513 groups; no maker grade comparison chart (`claude/tooling-ref`) |
@@ -857,7 +859,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB77 | Hardening and tempering temperatures by colour | done | `tempercolours`, `heattreat` | Temper colours with three publishers, hardening and tempering temperatures (`claude/materials-ref`) |
 | BB78 | Hardness comparison chart | done | `hardness` |  |
 | BB79 | Natural sines and tangents table | done | `calc` | Any sine or tangent from the calculator instead of a table (`claude/measure-maths`) |
-| BB80 | Drill point sharpening gauge (back cover) | missing | | |
+| BB80 | Drill point sharpening gauge (back cover) | done | `shoptools` | How the drill point gauge is used to check the angle and the length of each lip (the gauge itself is a tool, not a page) |
 
 ## 5. CNC Machining for Engineers and Makers (course handbook)
 

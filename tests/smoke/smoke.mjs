@@ -1939,6 +1939,23 @@ where = 'toolpaths';
     if (!/G71, the shape between blocks P and Q/.test(row('2 Rough turn')) || !/G75 \(outside or inside\), G74 \(in the face\)/.test(row('4 Groove')) || !/G76 \(the whole thread\), G92/.test(row('5 Thread'))) problems.push(`[${where}] the Haas cycles in the toolpath table: ${row('2 Rough turn')}`);
   }
   if (!/within 0\.1 mm \(0\.004 in\)/.test(g.all) || !/within 0\.005 in/.test(g.all) || !/8 to 10 times/.test(g.all) || !/G112/.test(g.all) || !/M133/.test(g.all) || !/1\/16 in to 2\.5 in/.test(g.all)) problems.push(`[${where}] parting off, live tool or collet figures are missing`);
+  // Shop tools guide: two chapters of one textbook and two articles of one magazine each count once; the
+  // hole saw table prints both charts' figures side by side.
+  where = 'shoptools';
+  g = await guide('shoptools');
+  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,5,5' || g.srcs !== 19) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 4 and 4 rows, 19 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 46) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Four things have to be right', 'Lip clearance', 'Drill point gauge', 'Order', 'Hacksaw blades', 'Break in a new band saw blade', 'Fluid and brush', 'Bigger saw, slower', 'Speed falls with size', 'The rule', 'Dressing and truing are two jobs'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  for (const k of ['Flat point', 'Web thinning', 'Three teeth in the cut', 'Band saw blades', 'Chips tell', 'Deep cuts', 'Long shanks', 'Copper', 'Shapes by number', 'Open or closed'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/350 \/ 382 175 \/ 255 470 \/ 382 470 \/ 446 235 \/ 127/.test(row('25 mm (1 in)')) || !/85 \/ 94 40 \/ 62 110 \/ 94 110 \/ 109 55 \/ 31/.test(row('102 mm (4 in)'))) problems.push(`[${where}] hole saw speeds from the two charts: ${row('25 mm (1 in)')} | ${row('102 mm (4 in)')}`);
+    if (/to be verified/.test(row('Neat (straight) oil')) || !/to be verified/.test(row('Semi-synthetic')) || !/to be verified/.test(row('Point too flat'))) problems.push(`[${where}] table rows: one source is flagged, two are not`);
+  }
+  if (!/8 to 12 degrees/.test(g.all) || !/6 to 9 degrees/.test(g.all) || !/20 to 50 %/.test(g.all) || !/first 100 square inches/.test(g.all) || !/about 27 to 30 m\/min/.test(g.all) || !/12 000 to 18 000 against 4 000 to 10 000/.test(g.all)) problems.push(`[${where}] drill clearance, break-in, hole saw or burr figures are missing`);
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);

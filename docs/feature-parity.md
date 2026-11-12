@@ -90,6 +90,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Library | Milling toolpath guide (model to part, 2D and 3D, features, contour with cutter compensation, pockets, slots, chamfer and radius, holes, 3D toolpaths, rest machining, tolerances) | done (ours, 0.6.0; 7 public sources, single-source statements marked) | `toolpaths` | |
 | Library | Workholding guide (vise and accessories, aligning, jaws and soft jaws, squaring a block, clamps and fixture plates, flanges and angle plates, thin parts, round and many parts) | done (ours, 0.6.0; 10 public sources, single-source statements marked) | `workholding` | |
 | Library | CNC lathe guide (holding the part, bar work, tools and insert shapes, speeds and feeds, toolpaths with the Haas cycles, parting off, live tools) | done (ours, 0.6.0; 9 public sources, single-source statements marked) | `latheguide` | |
+| Library | Shop tools guide (drill and tool bit sharpening, hacksaw and band saw blades, hole saw and burr speeds, cutting fluids, grinding wheel shapes, dressing) | done (ours, 0.6.0; 18 public sources, single-source statements marked, differing charts shown side by side) | `shoptools` | |
 | Library | Glossary of shop and CNC words | done (ours, 0.6.0; 108 terms in our own words, 97 linked to the page that explains them) | `glossary` | |
 | Milling | Chamfer mill: tip depth, centre offset, cutting diameter, widest chamfer | done (ours, 0.6.0; own cone geometry, drawing to scale) | `chamfermill` | |
 | Library | Tip of the day | done (own tips, Home widget) | `tips.js` | U98 |
