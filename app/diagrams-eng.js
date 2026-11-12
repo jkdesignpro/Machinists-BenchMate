@@ -109,6 +109,56 @@ const deCross = (x, y, r) => DK.cl(x - r, y, x + r, y) + DK.cl(x, y - r, x, y + 
 // Thread form data for the wire drawing: flank half-angle, crest height and root depth from the pitch line (x P).
 const DE_FORMS = { 60: [30, 0.324760, 0.216506, '60° UN / ISO metric'], 55: [27.5, 0.320163, 0.320163, '55° Whitworth'], 29: [14.5, 0.25, 0.25, '29° ACME'], 30: [15, 0.25, 0.25, '30° trapezoidal'], 291: [14.5, 0.15, 0.15, '29° Stub ACME'] };
 
+// What is wrong with a measuring pin, by the flag bits of gears::space_view.
+const SPLINE_PIN_MSG = ['This pin does not touch the involute flanks', 'This pin sits on the root', 'This pin does not stand proud of the teeth'];
+// One tooth space of a spline or gear, enlarged, with its measuring pin: the tooth either side, the tip, root,
+// pitch and base circles, the pin and where it touches. Geometry from the core (gear_space_view); placed in a
+// w x h window whose top centre is (cx, top). t: tooth thickness (external) or space width (internal) on d.
+function deSpace(id, cx, top, w, h, internal, z, d, t, dTip, dRoot, dPin, u, dp, note) {
+  const C = state.W, n = C.gear_space_view(internal ? 1 : 0, z, d, 30, t, dTip, dRoot, dPin > 0 ? dPin : 0, 24);
+  if (!(n > 6)) return DK.text(cx, top + h / 2, 'These sizes do not make a tooth space', { cls: 'mut' });
+  const dc = C.list_out(0), rc = dc / 2, dk = C.list_out(1), kx = C.list_out(2), ky = C.list_out(3), flags = C.list_out(4), np = C.list_out(5), pts = [];
+  for (let i = 0; i < np; i++) pts.push([C.list_out(6 + 2 * i), C.list_out(7 + 2 * i)]);
+  const rt = dTip / 2, rr = dRoot / 2, depth = Math.abs(rt - rr), pin = dPin > 0 && deFin(rc), pr = dPin / 2;
+  // Window in part units: one and a half pitches wide, from behind the root to past the pin.
+  const lo = internal ? Math.min(rt, pin ? rc - pr : rt) - 0.45 * depth : rr - 0.5 * depth;
+  const hi = internal ? rr + 0.5 * depth : Math.max(rt, pin ? rc + pr : rt) + 0.45 * depth;
+  const half = 0.95 * Math.PI * d / z, yTop = top + 4, hh = h - 64;
+  const k = Math.min(w / (2 * half), hh / (hi - lo));
+  // External: outwards is up. Internal: the hub is above the space, the bore centre below, so outwards is up as well.
+  const X = x => cx + x * k, Y = y => yTop + (hi - y) * k + (hh - (hi - lo) * k) / 2;
+  const turn = (p, a) => [p[0] * Math.cos(a) + p[1] * Math.sin(a), -p[0] * Math.sin(a) + p[1] * Math.cos(a)];
+  const all = [];
+  [-1, 0, 1].forEach(j => pts.forEach((p, i) => { if (j === -1 || i > 0) all.push(turn(p, j * 2 * Math.PI / z)); }));
+  const back = internal ? yTop - 4 : yTop + hh + 4;
+  let g = '<clipPath id="' + id + '"><rect x="' + deF(cx - w / 2) + '" y="' + deF(yTop) + '" width="' + deF(w) + '" height="' + deF(hh) + '"/></clipPath><g clip-path="url(#' + id + ')">';
+  g += '<path class="part" id="' + id + 'p" d="M' + all.map(p => deF(X(p[0])) + ' ' + deF(Y(p[1]))).join('L') + 'L' + deF(X(all[all.length - 1][0])) + ' ' + deF(back) + 'L' + deF(X(all[0][0])) + ' ' + deF(back) + 'Z"/>';
+  const ring = (r, cls, cid) => '<circle class="' + cls + '"' + (cid ? ' id="' + id + cid + '"' : '') + ' cx="' + deF(X(0)) + '" cy="' + deF(Y(0)) + '" r="' + deF(r * k) + '"/>';
+  g += ring(d / 2, 'cl', 'd');
+  const rb = d * Math.cos(Math.PI / 6) / 2, showBase = rb > lo && rb < hi;
+  if (showBase) g += ring(rb, 'hid');
+  if (pin) {
+    g += '<circle class="tool" id="' + id + 'pin" cx="' + deF(X(0)) + '" cy="' + deF(Y(rc)) + '" r="' + deF(pr * k) + '"/>' + DK.line(X(0) - 5, Y(rc), X(0) + 5, Y(rc), 'thin') + DK.line(X(0), Y(rc) - 5, X(0), Y(rc) + 5, 'thin');
+    if (deFin(kx)) g += [1, -1].map(sg => DK.line(X(0), Y(rc), X(sg * kx), Y(ky), 'hot') + '<circle class="hotf' + (sg > 0 ? '" id="' + id + 'k' : '') + '" cx="' + deF(X(sg * kx)) + '" cy="' + deF(Y(ky)) + '" r="2.6"/>').join('');
+  }
+  g += '</g><rect class="thin" x="' + deF(cx - w / 2) + '" y="' + deF(yTop) + '" width="' + deF(w) + '" height="' + deF(hh) + '"/>';
+  // Labels: the thickness on the pitch circle; the circles, the pin and its contact circle in words underneath.
+  const onPitch = pts.filter(p => Math.abs(Math.hypot(p[0], p[1]) - d / 2) < 1e-9 * d);
+  if (onPitch.length === 2) {
+    // On the pitch circle. External: the thickness of the tooth on the right of the pin. Internal: the width of the
+    // space the pin sits in, with the dimension line below the pin.
+    const A = internal ? onPitch[0] : onPitch[1], B = internal ? onPitch[1] : turn(onPitch[0], 2 * Math.PI / z);
+    g += DK.dim(X(A[0]), Y(A[1]), X(B[0]), Y(B[1]), (internal ? 'e ' : 's ') + DK.n(t, dp), { off: internal ? -((pin ? Y(rc - pr) : Y(rt)) - Y(A[1]) + 14) : -16, below: true });
+  }
+  const lines = [internal ? 'minor Ø ' + DK.n(dTip, dp - 1) + ', major Ø ' + DK.n(dRoot, dp - 1) : 'major Ø ' + DK.n(dTip, dp - 1) + ', minor Ø ' + DK.n(dRoot, dp - 1)];
+  if (pin) lines.push('pin Ø ' + DK.n(dPin, dp) + ', centre on Ø ' + DK.n(dc, dp));
+  if (pin && deFin(dk) && !(flags & 1)) lines.push('touches the flanks on Ø ' + DK.n(dk, dp) + ' (pitch Ø ' + DK.n(d, dp - 1) + ')');
+  const bad = SPLINE_PIN_MSG.filter((m, i) => flags & (1 << i));
+  g += lines.concat(note ? [note] : []).map((l, i) => DK.text(cx, yTop + hh + 14 + 13 * i, l, { cls: 'mut', size: 10.5 })).join('');
+  g += bad.map((l, i) => DK.text(cx, yTop + hh + 14 + 13 * (lines.length + (note ? 1 : 0) + i), l, { cls: 'hotf', size: 10.5 })).join('');
+  return g;
+}
+
 Object.assign(DIAGRAMS, {
   // Three-wire measurement: the thread in axial section to scale, wires seated on the flanks, anvils and M.
   wires(v, sys, rows) {
@@ -429,7 +479,7 @@ Object.assign(DIAGRAMS, {
 
   // Involute splines: external with pins over, internal with pins between, both drawn from the 30° involute.
   spline(v, sys, rows) {
-    const W = 520, H = 310, u = deU(sys), dp = deDp(sys) + 1;
+    const W = 520, H = 590, u = deU(sys), dp = deDp(sys) + 1;
     if (!(v.mp > 0 && v.z >= 6 && v.z <= 200 && (v.std === 1 || v.std === 2))) return '';
     const z = Math.round(v.z), m = v.std === 1 ? (sys === 'inch' ? 1 / v.mp : 25.4 / v.mp) : (sys === 'inch' ? v.mp / 25.4 : v.mp), D = deV(rows, 'Pitch diameter D');
     if (!(D > 0)) return '';
@@ -455,8 +505,13 @@ Object.assign(DIAGRAMS, {
     h += deRing(ix, cy, Rf * 1.16 * s, gi) + DK.circle(ix, cy, D / 2 * s, 'cl') + deCross(ix, cy, Rf * 1.16 * s + 10);
     const pi = deV(rows, 'Pin diameter, internal'), Mi = deV(rows, 'Measurement between pins, internal');
     if (pi > 0 && Mi > 0) { const q = pins(ix, (Mi + pi) / 2 / co, pi, true, Mi); h += q.g; lab += q.d; }
+    // Below: one tooth space of each, enlarged, with its pin. The profile, the pin centre and the contact
+    // points come from the Rust core (gears::space_view); this only places them on the page.
+    const tipI = Dmi > 0 ? 2 * Ra : NaN;
+    lab += deSpace('spe', ex, 326, 244, 236, false, z, D, st, 2 * ra, 2 * rf, pe, u, dp, !(Die > 0) ? 'minor Ø drawn at m (z − 1.35): no rule for this pitch here' : '');
+    lab += deSpace('spi', ix, 326, 244, 236, true, z, D, et, 2 * Ra, 2 * Rf, pi, u, dp, !(Dmi > 0) ? 'minor Ø drawn at m (z − 1): not given by the source' : '');
     lab += DK.text(ex, 18, 'External (shaft): over pins', { cls: 'txt' }) + DK.text(ix, 18, 'Internal (hub): between pins', { cls: 'txt' });
-    lab += DK.text(W / 2, H - 6, z + ' teeth, ' + (v.std === 1 ? DK.n(v.mp, 3) + '/' + DK.n(2 * v.mp, 3) + ' pitch' : 'module ' + DK.n(v.mp, 3)) + ', 30° pressure angle, pitch Ø ' + DK.n(D, dp - 1) + ' ' + u + ' (chain circle)', { cls: 'mut' });
+    lab += DK.text(W / 2, 304, z + ' teeth, ' + (v.std === 1 ? DK.n(v.mp, 3) + '/' + DK.n(2 * v.mp, 3) + ' pitch' : 'module ' + DK.n(v.mp, 3)) + ', 30° pressure angle, pitch Ø ' + DK.n(D, dp - 1) + ' ' + u + ' (chain circle)', { cls: 'mut' });
     if (pe > 0) lab += DK.text(ex, 34, 'pins Ø ' + DK.n(pe, dp), { cls: 'mut' });
     if (pi > 0) lab += DK.text(ix, 34, 'pins Ø ' + DK.n(pi, dp), { cls: 'mut' });
     return DK.svg(W, H, h + lab, 'Involute spline, external and internal, with measuring pins');
@@ -1244,5 +1299,54 @@ Object.assign(DIAGRAMS, {
     L.forEach((t, i) => { lab += DK.text(14, 22 + i * 18, t, { cls: 'hott', anchor: 'start' }); });
     lab += deLines(14, H - 24, [deFin(sag) ? 'static sag ' + DK.n(sag, sys === 'inch' ? 5 : 4) + ' ' + u.L : '', 'First whirling shape in orange, exaggerated.']);
     return DK.svg(W, H, h + lab, 'Shaft critical speed with discs and the whirl shape');
+  },
+});
+
+// Rotary axis: where a point goes. Seen from the + end of the rotary axis looking back along it:
+// the centre line, the point before and after, and the way the part turns. The other two axes are
+// drawn right and up in the order that makes a right-hand turn counter-clockwise on the page.
+Object.assign(DIAGRAMS, {
+  rotpoint(v, sys, rows) {
+    const W = 520, H = 356, cx = 250, cy = 158, RM = 110, u = deU(sys), dp = deDp(sys);
+    const ax = [0, 1, 2].includes(v.axis) ? v.axis : 0, names = 'XYZ', iu = (ax + 1) % 3, iw = (ax + 2) % 3;
+    const p0 = [v.x, v.y, v.z], c = [deFin(v.cx) ? v.cx : 0, deFin(v.cy) ? v.cy : 0, deFin(v.cz) ? v.cz : 0];
+    const p1 = [deV(rows, 'Point after the move: X'), deV(rows, 'Point after the move: Y'), deV(rows, 'Point after the move: Z')];
+    const rad = deV(rows, 'Distance of the point from the axis'), live = p1.every(deFin) && rad > 0;
+    let s = DK.cl(cx - RM - 40, cy, cx + RM + 40, cy) + DK.cl(cx, cy - RM - 30, cx, cy + RM + 30);
+    s += deArrow(cx + RM + 22, cy, cx + RM + 44, cy, 'thin') + DK.text(cx + RM + 50, cy + 4, '+' + names[iu], { anchor: 'start', cls: 'mut' });
+    s += deArrow(cx, cy - RM - 14, cx, cy - RM - 34, 'thin') + DK.text(cx + 8, cy - RM - 26, '+' + names[iw], { anchor: 'start', cls: 'mut' });
+    s += DK.circle(cx, cy, 3, 'ln') + DK.text(cx - 8, cy + 16, 'axis ' + 'ABC'[ax], { anchor: 'end', cls: 'mut' });
+    if (live) {
+      const k = RM / rad, P = p => [cx + (p[iu] - c[iu]) * k, cy - (p[iw] - c[iw]) * k], a = P(p0), b = P(p1);
+      s += '<circle class="thin" id="rpcirc" fill="none" stroke-dasharray="5 4" cx="' + cx + '" cy="' + cy + '" r="' + RM + '"/>';
+      s += DK.line(cx, cy, a[0], a[1], 'thin') + DK.line(cx, cy, b[0], b[1], 'hot');
+      s += '<circle class="ln" id="rpa" cx="' + deF(a[0]) + '" cy="' + deF(a[1]) + '" r="4.5"/>' + '<circle class="hotf" id="rpb" cx="' + deF(b[0]) + '" cy="' + deF(b[1]) + '" r="4.5"/>';
+      const a0 = Math.atan2(cy - a[1], a[0] - cx) * 180 / Math.PI, turn = (v.dir === 1 ? 1 : -1) * v.deg;
+      if (Math.abs(turn) > 0.5) { const sw = deClamp(turn, -330, 330); s += deRot(cx, cy, RM * 0.45, a0, a0 + sw, 'hot'); }
+      const lab = (q, t, cls, id) => DK.text(q[0] + (q[0] >= cx ? 10 : -10), q[1] + (q[1] <= cy ? -8 : 16), t, { anchor: q[0] >= cx ? 'start' : 'end', cls });
+      s += lab(a, 'at 0', 'mut') + lab(b, 'at ' + 'ABC'[ax] + DK.n(v.deg, 3), 'hott');
+      s += deLines(14, H - 32, [names[iu] + ' ' + DK.n(p1[iu], dp) + ', ' + names[iw] + ' ' + DK.n(p1[iw], dp) + ' ' + u + ' after the move; ' + names[ax] + ' stays ' + DK.n(p1[ax], dp),
+        'Distance from the axis ' + DK.n(rad, dp) + ' ' + u + '. Seen from the + end of ' + names[ax] + ', looking back along it.']);
+    } else s += deLines(14, H - 32, [rad === 0 ? 'The point is on the centre line of the axis: it does not move.' : 'Enter the point and the angle.', 'Seen from the + end of ' + names[ax] + ', looking back along it.']);
+    return DK.svg(W, H, s, 'A point on the part before and after the rotary axis turns, seen along the axis');
+  },
+
+  // Rotary axis feed: the surface of the part unrolled flat. Across: the move along the axis.
+  // Up: the length round the part. The cut is the sloping line. Fixed proportions; labels carry the numbers.
+  rotfeed(v, sys, rows) {
+    const W = 520, H = 300, u = deU(sys), dp = deDp(sys);
+    const arc = deV(rows, 'Length round the part'), len = deV(rows, 'Length of the cut'), f = deV(rows, 'Inverse time feed word'), t = deV(rows, 'Time for the block');
+    const lin = deFin(v.lin) ? Math.abs(v.lin) : 0, live = deFin(arc) && arc > 0;
+    const x0 = 120, y0 = 206, bw = 250, bh = 150;
+    let wpx = bw, hpx = bh;
+    if (live && lin > 0) { const k = Math.min(bw / lin, bh / arc); wpx = deClamp(lin * k, 36, bw); hpx = deClamp(arc * k, 36, bh); }
+    else if (live) wpx = 0;
+    let s = DK.rect(x0, y0 - bh, bw, bh, 'thin') + DK.text(x0 + bw, y0 - bh - 8, 'surface of the part, unrolled flat', { anchor: 'end', cls: 'mut' });
+    s += DK.line(x0, y0, x0 + wpx, y0 - hpx, 'hot') + DK.circle(x0, y0, 3.5, 'hotf') + deHead(x0 + wpx, y0 - hpx, Math.atan2(-hpx, wpx), 'hotf');
+    s += deDimV(y0, y0 - hpx, x0 - 26, live ? 'round ' + DK.n(arc, dp) : 'round the part');
+    if (wpx > 0) s += DK.dimH(x0, x0 + wpx, y0 + 28, live && lin > 0 ? 'along ' + DK.n(lin, dp) : 'along the axis', { from: y0, below: true });
+    if (live) s += DK.text(x0 + wpx / 2 + 14, y0 - hpx / 2 + 4, 'cut ' + DK.n(deFin(len) ? len : arc, dp) + ' ' + u, { anchor: 'start', cls: 'hott' });
+    s += deLines(14, H - 16, [deFin(f) ? 'G93 F' + DK.n(f, 3) + ': the block takes 1/F minutes' + (deFin(t) ? ' (' + DK.n(t, 2) + ' s)' : '') : 'Give the feed and the angle to see the inverse time feed word.']);
+    return DK.svg(W, H, s, 'The cut on the unrolled surface of the part: length round the part, move along the axis, and the cut as the sloping line');
   },
 });

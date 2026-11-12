@@ -26,6 +26,7 @@ f1!(taper_included_angle_deg, c::taper_included_angle_deg, large, small, length)
 f1!(taper_per_length, c::taper_per_length, large, small, length);
 f1!(taper_small_dia, c::taper_small_dia, large, length, deg);
 f1!(drill_point_length, c::drill_point_length, dia, angle);
+f1!(drill_tip_depth, c::drill_tip_depth, depth, dia, angle);
 f1!(thread_pitch_dia_basic, c::thread_pitch_dia_basic, major, pitch);
 f1!(thread_best_wire, c::thread_best_wire, pitch);
 f1!(thread_three_wire_m, c::thread_three_wire_m, e, wire, pitch);
@@ -288,10 +289,10 @@ fn prog() -> Option<&'static c::gcode::Program> { unsafe { (*core::ptr::addr_of!
     let ok = p.error.is_none();
     unsafe { *core::ptr::addr_of_mut!(PROG) = Some(p); }
     if ok { 1.0 } else { 0.0 } }
-/// Put text into the string buffer: 0 program, 1 error, 2 warnings (one per line). Returns the length.
+/// Put text into the string buffer: 0 program, 1 error, 2 warnings (one per line), 3 the cycle blocks only (snippet). Returns the length.
 #[no_mangle] pub extern "C" fn cyc_text(which: f64) -> f64 {
     match prog() { None => set_str(""), Some(p) => match which as i32 {
-        0 => set_str(&p.text), 1 => set_str(p.error.as_deref().unwrap_or("")), _ => set_str(&p.warnings.join("\n")) } } }
+        0 => set_str(&p.text), 1 => set_str(p.error.as_deref().unwrap_or("")), 3 => set_str(&p.snippet), _ => set_str(&p.warnings.join("\n")) } } }
 /// Number of moves of the last program.
 #[no_mangle] pub extern "C" fn cyc_moves() -> f64 { prog().map(|p| p.moves.len() as f64).unwrap_or(0.0) }
 /// Move `i` field: 0 kind, 1 x, 2 y, 3 z, 4 cx, 5 cy, 6 feed/min, 7 seconds.
@@ -319,7 +320,8 @@ fn set_text(s: String) -> f64 { let n = s.len(); unsafe { *core::ptr::addr_of_mu
 /// On success returns the DXF text length (text at `text_ptr`) and puts the
 /// drawing in `list_out` (`Drawing::flatten`). On bad input returns minus the
 /// length of an error message held at `text_ptr`.
-#[no_mangle] pub extern "C" fn dxf_build(shape: f64, n: f64, inch: f64, r12: f64, marks: f64, lower_left: f64) -> f64 {
+/// `explode` 1 writes the outlines as separate lines and arcs instead of polylines.
+#[no_mangle] pub extern "C" fn dxf_build(shape: f64, n: f64, inch: f64, r12: f64, marks: f64, lower_left: f64, explode: f64) -> f64 {
     let p = buf(n).to_vec();
     match c::cad::build(shape as u32, &p, marks != 0.0) {
         Ok(mut d) => {
@@ -327,7 +329,8 @@ fn set_text(s: String) -> f64 { let n = s.len(); unsafe { *core::ptr::addr_of_mu
             set_out(d.flatten());
             let u = if inch != 0.0 { c::dxf::Units::Inch } else { c::dxf::Units::Mm };
             let v = if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 };
-            set_text(c::dxf::write_dxf(&d, u, v))
+            let doc = c::dxf::Doc::from_drawing(&d);
+            set_text(c::dxf::write_doc(&if explode != 0.0 { doc.exploded() } else { doc }, u, v))
         }
         Err(e) => { set_out(vec![]); -set_text(e) }
     } }
@@ -336,6 +339,102 @@ f1!(polygon_dims, c::cad::polygon_dims, n, size, corners, which);
 f1!(insert_edge_length, c::insert_edge_length, d, a1, a2);
 f1!(insert_edge_length_shape, c::insert_edge_length_f, d, letter_code);
 f1!(insert_size_code, c::insert_size_code, edge_len);
+// Insert outline to scale (core/src/insert.rs)
+fn insert_letter(code: f64) -> char { char::from_u32(code as u32).unwrap_or('?') }
+/// Outline of an insert as a closed polyline. Returns the number of vertices
+/// and puts (x, y, bulge, arc radius) per vertex in `list_out`; on bad input
+/// returns minus the length of a message held at `text_ptr`.
+#[no_mangle] pub extern "C" fn insert_outline(letter_code: f64, d: f64, r: f64) -> f64 {
+    match c::insert::outline(insert_letter(letter_code), d, r) {
+        Ok(v) => {
+            let n = v.len();
+            let mut out = Vec::with_capacity(4 * n);
+            for i in 0..n {
+                let (p, q) = (v[i], v[(i + 1) % n]);
+                let rad = if p.2 != 0.0 { c::dxf::bulge_arc((p.0, p.1), (q.0, q.1), p.2).1 } else { 0.0 };
+                out.extend([p.0, p.1, p.2, rad]);
+            }
+            set_out(out);
+            n as f64
+        }
+        Err(e) => { set_out(vec![]); -set_text(e) }
+    } }
+/// One dimension of the insert outline (see `insert::dim` for `which`).
+#[no_mangle] pub extern "C" fn insert_dim(letter_code: f64, d: f64, r: f64, which: f64) -> f64 { c::insert::dim(insert_letter(letter_code), d, r, which as u32) }
+f1!(insert_base_ic, c::insert::base_ic, d, s, clearance_deg);
+/// The insert outline and its inscribed circle as a DXF file in millimetres
+/// (text at `text_ptr`); minus the length of a message on bad input.
+#[no_mangle] pub extern "C" fn insert_dxf(letter_code: f64, d: f64, r: f64, r12: f64) -> f64 {
+    match c::insert::doc(insert_letter(letter_code), d, r) {
+        Ok(doc) => set_text(c::dxf::write_doc(&doc, c::dxf::Units::Mm, if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 })),
+        Err(e) => -set_text(e),
+    } }
+// Text engraving (core/src/engrave.rs, gcode::gen_engrave). JS writes the font
+// file, then the text, where `gsim_in` says; the font and the laid-out
+// strokes are kept here between calls.
+static mut ENG_FONT: Option<c::engrave::Font> = None;
+static mut ENG_LAID: Option<c::engrave::Laid> = None;
+fn eng_in(len: f64) -> String {
+    // SAFETY: single-threaded wasm; GSIM_IN is written by JS before this call.
+    unsafe { let src = &*core::ptr::addr_of!(GSIM_IN); let n = (len.max(0.0) as usize).min(src.len()); String::from_utf8_lossy(&src[..n]).into_owned() }
+}
+fn eng_laid() -> Option<&'static c::engrave::Laid> { unsafe { (*core::ptr::addr_of!(ENG_LAID)).as_ref() } }
+/// Read the SVG font in the first `len` input bytes. Returns the number of
+/// letters, or minus the length of a message at `text_ptr`.
+#[no_mangle] pub extern "C" fn engrave_font(len: f64) -> f64 {
+    match c::engrave::Font::parse_svg(&eng_in(len)) {
+        Ok(f) => { let n = f.glyphs.len() as f64; unsafe { *core::ptr::addr_of_mut!(ENG_FONT) = Some(f); *core::ptr::addr_of_mut!(ENG_LAID) = None; } n }
+        Err(e) => { unsafe { *core::ptr::addr_of_mut!(ENG_FONT) = None; *core::ptr::addr_of_mut!(ENG_LAID) = None; } -set_text(e) }
+    } }
+/// Lay out the text in the first `len` input bytes with the font read last
+/// (see `engrave::Opts`). Returns the number of strokes and puts them in
+/// `list_out` (per stroke: point count, then x, y pairs); on bad input
+/// returns minus the length of a message at `text_ptr`.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn engrave_layout(len: f64, cap_h: f64, spacing: f64, line: f64, stretch: f64, align: f64, mode: f64, x: f64, y: f64, angle: f64, radius: f64, mirror: f64) -> f64 {
+    let text = eng_in(len);
+    let font = unsafe { (*core::ptr::addr_of!(ENG_FONT)).as_ref() };
+    let r = match font {
+        None => Err("No font is loaded.".to_string()),
+        Some(f) => c::engrave::layout(f, &text, &c::engrave::Opts { cap_h, spacing, line, stretch, align: align.clamp(0.0, 2.0) as u8, mode: mode.clamp(0.0, 9.0) as u8, x, y, angle, radius, mirror: mirror != 0.0 }),
+    };
+    match r {
+        Ok(l) => { let n = l.strokes.len() as f64; set_out(c::engrave::flat(&l)); unsafe { *core::ptr::addr_of_mut!(ENG_LAID) = Some(l); } n }
+        Err(e) => { set_out(vec![]); unsafe { *core::ptr::addr_of_mut!(ENG_LAID) = None; } -set_text(e) }
+    } }
+/// About the last layout: `which` as `engrave::info`.
+#[no_mangle] pub extern "C" fn engrave_info(which: f64) -> f64 { eng_laid().map(|l| c::engrave::info(l, which as u32)).unwrap_or(f64::NAN) }
+/// The characters the font has no letter for, as text at `text_ptr`; returns the length.
+#[no_mangle] pub extern "C" fn engrave_missing() -> f64 { set_text(eng_laid().map(|l| l.missing.iter().collect::<String>()).unwrap_or_default()) }
+/// Engraving program for the last layout; the text in the first `len` input
+/// bytes goes in the header. Read it with the `cyc_*` calls. Returns 1 if a
+/// program was made, 0 on error.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn engrave_program(len: f64, metric: f64, ctrl: f64, prog: f64, tool: f64, wcs: f64, rpm: f64, feed: f64, plunge: f64, z_safe: f64, depth: f64, coolant: f64) -> f64 {
+    let u = |v: f64| if v.is_finite() && v > 0.0 { v.round() as u32 } else { 0 };
+    let p = c::gcode::gen_engrave(&c::gcode::EngraveJob { metric: metric != 0.0, ctrl: c::gcode::Ctrl::from_f(ctrl), prog: u(prog), tool: u(tool).max(1), wcs: u(wcs).clamp(54, 59),
+        rpm, feed, plunge, z_safe, depth, coolant: coolant != 0.0, text: eng_in(len), strokes: eng_laid().map(|l| l.strokes.clone()).unwrap_or_default() });
+    let ok = p.error.is_none();
+    unsafe { *core::ptr::addr_of_mut!(PROG) = Some(p); }
+    if ok { 1.0 } else { 0.0 } }
+/// The last layout as a DXF file (text at `text_ptr`); returns the length, 0 when there is no layout.
+#[no_mangle] pub extern "C" fn engrave_dxf(metric: f64, r12: f64) -> f64 {
+    match eng_laid() {
+        Some(l) => set_text(c::dxf::write_doc(&c::engrave::doc(l), if metric != 0.0 { c::dxf::Units::Mm } else { c::dxf::Units::Inch }, if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 })),
+        None => set_text(String::new()),
+    } }
+// Rotary axis helper (core/src/rotary.rs)
+f1!(rot_part_point, c::rotary::part_point_f, axis, deg, x, y, z, cx, cy, cz, part_right_hand, which);
+f1!(rot_arc_length, c::rotary::arc_length, radius, deg);
+f1!(rot_angle_for_length, c::rotary::angle_for_length, radius, length);
+f1!(rot_deg_per_min, c::rotary::deg_per_min, surface_feed, radius);
+f1!(rot_surface_feed, c::rotary::surface_feed, deg_per_min, radius);
+f1!(rot_move_length, c::rotary::move_length, radius, deg, linear);
+f1!(rot_move_time_s, c::rotary::move_time_s, surface_feed, length);
+f1!(rot_inverse_time_f, c::rotary::inverse_time_f, surface_feed, length);
+f1!(rot_rotary_rate, c::rotary::rotary_rate, surface_feed, length, deg);
+f1!(engrave_v_width, c::engrave::v_width, depth, angle_deg, flat);
+f1!(engrave_v_depth, c::engrave::v_depth, width, angle_deg, flat);
 f1!(knurl_blank_dia_cp, c::knurl_blank_dia_cp, p, n);
 f1!(knurl_blank_dia_dp, c::knurl_blank_dia_dp, dp, n);
 f1!(knurl_teeth_cp, c::knurl_teeth_cp, d, p);
@@ -609,6 +708,11 @@ pub extern "C" fn gear_measure(mn: f64, z: f64, an: f64, beta: f64, xn: f64, dp:
 /// One tooth outline (x, y pairs) into list_out; returns the value count.
 #[no_mangle] pub extern "C" fn gear_tooth(d: f64, db: f64, da: f64, df: f64, s: f64, n: f64) -> f64 {
     set_out(c::gears::tooth_outline(d, db, da, df, s, n.max(0.0) as usize)) }
+/// One tooth space with its measuring pin into list_out (see `gears::space_view_flat`:
+/// pin centre diameter, contact diameter, contact x, y, flags, point count, points); returns the value count.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gear_space_view(internal: f64, z: f64, d: f64, alpha: f64, t: f64, d_tip: f64, d_root: f64, dp: f64, n: f64) -> f64 {
+    set_out(c::gears::space_view_flat(internal != 0.0, z, d, alpha, t, d_tip, d_root, dp, n.max(0.0) as usize)) }
 /// Gear train ratio from the first `n` buffer values (driver, driven, driver, driven, ...).
 #[no_mangle] pub extern "C" fn gear_train_ratio(n: f64) -> f64 { c::gears::train_ratio(buf(n)) }
 f1!(gear_willis, c::gears::willis, zs, zr, ns, nr, nc);
@@ -667,6 +771,166 @@ pub extern "C" fn gsim_run(len: f64, lathe: f64, ctrl: f64, metric_out: f64, def
 #[no_mangle] pub extern "C" fn gsim_stat(i: f64) -> f64 { unsafe { (&*core::ptr::addr_of!(GSIM_STATS)).get(i as usize).copied().unwrap_or(f64::NAN) } }
 /// Messages ("line TAB level TAB text" per line) into the text buffer; returns the length (text at `text_ptr`).
 #[no_mangle] pub extern "C" fn gsim_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GSIM_MSGS)).clone() }) }
+
+// G-code tidy tools (core/src/gtidy.rs). The program text is written at
+// `gsim_in(len)` as for the backplot. Each call keeps its result text and its
+// messages; read them with `gtidy_text` and `gtidy_msgs` (each returns a
+// length, the text is at `text_ptr`).
+static mut GT_TEXT: String = String::new();
+static mut GT_MSGS: String = String::new();
+fn gt_src(len: f64) -> String {
+    // SAFETY: single-threaded wasm; GSIM_IN is only written by gsim_in.
+    unsafe {
+        let src = &*core::ptr::addr_of!(GSIM_IN);
+        let n = (len.max(0.0) as usize).min(src.len());
+        String::from_utf8_lossy(&src[..n]).into_owned()
+    }
+}
+fn gt_store(text: String, msgs: String) {
+    // SAFETY: single-threaded wasm; the statics are only touched here and by the two readers.
+    unsafe { *core::ptr::addr_of_mut!(GT_TEXT) = text; *core::ptr::addr_of_mut!(GT_MSGS) = msgs; }
+}
+/// Renumber, strip and re-space (see `gtidy::TidyOpts`). numbers: 0 leave, 1
+/// renumber from `start` by `step` (`all` 1: every block), 2 remove; comments
+/// and blank 1 = remove; spacing 0 leave, 1 one space, 2 none; upper 1 =
+/// upper case; lathe 1 = G70 to G73 P and Q are block numbers. Returns the
+/// number of lines changed.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn gtidy_run(len: f64, numbers: f64, start: f64, step: f64, all: f64, comments: f64, blank: f64, spacing: f64, upper: f64, lathe: f64) -> f64 {
+    let o = c::gtidy::TidyOpts { numbers: numbers.clamp(0.0, 2.0) as u8, start: start.clamp(0.0, 99_999_999.0) as u32, step: step.clamp(1.0, 1_000_000.0) as u32,
+        all: all != 0.0, comments: comments != 0.0, blank: blank != 0.0, spacing: spacing.clamp(0.0, 2.0) as u8, upper: upper != 0.0, lathe: lathe != 0.0 };
+    let r = c::gtidy::tidy(&gt_src(len), &o);
+    gt_store(r.text, c::gtidy::msgs_text(&r.msgs));
+    r.changed as f64
+}
+/// Convert the program between inch and mm (see `gtidy::convert_units`).
+/// Returns the number of lines changed.
+#[no_mangle] pub extern "C" fn gconv_run(len: f64, to_metric: f64, lathe: f64, int_mode: f64) -> f64 {
+    let r = c::gtidy::convert_units(&gt_src(len), to_metric != 0.0, lathe != 0.0, if int_mode == 1.0 { 1 } else { 0 });
+    gt_store(r.text, c::gtidy::msgs_text(&r.msgs));
+    r.changed as f64
+}
+/// Lathe (1), mill (0) or cannot tell (-1); the reasons are read with `gtidy_msgs`.
+#[no_mangle] pub extern "C" fn gdetect(len: f64) -> f64 {
+    let (k, why) = c::gtidy::detect_machine(&gt_src(len));
+    gt_store(String::new(), why);
+    k as f64
+}
+#[no_mangle] pub extern "C" fn gtidy_text() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GT_TEXT)).clone() }) }
+#[no_mangle] pub extern "C" fn gtidy_msgs() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(GT_MSGS)).clone() }) }
+
+// 2D sketcher (core/src/sketch.rs). One sketch lives here; text goes in
+// through `gsim_in` and comes out through `text_ptr`.
+use c::dxf::Geo as SkGeo;
+static mut SK: Option<c::sketch::Sketch> = None;
+static mut SK_MSG: String = String::new();
+static mut SK_SEL: Vec<usize> = Vec::new();
+static mut SK_PT: (f64, f64) = (0.0, 0.0);
+fn sk() -> &'static mut c::sketch::Sketch {
+    // SAFETY: single-threaded wasm; the sketch is only reached through these wrappers.
+    unsafe { (*core::ptr::addr_of_mut!(SK)).get_or_insert_with(|| c::sketch::Sketch::new(false)) }
+}
+fn sk_say(m: String) { unsafe { *core::ptr::addr_of_mut!(SK_MSG) = m; } }
+fn sk_res(r: Result<usize, String>) -> f64 { match r { Ok(i) => { sk_say(String::new()); i as f64 } Err(e) => { sk_say(e); -1.0 } } }
+fn sk_li(layer: f64) -> usize { if layer >= 0.0 { layer as usize } else { 0 } }
+/// Start a new empty sketch in inch (1) or mm (0); the undo history is dropped.
+#[no_mangle] pub extern "C" fn sk_new(inch: f64) -> f64 { unsafe { *core::ptr::addr_of_mut!(SK) = Some(c::sketch::Sketch::new(inch != 0.0)); } 0.0 }
+/// Load a sketch from its text form (see `Sketch::to_text`); returns the entity count.
+#[no_mangle] pub extern "C" fn sk_load(len: f64) -> f64 {
+    let s = c::sketch::Sketch::from_text(&gt_src(len));
+    let n = s.doc.items.len();
+    unsafe { *core::ptr::addr_of_mut!(SK) = Some(s); }
+    n as f64
+}
+#[no_mangle] pub extern "C" fn sk_text() -> f64 { set_text(sk().to_text()) }
+/// What to draw (see `Sketch::display`).
+#[no_mangle] pub extern "C" fn sk_draw() -> f64 { set_text(sk().display()) }
+#[no_mangle] pub extern "C" fn sk_count() -> f64 { sk().doc.items.len() as f64 }
+#[no_mangle] pub extern "C" fn sk_inch() -> f64 { if sk().inch { 1.0 } else { 0.0 } }
+/// The last error or report (lines separated by new lines).
+#[no_mangle] pub extern "C" fn sk_msg() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(SK_MSG)).clone() }) }
+#[no_mangle] pub extern "C" fn sk_set_units(inch: f64, convert: f64) -> f64 { if sk().set_units(inch != 0.0, convert != 0.0) { 1.0 } else { 0.0 } }
+/// Replace the sketch with a DXF file; returns the entity count or -1 (reason in `sk_msg`).
+#[no_mangle] pub extern "C" fn sk_import(len: f64, default_inch: f64) -> f64 {
+    match sk().import_dxf(&gt_src(len), default_inch != 0.0) {
+        Ok(rep) => { sk_say(rep.join("\n")); sk().doc.items.len() as f64 }
+        Err(e) => { sk_say(e); -1.0 }
+    }
+}
+/// The sketch as a DXF file: r12 1 = R12, 0 = R2000; explode 1 = polylines as separate lines and arcs.
+#[no_mangle] pub extern "C" fn sk_export(r12: f64, explode: f64) -> f64 { set_text(sk().export_dxf(r12 != 0.0, explode != 0.0)) }
+#[no_mangle] pub extern "C" fn sk_point(layer: f64, x: f64, y: f64) -> f64 { sk_res(sk().add(sk_li(layer), SkGeo::Point { p: (x, y) })) }
+#[no_mangle] pub extern "C" fn sk_line(layer: f64, x1: f64, y1: f64, x2: f64, y2: f64) -> f64 { sk_res(sk().add(sk_li(layer), SkGeo::Line { a: (x1, y1), b: (x2, y2) })) }
+#[no_mangle] pub extern "C" fn sk_circle(layer: f64, cx: f64, cy: f64, r: f64) -> f64 { sk_res(sk().add(sk_li(layer), SkGeo::Circle { c: (cx, cy), r })) }
+/// A circle from its centre and diameter.
+#[no_mangle] pub extern "C" fn sk_circle_dia(layer: f64, cx: f64, cy: f64, d: f64) -> f64 { sk_res(sk().add(sk_li(layer), SkGeo::Circle { c: (cx, cy), r: d / 2.0 })) }
+#[no_mangle] pub extern "C" fn sk_arc3(layer: f64, x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64) -> f64 {
+    sk_res(c::sketch::arc3((x1, y1), (x2, y2), (x3, y3)).and_then(|g| sk().add(sk_li(layer), g)))
+}
+/// The arc through three points without adding it: which 0 centre x, 1 centre y, 2 radius, 3 start angle, 4 end angle (NaN if there is none).
+#[no_mangle] pub extern "C" fn sk_arc3_at(x1: f64, y1: f64, x2: f64, y2: f64, x3: f64, y3: f64, which: f64) -> f64 {
+    match c::sketch::arc3((x1, y1), (x2, y2), (x3, y3)) {
+        Ok(SkGeo::Arc { c, r, start, end }) => pick([c.0, c.1, r, start, end], which),
+        _ => f64::NAN,
+    }
+}
+#[no_mangle] pub extern "C" fn sk_rect(layer: f64, x1: f64, y1: f64, x2: f64, y2: f64) -> f64 {
+    sk_res(c::sketch::rect((x1, y1), (x2, y2)).and_then(|g| sk().add(sk_li(layer), g)))
+}
+/// Add a single line of text (the text is read from the input buffer).
+#[no_mangle] pub extern "C" fn sk_text_add(len: f64, layer: f64, x: f64, y: f64, h: f64, rot: f64) -> f64 {
+    sk_res(sk().add(sk_li(layer), SkGeo::Text { p: (x, y), h, rot, text: gt_src(len).trim().to_string() }))
+}
+/// Index of the layer named in the input buffer, added with this colour if new.
+#[no_mangle] pub extern "C" fn sk_layer(len: f64, colour: f64) -> f64 { sk().layer_named(&gt_src(len), colour as i32) as f64 }
+#[no_mangle] pub extern "C" fn sk_layer_colour(i: f64, colour: f64) -> f64 { if i >= 0.0 && sk().set_layer_colour(i as usize, colour as i32) { 1.0 } else { 0.0 } }
+// The selection the next delete or move works on.
+#[no_mangle] pub extern "C" fn sk_sel_clear() -> f64 { unsafe { (&mut *core::ptr::addr_of_mut!(SK_SEL)).clear(); } 0.0 }
+#[no_mangle] pub extern "C" fn sk_sel_add(i: f64) -> f64 { if i >= 0.0 { unsafe { (&mut *core::ptr::addr_of_mut!(SK_SEL)).push(i as usize); } } 0.0 }
+#[no_mangle] pub extern "C" fn sk_delete_sel() -> f64 { let n = sk().delete(unsafe { &*core::ptr::addr_of!(SK_SEL) }); sk_sel_clear(); n as f64 }
+/// Move (copy 0) or copy (copy 1) the selection by dx, dy. The selection becomes the moved or new entities; returns how many.
+#[no_mangle] pub extern "C" fn sk_move_sel(dx: f64, dy: f64, copy: f64) -> f64 {
+    let out = sk().move_by(unsafe { &*core::ptr::addr_of!(SK_SEL) }, dx, dy, copy != 0.0);
+    let n = out.len();
+    if n > 0 { unsafe { *core::ptr::addr_of_mut!(SK_SEL) = out; } }
+    n as f64
+}
+#[no_mangle] pub extern "C" fn sk_sel_len() -> f64 { unsafe { (&*core::ptr::addr_of!(SK_SEL)).len() as f64 } }
+#[no_mangle] pub extern "C" fn sk_sel_at(i: f64) -> f64 { unsafe { (&*core::ptr::addr_of!(SK_SEL)).get(i.max(0.0) as usize).map(|x| *x as f64).unwrap_or(-1.0) } }
+#[no_mangle] pub extern "C" fn sk_clear() -> f64 { if sk().clear() { 1.0 } else { 0.0 } }
+#[no_mangle] pub extern "C" fn sk_undo() -> f64 { sk_sel_clear(); if sk().undo() { 1.0 } else { 0.0 } }
+#[no_mangle] pub extern "C" fn sk_redo() -> f64 { sk_sel_clear(); if sk().redo() { 1.0 } else { 0.0 } }
+#[no_mangle] pub extern "C" fn sk_can_undo() -> f64 { if sk().can_undo() { 1.0 } else { 0.0 } }
+#[no_mangle] pub extern "C" fn sk_can_redo() -> f64 { if sk().can_redo() { 1.0 } else { 0.0 } }
+/// Object snap (see `Sketch::snap`): returns the kind found (0 none); the point is read with `sk_sx` and `sk_sy`.
+/// With `has_from` 1 the tangent and square snaps work from the point (fx, fy), the last one placed.
+#[no_mangle] pub extern "C" fn sk_snap(x: f64, y: f64, tol: f64, modes: f64, grid: f64, has_from: f64, fx: f64, fy: f64) -> f64 {
+    let (p, k) = sk().snap_from((x, y), tol, modes.max(0.0) as u32, grid, if has_from != 0.0 { Some((fx, fy)) } else { None });
+    unsafe { *core::ptr::addr_of_mut!(SK_PT) = p; }
+    k as f64
+}
+#[no_mangle] pub extern "C" fn sk_sx() -> f64 { unsafe { (*core::ptr::addr_of!(SK_PT)).0 } }
+#[no_mangle] pub extern "C" fn sk_sy() -> f64 { unsafe { (*core::ptr::addr_of!(SK_PT)).1 } }
+/// Index of the entity nearest to the point within tol, or -1.
+#[no_mangle] pub extern "C" fn sk_pick(x: f64, y: f64, tol: f64) -> f64 { sk().pick((x, y), tol).map(|i| i as f64).unwrap_or(-1.0) }
+/// From point 1 to point 2: which 0 distance, 1 along X, 2 along Y, 3 direction in degrees.
+#[no_mangle] pub extern "C" fn sk_measure(x1: f64, y1: f64, x2: f64, y2: f64, which: f64) -> f64 { let m = c::sketch::measure((x1, y1), (x2, y2)); pick([m.0, m.1, m.2, m.3], which) }
+/// The point at a length and direction from a point: which 0 x, 1 y.
+#[no_mangle] pub extern "C" fn sk_polar(x: f64, y: f64, len: f64, deg: f64, which: f64) -> f64 { let p = c::sketch::polar((x, y), len, deg); pick([p.0, p.1], which) }
+/// A point moved onto the horizontal or vertical through another: which 0 x, 1 y.
+#[no_mangle] pub extern "C" fn sk_ortho(x0: f64, y0: f64, x: f64, y: f64, which: f64) -> f64 { let p = c::sketch::ortho((x0, y0), (x, y)); pick([p.0, p.1], which) }
+/// Rows of `label, value, kind` for one entity (tab separated, one per line).
+#[no_mangle] pub extern "C" fn sk_info(i: f64) -> f64 {
+    if i < 0.0 { return set_text(String::new()); }
+    set_text(sk().info(i as usize).iter().map(|r| format!("{}\t{}\t{}", r.0.replace(['\t', '\n'], " "), r.1, r.2)).collect::<Vec<_>>().join("\n"))
+}
+/// Rows for a pair of entities (see `Sketch::between`).
+#[no_mangle] pub extern "C" fn sk_between(i: f64, j: f64) -> f64 {
+    if i < 0.0 || j < 0.0 { return set_text(String::new()); }
+    set_text(sk().between(i as usize, j as usize).iter().map(|r| format!("{}\t{}\t{}", r.0, r.1, r.2)).collect::<Vec<_>>().join("\n"))
+}
+/// Extents of the sketch: which 0 x min, 1 y min, 2 x max, 3 y max (NaN when empty).
+#[no_mangle] pub extern "C" fn sk_ext(which: f64) -> f64 { match sk().doc.extents() { Some(e) => pick([e.0, e.1, e.2, e.3], which), None => f64::NAN } }
 
 // Mechanics (core/src/mechanics.rs): unit-consistent unless named.
 use c::mechanics as mech;

@@ -10,6 +10,10 @@ For each file: strict read with ezdxf.readfile (not the recover loader),
 then doc.audit(); prints the DXF version, $INSUNITS, entity counts per layer
 and every audit error or fix. Exits non-zero if any file fails to load or
 has audit errors.
+
+A file whose name ends in -la has its outlines written as separate lines and
+arcs. It is compared piece by piece with what ezdxf itself makes of the
+polyline in the file of the same name without -la (virtual_entities()).
 """
 import math
 import os
@@ -56,6 +60,51 @@ EXPECTED_AREA = {
 }
 
 
+def pieces(entities):
+    """LINE and ARC entities as comparable tuples (arcs counter-clockwise, angles 0 to 360)."""
+    out = []
+    for e in entities:
+        if e.dxftype() == "LINE":
+            out.append(("L", e.dxf.start.x, e.dxf.start.y, e.dxf.end.x, e.dxf.end.y))
+        elif e.dxftype() == "ARC":
+            out.append(("A", e.dxf.center.x, e.dxf.center.y, e.dxf.radius, e.dxf.start_angle % 360, e.dxf.end_angle % 360))
+    return out
+
+
+def same_pieces(a, b, tol=1e-6):
+    if len(a) != len(b):
+        return False
+    for x, y in zip(a, b):
+        if x[0] != y[0]:
+            return False
+        for i, (u, v) in enumerate(zip(x[1:], y[1:])):
+            d = abs(u - v)
+            if x[0] == "A" and i >= 3:
+                d = min(d, 360 - d)
+            if d > tol:
+                return False
+    return True
+
+
+def check_taken_apart(path, msp):
+    """The -la file against ezdxf's own explosion of the polylines in its sibling."""
+    sib = path.replace("-la.dxf", ".dxf")
+    if not os.path.exists(sib):
+        print("  no sibling file to compare with")
+        return True
+    ours = pieces(msp)
+    theirs = []
+    for e in ezdxf.readfile(sib).modelspace():
+        if e.dxftype() in ("LWPOLYLINE", "POLYLINE"):
+            theirs += pieces(e.virtual_entities())
+        else:
+            theirs += pieces([e])
+    good = same_pieces(ours, theirs)
+    polys = sum(1 for e in msp if e.dxftype() in ("LWPOLYLINE", "POLYLINE"))
+    print(f"  lines and arcs: {len(ours)} pieces, ezdxf makes {len(theirs)} of the polyline file, {'same' if good else 'MISMATCH'}; polylines left: {polys}")
+    return good and polys == 0
+
+
 def check(path):
     doc = ezdxf.readfile(path)
     auditor = doc.audit()
@@ -69,8 +118,11 @@ def check(path):
     for f in auditor.fixes:
         print("  fix:", f.message)
     name = os.path.basename(path).split("-")[0]
+    if path.endswith("-la.dxf"):
+        if not check_taken_apart(path, msp):
+            return False
     outl = [e for e in msp if e.dxf.layer == "OUTLINE" and e.dxftype() in ("LWPOLYLINE", "POLYLINE")]
-    if name in EXPECTED_AREA and "-in" not in path:
+    if name in EXPECTED_AREA and "-in" not in path and outl:
         a = outline_area(outl[0])
         exp = EXPECTED_AREA[name]
         good = abs(a - exp) / exp < 1e-9
@@ -80,9 +132,11 @@ def check(path):
     # Geometry sanity: closed polylines have at least two vertices, circles positive radius.
     for e in msp:
         if e.dxftype() == "LWPOLYLINE":
-            assert e.closed and len(e) >= 2, path
+            assert len(e) >= 2 and (e.closed or name.startswith("sketch")), path
         if e.dxftype() == "POLYLINE":
-            assert e.is_closed and len(e.vertices) >= 2, path
+            assert len(e.vertices) >= 2 and (e.is_closed or name.startswith("sketch")), path
+        if e.dxftype() == "TEXT":
+            assert e.dxf.height > 0 and e.dxf.text.strip(), path
         if e.dxftype() in ("CIRCLE", "ARC"):
             assert e.dxf.radius > 0, path
     return len(auditor.errors) == 0

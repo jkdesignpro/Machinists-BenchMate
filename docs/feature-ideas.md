@@ -38,8 +38,8 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 3 | Wear offset adjustment (`offsetadj`) | 0 (0.2.0) | built |
 | 4 | Worked example panel: a published example beside BenchMate's answer | 0 (0.2.0) | built; five tools have an example, more to add |
 | 5 | Print a page and copy a link with the numbers | 0 (0.2.0) | built |
-| 6 | G-code tidy tools (renumber, strip, convert) | 2 (0.4.0) | to do |
-| 7 | Text engraving with the Hershey fonts | 2 (0.4.0) | to do |
+| 6 | G-code tidy tools (renumber, strip, convert) | 2 (0.4.0) | built, in the G-code editor and simulator (`gsim`) |
+| 7 | Text engraving with the Hershey fonts (`engrave`) | 2 (0.4.0) | built |
 | 8 | Collet and pull stud torque | 3 (0.5.0) | to do |
 | 9 | Slender part deflection (`slender`) | 1 (0.3.0) | built |
 | 10 | High-feed chip thinning (`leadthin`) | 1 (0.3.0) | built |
@@ -47,7 +47,7 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 12 | Tap torque (`taptorque`) | 1 (0.3.0) | built |
 | 13 | Gauge R&R | 3 (0.5.0) | to do |
 | 14 | Thread gauge limits | 3 (0.5.0) | to do |
-| 15 | Rotary axis helper | 2 (0.4.0) | to do |
+| 15 | Rotary axis helper (`rotpoint`, `rotfeed`) | 2 (0.4.0) | built |
 | 16 | Job time and quote | 5 (0.9.0) | to do |
 | 17 | Vendor data import and cut log | 5 (0.9.0) | to do |
 | 18 | Wire EDM | 3 (0.5.0) | to do |
@@ -79,7 +79,7 @@ State of the tier list above, with the stage for what is still to build.
 | 12 Coolant with refractometer | built | | |
 | 13 Fraction, decimal and metric quick calculator | built | | |
 | 14 Troubleshooting guide | built (turning and milling troubles in the CNC guide) | Drilling, tapping and grinding symptoms | 3 (0.5.0) |
-| 15 G-code snippets per control profile | part (cycle generators) | Snippets from any calculator, per control | 2 (0.4.0) |
+| 15 G-code snippets per control profile | built (0.4.0): the cycle blocks only on every generator page, and a G-code box on the bolt circle, hole grid, drill point, spot drill depth, tap drill, spindle speed, milling feed and lathe feed pages, for Generic ISO / Fanuc-style and Haas (`docs/snippets.md`) | Other controls, once their manuals can be read | |
 | 16 Profile export and import by file | part (tool library, setup sheet, machines) | One file for everything | 5 (0.9.0) |
 | 17 Link with Alkart Mega Wizard | not planned | No links | |
 | 18 Phone or tablet build | not planned for now | | |

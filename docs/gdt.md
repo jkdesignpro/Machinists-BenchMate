@@ -451,5 +451,21 @@ resultant condition with LMC; ISO 8015:2011 preview pages on iso.org OBP
 - **Composite profile** is explained in the guide only; there is no
   checker. Its lower row is a best fit with translation free and rotation
   held by the repeated datums, which a CMM does better than a calculator.
+- **Frame read-out (0.4.0).** The builder reads the built frame out in plain
+  words: the frame said aloud, the demand in one sentence with the zone
+  sketch, the datum set-up order, each box in turn, worked sizes, and the
+  checking and common-mistake notes of that characteristic from the guide.
+  It adds no new rules: every sentence is a rewording of a statement already
+  in the check list above (zone shapes, modifiers, datum order, datum
+  feature shift, functional gauge at the virtual condition). The worked
+  sizes (MMC and LMC size, bonus, tolerance allowed, virtual condition) are
+  calls to `core/src/gdt.rs`; the JavaScript only words them. The read-out
+  shows the two limit sizes only, so no size is computed in the UI. The
+  smoke test checks a hole 10.0 to 10.2 with diameter 0.25 at MMC (0.25 at
+  10.00, 0.45 at 10.20, virtual condition 9.75), the same limits as a pin
+  (virtual condition 10.45) and at LMC. The zone sketch is the equal case;
+  with the U modifier a note says so. An invalid frame is still read box by
+  box, under a warning, because seeing what each box would say helps find
+  the mistake.
 - **ASME is the default** in the builder (US shop drawings); switching to
   ISO 1101:2017 allows concentricity and symmetry.

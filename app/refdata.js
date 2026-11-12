@@ -173,6 +173,8 @@ async function renderTapDrill(el) {
     out.innerHTML = '<div class="res"><div class="h">Results' + (sel ? ' for ' + rEsc(sel.label) + ' ' + badge(sel.status) : ' for ' + fLen(d) + ' ' + uLen() + ', ' + pitchTxt) + '</div><table>' + rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') + '</table></div>' +
       order.map(nearTable).join('') +
       (form && typeof formTapCompare === 'function' ? formTapCompare(R, d, p, pct) : '');
+    // G-code: a tapping cycle with this pitch (snippets.js). The speed is left for the user to type.
+    if (typeof snipBox === 'function') { const sb = document.createElement('div'); out.appendChild(sb); snipBox(sb, { id: 'tapdrill', kind: 'holes', title: 'G-code: a tapping cycle for this thread', from: 'the tap drill page', init: { cycle: 84 }, set: { pitch: inMode() ? +(IN_MM / p).toPrecision(6) : +p.toPrecision(7) } }); }
   }
   const pick = $('#tpick', el);
   if (pick) pick.onchange = () => {
@@ -239,7 +241,7 @@ async function renderSpotDepth(el) {
     const out = $('#sres', el), dia = $('#sdia', el), note = $('#snote', el), rows = [];
     const dcU = num('sdc'), zU = num('sz'), dhU = num('sdh'), dpL = inMode() ? 4 : 3;
     const len = mm => fBoth(mm);
-    let svg = '';
+    let svg = '', zCut = NaN;   // zCut: the depth from the tip, mm, for the G-code box
     if (m.mode !== 3) {
       const ang = num('sang'), dc = fromUser(dcU), z = fromUser(zU), dh = fromUser(dhU);
       if (!(ang > 0 && ang < 180)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter an included angle between 0 and 180°.</td></tr></table></div>'; dia.innerHTML = ''; return; }
@@ -247,18 +249,20 @@ async function renderSpotDepth(el) {
         const dp = fromUser(num('sdp')), lp = fromUser(num('slp'));
         if (!(dp > 0 && lp >= 0)) rows.push(['Centre drill', 'Enter the pilot diameter and the length from the tip to the countersink']);
         else {
-          if (dc > 0) { const zz = W.centre_drill_depth(dc, dp, lp, ang); rows.push(['<b>Depth from the tip</b>', isFinite(zz) ? '<b>' + len(zz) + '</b>' : 'Countersink smaller than the pilot']); }
+          if (dc > 0) { const zz = W.centre_drill_depth(dc, dp, lp, ang); zCut = zz; rows.push(['<b>Depth from the tip</b>', isFinite(zz) ? '<b>' + len(zz) + '</b>' : 'Countersink smaller than the pilot']); }
           if (z > 0) { const d = W.centre_drill_dia(z, dp, lp, ang); rows.push(['Countersink diameter at that depth', isFinite(d) ? len(d) : 'Depth does not reach the countersink']); }
           svg = mtSpotSvg(2, dc, ang, dp, lp);
         }
       } else {
-        if (dc > 0) rows.push(['<b>Depth from the tip</b>', '<b>' + len(W.spot_depth(dc, ang)) + '</b>']);
+        if (dc > 0) { zCut = W.spot_depth(dc, ang); rows.push(['<b>Depth from the tip</b>', '<b>' + len(zCut) + '</b>']); }
         if (z > 0) rows.push(['Chamfer diameter at that depth', len(W.spot_chamfer_dia(z, ang))]);
         svg = mtSpotSvg(1, dc, ang);
       }
       if (dh > 0 && dc > dh) rows.push(['Chamfer width on the hole (each side)', len((dc - dh) / 2)]);
       out.innerHTML = '<div class="res"><div class="h">Results</div><table>' + (rows.length ? rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') : '<tr><td class="ms">Enter a countersink diameter or a depth.</td></tr>') + '</table></div>';
       dia.innerHTML = svg;
+      // G-code: a spot drilling cycle to that depth (snippets.js).
+      if (zCut > 0 && typeof snipBox === 'function') { const sb = document.createElement('div'); out.appendChild(sb); snipBox(sb, { id: 'spotdepth', kind: 'holes', title: 'G-code: a spot drilling cycle to this depth', from: 'the spot drill depth page', init: { cycle: 82 }, set: { z: -(+toUser(zCut).toFixed(inMode() ? 4 : 3)) } }); }
       note.innerHTML = '<b>Working:</b> pointed tool: depth from the tip z = (Dc / 2) / tan(angle / 2); diameter at depth z: Dc = 2 z tan(angle / 2). Centre drill: z = l + (Dc - d) / (2 tan(angle / 2)), with d the pilot diameter and l the length from the tip to where the countersink cone starts (it includes the pilot\'s own point). Program the Z depth to the tool tip; a tip with a flat or radius cuts slightly larger at the same depth. Right-triangle geometry of a cone, as in the Drill point length tool.';
       return;
     }

@@ -78,8 +78,8 @@ function toolGeom(v, s) {
 const LIMIT_NAMES = { 1: 'Tool deflection', 2: 'Spindle power', 3: 'Spindle torque (below base speed)', 4: 'Flute length', 5: 'Tool diameter (ae = D)', 6: 'Stick-out (no flute length entered)' };
 
 // Shared note for the DXF screens (see docs/cad-dxf.md).
-const DXF_NOTE = 'Geometry and the DXF text are made in the Rust core. Layers: OUTLINE (outer profile), HOLES (round holes), CENTRE (centre marks, pitch circle, slot centreline). Outer profiles are closed polylines, counter-clockwise; arcs inside a polyline are stored as bulges, bulge = tan(included angle / 4). R2000 files store the units in $INSUNITS (1 = inches, 4 = millimetres); R12 files cannot, so set the units when you import them. All values are in the units chosen in the title bar.';
-const DXF_SOURCE = 'Autodesk DXF Reference (HEADER $INSUNITS and $MEASUREMENT; LINE, CIRCLE, ARC, LWPOLYLINE, POLYLINE/VERTEX bulge). Output checked with the open-source ezdxf reader (audit). See docs/cad-dxf.md.';
+const DXF_NOTE = 'Geometry and the DXF text are made in the Rust core. Layers: OUTLINE (outer profile), HOLES (round holes), CENTRE (centre marks, pitch circle, slot centreline). Outer profiles are closed polylines, counter-clockwise; arcs inside a polyline are stored as bulges, bulge = tan(included angle / 4). R2000 files store the units in $INSUNITS (1 = inches, 4 = millimetres); R12 files cannot, so set the units when you import them. "Outlines as separate lines and arcs" writes each outline as LINE and ARC entities end to end instead of one polyline, for programs that draw polyline arcs as straight lines (OpenSCAD does) or do not read polylines. All values are in the units chosen in the title bar.';
+const DXF_SOURCE = 'Autodesk DXF Reference (HEADER $INSUNITS and $MEASUREMENT; LINE, CIRCLE, ARC, LWPOLYLINE, POLYLINE/VERTEX bulge). Output checked with the open-source ezdxf reader (audit) and by opening the files in LibreCAD, Inkscape and OpenSCAD and comparing the sizes they measure. See docs/cad-dxf.md.';
 
 const TOOLS = [
 {
@@ -99,6 +99,8 @@ const TOOLS = [
     if (v.rpm > 0 && v.dia > 0) rows.push(R(s === 'inch' ? 'Surface speed at that RPM' : 'Cutting speed at that RPM', s === 'inch' ? W.sfm_from_rpm(v.rpm, v.dia) : W.vc_from_rpm(v.rpm, v.dia), spdU(s), 1));
     return rows;
   },
+  // G-code: the spindle start for this speed (a lathe can also take the surface speed with G96).
+  snip: (v, W, s, rows) => { const r = rows.find(x => x.label === 'Spindle speed'), n = r ? r.value : v.rpm; return n > 0 ? { kind: 'words', rpm: n, v: v.speed > 0 ? v.speed : undefined } : null; },
   working: 'Inch: n = 12 x SFM / (pi x D). Metric: n = 1000 x Vc / (pi x D).',
   source: "Machinery's Handbook (speeds and feeds); ISO cutting-speed symbols",
 },
@@ -119,6 +121,8 @@ const TOOLS = [
     if (v.rpm > 0 && v.z > 0 && v.vf > 0) rows.push(R('Feed per tooth', W.feed_per_tooth(v.vf, v.rpm, v.z), lenU(s), 4));
     return rows;
   },
+  // G-code: spindle start and the feed word for this table feed.
+  snip: (v, W, s, rows) => { const r = rows.find(x => x.label === 'Table feed'), f = r ? r.value : v.vf; return f > 0 ? { kind: 'words', lathe: false, rpm: v.rpm, feed: f } : null; },
   working: 'Vf = n x fz x z.',
   source: "Machinery's Handbook; Sandvik Coromant formulas and definitions",
 },
@@ -574,10 +578,10 @@ const TOOLS = [
 },
 {
   id: 'insertcode', level: 'advanced', group: 'Turning', title: 'Insert designation (ISO 1832)',
-  desc: 'Decode or build a metric turning insert code (shape, clearance, tolerance class, type, size, thickness, corner, edge, hand, maker chipbreaker), with the insert shape drawn and the size number computed from the inscribed circle.',
+  desc: 'Decode a metric turning insert code or tap one together key by key (shape, clearance, tolerance class, type, size, thickness, corner, hand, maker chipbreaker). The insert is drawn to scale from above and in section, with its edge length, nose radius and corner height, and the nose radius goes to the turning advisor or the outline to the sketcher with one key.',
   render: el => renderInsertCode(el),
-  working: 'See the note under the tool. Size = cutting edge length in whole mm, l = (d/2)(cot(a1/2) + cot(a2/2)).',
-  source: 'ISO 1832:2017; code meanings from the Walter, Mitsubishi Materials, Korloy, Kennametal, YG-1, ISCAR and Dormer Pramet code keys listed under the tool.',
+  working: 'See the note under the tool. Size = cutting edge length in whole mm, l = (d/2)(cot(a1/2) + cot(a2/2)). Outline: corner at (d/2) / sin(a/2) from the centre, radius meeting each side r / tan(a/2) from the sharp corner.',
+  source: 'ISO 1832:2017; code meanings from the Walter, Mitsubishi Materials, Korloy, Kennametal, YG-1, ISCAR and Dormer Pramet code keys listed under the tool. Outline checked against the corner heights printed in ISO 3364:1997; fixing hole sizes from ISO 3364:1997 and Tungaloy.',
 },
 {
   id: 'holdercode', level: 'advanced', group: 'Turning', title: 'Toolholder designation (ISO 5608)',
@@ -692,6 +696,12 @@ const TOOLS = [
     if (v.f > 0) rows.push(R('Feed per minute', W.table_feed(n, v.f, 1), feedMinU(s), s === 'inch' ? 3 : 1, 'feed'));
     if (v.vf > 0) rows.push(R('Feed per revolution for that feed per minute', W.feed_per_tooth(v.vf, n, 1), feedRevU(s), s === 'inch' ? 5 : 4));
     return rows;
+  },
+  // G-code: spindle start (fixed rpm, or the surface speed with G96 and a G50 clamp) and the feed word per revolution or per minute.
+  snip: (v, W, s, rows) => {
+    const val = l => { const r = rows.find(x => x.label.startsWith(l)); return r && typeof r.value === 'number' ? r.value : NaN; };
+    const n = v.rpm > 0 ? v.rpm : val('Spindle speed at that diameter'), fr = v.f > 0 ? v.f : val('Feed per revolution for'), fm = v.vf > 0 ? v.vf : val('Feed per minute');
+    return n > 0 && (fr > 0 || fm > 0) ? { kind: 'words', lathe: true, rpm: n, v: v.speed > 0 && v.dia > 0 && !(v.rpm > 0) ? v.speed : undefined, feedRev: fr, feed: fm } : null;
   },
   working: 'Vf = fn x n; fn = Vf / n. With constant surface speed (G96) the rpm, and so the feed per minute, change with the diameter: convert at the diameter you care about.',
   source: "Sandvik Coromant turning formulas; Machinery's Handbook (feeds).",
@@ -1016,13 +1026,21 @@ const TOOLS = [
 {
   id: 'drillpoint', level: 'simple', group: 'Drilling and tapping', title: 'Drill point length',
   pick: { map: { dia: 'dia', ang: 'point' }, types: ['Drill', 'Spot', 'Other'] },
-  desc: 'Axial length of the drill point.',
+  desc: 'Axial length of the drill point, and the depth to program for a hole that must be a given depth at its full diameter.',
   fields: s => [
     { id: 'dia', label: 'Drill diameter', unit: lenU(s), def: s === 'inch' ? 0.25 : 6 },
     { id: 'ang', label: 'Point angle', unit: 'deg', def: 118 },
+    { id: 'depth', label: 'Hole depth at full diameter (optional)', unit: lenU(s), def: '' },
   ],
-  calc: (v, W, s) => (v.dia > 0 && v.ang > 0 && v.ang < 180) ? [R('Point length', W.drill_point_length(v.dia, v.ang), lenU(s), 4)] : [],
-  working: 'h = (d / 2) / tan(point angle / 2).',
+  calc: (v, W, s) => {
+    if (!(v.dia > 0 && v.ang > 0 && v.ang < 180)) return [];
+    const rows = [R('Point length', W.drill_point_length(v.dia, v.ang), lenU(s), 4)];
+    if (v.depth > 0) rows.push(R('Depth to program, to the drill point', W.drill_tip_depth(v.depth, v.dia, v.ang), lenU(s), 4));
+    return rows;
+  },
+  // G-code: a drilling cycle to that depth (Z0 on the surface the depth is measured from).
+  snip: (v, W, s, rows) => { const r = rows.find(x => x.label.startsWith('Depth to program')); return r ? { kind: 'holes', from: 'the drill point page', set: { z: -(+r.value.toFixed(s === 'inch' ? 4 : 3)) } } : null; },
+  working: 'h = (d / 2) / tan(point angle / 2). Depth to program = depth at full diameter + h.',
   source: "Machinery's Handbook (drills)",
 },
 {
@@ -1522,7 +1540,7 @@ const TOOLS = [
 },
 {
   id: 'spline', level: 'expert', group: 'Gears and splines', title: 'Involute splines (ANSI B92.1, ISO 4156)',
-  desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal). Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
+  desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal), with one tooth space of the shaft and of the hub drawn enlarged with its pin. Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
   fields: s => [
     { id: 'std', label: 'Standard', unit: '', def: s === 'inch' ? 1 : 2, options: [[1, 'ANSI B92.1 (inch, P/2P pitch)'], [2, 'ISO 4156 (metric module)']] },
     { id: 'mp', label: 'Pitch P (ANSI, e.g. 8 for 8/16) or module m (ISO, mm)', unit: '', def: s === 'inch' ? 8 : 2 },
@@ -1550,11 +1568,19 @@ const TOOLS = [
     const pe = v.dpe > 0 ? v.dpe : W.gear_ideal_pin_ext(m, v.z, 30, 0), pi = v.dpi > 0 ? v.dpi : W.gear_ideal_pin_int(m, v.z, 30, 0);
     rows.push(R('Pin diameter, external', pe, u, dp + 1), R('Measurement over pins, external', W.gear_over_pins_ext(v.z, d, 30, st, pe), u, dp + 1),
       R('Pin diameter, internal', pi, u, dp + 1), R('Measurement between pins, internal', W.gear_between_pins_int(v.z, d, 30, et, pi), u, dp + 1));
+    // Where each pin touches, and whether it measures at all: from the tooth space the core draws (gears::space_view).
+    const minE = isFinite(g(7)) && !(v.std === 1 && v.mp > 12) ? g(7) : NaN, minI = g(5);
+    [[0, st, g(4), minE, pe, 'external'], [1, et, minI, g(6), pi, 'internal']].forEach(([inn, t, tip, root, pin, name]) => {
+      if (!(tip > 0 && root > 0 && pin > 0) || !(W.gear_space_view(inn, v.z, d, 30, t, tip, root, pin, 8) > 6)) return;
+      const dk = W.list_out(1), fl = W.list_out(4);
+      if (isFinite(dk) && !(fl & 1)) rows.push(R('Pins touch the flanks on diameter, ' + name, dk, u, dp + 1));
+      SPLINE_PIN_MSG.forEach((msg, i) => { if (fl & (1 << i)) rows.push(R('Check the ' + name + ' pin', msg + [': it is too large for this tooth space, or too small to reach the flanks', ': it is too small', ', so the measuring faces would touch the teeth first: it is too small'][i], '', 0)); });
+    });
     rows.push(R('Major and minor diameter factors', v.std === 1 ? 'one free source so far (Engineers Edge)' : 'one free source so far (ISO 4156:1981 preview)', '', 0));
     rows.push(R('Pin size', 'the pins shown touch at the pitch diameter; the standards list their own measuring pin sizes: enter the size on your inspection sheet', '', 0));
     return rows;
   },
-  working: 'm = 1/P (ANSI) or the module (ISO). D = m z; Db = D cos 30°; p = π m; basic s = e = p/2. ANSI B92.1 30° flat root side fit: Do = (N + 1)/P, Di = (N − 1)/P, Dri = (N + 1.35)/P, Dre = (N − 1.35)/P (Dre rule for 2.5/5 to 12/24 pitch). ISO 4156 30° flat root: Dee = m (z + 1), Dei = m (z + 1.5), Die = m (z − 1.5) (basic, before deviations). Pins: external inv φ = s/D + inv 30° + dp/Db − π/z, M = Db / cos φ + dp (even z; odd z × cos(90°/z) before + dp); internal inv φ = e/D + inv 30° − dp/Db, M = Db / cos φ − dp. Ideal pins touch at the pitch diameter (as for a gear with x = 0).',
+  working: 'm = 1/P (ANSI) or the module (ISO). D = m z; Db = D cos 30°; p = π m; basic s = e = p/2. ANSI B92.1 30° flat root side fit: Do = (N + 1)/P, Di = (N − 1)/P, Dri = (N + 1.35)/P, Dre = (N − 1.35)/P (Dre rule for 2.5/5 to 12/24 pitch). ISO 4156 30° flat root: Dee = m (z + 1), Dei = m (z + 1.5), Die = m (z − 1.5) (basic, before deviations). Pins: external inv φ = s/D + inv 30° + dp/Db − π/z, M = Db / cos φ + dp (even z; odd z × cos(90°/z) before + dp); internal inv φ = e/D + inv 30° − dp/Db, M = Db / cos φ − dp. Ideal pins touch at the pitch diameter (as for a gear with x = 0). Tooth space drawing: half angle of a tooth of thickness s at radius r, ψ = s/D + inv 30° − inv α_r with cos α_r = Db / (2r); the pin centre is on Db / cos φ and touches the flank where the line from its centre, tangent to the base circle, is dp/2 shorter (external) or longer (internal).',
   source: 'ANSI B92.1-1996 and ISO 4156-1:2021 (second edition, replaces ISO 4156-1:2005), cited by name. Factors: Engineers Edge, involute spline basic formulas (ANSI); ISO 4156:1981 table 2 in the iTeh free preview (ISO). Pin formulas as for gears (KHK). Each status is in docs/gears.md.',
 },
 {
@@ -1668,6 +1694,11 @@ const TOOLS = [
       ],
     };
   },
+  // G-code: a drilling or tapping cycle at these holes.
+  snip: (v, W) => {
+    const h = []; for (let i = 0; i < v.n; i++) h.push([W.bolt_x(v.n, v.dia, v.start || 0, v.cx || 0, v.cy || 0, i), W.bolt_y(v.n, v.dia, v.start || 0, v.cx || 0, v.cy || 0, i)]);
+    return h.length ? { kind: 'holes', holes: h, from: 'the bolt circle' } : null;
+  },
   working: 'x = cx + (D/2) cos(a0 + 360 i / n), y = cy + (D/2) sin(a0 + 360 i / n). Angles measured counter-clockwise from +X.',
   source: "Machinery's Handbook (hole circles)",
 },
@@ -1694,6 +1725,8 @@ const TOOLS = [
     const xs = h.map(p => p[0]), ys = h.map(p => p[1]), dp = s === 'inch' ? 4 : 3;
     return [R('Number of holes', h.length, '', 0), R('First to last hole in X', Math.max(...xs) - Math.min(...xs), lenU(s), dp), R('First to last hole in Y', Math.max(...ys) - Math.min(...ys), lenU(s), dp)];
   },
+  // G-code: a drilling or tapping cycle at these holes, in the order listed.
+  snip: (v, W) => { const h = TOOLS.find(t => t.id === 'holegrid').holes(v, W); return h.length ? { kind: 'holes', holes: h, from: 'the hole grid' } : null; },
   table: (v, W, s, dpAdj) => {
     const dp = Math.max(0, Math.min(8, (s === 'inch' ? 4 : 3) + (dpAdj || 0)));
     const z = x => (Math.abs(x) < 0.5 * Math.pow(10, -dp) ? 0 : x).toFixed(dp);
@@ -1784,11 +1817,87 @@ const TOOLS = [
   source: 'CSS rpm: Sandvik Coromant turning formulas [SAN]. Time: BenchMate integration of dr / (f n), checked against numerical integration in core tests. G50/G96/G97: Haas Factory Outlet lathe programming; Fanuc G-code system A article (industrialmonitordirect). See docs/cycles.md.',
 },
 {
-  id: 'gsim', level: 'advanced', group: 'G-code cycles', title: 'G-code backplot (simulator)',
-  desc: 'Paste or load a G-code program (mill or lathe, Generic ISO / Fanuc-style or Haas) and see the programmed path in 2D: rapids dashed, feeds solid, step through it block by block. Distances, extents, an estimated cycle time and every error with its line number. A backplot, not a machine verification.',
+  id: 'gsim', level: 'advanced', group: 'G-code cycles', title: 'G-code editor and simulator',
+  desc: 'Paste, type or load a G-code program (Generic ISO / Fanuc-style or Haas; lathe or mill is told from the program) and see the programmed path: rapids dashed, feeds solid, from the top, front, side or in 3D with a view cube. Step through it block by block. Edit with undo, insert and delete lines, renumber, strip comments, and convert between inch and mm. Distances, extents, an estimated cycle time and every error with its line number. A backplot, not a machine verification.',
   render: el => renderGsim(el),
-  working: 'Parsed and run in the Rust core (core/src/gsim.rs). G0/G1/G2/G3 with I/J/K or R (helical arcs too), G17/G18/G19, G20/G21, G90/G91 on the mill, G94/G95 (mill) and G98/G99 (lathe) feed modes, G96/G97 with the G50 clamp, G4, G28 to the intermediate point, F/S/T/M/N words and comments. An arc whose start and end radius differ by more than the tolerance is an error. Mill G73, G74, G81-G86 and G89 are drawn hole by hole (G83/G73 re-entry 0.5 mm or 0.02 in, as in the cycle generators); lathe G70 runs its P..Q contour, G90/G92/G94 are drawn as single cycles. G71-G76 roughing and threading, mill G76/G87/G88, macros and subprograms are listed as not simulated. Lathe X is a diameter, plotted as a radius. Time = length / F (per rev: / (F x rpm)); acceleration is ignored. Other controls are not yet supported.',
-  source: 'FANUC Series 0i-F Plus Operator\'s Manual B-64694EN (interpolation, canned cycles, G-code system A for lathes, helical feed along the arc); Haas Mill and Lathe Operator\'s Manuals (G-code chapters); NIST RS274NGC interpreter version 3 report (arc radius check, word order). See docs/gsim.md.',
+  working: 'Parsed and run in the Rust core (core/src/gsim.rs). G0/G1/G2/G3 with I/J/K or R (helical arcs too), G17/G18/G19, G20/G21, G90/G91 on the mill, G94/G95 (mill) and G98/G99 (lathe) feed modes, G96/G97 with the G50 clamp, G4, G28 to the intermediate point, F/S/T/M/N words and comments. An arc whose start and end radius differ by more than the tolerance is an error. Mill G73, G74, G81-G86 and G89 are drawn hole by hole (G83/G73 re-entry 0.5 mm or 0.02 in, as in the cycle generators); lathe G70 runs its P..Q contour, G90/G92/G94 are drawn as single cycles. G71-G76 roughing and threading, mill G76/G87/G88, macros and subprograms are listed as not simulated. Lathe X is a diameter, plotted as a radius. Time = length / F (per rev: / (F x rpm)); acceleration is ignored. Other controls are not yet supported. Lathe or mill (Auto): told from words only one of them uses (a four-digit T word, G50 S, G96, G71 or G72 with P and Q, G92 with F, G32, U and W against G43 H, M06, Y words, G17, a drilling cycle with an R plane, G41 or G42 with D); when the signs are too few the active machine decides. Tidy (core/src/gtidy.rs): renumbering gives new N numbers from a start by a step and carries them into the blocks that name other blocks (P and Q of the lathe cycles G70 to G73, P of M97 and M99, GOTO n); removing N numbers keeps the ones that are named. Inch / mm: X Y Z U V W I J K R, a peck Q and F are multiplied or divided by 25.4 (R stays on a G68 rotation, F stays under G93), S under G96 by 3.28084 (m/min and ft/min), and on a lathe the whole-number P and Q of G74, G75 and G76 are converted as counts of 0.001 mm or 0.0001 in. A length with no decimal point is read the way you choose (whole units, or least input increments) and written with a decimal point. Macro statements are left alone and listed.',
+  source: 'FANUC Series 0i-F Plus Operator\'s Manual B-64694EN (interpolation, canned cycles, G-code system A for lathes, helical feed along the arc); Haas Mill and Lathe Operator\'s Manuals (G-code chapters); NIST RS274NGC interpreter version 3 report (arc radius check, word order). See docs/gsim.md. Decimal point reading (pocket calculator type or least input increment, parameter 3401 bit 0): FANUC decimal point programming as reprinted by mfgrobots.com; least input increment 0.001 mm or 0.0001 in: Modern Machine Shop, "Reducing a CNC\'s least input increment value"; G76 P and Q without a decimal point: CNC Training Centre, "G76 threading cycle". 1 in = 25.4 mm and 1 ft = 0.3048 m exactly (NIST SP 811).',
+},
+{
+  id: 'sketch', level: 'advanced', group: 'CAD / DXF', title: '2D sketcher',
+  desc: 'Draw points, lines, arcs, circles, rectangles and text on layers, with snaps to ends, crossings, middles, centres, quadrants, tangents and square, a grid, typed coordinates, measuring, undo and redo. Open a DXF file to look at it, measure it or change it, and save the drawing as DXF (R2000 or R12).',
+  render: el => renderSketch(el),
+  working: 'The drawing is kept and worked on in the Rust core (core/src/sketch.rs); the page only draws it. Arc through three points: the centre is the circumcentre of the three points (where the perpendicular bisectors meet); the arc runs counter-clockwise when the points turn left. Crossings: two lines by solving the two parametric equations; a line with a circle from the quadratic in the line parameter; two circles from the distance between centres d, a = (r1\u00b2 - r2\u00b2 + d\u00b2) / (2 d), h = sqrt(r1\u00b2 - a\u00b2). Tangent from the last point: the touching points lie at acos(r / d) either side of the line from the centre to that point. Square: the foot of the perpendicular from the last point. Snaps: the nearest snap point in reach wins (end, crossing, middle, centre, quadrant, tangent, square); where two are at the same place it is named in that order. A point on a line counts only when none of those is in reach, and the grid only when nothing is. Two lines selected: the angle between their directions folded into 0 to 90 degrees, and where they meet. Polyline arcs use the DXF bulge (tan of a quarter of the included angle). Text is taken as 0.7 x height wide per character for picking and extents; the program that opens the DXF uses its own font. DXF reading: LINE, CIRCLE, ARC, POINT, TEXT, MTEXT (as one line), LWPOLYLINE and 2D POLYLINE in model space with their layers; anything else (splines, ellipses, blocks, dimensions, hatches) is counted and listed, not drawn. Units come from $INSUNITS when the file has it.',
+  source: 'Autodesk DXF Reference (TEXT, POINT, LWPOLYLINE and POLYLINE group codes, bulge, arbitrary axis algorithm, ASCII control characters, $INSUNITS) with the ezdxf documentation as the second reading; Wolfram MathWorld: Circumcircle, Circle-Circle Intersection. Each geometry routine is tested against hand values (3-4-5 triangles, unit circle). DXF files checked by reading them back and by opening them in LibreCAD, Inkscape and OpenSCAD: see docs/cad-dxf.md.',
+},
+{
+  id: 'engrave', level: 'advanced', group: 'G-code cycles', title: 'Text engraving',
+  desc: 'Type a text, pick one of nine stroke (single line) letter styles and see it to scale: on a straight line at any angle or round a circle, mirrored if wanted. Gives the size, the length engraved, the line width of a pointed cutter and the program, and sends the strokes to the simulator, the sketcher or a DXF file.',
+  render: el => renderEngrave(el),
+  working: 'The letters are stroke fonts: each letter is a few open lines for the centre of the cutter to follow, so the line width is the cutter width. The height typed is the height of the capital letters, measured on the letter H of the font. Round a circle, a distance along the foot of the letters becomes an angle = distance / radius, and long strokes are cut into short pieces so they follow the circle. Each stroke is one rapid above its start, a plunge at the plunge feed, the stroke at the cutting feed and a rapid lift; strokes that carry on from each other are joined so the cutter is not lifted. Z0 is the surface. Pointed cutter: line width = tip flat + 2 x depth x tan(half the included angle). The layout, the lengths and the program come from the Rust core.',
+  source: 'Letters: the Hershey fonts (Dr. A. V. Hershey; data format by James Hurt, Cognition, Inc.), as SVG fonts prepared by Windell H. Oskay and shipped with Inkscape; use notice in each file in data/fonts/hershey and on the Fedora licensing wiki (Hershey font licence). Program: plain G00/G01 moves, the same header as the drilling cycles (FANUC Series 0i-F Plus Operator\'s Manual; Haas Mill Programming Workbook). Pointed cutter line width: BenchMate geometry, checked against the FlatCAM groove table (60 degrees, 0.1 flat, 0.05 deep: 0.158) and the Calculator Academy chamfer example (82 degrees, 5.0 to 9.4 at 2.53 deep). See docs/engraving.md.',
+},
+{
+  id: 'rotpoint', level: 'advanced', group: 'G-code cycles', title: 'Rotary axis: where a point goes',
+  desc: 'A point on the part at A0 (or B0, C0): where it is after the rotary axis turns. For picking up a feature on another face, moving a work offset, or checking a program. All lengths in one unit.',
+  fields: s => [
+    { id: 'axis', label: 'Rotary axis', unit: '', def: 0, options: [[0, 'A (turns about X)'], [1, 'B (turns about Y)'], [2, 'C (turns about Z)']] },
+    { id: 'deg', label: 'Angle the axis is sent to (from 0)', unit: 'deg', def: 90 },
+    { id: 'x', label: 'Point on the part at 0: X', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
+    { id: 'y', label: 'Point Y', unit: lenU(s), def: s === 'inch' ? 0.5 : 10 },
+    { id: 'z', label: 'Point Z', unit: lenU(s), def: s === 'inch' ? 1.5 : 40 },
+    { id: 'cx', label: 'Centre line of the rotary axis: X', unit: lenU(s), def: 0, when: v => v.axis !== 0 },
+    { id: 'cy', label: 'Centre line of the rotary axis: Y', unit: lenU(s), def: 0, when: v => v.axis !== 1 },
+    { id: 'cz', label: 'Centre line of the rotary axis: Z', unit: lenU(s), def: 0, when: v => v.axis !== 2 },
+    { id: 'dir', label: 'A positive angle turns the part', unit: '', def: 0, options: [[0, 'against the right-hand rule (table carries the part)'], [1, 'by the right-hand rule']] },
+  ],
+  calc: (v, W, s) => {
+    if (![v.deg, v.x, v.y, v.z].every(isFinite)) return [];
+    const c = k => (isFinite(v[k]) ? v[k] : 0), dp = s === 'inch' ? 4 : 3, u = lenU(s);
+    const t = i => W.rot_part_point(v.axis, v.deg, v.x, v.y, v.z, c('cx'), c('cy'), c('cz'), v.dir, i);
+    const ax = 'XYZ'[v.axis], name = 'ABC'[v.axis];
+    const cw = (v.dir === 1) === (v.deg < 0);   // how the part turns as seen from the + end of the axis
+    return [R('Point after the move: X', t(0), u, dp), R('Point after the move: Y', t(1), u, dp), R('Point after the move: Z', t(2), u, dp),
+      R('Distance of the point from the axis (does not change)', t(3), u, dp), R('Straight-line distance the point moved', t(4), u, dp),
+      R('In words', v.deg === 0 ? 'No move' : 'Seen from the + end of ' + ax + ' looking back along it, the part turns ' + (cw ? 'clockwise' : 'counter-clockwise') + ' by ' + DK.n(Math.abs(v.deg), 3) + ' degrees', '', 0),
+      R('Check on the machine', 'Jog ' + name + ' a few degrees plus and watch the part. If it turns the other way from the drawing, change the last box.', '', 0)];
+  },
+  working: 'The point turns about the centre line of the rotary axis; its coordinate along that axis and its distance from the axis do not change. Right-hand rule about X by an angle a: Y\' = Y cos a - Z sin a, Z\' = Y sin a + Z cos a (about Y: Z, X in place of Y, Z; about Z: X, Y), with Y and Z measured from the centre line. ISO 841 defines positive A, B and C by the right-hand screw rule for the tool relative to the work, so a table that carries the work turns the other way: the part point turns by minus the angle. Machine builders do not always follow the standard, so the direction is a box you set and check by jogging.',
+  source: 'Axis names and directions: ISO 841:1974 (public preview; clauses 2.1, 2.6, 6.1, 6.2, 10) and the BobCAD-CAM help page on the right-hand rule (which also says builders do not always follow it). Rotation about an axis: Wikipedia, "Rotation matrix" (basic 3D rotations, counter-clockwise when the axis points at the observer) and MathWorks rotx (matrix and a worked example, reproduced by the core tests). See docs/rotary.md.',
+  proof: [{ name: 'A 30 degree right-hand turn about X', sys: 'mm', vals: { axis: 0, deg: 30, x: 2, y: -2, z: 4, cy: 0, cz: 0, dir: 1 }, expect: [['Point after the move: Y', 'mm', -3.7321, 5e-5], ['Point after the move: Z', 'mm', 2.4641, 5e-5]],
+    source: 'MathWorks documentation, rotx: rotx(30) applied to the vector (2, -2, 4) gives (2.0000, -3.7321, 2.4641).', note: 'The example turns the point itself by the right-hand rule, so the last box is set that way.' }],
+},
+{
+  id: 'rotfeed', level: 'advanced', group: 'G-code cycles', title: 'Rotary axis feed',
+  desc: 'Feed for a block that turns a rotary axis: degrees per minute for the surface feed you want at a diameter, the length of a cut that turns and moves along the axis at once, its time, and the inverse time (G93) feed word.',
+  fields: s => [
+    { id: 'd', label: 'Diameter where the tool cuts', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
+    { id: 'feed', label: 'Feed wanted along the surface', unit: feedMinU(s), def: s === 'inch' ? 25 : 600 },
+    { id: 'dpm', label: 'Rotary feed, turn-only block', unit: 'deg/min', def: '' },
+    { id: 'deg', label: 'Angle turned in the block', unit: 'deg', def: 90 },
+    { id: 'lin', label: 'Move along the rotary axis in the same block (0 = none)', unit: lenU(s), def: s === 'inch' ? 3 : 75 },
+  ],
+  pairs: [['feed', 'dpm', (v, W) => W.rot_deg_per_min(v.feed, v.d / 2), (v, W) => W.rot_surface_feed(v.dpm, v.d / 2)]],
+  calc: (v, W, s) => {
+    if (!(v.d > 0)) return [];
+    const r = v.d / 2, dp = s === 'inch' ? 4 : 3, u = lenU(s), rows = [];
+    const feed = v.feed > 0 ? v.feed : (v.dpm > 0 ? W.rot_surface_feed(v.dpm, r) : NaN);
+    if (feed > 0) rows.push(R('Rotary feed for a block that only turns', W.rot_deg_per_min(feed, r), 'deg/min', 2), R('Feed along the surface', feed, feedMinU(s), s === 'inch' ? 3 : 1));
+    rows.push(R('One degree on this diameter is', W.rot_arc_length(r, 1), u, dp + 1));
+    if (!(isFinite(v.deg) && v.deg !== 0)) return rows;
+    const lin = isFinite(v.lin) ? v.lin : 0, len = W.rot_move_length(r, v.deg, lin);
+    rows.push(R('Length round the part', W.rot_arc_length(r, v.deg), u, dp));
+    if (lin !== 0) rows.push(R('Length of the cut (round and along at once)', len, u, dp));
+    if (!(feed > 0)) return rows;
+    rows.push(R('Time for the block', W.rot_move_time_s(feed, len), 's', 2), R('Inverse time feed word (G93): F', W.rot_inverse_time_f(feed, len), '1/min', 3));
+    if (lin !== 0) rows.push(R('Rotary speed during the block', W.rot_rotary_rate(feed, len, v.deg), 'deg/min', 2),
+      R('Feed word in G94 for this block', 'Controls differ. The Fadal manual reads F as the degrees per minute above; other controls read it in other ways. The inverse time word means the same on every control that has G93. Check your manual.', '', 0));
+    return rows;
+  },
+  working: 'Round the part, a length s at radius r is an angle s / r (radians), so a surface feed f is f x 180 / (pi x r) degrees per minute. A block that turns the part by an angle while the tool moves a length L along the rotary axis cuts a helix: length = sqrt((r x angle)^2 + L^2). Time = length / feed. In inverse time mode (G93) the F word is 1 / minutes the block takes = feed / length, and every cutting block needs its own F. The diameter is where the tool tip cuts, not the stock size.',
+  source: 'Fadal user manual, section 12 "Rotary axes" (actual move distance, degrees per minute and inverse time feed, with a worked example); Industrial Monitor Direct knowledge base, "CNC rotary axis feedrate sync with linear axis" (the same distance formula and X feed = A deg/min x pi x D / 360); CNC Cookbook, "Feed rate mode G-codes G93, G94 and G95" (a G93 block takes 1/F minutes; F on every cutting block); Haas UK, "Inverse time feed mode (G93)" (60 / F seconds). See docs/rotary.md.',
+  proof: [{ name: 'A 4 in diameter, A turns 90 degrees while X moves 3 in, at 25 in/min', sys: 'inch', vals: { d: 4, feed: 25, dpm: '', deg: 90, lin: 3 }, expect: [['Length of the cut', 'in', 4.3439, 5e-5], ['Inverse time feed word', '1/min', 5.755, 0.0005], ['Rotary speed during the block', 'deg/min', 517.97, 0.01]],
+    source: 'Fadal user manual, section 12, Rotary axes: actual move distance 4.3439, feed 517.97 degrees per minute, inverse time feed 5.755 (the sample program rounds it to F5.76).' }],
 },
 {
   id: 'cycbroach', level: 'expert', group: 'G-code cycles', title: 'Keyway broaching program',
@@ -1876,9 +1985,9 @@ const TOOLS = [
 },
 {
   id: 'gdtfcf', level: 'advanced', group: 'GD&T', title: 'Feature control frame builder',
-  desc: 'Build a feature control frame, see it drawn, read it in plain English, and get a warning for combinations that are invalid or doubtful.',
+  desc: 'Build a feature control frame, see it drawn, and have it read out in plain words: said aloud, the demand in one sentence, each box in turn, the tolerance at each size, how it is checked. Warns about combinations that are invalid or doubtful.',
   render: el => renderFcfBuilder(el),
-  working: 'The checks cover the common rules (datums on form tolerances, MMC on surfaces, runout at MMC, diameter zones, modifier use, datum order). They are not a full standards review.',
+  working: 'The read-out is built from the boxes of the frame, left to right, using the same confirmed statements as the reference guide. With the size limits typed, the bonus, the tolerance allowed at each limit and the virtual condition come from the same formulas as the bonus calculator. The checks cover the common rules (datums on form tolerances, MMC on surfaces, runout at MMC, diameter zones, modifier use, datum order). They are not a full standards review.',
   source: 'Rules as confirmed in docs/gdt.md (Geometric Learning Systems Y14.5-2018 chart, GD&T Basics, KEYENCE, University of Illinois ME 170 notes, Mitutoyo, Skill-Lync).',
 },
 {

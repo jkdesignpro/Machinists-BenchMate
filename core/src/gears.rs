@@ -404,6 +404,117 @@ pub fn tooth_outline(d: f64, db: f64, da: f64, df: f64, s: f64, n: usize) -> Vec
 }
 
 // ---------------------------------------------------------------------------
+// One tooth space with its measuring pin, for drawing
+
+/// One tooth space of an involute spline or spur gear, with the measuring
+/// pin that sits in it. See [`space_view`].
+#[derive(Clone, Debug, PartialEq)]
+pub struct SpaceView {
+    /// Profile from the middle of one tooth, down the flank, across the root,
+    /// up the next flank to the middle of the next tooth. The space is centred
+    /// on the +y axis; the part centre is the origin.
+    pub outline: Vec<(f64, f64)>,
+    /// Radius of the pin centre (on the +y axis); NaN without a pin.
+    pub pin_centre_r: f64,
+    /// Radius of the circle where the pin touches the two flanks.
+    pub contact_r: f64,
+    /// The contact point on the right-hand flank (the other is its mirror image).
+    pub contact: (f64, f64),
+    /// What is wrong with this pin, added up: 1 it does not touch the involute
+    /// part of the flanks (it rides on the tooth corners or sits below the
+    /// flank), 2 it touches the root before the flanks, 4 it does not stand
+    /// proud of the teeth, so the measuring faces would touch the teeth first.
+    pub flags: u32,
+}
+
+/// Tooth space and pin from the dimensions the calculators give.
+/// `internal` false: an external part, `t` is the tooth thickness on the
+/// reference circle `d`, the space is what is left of the pitch;
+/// true: an internal part, `t` is the space width on `d`.
+/// `d_tip` and `d_root` are the tip and root circles of that part (external:
+/// major and minor; internal: minor and major). `dp` is the pin diameter
+/// (0 = no pin). `n` points per flank.
+///
+/// Flank: a tooth (or internal space) of thickness t on d has the half angle
+/// psi(r) = t / d + inv a - inv a_r at radius r, cos a_r = d_b / (2r). Below
+/// the base circle the flank is drawn as a radial line (the real fillet
+/// depends on the cutting tool).
+/// Pin: external inv phi = t / d + inv a + dp / d_b - pi / z, internal
+/// inv phi = t / d + inv a - dp / d_b; the centre is at d_b / (2 cos phi) and
+/// the pin touches the flank where the line from the centre, tangent to the
+/// base circle, is dp / 2 shorter (external) or longer (internal).
+/// `None` when the numbers do not make a tooth space.
+#[allow(clippy::too_many_arguments)]
+pub fn space_view(internal: bool, z: f64, d: f64, alpha_deg: f64, t: f64, d_tip: f64, d_root: f64, dp: f64, n: usize) -> Option<SpaceView> {
+    let ok = |x: f64| x.is_finite() && x > 0.0;
+    if !(ok(z) && z >= 3.0 && ok(d) && ok(t) && ok(d_tip) && ok(d_root) && alpha_deg > 0.0 && alpha_deg < 90.0 && dp >= 0.0 && dp.is_finite()) { return None; }
+    if (internal && d_root <= d_tip) || (!internal && d_root >= d_tip) { return None; }
+    let n = n.clamp(4, 400);
+    let a = rad(alpha_deg);
+    let rb = d * a.cos() / 2.0;
+    let (rt, rr) = (d_tip / 2.0, d_root / 2.0);
+    let half_pitch = PI / z;
+    // Half angle of the tooth (external) or space (internal) at radius r.
+    let psi = |r: f64| t / d + inv_r(a) - inv_r((rb / r.max(rb)).min(1.0).acos());
+    // Half angle of the space at radius r.
+    let gap = |r: f64| if internal { psi(r) } else { half_pitch - psi(r) };
+    // The space must be open at the root and the teeth must have a land at the tip.
+    if !(gap(rr) > 0.0 && gap(rt) > 0.0 && gap(rr) < half_pitch && gap(rt) < half_pitch) { return None; }
+    let mut radii: Vec<f64> = (0..=n).map(|i| rt + (rr - rt) * i as f64 / n as f64).collect();
+    // The reference circle and the base circle are on the profile exactly, when they cross it.
+    for extra in [d / 2.0, rb] {
+        if (extra - rt) * (extra - rr) < 0.0 { radii.push(extra); }
+    }
+    radii.sort_by(|p, q| if internal { p.partial_cmp(q).unwrap() } else { q.partial_cmp(p).unwrap() });
+    radii.dedup_by(|p, q| (*p - *q).abs() < 1e-12 * d);
+    let at = |r: f64, th: f64| (r * th.sin(), r * th.cos());
+    let mut outline = Vec::with_capacity(2 * radii.len() + 16);
+    let arc = |out: &mut Vec<(f64, f64)>, r: f64, from: f64, to: f64, steps: usize| {
+        for i in 0..steps { out.push(at(r, from + (to - from) * i as f64 / steps as f64)); }
+    };
+    arc(&mut outline, rt, -half_pitch, -gap(rt), 4);
+    for &r in &radii { outline.push(at(r, -gap(r))); }
+    arc(&mut outline, rr, -gap(rr), gap(rr), 6);
+    for &r in radii.iter().rev() { outline.push(at(r, gap(r))); }
+    arc(&mut outline, rt, gap(rt), half_pitch, 4);
+    outline.push(at(rt, half_pitch));
+    let mut v = SpaceView { outline, pin_centre_r: f64::NAN, contact_r: f64::NAN, contact: (f64::NAN, f64::NAN), flags: 0 };
+    if dp > 0.0 {
+        let invf = if internal { t / d + inv_r(a) - dp / (2.0 * rb) } else { t / d + inv_r(a) + dp / (2.0 * rb) - half_pitch };
+        let f = inv_angle_r(invf);
+        if !f.is_finite() { v.flags = 1; return Some(v); }
+        let rc = rb / f.cos();
+        // Along the line from the pin centre, tangent to the base circle: its
+        // length is rb tan phi, and the flank is dp / 2 nearer (external) or further (internal).
+        let len = rb * f.tan() + if internal { dp / 2.0 } else { -dp / 2.0 };
+        v.pin_centre_r = rc;
+        let (lo, hi) = if internal { (rt, rr) } else { (rr.max(rb), rt) };
+        if len < 0.0 {
+            v.flags |= 1;
+        } else {
+            let cr = rb.hypot(len);
+            v.contact_r = cr;
+            v.contact = at(cr, gap(cr));
+            if cr < lo - 1e-12 * d || cr > hi + 1e-12 * d { v.flags |= 1; }
+        }
+        if (!internal && rc - dp / 2.0 < rr) || (internal && rc + dp / 2.0 > rr) { v.flags |= 2; }
+        if (!internal && rc + dp / 2.0 <= rt) || (internal && rc - dp / 2.0 >= rt) { v.flags |= 4; }
+    }
+    Some(v)
+}
+
+/// [`space_view`] as a flat list: diameter of the circle the pin centre is
+/// on, diameter of the circle where the pin touches the flanks, contact x,
+/// contact y, flags, number of outline points, then the points x, y.
+#[allow(clippy::too_many_arguments)]
+pub fn space_view_flat(internal: bool, z: f64, d: f64, alpha_deg: f64, t: f64, d_tip: f64, d_root: f64, dp: f64, n: usize) -> Vec<f64> {
+    let Some(v) = space_view(internal, z, d, alpha_deg, t, d_tip, d_root, dp, n) else { return Vec::new() };
+    let mut out = vec![2.0 * v.pin_centre_r, 2.0 * v.contact_r, v.contact.0, v.contact.1, v.flags as f64, v.outline.len() as f64];
+    for p in &v.outline { out.push(p.0); out.push(p.1); }
+    out
+}
+
+// ---------------------------------------------------------------------------
 // Gear trains
 
 /// Ratio of a train of meshing pairs: product of (driven teeth / driver teeth).
@@ -746,6 +857,77 @@ mod tests {
         let di = ideal_pin_int(m, 24.0, 30.0, 0.0);
         let mi = between_pins_int(24.0, 1.5, 30.0, PI * m / 2.0, di);
         close(pin_contact_dia(1.5 * rad(30.0).cos(), mi + di, di, true), 1.5, 1e-9);
+    }
+
+    /// The tooth space drawing against the computed dimensions, ANSI B92.1
+    /// 8/16 pitch, 24 teeth and ISO 4156 m 2, z 21 (odd), external and internal:
+    /// the tooth thickness (space width) measured on the drawn profile at the
+    /// pitch circle is the calculator's value; the pin centre is where the
+    /// measurement over (between) pins puts it; the pin touches both flanks
+    /// (nearest profile point is dp / 2 away, at the contact point the core
+    /// gives) and nothing is nearer; the ideal pin touches on the pitch circle.
+    #[test]
+    fn space_view_matches_computed_dimensions() {
+        for (std, m, z) in [(1u32, 0.125, 24.0), (2, 2.0, 21.0), (1, 1.0 / 12.0, 9.0), (2, 1.0, 60.0)] {
+            let g: Vec<f64> = (0..8).map(|i| spline_flat(std, m, z, i)).collect();
+            let (d, t) = (g[0], g[3]);
+            let minor_int = if g[5].is_finite() { g[5] } else { m * (z - 1.0) };
+            for internal in [false, true] {
+                let (tip, root) = if internal { (minor_int, g[6]) } else { (g[4], g[7]) };
+                let dp = if internal { ideal_pin_int(m, z, 30.0, 0.0) } else { ideal_pin_ext(m, z, 30.0, 0.0) };
+                let v = space_view(internal, z, d, 30.0, t, tip, root, dp, 200).unwrap();
+                assert_eq!(v.flags & 3, 0, "{std} {z} {internal}");
+                // thickness on the pitch circle, from the drawn points
+                let on_pitch: Vec<&(f64, f64)> = v.outline.iter().filter(|p| (p.0.hypot(p.1) - d / 2.0).abs() < 1e-9 * d).collect();
+                assert_eq!(on_pitch.len(), 2, "{std} {z} {internal}");
+                let space = 2.0 * on_pitch[1].0.atan2(on_pitch[1].1) * d / 2.0;
+                close(if internal { space } else { PI * m - space }, t, 1e-9 * d);
+                // the profile runs from the middle of one tooth to the middle of the next
+                let (first, last) = (v.outline[0], *v.outline.last().unwrap());
+                close(first.0.atan2(first.1), -PI / z, 1e-12); close(last.0.atan2(last.1), PI / z, 1e-12);
+                close(first.0.hypot(first.1), tip / 2.0, 1e-12);
+                // pin centre against the measurement over or between pins
+                let k = if (z as i64) % 2 != 0 { (PI / (2.0 * z)).cos() } else { 1.0 };
+                let mm = if internal { between_pins_int(z, d, 30.0, t, dp) } else { over_pins_ext(z, d, 30.0, t, dp) };
+                close(2.0 * v.pin_centre_r * k + if internal { -dp } else { dp }, mm, 1e-9 * d);
+                // contact: dp / 2 from the centre, on the pitch circle for the ideal pin, and the same as pin_contact_dia
+                let c = (0.0, v.pin_centre_r);
+                close((v.contact.0 - c.0).hypot(v.contact.1 - c.1), dp / 2.0, 1e-9 * d);
+                close(2.0 * v.contact_r, d, 1e-9 * d);
+                close(2.0 * v.contact_r, pin_contact_dia(g[1], 2.0 * v.pin_centre_r, dp, internal), 1e-9 * d);
+                // nothing on the flanks is nearer to the pin centre than the contact point
+                let nearest = v.outline.iter().map(|p| (p.0 - c.0).hypot(p.1 - c.1)).fold(f64::INFINITY, f64::min);
+                assert!(nearest >= dp / 2.0 - 1e-9 * d, "{std} {z} {internal}: {nearest} < {}", dp / 2.0);
+                assert!(nearest <= dp / 2.0 + 2e-4 * d, "{std} {z} {internal}: {nearest}");
+            }
+        }
+    }
+
+    /// Pins that do not measure: too large (rides on the tooth corners), too
+    /// small (sits on the root, or below the tips), and numbers that are no tooth space.
+    #[test]
+    fn space_view_pin_checks() {
+        let (m, z) = (0.125, 24.0);
+        let g: Vec<f64> = (0..8).map(|i| spline_flat(1, m, z, i)).collect();
+        let ext = |dp: f64| space_view(false, z, g[0], 30.0, g[3], g[4], g[7], dp, 40).unwrap();
+        let int = |dp: f64| space_view(true, z, g[0], 30.0, g[3], g[5], g[6], dp, 40).unwrap();
+        assert_eq!(ext(0.24).flags, 0);
+        assert_eq!(ext(0.40).flags, 1); // would touch above the major diameter: it rides on the tooth corners
+        assert_eq!(ext(0.17).flags, 2); // reaches the root before the flanks
+        assert_eq!(ext(0.15).flags, 6); // on the root and below the tips
+        assert_eq!(int(0.21).flags, 0);
+        assert_eq!(int(0.30).flags, 1); // would touch inside the minor diameter
+        assert_eq!(int(0.36).flags, 1); // no position at all: the centre would be inside the base circle
+        assert!(int(0.36).pin_centre_r.is_nan());
+        assert_eq!(int(0.12).flags, 6);
+        assert!(ext(0.0).pin_centre_r.is_nan());
+        assert!(space_view(false, z, g[0], 30.0, g[3], g[7], g[4], 0.2, 40).is_none()); // tip and root swapped
+        assert!(space_view(false, z, g[0], 30.0, 0.5, g[4], g[7], 0.2, 40).is_none()); // tooth wider than the pitch
+        assert!(space_view(false, 2.0, g[0], 30.0, g[3], g[4], g[7], 0.2, 40).is_none());
+        assert!(space_view_flat(false, z, g[0], 30.0, f64::NAN, g[4], g[7], 0.2, 40).is_empty());
+        let flat = space_view_flat(false, z, g[0], 30.0, g[3], g[4], g[7], 0.24, 40);
+        assert_eq!(flat.len(), 6 + 2 * flat[5] as usize);
+        close(flat[0], 2.0 * ext(0.24).pin_centre_r, 1e-12); close(flat[1], 2.0 * ext(0.24).contact_r, 1e-12);
     }
 
     /// Gear trains: compound 20/60 x 18/54 is 9 : 1; Willis for a 24 / 72 set
