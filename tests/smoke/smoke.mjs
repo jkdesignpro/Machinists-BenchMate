@@ -2200,12 +2200,12 @@ where = 'toolpaths';
   }
   where = 'fastguide';
   g = await guide('fastguide');
-  if (g.h2 !== 9 || g.svgs !== 4 || g.tabs !== '11,9,12,7,8,8,8' || g.srcs !== 21) problems.push(`[${where}] 9 sections, 4 drawings, tables of 10, 8, 11, 6, 7, 7 and 7 rows, 21 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
-  if (g.untagged !== 0 || g.tagged < 41) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
-  for (const k of ['Rule of thumb. Nord-Lock', 'Vibration tests named after Junker', 'What it does. Safety wire', 'Torque first', 'Direction. Lead the wire', 'Twists. About 6 to 8', 'Once only', 'The wire is usually stainless', 'What it is. A set screw', 'What they are. A tapping screw', 'Thread-forming screws push', 'Thread-cutting screws have', 'What it is. A retaining ring', 'Whitworth. Joseph Whitworth', 'BSW and BSF', 'BA. The British Association', 'BSP is the British pipe thread', 'Spanners. A Whitworth', 'Two markings', 'Not Unified'])
+  if (g.h2 !== 9 || g.svgs !== 4 || g.tabs !== '11,9,12,7,8,8,8' || g.srcs !== 22) problems.push(`[${where}] 9 sections, 4 drawings, tables of 10, 8, 11, 6, 7, 7 and 7 rows, 22 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 42) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['The aim. Engage enough', 'Rule of thumb. Nord-Lock', 'Vibration tests named after Junker', 'What it does. Safety wire', 'Torque first', 'Direction. Lead the wire', 'Twists. About 6 to 8', 'Once only', 'The wire is usually stainless', 'What it is. A set screw', 'What they are. A tapping screw', 'Thread-forming screws push', 'Thread-cutting screws have', 'What it is. A retaining ring', 'Whitworth. Joseph Whitworth', 'BSW and BSF', 'BA. The British Association', 'BSP is the British pipe thread', 'Spanners. A Whitworth', 'Two markings', 'Not Unified'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
   // Four Wikipedia articles, three Machine Design articles, three Essentra pages and two Fastener Engineering articles count once each.
-  for (const k of ['The aim. Engage enough', 'The same shop gives three', 'Softer materials', 'Galling is most common', 'Why they come loose', 'Torque and friction', 'One article, written by a washer maker', 'Common diameters are 0.5 to 1 mm', 'Hard or soft', 'A flat on the shaft', 'Marks. A hardened point', 'Not for high torque', 'That tight fit resists', 'They drive with less torque', 'The hole matters', 'Material. Tapping screws', 'Shear. Pins are loaded', 'Standards. ASME B18.27', 'The largest is 0 BA', 'Cycle thread', 'The Unified thread was agreed'])
+  for (const k of ['Fastenal: about 1 times the diameter', 'The same shop gives three', 'Softer materials', 'Galling is most common', 'Why they come loose', 'Torque and friction', 'One article, written by a washer maker', 'Common diameters are 0.5 to 1 mm', 'Hard or soft', 'A flat on the shaft', 'Marks. A hardened point', 'Not for high torque', 'That tight fit resists', 'They drive with less torque', 'The hole matters', 'Material. Tapping screws', 'Shear. Pins are loaded', 'Standards. ASME B18.27', 'The largest is 0 BA', 'Cycle thread', 'The Unified thread was agreed'])
     if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
   {
     const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
@@ -2229,7 +2229,35 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
-    if (links !== 'boltgrade,bolttorque,sti,bearguide,spanner,shcs,clearance,taperpin,whitworth,pipethreads') problems.push(`[${where}] links to other pages: ${links}`);
+    if (links !== 'threadstrip,boltgrade,bolttorque,sti,bearguide,spanner,shcs,clearance,taperpin,whitworth,pipethreads') problems.push(`[${where}] links to other pages: ${links}`);
+  }
+  // Thread engagement and breaking force: the published M10 row, the Grade 5 example, both aluminium rules side by side.
+  where = 'threadstrip';
+  {
+    const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+    const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+    await units('mm'); await mode('expert'); await open('threadstrip', 150);
+    await put('d', '10'); await put('p', '1.5'); await put('uts', ''); await put('le', '');
+    let t = await rows();
+    if (!/Tensile stress area As 57\.99 mm2/i.test(t) || !/Basic pitch diameter 9\.026 mm/.test(t) || !/\(simplified\) 14\.178 mm2\/mm/.test(t) || !/\(one source, to be verified\) 8\.180 mm/.test(t)) problems.push(`[${where}] M10 x 1.5 (Roymech row: 57.9896, 9.0257, 14.1776, 8.1805): ${t}`);
+    if (!/Breaking force enter the tensile strength of the screw/.test(t)) problems.push(`[${where}] the tensile strength must never be filled in: ${t}`);
+    if (!/in steel: 1 × diameter 10\.000 mm/.test(t) || !/\(Roymech only\) 15\.000 mm/.test(t) || !/2 × diameter \(Nord-Lock, Roymech\) 20\.000 mm/.test(t) || !/1\.5 × diameter \(Fastenal\) 15\.000 mm/.test(t)) problems.push(`[${where}] rules of thumb, both aluminium figures with their sources: ${t}`);
+    if (!/holds only where the tapped part is as strong as the screw/.test(t) || /Your engagement/.test(t)) problems.push(`[${where}] note, and no verdict without a length: ${t}`);
+    await put('uts', '800'); await put('le', '6'); t = await rows();
+    if (!/Breaking force of the screw in tension 46,392 N/.test(t) || !/Your engagement below the simplified least length/.test(t)) problems.push(`[${where}] 800 MPa and 6 mm engaged: ${t}`);
+    await put('le', '9'); t = await rows();
+    if (!/Your engagement at or above the simplified least length/.test(t)) problems.push(`[${where}] 9 mm engaged is above 8.18 mm: ${t}`);
+    const dr = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/d 10/.test(dr) || !/your engagement 9/.test(dr) || !/simplified least 8\.18/.test(dr) || !/threads not drawn/.test(dr)) problems.push(`[${where}] drawing: ${dr}`);
+    await put('p', '12'); t = await rows();
+    if (!/Pitch too coarse for this diameter/i.test(t) || /Tensile stress area/i.test(t)) problems.push(`[${where}] a 12 mm pitch on a 10 mm thread must be refused: ${t}`);
+    await put('p', '1.5'); await put('uts', ''); await put('le', '');
+    await units('inch'); await open('threadstrip', 150); await put('d', '0.75'); await put('tpi', '10'); await put('uts', '120000'); t = await rows();
+    if (!/Tensile stress area As 0\.3345 in2/i.test(t) || !/Breaking force of the screw in tension 40,135 lbf/.test(t) || !/Basic pitch diameter 0\.6850 in/.test(t) || !/in steel: 1 × diameter 0\.7500 in/.test(t)) problems.push(`[${where}] 3/4-10 at 120 000 psi (Fastenal: 40 080 lb with the area rounded to 0.3340): ${t}`);
+    await put('uts', '');
+    const src = await page.innerText('#main');
+    if (!/Roymech/.test(src) || !/Fastenal/.test(src) || !/FED-STD-H28 was not readable/.test(src)) problems.push(`[${where}] the source note must name Roymech and Fastenal and say what is not built`);
+    await mode('advanced');
   }
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';

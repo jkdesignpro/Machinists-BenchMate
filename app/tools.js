@@ -2771,6 +2771,48 @@ const TOOLS = [
   source: 'VDI 2230 Part 1:2015 (R7, R13), by name only; formula also printed by FVA and by Hameedi and Völgyi (2025); friction classes from Bossard. See docs/sources.md.',
 },
 {
+  id: 'threadstrip', level: 'advanced', group: 'Fasteners', title: 'Thread engagement and breaking force',
+  desc: 'How much thread to engage so that the screw breaks before the threads strip, and the force that breaks the screw in tension. The tensile strength is yours to enter; BenchMate never fills it in.',
+  fields: s => [
+    { id: 'd', label: 'Nominal diameter of the thread', unit: lenU(s), def: s === 'inch' ? 0.75 : 10 },
+    s === 'inch' ? { id: 'tpi', label: 'Threads per inch', unit: '', def: 10 } : { id: 'p', label: 'Pitch', unit: 'mm', def: 1.5 },
+    { id: 'uts', label: 'Tensile strength of the screw (optional)', unit: s === 'inch' ? 'psi' : 'MPa', def: '' },
+    { id: 'le', label: 'Your length of engagement (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 4 : 3, au = inch ? 'in2' : 'mm2', sys = inch ? 1 : 0;
+    const p = inch ? W.pitch_tpi(v.tpi) / IN_MM : v.p;   // threads per inch to a pitch in inches: a unit conversion
+    if (!(v.d > 0 && p > 0)) return [];
+    const As = W.stress_area(v.d, p, sys), Le = W.engagement_min_simple(v.d, p, sys);
+    if (!(As > 0 && Le > 0)) return [R('Pitch', 'too coarse for this diameter', '', 0)];
+    const rows = [R('Tensile stress area As', As, au, inch ? 4 : 2)];
+    if (v.uts > 0) rows.push(R('Breaking force of the screw in tension', W.tensile_load(As, v.uts), inch ? 'lbf' : 'N', 0));
+    else rows.push(R('Breaking force', 'enter the tensile strength of the screw', '', 0));
+    rows.push(R('Basic pitch diameter', W.thread_pitch_dia_basic(v.d, p), u, dp),
+      R('Shear area of the thread per unit of engaged length (simplified)', W.thread_shear_area_per_length(v.d, p), au + '/' + u, inch ? 4 : 3),
+      R('Least engagement, simplified, tapped part as strong as the screw (one source, to be verified)', Le, u, dp),
+      R('Rule of thumb in steel: 1 × diameter', W.engagement_by_diameters(v.d, 1), u, dp),
+      R('Rule of thumb in cast iron, brass and bronze: 1.5 × diameter (Roymech only)', W.engagement_by_diameters(v.d, 1.5), u, dp),
+      R('Rule of thumb in aluminium: 2 × diameter (Nord-Lock, Roymech)', W.engagement_by_diameters(v.d, 2), u, dp),
+      R('Rule of thumb in aluminium: 1.5 × diameter (Fastenal)', W.engagement_by_diameters(v.d, 1.5), u, dp));
+    if (v.le > 0) rows.push(R('Your engagement', v.le >= Le
+      ? 'at or above the simplified least length. Compare it with the rule of thumb for the tapped material too.'
+      : 'below the simplified least length: the threads may strip before the screw breaks.', '', 0));
+    rows.push(R('Note', 'The simplified length holds only where the tapped part is as strong as the screw. In a softer tapped material use the rule of thumb or a full calculation, which BenchMate does not do.', '', 0));
+    return rows;
+  },
+  working: 'Breaking force = tensile strength × As. As is the tensile stress area of the thread (ISO metric: 0.7854 (d − 0.9382 P)², Unified inch: 0.7854 (D − 0.9743 P)²). Simplified least engagement: the thread shear area 0.5 π d2 Le is made twice the tensile stress area, so Le = 2 As / (0.5 π d2), with the basic pitch diameter d2 = d − 0.64952 P. Rules of thumb = diameter × the factor shown.',
+  source: 'Breaking force: two Fastenal documents (engineering article "Screw thread design" and the Technical reference guide), one publisher. Simplified engagement: Roymech, "Screw thread calculations", one source, to be verified; Roymech says it is adequate below M6 and conservative above. Rules of thumb: Nord-Lock, Roymech and Fastenal, shown side by side where they differ. The detailed method of FED-STD-H28 was not readable from a free source and is not built. See docs/sources.md, Thread engagement.',
+  proof: [
+    { name: 'M10 × 1.5, simplified least engagement', sys: 'mm', vals: { d: 10, p: 1.5 },
+      expect: [['Tensile stress area As', 'mm2', 57.9896, 0.0005], ['Basic pitch diameter', 'mm', 9.0257, 0.00005], ['Shear area of the thread per unit of engaged length (simplified)', 'mm2/mm', 14.1776, 0.0005], ['Least engagement, simplified, tapped part as strong as the screw (one source, to be verified)', 'mm', 8.1805, 0.0005]],
+      source: 'Roymech, Screw thread calculations, table row M10 × 1.5: pitch diameter 9.0257 mm, tensile stress area 57.9896 mm2, shear area 14.1776 mm2 per mm, simplified engagement 8.1805 mm.', note: 'The same row gives 7.4443 mm by the detailed method, which is not built.' },
+    { name: '3/4-10 Grade 5 screw, breaking force', sys: 'inch', vals: { d: 0.75, tpi: 10, uts: 120000 },
+      expect: [['Breaking force of the screw in tension', 'lbf', 40080, 80]],
+      source: 'Fastenal, Technical reference guide: 3/4-10 SAE J429 Grade 5, 120 000 psi × 0.3340 in2 = 40 080 lb.', note: 'The guide rounds the stress area to 0.3340 in2; the Unified formula gives 0.3345 in2, so the force comes out about 60 lbf higher.' },
+  ],
+},
+{
   id: 'shcs', level: 'simple', group: 'Fasteners', title: 'Socket head cap screws',
   desc: 'Head diameter, head height and hex key of metric (ISO 4762) and inch (ASME B18.3) socket head cap screws, with clearance holes and counterbores.',
   render: el => renderShcs(el),

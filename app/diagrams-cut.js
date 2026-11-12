@@ -1037,6 +1037,23 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Side view of a taper pin: large end diameter D, small end diameter d, length');
   },
 
+  // Thread engagement: section of a screw in a tapped part, to scale. The engaged length is the user's own, or the simplified least length.
+  threadstrip(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys), dp = sys === 'inch' ? 4 : 3;
+    const Le = dcRow(rows, 'Least engagement, simplified'), d = v.d, own = dcOk(v.le);
+    if (!dcOk(Le) || !dcOk(d)) return '';
+    const L = own ? v.le : Le, sc = Math.min(110 / d, 120 / Math.max(L, Le)), cx = 200, top = 84, r = d / 2 * sc, bot = top + L * sc;
+    const blockBot = top + Math.max(L, Le) * sc + 26;
+    let h = DK.rect(cx - r - 90, top, 2 * r + 180, blockBot - top, 'hatch');
+    h += DK.poly([[cx - r, 26], [cx + r, 26], [cx + r, bot], [cx - r, bot]], 'tool');
+    h += DK.cl(cx, 14, cx, blockBot + 8);
+    h += DK.dimH(cx - r, cx + r, 16, 'd ' + dcN(d, dp), { from: 26 });
+    h += dcDimV(top, bot, cx + r + 120, (own ? 'your engagement ' : 'least engagement ') + dcN(L, dp), { from: cx + r });
+    if (own) h += dcPl([[cx - r - 60, top + Le * sc], [cx + r + 60, top + Le * sc]], 'dim') + dcLines(cx - r - 88, top + Le * sc - 6, ['simplified least ' + dcN(Le, dp)]);
+    h += dcLines(cx + r + 100, 30, ['section, to scale, ' + u, 'threads not drawn']) + dcLines(cx - r - 86, top + 16, ['tapped part']);
+    return DK.svg(W, H, h, 'Section of a screw in a tapped part: screw diameter and the length of thread engaged');
+  },
+
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
   sawtpi(v, sys, rows) {
     const W = 520, H = 250, u = dcU(sys);

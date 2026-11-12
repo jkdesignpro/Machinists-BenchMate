@@ -467,6 +467,10 @@ f1!(saw_min_tpi, c::saw_min_tpi, thin, teeth);
 
 // Fasteners and machine elements (core/src/fasteners.rs)
 f1!(stress_area, c::stress_area_f, d, p, system);
+f1!(tensile_load, c::tensile_load, stress_area, tensile_strength);
+f1!(thread_shear_area_per_length, c::thread_shear_area_per_length, d, p);
+f1!(engagement_min_simple, c::engagement_min_simple, d, p, system);
+f1!(engagement_by_diameters, c::engagement_by_diameters, d, k);
 f1!(stress_dia, c::stress_dia_f, d, p, system);
 f1!(bearing_mean_dia, c::bearing_mean_dia, dw, dh);
 f1!(tightening_torque, c::tightening_torque, f, p, d2, mu_g, dkm, mu_k);

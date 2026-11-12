@@ -102,7 +102,7 @@ const WORKSPACES = [
   ] },
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
     ['Materials', ['materials', 'hardness', 'heattreat', 'tempercolours', 'galvanic', 'plastics', 'metalid'], 'material'],
-    ['Fasteners', ['boltgrade', 'bolttorque', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
+    ['Fasteners', ['boltgrade', 'bolttorque', 'threadstrip', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
     ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife', 'spring', 'beltdrive', 'chaindrive', 'taperpin'], 'bearing'],
     ['Shop', ['coolant', 'economics', 'abbrev'], 'drop'],
     ['Guides', ['cncguide', 'millsetup', 'toolpaths', 'workholding', 'latheguide', 'shoptools', 'matguide', 'measguide', 'cutguide', 'bearguide', 'abrasguide', 'drawguide', 'procguide', 'elemguide', 'driveguide', 'fastguide', 'toolwear', 'toolguide', 'glossary'], 'book'],

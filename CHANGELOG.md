@@ -4,6 +4,20 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.7.0] - in progress
+Stage 4 of the plan, part 2: tables of dimensions and calculations for the book rows that 0.6.0 left partial. Built on top of 0.6.0.
+
+### Added (thread engagement)
+- New tool **Thread engagement and breaking force** (Reference > Fasteners): for a metric or inch thread it gives the tensile stress area, the force that breaks the screw in tension (the tensile strength is your own entry and is never filled in), the basic pitch diameter, a simplified least length of engagement for a tapped part as strong as the screw, and the rules of thumb for steel, cast iron, brass, bronze and aluminium. Where the sources differ (aluminium: 2 diameters from Nord-Lock and Roymech, 1.5 from Fastenal) both figures are shown with their sources. Your own engagement length is compared with the simplified least length. The simplified length rests on one source and is marked "to be verified"; the detailed method of FED-STD-H28 could not be read from a free source and is not built. Checked against a published M10 x 1.5 row and a published 3/4-10 Grade 5 example. A section drawing to scale shows the screw in the tapped part with the engaged length.
+- Formula library: three entries for the new tool.
+- Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
+
+### Fixed
+- The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.
+
+### Book audit
+- MH201 (working strength, engagement length, breaking force, lock wire) from partial to done: 368 done, 180 partial, 48 missing of 596 in-scope rows, 62 %; 169 more rows to done for the 90 % target.
+
 ## [0.6.0] - 2026-11-12
 Stage 4 of the plan, part 1: book references, in seventeen batches. Built on top of 0.5.0. The book audit (docs/parity-audit.md) stands at 367 done, 181 partial and 48 missing of 596 in-scope rows, 62 %; the target of 90 % is carried on in 0.7.0 and 0.8.0.
 

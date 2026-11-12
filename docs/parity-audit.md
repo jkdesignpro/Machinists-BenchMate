@@ -84,6 +84,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, seventeenth batch, 2026-11-12):** fasteners guide (`fastguide`). MH208 from missing to done and MH214 from partial to done; MH201, MH209, MH211, MH215 and MH216 from missing to partial (the tables of dimensions and hole sizes are still to come); MH210 stays partial with set screw points added. Counted from the tables below: 367 done, 181 partial, 48 missing of 596 in-scope rows, 62 %; 170 more rows to done for the 90 % target.
 
+**Update (0.7.0, first batch, 2026-11-12):** thread engagement and breaking force calculator (`threadstrip`). MH201 from partial to done. Counted from the tables below: 368 done, 180 partial, 48 missing of 596 in-scope rows, 62 %; 169 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -570,7 +572,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH198 | Torque and tension: tightening, wrench torque, preload, friction | partial | `bolttorque` | VDI 2230 torque from preload with your own friction (cited classes shown); no torque-angle or yield-controlled tightening, no tightening factor (scatter) |
 | MH199 | Thread tensile-stress area, torque-tension relationships | done | `bolttorque` | Stress area (ISO and Unified), torque-preload relation with the share of each term (`claude/fasteners`) |
 | MH200 | Grade marks, material properties, counterfeit detection | partial | `boltgrade` | ISO 898-1, SAE J429 and ASTM A574 minimums and head marks; no counterfeit detection |
-| MH201 | Working strength, engagement length, breaking force, lock wire | partial | `fastguide`, `boltgrade`, `bolttorque` | 0.6.0: engagement rule of thumb from two sources (differing figures shown) and lock wire in `fastguide`; strengths in `boltgrade`, preload in `bolttorque`; no breaking force by size and no calculated engagement length yet |
+| MH201 | Working strength, engagement length, breaking force, lock wire | done | `threadstrip`, `fastguide`, `boltgrade`, `bolttorque` | 0.7.0: breaking force from the stress area and your own tensile strength, simplified least engagement (one source, marked) and the rules of thumb with differing sources side by side in `threadstrip`; lock wire in `fastguide`; strengths in `boltgrade`, preload in `bolttorque`. The detailed FED-STD-H28 stripping method is not built (no readable free source) |
 | MH202 | Inch bolts, screws, nuts and washers (dimensions) | partial | `shcs`, `spanner` | Socket head cap screw heads and hex widths across flats only; no full bolt, nut and washer dimensions |
 | MH203 | Wrench clearances | missing | | |
 | MH204 | Metric hex screws, bolts, nuts and washers | partial | `spanner` | Widths across flats (ISO 272, old DIN, JIS) only; no head heights, nuts or washers |

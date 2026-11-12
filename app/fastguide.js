@@ -7,6 +7,7 @@
 const FG_SOURCES = {
   NORD: 'Nord-Lock Group, "The Experts: Thread engagement in a tapped hole" (no author shown)',
   UW: 'University of Wisconsin physics instrument shop, FAQ (no author shown)',
+  FAST_ART: 'Fastenal, engineering article "Screw thread design", rev. 2009 (no author shown)',
   MD_LOCK: 'Machine Design, K. Bock (Nord-Lock), "Proper fastener selection and application are key to bolted joints that won’t loosen or lose clamping force", 2009-06-16',
   FE_LOCK: 'Fastener Engineering, J. Muelaner, "What is the difference between a lock washer and a vibration-resistant washer?", 2020-04-20',
   ESS_LN: 'Essentra Components, "What is a lock nut? How does it work?" (no author or date shown)',
@@ -164,12 +165,13 @@ function renderFastGuide(el) {
     '<p class="desc">Fasteners as a machinist meets them, in our own words: how much thread to engage, what keeps a fastener tight, lock wire, set screw points, screw heads and drives, self-tapping screws, pins, retaining rings and the old British threads. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
 
     '<h2 id="fg-eng">Thread engagement</h2>' + fgEngage() +
-    fgP('<b>The aim.</b> Engage enough thread that the screw breaks before the threads strip.', ['NORD']) +
+    fgP('<b>The aim.</b> Engage enough thread that the screw breaks before the threads strip.', ['NORD', 'FAST_ART']) +
     fgP('<b>Rule of thumb.</b> Nord-Lock: about 1 times the screw diameter in steel and about 2 times in aluminium. The Wisconsin physics shop: about 1.5 times the diameter as the best length.', ['NORD', 'UW']) +
+    fgP('Fastenal: about 1 times the diameter in carbon steel and about 1.5 times in aluminium, with no real gain beyond that.', ['FAST_ART']) +
     fgP('The same shop gives three fully engaged threads as the least, and works an example: a 1/4-20 screw wants 0.375 in, about 7.5 threads.', ['UW']) +
     fgP('<b>Softer materials</b> and special alloys can need more than the rule gives. Then the length has to be calculated.', ['NORD']) +
     fgP('<b>Galling</b> is most common in stainless steel, aluminium and titanium. A lubricant with molybdenum disulphide or graphite helps, and so does pairing two different grades of stainless steel.', ['UW']) +
-    fgP('Strengths are under <a href="#/t/boltgrade">bolt grades and property classes</a>, tightening under <a href="#/t/bolttorque">bolt torque and preload</a>, thread inserts under <a href="#/t/sti">helical insert tapped holes</a>.', null) +
+    fgP('The <a href="#/t/threadstrip">thread engagement and breaking force</a> calculator works these out for a thread. Strengths are under <a href="#/t/boltgrade">bolt grades and property classes</a>, tightening under <a href="#/t/bolttorque">bolt torque and preload</a>, thread inserts under <a href="#/t/sti">helical insert tapped holes</a>.', null) +
 
     '<h2 id="fg-lock">Keeping fasteners tight</h2>' +
     fgP('<b>Why they come loose.</b> Vibration makes the surfaces in contact slip. The friction in the thread is overcome and the clamp load is lost.', ['MD_LOCK']) +
