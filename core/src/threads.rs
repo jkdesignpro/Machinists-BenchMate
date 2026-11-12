@@ -299,6 +299,20 @@ pub fn un_limit(d: f64, p: f64, class: u32, which: u32) -> f64 {
 /// side: plus (`plus` > 0: GO thread plug, NOT GO thread ring) or minus (NOT
 /// GO thread plug, GO thread ring), so that a new gauge never accepts a part
 /// outside its limits. `which` 0 smallest, 1 largest size of the member.
+/// Blank diameter before thread rolling by a thread roll maker's rule: the
+/// maximum pitch diameter less an allowance (CJWinter: .002 in, .051 mm).
+pub fn roll_blank_dia(pd_max: f64, allowance: f64) -> f64 {
+    if pd_max.is_finite() && pd_max > 0.0 && allowance.is_finite() && allowance >= 0.0 && allowance < pd_max { pd_max - allowance } else { f64::NAN }
+}
+
+/// Change to make to the blank diameter after a trial: the rolled major
+/// diameter moves `ratio` times as far as the blank (CJWinter: 3 to 1), so the
+/// blank changes by (middle of the major diameter limits - measured) / ratio.
+pub fn roll_blank_change(measured: f64, major_max: f64, major_min: f64, ratio: f64) -> f64 {
+    if !(measured.is_finite() && measured > 0.0 && major_max.is_finite() && major_min.is_finite() && major_max >= major_min && ratio.is_finite() && ratio > 0.0) { return f64::NAN; }
+    ((major_max + major_min) / 2.0 - measured) / ratio
+}
+
 pub fn gauge_member_limit(size: f64, tol: f64, plus: f64, which: f64) -> f64 {
     if !(size > 0.0 && tol >= 0.0) { return f64::NAN; }
     let (lo, hi) = if plus > 0.0 { (size, size + tol) } else { (size - tol, size) };
@@ -309,6 +323,23 @@ pub fn gauge_member_limit(size: f64, tol: f64, plus: f64, which: f64) -> f64 {
 mod tests {
     use super::*;
     fn close(a: f64, b: f64, tol: f64) { assert!((a - b).abs() <= tol, "{a} vs {b}"); }
+
+    /// Rolled-thread blank: CJWinter's rule (maximum pitch diameter less .002 in
+    /// or .051 mm) and its 3 to 1 ratio between blank and major diameter.
+    #[test] fn rolled_thread_blank() {
+        let pd = un_limit(0.25, 1.0 / 20.0, 2, 2); // 1/4-20 UNC-2A maximum pitch diameter, 0.2164 in
+        assert!((pd - 0.2164).abs() < 1e-9);
+        assert!((roll_blank_dia(pd, 0.002) - 0.2144).abs() < 1e-9);
+        let pm = iso965_limit(10.0, 1.5, 6, 3, 2); // M10 x 1.5 6g maximum pitch diameter, 8.994 mm
+        assert!((pm - 8.994).abs() < 5e-4);
+        assert!((roll_blank_dia(pm, 0.051) - (pm - 0.051)).abs() < 1e-12 && (roll_blank_dia(pm, 0.051) - 8.943).abs() < 5e-4);
+        assert!(roll_blank_dia(0.0, 0.002).is_nan() && roll_blank_dia(0.2, -0.001).is_nan());
+        // .001 in on the blank is .003 in on the major diameter.
+        assert!((roll_blank_change(0.2470, 0.2500, 0.2500, 3.0) - 0.001).abs() < 1e-12);
+        // 1/4-20 UNC-2A major 0.2489 to 0.2408: middle 0.24485; a trial at 0.2430 is 0.00185 small, blank up by a third.
+        assert!((roll_blank_change(0.2430, 0.2489, 0.2408, 3.0) - 0.00185 / 3.0).abs() < 1e-12);
+        assert!(roll_blank_change(0.2430, 0.24, 0.25, 3.0).is_nan() && roll_blank_change(0.2430, 0.25, 0.24, 0.0).is_nan());
+    }
 
     /// Gauge members: 1/4-20 UNC-2B plug with X tolerance 0.0003 in (GO made to
     /// 0.2175 plus, NOT GO made to 0.2224 minus), and a 2A ring (GO 0.2164

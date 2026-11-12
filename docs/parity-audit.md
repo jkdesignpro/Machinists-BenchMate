@@ -506,7 +506,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH186 | Sheet metal: shearing, blanking force, stripper force | missing | | Low priority |
 | MH187 | Sheet metal bending (bend allowance) | missing | | In progress (`claude/geometry`, `bend`) |
 | MH188 | Stretch forming, dies, presses, tube bending | out of scope? | | Press shop, not machining |
-| MH189 | EDM: terms, process, wire EDM | missing | | |
+| MH189 | EDM: terms, process, wire EDM | partial | `edmoffset`, `edmtaper`, `edmtime` | Wire EDM kerf, offset, corner radius, taper and cut time (0.5.0). Sinker EDM and rate tables not covered |
 | MH190 | Metal casting, moulding and extrusion | out of scope | | Casting process detail |
 | MH191 | Powder metallurgy and metal additive manufacturing | out of scope? | | |
 | MH192 | Soldering and brazing | out of scope? | | Joining, like welding |

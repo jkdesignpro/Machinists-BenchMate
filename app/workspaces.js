@@ -49,6 +49,8 @@ const HUBS = {
     tabs: [['drillforce', 'Drill thrust and torque'], ['taptorque', 'Tap torque']] },
   saws: { title: 'Bandsaw', icon: 'saw', desc: 'Cut time and the blade pitch for the section being cut.',
     tabs: [['bandsaw', 'Cut time'], ['sawtpi', 'Blade pitch']] },
+  wireedm: { title: 'Wire EDM', icon: 'wave', desc: 'Kerf, wire offsets and corner radius, taper cuts, and cut time from the cutting rate.',
+    tabs: [['edmoffset', 'Offset and kerf'], ['edmtaper', 'Taper'], ['edmtime', 'Cut time']] },
 };
 
 const WORKSPACES = [
@@ -68,13 +70,14 @@ const WORKSPACES = [
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
     ['Drilling', ['advdrill', 'advream', 'advtap', 'gundrill', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
-    ['Tapping and thread data', ['threaddata', 'threadid', 'taplimits', 'threadgauge', 'wires', 'sti', 'coating', 'multistart'], 'tap'],
+    ['Tapping and thread data', ['threaddata', 'threadid', 'taplimits', 'threadgauge', 'rollblank', 'wires', 'sti', 'coating', 'multistart'], 'tap'],
     ['Thread standards', ['pipethreads', 'whitworth', 'acme', 'trapezoidal', 'buttress', 'unseries', 'unm', 'unjunr'], 'thread'],
     ['Thread programs', ['threadprog'], 'code'],
   ] },
-  { id: 'process', name: 'Grinding, sawing and gears', icon: 'gear', blurb: 'Grinding speeds and times, saws, gears, splines and broaching.', sections: [
+  { id: 'process', name: 'Grinding, sawing and gears', icon: 'gear', blurb: 'Grinding speeds and times, saws, wire EDM, gears, splines and broaching.', sections: [
     ['Grinding', ['grindspeed', 'grindratio', 'grindtimes', 'gritconv', 'wheelcode'], 'wheel'],
     ['Sawing', ['saws', 'slitsaw'], 'saw'],
+    ['Wire EDM', ['wireedm'], 'wave'],
     ['Gears', ['spurgear', 'helicalgear', 'gearmeasure', 'geartrain', 'planetary', 'worm', 'changegears', 'indexing'], 'gear'],
     ['Splines and broaching', ['spline', 'cycbroach', 'keys'], 'gear'],
   ] },

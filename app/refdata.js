@@ -117,10 +117,11 @@ async function renderTapDrill(el) {
     '<label class="f"><span>Thread engagement <b id="tpv" class="mv"></b> <span class="ms" id="tps"></span></span><div class="row"><input id="tp" type="range" min="55" max="85" step="1" style="flex:1 1 160px;min-width:120px;padding:0;border:0;background:transparent" aria-label="Thread engagement in percent"><span class="u">%</span></div></label>' +
     '<label class="f cust"><span>Major diameter</span><div class="row"><input id="td" type="number" step="any"><span class="u">' + uLen() + '</span></div></label>' +
     '<label class="f cust"><span>Pitch' + (inMode() ? ' (threads per inch)' : '') + '</span><div class="row"><input id="tpp" type="number" step="any"><span class="u">' + (inMode() ? 'TPI' : 'mm') + '</span></div></label>' +
+    '<label class="f"><span>Hole as measured (optional)</span><div class="row"><input id="thm" type="number" step="any" value="' + rEsc(m.hole || '') + '"><span class="u">' + uLen() + '</span></div></label>' +
     '</div><div id="tres"></div><div class="note"><b>Working:</b> Cutting taps: drill = D - 1.299038 P x %/100, the convention behind the inch formula drill = D - 0.01299 x % / TPI (OSG USA tapping guide, 2024) and the metric form D - % x P / 76.98 (FM Carbide). In this convention 100 % is a thread depth of 2 x 0.75 H = 1.299 P on the diameter, deeper than the basic engagement of ISO 68-1 / ASME B1.1 (2 x 5/8 H = 1.0825 P), so a hole at the basic minor diameter is 83.3 %. Forming taps: hole = D - 0.0068 x % x P (inch: D - 0.0068 x % / TPI; metric form D - % x P / 147.06), as published by the forming tap makers North American Tool and Besly and by FM Carbide, Engineers Edge and MSC (compared under the result in forming mode); the formed metal flows inward, so the hole is larger than for a cutting tap. It is a rule of thumb: the forming-tap maker Balax prints hole sizes for 75, 65 and 55 % thread (miniature sizes, 0-80 to 3-48 and M1 to M1.4) that are 0 to 0.0016 in larger than it gives. Use the tap maker\'s recommended hole size for the tap you have. The shop rule of thumb "drill = major minus pitch" is an approximation: it gives 77 % thread with a cutting tap.<br>' +
     '<b>Suggested engagement:</b> 75 % for cutting taps: USCTI calls 75 % the general rule for 2B and 3B threads (a little more in soft, a little less in hard material, and not under 65 % in holes shallower than 3 x D); FM Carbide gives 65 to 75 % for cutting taps and starts its calculator at 75 %. 65 % for forming taps: Besly (Cutting Tool Engineering, 1995) says 65 to 75 % is enough for general work and works its example at 65 %; FM Carbide gives 60 to 65 % for forming in steel, stainless and ductile alloys; North American Tool gives 55 to 75 %. Besly and FM Carbide both advise against forming above 75 %. The slider runs from 55 to 85 %; the suggestions are starting points, not limits.<br>' +
     '<b>Nearest drills:</b> for each drill series, the nearest size at or below and the nearest above the theoretical hole for the tap type you chose, with the engagement each gives with a cutting tap and with a forming tap (the two use different formulas, so the same drill gives a different percent). Sizes come from the drill chart (number and letter sizes as printed by its publishers). Check the hole against the internal thread minor diameter limits and your tap maker\'s chart, especially for forming taps.<br><b>Sources:</b> OSG USA, Tapping Guide vol. 3 (2024), formula and drill tables for 60 to 80 % thread; FM Carbide TechTips "Tapping formulas" (constants 1.299 / 0.68, 76.98 / 147.06; engagement ranges); Engineers Edge "Theoretical tapping hole size, cold form threads" (0.0068); USCTI tapping tip "Don\'t let percent of thread derail your part"; Besly Products in Cutting Tool Engineering, "Threads will roll" (1995); North American Tool TRU-FLO engineering data. Thread geometry ISO 68-1:2023, ASME B1.1-2024.</div>';
-  const k = $('#tk', el), tt = $('#tt', el), tp = $('#tp', el), td = $('#td', el), tpp = $('#tpp', el);
+  const k = $('#tk', el), tt = $('#tt', el), tp = $('#tp', el), td = $('#td', el), tpp = $('#tpp', el), thm = $('#thm', el);
   const type = () => m.type === 'form' ? 'form' : 'cut';
   function setType() {
     tt.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === type()));
@@ -154,6 +155,15 @@ async function renderTapDrill(el) {
       ['Basic minor diameter of the internal thread (D1)', fBoth(d1) + ' <span class="ms">' + pctTxt(d1) + '</span>'],
       ['Rule of thumb D - P (approximation)', fBoth(d - p) + ' <span class="ms">' + pctTxt(d - p) + '</span>'],
     ]);
+    // A hole the user measured: the engagement it gives with each tap type (core), and a warning outside 50 to 100 %.
+    m.hole = thm.value;
+    const hm = fromUser(parseFloat(thm.value));
+    let holeHtml = '';
+    if (hm > 0) {
+      const line = t => { const v = T[t].of(hm), warn = !(v > 0) ? 'larger than the thread: no engagement' : v > 100 ? 'over 100 %: the tap will bind or break' : v < 50 ? 'under 50 %: weak thread' : '';
+        return '<tr' + (warn ? ' class="over"' : '') + '><td>' + T[t].name + (t === 'form' ? ' <span class="ms">(hole before forming)</span>' : ' <span class="ms">(the hole is the minor diameter of the thread)</span>') + '</td><td class="v"><b>' + (v > 0 ? fx(v, 1) + ' %' : 'none') + '</b>' + (warn ? '<div class="wmsg">' + warn + '</div>' : '') + '</td></tr>'; };
+      holeHtml = '<div class="res" style="margin-top:12px" id="thole"><div class="h">Your hole of ' + fBoth(hm) + ': thread engagement</div><table>' + order.map(line).join('') + '</table></div>';
+    }
     const nearTable = t => {
       const X = T[t];
       let near = '';
@@ -170,7 +180,7 @@ async function renderTapDrill(el) {
       });
       return '<div class="res mtab" style="margin-top:12px"><div class="h">' + X.name + ': nearest standard drills to ' + fLen(X.hole) + ' ' + uLen() + ' (' + fx(X.pct, 0) + ' %)</div><table><tr><th>Series</th><th>Drill</th><th style="text-align:right">Size</th><th style="text-align:right">Difference (' + uLen() + ')</th><th style="text-align:right">Engagement</th></tr>' + near + '</table></div>';
     };
-    out.innerHTML = '<div class="res"><div class="h">Results' + (sel ? ' for ' + rEsc(sel.label) + ' ' + badge(sel.status) : ' for ' + fLen(d) + ' ' + uLen() + ', ' + pitchTxt) + '</div><table>' + rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') + '</table></div>' +
+    out.innerHTML = '<div class="res"><div class="h">Results' + (sel ? ' for ' + rEsc(sel.label) + ' ' + badge(sel.status) : ' for ' + fLen(d) + ' ' + uLen() + ', ' + pitchTxt) + '</div><table>' + rows.map(r => '<tr><td>' + r[0] + '</td><td class="v">' + r[1] + '</td></tr>').join('') + '</table></div>' + holeHtml +
       order.map(nearTable).join('') +
       (form && typeof formTapCompare === 'function' ? formTapCompare(R, d, p, pct) : '');
     // G-code: a tapping cycle with this pitch (snippets.js). The speed is left for the user to type.
@@ -189,7 +199,7 @@ async function renderTapDrill(el) {
     setCustomFields(); setType(); upd();
   };
   tt.querySelectorAll('button').forEach(b => b.onclick = () => { m.type = b.dataset.v; setType(); upd(); });
-  k.onchange = () => { setCustomFields(); upd(); }; tp.oninput = upd; td.oninput = upd; tpp.oninput = upd;
+  k.onchange = () => { setCustomFields(); upd(); }; tp.oninput = upd; td.oninput = upd; tpp.oninput = upd; thm.oninput = upd;
   setCustomFields(); setType(); upd();
 }
 

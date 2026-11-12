@@ -1,0 +1,118 @@
+{
+ "_note": "Blank diameter before thread rolling. Two publishers, two different rules: both are kept as printed, nothing is merged.",
+ "sources": {
+  "CJW_PD": {
+   "publisher": "CJWinter",
+   "title": "Pitch diameter, major diameter, blank diameter: what are they? (30 November 2017)",
+   "url": "https://www.cjwinter.com/pitch-diameter-major-diameter-blank-diameter-what-are-they",
+   "accessed": "2026-11-12",
+   "note": "Thread roll maker. Blank diameter = MAX thread pitch diameter less .002 in [or .051 mm], for straight threads."
+  },
+  "CJW_BLANK": {
+   "publisher": "CJWinter",
+   "title": "Engineering bulletin: blank design (24 May 2016)",
+   "url": "https://cjwinter.com/?p=83",
+   "accessed": "2026-11-12",
+   "note": "Changes to the blank diameter affect the major diameter of the thread by a ratio of 3 to 1: .001 in on the blank is .003 in on the major diameter."
+  },
+  "MH_ROLL": {
+   "publisher": "Industrial Press",
+   "title": "Machinery's Handbook, 31st ed. (2020), Thread rolling, 'Diameter of blank for thread rolling', p. 2188 (the publisher's online copy)",
+   "url": "https://online.flippingbook.com/view/954046886/842",
+   "accessed": "2026-11-12",
+   "note": "Read twice, same figures. The blank is about the pitch diameter; the amounts above or below it by screw size; the outside diameter grows by about the depth of one thread; verify by trial. The passage does not say whether maximum, minimum or basic pitch diameter is meant."
+  }
+ },
+ "rule": {
+  "allow_in": 0.002,
+  "allow_mm": 0.051,
+  "src": "CJW_PD"
+ },
+ "ratio": {
+  "v": 3,
+  "src": "CJW_BLANK"
+ },
+ "handbook": {
+  "src": "MH_ROLL",
+  "_cols": "from (in, exclusive unless from_incl), to (in, inclusive; null = no upper limit), sign (+1 larger than the pitch diameter, -1 less), low and high amount (in), words",
+  "rows": [
+   {
+    "from": 0,
+    "to": 0.25,
+    "to_incl": false,
+    "sign": -1,
+    "lo": 0.001,
+    "hi": 0.0015,
+    "size": "smaller than 1/4 in",
+    "use": "ordinary grades of work"
+   },
+   {
+    "from": 0.25,
+    "to": 0.5,
+    "to_incl": true,
+    "sign": 1,
+    "lo": 0.002,
+    "hi": 0.0025,
+    "size": "1/4 to 1/2 in",
+    "use": ""
+   },
+   {
+    "from": 0.25,
+    "to": 0.5,
+    "to_incl": true,
+    "sign": -1,
+    "lo": 0.002,
+    "hi": 0.003,
+    "size": "1/4 to 1/2 in",
+    "use": "bolts and screws that are to have a comparatively free fit"
+   },
+   {
+    "from": 0.5,
+    "to": null,
+    "to_incl": true,
+    "sign": 1,
+    "lo": 0.0025,
+    "hi": 0.003,
+    "size": "1/2 to 1 in or larger",
+    "use": ""
+   },
+   {
+    "from": 0.5,
+    "to": null,
+    "to_incl": true,
+    "sign": -1,
+    "lo": 0.003,
+    "hi": 0.005,
+    "size": "above 1/2 in",
+    "use": "bolts and screws that are to have a comparatively free fit",
+    "from_excl": true
+   }
+  ]
+ },
+ "notes": [
+  {
+   "t": "Rolling raises the outside diameter by about the depth of one thread.",
+   "src": [
+    "MH_ROLL"
+   ]
+  },
+  {
+   "t": "Verify the blank diameter by trial, especially for accurate threads; harder and tougher stock resists being displaced, so the trial size may need adjusting for the material.",
+   "src": [
+    "MH_ROLL"
+   ]
+  },
+  {
+   "t": "A change of the blank diameter changes the rolled major diameter by about three times as much.",
+   "src": [
+    "CJW_BLANK"
+   ]
+  }
+ ],
+ "gaps": [
+  "Blank diameters for tapered pipe threads (calculated differently, per CJWinter).",
+  "Tolerance on the blank diameter, chamfer angle and chamfer diameter: no figures in the pages read.",
+  "Rolls, penetration rates, rolling speeds and the pressure needed.",
+  "Allowance for plating."
+ ]
+}

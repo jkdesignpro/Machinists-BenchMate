@@ -627,6 +627,8 @@ pub mod grinding;
 pub use grinding::*;
 pub mod deephole;
 pub use deephole::*;
+pub mod edm;
+pub use edm::*;
 pub mod tnrc;
 pub mod measure;
 pub mod power_threads;

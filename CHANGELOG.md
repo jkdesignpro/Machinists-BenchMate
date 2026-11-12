@@ -45,6 +45,18 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - Recorded where sources differ: the macro variable number of one tool offset on Fanuc (two sources differ by one).
 - Not found in a readable form, and listed as gaps on the page: Fanuc's own M-code and system variable tables, Haas Next Generation Control variable numbers, Doosan lathe M codes.
 
+### Added (thread extras)
+- New tool **Rolled thread blank diameter** in Holes and threads > Tapping and thread data, for ISO metric (6g, 6h, 4h) and Unified (2A, 3A) threads: the blank diameter by a thread roll maker's rule (maximum pitch diameter less 0.002 in or 0.051 mm), the thread's pitch and major diameter limits, and the handbook's amounts for the size beside it. The two publishers give different rules; both are shown and nothing is merged.
+- Enter the major diameter of a trial and the page gives the change to make to the blank (one third of the difference to the middle of the limits; one source, marked so).
+- **Tap drill size**: enter a hole as measured and the page gives the thread engagement it produces with a cutting tap and with a forming tap, with a warning over 100 % and under 50 %.
+- Two entries in the formula library.
+
+### Added (wire EDM)
+- New page **Wire EDM** in Grinding, sawing and gears, with three tabs. **Offset and kerf**: the width of the slot the wire leaves, the wire offset for the first cut (with the stock left for skim cuts) and for the final skim cut, and the smallest inside corner radius. **Taper**: how far a tapered wall moves sideways over its height, the angle from that distance, and how far apart sideways the wire guides must be. **Cut time**: area of the cut, time of the first cut and of up to four skim cuts, and the speed along the path, from the cutting rate.
+- The spark gap, the stock and the cutting rate are inputs from the machine's cutting tables. Two published ranges for the gap on the first cut differ (0.001 to 0.002 in and 0.002 to 0.003 in): the page prints both.
+- The formulas are in the core (`core/src/edm.rs`) with tests against a free EDM handbook's figures and two worked examples; five entries in the formula library.
+- Not included: cutting rates and gaps per machine and wire, sinker EDM.
+
 ### Added (thread gauge limits)
 - New tool **Thread gauge limits (GO and NOT GO)** in Holes and threads > Tapping and thread data, for Unified threads in classes 2A, 2B, 3A and 3B: the pitch diameter each member of a thread plug and a thread ring is made to, the gauge maker's X tolerance for the pitch and diameter, the smallest and largest size of each member, and a drawing of where the gauge zones sit in the thread's tolerance.
 - A gauge maker's pitch diameter chart (15 common sizes) is shown beside the result. It agrees with BenchMate's thread limits in 102 of 105 values; the three that differ by 0.0001 in are shown with a "Chart differs" mark and are not changed (one of them is the 1/4-20 2B maximum already on the list of open questions).

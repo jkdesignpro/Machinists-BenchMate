@@ -874,3 +874,70 @@ async function renderThreadGauge(el) {
   upd();
 }
 
+// ------------------------------------------------------------------ rolled thread blank diameter
+// Blank diameter before thread rolling. The thread's limits are the core's, the maker's allowance and the
+// handbook's amounts are looked up in the reference data, and the blank and the correction after a trial
+// come from the core. Two publishers give two different rules: both are shown, nothing is merged.
+async function renderRollBlank(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, K = R.rollblank; if (!K) { el.textContent = 'Thread rolling data not built.'; return; }
+  const opts = threadOptions(R);
+  const m = RMEM.rollblank || (RMEM.rollblank = { key: 'M10x1.5', cu: '2', cm: '6g', meas: '' });
+  if (!opts.some(o => o.key === m.key)) m.key = opts[0].key;
+  const MC = { '6g': [6, 3], '6h': [6, 4], '4h': [4, 4] };
+  const grp = sys => opts.filter(o => o.sys === sys).map(o => '<option value="' + rEsc(o.key) + '"' + (o.key === m.key ? ' selected' : '') + '>' + rEsc(o.label) + '</option>').join('');
+  const cite = ks => ks.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ');
+  el.innerHTML = '<div class="grid" style="max-width:860px"><label class="f"><span>Thread</span><div class="row"><select id="rbk"><optgroup label="ISO metric">' + grp('metric') + '</optgroup><optgroup label="Unified inch">' + grp('unified') + '</optgroup></select></div></label>' +
+    '<label class="f"><span>Class of the external thread</span><div class="row"><select id="rbc"></select></div></label>' +
+    '<label class="f"><span>Major diameter measured after a trial (optional)</span><div class="row"><input id="rbm" type="number" step="any" value="' + rEsc(m.meas) + '"><span class="u">' + uLen() + '</span></div></label></div>' +
+    '<div id="rbplot"></div><div id="rbres"></div>' +
+    '<div class="note"><b>Working:</b> a rolled thread is formed, not cut: metal pushed out of the root rises to make the crest, so the blank is turned to about the pitch diameter. The blank given here follows the thread roll maker\'s rule: maximum pitch diameter less ' + fx(K.rule.allow_in, 3) + ' in (' + fx(K.rule.allow_mm, 3) + ' mm). The pitch and major diameter limits are the ones the Thread data tool works out. ' +
+    'The handbook gives amounts above or below "the pitch diameter" by screw size and does not say which pitch diameter it means, so its figures are printed as they are and not worked into a size. ' + K.notes.map(n => rEsc(n.t) + ' <span class="ms">(' + cite(n.src) + ')</span>').join(' ') +
+    ' After a trial, measure the major diameter: the correction shown is the difference to the middle of the major diameter limits divided by ' + K.ratio.v + '. Check the finished thread with a gauge as well (the last sentence is BenchMate\'s own advice).</div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '<br><b>Not covered:</b> ' + K.gaps.map(rEsc).join(' ') + '</div>';
+  const q = id => $('#' + id, el), tk = q('rbk'), tc = q('rbc'), tm = q('rbm');
+  function classes() {
+    const o = opts.find(x => x.key === tk.value), uni = o.sys === 'unified';
+    tc.innerHTML = uni ? '<option value="2">2A</option><option value="3">3A</option>' : Object.keys(MC).map(c => '<option value="' + c + '">' + c + '</option>').join('');
+    tc.value = uni ? m.cu : m.cm;
+  }
+  function upd() {
+    m.key = tk.value; m.meas = tm.value;
+    const o = opts.find(x => x.key === m.key), uni = o.sys === 'unified', out = q('rbres'), plot = q('rbplot');
+    if (uni) m.cu = tc.value; else m.cm = tc.value;
+    // Native unit of the thread: inches for Unified, mm for metric. k turns it into mm for display.
+    const k = uni ? IN_MM : 1, L = i => (uni ? W.un_limit(o.din, 1 / o.tpi, +m.cu, i) : W.iso965_limit(o.d, o.p, MC[m.cm][0], MC[m.cm][1], i));
+    const mjMax = L(0), mjMin = L(1), pdMax = L(2), pdMin = L(3), blank = W.roll_blank_dia(pdMax, uni ? K.rule.allow_in : K.rule.allow_mm);
+    const din = o.d / IN_MM, hb = K.handbook.rows.filter(r => (r.from_excl ? din > r.from : din >= r.from) && (r.to === null || (r.to_incl ? din <= r.to : din < r.to)));
+    const amt = r => fx(r.lo, 4) + ' to ' + fx(r.hi, 4) + ' in <span class="ms">(' + fx(r.lo * IN_MM, 3) + ' to ' + fx(r.hi * IN_MM, 3) + ' mm)</span>';
+    const name = rEsc(o.label) + (uni ? '-' + m.cu + 'A' : ' ' + m.cm);
+    let html = '<div class="res" style="margin-top:12px" id="rbmain"><div class="h">Blank for ' + name + '</div><table>' + rowsHtml([
+      ['Blank diameter before rolling', calcCell('<b>' + fBoth(blank * k) + '</b>', 'maximum pitch diameter less ' + (uni ? fx(K.rule.allow_in, 3) + ' in' : fx(K.rule.allow_mm, 3) + ' mm') + '; ' + cite([K.rule.src]) + ' (one maker\'s rule)')],
+      ['Pitch diameter, maximum', calcCell(fBoth(pdMax * k), 'Thread data tool')], ['Pitch diameter, minimum', calcCell(fBoth(pdMin * k), 'Thread data tool')],
+      ['Major diameter after rolling, maximum', calcCell(fBoth(mjMax * k), 'Thread data tool')], ['Major diameter after rolling, minimum', calcCell(fBoth(mjMin * k), 'Thread data tool')]]) + '</table></div>';
+    html += '<div class="res mtab" style="max-width:none;margin-top:12px" id="rbhb"><div class="h">What the handbook prints for this size <span class="badge differs">A different rule</span></div><table><tr><th>Screw size</th><th>Blank against the pitch diameter</th><th>For</th></tr>' +
+      hb.map(r => '<tr><td>' + rEsc(r.size) + '</td><td>' + (r.sign > 0 ? 'larger by ' : 'less by ') + amt(r) + '</td><td>' + (r.use ? rEsc(r.use) : '<span class="ms">not stated</span>') + '</td></tr>').join('') +
+      '</table><p class="ms" style="padding:4px 10px">' + cite([K.handbook.src]) + ', Machinery\'s Handbook. The maker\'s rule puts the blank below the maximum pitch diameter; the handbook also gives blanks above the pitch diameter. Start from one, roll a trial and measure.</p></div>';
+    const meas = parseFloat(tm.value);
+    if (meas > 0) {
+      const mn = (inMode() ? meas * IN_MM : meas) / k, ch = W.roll_blank_change(mn, mjMax, mjMin, K.ratio.v);
+      const inside = mn <= mjMax + 1e-9 && mn >= mjMin - 1e-9;
+      html += '<div class="res" style="margin-top:12px" id="rbtrial"><div class="h">After the trial</div><table>' + rowsHtml([
+        ['Major diameter measured', calcCell(fBoth(mn * k), inside ? '<span class="badge confirmed">Inside the limits</span>' : '<span class="badge differs">' + (mn > mjMax ? 'Above the maximum' : 'Below the minimum') + '</span>')],
+        ['Change the blank by', calcCell('<b>' + (ch >= 0 ? '+' : '&minus;') + (inMode() ? fx(Math.abs(ch) * k / IN_MM, 4) + ' in' : fx(Math.abs(ch) * k, 3) + ' mm') + '</b>', 'to bring the major diameter to the middle of its limits; ' + K.ratio.v + ' to 1, ' + cite([K.ratio.src]) + ' (one source)')],
+        ['Blank diameter for the next trial', calcCell('<b>' + fBoth(W.roll_blank_dia(blank + ch, 0) * k) + '</b>', 'the blank above with the change')]]) + '</table></div>';
+    }
+    out.innerHTML = html;
+    // Drawing: the blank against the pitch and major diameter limits, to scale along the axis.
+    const Wd = 600, Lx = 170, Rr = 40, lo = Math.min(blank, pdMin), span = mjMax - lo, pad = span * 0.2, X = v => Lx + (v - (lo - pad)) / (span + 2 * pad) * (Wd - Lx - Rr);
+    const zone = (a, b, y, cls) => '<rect class="' + cls + '" x="' + X(a).toFixed(1) + '" y="' + y + '" width="' + Math.max(1.5, X(b) - X(a)).toFixed(1) + '" height="20"/>';
+    const lab = (v, y, end) => '<text class="tl" x="' + (X(v) + (end ? -5 : 5)).toFixed(1) + '" y="' + y + '" text-anchor="' + (end ? 'end' : 'start') + '">' + (inMode() ? fx(v * k / IN_MM, 4) : fx(v * k, 3)) + '</text>';
+    plot.innerHTML = '<svg class="capplot" viewBox="0 0 ' + Wd + ' 150" role="img" aria-label="The blank diameter against the pitch diameter and major diameter limits of the thread"><text class="tl" x="' + Lx + '" y="12">diameter, ' + uLen() + ' (pale: the thread\'s limits; solid: the blank)</text>' +
+      '<text class="tl" x="8" y="45">pitch diameter</text>' + zone(pdMin, pdMax, 30, 'bar') + lab(pdMin, 45, 1) + lab(pdMax, 45) +
+      '<text class="tl" x="8" y="105">major, after rolling</text>' + zone(mjMin, mjMax, 90, 'bar') + lab(mjMin, 105, 1) + lab(mjMax, 105) +
+      '<rect class="tgz" x="' + (X(blank) - 1.5).toFixed(1) + '" y="58" width="3" height="62"/><text class="tl" x="' + X(blank).toFixed(1) + '" y="138" text-anchor="middle">blank ' + (inMode() ? fx(blank * k / IN_MM, 4) : fx(blank * k, 3)) + '</text></svg>';
+  }
+  tk.onchange = () => { classes(); upd(); }; tc.onchange = upd; tm.oninput = upd;
+  classes(); upd();
+}
+

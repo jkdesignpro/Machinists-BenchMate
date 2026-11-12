@@ -1474,6 +1474,102 @@ where = 'threadgauge';
   t = await mrow('plug-go');
   if (!/5\.5245 mm 0\.2175 in 5\.5245 mm 0\.2175 in 5\.5321 mm 0\.2178 in/.test(t)) problems.push(`[${where}] mm first in metric mode: ${t}`);
 }
+// Wire EDM: kerf, offsets and corner radius against the handbook's figures, the taper both ways, and cut time
+// from the rate in both unit systems.
+where = 'wireedm';
+{
+  const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+  const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+  await units('mm'); await open('edmoffset', 150);
+  let t = await rows();
+  if (!/Kerf of the first cut 0\.350 mm/i.test(t) || !/Wire offset, first cut 0\.175 mm/i.test(t) || !/Smallest inside corner radius 0\.175 mm/i.test(t)) problems.push(`[${where}] 0.25 mm wire, 0.05 mm gap: ${t}`);
+  await put('st', '0.03'); t = await rows();
+  if (!/first cut \(with the stock left on\) 0\.205 mm/i.test(t) || !/enter the spark gap of the final skim cut/i.test(t)) problems.push(`[${where}] stock left on with no skim gap: ${t}`);
+  await put('gf', '0.008'); t = await rows();
+  if (!/Wire offset, final skim cut 0\.133 mm/i.test(t) || !/Smallest inside corner radius \(after the final skim\) 0\.133 mm/i.test(t) || /Note/i.test(t)) problems.push(`[${where}] with a final skim: ${t}`);
+  const dia = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/offset 0\.205 mm/.test(dia) || !/stock 0\.03 mm per side/.test(dia) || !/radius 0\.133 mm/.test(dia)) problems.push(`[${where}] offset drawing: ${dia}`);
+  await units('inch'); await open('edmoffset', 150);
+  await put('d', '0.012'); await put('gf', '0.0003'); t = await rows();
+  if (!/Kerf of the first cut 0\.0160 in/i.test(t) || !/after the final skim\) 0\.0063 in/i.test(t)) problems.push(`[${where}] handbook figures for 0.012 in wire (kerf 0.016, radius 0.0063): ${t}`);
+  await put('g', '0.02'); t = await rows();
+  if (!/gap entered is larger than the wire diameter/i.test(t)) problems.push(`[${where}] a gap larger than the wire must be questioned: ${t}`);
+
+  await units('mm'); await open('edmtaper', 150);
+  await put('zg', '200'); t = await rows();
+  if (!/per side 0\.655 mm/i.test(t) || !/\(both sides\) 1\.309 mm/i.test(t) || !/upper and lower guide 5\.237 mm/i.test(t)) problems.push(`[${where}] 1.5 degrees over 25 mm, guides 200 mm apart: ${t}`);
+  await put('a', '50'); t = await rows();
+  if (!/angles up to 45 degrees/i.test(t)) problems.push(`[${where}] above 45 degrees needs the note: ${t}`);
+  await put('a', '90'); t = await rows();
+  if (!/Enter an angle from 0 to less than 90 degrees/i.test(t)) problems.push(`[${where}] 90 degrees must be refused: ${t}`);
+  await page.selectOption('#main [data-id="find"]', '2'); await page.waitForTimeout(80);
+  await put('land', '25'); t = await rows();
+  if (!/Taper angle per side 45(\.000)? deg/i.test(t) || !/\(both sides\) 50(\.000)? mm/i.test(t)) problems.push(`[${where}] 25 mm sideways over 25 mm is 45 degrees: ${t}`);
+  await page.selectOption('#main [data-id="find"]', '1');
+
+  await units('inch'); await open('edmtime', 150);
+  t = await rows();
+  if (!/Area of one pass 26(\.00)? in2/i.test(t) || !/Enter the cutting rate/i.test(t) || /Total/i.test(t)) problems.push(`[${where}] no rate entered: ${t}`);
+  await put('h', '10'); await put('rate', '3'); t = await rows();
+  if (!/Area of one pass 130(\.00)? in2/i.test(t) || !/Time, first cut 2,?600(\.0)? min/i.test(t) || !/first cut 0\.0050 in\/min/i.test(t) || !/Total cutting time 43\.33 h/i.test(t)) problems.push(`[${where}] 13 in through 10 in at 3 in2/h: ${t}`);
+  await page.selectOption('#main [data-id="n"]', '2'); await page.waitForTimeout(80); t = await rows();
+  if (!/Enter the cutting rate of the skim cuts/i.test(t) || /Total/i.test(t)) problems.push(`[${where}] skims with no rate must not give a total: ${t}`);
+  await put('srate', '8'); t = await rows();
+  if (!/Time, 2 skim cuts 1,?950(\.0)? min/i.test(t) || !/Total cutting time 4,?550(\.0)? min/i.test(t) || !/Total cutting time 75\.83 h/i.test(t)) problems.push(`[${where}] two skims at 8 in2/h: ${t}`);
+  await page.selectOption('#main [data-id="n"]', '0');
+  await units('mm'); await open('edmtime', 150);
+  await put('rate', '120'); t = await rows();
+  if (!/Area of one pass 16,?500 mm2/i.test(t) || !/Time, first cut 137\.5 min/i.test(t) || !/first cut 2\.40? mm\/min/i.test(t) || !/Total cutting time 2\.29 h/i.test(t)) problems.push(`[${where}] 330 mm through 50 mm at 120 mm2/min: ${t}`);
+}
+// Rolled thread blank: the maker's rule on the core's maximum pitch diameter, the handbook rows for the size,
+// the correction after a trial, and the hole check on the tap drill page.
+where = 'rollblank';
+{
+  const txt = async id => (await page.innerText('#main #' + id)).replace(/\s+/g, ' ');
+  const pick = async (id, v) => { await page.selectOption('#main #' + id, v); await page.waitForTimeout(80); };
+  const meas = async v => { await page.fill('#main #rbm', v); await page.dispatchEvent('#main #rbm', 'input'); await page.waitForTimeout(60); };
+  await units('mm'); await open('rollblank', 250);
+  await pick('rbk', 'M10x1.5'); await pick('rbc', '6g');
+  let t = await txt('rbmain');
+  if (!/Blank for M10 x 1\.5 \(coarse\) 6g Blank diameter before rolling 8\.943 mm 0\.3521 in maximum pitch diameter less 0\.051 mm; CJWinter/i.test(t) || !/Pitch diameter, maximum 8\.994 mm/.test(t) || !/Major diameter after rolling, minimum 9\.732 mm/.test(t))
+    problems.push(`[${where}] M10 x 1.5 6g: ${t}`);
+  t = await txt('rbhb');
+  if (!/1\/4 to 1\/2 in larger by 0\.0020 to 0\.0025 in \(0\.051 to 0\.064 mm\) not stated 1\/4 to 1\/2 in less by 0\.0020 to 0\.0030 in/.test(t) || /1\/2 to 1 in/.test(t)) problems.push(`[${where}] handbook rows for M10: ${t}`);
+  if (await page.$('#main #rbtrial')) problems.push(`[${where}] no trial entered, but a trial block is shown`);
+  const plot = await page.$eval('#main #rbplot svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/blank 8\.943/.test(plot) || !/8\.862/.test(plot) || !/9\.968/.test(plot)) problems.push(`[${where}] drawing: ${plot}`);
+  await meas('9.80'); t = await txt('rbtrial');
+  if (!/Major diameter measured 9\.800 mm 0\.3858 in Inside the limits Change the blank by \+0\.017 mm/.test(t) || !/next trial 8\.959 mm/.test(t)) problems.push(`[${where}] trial at 9.80 mm: ${t}`);
+  await meas('10.1'); t = await txt('rbtrial');
+  if (!/Above the maximum Change the blank by −0\.083 mm/.test(t) || !/next trial 8\.859 mm/.test(t)) problems.push(`[${where}] trial at 10.1 mm: ${t}`);
+  await meas('');
+  await pick('rbc', '6h'); t = await txt('rbmain');
+  if (!/6h Blank diameter before rolling 8\.975 mm/i.test(t)) problems.push(`[${where}] M10 x 1.5 6h: ${t}`);
+  await pick('rbc', '6g');
+  await units('inch'); await open('rollblank', 250);
+  await pick('rbk', '1/4-20 UNC'); await pick('rbc', '2'); t = await txt('rbmain');
+  if (!/1\/4-20 UNC-2A Blank diameter before rolling 0\.2144 in 5\.446 mm maximum pitch diameter less 0\.002 in/i.test(t) || !/Pitch diameter, maximum 0\.2164 in/.test(t)) problems.push(`[${where}] 1/4-20 UNC-2A: ${t}`);
+  await pick('rbc', '3'); t = await txt('rbmain');
+  if (!/UNC-3A Blank diameter before rolling 0\.2155 in/i.test(t)) problems.push(`[${where}] 1/4-20 UNC-3A: ${t}`);
+  await pick('rbc', '2');
+  await pick('rbk', '#4-40 UNC'); t = await txt('rbhb');
+  if (!/smaller than 1\/4 in less by 0\.0010 to 0\.0015 in .* ordinary grades of work/.test(t) || /larger by/.test(t)) problems.push(`[${where}] handbook row below 1/4 in: ${t}`);
+  await pick('rbk', '1-8 UNC'); t = await txt('rbhb');
+  if (!/1\/2 to 1 in or larger larger by 0\.0025 to 0\.0030 in .* above 1\/2 in less by 0\.0030 to 0\.0050 in/.test(t) || /1\/4 to 1\/2/.test(t)) problems.push(`[${where}] handbook rows above 1/2 in: ${t}`);
+  await pick('rbk', '1/4-20 UNC');
+
+  await units('mm'); await open('tapdrill', 250);
+  await pick('tk', 'M10x1.5');
+  const hole = async v => { await page.fill('#main #thm', v); await page.dispatchEvent('#main #thm', 'input'); await page.waitForTimeout(60); };
+  if (await page.$('#main #thole')) problems.push(`[${where}] tap drill: no hole entered, but a hole block is shown`);
+  await hole('8.5'); t = await txt('thole');
+  if (!/Your hole of 8\.500 mm 0\.3346 in: thread engagement Cutting tap .* 77\.0 % Forming tap/i.test(t)) problems.push(`[${where}] tap drill, 8.5 mm hole in M10 x 1.5 (cutting tap 77.0 %): ${t}`);
+  await hole('8.7'); t = await txt('thole');
+  if (!/Cutting tap .* 66\.7 % Forming tap .* 127\.5 % over 100 %/i.test(t)) problems.push(`[${where}] tap drill, 8.7 mm hole: ${t}`);
+  await hole('10.2'); t = await txt('thole');
+  if (!/none larger than the thread: no engagement/i.test(t)) problems.push(`[${where}] tap drill, a hole larger than the thread: ${t}`);
+  await hole('');
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

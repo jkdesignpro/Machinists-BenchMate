@@ -1024,6 +1024,89 @@ const TOOLS = [
   source: 'L.S. Starrett, Sawing starts with the material (2023); Revolution Machine Tools, Do I have the right TPI (accessed 2026-11-11). See docs/tooling.md.',
 },
 {
+  id: 'edmoffset', level: 'advanced', group: 'EDM', title: 'Wire EDM: kerf, wire offset and corner radius',
+  desc: 'Width of the slot a wire leaves, the wire offset for the first cut and for the final skim cut, and the smallest inside corner radius, from the wire diameter and the spark gap in your machine\'s cutting tables.',
+  fields: s => [
+    { id: 'd', label: 'Wire diameter', unit: lenU(s), def: s === 'inch' ? 0.01 : 0.25 },
+    { id: 'g', label: 'Spark gap on the first cut, per side', unit: lenU(s), def: s === 'inch' ? 0.002 : 0.05 },
+    { id: 'st', label: 'Stock left for skim cuts, per side (blank for none)', unit: lenU(s), def: '' },
+    { id: 'gf', label: 'Spark gap on the final skim cut, per side (blank for one cut only)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0) || !(v.g >= 0)) return [];
+    const dp = s === 'inch' ? 4 : 3, u = lenU(s), st = v.st > 0 ? v.st : 0, skim = v.gf > 0;
+    const rows = [R('Kerf of the first cut', W.edm_kerf(v.d, v.g), u, dp), R(st > 0 ? 'Wire offset, first cut (with the stock left on)' : 'Wire offset, first cut', W.edm_offset(v.d, v.g, st), u, dp)];
+    if (skim) rows.push(R('Wire offset, final skim cut', W.edm_offset(v.d, v.gf, 0), u, dp));
+    rows.push(R(skim ? 'Smallest inside corner radius (after the final skim)' : 'Smallest inside corner radius', W.edm_min_inside_radius(v.d, skim ? v.gf : v.g), u, dp));
+    if (st > 0 && !skim) rows.push(R('Note', 'Stock is left on, so skim cuts follow: enter the spark gap of the final skim cut to get its offset and the corner radius it leaves.', '', 0));
+    if (v.g > v.d) rows.push(R('Note', 'The gap entered is larger than the wire diameter. The published gaps are a small fraction of the wire: check the entry.', '', 0));
+    return rows;
+  },
+  working: 'Kerf = wire diameter + 2 x spark gap. Wire offset (the distance from the wire centre to the finished profile) = wire radius + spark gap + stock left for later cuts; with no stock it is half the kerf. Smallest inside corner radius = wire radius + spark gap of the cut that finishes the corner: the wire cannot leave a sharper inside corner. The spark gap is not a fixed number: it depends on the wire, the power setting, the material and the flushing, so take it from the machine\'s cutting tables or measure a test cut (offset = half the measured slot width). ' +
+    'Published gaps for the first cut differ: Cutting Tool Engineering (2013) gives 0.001 to 0.002 in (0.025 to 0.05 mm) with 0.010 or 0.012 in wire, the Complete EDM Handbook 0.002 to 0.003 in (0.05 to 0.076 mm). For skim cuts Cutting Tool Engineering gives 0.0005 down to 0.0001 in (0.013 to 0.0025 mm). The handbook\'s smallest inside radii (0.0063 in for 0.012 in wire, 0.0053 in for 0.010 in wire) are the wire radius plus 0.0003 in. The default gap of 0.002 in (0.05 mm) lies in both published ranges; it is an example, not a setting.',
+  source: "Complete EDM Handbook (C. Sommer and S. Sommer, Reliable EDM), chapters 2 and 5; Cimatron wire EDM help (cut width); Autodesk FeatureCAM help, \'Offset method\'; S. Woods, \'Gap guidance\', Cutting Tool Engineering, March 2013; University of Minnesota AEM wire EDM notes (taper angle); Industrial Monitor Direct knowledge base (no author named). See docs/sources.md, Wire EDM.",
+  proof: [{ name: 'A 0.012 in wire with a 0.002 in gap', sys: 'inch', vals: { d: 0.012, g: 0.002 }, expect: [['Kerf of the first cut', 'in', 0.016, 1e-9]],
+    source: 'Complete EDM Handbook, chapter 5, p. 82: a 0.012 in wire usually creates a 0.016 in kerf; p. 84: the gap between the wire and the workpiece is 0.002 to 0.003 in.' },
+  { name: 'Smallest inside radius for 0.010 in wire after skimming', sys: 'inch', vals: { d: 0.01, g: 0.002, gf: 0.0003 }, expect: [['Smallest inside corner radius (after the final skim)', 'in', 0.0053, 1e-9]],
+    source: 'Complete EDM Handbook, chapter 5, p. 83: the minimum inside radius for 0.010 in wire is 0.0053 in, achieved by skimming.', note: 'The gap of 0.0003 in is the handbook figure less the wire radius.' }],
+},
+{
+  id: 'edmtaper', level: 'advanced', group: 'EDM', title: 'Wire EDM: taper cut',
+  desc: 'How far a tapered wall moves sideways over the height of the part, the taper angle from that distance, and how far apart sideways the wire guides have to be, to check against the U and V travel of the machine.',
+  fields: s => [
+    { id: 'find', label: 'Find', unit: '', def: 1, options: [[1, 'Sideways distance from the angle'], [2, 'Angle from the sideways distance']] },
+    { id: 'h', label: 'Height of the tapered wall', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
+    { id: 'a', label: 'Taper angle per side, from the vertical', unit: 'deg', def: 1.5, when: v => v.find !== 2 },
+    { id: 'land', label: 'Sideways distance over the height, per side', unit: lenU(s), def: s === 'inch' ? 0.026 : 0.655, when: v => v.find === 2 },
+    { id: 'zg', label: 'Length of wire between the guides (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.h > 0)) return [];
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3;
+    let a = v.a;
+    const rows = [];
+    if (v.find === 2) { if (!(v.land >= 0)) return []; a = W.edm_taper_angle(v.land, v.h); rows.push(R('Taper angle per side', a, 'deg', 3)); }
+    if (!(a >= 0 && a < 90)) return [R('Angle', 'Enter an angle from 0 to less than 90 degrees', '', 0)];
+    if (v.find !== 2) rows.push(R('Sideways distance over the height, per side', W.edm_taper(v.h, a, 0), u, dp));
+    rows.push(R('Difference in size between top and bottom (both sides)', W.edm_taper(v.h, a, 1), u, dp));
+    if (v.zg > 0) rows.push(R('Sideways distance between the upper and lower guide', W.edm_taper(v.zg, a, 0), u, dp));
+    if (a > 45) rows.push(R('Note', 'The Complete EDM Handbook says machines cut angles up to 45 degrees. Check what your machine and its guides allow.', '', 0));
+    return rows;
+  },
+  working: 'Sideways distance = height x tan(angle); angle = atan(sideways distance / height). An opening or a punch tapered the same on two opposite sides differs in size between top and bottom by twice that. The same relation gives the sideways distance between the two wire guides when the height is the length of wire between them (the U and V travel the cut needs: for a taper in both U and V it is sqrt(U^2 + V^2)). Which surface the programmed size lies on (the programme plane) and the guide heights are machine settings: take them from the machine manual. Tall parts and steep angles are limited by the U and V travel and by the guides.',
+  source: "Complete EDM Handbook (C. Sommer and S. Sommer, Reliable EDM), chapters 2 and 5; Cimatron wire EDM help (cut width); Autodesk FeatureCAM help, \'Offset method\'; S. Woods, \'Gap guidance\', Cutting Tool Engineering, March 2013; University of Minnesota AEM wire EDM notes (taper angle); Industrial Monitor Direct knowledge base (no author named). See docs/sources.md, Wire EDM.",
+  proof: [{ name: 'A 1.5 degree taper over 25 mm', sys: 'metric', vals: { find: 1, h: 25, a: 1.5 }, expect: [['Sideways distance over the height, per side', 'mm', 0.655, 5e-4]],
+    source: 'Industrial Monitor Direct knowledge base, Mitsubishi FX10 taper cutting (no author named): tan(1.5 deg) = 0.02619; land per side = 0.02619 x 25 = 0.655 mm.' }],
+},
+{
+  id: 'edmtime', level: 'advanced', group: 'EDM', title: 'Wire EDM: cut time',
+  desc: 'Time for a wire cut from the cutting rate the machine maker gives (area per hour or per minute): area of the cut, time of the first cut and of the skim cuts, and the speed along the path.',
+  fields: s => [
+    { id: 'len', label: 'Length of the cut path', unit: lenU(s), def: s === 'inch' ? 13 : 330 },
+    { id: 'h', label: 'Thickness of the work', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'rate', label: 'Cutting rate, first cut', unit: s === 'inch' ? 'in2/h' : 'mm2/min', def: '' },
+    { id: 'n', label: 'Skim cuts', unit: '', def: 0, options: [[0, 'None'], [1, '1'], [2, '2'], [3, '3'], [4, '4']] },
+    { id: 'srate', label: 'Cutting rate, skim cuts', unit: s === 'inch' ? 'in2/h' : 'mm2/min', def: '', when: v => v.n > 0 },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.len > 0 && v.h > 0)) return [];
+    const inch = s === 'inch', n = v.n > 0 ? v.n : 0, C = k => W.edm_cut(v.len, v.h, v.rate > 0 ? v.rate : 0, n, v.srate > 0 ? v.srate : 0, k);
+    // The core returns times in the time unit of the rate: hours in inch mode, minutes in mm mode.
+    const mins = t => (inch ? t * 60 : t), hrs = t => (inch ? t : t / 60), fmin = f => (inch ? f / 60 : f);
+    const rows = [R('Area of one pass', C(0), inch ? 'in2' : 'mm2', inch ? 2 : 0)];
+    if (!(v.rate > 0)) { rows.push(R('Note', 'Enter the cutting rate for this material and thickness from the machine\'s cutting tables.', '', 0)); return rows; }
+    rows.push(R('Time, first cut', mins(C(1)), 'min', 1), R('Speed along the path, first cut', fmin(C(2)), feedMinU(s), inch ? 4 : 2));
+    if (n > 0 && v.srate > 0) rows.push(R('Time, ' + n + (n === 1 ? ' skim cut' : ' skim cuts'), mins(C(3)), 'min', 1), R('Speed along the path, skim cuts', fmin(C(5)), feedMinU(s), inch ? 4 : 2));
+    if (n > 0 && !(v.srate > 0)) rows.push(R('Note', 'Enter the cutting rate of the skim cuts to add their time.', '', 0));
+    else rows.push(R('Total cutting time', mins(C(4)), 'min', 1), R('Total cutting time', hrs(C(4)), 'h', 2));
+    return rows;
+  },
+  working: 'Area of one pass = length of the cut path x thickness of the work. Time = area / cutting rate; each skim cut goes round the same path, so it adds the same area at its own rate. Speed along the path = cutting rate / thickness. Makers rate their machines in area per time (square inches per hour, or mm2 per minute) under ideal conditions: the Complete EDM Handbook names 2 1/4 in thick hardened D2 with perfect flushing. Real rates depend on the wire, the material, the thickness and the flushing, so use the rate from the machine\'s cutting tables for the job. Threading, moving between openings and slug removal are not included. 1 in2/h = 10.75 mm2/min.',
+  source: "Complete EDM Handbook (C. Sommer and S. Sommer, Reliable EDM), chapters 2 and 5; Cimatron wire EDM help (cut width); Autodesk FeatureCAM help, \'Offset method\'; S. Woods, \'Gap guidance\', Cutting Tool Engineering, March 2013; University of Minnesota AEM wire EDM notes (taper angle); Industrial Monitor Direct knowledge base (no author named). See docs/sources.md, Wire EDM.",
+  proof: [{ name: 'A 13 in cut through 10 in at 3 in2 per hour', sys: 'inch', vals: { len: 13, h: 10, rate: 3, n: 0 }, expect: [['Area of one pass', 'in2', 130, 1e-9], ['Total cutting time', 'h', 43, 0.5]],
+    source: 'Industrial Monitor Direct knowledge base, wire EDM job pricing (no author named): cut area = cut length x workpiece height, 13 x 10 = 130 sq in; roughing at about 3 sq in per hour, about 43 hours.' }],
+},
+{
   id: 'drillpoint', level: 'simple', group: 'Drilling and tapping', title: 'Drill point length',
   pick: { map: { dia: 'dia', ang: 'point' }, types: ['Drill', 'Spot', 'Other'] },
   desc: 'Axial length of the drill point, and the depth to program for a hole that must be a given depth at its full diameter.',
@@ -1136,6 +1219,13 @@ const TOOLS = [
   render: el => renderThreadGauge(el),
   working: 'GO plug: smallest internal pitch diameter, tolerance plus. NOT GO plug: largest, tolerance minus. GO ring: largest external pitch diameter, tolerance minus. NOT GO ring: smallest, tolerance plus. See the note under the tool.',
   source: 'Thread Check Inc., catalogue p. 52 (X tolerances) and fixed limit gage fact sheet; Royal Oak Gage, class X tolerances; Vermont Gage and Westport standard pitch diameter charts. Thread limits: ASME B1.1 formulas (Thread data tool). ASME B1.2 cited by name. See docs/sources.md, Thread gauge limits.',
+},
+{
+  id: 'rollblank', level: 'advanced', group: 'Threads', title: 'Rolled thread blank diameter',
+  desc: 'Diameter to turn a blank to before thread rolling, for ISO metric and Unified external threads: a thread roll maker\'s rule from the maximum pitch diameter, the handbook\'s amounts beside it, and the correction to the blank after measuring a trial.',
+  render: el => renderRollBlank(el),
+  working: 'Blank = maximum pitch diameter less 0.002 in (0.051 mm). After a trial: change of blank = (middle of the major diameter limits less the measured major diameter) / 3. See the note under the tool.',
+  source: 'CJWinter, "Pitch diameter, major diameter, blank diameter" (2017) and Engineering bulletin: blank design (2016); Machinery\'s Handbook, 31st ed., thread rolling, p. 2188. Thread limits: ISO 965-1 and ASME B1.1 formulas (Thread data tool). See docs/sources.md, Rolled thread blank.',
 },
 {
   id: 'holdertorque', level: 'advanced', group: 'Setup', title: 'Collet nut and pull stud torque',

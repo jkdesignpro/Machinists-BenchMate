@@ -121,6 +121,8 @@ f1!(iso965_limit, c::iso965_limit_f, d, p, grade, pos, which);
 f1!(iso965_value, c::iso965_value_f, d, p, grade, what);
 f1!(un_limit, c::un_limit_f, d, p, class, which);
 f1!(gauge_member_limit, c::gauge_member_limit, size, tol, plus, which);
+f1!(roll_blank_dia, c::roll_blank_dia, pd_max, allowance);
+f1!(roll_blank_change, c::roll_blank_change, measured, major_max, major_min, ratio);
 
 // ISO limits and fits (core/src/fits.rs)
 f1!(iso286_step_mean, c::iso286_step_mean, lo, hi);
@@ -513,6 +515,12 @@ f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
 f1!(spot_chamfer_dia, c::spot_chamfer_dia, z, angle);
 f1!(saw_section, c::saw_section, shape, a, b, nx, ny, which);
 f1!(saw_cut_time, c::saw_cut_time, area, rate);
+f1!(edm_kerf, c::edm_kerf, d, gap);
+f1!(edm_offset, c::edm_offset, d, gap, stock);
+f1!(edm_min_inside_radius, c::edm_min_inside_radius, d, gap);
+f1!(edm_taper, c::edm_taper, h, angle, which);
+f1!(edm_taper_angle, c::edm_taper_angle, land, h);
+f1!(edm_cut, c::edm_cut, length, thickness, rate, skims, skim_rate, which);
 f1!(partoff_time, c::partoff_time, d0, d1, f, vc, n_max, k, which);
 f1!(partoff_time_rpm, c::partoff_time_rpm, d0, d1, f, n);
 /// Per-tooth chip loads with runout into list_out; returns the tooth count.

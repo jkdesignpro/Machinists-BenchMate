@@ -492,6 +492,23 @@ def build_holdertorque():
             'pullstud': studs, 'rules': rules, 'gaps': ev['gaps']}
 
 
+def build_rollblank():
+    """Blank diameter before thread rolling: one maker's rule and the handbook's
+    amounts by size, kept apart. Checks the sources and that the handbook rows
+    are well formed."""
+    ev = load_ev('rollblank-evidence.json')
+    if not ev: return None
+    S = ev['sources']
+    for k in [ev['rule']['src'], ev['ratio']['src'], ev['handbook']['src']] + [k for n in ev['notes'] for k in n['src']]:
+        if k not in S: raise SystemExit('rollblank: unknown source ' + k)
+    if not (0 < ev['rule']['allow_in'] < 0.01) or abs(ev['rule']['allow_in'] * 25.4 - ev['rule']['allow_mm']) > 0.0005: raise SystemExit('rollblank: allowance')
+    if not (1 <= ev['ratio']['v'] <= 5): raise SystemExit('rollblank: ratio')
+    for r in ev['handbook']['rows']:
+        if r['sign'] not in (1, -1) or not (0 < r['lo'] <= r['hi'] < 0.01) or (r['to'] is not None and r['to'] <= r['from']): raise SystemExit('rollblank: handbook row ' + r['size'])
+    return {'sources': sources_of(ev), 'rule': ev['rule'], 'ratio': ev['ratio'],
+            'handbook': {'src': ev['handbook']['src'], 'rows': ev['handbook']['rows']}, 'notes': ev['notes'], 'gaps': ev['gaps']}
+
+
 def build_threadgauge():
     """Unified thread gauge X tolerances on pitch diameter (per publisher, with
     consensus per cell), the side each member's tolerance lies on, and a
@@ -982,7 +999,7 @@ def matref_summary(m):
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
-           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'holdertorque': build_holdertorque(), 'threadgauge': build_threadgauge(), 'gcodes': build_gcodes(),
+           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'holdertorque': build_holdertorque(), 'threadgauge': build_threadgauge(), 'rollblank': build_rollblank(), 'gcodes': build_gcodes(),
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
            'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),

@@ -829,6 +829,68 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Bandsaw cut through a section');
   },
 
+  // Wire EDM, seen along the wire: the wire in its kerf, the stock left on and the finished profile (to scale).
+  edmoffset(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys), d = v.d, g = v.g;
+    if (!dcOk(d) || !(g >= 0)) return '';
+    const st = dcOk(v.st) ? v.st : 0, kerf = dcRow(rows, 'Kerf of the first cut'), off = dcRow(rows, 'Wire offset, first cut'), rmin = dcRow(rows, 'Smallest inside corner radius');
+    if (!dcOk(kerf) || !dcOk(off)) return '';
+    const s = 130 / Math.max(kerf, off * 1.6), xc = 180, y0 = 44, y1 = 196, dp = sys === 'inch' ? 4 : 3;
+    const xl = xc - kerf / 2 * s, xr = xc + kerf / 2 * s, xp = xc + off * s;
+    let h = DK.rect(20, y0, xl - 20, y1 - y0, 'hatch') + DK.rect(xp, y0, 330 - xp, y1 - y0, 'hatch');
+    if (st > 0) h += DK.rect(xr, y0, xp - xr, y1 - y0, 'part') + DK.text((xr + xp) / 2, y0 - 6, 'stock', { cls: 'mut' });
+    h += DK.line(xp, y0, xp, y1 + 14, 'hot') + DK.text(xp + 6, y1 + 14, 'finished profile', { cls: 'hott', anchor: 'start' });
+    h += DK.circle(xc, 104, d / 2 * s, 'tool') + DK.cl(xc, y0 - 8, xc, y1 + 8);
+    h += DK.text(60, y0 + 18, 'scrap side', { cls: 'mut' }) + DK.text(xc, y0 - 12, 'wire', { cls: 'mut' });
+    h += DK.dimH(xl, xr, y1 + 34, 'kerf ' + dcN(kerf, dp) + ' ' + u, { from: y1 + 2, below: true });
+    h += DK.dimH(xc, xp, 180, 'offset', { hot: true });
+    const x = 346;
+    h += dcResult(x, 56, 'offset ' + dcN(off, dp) + ' ' + u, 'wire centre to finished profile');
+    h += dcLines(x, 104, ['wire Ø ' + dcN(d, dp) + ' ' + u, 'gap ' + dcN(g, dp) + ' ' + u + ' per side', st > 0 ? 'stock ' + dcN(st, dp) + ' ' + u + ' per side' : '', dcOk(rmin) ? 'smallest inside' : '', dcOk(rmin) ? 'radius ' + dcN(rmin, dp) + ' ' + u : '']);
+    h += DK.text(W - 6, H - 6, 'seen along the wire; to scale', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Wire in its kerf: wire diameter, spark gap, stock and the offset to the finished profile');
+  },
+
+  // Wire EDM taper: the wire leaning through the work between the guides. The angle is drawn larger than it is when small.
+  edmtaper(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), dp = sys === 'inch' ? 4 : 3;
+    if (!dcOk(v.h)) return '';
+    const a = v.find === 2 ? dcRow(rows, 'Taper angle per side') : v.a, land = v.find === 2 ? v.land : dcRow(rows, 'Sideways distance over the height');
+    if (!(a >= 0 && a < 90)) return '';
+    const ad = dcClamp(a, 16, 38), t = Math.tan(dcRad(ad)), yt = 92, yb = 192, xb = 150, xt = xb + (yb - yt) * t;
+    const yg0 = 40, yg1 = 244, xa = x => xb + (yb - x) * t; // x of the wire at height y
+    let h = DK.poly([[xt, yt], [330, yt], [330, yb], [xb, yb]], 'hatch') + DK.poly([[30, yt], [xt - 14, yt], [xb - 14, yb], [30, yb]], 'part');
+    h += DK.line(xa(yg1), yg1, xa(yg0), yg0, 'hot');
+    h += DK.rect(xa(yg0) - 16, yg0 - 12, 32, 12, 'tool') + DK.rect(xa(yg1) - 16, yg1, 32, 12, 'tool');
+    h += DK.text(xa(yg0) + 22, yg0 - 2, 'upper guide', { cls: 'mut', anchor: 'start' }) + DK.text(xa(yg1) + 22, yg1 + 10, 'lower guide', { cls: 'mut', anchor: 'start' });
+    h += DK.line(xb, yb, xb, yt - 30, 'thin') + DK.angle(xb, yb, 118, 90 - ad, 90, '', { hot: true }) + DK.text(xb - 8, yt - 14, dcN(a, 3) + '°', { cls: 'hott', anchor: 'end' });
+    h += dcDimV(yt, yb, 356, 'height ' + dcL(v.h, u, 'h'), { from: 332 });
+    if (dcOk(land)) h += DK.dimH(xb, xt, yb + 28, '', { from: yb + 2 }) + DK.text(xt + 24, yb + 32, dcN(land, dp) + ' ' + u, { cls: 'dimt', anchor: 'start' });
+    h += DK.text(60, (yt + yb) / 2 + 4, 'slug', { cls: 'mut' });
+    const x = 386, both = dcRow(rows, 'Difference in size'), gd = dcRow(rows, 'Sideways distance between the upper and lower guide');
+    h += dcLines(x, 96, [dcOk(both) ? 'top to bottom,' : '', dcOk(both) ? 'both sides:' : '', dcOk(both) ? dcN(both, dp) + ' ' + u : '', dcOk(gd) ? 'between guides:' : '', dcOk(gd) ? dcN(gd, dp) + ' ' + u : '']);
+    h += DK.text(W - 6, H - 6, ad !== a ? 'angle not to scale' : 'angle to scale', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Wire leaning through the work between the upper and lower guide for a taper cut');
+  },
+
+  // Wire EDM cut time: the cut path laid out flat, length by thickness, with the wire part of the way along.
+  edmtime(v, sys, rows) {
+    const W = 520, H = 230, u = dcU(sys);
+    if (!dcOk(v.len) || !dcOk(v.h)) return '';
+    const x0 = 30, y0 = 70, w = 300, hh = dcClamp(w * v.h / v.len, 26, 96), xw = x0 + w * 0.42;
+    const area = (rows.find(r => r.label === 'Area of one pass') || {}), tt = dcRow(rows, 'Total cutting time', 'min'), th = dcRow(rows, 'Total cutting time', 'h'), sp = dcRow(rows, 'Speed along the path, first cut');
+    let h = DK.rect(x0, y0, w, hh, 'hatch') + DK.rect(x0, y0, xw - x0, hh, 'part');
+    h += DK.line(xw, y0 - 22, xw, y0 + hh + 22, 'hot') + DK.text(xw, y0 - 28, 'wire', { cls: 'mut' });
+    h += DK.arrow(xw + 8, y0 + hh / 2, xw + 60, y0 + hh / 2, 'hot');
+    h += DK.dimH(x0, x0 + w, y0 + hh + 40, 'length of the cut path ' + dcL(v.len, u, 'L'), { from: y0 + hh + 2, below: true });
+    h += dcDimV(y0, y0 + hh, x0 + w + 30, dcL(v.h, u, 'h'), { from: x0 + w + 2 });
+    const x = 392;
+    h += DK.text(x, 60, dcOk(tt) ? 'time ' + dcN(tt, 1) + ' min' : 'time: enter a rate', { cls: 'hott', anchor: 'start' });
+    h += dcLines(x, 78, [dcOk(th) ? '(' + dcN(th, 2) + ' h)' : '', isFinite(area.value) ? 'area ' + dcN(area.value) + ' ' + dcUnit(area.unit) : '', dcOk(sp) ? 'along the path' : '', dcOk(sp) ? dcN(sp) + ' ' + dcFU(sys) : '', v.n > 0 ? v.n + (v.n === 1 ? ' skim cut' : ' skim cuts') : '']);
+    h += DK.text(W - 6, H - 6, 'the cut path laid out flat; thickness not to scale', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Wire EDM cut laid out flat: length of the path by thickness of the work');
+  },
+
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
   sawtpi(v, sys, rows) {
     const W = 520, H = 250, u = dcU(sys);

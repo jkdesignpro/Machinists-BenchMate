@@ -50,7 +50,7 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 15 | Rotary axis helper (`rotpoint`, `rotfeed`) | 2 (0.4.0) | built |
 | 16 | Job time and quote | 5 (0.9.0) | to do |
 | 17 | Vendor data import and cut log | 5 (0.9.0) | to do |
-| 18 | Wire EDM | 3 (0.5.0) | to do |
+| 18 | Wire EDM (`wireedm` page: `edmoffset`, `edmtaper`, `edmtime`) | 3 (0.5.0) | built (kerf, offsets, corner radius, taper, cut time from the rate; no rate tables) |
 
 Built in 0.3.0 so far (branch `claude/advisor`): the cutting-force tools and the milling, turning, drilling and reaming advisors with locks and limit cards. The boring bar and slitting saw pages now take their material data from the advisor. The stability chart with a draggable speed marker is in the milling advisor. The tapping advisor gives a speed and the feed that goes with it. Plunge roughing is its own page with three publishers' rules side by side. The milling and turning advisors open the tool life page with their speed (Taylor exponents stay the user's own figures: no open table was found). The deflection checks take an optional holder and spindle stiffness (typed, or from a push test). The turning advisor holds its suggestions inside the insert's chip breaker range when you give it one.
 
@@ -74,7 +74,7 @@ State of the tier list above, with the stage for what is still to build.
 | 7 Material equivalents | built | | |
 | 8 Setup sheet generator | built | | |
 | 9 Turning chip-breaking window | built | Filling the range from an imported catalogue (with the catalogue import) | 5 (0.9.0) |
-| 10 Thread extras | part | Rolled-thread blank diameter, tap torque (idea 12), percent engagement check on the minor diameter, infeed tables for G76-style cycles | 1 (0.3.0) and 3 (0.5.0) |
+| 10 Thread extras | built (0.5.0: `rollblank`, the hole check on `tapdrill`; tap torque is `taptorque`; infeed tables per control are in `threadprog`) | | |
 | 11 Inspection helpers | built | | |
 | 12 Coolant with refractometer | built | | |
 | 13 Fraction, decimal and metric quick calculator | built | | |

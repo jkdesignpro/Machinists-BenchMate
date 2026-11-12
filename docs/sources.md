@@ -485,6 +485,44 @@ Findings:
 - **The chart against the core's thread limits.** 15 sizes by 7 columns (GO basic, NOT GO 2B and 3B, ring GO and NOT GO for 2A and 3A). 102 of 105 values agree. Three differ by 0.0001 in: 6-32 3B maximum (core 0.1205, chart 0.1204, two makers), 1/4-20 2B maximum (core 0.2223, chart 0.2224, two makers; this is the open rounding question already on the list) and 1/2-13 3A minimum (core 0.4462, chart 0.4463, one maker). The core is not changed: the page shows the chart's figure beside the core's with a "Chart differs" mark, and a core test pins the three so that any change shows up. This is also the first comparison of the 3A and 3B limits with a published table.
 - **Not included:** ISO metric gauges (ISO 1502: no public table of the gauge tolerances could be read), setting plugs and W tolerances, wear limits, major and minor diameters of the members, classes 1A and 1B.
 
+## Rolled thread blank (`data/refdata/rollblank-evidence.json`, `core/src/threads.rs`, `app/refdata3.js`)
+All accessed 2026-11-12.
+
+- **[CJW_PD]** CJWinter (thread roll maker), "Pitch diameter, major diameter, blank diameter: what are they?", 30 November 2017. https://www.cjwinter.com/pitch-diameter-major-diameter-blank-diameter-what-are-they . Blank diameter = maximum thread pitch diameter less .002 in [or .051 mm], for straight threads; tapered pipe threads are calculated differently.
+- **[CJW_BLANK]** CJWinter, "Engineering bulletin: blank design", 24 May 2016. https://cjwinter.com/?p=83 . A change of the blank diameter changes the major diameter by 3 to 1 (.001 in on the blank, .003 in on the major diameter).
+- **[MH_ROLL]** *Machinery's Handbook*, 31st ed., Industrial Press, 2020, thread rolling, "Diameter of blank for thread rolling", p. 2188, read on the publisher's online copy. https://online.flippingbook.com/view/954046886/842 . Read twice with the same figures. Blanks 0.002 to 0.0025 in larger than the pitch diameter for screws from 1/4 to 1/2 in and 0.0025 to 0.003 in larger for 1/2 to 1 in or larger; for a comparatively free fit 0.002 to 0.003 in less (1/4 to 1/2 in), 0.003 to 0.005 in less (above 1/2 in) and, below 1/4 in, 0.001 to 0.0015 in less for ordinary work. The outside diameter grows by about the depth of one thread. Verify by trial.
+
+Findings:
+- **The two publishers give different rules, and both are shown.** CJWinter puts the blank 0.002 in below the *maximum* pitch diameter. The handbook gives blanks above the pitch diameter as well as below it, by size, and does not say whether it means the maximum, minimum or basic pitch diameter. BenchMate calculates CJWinter's rule (it is fully stated) and prints the handbook's amounts for the size beside it without turning them into a diameter.
+- The 3 to 1 ratio rests on one source (CJWinter) and is marked so on the page.
+- The handbook's metric equivalent of the 1/4 to 1/2 in size range is printed in micrometres in one place (a misprint in the book); the inch figures are used.
+- Not readable or without figures: Modern Machine Shop, "Axial thread rolling for CNC lathe users" (1996; no blank diameter rule); Production Machining, "Taking a calculated approach to thread rolling" (2024; names the maker's calculator only).
+- **Not included:** pipe threads, the tolerance on the blank, chamfer angle and diameter, plating allowance, rolling speeds and pressures.
+
+### Hole check on the tap drill page
+The tap drill page takes a measured hole and gives the thread engagement it produces with a cutting tap and with a forming tap, from the same core formulas as the rest of the page (`tap_pct_cut`, `tap_pct_form`; sources under tap drills). No new source.
+
+## Wire EDM (`core/src/edm.rs`, tools `edmoffset`, `edmtaper`, `edmtime`)
+All accessed 2026-11-12.
+
+- **[RELEDM]** Carl Sommer and Steve Sommer, *Complete EDM Handbook*, 3rd ed. (Reliable EDM; free on the publisher's site). https://reliableedm.com/handbook.php . Chapter 2 (wire EDM fundamentals): gap of .002 to .003 in held between wire and work; wire from .001 to .014 in; angles up to 45 degrees; 2 sq in per hour printed as 21 mm2/min and 6 as 64. Chapter 5 (understanding the wire EDM process): a .012 in wire usually creates a .016 in kerf; the inside radius is set by the wire and the spark gap; minimum inside radius .0063 in for .012 in wire and .0053 in for .010 in wire, reached by skimming; speed is rated in square inches cut in one hour, under ideal conditions (2 1/4 in hardened D2, perfect flushing).
+- **[CIMA_W]** Cimatron wire EDM help, "Common parameters for all machines". https://help.cimatron.com/en/2026/wedm/common_parameters_for_all_machines.htm . Cut width = the wire's diameter + 2 times the gap (spark).
+- **[ADSK_W]** Autodesk FeatureCAM help, "Offset method". https://help.autodesk.com/cloudhelp/2024/ENU/FCAM/files/GUID-84AE09F1-379D-461C-950F-66824F60914F.htm . The compensation value is the wire radius plus the spark gap allowance plus any finishing allowance.
+- **[CTE_GAP]** Susan Woods, "Gap guidance", *Cutting Tool Engineering*, March 2013. https://ctemag.com/node/19963 . Typical gap when roughing .001 to .002 in with .010 or .012 in wire; when skimming .0005 down to .0001 in; the gap grows with the wire diameter and is smaller in oil.
+- **[UMN_EDM]** University of Minnesota, Aerospace Engineering and Mechanics (T. Shield), wire EDM notes. https://dept.aem.umn.edu/~./faculty/shield/software/xorient/edm.html . Taper angle = atan(sqrt(U^2 + V^2) / (Z3 + Z4)); Z3 + Z4 is the length of wire between the guides.
+- **[IMD_EDM]** Industrial Monitor Direct knowledge base (no author named; dated 2026): "Mitsubishi FX10 taper cutting" (land = tan(A) x height; 1.5 degrees over 25 mm is 0.655 mm) and "Wire EDM job pricing" (cut area = cut length x workpiece height; 130 sq in at about 3 sq in per hour is about 43 hours). https://industrialmonitordirect.com/blogs/knowledgebase/mitsubishi-fx10-taper-cutting-a-command-z1z2z5-land-setup , https://industrialmonitordirect.com/blogs/knowledgebase/wire-edm-job-pricing-estimating-costs-per-square-inch . Used only as a second statement of relations the other sources give, and for the two worked examples.
+- Also read, in agreement: Engineers Edge, EDM design considerations (the wire diameter must be less than twice the smallest inside corner radius); PTC Creo wire EDM parameters (spark allowance, stock allowance and wire diameter together set the path of the wire centre); MIT Center for Bits and Atoms, Sodick EDM notes (offset per side: opening a hole by .010 in takes .005 in off the offset).
+
+Findings:
+- **Kerf** = wire diameter + 2 x gap: stated by Cimatron; the handbook's .012 in wire and .016 in kerf fit it with a gap of .002 in, the low end of the handbook's own range. Confirmed.
+- **Offset** = wire radius + gap + stock left on: stated by Autodesk; PTC names the same three terms without the sum. With no stock it is half the kerf (the MIT notes and the handbook figures fit). The stock term rests on one explicit statement.
+- **Smallest inside corner radius** = wire radius + gap: the handbook says "wire diameter plus the spark gap", but its figures (.0063 and .0053 in) are the wire *radius* plus .0003 in, and Engineers Edge gives the radius form. BenchMate uses the radius. The handbook prints .0063 in as ".016 mm"; 0.0063 in is 0.16 mm.
+- **Gap on the first cut: the sources differ.** Cutting Tool Engineering: .001 to .002 in. The handbook: .002 to .003 in. Both are printed on the page; the gap is an input and nothing is averaged. The default (.002 in, 0.05 mm) lies in both ranges.
+- **Taper**: plain trigonometry, given by the university notes for the guides and by the knowledge base for the part.
+- **Cut time** = length x thickness / rate. No cutting rates are given: no two makers' tables for the same wire, material and thickness were read. The rate is an input.
+- **Not included:** rates and gaps per machine, wire and material; corner strategies; the programme plane and guide heights of a taper cut (machine settings); sinker EDM (overburn, orbit, electrode wear); small-hole EDM.
+- Not readable, so not used: the same handbook on Scribd; Modern Machine Shop, "More accurate taper cutting with wire EDM" (the article body did not load).
+
 ## Collet nut and pull stud torque (`data/refdata/holdertorque-evidence.json`, `app/refdata3.js`)
 All accessed 2026-11-12. Every table used was read twice from the PDF; the two readings agree for every cell used.
 
