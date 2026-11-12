@@ -501,6 +501,82 @@ pub fn offset_adjust(measured: f64, target: f64, sense: f64, halve: f64, current
     [e, c, current + c]
 }
 
+// ---------------------------------------------------------------------------
+// Depreciation schedules. `method`: 0 straight line, 1 declining balance at
+// rate = factor / life (factor 2 is the double declining balance), 2 sum of
+// the years' digits. Whole years; money in any one currency.
+
+fn depreciation_inputs_ok(method: f64, cost: f64, salvage: f64, life: f64, factor: f64) -> bool {
+    let m = method as i32;
+    cost > 0.0 && salvage >= 0.0 && salvage <= cost && life >= 1.0 && life.fract() == 0.0 && life <= 200.0
+        && (0..=2).contains(&m) && (m != 1 || (factor > 0.0 && factor <= life))
+}
+
+/// Depreciation expense of one year (1 = the first year). Zero after the last
+/// year of the life. The declining balance never takes the book value below
+/// the salvage value: the year that would cross it is cut to end on it.
+pub fn depreciation_expense(method: f64, cost: f64, salvage: f64, life: f64, factor: f64, year: f64) -> f64 {
+    if !depreciation_inputs_ok(method, cost, salvage, life, factor) || !(year >= 1.0) || year.fract() != 0.0 { return f64::NAN; }
+    if year > life { return 0.0; }
+    match method as i32 {
+        0 => (cost - salvage) / life,
+        2 => (cost - salvage) * (life - year + 1.0) / (life * (life + 1.0) / 2.0),
+        _ => {
+            let before = depreciation_book_value(method, cost, salvage, life, factor, year - 1.0);
+            (before * factor / life).min(before - salvage).max(0.0)
+        }
+    }
+}
+
+/// Book value at the end of a year (0 = at the start: the cost). After the
+/// last year of the life it stays at the value reached then.
+pub fn depreciation_book_value(method: f64, cost: f64, salvage: f64, life: f64, factor: f64, year: f64) -> f64 {
+    if !depreciation_inputs_ok(method, cost, salvage, life, factor) || !(year >= 0.0) || year.fract() != 0.0 { return f64::NAN; }
+    let n = year.min(life) as i32;
+    let mut bv = cost;
+    for k in 1..=n {
+        let e = match method as i32 {
+            0 => (cost - salvage) / life,
+            2 => (cost - salvage) * (life - k as f64 + 1.0) / (life * (life + 1.0) / 2.0),
+            _ => (bv * factor / life).min(bv - salvage).max(0.0),
+        };
+        bv -= e;
+    }
+    bv
+}
+
+// ---------------------------------------------------------------------------
+// Block and tackle; squaring a corner.
+
+/// Pull on the hauling rope of a block and tackle: load / (efficiency x rope
+/// parts that carry the moving block). Efficiency 1 is the ideal tackle.
+pub fn tackle_effort(load: f64, parts: f64, efficiency: f64) -> f64 {
+    if load >= 0.0 && parts >= 1.0 && parts.fract() == 0.0 && efficiency > 0.0 && efficiency <= 1.0 { load / (efficiency * parts) } else { f64::NAN }
+}
+
+/// Rope hauled in for a lift: lift x rope parts (the velocity ratio).
+pub fn tackle_rope_pulled(lift: f64, parts: f64) -> f64 {
+    if lift >= 0.0 && parts >= 1.0 && parts.fract() == 0.0 { lift * parts } else { f64::NAN }
+}
+
+/// Diagonal across a square corner with legs a and b (Pythagoras).
+pub fn square_diagonal(a: f64, b: f64) -> f64 {
+    if a > 0.0 && b > 0.0 { a.hypot(b) } else { f64::NAN }
+}
+
+/// Angle of a corner, in degrees, from its two legs and the measured diagonal
+/// (law of cosines). Not a number when the three lengths cannot close.
+pub fn corner_angle_deg(a: f64, b: f64, diagonal: f64) -> f64 {
+    if !(a > 0.0 && b > 0.0 && diagonal > 0.0) { return f64::NAN; }
+    let c = (a * a + b * b - diagonal * diagonal) / (2.0 * a * b);
+    if (-1.0..=1.0).contains(&c) { c.acos().to_degrees() } else { f64::NAN }
+}
+
+/// Rise over a run at an angle from the run: run x tan(angle).
+pub fn rise_for_angle(run: f64, angle_deg: f64) -> f64 {
+    if run > 0.0 && angle_deg > -90.0 && angle_deg < 90.0 { run * angle_deg.to_radians().tan() } else { f64::NAN }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -805,5 +881,49 @@ mod tests {
         close(trapezoid_area(&[1.0, 2.0, 3.0, 4.0], 2.0), 15.0, 1e-12);
         assert!(simpson_area(&[1.0, 2.0, 3.0, 4.0], 1.0).is_nan());
         assert!(trapezoid_area(&[1.0], 1.0).is_nan());
+    }
+
+    #[test] fn depreciation_reproduces_the_published_schedules() {
+        let near = |a: f64, b: f64| assert!((a - b).abs() < 0.006, "{a} vs {b}");
+        // Wikipedia, Depreciation: straight line 17 000, salvage 2000, 5 years: 3000 a year, book 14 000 ... 2000.
+        near(depreciation_expense(0.0, 17000.0, 2000.0, 5.0, 0.0, 3.0), 3000.0);
+        for (k, bv) in [14000.0, 11000.0, 8000.0, 5000.0, 2000.0].iter().enumerate() { near(depreciation_book_value(0.0, 17000.0, 2000.0, 5.0, 0.0, k as f64 + 1.0), *bv); }
+        // Wikipedia: declining balance 1000 at 40 % (factor 2 over 5 years), salvage 100: 400, 240, 144, 86.40, then 29.60 to end on the salvage value.
+        for (k, e) in [400.0, 240.0, 144.0, 86.40, 29.60].iter().enumerate() { near(depreciation_expense(1.0, 1000.0, 100.0, 5.0, 2.0, k as f64 + 1.0), *e); }
+        near(depreciation_book_value(1.0, 1000.0, 100.0, 5.0, 2.0, 4.0), 129.60);
+        near(depreciation_book_value(1.0, 1000.0, 100.0, 5.0, 2.0, 5.0), 100.0);
+        // Wikipedia: sum of the years' digits 1000, salvage 100, 5 years: 300, 240, 180, 120, 60.
+        for (k, e) in [300.0, 240.0, 180.0, 120.0, 60.0].iter().enumerate() { near(depreciation_expense(2.0, 1000.0, 100.0, 5.0, 0.0, k as f64 + 1.0), *e); }
+        near(depreciation_book_value(2.0, 1000.0, 100.0, 5.0, 0.0, 5.0), 100.0);
+        // Corporate Finance Institute: 25 000 over 8 years. Straight line 3125; double declining 25 %, first year 6250, book 18 750; sum of digits 36, second year 4861.
+        near(depreciation_expense(0.0, 25000.0, 0.0, 8.0, 0.0, 1.0), 3125.0);
+        near(depreciation_expense(1.0, 25000.0, 2500.0, 8.0, 2.0, 1.0), 6250.0);
+        near(depreciation_book_value(1.0, 25000.0, 2500.0, 8.0, 2.0, 1.0), 18750.0);
+        assert!((depreciation_expense(2.0, 25000.0, 0.0, 8.0, 0.0, 2.0) - 4861.11).abs() < 0.01);
+        // After the life nothing more is written off; bad input gives no value.
+        near(depreciation_expense(0.0, 17000.0, 2000.0, 5.0, 0.0, 6.0), 0.0);
+        near(depreciation_book_value(0.0, 17000.0, 2000.0, 5.0, 0.0, 9.0), 2000.0);
+        assert!(depreciation_expense(0.0, 1000.0, 2000.0, 5.0, 0.0, 1.0).is_nan());
+        assert!(depreciation_expense(1.0, 1000.0, 0.0, 5.0, 6.0, 1.0).is_nan());
+        assert!(depreciation_expense(0.0, 1000.0, 0.0, 2.5, 0.0, 1.0).is_nan());
+        // A declining balance with no salvage value never reaches zero: what is left at the end of the life is shown, not hidden.
+        assert!(depreciation_book_value(1.0, 1000.0, 0.0, 5.0, 2.0, 5.0) > 77.0);
+    }
+
+    #[test] fn tackle_and_corner_checks() {
+        // Engineering ToolBox, Pulleys: 100 kg (981 N) on 4 ropes at efficiency 0.8: 981 / 3.2 = 307 N.
+        assert!((tackle_effort(981.0, 4.0, 0.8) - 306.5625).abs() < 1e-9);
+        // Wikipedia, Block and tackle: ideal pull = load / rope parts; a 4 to 1 tackle hauls 4 m of rope for 1 m of lift.
+        assert!((tackle_effort(1000.0, 4.0, 1.0) - 250.0).abs() < 1e-12);
+        assert!((tackle_rope_pulled(1.0, 4.0) - 4.0).abs() < 1e-12);
+        assert!(tackle_effort(100.0, 2.5, 1.0).is_nan() && tackle_effort(100.0, 2.0, 1.2).is_nan() && tackle_effort(100.0, 0.0, 1.0).is_nan());
+        // 3-4-5 and its multiples are square; Math Open Reference gives the other angles as 36.87 and 53.13 degrees.
+        assert!((square_diagonal(3.0, 4.0) - 5.0).abs() < 1e-12 && (square_diagonal(9.0, 12.0) - 15.0).abs() < 1e-12);
+        assert!((corner_angle_deg(3.0, 4.0, 5.0) - 90.0).abs() < 1e-9);
+        assert!((corner_angle_deg(3.0, 5.0, 4.0) - 53.130102).abs() < 1e-5 && (corner_angle_deg(4.0, 5.0, 3.0) - 36.869898).abs() < 1e-5);
+        assert!(corner_angle_deg(3.0, 4.0, 5.1) > 90.0 && corner_angle_deg(3.0, 4.0, 4.9) < 90.0 && corner_angle_deg(3.0, 4.0, 8.0).is_nan());
+        // Rise over a run: 45 degrees rises as much as it runs; 1 degree over 100 rises 1.7455.
+        assert!((rise_for_angle(100.0, 45.0) - 100.0).abs() < 1e-9 && (rise_for_angle(100.0, 1.0) - 1.745506).abs() < 1e-5);
+        assert!(rise_for_angle(100.0, 90.0).is_nan());
     }
 }

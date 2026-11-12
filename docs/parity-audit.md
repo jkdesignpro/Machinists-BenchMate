@@ -86,6 +86,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, first batch, 2026-11-12):** thread engagement and breaking force calculator (`threadstrip`). MH201 from partial to done. Counted from the tables below: 368 done, 180 partial, 48 missing of 596 in-scope rows, 62 %; 169 more rows to done for the 90 % target.
 
+**Update (0.7.0, second batch, 2026-11-12):** shop maths 2 (`depreciation`, `tackle`, `squaring`) and the sieve table in `abrasguide`. MH24, MH133, ED75 and BB29 from partial to done. Re-audit of three rows whose notes were out of date: MH145, MH177 and CN11 from partial to done (what they asked for was already in the app). Counted from the tables below: 375 done, 173 partial, 48 missing of 596 in-scope rows, 63 %; 162 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -360,7 +362,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH21 | Calculus, Newton's method, series | out of scope? | | |
 | MH22 | Statistics: probability and normal distribution | partial | `capability` | Normal fit and ppm only |
 | MH23 | Applying statistics: minimum number of tests, comparing averages | missing | | |
-| MH24 | Engineering economics: interest, present value, annuities, depreciation | partial | `economics` | Capital recovery factor, machine hourly rate, break-even, payback, discounted payback, NPV; no depreciation schedules (`claude/measure-maths`) |
+| MH24 | Engineering economics: interest, present value, annuities, depreciation | done | `economics`, `depreciation` | Capital recovery factor, machine hourly rate, break-even, payback, discounted payback, NPV; 0.7.0: depreciation schedules by straight line, declining balance and sum of the years' digits (units of production not built) |
 
 ### Mechanics and strength of materials
 
@@ -489,7 +491,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH130 | Knurls and knurling: sizes, formulas for knurled work, tolerances | partial | `knurl` | Blank diameter by four methods with a trial procedure; no tolerances on knurled work |
 | MH131 | Tool wear: flank wear, cratering, chipping, deformation | done | `cncguide` | See U91 (`claude/cnc-guide`) |
 | MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | partial | `shoptools`, `toolguide` | Drill sharpening by hand, faults and web thinning; no carbide tool grinding or diamond wheels |
-| MH133 | Sieves, mesh and abrasive grit numbers | partial | `gritconv` | Grit size conversion per publisher; no sieve and mesh table |
+| MH133 | Sieves, mesh and abrasive grit numbers | done | `gritconv`, `abrasguide` | Grit size conversion per publisher; 0.7.0: sieve No. 4 to No. 635 openings as three sources print them, side by side, with what the mesh number means |
 
 ### Machining operations
 
@@ -506,7 +508,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH142 | Speeds and feeds for drilling, reaming and threading (by material) | partial | `advdrill`, `advream`, `advtap` | Starting data for drilling, reaming and tapping; carbide and tapping speeds from one publisher each |
 | MH143 | Cutting speed for broaching | missing | | |
 | MH144 | Planing and shaping speeds and times | out of scope? | | Planers and shapers rare now |
-| MH145 | Cutting time for turning, boring and facing | partial | `passtime` | One pass at fixed RPM; no facing with CSS |
+| MH145 | Cutting time for turning, boring and facing | done | `passtime`, `roughtime`, `partofftime` | One pass and several passes at fixed RPM; facing, parting and grooving at constant surface speed with a spindle speed limit, or at constant RPM (re-audited in 0.7.0: `partofftime` has done this since 0.2.0) |
 | MH146 | Speeds for metal-cutting saws | missing | | |
 | MH147 | Estimating machining power: power constants, feed and wear factors | partial | `mrr`, `cutopt` | kc entered by user; no constants |
 | MH148 | Drilling thrust, torque and power | done | `holeforce` | Drilling torque, thrust and power, tapping torque |
@@ -538,7 +540,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH174 | CNC introduction, coordinate geometry, word address format, program structure | partial | `cncguide` | Axes, coordinate systems, block and word format, modal groups, program order; no coordinate geometry worked examples (`claude/cnc-guide`) |
 | MH175 | M-codes, G20/G21, G90/G91, S, F, inverse time feed, T | done | `gmcodes`, `rotfeed` | G and M codes per control with modal groups; inverse time feed in the rotary feed tool |
 | MH176 | Tool nose radius compensation | done | `tnrc` | Hand compensation and G41/G42 with tip numbers (`claude/cnc-guide`) |
-| MH177 | Rapid, linear, circular and helical interpolation | partial | `helix`, `arcfeed` | Feed maths only; no G-code reference or output |
+| MH177 | Rapid, linear, circular and helical interpolation | done | `gmcodes`, `gsim`, `arcfeed`, `helix` | Re-audited in 0.7.0: G0 to G3 in the G and M code reference per control; the backplot reads arcs with I, J, K or R and helical arcs; feed correction on arcs; pitch, ramp angle and feeds of helical interpolation |
 | MH178 | Work offsets, tool length offsets, cutter radius offsets | done | `cncguide` | Work offsets (G54-G59 and extended), tool length, cutter radius and wear offsets explained (`claude/cnc-guide`) |
 | MH179 | Fixed (canned) cycles for holes | done | `toolpaths`, `cycdrill` | Re-audit: G81, G82, G83, the R plane with G98 and G99, and G84 explained in the milling toolpath guide (0.6.0); generator for the blocks |
 | MH180 | Contouring, turning and boring on CNC | done | `toolpaths`, `latheguide` | Re-audit: contouring with cutter compensation in the milling toolpath guide; turning and boring in the CNC lathe guide (0.6.0) |
@@ -777,7 +779,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED72 | 13.8 Shaft couplings | out of scope? | | |
 | ED73 | 13.9 Cam mechanisms | done | `elemguide` | 0.6.0: as MH280: kinds of cam and follower, terms, displacement diagram, follower motions named (one source, marked) |
 | ED74 | 13.10 Clutches | out of scope? | | |
-| ED75 | 13.11 Pulley mechanisms | partial | `beltdrive` | 0.6.0: belt length, ratio and wrap for two pulleys; no rope and block pulley systems |
+| ED75 | 13.11 Pulley mechanisms | done | `beltdrive`, `tackle` | 0.6.0: belt length, ratio and wrap for two pulleys; 0.7.0: block and tackle, ideal pull, pull at your own efficiency and rope hauled in (the last two from one source each, marked) |
 | ED76 | 13.12 Drive types | partial | `beltdrive`, `chaindrive`, `geartrain` | 0.6.0: belt, chain and gear drives each have a calculator; no comparison of drive types |
 | ED77 | 14.1-14.3 ISO 9001 quality systems and certification | out of scope? | | Management system |
 | ED78 | 14.4 Taguchi methods | missing | | Low priority |
@@ -830,7 +832,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB26 | Bandsaw blade selection | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch selection, blade types, break-in (two suppliers, figures differ), fault table and cut time; no blade width or speed chart |
 | BB27 | Sharpening HSS toolbits | done | `shoptools` | Order of grinding, relief and rake by material, nose radius, cooling, wheel and finishing, with a drawing (two guides) |
 | BB28 | Lubricants and coolants for cutting tools | done | `shoptools`, `coolconc`, `coolmix` | Table of four kinds of fluid and where each suits, the rule by speed and by material, care of mixed fluids |
-| BB29 | Trigonometry, Pythagoras, rise per degree, 3-4-5 rule | partial | `triangle` | Triangle solver; no rise per degree or 3-4-5 rule |
+| BB29 | Trigonometry, Pythagoras, rise per degree, 3-4-5 rule | done | `triangle`, `squaring` | Triangle solver; 0.7.0: 3-4-5 rule for any two legs, corner angle from a measured diagonal, rise over a length for an angle |
 | BB30 | Geometrical construction | missing | | |
 | BB31 | Formulae for dimensions of plane figures | done | `figures` | (`claude/measure-maths`) |
 | BB32 | Area and measurement of plane figures | done | `figures` | (`claude/measure-maths`) |
@@ -899,7 +901,7 @@ One row per learning objective.
 | CN8 | L3 Chip formation | done | `cncguide` | Shear zone, chip types, chip thickness (`claude/cnc-guide`) |
 | CN9 | L3 Chip load definition | done | `cncguide`, `feed`, `cutopt` | 0.6.0: chip load defined in the CNC guide (two publishers), with the feed formula and the link to chip thinning |
 | CN10 | L3 Climb vs conventional milling | done | `cncguide` | With drawing (`claude/cnc-guide`) |
-| CN11 | L3 Speeds and feeds from reference tables | partial | `rpm`, `feed` | Formulas only; no tables |
+| CN11 | L3 Speeds and feeds from reference tables | done | `advmill`, `advturn`, `advdrill`, `rpm`, `feed` | Re-audited in 0.7.0: the advisors give starting speed, chip load and feed by material and tool size (one publisher for some, marked there), on top of the formulas |
 | CN12 | L4 Cartesian coordinate system | done | `cncguide` | Right-handed axes (`claude/cnc-guide`) |
 | CN13 | L4 Work coordinate system and how to choose it | done | `cncguide` | Work coordinates and where to put part zero (`claude/cnc-guide`) |
 | CN14 | L4 Closed-loop servo control | out of scope? | | Machine design |

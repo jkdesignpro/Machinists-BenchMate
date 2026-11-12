@@ -669,6 +669,13 @@ f1!(change_gear_ratio, c::change_gear_ratio, target, leadscrew, fixed);
     let k = t.len();
     set_out(t.iter().flat_map(|t| [t.a as f64, t.b as f64, t.c as f64, t.d as f64, t.ratio]).collect()); k as f64 }
 f1!(capital_recovery_factor, c::capital_recovery_factor, i, n);
+f1!(depreciation_expense, c::depreciation_expense, method, cost, salvage, life, factor, year);
+f1!(depreciation_book_value, c::depreciation_book_value, method, cost, salvage, life, factor, year);
+f1!(tackle_effort, c::tackle_effort, load, parts, efficiency);
+f1!(tackle_rope_pulled, c::tackle_rope_pulled, lift, parts);
+f1!(square_diagonal, c::square_diagonal, a, b);
+f1!(corner_angle_deg, c::corner_angle_deg, a, b, diagonal);
+f1!(rise_for_angle, c::rise_for_angle, run, angle_deg);
 #[no_mangle] #[allow(clippy::too_many_arguments)]
 pub extern "C" fn machine_hourly_rate(price: f64, resale: f64, years: f64, interest: f64, hours: f64, fixed: f64, kw: f64, load: f64, kwh: f64, labour: f64, which: f64) -> f64 {
     c::machine_hourly_rate(price, resale, years, interest, hours, fixed, kw, load, kwh, labour, which as u32) }

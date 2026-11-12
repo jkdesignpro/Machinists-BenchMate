@@ -1054,6 +1054,57 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Section of a screw in a tapped part: screw diameter and the length of thread engaged');
   },
 
+  // Depreciation: book value at the end of each year as bars, the salvage value as a dashed line.
+  depreciation(v, sys, rows) {
+    const W = 520, H = 250, n = Math.min(v.life, 40), bv = [];
+    if (!dcOk(v.cost) || !(n >= 1)) return '';
+    for (let k = 1; k <= n; k++) { const r = (rows || []).find(x => x.label === 'Year ' + k + ': book value at the year end'); if (!r || !isFinite(r.value)) return ''; bv.push(r.value); }
+    const x0 = 70, y0 = 200, w = 420, hh = 160, sy = hh / v.cost, step = w / (n + 1), bw = Math.min(34, step * 0.7);
+    let h = DK.line(x0, y0, x0 + w, y0, 'thin') + DK.line(x0, y0, x0, y0 - hh - 8, 'thin');
+    h += DK.rect(x0 + step * 0.5 - bw / 2, y0 - v.cost * sy, bw, v.cost * sy, 'ghost') + DK.text(x0 + step * 0.5, y0 + 16, '0', { cls: 'mut', anchor: 'middle' });
+    bv.forEach((b, i) => {
+      const x = x0 + step * (i + 1.5) - bw / 2;
+      if (b > 0) h += DK.rect(x, y0 - b * sy, bw, b * sy, 'part');
+      if (n <= 12 || (i + 1) % 5 === 0) h += DK.text(x + bw / 2, y0 + 16, String(i + 1), { cls: 'mut', anchor: 'middle' });
+    });
+    if (v.salv > 0 && v.salv <= v.cost) h += dcPl([[x0, y0 - v.salv * sy], [x0 + w, y0 - v.salv * sy]], 'hid') + DK.text(x0 + w, y0 - v.salv * sy - 5, 'salvage ' + dcN(v.salv, 0), { cls: 'mut', anchor: 'end' });
+    h += DK.text(x0 - 6, y0 - v.cost * sy + 4, dcN(v.cost, 0), { cls: 'dimt', anchor: 'end' }) + DK.text(x0 + w / 2, y0 + 36, 'end of year', { cls: 'mut', anchor: 'middle' });
+    h += dcLines(x0 + 8, 20, ['book value at the end of each year']);
+    return DK.svg(W, H, h, 'Bar chart of the book value at the end of each year, with the salvage value as a dashed line');
+  },
+
+  // Block and tackle: a diagram of the rope parts between the fixed and the moving block. Not to scale.
+  tackle(v, sys, rows) {
+    const W = 520, H = 260, n = Math.round(v.n);
+    if (!(n >= 1) || n !== v.n || !dcOk(v.load)) return '';
+    const m = Math.min(n, 12), gap = Math.min(22, 200 / m), cx = 190, x1 = cx - gap * (m - 1) / 2, yT = 56, yB = 150, fu = sys === 'inch' ? 'lbf' : 'N';
+    let h = DK.rect(cx - 110, 22, 220, 10, 'hatch');
+    h += DK.rect(x1 - 14, yT - 14, gap * (m - 1) + 28, 22, 'part') + DK.line(cx, 32, cx, yT - 14, 'ln');
+    h += DK.rect(x1 - 14, yB - 8, gap * (m - 1) + 28, 22, 'tool') + DK.line(cx, yB + 14, cx, yB + 40, 'ln');
+    for (let i = 0; i < m; i++) h += DK.line(x1 + gap * i, yT + 8, x1 + gap * i, yB - 8, 'ln');
+    h += DK.rect(cx - 34, yB + 40, 68, 40, 'part') + DK.text(cx, yB + 65, 'load', { cls: 'txt', anchor: 'middle' });
+    const xp = x1 + gap * (m - 1) + 60, pull = dcRow(rows, 'Pull on the rope at your efficiency'), ideal = dcRow(rows, 'Pull on the rope, ideal');
+    h += dcPl([[x1 + gap * (m - 1) + 14, yT - 3], [xp, yT - 3], [xp, yB + 30]], 'ln') + DK.arrow(xp, yB + 30, xp, yB + 62, 'hot');
+    h += dcResult(xp + 14, yB + 44, dcN(dcOk(pull) ? pull : ideal, 1) + ' ' + fu, dcOk(pull) ? 'pull at your efficiency' : 'ideal pull');
+    h += dcLines(xp + 14, 22, [n + ' rope part' + (n === 1 ? '' : 's') + ' carry the moving block', n > m ? 'only ' + m + ' are drawn' : '', 'diagram, not to scale']);
+    h += dcLines(x1 - 100, yT + 2, ['fixed block']) + dcLines(x1 - 108, yB + 8, ['moving block']);
+    return DK.svg(W, H, h, 'Diagram of a block and tackle: a fixed block, a moving block with the load, the rope parts between them and the hauling rope');
+  },
+
+  // Squaring a corner: the two legs and the diagonal, to scale.
+  squaring(v, sys, rows) {
+    const W = 520, H = 260, u = dcU(sys), dp = sys === 'inch' ? 3 : 1;
+    const c = dcRow(rows, 'Diagonal for a square corner');
+    if (!dcOk(v.a) || !dcOk(v.b) || !dcOk(c)) return '';
+    const sc = Math.min(300 / v.b, 150 / v.a), x0 = 90, y0 = 210, bx = x0 + v.b * sc, ay = y0 - v.a * sc;
+    let h = DK.poly([[x0, y0], [bx, y0], [x0, ay]], 'part');
+    h += dcPl([[x0 + 12, y0], [x0 + 12, y0 - 12], [x0, y0 - 12]], 'thin');
+    h += DK.dimH(x0, bx, y0 + 26, dcN(v.b, dp), { from: y0 }) + dcDimV(ay, y0, x0 - 30, dcN(v.a, dp), { from: x0 });
+    h += DK.dim(x0, ay, bx, y0, 'diagonal ' + dcN(c, dp), { off: 22, hot: true });
+    h += dcLines(bx - 60, 24, ['to scale, ' + u]);
+    return DK.svg(W, H, h, 'A right-angled triangle: the two legs measured from the corner and the diagonal between their ends');
+  },
+
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
   sawtpi(v, sys, rows) {
     const W = 520, H = 250, u = dcU(sys);

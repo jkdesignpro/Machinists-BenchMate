@@ -26,9 +26,12 @@ const AG_SOURCES = {
   WEILER: 'Weiler Abrasives, "Cutting wheel guide"',
   NORTON: 'Norton (Saint-Gobain Abrasives), catalogue pages on mounted points',
   PFERD: 'PFERD, safety notes for mounted points and bench grinding wheels (catalogue 3)',
+  GILSON: 'Gilson Company, "Sieve sizes" (ASTM E11 openings)',
+  WP_MESH: 'Wikipedia, "Mesh (scale)" (CC BY-SA)',
+  SIGMA: 'Sigma-Aldrich, "Particle size conversion table"',
 };
 // Several pages of one publisher count once.
-const AG_FAMILY = { OU_G: 'OU', OU_C: 'OU', CTE_W: 'CTE', CTE_C: 'CTE', CTE_H: 'CTE', MMS_G: 'MMS', MMS_C: 'MMS', MMS_H: 'MMS', WP_HONE: 'WIKI', WP_LAP: 'WIKI', EMI4: 'EMI', EMI6: 'EMI' };
+const AG_FAMILY = { OU_G: 'OU', OU_C: 'OU', CTE_W: 'CTE', CTE_C: 'CTE', CTE_H: 'CTE', MMS_G: 'MMS', MMS_C: 'MMS', MMS_H: 'MMS', WP_HONE: 'WIKI', WP_LAP: 'WIKI', WP_MESH: 'WIKI', EMI4: 'EMI', EMI6: 'EMI' };
 const agTags = keys => guideTags(keys, AG_SOURCES, AG_FAMILY);
 const agP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + agTags(keys)) + '</p>';
 const agBox = d => '<path class="gfill" d="' + d + '"/><path class="gp" d="' + d + '"/>';
@@ -86,11 +89,47 @@ const AG_BELT = [
   ['Slack belt', 'Nothing: the free span between two wheels', 'Contoured parts: deburring, blending, polishing', ['EMI4', 'XOM_B']],
 ];
 
+// Sieve openings as each source prints them, in the source's own units. Nothing is converted or averaged here.
+const AG_SIEVE = [
+  ['No. 4', '4.75 mm', '4.75 mm (0.187 in)', '4.76 mm (0.187 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 5', '4.00 mm', '4.00 mm (0.157 in)', '4.00 mm (0.157 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 6', '3.35 mm', '3.35 mm (0.132 in)', '3.36 mm (0.132 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 7', '2.80 mm', '2.80 mm (0.110 in)', '2.83 mm (0.111 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 8', '2.36 mm', '2.36 mm (0.093 in)', '2.38 mm (0.0937 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 10', '2.00 mm', '2.00 mm (0.079 in)', '2.00 mm (0.0787 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 12', '1.70 mm', '1.70 mm (0.0661 in)', '1.68 mm (0.0661 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 14', '1.40 mm', '1.40 mm (0.0555 in)', '1.41 mm (0.0555 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 16', '1.18 mm', '1.18 mm (0.0469 in)', '1.19 mm (0.0469 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 18', '1.00 mm', '1.00 mm (0.0394 in)', '1.00 mm (0.0394 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 20', '850 µm', '0.85 mm (0.0331 in)', '0.841 mm (0.0331 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 25', '710 µm', '0.71 mm (0.0278 in)', '0.707 mm (0.0278 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 30', '600 µm', '0.60 mm (0.0232 in)', '0.595 mm (0.0234 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 35', '500 µm', '0.50 mm (0.0197 in)', '0.500 mm (0.0197 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 40', '425 µm', '0.425 mm (0.0165 in)', '0.420 mm (0.0165 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 45', '355 µm', '0.355 mm (0.0139 in)', '0.354 mm (0.0139 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 50', '300 µm', '0.300 mm (0.0117 in)', '0.297 mm (0.0117 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 60', '250 µm', '0.250 mm (0.0098 in)', '0.250 mm (0.0098 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 70', '212 µm', '0.212 mm (0.0083 in)', '0.210 mm (0.0083 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 80', '180 µm', '0.180 mm (0.0070 in)', '0.177 mm (0.0070 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 100', '150 µm', '0.150 mm (0.0059 in)', '0.149 mm (0.0059 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 120', '125 µm', '0.125 mm (0.0049 in)', '0.125 mm (0.0049 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 140', '106 µm', '0.105 mm (0.0041 in)', '0.105 mm (0.0041 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 170', '90 µm', '0.090 mm (0.0035 in)', '0.088 mm (0.0035 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 200', '75 µm', '0.075 mm (0.0029 in)', '0.074 mm (0.0029 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 230', '63 µm', '0.063 mm (0.0024 in)', '0.063 mm (0.0025 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 270', '53 µm', '0.053 mm (0.0021 in)', '0.053 mm (0.0021 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 325', '45 µm', '0.044 mm (0.0017 in)', '0.044 mm (0.0017 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 400', '38 µm', '0.037 mm (0.0015 in)', '0.037 mm (0.0015 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 450', '32 µm', 'not listed', 'not listed', ['GILSON']],
+  ['No. 500', '25 µm', 'not listed', 'not listed', ['GILSON']],
+  ['No. 635', '20 µm', 'not listed', 'not listed', ['GILSON']],
+];
+
 function renderAbrasGuide(el) {
-  const toc = [['ag-fig', 'Grinding in figures'], ['ag-cless', 'Centerless grinding'], ['ag-hone', 'Honing'], ['ag-lap', 'Lapping'], ['ag-super', 'Diamond and CBN wheels'], ['ag-belt', 'Belts and cut-off wheels'], ['ag-point', 'Mounted points']];
+  const toc = [['ag-fig', 'Grinding in figures'], ['ag-cless', 'Centerless grinding'], ['ag-hone', 'Honing'], ['ag-lap', 'Lapping'], ['ag-super', 'Diamond and CBN wheels'], ['ag-belt', 'Belts and cut-off wheels'], ['ag-point', 'Mounted points'], ['ag-sieve', 'Sieves and mesh']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">The abrasive processes beyond the plain grinding wheel, in our own words: the grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding and cut-off wheels, and mounted points. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
+    '<p class="desc">The abrasive processes beyond the plain grinding wheel, in our own words: the grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding and cut-off wheels, mounted points, and sieves and mesh numbers. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
 
     '<h2 id="ag-fig">Grinding in figures</h2>' +
     agP('<b>Grinding ratio (G ratio).</b> The volume of metal ground off divided by the volume of wheel worn away in doing it.', ['OU_G', 'CTE_W']) +
@@ -177,6 +216,14 @@ function renderAbrasGuide(el) {
     agP('<b>Shapes.</b> A shapes for medium and heavy blending, B shapes for light deburring and finishing, W shapes for offhand and precision grinding.', ['NORTON']) +
     agP('<b>Grit.</b> 36 and coarser for rough grinding; 60 to 90 for a fine finish and on narrow surfaces.', ['NORTON']) +
     agP('Carbide burrs are in the <a href="#/t/shoptools">shop tools guide</a>.', null) +
+
+    '<h2 id="ag-sieve">Sieves and mesh numbers</h2>' +
+    agP('<b>Mesh number.</b> Sieve numbers began as the number of openings in one inch of the cloth.', ['GILSON', 'WP_MESH']) +
+    agP('<b>Not an exact size.</b> The wires take up room, so the number does not give the opening directly, and different standards give slightly different openings for the same number.', ['WP_MESH']) +
+    agP('<b>Standards.</b> ASTM E11 gives the US series of sieves. ISO 565 gives the nominal metric openings, from 125 mm down to 20 µm, and ISO 3310-1 the tolerances on wires and openings.', ['GILSON']) +
+    agP('<b>The sources do not all print the same opening.</b> For No. 4, 20 and 200, Gilson and Wikipedia print 4.75 mm, 850 µm and 75 µm, and Sigma-Aldrich prints 4.76 mm, 0.841 mm and 0.074 mm. The table shows what each source prints, in its own units.', ['GILSON', 'WP_MESH', 'SIGMA']) +
+    guideTable(['Sieve', 'Gilson (ASTM E11)', 'Wikipedia', 'Sigma-Aldrich'], AG_SIEVE, agTags) +
+    agP('Abrasive grit numbers (FEPA, ANSI, JIS) are under <a href="#/t/gritconv">grit size conversion</a>.', null) +
 
     '<h2 id="ag-src">Sources</h2><ul class="gsl">' + Object.entries(AG_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
     '<p class="desc">Full URLs and access dates are in docs/sources.md, "Abrasive processes guide". No text, figures or tables were copied from the sources.</p>';

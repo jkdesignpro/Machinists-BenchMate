@@ -1979,6 +1979,38 @@ const TOOLS = [
   source: 'OpenStax, Algebra and Trigonometry 2e, ch. 10 (non-right triangles: law of sines incl. the ambiguous case, law of cosines). See docs/geometry.md.',
 },
 {
+  id: 'squaring', level: 'simple', group: 'Geometry', title: 'Squaring a corner (3-4-5 rule)',
+  desc: 'The diagonal that makes a corner square for any two legs, the angle of the corner from the diagonal you measured, and the rise over a length for an angle.',
+  fields: s => [
+    { id: 'a', label: 'First leg, measured from the corner', unit: lenU(s), def: s === 'inch' ? 36 : 900 },
+    { id: 'b', label: 'Second leg, measured from the corner', unit: lenU(s), def: s === 'inch' ? 48 : 1200 },
+    { id: 'c', label: 'Diagonal you measured (optional)', unit: lenU(s), def: '' },
+    { id: 'run', label: 'Length for a rise (optional)', unit: lenU(s), def: '' },
+    { id: 'ang', label: 'Angle for the rise', unit: 'deg', def: 1, when: v => v.run > 0 },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.a > 0 && v.b > 0)) return [];
+    const u = lenU(s), dp = s === 'inch' ? 4 : 2, rows = [R('Diagonal for a square corner', W.square_diagonal(v.a, v.b), u, dp)];
+    if (v.c > 0) {
+      const A = W.corner_angle_deg(v.a, v.b, v.c);
+      rows.push(isFinite(A) ? R('Angle of the corner from your diagonal', A, 'deg', 3) : R('Diagonal', 'these three lengths cannot make a triangle', '', 0));
+      const A3 = +A.toFixed(3);   // wording only: compare at the three decimals shown
+      if (isFinite(A)) rows.push(R('Corner', A3 > 90 ? 'wider than square: bring the ends of the legs together' : A3 < 90 ? 'tighter than square: move the ends of the legs apart' : 'square, to the three decimals shown', '', 0));
+    }
+    if (v.run > 0) {
+      const r = W.rise_for_angle(v.run, v.ang);
+      rows.push(isFinite(r) ? R('Rise over that length at the angle', r, u, dp) : R('Angle', 'must be between -90 and 90 degrees', '', 0));
+    }
+    rows.push(R('Note', 'Legs of 3 and 4 parts give a diagonal of 5 parts; so do 6-8-10, 9-12-15 and every other multiple. The larger the triangle, the smaller the effect of a small error with the tape.', '', 0));
+    return rows;
+  },
+  working: 'Diagonal = sqrt(a² + b²). Angle of the corner = acos((a² + b² − c²) / (2 a b)). Rise = length × tan(angle).',
+  source: '3-4-5 rule: Math Open Reference, "3:4:5 triangle" and A Concord Carpenter, "The 3-4-5 method for squaring corners" (R. Robillard, 2018). Pythagoras, the law of cosines and the tangent: OpenStax, Algebra and Trigonometry 2e. See docs/sources.md, Shop maths 2.',
+  proof: [{ name: 'Legs of 3 and 4', sys: 'mm', vals: { a: 3, b: 4, c: 5 },
+    expect: [['Diagonal for a square corner', 'mm', 5, 0.000001], ['Angle of the corner from your diagonal', 'deg', 90, 0.000001]],
+    source: 'Math Open Reference, 3:4:5 triangle: sides in the ratio 3:4:5 make a right triangle.' }],
+},
+{
   id: 'arc', level: 'advanced', group: 'Geometry', title: 'Chord, arc, sagitta and 3-point circle',
   desc: 'Solve an arc from any two of radius, included angle, chord, sagitta (height) and arc length (all ten pairs, with both arcs where two fit); segment and sector areas; centre and radius of the circle through three points.',
   render: el => renderArc(el),
@@ -2680,6 +2712,44 @@ const TOOLS = [
   source: "Engineering economy interest formulas (Machinery's Handbook 'engineering economics', by name); see docs/sources.md.",
 },
 {
+  id: 'depreciation', level: 'advanced', group: 'Shop helpers', title: 'Depreciation schedule',
+  desc: 'How the book value of a machine falls year by year: straight line, declining balance (double declining by default) and sum of the years\' digits, with the whole schedule drawn. Book-keeping only: tax rules differ by country and are not covered.',
+  fields: s => [
+    { id: 'cost', label: 'Cost of the machine', unit: '', def: 25000 },
+    { id: 'salv', label: 'Salvage (resale) value at the end', unit: '', def: 2500 },
+    { id: 'life', label: 'Useful life', unit: 'years', def: 8 },
+    { id: 'm', label: 'Method', unit: '', def: 0, options: [[0, 'Straight line'], [1, 'Declining balance'], [2, 'Sum of the years\' digits']] },
+    { id: 'fac', label: 'Declining balance factor (2 = double declining)', unit: '', def: 2, when: v => v.m === 1 },
+    { id: 'yr', label: 'Year to show', unit: '', def: 1 },
+  ],
+  calc: (v, W) => {
+    if (!(v.cost > 0 && v.life >= 1)) return [];
+    const salv = v.salv > 0 ? v.salv : 0, fac = v.m === 1 ? v.fac : 0;
+    const E = k => W.depreciation_expense(v.m, v.cost, salv, v.life, fac, k), B = k => W.depreciation_book_value(v.m, v.cost, salv, v.life, fac, k);
+    if (!isFinite(B(0))) return [R('Inputs', v.life % 1 ? 'the life must be a whole number of years' : salv > v.cost ? 'the salvage value cannot be more than the cost' : v.m === 1 ? 'the factor must be more than 0 and not more than the life' : 'check the inputs', '', 0)];
+    const rows = [], yr = v.yr >= 1 && v.yr % 1 === 0 ? v.yr : 1;
+    rows.push(R('Depreciation in year ' + yr, E(yr), '', 2), R('Book value at the end of year ' + yr, B(yr), '', 2));
+    const n = v.life > 40 ? 40 : v.life;
+    for (let k = 1; k <= n; k++) rows.push(R('Year ' + k + ': depreciation', E(k), '', 2), R('Year ' + k + ': book value at the year end', B(k), '', 2));
+    if (v.life > 40) rows.push(R('Note', 'Only the first 40 years are listed.', '', 0));
+    if (v.m === 1 && B(v.life) > salv) rows.push(R('Note', 'A declining balance does not reach the salvage value by itself. The book value left after the last year is shown as it is; some book-keepers switch to straight line for the last years, which is not done here.', '', 0));
+    return rows;
+  },
+  working: 'Straight line: (cost − salvage) / life, the same every year. Declining balance: book value at the start of the year × factor / life, cut in the year that would take the book value below the salvage value. Sum of the years\' digits: (cost − salvage) × years of life left at the start of the year / (1 + 2 + ... + life).',
+  source: 'Corporate Finance Institute, "Depreciation methods" (T. Vipond, 2019) and Wikipedia, "Depreciation": both give the three methods; the rule that the book value never goes below the salvage value is from Wikipedia. See docs/sources.md, Shop maths 2.',
+  proof: [
+    { name: 'Sum of the years\' digits, 1000 with 100 salvage over 5 years, year 2', sys: 'mm', vals: { cost: 1000, salv: 100, life: 5, m: 2, yr: 2 },
+      expect: [['Depreciation in year 2', '', 240, 0.005], ['Book value at the end of year 2', '', 460, 0.005]],
+      source: 'Wikipedia, Depreciation, sum-of-years-digits example: 300, 240, 180, 120, 60; book value 700, 460, 280, 160, 100.' },
+    { name: 'Double declining balance, 1000 with 100 salvage over 5 years, year 5', sys: 'mm', vals: { cost: 1000, salv: 100, life: 5, m: 1, fac: 2, yr: 5 },
+      expect: [['Depreciation in year 5', '', 29.6, 0.005], ['Book value at the end of year 5', '', 100, 0.005]],
+      source: 'Wikipedia, Depreciation, declining balance example at 40 %: 400, 240, 144, 86.40 and 29.60 in the last year, to end on the scrap value of 100.' },
+    { name: 'Straight line, 25 000 over 8 years', sys: 'mm', vals: { cost: 25000, salv: 0, life: 8, m: 0, yr: 1 },
+      expect: [['Depreciation in year 1', '', 3125, 0.005]],
+      source: 'Corporate Finance Institute, Depreciation methods: 25 000 over 8 years with no salvage value, 3125 a year.' },
+  ],
+},
+{
   id: 'machines', level: 'simple', group: 'Setup', title: 'Machine profiles',
   desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
   render: el => renderMachines(el),
@@ -3008,6 +3078,34 @@ const TOOLS = [
   proof: [{ name: 'No. 3/0 taper pin, 1 in long', sys: 'inch', vals: { no: -2, l: 1 },
     expect: [['Small end diameter at this length', 'in', 0.1042, 0.00005], ['Large end diameter (basic)', 'in', 0.125, 0.00005]],
     source: 'Albany County Fasteners, pin size chart: No. 3/0 taper pin, large end 0.1250 in, small end at 1 in of length 0.1042 in.', note: 'Only the rows of that chart that match the standard\'s cut sheet are used; its sizes from 2/0 up do not.' }],
+},
+{
+  id: 'tackle', level: 'advanced', group: 'Machine elements', title: 'Block and tackle',
+  desc: 'The pull needed on the rope of a block and tackle from the load and the number of rope parts that carry the moving block, and the rope hauled in for a lift. The efficiency is yours to enter; left blank, only the ideal figure is shown. This is not a rigging calculation: it says nothing about the safe load of rope, blocks or anchor.',
+  fields: s => [
+    { id: 'load', label: 'Load', unit: s === 'inch' ? 'lbf' : 'N', def: s === 'inch' ? 500 : 981 },
+    { id: 'n', label: 'Rope parts carrying the moving block', unit: '', def: 4 },
+    { id: 'eff', label: 'Efficiency of the tackle, 0 to 1 (optional)', unit: '', def: '' },
+    { id: 'lift', label: 'Lift (optional)', unit: s === 'inch' ? 'ft' : 'm', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.load > 0 && v.n > 0)) return [];
+    const fu = s === 'inch' ? 'lbf' : 'N', ideal = W.tackle_effort(v.load, v.n, 1);
+    if (!isFinite(ideal)) return [R('Rope parts', 'must be a whole number, 1 or more', '', 0)];
+    const rows = [R('Pull on the rope, ideal (no friction)', ideal, fu, 1), R('Ideal mechanical advantage (the number of rope parts)', v.n, '', 0)];
+    if (v.eff > 0) {
+      const e = W.tackle_effort(v.load, v.n, v.eff);
+      rows.push(isFinite(e) ? R('Pull on the rope at your efficiency (one source, to be verified)', e, fu, 1) : R('Efficiency', 'must be more than 0 and not more than 1', '', 0));
+    }
+    if (v.lift > 0) rows.push(R('Rope hauled in for this lift (one source, to be verified)', W.tackle_rope_pulled(v.lift, v.n), s === 'inch' ? 'ft' : 'm', 2));
+    rows.push(R('Note', 'Count only the rope parts that carry the moving block. A hauling rope that comes off the moving block counts as one more part (rove to advantage); one that comes off the fixed block only changes the direction of the pull.', '', 0));
+    return rows;
+  },
+  working: 'Ideal pull = load / rope parts. Pull at an efficiency = load / (efficiency × rope parts). Rope hauled in = lift × rope parts.',
+  source: 'Ideal pull: Wikipedia, "Block and tackle" and Engineering ToolBox, "Pulleys". The efficiency form is from Engineering ToolBox alone, the rope hauled in and the note on reeving from Wikipedia alone. See docs/sources.md, Shop maths 2.',
+  proof: [{ name: '100 kg (981 N) on 4 ropes at an efficiency of 0.8', sys: 'mm', vals: { load: 981, n: 4, eff: 0.8 },
+    expect: [['Pull on the rope at your efficiency (one source, to be verified)', 'N', 306.6, 0.5], ['Pull on the rope, ideal (no friction)', 'N', 245.25, 0.05]],
+    source: 'Engineering ToolBox, Pulleys: 100 kg on 4 ropes with an efficiency of 0.8, 981 / 3.2 = 307 N.' }],
 },
 {
   id: 'keys', level: 'advanced', group: 'Machine elements', title: 'Keys and keyways',

@@ -12,11 +12,23 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (shop maths 2)
+- New tool **Depreciation schedule** (Shop > Shop helpers): straight line, declining balance (double declining by default, never below the salvage value) and sum of the years' digits, with every year listed and the book value drawn as bars. Three published schedules are reproduced.
+- New tool **Block and tackle** (Reference > Machine elements): pull on the rope from the load and the rope parts that carry the moving block, with your own efficiency if you enter one (never filled in), and the rope hauled in for a lift, with a diagram. Not a rigging calculation.
+- New tool **Squaring a corner (3-4-5 rule)** (Shop maths > Geometry): the diagonal that makes a corner square, the angle of the corner from the diagonal you measured, and the rise over a length for an angle, drawn to scale.
+- Abrasive processes guide: new section **Sieves and mesh numbers** with the openings of sieves No. 4 to No. 635 as three sources print them, side by side (they do not all agree, and nothing is averaged). 24 sources.
+- Formula library: nine entries for the three new tools.
+
+### Book audit (second batch)
+- MH24 (depreciation), MH133 (sieves and mesh), ED75 (pulley mechanisms) and BB29 (3-4-5 rule and rise for an angle) from partial to done.
+- Re-audit of rows whose notes were out of date: MH145 (facing at constant surface speed has been in `partofftime` since 0.2.0), MH177 (the G and M code reference, the backplot with helical arcs, arc feed and helical interpolation cover it) and CN11 (the advisors give starting speeds and feeds by material) from partial to done.
+- 375 done, 173 partial, 48 missing of 596 in-scope rows, 63 %; 162 more rows to done for the 90 % target.
+
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.
 
-### Book audit
-- MH201 (working strength, engagement length, breaking force, lock wire) from partial to done: 368 done, 180 partial, 48 missing of 596 in-scope rows, 62 %; 169 more rows to done for the 90 % target.
+### Book audit (first batch)
+- MH201 (working strength, engagement length, breaking force, lock wire) from partial to done.
 
 ## [0.6.0] - 2026-11-12
 Stage 4 of the plan, part 1: book references, in seventeen batches. Built on top of 0.5.0. The book audit (docs/parity-audit.md) stands at 367 done, 181 partial and 48 missing of 596 in-scope rows, 62 %; the target of 90 % is carried on in 0.7.0 and 0.8.0.

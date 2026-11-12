@@ -2045,11 +2045,11 @@ where = 'toolpaths';
   }
   where = 'abrasguide';
   g = await guide('abrasguide');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '4,4,4' || g.srcs !== 21) problems.push(`[${where}] 8 sections, 3 drawings, three tables of 3 rows, 21 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
-  if (g.untagged !== 0 || g.tagged < 65) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
-  for (const k of ['Grinding ratio (G ratio)', 'No centres, no chuck', 'Above centre', 'What it is. A slow abrasive process', 'Crosshatch', 'How slow', 'What it is for', 'What it holds. Under 0.001 in', 'Abrasives', 'Single-pass honing', 'Plateau honing', 'What it is. Rubbing the work', 'The lap is the softer one', 'Lap material', 'Silicon carbide', 'Diamond cuts faster', 'Conditioning rings', 'Bright is not flat', 'Checking flatness', 'Diamond wheels grind carbide', 'One carat', 'More is not always better', 'Belt speed', 'Grit by stage', 'The speed limit is not one number'])
+  if (g.h2 !== 9 || g.svgs !== 3 || g.tabs !== '4,4,4,33' || g.srcs !== 24) problems.push(`[${where}] 9 sections, 3 drawings, three tables of 3 rows and one of 32, 24 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 69) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Mesh number. Sieve numbers', 'The sources do not all print', 'Grinding ratio (G ratio)', 'No centres, no chuck', 'Above centre', 'What it is. A slow abrasive process', 'Crosshatch', 'How slow', 'What it is for', 'What it holds. Under 0.001 in', 'Abrasives', 'Single-pass honing', 'Plateau honing', 'What it is. Rubbing the work', 'The lap is the softer one', 'Lap material', 'Silicon carbide', 'Diamond cuts faster', 'Conditioning rings', 'Bright is not flat', 'Checking flatness', 'Diamond wheels grind carbide', 'One carat', 'More is not always better', 'Belt speed', 'Grit by stage', 'The speed limit is not one number'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
-  for (const k of ['How large', 'An example', 'Less wheel wear', 'Wheel speed. Most surface grinding', 'Spark-out', 'What grinding holds', 'Regulating wheel', 'What it is. A rubber-bonded', 'On centre', 'How far above', 'Lobing', 'Against lobing and chatter', 'Bores', 'What it holds. Diameter', 'Stock. Usually', 'Which abrasive', 'Hard and soft stones', 'Honing oil', 'Plateau finish, in figures', 'Hard and soft work', 'Stock, pressure, speed', 'Grit. 100 to 280', 'One light band', 'What lapping does not do', 'CBN wheels grind hardened steel', 'Bond', 'Shape code', 'Where the layer sits', 'Wheel speed. Diamond 1200', 'Contact wheel hardness', 'Serrated wheels', 'Backing', 'Cut-off wheels', 'Thin or thick', 'Hard or soft bond', 'Speed marking', 'Overhang', 'Grip', 'Shapes', 'Grit. 36 and coarser'])
+  for (const k of ['Not an exact size', 'Standards. ASTM E11', 'How large', 'An example', 'Less wheel wear', 'Wheel speed. Most surface grinding', 'Spark-out', 'What grinding holds', 'Regulating wheel', 'What it is. A rubber-bonded', 'On centre', 'How far above', 'Lobing', 'Against lobing and chatter', 'Bores', 'What it holds. Diameter', 'Stock. Usually', 'Which abrasive', 'Hard and soft stones', 'Honing oil', 'Plateau finish, in figures', 'Hard and soft work', 'Stock, pressure, speed', 'Grit. 100 to 280', 'One light band', 'What lapping does not do', 'CBN wheels grind hardened steel', 'Bond', 'Shape code', 'Where the layer sits', 'Wheel speed. Diamond 1200', 'Contact wheel hardness', 'Serrated wheels', 'Backing', 'Cut-off wheels', 'Thin or thick', 'Hard or soft bond', 'Speed marking', 'Overhang', 'Grip', 'Shapes', 'Grit. 36 and coarser'])
     if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
   {
     const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
@@ -2058,7 +2058,8 @@ where = 'toolpaths';
     if (!/^50 2\.2 12\.5 %/.test(row('50 ')) || !/^75 3\.3 18\.8 %/.test(row('75 ')) || !/^100 4\.4 25 %/.test(row('100 '))) problems.push(`[${where}] concentration rows: ${row('50 ')} | ${row('75 ')} | ${row('100 ')}`);
     if (!/Most work \(EMI\); contours and hollow grinding \(Xometry\)/.test(row('Contact wheel')) || !/A fixed flat plate Flat surfaces/.test(row('Platen')) || !/the free span between two wheels/.test(row('Slack belt'))) problems.push(`[${where}] belt rows: ${row('Contact wheel')} | ${row('Platen')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
-    if (fl !== 'End-feed 50') problems.push(`[${where}] only the end-feed and concentration 50 rows have one publisher: ${fl}`);
+    if (fl !== 'End-feed 50 No. No. No.') problems.push(`[${where}] only the end-feed and concentration 50 rows and the three finest sieves have one publisher: ${fl}`);
+    if (!/^No\. 4 4\.75 mm 4\.75 mm \(0\.187 in\) 4\.76 mm \(0\.187 in\)/.test(row('No. 4 ')) || !/^No\. 20 850 µm 0\.85 mm \(0\.0331 in\) 0\.841 mm \(0\.0331 in\)/.test(row('No. 20 ')) || !/^No\. 140 106 µm 0\.105 mm \(0\.0041 in\) 0\.105 mm \(0\.0041 in\)/.test(row('No. 140 ')) || !/^No\. 400 38 µm 0\.037 mm \(0\.0015 in\) 0\.037 mm \(0\.0015 in\)/.test(row('No. 400 ')) || !/^No\. 635 20 µm not listed not listed/.test(row('No. 635 '))) problems.push(`[${where}] sieve rows as each source prints them: ${row('No. 4 ')} | ${row('No. 20 ')} | ${row('No. 140 ')} | ${row('No. 400 ')} | ${row('No. 635 ')}`);
   }
   if (!/Values run from 2 to 200/.test(g.all) || !/12 to 25 % of the work diameter, on a blade with a 30° top face/.test(g.all) || !/100 to 250 ft\/min for the turning hone/.test(g.all) || !/start at about 65 ft\/min/.test(g.all) || !/Rz 3 to 6, Rpk at most 0\.3, Rk 0\.3 to 1\.5 and Rvk 0\.8 to 2\.0 micrometres/.test(g.all) || !/about 280 nanometres \(0\.000011 in\)/.test(g.all) || !/1A1, 6A2C/.test(g.all) || !/4000 to 6000 ft\/min/.test(g.all) || !/At least 10 mm of the shank/.test(g.all) || !/70 to 95 Shore A/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   {
@@ -2257,6 +2258,55 @@ where = 'toolpaths';
     await put('uts', '');
     const src = await page.innerText('#main');
     if (!/Roymech/.test(src) || !/Fastenal/.test(src) || !/FED-STD-H28 was not readable/.test(src)) problems.push(`[${where}] the source note must name Roymech and Fastenal and say what is not built`);
+    await mode('advanced');
+  }
+  // Shop maths 2: depreciation schedule, block and tackle, squaring a corner. Published examples reproduced.
+  where = 'depreciation';
+  {
+    const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+    const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+    const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, v); await page.waitForTimeout(60); };
+    await units('mm'); await mode('expert'); await open('depreciation', 150);
+    await put('cost', '1000'); await put('salv', '100'); await put('life', '5'); await pick('m', '2'); await put('yr', '2');
+    let t = await rows();
+    if (!/Depreciation in year 2 240\.00/i.test(t) || !/Book value at the end of year 2 460\.00/.test(t) || !/Year 1: depreciation 300\.00/.test(t) || !/Year 5: depreciation 60\.00/.test(t) || !/Year 5: book value at the year end 100\.00/.test(t) || /Year 6:/.test(t)) problems.push(`[${where}] sum of the years' digits (Wikipedia: 300, 240, 180, 120, 60): ${t}`);
+    await pick('m', '1'); await put('fac', '2'); await put('yr', '5'); t = await rows();
+    if (!/Depreciation in year 5 29\.60/i.test(t) || !/Year 4: depreciation 86\.40/.test(t) || !/Year 4: book value at the year end 129\.60/.test(t) || !/Year 5: book value at the year end 100\.00/.test(t) || /does not reach the salvage value/.test(t)) problems.push(`[${where}] declining balance at 40 % (Wikipedia: 400, 240, 144, 86.40, 29.60): ${t}`);
+    await put('salv', '0'); t = await rows();
+    if (!/Year 5: book value at the year end 77\.76/.test(t) || !/does not reach the salvage value by itself/.test(t)) problems.push(`[${where}] with no salvage value the declining balance leaves 77.76 and says so: ${t}`);
+    await pick('m', '0'); await put('cost', '25000'); await put('life', '8'); await put('yr', '1'); t = await rows();
+    if (!/Depreciation in year 1 3,125\.00/i.test(t)) problems.push(`[${where}] straight line (CFI: 3125 a year): ${t}`);
+    const dr = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/book value at the end of each year/.test(dr) || !/25000/.test(dr) || (await page.$$eval('#main .tdia svg rect.part', r => r.length)) !== 7) problems.push(`[${where}] drawing: seven bars above zero for eight years down to nothing: ${dr}`);
+    await put('life', '2.5'); t = await rows();
+    if (!/whole number of years/.test(t)) problems.push(`[${where}] a life of 2.5 years must be refused: ${t}`);
+    await put('life', '8'); await put('salv', '2500');
+    where = 'tackle';
+    await open('tackle', 150); await put('load', '981'); await put('n', '4'); await put('eff', ''); await put('lift', ''); t = await rows();
+    if (!/Pull on the rope, ideal \(no friction\) 245\.3 N/i.test(t) || /at your efficiency/.test(t) || /hauled in/.test(t) || !/rove to advantage/.test(t)) problems.push(`[${where}] ideal pull only when no efficiency is entered: ${t}`);
+    await put('eff', '0.8'); await put('lift', '1'); t = await rows();
+    if (!/Pull on the rope at your efficiency \(one source, to be verified\) 306\.6 N/.test(t) || !/Rope hauled in for this lift \(one source, to be verified\) 4\.00 m/.test(t)) problems.push(`[${where}] Engineering ToolBox example (307 N) and 4 m of rope for 1 m of lift: ${t}`);
+    const dt = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/4 rope parts carry the moving block/.test(dt) || !/306\.6 N/.test(dt) || !/not to scale/.test(dt)) problems.push(`[${where}] drawing: ${dt}`);
+    await put('eff', '1.2'); t = await rows();
+    if (!/Efficiency must be more than 0 and not more than 1/.test(t)) problems.push(`[${where}] an efficiency above 1 must be refused: ${t}`);
+    await put('n', '2.5'); t = await rows();
+    if (!/must be a whole number/.test(t)) problems.push(`[${where}] 2.5 rope parts must be refused: ${t}`);
+    await put('n', '4'); await put('eff', ''); await put('lift', '');
+    where = 'squaring';
+    await open('squaring', 150); await put('a', '900'); await put('b', '1200'); await put('c', ''); await put('run', ''); t = await rows();
+    if (!/Diagonal for a square corner 1,500\.00 mm/i.test(t) || !/6-8-10, 9-12-15/.test(t) || /Angle of the corner/.test(t)) problems.push(`[${where}] 900 and 1200 give 1500: ${t}`);
+    await put('c', '1500'); t = await rows();
+    if (!/Angle of the corner from your diagonal 90\.000 deg/.test(t) || !/Corner square, to the three decimals shown/.test(t)) problems.push(`[${where}] a diagonal of 1500 is square: ${t}`);
+    await put('c', '1510'); t = await rows();
+    if (!/Angle of the corner from your diagonal 90\.(7|8)\d\d deg/.test(t) || !/wider than square/.test(t)) problems.push(`[${where}] a long diagonal means a wide corner: ${t}`);
+    await put('c', '5000'); t = await rows();
+    if (!/cannot make a triangle/.test(t)) problems.push(`[${where}] an impossible diagonal must be refused: ${t}`);
+    await put('c', ''); await put('run', '100'); t = await rows();
+    if (!/Rise over that length at the angle 1\.75 mm/.test(t)) problems.push(`[${where}] 1 degree over 100 mm rises 1.75 mm: ${t}`);
+    await put('run', '');
+    const ds = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/diagonal 1500/.test(ds) || !/to scale/.test(ds)) problems.push(`[${where}] drawing: ${ds}`);
     await mode('advanced');
   }
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
