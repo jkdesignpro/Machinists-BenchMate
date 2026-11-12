@@ -363,14 +363,32 @@ async function renderTslots(el) {
 }
 
 // ------------------------------------------------------------------ keys and keyways
-function keySvg(d, b, t1, t2, h) {
-  const R0 = 70, sc = R0 / (d / 2), cx = 110, cy = 100;
-  const hb = b / 2 * sc, ang = Math.asin(Math.min(1, hb / R0)), yTop = cy - R0 * Math.cos(ang);
-  const shaft = 'M' + (cx - hb).toFixed(1) + ' ' + yTop.toFixed(1) + 'V' + (cy - R0 + t1 * sc).toFixed(1) + 'H' + (cx + hb).toFixed(1) + 'V' + yTop.toFixed(1) + 'A' + R0 + ' ' + R0 + ' 0 1 1 ' + (cx - hb).toFixed(1) + ' ' + yTop.toFixed(1) + 'Z';
-  const hubR = R0 + 26, hub = 'M' + (cx - hb).toFixed(1) + ' ' + (cy - R0 * Math.cos(ang)).toFixed(1) + 'V' + (cy - R0 - t2 * sc).toFixed(1) + 'H' + (cx + hb).toFixed(1) + 'V' + (cy - R0 * Math.cos(ang)).toFixed(1);
-  const key = '<rect x="' + (cx - hb).toFixed(1) + '" y="' + (cy - R0 + t1 * sc - h * sc).toFixed(1) + '" width="' + (2 * hb).toFixed(1) + '" height="' + (h * sc).toFixed(1) + '" style="fill:var(--accent);opacity:.25;stroke:var(--accent)"/>';
-  return '<svg class="gdia big" viewBox="0 0 220 220" role="img" aria-label="shaft, key and hub section"><circle class="gm" cx="' + cx + '" cy="' + cy + '" r="' + hubR + '"/><path class="gb" d="' + hub + '"/><path class="gp" d="' + shaft + '"/>' + key +
-    '<text class="gl" x="' + cx + '" y="' + (cy + 20) + '" text-anchor="middle">shaft</text><text class="gl" x="' + (cx + hubR - 30) + '" y="' + (cy + hubR - 6) + '">hub</text></svg>';
+// Section through the shaft, key and hub, to scale, with the table's letters on the dimensions.
+// t1 and t2 are the depths from the shaft surface at the centreline. inch: ASME B17.1 letters.
+function keySvg(d, b, t1, t2, h, inch) {
+  const W = 340, H = 256, R0 = 62, sc = R0 / (d / 2), cx = 160, cy = 122, RH = R0 + 30;
+  const hb = b / 2 * sc, ang = Math.asin(Math.min(1, hb / R0)), yCh = cy - R0 * Math.cos(ang), yTop = cy - R0;
+  const ySeat = yTop + t1 * sc, yWay = yTop - t2 * sc, yKey = ySeat - h * sc, F = v => v.toFixed(1);
+  const L = inch ? { b: 'W', h: 'H', t1: 'H/2 + Y', t2: 'H/2 - Y', s: 'D - Y - H/2', hub: 'D - Y + H/2', d: 'Ø D' } : { b: 'b', h: 'h', t1: 't1', t2: 't2', s: 'd - t1', hub: 'd + t2', d: 'Ø d' };
+  let g = DK.circle(cx, cy, RH, 'hatch');
+  g += '<rect x="' + F(cx - hb) + '" y="' + F(yWay) + '" width="' + F(2 * hb) + '" height="' + F(cy - yWay) + '" style="fill:var(--panel);stroke:var(--ink);stroke-width:1.6"/>';
+  g += DK.path('M' + F(cx - hb) + ' ' + F(yCh) + 'V' + F(ySeat) + 'H' + F(cx + hb) + 'V' + F(yCh) + 'A' + R0 + ' ' + R0 + ' 0 1 1 ' + F(cx - hb) + ' ' + F(yCh) + 'Z', 'part');
+  g += DK.rect(cx - hb, yKey, 2 * hb, h * sc, 'tool');
+  g += DK.cl(cx - RH - 8, cy, cx + RH + 8, cy) + DK.cl(cx, cy - RH - 8, cx, cy + RH + 8);
+  g += DK.dimH(cx - hb, cx + hb, cy - RH - 16, L.b, { from: yWay - 2 });
+  g += DK.dimH(cx - R0, cx + R0, cy + RH + 16, L.d, { from: cy + 4, below: true });
+  // Depths on the right, from the shaft surface at the centreline.
+  const xr = cx + RH + 14;
+  g += DK.line(cx + hb + 2, yWay, xr + 6, yWay, 'dim ext') + DK.line(cx + 2, yTop, xr + 6, yTop, 'dim ext') + DK.line(cx + hb + 2, ySeat, xr + 6, ySeat, 'dim ext');
+  g += DK.line(xr, yWay - 12, xr, ySeat + 12, 'dim');
+  g += DK.text(xr + 8, (yWay + yTop) / 2 - 3, L.t2, { cls: 'dimt', anchor: 'start' }) + DK.text(xr + 8, (yTop + ySeat) / 2 + 11, L.t1, { cls: 'dimt', anchor: 'start' });
+  // Key height and the two check dimensions on the left.
+  const xl = cx - RH - 14;
+  g += DK.line(cx - hb - 2, yKey, xl - 6, yKey, 'dim ext') + DK.line(cx - hb - 2, ySeat, xl - 6, ySeat, 'dim ext') + DK.line(xl, yKey - 12, xl, ySeat + 12, 'dim');
+  g += DK.text(xl - 8, (yKey + ySeat) / 2 + 4, L.h, { cls: 'dimt', anchor: 'end' });
+  g += DK.dimV(cy + R0, ySeat, cx - 22, L.s, { hot: true }) + DK.dimV(cy + R0, yWay, cx + 36, L.hub, { hot: true });
+  g += DK.text(cx - 44, cy - 8, 'shaft', { cls: 'mut' }) + DK.text(cx + RH - 4, cy + RH - 2, 'hub', { cls: 'mut', anchor: 'start' });
+  return '<div class="tdia" style="max-width:520px;margin-top:12px">' + DK.svg(W, H, g, 'Shaft, key and hub section with the keyseat and keyway dimensions') + '</div>';
 }
 async function renderKeys(el) {
   const R = await loadFast(el); if (!R) return;
@@ -409,10 +427,10 @@ async function renderKeys(el) {
             [['Key width W', fCell(srcs, r.width, v => rEsc(v) + ' in')], ['Square key height', fCell(srcs, r.square_h, v => rEsc(v) + ' in')], ['Rectangular key height', fCell(srcs, r.rect_h, v => rEsc(v) + ' in')],
              ['Keyseat depth (square / rectangular) = H/2', '<td class="mv">' + (isFinite(sq) ? IN(sq / 2) : '-') + ' / ' + (isFinite(rc) ? IN(rc / 2) : '-') + '</td>'],
              ['Chordal height Y at this diameter', '<td class="mv">' + IN(Y) + '</td>'], ['Check dimensions, square key', chk(sq)], ['Check dimensions, rectangular key', chk(rc)]].map(([a, c]) => '<tr><td>' + a + '</td>' + c + '</tr>').join('') + '</table></div>' +
-            '<p class="ms">' + rEsc(F.keys_inch_note || '') + '</p>' + keySvg(din, w, (isFinite(sq) ? sq : rc) / 2 + Y, (isFinite(sq) ? sq : rc) / 2 - Y, isFinite(sq) ? sq : rc);
+            '<p class="ms">' + rEsc(F.keys_inch_note || '') + '</p>' + keySvg(din, w, (isFinite(sq) ? sq : rc) / 2 + Y, (isFinite(sq) ? sq : rc) / 2 - Y, isFinite(sq) ? sq : rc, true);
         }
       }
-    } else h = '<div class="res"><table><tr><td class="warn">Enter the shaft diameter.</td></tr></table></div>';
+    } else h = '<div class="res"><table><tr><td class="warn">Enter the shaft diameter.</td></tr></table></div>' + keySvg(30, 8, 4, 3.3, 7, !met); // proportions only, no values shown
     out.innerHTML = h;
     $('#ktab', el).innerHTML = met
       ? '<div class="res mtab" style="margin-top:12px"><div class="h">Parallel keys, all sizes (mm)</div><table><tr><th>Shaft over to</th><th>b x h</th><th>t1</th><th>t2</th></tr>' + F.keys_metric.map(r => '<tr><td>' + r.d_over.value + ' to ' + r.d_to.value + '</td><td><b>' + rEsc(r.size.replace('x', ' x ')) + '</b></td>' + fCell(srcs, r.t1, v => fx(v, 1)) + fCell(srcs, r.t2, v => fx(v, 1)) + '</tr>').join('') + '</table></div>'

@@ -1,25 +1,68 @@
-/* Shared design tokens, same family as Alkart Mega Wizard (Jacob's apps). Light/dark, JetBrains/Fusion-style tool look. */
+/* BenchMate design tokens: the Machine control look. A CNC control panel: enamel chassis, readout
+   screens, hard keys. Dark is the default; light is a pale enamel panel with LCD-style readouts.
+   Same token names as before so every tool file keeps working.
+
+   The accent is the user's to choose (settings menu > Accent colour, kept under bm.accent):
+     --key / --key-ink   the accent as chosen, and black or white text to sit on it (set by app.js)
+     --accent            the accent where it is used as text or a line: --key-lift on the dark panel and --key-drop on the
+                         light one (app.js lightens or darkens the chosen colour until it reads as text)
+     --accent2 / --sel   tints of the accent on the panel
+   Readouts: --screen (background), --screen-line, --digit (the main number).
+   Keys: --keytop / --keybot (face), --keyedge (border), --keyink (lettering). --edge is the chassis edge,
+   --bar the top and status bars, --bevel the light line on a panel's top edge. --dim is the dimension-line colour in drawings. */
 :root{
-  --bg:#e9ebee; --panel:#ffffff; --head:#f4f5f7; --raise:#f7f8fa; --ink:#1f2328; --muted:#636a74; --line:#d3d7dd; --soft:#eef0f3;
-  --accent:#2f6fde; --accent-ink:#ffffff; --accent2:#e3ecfb; --sel:#d6e4fa;
-  --g:#0b4fb3; --m:#86198f; --t:#9a4d00; --c:#7b8189; --q:#11793f;
-  --err:#c42b2b; --warn:#9a6200; --ok:#1d7a3e; --hl:#fff4c2; --gut:#9aa1aa;
-  --r:4px; --mono:"JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
-  --sans:"Segoe UI",system-ui,-apple-system,sans-serif;
+  --bg:#2a2f33; --panel:#1b1f22; --head:#23282c; --raise:#23282c; --ink:#e4e9e6; --muted:#9aa5a3; --line:#454e54; --soft:#2c3338;
+  --key:#ffb000; --key-ink:#141414;
+  --accent:var(--key-lift,var(--key)); --accent-ink:var(--key-ink);
+  --accent2:color-mix(in srgb,var(--key) 20%,var(--panel)); --sel:color-mix(in srgb,var(--key) 24%,var(--panel));
+  --screen:#060707; --screen-line:#2c3338; --digit:#4fe08a;
+  --hot:#4fe08a; --hot2:#143524;
+  --bar:#15181a; --bevel:#3b4348; --dim:#62c8fa; --glow:0 0 8px rgba(79,224,138,.35);
+  --edge:#0c0e0f; --keytop:#4a5258; --keybot:#3a4146; --keyedge:#14171a; --keyink:#e4e9e6; --field:#0c0e0f;
+  --g:#62c8fa; --m:#e08be0; --t:#ffb65c; --c:#8a949a; --q:#4fe08a;
+  --err:#ff6b5e; --warn:#ff9a4a; --ok:#4fe08a; --err2:#3d1d1d; --warn2:#3b2a17; --ok2:#143524; --hl:#3b3520; --gut:#5f6873;
+  --grid:transparent; --shadow:0 2px 0 rgba(0,0,0,.35);
+  --r:2px; --r2:3px; --mono:"JetBrains Mono","Cascadia Mono","SF Mono",Consolas,"Liberation Mono",ui-monospace,monospace;
+  --sans:"Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,"Liberation Sans",sans-serif;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){--bg:#1b1c1f;--panel:#1e1f22;--head:#2b2d30;--raise:#26282b;--ink:#dfe1e5;--muted:#8b8f96;--line:#393b40;--soft:#2f3134;
-  --accent:#3d7ef0;--accent-ink:#ffffff;--accent2:#25324a;--sel:#2e436e;--g:#56a8f5;--m:#c77dbb;--t:#e3a54a;--c:#7a7e85;--q:#5fb97d;
-  --err:#f26d6d;--warn:#e0b44e;--ok:#5fb97d;--hl:#3b3520;--gut:#5f636a}
+:root[data-theme="light"]{
+  --bg:#c3c8c4; --panel:#eceeea; --head:#dde0db; --raise:#e1e4df; --ink:#14181a; --muted:#485153; --line:#959d9a; --soft:#d6dad5;
+  --accent:var(--key-drop,color-mix(in srgb,var(--key) 48%,#000)); --accent-ink:#ffffff;
+  --accent2:color-mix(in srgb,var(--key) 24%,var(--panel)); --sel:color-mix(in srgb,var(--key) 34%,var(--panel));
+  --screen:#f2f5e9; --screen-line:#b7c0ad; --digit:#0b5c2e;
+  --hot:#0b6b34; --hot2:#d3ead8;
+  --bar:#d3d7d2; --bevel:#ffffff; --dim:#0b4fb3; --glow:none;
+  --edge:#7b8380; --keytop:#fbfcfa; --keybot:#d5d9d4; --keyedge:#7b8380; --keyink:#14181a; --field:#fbfcfa;
+  --g:#0b4fb3; --m:#86198f; --t:#8a4a00; --c:#6b7278; --q:#11793f;
+  --err:#c22f2f; --warn:#a14a00; --ok:#18794e; --err2:#fde8e8; --warn2:#fbe6cf; --ok2:#e2f4e9; --hl:#fff4c2; --gut:#8a9197;
+  --shadow:0 2px 0 rgba(0,0,0,.12); color-scheme:light;
 }
-:root[data-theme="dark"]{--bg:#1b1c1f;--panel:#1e1f22;--head:#2b2d30;--raise:#26282b;--ink:#dfe1e5;--muted:#8b8f96;--line:#393b40;--soft:#2f3134;
-  --accent:#3d7ef0;--accent-ink:#ffffff;--accent2:#25324a;--sel:#2e436e;--g:#56a8f5;--m:#c77dbb;--t:#e3a54a;--c:#7a7e85;--q:#5fb97d;
-  --err:#f26d6d;--warn:#e0b44e;--ok:#5fb97d;--hl:#3b3520;--gut:#5f636a}
+@media (prefers-color-scheme: light){
+  :root[data-theme="auto"]{
+  --bg:#c3c8c4; --panel:#eceeea; --head:#dde0db; --raise:#e1e4df; --ink:#14181a; --muted:#485153; --line:#959d9a; --soft:#d6dad5;
+  --accent:var(--key-drop,color-mix(in srgb,var(--key) 48%,#000)); --accent-ink:#ffffff;
+  --accent2:color-mix(in srgb,var(--key) 24%,var(--panel)); --sel:color-mix(in srgb,var(--key) 34%,var(--panel));
+  --screen:#f2f5e9; --screen-line:#b7c0ad; --digit:#0b5c2e;
+  --hot:#0b6b34; --hot2:#d3ead8;
+  --bar:#d3d7d2; --bevel:#ffffff; --dim:#0b4fb3; --glow:none;
+  --edge:#7b8380; --keytop:#fbfcfa; --keybot:#d5d9d4; --keyedge:#7b8380; --keyink:#14181a; --field:#fbfcfa;
+  --g:#0b4fb3; --m:#86198f; --t:#8a4a00; --c:#6b7278; --q:#11793f;
+  --err:#c22f2f; --warn:#a14a00; --ok:#18794e; --err2:#fde8e8; --warn2:#fbe6cf; --ok2:#e2f4e9; --hl:#fff4c2; --gut:#8a9197;
+  --shadow:0 2px 0 rgba(0,0,0,.12); color-scheme:light;
+  }
+}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:12.5px/1.4 var(--sans);display:flex;flex-direction:column;overflow:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden}
 button,select,input,textarea{font:inherit;color:inherit}
 svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
-:focus-visible{outline:1px solid var(--accent);outline-offset:0}
-input,select{border:1px solid var(--line);border-radius:var(--r);padding:3px 7px;background:var(--panel);min-width:0;height:26px}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+svg.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.ic .f{fill:currentColor;stroke:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input,select,textarea{border:1px solid var(--line);border-radius:var(--r);padding:4px 8px;background:var(--field);min-width:0}
+input,select{height:30px}
+input[type="checkbox"],input[type="radio"]{height:auto;accent-color:var(--key)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+a{color:var(--accent)}
+[hidden]{display:none !important}

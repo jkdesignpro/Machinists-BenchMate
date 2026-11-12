@@ -90,6 +90,10 @@ const FORMULA_SOURCES = {
   YORK: 'University of York, Department of Mathematics, factors for control charts',
   ISO2859: 'ISO 2859-1:1999 and ANSI/ASQ Z1.4-2003, attribute sampling (cited by name, tables not used)',
   OWN: 'BenchMate derivation, with tests in benchmate-core',
+  WOJ11: 'S. Wojciechowski, Machined surface roughness including cutter displacements in milling of hardened steel, Metrology and Measurement Systems 18 (2011) no. 3',
+  QMAG: 'Quality Magazine, Apples, oranges and surface finish parameters; Wevolver, Surface finish chart: Ra, Rq and N grade conversions',
+  MMSWEAR: 'Modern Machine Shop, Taking full advantage of geometry and wear offsets (CNC tech talk column)',
+  CIMCOCDC: 'CIMCO CNC Handbook, chapter 6, Adjusting CDC offsets; Autodesk Fusion blog, Cutter compensation for beginners',
   GERR: 'D. Gerr, Controlling Galvanic Corrosion (galvanic series in seawater, V vs Ag/AgCl; 0.20 V rule)',
   EEGALV: 'Engineers Edge, galvanic compatibility (anodic index; 0.15 / 0.25 / 0.50 V); Carr Lane, anodic index guideline',
 };
@@ -144,6 +148,8 @@ const FORMULAS = [
   F('lathefeed', 'Lathe feed per minute', 'Vf = fn · n', 'Vf: [per min]; fn: feed per rev; n: [rpm]', ['SAN', 'MH']),
   F('roughtime', 'Number of roughing passes', 'N = ⌈(D0 − D1) / (2 · ap_max)⌉', 'D0: stock; D1: finished diameter; ap_max: largest depth per pass', ['SAN']),
   F('roughtime', 'Spindle speed at constant surface speed', 'n = 1000 · Vc / (π · Di), capped at the clamp', 'Di: diameter of the pass; Vc: [m/min]', ['SAN']),
+  F('partofftime', 'Part-off time at constant surface speed', 't = π (Da² − Db²) / (4000 · f · Vc)', 'above the clamp diameter; D [mm]; f [mm/rev]; Vc [m/min]; t [min]', ['OWN', 'SAN']),
+  F('partofftime', 'Clamp diameter and time below it', 'Dc = 1000 · Vc / (π · nmax);  t = (Da − Db) / (2 · f · nmax)', 'nmax: G50 / G92 spindle limit [rpm]', ['OWN', 'SAN']),
   F('boringbar', 'Section of a bar with a coolant hole', 'I = π · (d⁴ − di⁴) / 64', 'd: bar diameter; di: coolant hole', ['GERE']),
   F('boringbar', 'Boring bar deflection', 'δ = F · L³ / (3 E I)', 'F: cutting force; L: overhang; E: modulus; I: second moment', ['GERE', 'ROARK']),
   F('boringbar', 'Turning cutting force', 'Fc = kc · ap · fn', 'Fc: [N]; kc: [N/mm²]; ap: [mm]; fn: [mm/rev]', ['SAN']),
@@ -178,6 +184,8 @@ const FORMULAS = [
   F('triangle', 'Law of cosines', 'a² = b² + c² − 2bc · cos A', 'a, b, c: sides; A: angle opposite a', ['OPENSTAX']),
   F('arc', 'Chord and sagitta', 'c = 2R · sin(θ/2);  s = R · (1 − cos(θ/2))', 'R: radius; θ: included angle', ['OPENSTAX']),
   F('arc', 'Radius from chord and sagitta', 'R = (c²/4 + s²) / (2s)', 'c: chord; s: sagitta', ['OPENSTAX']),
+  F('arc', 'Angle from chord and arc length (solved by bisection)', 'sin(u) / u = c / L,  θ = 2u,  R = c / (2 sin u)', 'u: half the included angle [rad]; one root on 0 < u ≤ π', ['OWN']),
+  F('arc', 'Angle from sagitta and arc length (solved by bisection)', '(1 − cos u) / (2u) = s / L,  θ = 2u,  R = L / (2u)', 'peak at u · sin u = 1 − cos u (θ ≈ 267°): up to two arcs', ['OWN']),
   F('fillet', 'Fillet tangent distance in a corner', 't = r / tan(α/2)', 'r: fillet radius; α: angle between the legs', ['OWN']),
   F('dovetail', 'Male dovetail over pins', 'M = W + d · (1 + cot(α/2))', 'W: width at the sharp corners; d: pin diameter; α: dovetail angle', ['OWN']),
   F('cycdrill', 'Tapping feed', 'F = pitch · n', 'F: feed per minute; pitch: thread lead; n: [rpm]', ['HAAS']),
@@ -213,6 +221,12 @@ const FORMULAS = [
   F('bend', 'Outside setback and bend deduction', 'OSSB = tan(angle/2) · (R + t);  BD = 2 · OSSB − BA', '', ['KETIV', 'AST']),
   F('capability', 'Process capability', 'Cp = (USL − LSL) / 6σ;  Cpk = min(USL − x̄, x̄ − LSL) / 3σ', 'σ: within sigma (moving range / d2)', ['NISTSEM', 'MINITAB']),
   F('capability', 'Within sigma from moving ranges', 'σ = MR̄ / d2,  d2 = 1.128', 'MR̄: average moving range of two', ['NISTSEM']),
+  F('threadid', 'Thread identifier: closeness of a standard thread', 'score = √((Δp / 0.02)² + (Δd / (0.02 · d + 0.05))²)', 'Δp: (measured pitch − its pitch) / its pitch; Δd: measured diameter − its basic diameter [mm]; d: its basic diameter [mm]; listed when |Δp| ≤ 0.06 and |Δd| ≤ max(0.06 · d, 0.3)', ['OWN']),
+  F('offsetadj', 'Wear offset change, turned diameter or outside milled size', 'change = −(measured − target)', 'for an X offset or a D offset held as a diameter; halve it for a radius value', ['MMSWEAR', 'CIMCOCDC']),
+  F('offsetadj', 'Wear offset change, inside milled size or depth', 'change = +(measured − target)', 'inside size with cutter compensation (halve for a radius value); depth below Z zero with G43', ['OWN']),
+  F('millfinish', 'Milling feed marks, peak to valley', 'Rt = r − √(r² − (f/2)²)  ≈ f² / (8 r)', 'r: corner radius (floor) or cutter radius D/2 (wall); f: feed per tooth, or feed per rev when one tooth marks', ['WOJ11', 'OWN']),
+  F('surface', 'RMS (Rq) of a sine-shaped profile', 'Rq = π / (2 √2) · Ra ≈ 1.11 Ra', 'only for a pure sine wave; measured surfaces give 1.1 to 2.1', ['QMAG', 'OWN']),
+  F('tolmid', 'Middle of a tolerance', 'middle = (upper limit + lower limit) / 2', 'upper limit = size + larger deviation; lower limit = size + smaller deviation', ['OWN']),
   F('tempcomp', 'Measurement at 20 °C', 'L20 = reading · (1 + αg (Tg − 20)) / (1 + αp (Tp − 20))', 'α: expansion coefficient [1/K]; T: temperature [°C]', ['DOIRON', 'OWN']),
   F('coolconc', 'Coolant concentration', 'c = Brix reading · refractometer factor', 'c: [%]; factor from the fluid data sheet', ['FASTENAL']),
   F('coolmix', 'Concentrate to raise strength', 'x = V · (c_target − c_now) / (c_conc − c_target)', 'V: sump volume; c: concentrations [%]', ['OWN', 'FASTENAL']),
@@ -326,37 +340,59 @@ const FORMULA_EXEMPT = ['holdercode', 'iso513', 'drillchart', 'tapdrill', 'gritc
   'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'toolguide', 'formulas',
   'tempercolours', 'heattreat', 'plastics', 'metalid'];
 
+// Library screen. FLIB.g is a group name, '' for all, or FLIB_FAV for the favourites.
+// Favourites (bm.formfav) are kept in this browser as "tool|formula name" keys.
 const FLIB = { q: '', g: '' };
+const FLIB_FAV = '\u0001fav';
+const flibKey = f => f.tool + '|' + f.name;
+const FormFavs = {
+  all: () => { const v = lsJson('bm.formfav', []); return Array.isArray(v) ? v.filter(x => typeof x === 'string') : []; },
+  has: k => FormFavs.all().includes(k),
+  toggle: k => { const a = FormFavs.all(); lsPut('bm.formfav', a.includes(k) ? a.filter(x => x !== k) : a.concat(k)); },
+};
 function renderFormulaLibrary(el) {
   const esc = x => String(x ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const tool = id => TOOLS.find(t => t.id === id);
   const groups = [...new Set(FORMULAS.map(f => (tool(f.tool) || {}).group).filter(Boolean))];
-  el.innerHTML = '<div class="flib-bar"><input id="fq" type="search" placeholder="Search formulas: rpm, chip, cusp, taper, torque ..." aria-label="Search formulas"><select id="fg" aria-label="Filter by group"><option value="">All groups</option>' +
-    groups.map(g => '<option>' + esc(g) + '</option>').join('') + '</select></div><div id="flist"></div>' +
+  if (FLIB.g && FLIB.g !== FLIB_FAV && !groups.includes(FLIB.g)) FLIB.g = '';
+  el.innerHTML = '<div class="flib-bar"><input id="fq" type="search" placeholder="Search formulas: rpm, chip, cusp, taper, torque ..." aria-label="Search formulas"></div>' +
+    '<div class="fchips flib-chips" id="fg" role="group" aria-label="Filter by category"></div><div id="flist"></div>' +
     '<h2>Source keys</h2><ul class="gsl">' + Object.entries(FORMULA_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + esc(v) + '</li>').join('') + '</ul>';
+  const chipBox = $('#fg', el);
+  const chips = () => {
+    const favs = FormFavs.all(), nFav = FORMULAS.filter(f => favs.includes(flibKey(f))).length;
+    const chip = (v, label, n) => '<button type="button" class="fchip' + (FLIB.g === v ? ' on' : '') + '" data-g="' + esc(v) + '" aria-pressed="' + (FLIB.g === v) + '">' + label + (n !== undefined ? ' <span class="gmtn">' + n + '</span>' : '') + '</button>';
+    chipBox.innerHTML = chip('', 'All') + chip(FLIB_FAV, icon('star') + 'Favourites', nFav) +
+      groups.map(g => chip(g, esc(g), FORMULAS.filter(f => (tool(f.tool) || {}).group === g).length)).join('');
+    chipBox.querySelectorAll('.fchip').forEach(b => b.onclick = () => { FLIB.g = b.dataset.g; chips(); draw(); });
+  };
   const draw = () => {
-    const q = FLIB.q.trim().toLowerCase();
+    const q = FLIB.q.trim().toLowerCase(), favs = FormFavs.all();
     const rows = FORMULAS.filter(f => {
       const t = tool(f.tool); if (!t) return false;
-      if (FLIB.g && t.group !== FLIB.g) return false;
+      if (FLIB.g === FLIB_FAV ? !favs.includes(flibKey(f)) : (FLIB.g && t.group !== FLIB.g)) return false;
       return !q || (f.name + ' ' + f.expr + ' ' + f.vars + ' ' + t.title + ' ' + f.src.join(' ')).toLowerCase().includes(q);
     });
-    $('#flist', el).innerHTML = '<p class="desc">' + rows.length + ' of ' + FORMULAS.length + ' formulas, from ' + new Set(FORMULAS.map(f => f.tool)).size + ' tools. Click a tool name to open it.</p>' +
+    const empty = FLIB.g === FLIB_FAV && !rows.length ? '<p class="desc">' + (favs.length ? 'No favourite matches the search.' : 'No favourites yet. Click the star on a formula to keep it here.') + '</p>' : '';
+    $('#flist', el).innerHTML = '<p class="desc">' + rows.length + ' of ' + FORMULAS.length + ' formulas, from ' + new Set(FORMULAS.map(f => f.tool)).size + ' tools. Star a formula to keep it under Favourites.</p>' + empty +
       rows.map(f => {
-        const t = tool(f.tool);
-        return '<div class="frow"><div class="fh"><b>' + esc(f.name) + '</b> <button class="btn flink" data-id="' + f.tool + '">' + esc(t.title) + '</button></div>' +
+        const t = tool(f.tool), k = flibKey(f), on = favs.includes(k);
+        return '<div class="frow"><div class="fh"><span class="fht"><button type="button" class="star fstar' + (on ? ' on' : '') + '" data-k="' + esc(k) + '" aria-pressed="' + on + '" title="' + (on ? 'Remove from favourites' : 'Add to favourites') + '" aria-label="' + (on ? 'Remove from favourites: ' : 'Add to favourites: ') + esc(f.name) + '">' + icon('star') + '</button><b>' + esc(f.name) + '</b></span>' +
+          '<span class="fgo"><span class="ms">' + esc(t.title) + '</span><button type="button" class="btn sm flink" data-id="' + f.tool + '" title="Open ' + esc(t.title) + '">' + icon('calc') + '<span>Open calculator</span></button></span></div>' +
           '<div class="fx">' + esc(f.expr) + '</div>' +
           (f.vars ? '<div class="fv">' + f.vars.split(';').map(v => esc(v.trim())).join('<br>') + '</div>' : '') +
           '<div class="fs">' + f.src.map(k => '<abbr class="gsrc" title="' + esc(FORMULA_SOURCES[k] || k) + '">' + k + '</abbr>').join('') + ' <span class="ms">' + esc(t.group) + '</span></div></div>';
       }).join('');
-    el.querySelectorAll('.flink').forEach(b => b.onclick = () => {
-      state.tool = b.dataset.id; try { localStorage.setItem('bm.tool', b.dataset.id); } catch (e) {}
-      renderList($('#search').value); renderTool(); $('#main').scrollTop = 0;
+    el.querySelectorAll('.flink').forEach(b => b.onclick = () => { openTool(b.dataset.id); });
+    el.querySelectorAll('.fstar').forEach(b => b.onclick = () => {
+      FormFavs.toggle(b.dataset.k); chips();
+      if (FLIB.g === FLIB_FAV) { draw(); return; }
+      const on = FormFavs.has(b.dataset.k); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+      b.title = on ? 'Remove from favourites' : 'Add to favourites';
     });
   };
-  const q = $('#fq', el), g = $('#fg', el);
-  q.value = FLIB.q; g.value = FLIB.g;
+  const q = $('#fq', el);
+  q.value = FLIB.q;
   q.oninput = () => { FLIB.q = q.value; draw(); };
-  g.onchange = () => { FLIB.g = g.value; draw(); };
-  draw();
+  chips(); draw();
 }

@@ -244,6 +244,9 @@ async function renderSurface(el) {
     '<div class="res mtab" style="margin-top:12px"><div class="h">Roughness grade numbers (N grades)</div><table><tr><th>Grade</th><th>Ra</th><th>Evidence</th></tr>' + grades.map(g => {
       const c = T.n_ra[g]; return '<tr><td><b>' + g + '</b></td><td>' + fRa(+c.value) + (c.groups.length > 1 ? '<br><span class="warn">also printed: ' + c.groups.slice(1).map(x => x.value + ' um (' + x.publishers.map(p => rEsc(pubName(T.sources, p))).join(', ') + ')').join('; ') + '</span>' : '') + '</td>' + evCell(T.sources, c) + '</tr>';
     }).join('') + '</table></div>' +
+    '<div class="note"><b>Ra and RMS (Rq).</b> RMS, now written Rq, is the root-mean-square height of the profile about its mean line; Ra is the plain average height. Rq is never the smaller of the two. For a pure sine wave Rq = pi / (2 sqrt 2) x Ra = 1.11 Ra, the factor conversion charts use. For ideal profiles the ratio is ' +
+    ['sine wave', 'triangular (sawtooth)', 'turned feed marks (arcs)', 'square wave'].map((n, i) => n + ' ' + fx(W.profile_rq_over_ra(i), 2)).join(', ') + ' (computed by the core and checked by sampling each profile). Measured surfaces run higher: Quality Magazine reports ratios of 1.17 to 1.26 for turning, 1.16 to 1.40 for milling, 1.22 to 1.27 for surface grinding, 1.29 to 2.10 for honing and 1.24 to 1.27 for EDM, and suggests about 1.25 for most processes (one source). So 1.11 is a low estimate, not a conversion. If an old drawing gives an RMS limit, measure Rq; if you can only measure Ra, keep it under the limit divided by the ratio for your process. Reading an RMS limit as an Ra limit of the same number accepts a rougher surface (Ra 63 uin is about 70 uin RMS or more).' +
+    '<br><b>Sources:</b> Quality Magazine, "Apples, oranges and surface finish parameters" (sine ratio 1.11, measured ratios by process); Wevolver, "Surface finish chart: Ra, Rq and N grade conversions" (Rq about 1.11 Ra, exact only for a sine profile).</div>' +
     '<div class="note"><b>Why Ra cannot be converted to Rz with a fixed factor.</b> Ra is the average distance of the profile from its mean line, so it smooths everything out. Rz is the average of the largest peak-to-valley heights in five sampling lengths, so it is driven by the extremes. Two surfaces with the same Ra can have very different Rz: one isolated scratch or burr barely moves Ra but sets Rz. The ratio depends only on the shape of the profile; for ideal profiles it is ' +
     ['sine wave', 'triangular (sawtooth)', 'turned feed marks (arcs)', 'square wave'].map((n, i) => n + ' ' + fx(W.profile_rz_over_ra(i), 2)).join(', ') + ' (computed by the core and checked by sampling each profile). Real surfaces scatter much wider. ' +
     'Some tables print an Rz or Rt value beside each N grade; those columns are typical companions, not conversions. In the tables used here the ratio runs ' + (() => {
@@ -272,6 +275,8 @@ async function renderSurface(el) {
     const below = [...grades].reverse().find(g => +T.n_ra[g].value < um * (1 - 1e-9));
     out.innerHTML = '<div class="res"><table>' + rowsHtml([
       ['Ra', calcCell(fRa(um), '1 um = 39.37 uin')],
+      ['RMS (Rq), if the profile were a pure sine wave', calcCell(fRa(W.rq_ra_convert(um, 0, 0)), 'Ra x 1.11; real surfaces are 1.1 to 2.1 x Ra, see below')],
+      ['Ra, if this number is an RMS (Rq) value', calcCell(fRa(W.rq_ra_convert(um, 0, 1)), 'RMS / 1.11, sine wave')],
       ['Smallest N grade that allows this Ra', calcCell(g ? '<b>' + g + '</b> (Ra ' + fRa(+T.n_ra[g].value) + ')' : 'coarser than N12', 'an N grade is an upper limit of Ra')],
       ['Next finer grade', calcCell(below ? below + ' (Ra ' + fRa(+T.n_ra[below].value) + ')' : '-')],
       ['Rz', calcCell('<span class="warn">not convertible</span>', 'for ideal profiles Rz is 2 to 4 x Ra, real surfaces vary more; see below')],
@@ -288,7 +293,8 @@ async function renderHardness(el) {
   const m = RMEM.hard || (RMEM.hard = { scale: 'hrc', v: 45 });
   const KSI = 6.894757;
   el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f"><span>Scale</span><div class="row"><select id="hs">' + HSCALES.map(([k, n]) => '<option value="' + k + '">' + n + '</option>').join('') + '</select></div></label>' +
-    '<label class="f"><span>Value</span><div class="row"><input id="hv" type="number" step="any" inputmode="decimal"><span class="u" id="hu"></span></div></label></div><div id="hres"></div>' +
+    '<label class="f"><span>Value</span><div class="row"><input id="hv" type="number" step="any" inputmode="decimal"><span class="u" id="hu"></span></div></label></div>' +
+    '<div class="fchips" id="hpick" role="group" aria-label="Scales to show"></div><div id="hres"></div><div class="tdia" id="hchart" style="border:0;padding:0;max-width:760px"></div>' +
     '<div class="note"><b>Read this first.</b> Hardness conversions are approximate and only valid for the material group the table was made for: here unalloyed and low alloy steels and cast steel, heat treated or hot formed (ISO 18265, the table both publishers below reproduce). Expect large errors for austenitic stainless, high alloy or cold worked steels, cast iron and non-ferrous metals, which have their own tables. Tensile strength from hardness is an estimate, not a substitute for a tensile test. Values in brackets in the source tables are outside the normal range of that test method (Brinell above 450 with a carbide ball only). ' +
     'Between table rows the value is interpolated linearly, as the standards do; the working shows the two rows used. Outside the table nothing is given. ' +
     '<br><b>Standards:</b> ISO 18265:2013 (metallic materials, conversion of hardness values; current per iso.org) and ASTM E140-26 (hardness conversion tables for metals; current, published 2026). The ASTM tables are separate and differ in places from ISO 18265; the values here are ISO 18265 values as printed by the publishers below. Older practice: DIN 50150 was replaced by DIN EN ISO 18265.</div><div id="htab"></div><div class="note"><b>Sources</b><br>' + sourceList(T.sources) + '</div>';
@@ -297,17 +303,62 @@ async function renderHardness(el) {
   const unit = k => k === 'uts' ? (inMode() ? 'ksi' : 'MPa') : '';
   const show = (k, v) => k === 'uts' ? '<span class="mv">' + (inMode() ? fx(v / KSI, 0) + ' ksi' : fx(v, 0) + ' MPa') + '</span> <span class="ms">' + (inMode() ? fx(v, 0) + ' MPa' : fx(v / KSI, 0) + ' ksi') + '</span>' : '<span class="mv">' + fx(v, k === 'hv' || k === 'hb' ? 0 : 1) + '</span>';
   function setInput() { $('#hu', el).textContent = unit(hs.value); hv.value = m.scale === hs.value ? (hs.value === 'uts' && inMode() ? +(m.v / KSI).toFixed(1) : m.v) : ''; }
+  // Scale picker: which scales to list and draw (the input scale always shows). Kept between runs.
+  let shown = null; try { shown = JSON.parse(localStorage.getItem('bm.hardscales') || 'null'); } catch (e) {}
+  if (!Array.isArray(shown) || !shown.length) shown = HSCALES.map(s => s[0]);
+  const isOn = f => shown.includes(f) || f === hs.value;
+  function picker() {
+    $('#hpick', el).innerHTML = '<span class="ms" style="align-self:center">Show:</span>' + HSCALES.map(([f, n]) => '<button type="button" class="fchip' + (isOn(f) ? ' on' : '') + '" data-f="' + f + '"' + (f === hs.value ? ' disabled title="The scale you are converting from"' : '') + ' aria-pressed="' + isOn(f) + '">' + rEsc(n) + '</button>').join('');
+    $$('#hpick button', el).forEach(b => b.onclick = () => {
+      const f = b.dataset.f; shown = shown.includes(f) ? shown.filter(x => x !== f) : shown.concat(f);
+      try { localStorage.setItem('bm.hardscales', JSON.stringify(shown)); } catch (e) {}
+      picker(); upd();
+    });
+  }
+  // Chart: every scale laid along a common Vickers axis, from the confirmed table rows, with the value marked.
+  function chart(hvNow) {
+    const scales = HSCALES.filter(([f]) => isOn(f)), Wd = 520, x0 = 96, x1 = 500, y0 = 34, dy = 30, H = y0 + scales.length * dy + 22;
+    const hvs = T.rows.map(r => r.hv.value), hmin = Math.min(...hvs), hmax = Math.max(...hvs);
+    const X = h => x0 + (x1 - x0) * (h - hmin) / (hmax - hmin);
+    const ticks = { hv: [100, 200, 300, 400, 500, 600, 700, 800, 900], hb: [100, 200, 300, 400, 500, 600], hrc: [20, 30, 40, 50, 60, 65], hrb: [50, 60, 70, 80, 90, 100], hra: [60, 65, 70, 75, 80, 85], uts: inMode() ? [50, 100, 150, 200, 250, 300].map(v => v * KSI) : [500, 1000, 1500, 2000] };
+    let s = '';
+    scales.forEach(([f, n], i) => {
+      const y = y0 + i * dy, rows = T.rows.filter(r => r[f] && r[f].status === 'confirmed' && !r[f].approx);
+      if (rows.length < 2) return;
+      s += DK.line(X(rows[0].hv.value), y, X(rows[rows.length - 1].hv.value), y, 'ln') + DK.text(x0 - 10, y + 4, f === 'uts' ? 'Tensile ' + (inMode() ? 'ksi' : 'MPa') : f.toUpperCase(), { cls: 'txt', anchor: 'end' });
+      let lastX = -99;
+      for (const tv of ticks[f]) {
+        for (let j = 0; j < rows.length - 1; j++) {
+          const a = rows[j][f].value, b = rows[j + 1][f].value;
+          if ((a <= tv && tv <= b) || (b <= tv && tv <= a)) {
+            const h = a === b ? rows[j].hv.value : W.lerp(tv, a, rows[j].hv.value, b, rows[j + 1].hv.value), x = X(h);
+            s += DK.line(x, y - 4, x, y + 4, 'thin');
+            if (Math.abs(x - lastX) >= 22) { s += DK.text(x, y - 7, f === 'uts' && inMode() ? fx(tv / KSI, 0) : String(tv), { cls: 'mut', size: 10 }); lastX = x; } // no crowded labels
+            break;
+          }
+        }
+      }
+      if (isFinite(hvNow)) {
+        const lo2 = rows.findIndex((r, j) => j < rows.length - 1 && r.hv.value <= hvNow && hvNow <= rows[j + 1].hv.value);
+        if (lo2 >= 0) s += DK.circle(X(hvNow), y, 3.4, 'hotf');
+      }
+    });
+    if (isFinite(hvNow)) s += DK.line(X(hvNow), y0 - 16, X(hvNow), y0 + (scales.length - 1) * dy + 10, 'hot');
+    s += DK.text(x0, H - 6, 'softer', { cls: 'mut', anchor: 'start' }) + DK.text(x1, H - 6, 'harder', { cls: 'mut', anchor: 'end' });
+    $('#hchart', el).innerHTML = DK.svg(Wd, H, s, 'Hardness scales side by side for steel, with the converted value marked');
+  }
   function upd() {
     const k = hs.value, raw = parseFloat(hv.value), out = $('#hres', el);
     m.scale = k;
-    if (!(raw > 0)) { out.innerHTML = ''; return; }
+    if (!(raw > 0)) { out.innerHTML = ''; chart(NaN); return; }
     const x = k === 'uts' && inMode() ? raw * KSI : raw; m.v = k === 'uts' && inMode() ? x : raw;
     // interpolate only on values both publishers print
     const rows = T.rows.filter(r => r[k] && r[k].status === 'confirmed').map(r => ({ r, x: r[k].value }));
     let lo = null, hi = null;
     for (let i = 0; i < rows.length - 1; i++) if (rows[i].x <= x && x <= rows[i + 1].x) { lo = rows[i]; hi = rows[i + 1]; break; }
-    if (!lo) { out.innerHTML = '<div class="res"><span class="warn">Outside the published table for ' + rEsc(HSCALES.find(s => s[0] === k)[1]) + ' (' + fx(rows[0].x, 1) + ' to ' + fx(rows[rows.length - 1].x, 1) + '). No conversion given.</span></div>'; return; }
-    const res = HSCALES.filter(([f]) => f !== k).map(([f, n]) => {
+    if (!lo) { chart(NaN); out.innerHTML = '<div class="res"><span class="warn">Outside the published table for ' + rEsc(HSCALES.find(s => s[0] === k)[1]) + ' (' + fx(rows[0].x, 1) + ' to ' + fx(rows[rows.length - 1].x, 1) + '). No conversion given.</span></div>'; return; }
+    chart(k === 'hv' ? x : W.lerp(x, lo.x, lo.r.hv.value, hi.x, hi.r.hv.value));
+    const res = HSCALES.filter(([f]) => f !== k && isOn(f)).map(([f, n]) => {
       if (!lo.r[f] || !hi.r[f] || lo.r[f].status !== 'confirmed' || hi.r[f].status !== 'confirmed') return [n, calcCell('-', 'not in the table at this hardness (or printed by one source only)')];
       const v = W.lerp(x, lo.x, lo.r[f].value, hi.x, hi.r[f].value);
       const ap = lo.r[f].approx || hi.r[f].approx, st = [lo.r[f].status, hi.r[f].status].find(s => s !== 'confirmed') || 'confirmed';
@@ -323,8 +374,8 @@ async function renderHardness(el) {
       return '<td title="' + rEsc(groupsTitle(T.sources, c.groups)) + '">' + (c.approx ? '(' + v + ')' : v) + (c.status === 'confirmed' ? '' : ' ' + badge(c.status)) + '</td>';
     }).join('') + '</tr>').join('') + '</table></div><p class="desc">Every cell is printed by both publishers unless marked One source. The bracketed HRB values above 100 sit one row apart in the two printings, so each shows as One source.</p></details>';
   }
-  hs.onchange = () => { setInput(); upd(); }; hv.oninput = upd;
-  setInput(); upd(); table();
+  hs.onchange = () => { setInput(); picker(); upd(); }; hv.oninput = upd;
+  setInput(); picker(); upd(); table();
 }
 
 // ------------------------------------------------------------------ knurling

@@ -24,8 +24,7 @@ function mrSources(S, keys) {
   return keys.map(k => S[k]).filter(Boolean).map(s => '<b>' + rEsc(s.publisher) + '</b>: ' + rEsc(s.title) + (s.url ? ' (' + rEsc(s.url) + ')' : '') + ', accessed ' + rEsc(s.accessed) + (s.note ? '. <i>' + rEsc(s.note) + '</i>' : '')).join('<br>');
 }
 function mrOpen(id) {
-  state.tool = id; try { localStorage.setItem('bm.tool', id); } catch (e) {}
-  renderList($('#search').value); renderTool(); $('#main').scrollTop = 0;
+  openTool(id);
 }
 // Each publisher's printing of a temperature field: "Publisher: 790-850 °C".
 function mrTempCell(S, c) {

@@ -201,20 +201,40 @@ function fracText(W, x, den) {
   const txt = (neg ? '-' : '') + (whole ? whole + (rest ? ' ' : '') : '') + (rest ? rest + '/' + b : (whole ? '' : '0'));
   return { txt: txt + '"', val: num / den };
 }
+// One inch of a ruler around the value, divided to the chosen fraction, with the value and the
+// nearest fraction marked. inch and f (text and value of the nearest fraction) come from the core.
+function fracRuler(inch, den, f) {
+  if (!(inch >= 0 && inch < 1e4) || typeof DK === 'undefined') return '';
+  const W = 520, H = 150, x0 = 34, x1 = 486, yt = 58, base = Math.min(Math.floor(inch), Math.floor(f.val)), n = Math.min(den, 64);
+  const X = v => x0 + (x1 - x0) * Math.max(0, Math.min(1, v - base));
+  let h = DK.rect(x0 - 14, yt, x1 - x0 + 28, 62, 'part');
+  for (let i = 0; i <= n; i++) {
+    const k = i * 64 / n, len = k % 64 === 0 ? 36 : k % 32 === 0 ? 30 : k % 16 === 0 ? 24 : k % 8 === 0 ? 18 : k % 4 === 0 ? 13 : k % 2 === 0 ? 9 : 6, x = x0 + (x1 - x0) * i / n;
+    h += DK.line(x, yt, x, yt + len, k % 16 === 0 ? 'ln' : 'thin');
+  }
+  h += DK.text(x0, yt + 52, String(base), { cls: 'txt', size: 14 }) + DK.text(x1, yt + 52, String(base + 1), { cls: 'txt', size: 14 });
+  if (n >= 4) [['1/4', 0.25], ['1/2', 0.5], ['3/4', 0.75]].forEach(q => { h += DK.text(x0 + (x1 - x0) * q[1], yt + 46, q[0], { cls: 'mut' }); });
+  const xf = X(f.val), xv = X(inch), anc = x => (x < 90 ? 'start' : x > 430 ? 'end' : 'middle');
+  h += '<line class="dim" style="stroke-width:3" x1="' + xf.toFixed(1) + '" y1="' + yt + '" x2="' + xf.toFixed(1) + '" y2="' + (yt + 38) + '"/>';
+  h += DK.text(xf, H - 8, 'nearest 1/' + den + ': ' + f.txt, { cls: 'dimt', anchor: anc(xf) });
+  h += DK.arrow(xv, 26, xv, yt - 1, 'hot') + DK.text(xv, 18, fmt(inch, 4) + ' in', { cls: 'hott', anchor: anc(xv) });
+  return DK.svg(W, H, h, 'Ruler with the value and the nearest fraction marked');
+}
 function renderFraction(el) {
   const s = FRAC_STATE, W = state.W;
   el.innerHTML = '<div class="grid">' + sfield('Value (e.g. 1 3/8, 1-3/8, 0.375, 0.375", 9.525 mm)', '<input type="text" id="fin" value="' + sesc(s.text) + '" style="font-family:var(--mono)" autocomplete="off">', '') +
     sfield('Round to nearest', '<select id="fden">' + [2, 4, 8, 16, 32, 64, 128].map(d => '<option value="' + d + '"' + (d === +s.den ? ' selected' : '') + '>1/' + d + '</option>').join('') + '</select>', 'in') + '</div>' +
-    '<p class="desc" id="fhint"></p><div class="res" id="fres"></div><div class="res" id="ftab" style="margin-top:10px"></div>';
+    '<p class="desc" id="fhint"></p><div class="res" id="fres"></div><div class="tdia" id="fdia" style="max-width:640px;margin-top:10px"></div><div class="res" id="ftab" style="margin-top:10px"></div>';
   const calc = () => {
     s.text = el.querySelector('#fin').value; s.den = +el.querySelector('#fden').value;
     const p = parseLength(s.text, W), res = el.querySelector('#fres'), tab = el.querySelector('#ftab');
-    if (!p || !isFinite(p.inch)) { res.innerHTML = stable('Result', [['Could not read that value', '', '']]); tab.innerHTML = ''; el.querySelector('#fhint').textContent = ''; return; }
+    if (!p || !isFinite(p.inch)) { res.innerHTML = stable('Result', [['Could not read that value', '', '']]); tab.innerHTML = ''; el.querySelector('#fdia').innerHTML = ''; el.querySelector('#fhint').textContent = ''; return; }
     let inch = p.inch, hint = '';
     if (p.from === 'mm?') { inch = p.inch / IN_MM; hint = 'Plain number read as millimetres because the unit toggle is on mm. Add " or in to enter inches.'; }
     else if (p.from === 'decimal inch' && !/in|"/.test(s.text)) hint = 'Plain number read as inches because the unit toggle is on inch. Add mm to enter millimetres.';
     el.querySelector('#fhint').textContent = hint;
     const f = fracText(W, inch, s.den), err = inch - f.val;
+    el.querySelector('#fdia').innerHTML = fracRuler(inch, s.den, f);
     res.innerHTML = stable('Result', [
       ['Decimal inch', fmt(inch, 5), 'in'], ['Millimetres', fmt(inch * IN_MM, 4), 'mm'],
       ['Nearest 1/' + s.den, f.txt, ''], ['That fraction as decimal', fmt(f.val, 6), 'in'],

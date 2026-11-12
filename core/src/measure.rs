@@ -417,6 +417,44 @@ pub fn scale_reading(kind: u32, value: f64) -> [f64; 5] {
     }
 }
 
+// ---------- Limits of size and the middle of a tolerance ----------
+
+/// Limits of size from a nominal size and two deviations, given in either
+/// order and with their signs (for example +0.002 and -0.001, or +0.05 and
+/// +0.02). For two limits, pass nominal 0 and the limits as the deviations.
+/// Returns `[upper limit, lower limit, middle, tolerance (upper - lower),
+/// half the tolerance, middle - nominal]`. The middle is the size to aim
+/// for so the same amount of tolerance is left on both sides.
+pub fn tol_limits(nominal: f64, dev_a: f64, dev_b: f64) -> [f64; 6] {
+    if !(nominal.is_finite() && dev_a.is_finite() && dev_b.is_finite()) { return [f64::NAN; 6]; }
+    let hi = nominal + dev_a.max(dev_b);
+    let lo = nominal + dev_a.min(dev_b);
+    let mid = (hi + lo) / 2.0;
+    [hi, lo, mid, hi - lo, (hi - lo) / 2.0, mid - nominal]
+}
+
+// ---------- Wear offset change from a measured size ----------
+
+/// Change to a wear offset that brings a measured size to its target.
+/// error = measured - target; change = sense x error, halved when `halve`
+/// is above 0.5. `sense` is -1 when a larger reading needs a smaller offset
+/// value (a turned diameter or bore on the X wear offset, an outside size
+/// milled with cutter compensation, a height or length left under the tool)
+/// and +1 when it needs a larger one (an inside size milled with cutter
+/// compensation, a depth cut below the Z zero). Halve when the reading is
+/// across two sides but the offset acts on one (a radius value).
+///
+/// This is the arithmetic of a control that adds the wear value to the tool
+/// position (lathe X and Z wear, G43 on a mill) and moves the cutter away
+/// from the programmed edge by the D value (G41 / G42).
+/// Returns `[error, change, current + change]`.
+pub fn offset_adjust(measured: f64, target: f64, sense: f64, halve: f64, current: f64) -> [f64; 3] {
+    if !(measured.is_finite() && target.is_finite() && current.is_finite() && sense.is_finite()) || sense == 0.0 { return [f64::NAN; 3]; }
+    let e = measured - target;
+    let c = sense.signum() * e * if halve > 0.5 { 0.5 } else { 1.0 };
+    [e, c, current + c]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -610,6 +648,53 @@ mod tests {
         // Same, with vernier: .2262 = .225 + .001 + .0002.
         let r = scale_reading(3, 0.2262);
         close(r[1], 0.225, 1e-12); close(r[3], 1.0, 1e-12); close(r[4], 2.0, 1e-12);
+    }
+
+    #[test]
+    fn tolerance_limits_and_middle() {
+        // 1.000 +0.002 / -0.001: limits 1.002 and 0.999, middle 1.0005, band 0.003.
+        let r = tol_limits(1.0, 0.002, -0.001);
+        close(r[0], 1.002, 1e-12); close(r[1], 0.999, 1e-12); close(r[2], 1.0005, 1e-12);
+        close(r[3], 0.003, 1e-12); close(r[4], 0.0015, 1e-12); close(r[5], 0.0005, 1e-12);
+        // The order of the deviations does not matter.
+        assert_eq!(tol_limits(1.0, -0.001, 0.002), r);
+        // Both deviations on one side, as for an ISO 286 shaft 25 g6 (-0.007 / -0.020):
+        // limits 24.993 and 24.980, middle 24.9865.
+        let r = tol_limits(25.0, -0.007, -0.020);
+        close(r[0], 24.993, 1e-12); close(r[1], 24.980, 1e-12); close(r[2], 24.9865, 1e-12); close(r[5], -0.0135, 1e-12);
+        // Equal plus and minus: the middle is the nominal.
+        let r = tol_limits(10.0, 0.05, -0.05);
+        close(r[2], 10.0, 1e-12); close(r[5], 0.0, 1e-12); close(r[4], 0.05, 1e-12);
+        // Two limits (nominal 0): 25.05 and 24.98 give 25.015.
+        let r = tol_limits(0.0, 25.05, 24.98);
+        close(r[0], 25.05, 1e-12); close(r[1], 24.98, 1e-12); close(r[2], 25.015, 1e-12);
+        assert!(tol_limits(f64::NAN, 0.1, 0.1)[2].is_nan());
+    }
+
+    #[test]
+    fn wear_offset_change() {
+        // Turned diameter 0.002 in oversize: -0.002 in the X wear offset (Modern Machine Shop,
+        // "Taking full advantage of geometry and wear offsets").
+        let r = offset_adjust(1.002, 1.0, -1.0, 0.0, 0.0);
+        close(r[0], 0.002, 1e-12); close(r[1], -0.002, 1e-12); close(r[2], -0.002, 1e-12);
+        // A bore 0.03 mm small needs +0.03 mm (the tool moves to a larger diameter).
+        close(offset_adjust(19.97, 20.0, -1.0, 0.0, 0.0)[1], 0.03, 1e-12);
+        // Boss 1.001 for 1.000 with a diameter table: -0.001 (Autodesk); 1.0120 for 1.0000: -0.0120 (CIMCO).
+        close(offset_adjust(1.001, 1.0, -1.0, 0.0, 0.0)[1], -0.001, 1e-12);
+        close(offset_adjust(1.012, 1.0, -1.0, 0.0, 0.0)[1], -0.012, 1e-12);
+        // The same boss on a control that holds a radius: half the error.
+        close(offset_adjust(25.04, 25.0, -1.0, 1.0, 0.0)[1], -0.02, 1e-12);
+        // A pocket 0.04 mm small, radius value: the offset also goes down 0.02 (more is removed).
+        close(offset_adjust(24.96, 25.0, 1.0, 1.0, 0.0)[1], -0.02, 1e-12);
+        // A pocket floor 0.05 mm too deep with -0.10 already in the wear: +0.05, new value -0.05.
+        let r = offset_adjust(10.05, 10.0, 1.0, 0.0, -0.10);
+        close(r[1], 0.05, 1e-12); close(r[2], -0.05, 1e-12);
+        // A part 0.08 mm too thick under a face mill: -0.08.
+        close(offset_adjust(20.08, 20.0, -1.0, 0.0, 0.0)[1], -0.08, 1e-12);
+        // On target: no change.
+        close(offset_adjust(5.0, 5.0, 1.0, 1.0, 0.25)[2], 0.25, 1e-12);
+        assert!(offset_adjust(1.0, 1.0, 0.0, 0.0, 0.0)[1].is_nan());
+        assert!(offset_adjust(f64::NAN, 1.0, 1.0, 0.0, 0.0)[1].is_nan());
     }
 
     #[test]

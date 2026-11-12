@@ -75,6 +75,23 @@ pub fn cusp_height(r: f64, s: f64) -> f64 {
     r - (r * r - s * s / 4.0).sqrt()
 }
 
+/// Theoretical (kinematic) roughness left by a milling cutter whose cutting
+/// edge is an arc of radius `r` where it makes the surface: the corner radius
+/// on a floor, the cutter radius D/2 on a wall. `fz` feed per tooth, `z`
+/// teeth, all in one length unit. The feed marks are arcs a feed apart, so
+/// Rt = r - sqrt(r^2 - (f/2)^2) (close to f^2 / (8 r)) and Ra = f^2 / (32 r),
+/// as for a turned surface. With every tooth cutting alike the marks are a
+/// feed per tooth apart; when runout leaves one tooth cutting the finished
+/// surface they are a feed per revolution (fz x z) apart.
+/// Returns `[Rt per tooth, Ra per tooth, Rt per rev, Ra per rev, feed per
+/// rev]`; a value is NaN where the feed is more than 2 r.
+pub fn mill_finish(fz: f64, z: f64, r: f64) -> [f64; 5] {
+    if !(fz > 0.0 && z >= 1.0 && r > 0.0) || !(fz + z + r).is_finite() { return [f64::NAN; 5]; }
+    let frev = fz * z;
+    let ra = |f: f64| if f <= 2.0 * r { crate::ra_theoretical(f, r) } else { f64::NAN };
+    [cusp_height(r, fz), ra(fz), cusp_height(r, frev), ra(frev), frev]
+}
+
 /// Stepover for a scallop height `h` with ball radius `r`: s = 2 sqrt(2 r h - h^2) (h <= r).
 pub fn stepover_for_cusp(r: f64, h: f64) -> f64 {
     if !(r > 0.0 && h >= 0.0) || h > r { return f64::NAN; }
@@ -168,6 +185,45 @@ pub fn turn_rough(d0: f64, d1: f64, ap_max: f64, len: f64, f: f64, vc: f64, rpm:
     }).collect()
 }
 
+/// Time to part off, face or plunge-groove from diameter `d0` down to `d1`
+/// (d1 = 0 for parting to the centre) at feed `f` per revolution and constant
+/// surface speed `vc`, with the spindle limited to `n_max` rpm (G50 / G92 clamp;
+/// 0 = no limit). `k` makes the units: 1000 for vc in m/min with mm, 12 for
+/// SFM with inches (n = k vc / (pi D)).
+///
+/// The tool moves in at f x n per minute on the radius, so dD/dt = -2 f n(D)
+/// and t = integral from d1 to d0 of dD / (2 f n(D)), with
+/// n(D) = k vc / (pi D) above the clamp diameter Dc = k vc / (pi n_max) and
+/// n_max below it. Above Dc: t = pi (Da^2 - Db^2) / (4 k f vc); below Dc:
+/// t = (Da - Db) / (2 f n_max). Own derivation; the two-region idea is in
+/// Isakov (CTE 2011, Rmin where the spindle reaches nmax) and SmartLathe.
+///
+/// `which`: 0 total minutes, 1 minutes at constant surface speed (above Dc),
+/// 2 minutes at the clamp (below Dc), 3 clamp diameter Dc (0 with no clamp),
+/// 4 rpm at d0, 5 rpm at d1 (n_max at d1 = 0 with a clamp; inf without).
+pub fn partoff_time(d0: f64, d1: f64, f: f64, vc: f64, n_max: f64, k: f64, which: f64) -> f64 {
+    if !(d0 > d1 && d1 >= 0.0 && f > 0.0 && vc > 0.0 && k > 0.0 && n_max >= 0.0) { return f64::NAN; }
+    let dc = if n_max > 0.0 { k * vc / (PI * n_max) } else { 0.0 };
+    let rpm = |d: f64| if d <= dc { n_max } else { k * vc / (PI * d) };
+    // CSS part: from max(d1, dc) to d0 (where d0 > dc); clamped part: from d1 to min(d0, dc).
+    let (a_hi, a_lo) = (d0, d1.max(dc.min(d0)));
+    let t_css = if a_hi > a_lo { PI * (a_hi * a_hi - a_lo * a_lo) / (4.0 * k * f * vc) } else { 0.0 };
+    let (b_hi, b_lo) = (d0.min(dc), d1);
+    let t_clamp = if b_hi > b_lo { (b_hi - b_lo) / (2.0 * f * n_max) } else { 0.0 };
+    match which as i32 {
+        0 => t_css + t_clamp, 1 => t_css, 2 => t_clamp, 3 => dc,
+        4 => rpm(d0), 5 => if d1 > 0.0 || n_max > 0.0 { rpm(d1) } else { f64::INFINITY },
+        _ => f64::NAN,
+    }
+}
+
+/// Time (min) to part off or face from `d0` to `d1` at a constant spindle speed
+/// `n` (G97) and feed `f` per revolution: (d0 - d1) / (2 f n).
+pub fn partoff_time_rpm(d0: f64, d1: f64, f: f64, n: f64) -> f64 {
+    if !(d0 > d1 && d1 >= 0.0 && f > 0.0 && n > 0.0) { return f64::NAN; }
+    (d0 - d1) / (2.0 * f * n)
+}
+
 /// C axis: angular feed (deg/min) for a feed `vf` along the circumference at diameter `d`:
 /// deg/min = vf x 360 / (pi d).
 pub fn c_axis_deg_min(vf: f64, d: f64) -> f64 { vf * 360.0 / (PI * d) }
@@ -202,11 +258,43 @@ pub fn turning_force(kc: f64, ap: f64, fnr: f64) -> f64 { kc * ap * fnr }
 /// (m/min) and teeth per inch: vf / teeth per minute, teeth per minute = vb x 1000 / 25.4 x TPI. [KASCO]
 pub fn bandsaw_chip_per_tooth(vf: f64, vb: f64, tpi: f64) -> f64 { vf / (vb * 1000.0 / crate::MM_PER_IN * tpi) }
 
+/// Section a bandsaw cuts through: one piece or a bundle of `nx` pieces across
+/// (side by side, across the blade) and `ny` layers high (stacked in the feed
+/// direction), packed square. `shape`: 1 round bar (diameter a), 2 rectangle
+/// (width a across the blade, height b), 3 tube (outside diameter a, wall b).
+/// `which`: 0 metal area cut (all pieces), 1 height the blade feeds through,
+/// 2 effective width (the longest path of the blade in the bundle, across it),
+/// 3 number of pieces. Same length unit throughout; area in that unit squared.
+/// NaN for impossible input (tube wall over half the diameter).
+pub fn saw_section(shape: f64, a: f64, b: f64, nx: f64, ny: f64, which: f64) -> f64 {
+    let (nx, ny) = (nx.max(1.0).floor(), ny.max(1.0).floor());
+    if !(a > 0.0) { return f64::NAN; }
+    let (area, w, h) = match shape as i32 {
+        1 => (PI / 4.0 * a * a, a, a),
+        2 if b > 0.0 => (a * b, a, b),
+        3 if b > 0.0 && b < a / 2.0 => (PI / 4.0 * (a * a - (a - 2.0 * b).powi(2)), a, a),
+        _ => return f64::NAN,
+    };
+    match which as i32 { 0 => area * nx * ny, 1 => h * ny, 2 => w * nx, 3 => nx * ny, _ => f64::NAN }
+}
+
+/// Bandsaw cut time (min) from the metal area cut and a cutting rate in area
+/// per minute (in^2/min or cm^2/min, the figure saw and blade makers quote):
+/// t = area / rate. [Starrett Bulletin 193; Machinery's Handbook, band saw blades]
+pub fn saw_cut_time(area: f64, rate: f64) -> f64 { if area >= 0.0 && rate > 0.0 { area / rate } else { f64::NAN } }
+
 /// Spot or countersink depth from the tool tip for a chamfer (countersink) diameter
 /// `dc` with included angle `angle`: (dc/2) / tan(angle/2).
 pub fn spot_depth(dc: f64, angle_deg: f64) -> f64 {
     if !(dc > 0.0 && angle_deg > 0.0 && angle_deg < 180.0) { return f64::NAN; }
     dc / 2.0 / (angle_deg.to_radians() / 2.0).tan()
+}
+
+/// Chamfer diameter a pointed tool of included angle `angle` cuts at depth `z`
+/// from its tip: 2 z tan(angle/2) (inverse of `spot_depth`).
+pub fn spot_chamfer_dia(z: f64, angle_deg: f64) -> f64 {
+    if !(z >= 0.0 && angle_deg > 0.0 && angle_deg < 180.0) { return f64::NAN; }
+    2.0 * z * (angle_deg.to_radians() / 2.0).tan()
 }
 
 /// Centre drill depth from its tip for countersink diameter `dc`: the length from the
@@ -260,6 +348,26 @@ mod tests {
         for i in 0..=200000 { let t = PI * i as f64 / 200000.0; let x = a + r * t.cos(); let y = r * t.sin(); if (x * x + y * y).sqrt() > rw - ae { last = t; } }
         assert!(close(engagement_arc_rad(ae, 2.0 * r, rw, true), last, 2e-5));
         assert!(engagement_arc_rad(2.0, 10.0, 5.0, true).is_nan());
+    }
+
+    #[test]
+    fn milling_finish() {
+        // Floor, corner radius 0.8 mm, 0.1 mm per tooth, 4 teeth: Rth = fz^2 / (8 r) = 1.5625 um
+        // (Soltan 2008; JM CNC); the exact arc gives 1.5640 um. Ra = fz^2 / (32 r) = 0.3906 um.
+        let r = mill_finish(0.1, 4.0, 0.8);
+        assert!((r[0] - 0.0015640).abs() < 1e-7 && (r[0] - 0.01 / 6.4).abs() < 2e-6);
+        assert!((r[1] - 0.01 / 25.6).abs() < 1e-12);
+        // One tooth marking: the marks are 0.4 mm apart, 16 times the Ra.
+        assert!((r[4] - 0.4).abs() < 1e-12 && (r[3] - 16.0 * r[1]).abs() < 1e-12);
+        assert!((r[2] - (0.8 - (0.64f64 - 0.04).sqrt())).abs() < 1e-12);
+        // Wall of a 10 mm end mill at 0.05 mm per tooth: Rt0 = R - sqrt(R^2 - fz^2/4) (Wojciechowski 2011),
+        // close to fz^2 / (4 D) = 0.0625 um.
+        let w = mill_finish(0.05, 4.0, 5.0);
+        assert!((w[0] - 0.0000625).abs() < 1e-9);
+        // Feed per rev above 2 r: no per-rev value, the per-tooth value stays.
+        let n = mill_finish(0.3, 6.0, 0.4);
+        assert!(n[0].is_finite() && n[2].is_nan() && n[3].is_nan());
+        assert!(mill_finish(0.0, 4.0, 0.8)[0].is_nan());
     }
 
     #[test]
@@ -340,6 +448,42 @@ mod tests {
     }
 
     #[test]
+    fn partoff() {
+        // No clamp, 50 mm to the centre, 0.1 mm/rev, 150 m/min:
+        // t = pi 2500 / (4 x 1000 x 0.1 x 150) = 0.130900 min.
+        let t = partoff_time(50.0, 0.0, 0.1, 150.0, 0.0, 1000.0, 0.0);
+        assert!(close(t, PI * 2500.0 / 60_000.0, 1e-12));
+        // Isakov (CTE, 2011): facing at constant surface speed takes about half the time of
+        // facing at the constant rpm that speed gives at the start diameter (0.98 vs 1.90 min
+        // in his example, with a spindle limit). Without a limit the ratio is exactly 1/2.
+        let n0 = 1000.0 * 150.0 / (PI * 50.0);
+        assert!(close(t / partoff_time_rpm(50.0, 0.0, 0.1, n0), 0.5, 1e-12));
+        // Inch: 4 in bar, 0.004 ipr, 500 SFM, to the centre: pi 16 / (4 x 12 x 0.004 x 500) = 0.52360 min.
+        assert!(close(partoff_time(4.0, 0.0, 0.004, 500.0, 0.0, 12.0, 0.0), PI * 16.0 / 96.0, 1e-12));
+        // With a 3000 rpm clamp: Dc = 150000 / (pi 3000) = 15.915 mm.
+        let dc = partoff_time(50.0, 0.0, 0.1, 150.0, 3000.0, 1000.0, 3.0);
+        assert!(close(dc, 150_000.0 / (PI * 3000.0), 1e-12));
+        let t1 = partoff_time(50.0, 0.0, 0.1, 150.0, 3000.0, 1000.0, 1.0);
+        let t2 = partoff_time(50.0, 0.0, 0.1, 150.0, 3000.0, 1000.0, 2.0);
+        assert!(close(t1, PI * (2500.0 - dc * dc) / 60_000.0, 1e-12));
+        assert!(close(t2, dc / (2.0 * 0.1 * 3000.0), 1e-12));
+        // Check the closed form by integrating dD / (2 f n(D)) numerically (Simpson, 20000 steps).
+        let n = |d: f64| (150_000.0 / (PI * d)).min(3000.0);
+        let (a, b, m) = (0.0, 50.0, 20_000);
+        let h = (b - a) / m as f64;
+        let g = |d: f64| 1.0 / (2.0 * 0.1 * n(d));
+        let mut s = g(a) + g(b);
+        for i in 1..m { s += g(a + i as f64 * h) * if i % 2 == 1 { 4.0 } else { 2.0 }; }
+        assert!(close(t1 + t2, s * h / 3.0, 1e-7));
+        // Rpm at the ends, and a groove that stays above the clamp diameter (no clamped part).
+        assert!(close(partoff_time(50.0, 0.0, 0.1, 150.0, 3000.0, 1000.0, 5.0), 3000.0, 1e-12));
+        assert!(close(partoff_time(50.0, 30.0, 0.1, 150.0, 3000.0, 1000.0, 2.0), 0.0, 0.0));
+        // A groove entirely below the clamp diameter: constant 3000 rpm.
+        assert!(close(partoff_time(12.0, 4.0, 0.1, 150.0, 3000.0, 1000.0, 0.0), partoff_time_rpm(12.0, 4.0, 0.1, 3000.0), 1e-12));
+        assert!(partoff_time(10.0, 20.0, 0.1, 150.0, 0.0, 1000.0, 0.0).is_nan());
+    }
+
+    #[test]
     fn c_axis() {
         // 100 mm/min at 50 mm diameter: 100 x 360 / (pi 50) = 229.18 deg/min
         assert!(close(c_axis_deg_min(100.0, 50.0), 36000.0 / (PI * 50.0), 1e-9));
@@ -367,6 +511,25 @@ mod tests {
         // 60 m/min blade, 6 TPI, 30 mm/min down-feed: teeth per min = 60000/25.4 x 6 = 14173.2,
         // chip = 0.0021167 mm
         assert!(close(bandsaw_chip_per_tooth(30.0, 60.0, 6.0), 30.0 / (60000.0 / 25.4 * 6.0), 1e-15));
+        // Machinery's Handbook (band saw blades) example: 5.5 in^2 at about 4 in^2/min = 1.375 min.
+        assert!(close(saw_cut_time(5.5, 4.0), 1.375, 1e-15));
+        assert!(saw_cut_time(5.5, 0.0).is_nan());
+        // Single 4 in round: area 12.566 in^2, height and width 4 in.
+        assert!(close(saw_section(1.0, 4.0, 0.0, 1.0, 1.0, 0.0), 4.0 * PI, 1e-12));
+        assert!(close(saw_section(1.0, 4.0, 0.0, 1.0, 1.0, 1.0), 4.0, 1e-15));
+        // Bundle of 2 in rounds, 3 across and 2 high: 6 pieces, metal area 6 pi = 18.85 in^2,
+        // feed through 4 in, blade crosses 6 in.
+        assert!(close(saw_section(1.0, 2.0, 0.0, 3.0, 2.0, 0.0), 6.0 * PI, 1e-12));
+        assert!(close(saw_section(1.0, 2.0, 0.0, 3.0, 2.0, 1.0), 4.0, 1e-15));
+        assert!(close(saw_section(1.0, 2.0, 0.0, 3.0, 2.0, 2.0), 6.0, 1e-15));
+        assert!(close(saw_section(1.0, 2.0, 0.0, 3.0, 2.0, 3.0), 6.0, 1e-15));
+        // Rectangles 50 x 20 mm, 4 across, 3 high: area 12 000 mm^2, height 60, width 200.
+        assert!(close(saw_section(2.0, 50.0, 20.0, 4.0, 3.0, 0.0), 12_000.0, 1e-9));
+        assert!(close(saw_section(2.0, 50.0, 20.0, 4.0, 3.0, 1.0), 60.0, 1e-12));
+        assert!(close(saw_section(2.0, 50.0, 20.0, 4.0, 3.0, 2.0), 200.0, 1e-12));
+        // Tube 60 x 3 wall: pi/4 (3600 - 2916) = 171 pi = 537.21 mm^2 per piece.
+        assert!(close(saw_section(3.0, 60.0, 3.0, 2.0, 2.0, 0.0), 4.0 * 171.0 * PI, 1e-9));
+        assert!(saw_section(3.0, 60.0, 30.0, 1.0, 1.0, 0.0).is_nan());
         // 90 deg spot drill, 10 mm chamfer diameter: depth 5 mm
         assert!(close(spot_depth(10.0, 90.0), 5.0, 1e-12));
         // 120 deg: 5 / tan 60 = 2.8868
@@ -376,6 +539,16 @@ mod tests {
         let z = centre_drill_depth(6.0, 2.5, 3.0, 60.0);
         assert!(close(z, 3.0 + 1.75 * 3f64.sqrt(), 1e-12));
         assert!(close(centre_drill_dia(z, 2.5, 3.0, 60.0), 6.0, 1e-12));
+        // spot_chamfer_dia inverts spot_depth
+        assert!(close(spot_chamfer_dia(spot_depth(8.0, 118.0), 118.0), 8.0, 1e-12));
+        assert!(close(spot_chamfer_dia(5.0, 90.0), 10.0, 1e-12));
+        // Table sizes (data/refdata/centredrills-evidence.json):
+        // ISO 866 type A, pilot 2.5 mm, pilot length 3.1 mm (min), full countersink at the
+        // 6.3 mm body: 3.1 + 1.9 / tan 30 = 6.3909 mm.
+        assert!(close(centre_drill_depth(6.3, 2.5, 3.1, 60.0), 3.1 + 1.9 * 3f64.sqrt(), 1e-12));
+        // Inch #3 plain (7/64 pilot and length), 60 deg, 0.200 in countersink:
+        // 0.109375 + 0.090625 / (2 tan 30) = 0.18786 in
+        assert!(close(centre_drill_depth(0.2, 0.109375, 0.109375, 60.0), 0.109375 + 0.090625 / 2.0 * 3f64.sqrt(), 1e-12));
     }
 }
 

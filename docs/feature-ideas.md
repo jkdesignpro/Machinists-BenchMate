@@ -27,3 +27,59 @@ Ideas from looking at other machinist tools (G-Wizard, HSMAdvisor, FSWizard, ope
 18. **Phone/tablet build** of the same app for use at the machine.
 
 Sources looked at: G-Wizard feature list (cnccookbook.com), HSMAdvisor forum discussions, FSWizard store listing, better-tool-library feeds-and-speeds notes (GitHub). Ideas only; no code or data taken.
+
+## Agreed additions (owner decision, 2026-11-11)
+The owner asked for all 18 ideas from the review "what is missing, new ideas and sources" and for every missing Ultra feature, except a mobile app and a link to another app or device. The vibration check is to work with any sensor. They are built in the stage where they fit; each still needs its sources (two publishers, or marked single source).
+
+| # | Idea | Stage | State |
+|---|---|---|---|
+| 1 | Thread identifier (`threadid`) | 0 (0.2.0) | built |
+| 2 | Limits and middle of a tolerance (`tolmid`) | 0 (0.2.0) | built |
+| 3 | Wear offset adjustment (`offsetadj`) | 0 (0.2.0) | built |
+| 4 | Worked example panel: a published example beside BenchMate's answer | 0 (0.2.0) | built; five tools have an example, more to add |
+| 5 | Print a page and copy a link with the numbers | 0 (0.2.0) | built |
+| 6 | G-code tidy tools (renumber, strip, convert) | 2 (0.4.0) | to do |
+| 7 | Text engraving with the Hershey fonts | 2 (0.4.0) | to do |
+| 8 | Collet and pull stud torque | 3 (0.5.0) | to do |
+| 9 | Slender part deflection | 1 (0.3.0) | to do |
+| 10 | High-feed chip thinning | 1 (0.3.0) | to do |
+| 11 | Drill thrust and torque | 1 (0.3.0) | to do |
+| 12 | Tap torque | 1 (0.3.0) | to do |
+| 13 | Gauge R&R | 3 (0.5.0) | to do |
+| 14 | Thread gauge limits | 3 (0.5.0) | to do |
+| 15 | Rotary axis helper | 2 (0.4.0) | to do |
+| 16 | Job time and quote | 5 (0.9.0) | to do |
+| 17 | Vendor data import and cut log | 5 (0.9.0) | to do |
+| 18 | Wire EDM | 3 (0.5.0) | to do |
+
+Missing Ultra rows (docs/parity-audit.md) keep the stage the spec gives them: cutting-data advisors for turning, milling and drilling, reaming and tapping speeds in stage 1; gun drill, RPM cylindricity, SAE J499a and milling surface finish with RMS in stage 3; the vibration check in stage 5.
+
+**Vibration check, any sensor:** the check takes a typed frequency and amplitude, a CSV from any accelerometer or data logger (time and one to three axes), or a sound recording, and uses the device's own motion sensor only where one exists. It compares like with like (same machine, same place, same speed) and never depends on one make of sensor. Everything stays on the device.
+
+Not planned for now: a phone or tablet app, and links to another app or device (confirmed by the owner, 2026-11-11: "yes no links").
+
+### Every idea in this document (owner, 2026-11-11: "add every single feature in that markdown doc")
+State of the tier list above, with the stage for what is still to build.
+
+| Tier item | State | Still to build | Stage |
+|---|---|---|---|
+| 1 Machine profiles | built | | |
+| 2 Cut optimiser with deflection and torque checks | built | Holder and spindle compliance in the deflection check | 1 (0.3.0) |
+| 3 Arc and helix feed correction | built | Plunge roughing | 1 (0.3.0) |
+| 4 Cost per part and tool life | built | | |
+| 5 Bar stock planner | built | | |
+| 6 Shop knowledge base | to do | Log what worked for a tool, material and machine, searchable; with the cut log (idea 17) | 5 (0.9.0) |
+| 7 Material equivalents | built | | |
+| 8 Setup sheet generator | built | | |
+| 9 Turning chip-breaking window | to do | Feed and depth inside the insert's chip-breaker range, from imported catalogue data | 1 (0.3.0) |
+| 10 Thread extras | part | Rolled-thread blank diameter, tap torque (idea 12), percent engagement check on the minor diameter, infeed tables for G76-style cycles | 1 (0.3.0) and 3 (0.5.0) |
+| 11 Inspection helpers | built | | |
+| 12 Coolant with refractometer | built | | |
+| 13 Fraction, decimal and metric quick calculator | built | | |
+| 14 Troubleshooting guide | built (turning and milling troubles in the CNC guide) | Drilling, tapping and grinding symptoms | 3 (0.5.0) |
+| 15 G-code snippets per control profile | part (cycle generators) | Snippets from any calculator, per control | 2 (0.4.0) |
+| 16 Profile export and import by file | part (tool library, setup sheet, machines) | One file for everything | 5 (0.9.0) |
+| 17 Link with Alkart Mega Wizard | not planned | No links | |
+| 18 Phone or tablet build | not planned for now | | |
+
+Also built in 0.2.0 after the review: milling surface finish and the RMS (Rq) conversion, which closed Ultra row U66.

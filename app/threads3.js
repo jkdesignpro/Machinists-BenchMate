@@ -322,3 +322,114 @@ async function renderUnSeries(el) {
   us.onchange = upd;
   upd();
 }
+
+// ------------------------------------------------------------------ thread identifier
+// Every standard thread in the tables as { label, std, d, p, tpi, minor, go }: d = basic major diameter and
+// p = pitch in mm, minor = basic minor diameter of the nut in mm (NaN where the core has no rule for it),
+// go = [tool id, RMEM key, values], so a click opens that thread in its own tool.
+function tidCandidates(R, W) {
+  const T = R.threads, O = R.other_threads, A = R.power_threads, out = [];
+  const v60 = (d, p) => W.thread_basic_minor_dia(d, p), v55 = (d, p) => W.whitworth_value(d, p, 1);
+  T.metric.forEach(t => out.push({ label: 'M' + t.d + ' x ' + t.p, std: 'ISO metric, ' + t.series, d: t.d, p: t.p, minor: v60(t.d, t.p),
+    go: ['threaddata', 'thd', { key: 'M' + t.d + 'x' + t.p, d: t.d, p: t.p, sys: 'metric' }] }));
+  T.unified.forEach(t => {
+    const d = t.d * IN_MM, p = W.pitch_tpi(t.tpi);
+    out.push({ label: t.size + '-' + t.tpi + ' ' + t.series, std: 'Unified inch', d, p, tpi: t.tpi, minor: v60(d, p), go: ['threaddata', 'thd', { key: t.size + '-' + t.tpi + ' ' + t.series, d, p, sys: 'unified' }] });
+  });
+  Object.keys(A.un_const || {}).forEach(k => {
+    const i = k.indexOf(' '), s = k.slice(0, i), z = k.slice(i + 1), tpi = parseInt(s), din = t3Frac(z);
+    if (!(tpi > 0 && din > 0) || T.unified.some(t => Math.abs(t.d - din) < 1e-6 && +t.tpi === tpi)) return;
+    const d = din * IN_MM, p = W.pitch_tpi(tpi);
+    out.push({ label: z + '-' + tpi + ' UN', std: 'Unified constant pitch', d, p, tpi, minor: v60(d, p), go: ['unseries', 'unser', { s }] });
+  });
+  ['bsw', 'bsf'].forEach(k => (O[k] || []).forEach(r => {
+    const d = t3Frac(r.size) * IN_MM, tpi = +r.tpi.value, p = W.pitch_tpi(tpi);
+    out.push({ label: r.size + '" ' + k.toUpperCase(), std: 'Whitworth, 55° (BS 84)', d, p, tpi, minor: v55(d, p), go: ['whitworth', 'whit', { sys: k, size: r.size }] });
+  }));
+  (O.bsp || []).forEach(r => {
+    if (!r.major_mm) return;
+    const d = r.major_mm.value, tpi = +r.tpi.value, p = W.pitch_tpi(tpi);
+    out.push({ label: 'G ' + r.size + ' / R ' + r.size, std: 'BSP pipe, 55° (R is tapered)', d, p, tpi, minor: v55(d, p), go: ['pipethreads', 'pipe', { sys: 'bsp', size: r.size }] });
+  });
+  (O.npt || []).forEach(r => {
+    const d = r.od.value * IN_MM, tpi = +r.tpi.value;
+    out.push({ label: r.size + ' NPT', std: 'NPT pipe, 60°, tapered', d, p: W.pitch_tpi(tpi), tpi, minor: NaN, go: ['pipethreads', 'pipe', { sys: 'npt', size: r.size }] });
+  });
+  (O.ba || []).forEach(r => {
+    const n = +r.size;
+    out.push({ label: r.size + ' BA', std: 'BA, 47.5° (BS 93)', d: W.round_sig(W.ba_value(n, 1), 2), p: W.round_sig(W.ba_value(n, 0), 2), minor: NaN, go: ['whitworth', 'whit', { sys: 'ba', size: r.size }] });
+  });
+  [['acme', 'ACME', 'gp'], ['stub_acme', 'Stub ACME', 'stub']].forEach(([k, name, form]) => (A[k] || []).forEach(r => {
+    const din = t3Frac(r.size), tpi = +r.tpi.value;
+    const minor = (form === 'stub' ? W.stub_acme_limit(din, 1 / tpi, 1, 5) : W.acme_limit(din, 1 / tpi, 2, 1, 5)) * IN_MM;
+    out.push({ label: r.size + '"-' + tpi + ' ' + name, std: name + ', 29°', d: din * IN_MM, p: W.pitch_tpi(tpi), tpi, minor, go: ['acme', 'acme', { form, size: r.size, cls: 2, starts: 1, d: din, tpi }] });
+  }));
+  (A.trap || []).forEach(r => {
+    const d = parseFloat(r.size), p = +r.p.value;
+    out.push({ label: 'Tr ' + d + ' x ' + p, std: 'Metric trapezoidal, 30°', d, p, minor: W.trap_value(d, p, 2), go: ['trapezoidal', 'trap', { size: r.size, d, p, starts: 1 }] });
+  });
+  (A.unm || []).forEach(r => {
+    const d = +r.size, p = +r.p.value;
+    out.push({ label: r.size + ' UNM', std: 'Unified miniature', d, p, minor: v60(d, p), go: ['unm', 'unm', { size: r.size }] });
+  });
+  return out.filter(c => c.d > 0 && c.p > 0);
+}
+
+async function renderThreadId(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, cands = tidCandidates(R, W);
+  const m = RMEM.tid || (RMEM.tid = inMode() ? { d: 0.245 * IN_MM, pv: 20, pu: 'tpi', bore: 0 } : { d: 9.85, pv: 1.5, pu: 'mm', bore: 0 });
+  el.innerHTML = '<div class="grid" style="max-width:760px">' +
+    '<div class="f"><span>Measured on</span><div class="row"><div class="seg" id="ib"><button type="button" data-v="0">Screw</button><button type="button" data-v="1">Nut or hole</button></div></div></div>' +
+    '<label class="f"><span id="idl"></span><div class="row"><input id="idv" type="number" step="any" min="0"><span class="u">' + uLen() + '</span></div></label>' +
+    '<label class="f"><span>Pitch, from a thread pitch gauge</span><div class="row"><input id="ipv" type="number" step="any" min="0"><select id="ipu" aria-label="Pitch unit" style="flex:0 0 auto;width:auto"><option value="mm">mm</option><option value="tpi">threads per inch</option></select></div></label>' +
+    '</div><div id="ires"></div>' +
+    '<div class="note"><b>How to measure:</b> on a screw, measure across the thread crests with a caliper or micrometer. On a nut or tapped hole, measure the bore across the crests with the inside jaws. Read the pitch with a thread pitch gauge, or count the crests along 1 in (25.4 mm) for threads per inch. ' +
+    'A screw normally measures a little under its nominal size and a tapped hole a little over its basic minor diameter, because of the allowance and tolerances (the Thread data and limits tool gives the limits), so a small minus on a screw or a small plus on a bore is what a good match looks like. ' +
+    'Tapered pipe threads (NPT, R) change diameter along their length: measure near the middle of the thread. A diameter and a pitch cannot tell a 55° thread from a 60° one of nearly the same size (for example G 1/8 and 1/8 NPT, or 1/2 in BSW and 1/2-13 UNC at 12 and 13 threads per inch): check the flanks with the gauge leaf against the light, or try a known nut or screw. Worn, damaged, plated or special threads may not match anything here.' +
+    '<br><b>Working:</b> pitch in mm = 25.4 / threads per inch. Every standard thread in BenchMate\'s tables is compared with the reading. Diameter difference = measured diameter minus that thread\'s basic major diameter (screw) or basic minor diameter (bore: D - 1.082532 P for 60° threads, D - 1.280654 P for Whitworth and BSP, D - P for ACME and trapezoidal, D - 0.6 P for Stub ACME). Pitch difference = (measured pitch - its pitch) / its pitch. A thread is listed when the pitch is within 6 % and the diameter within 6 % (never less than 0.3 mm). The list is ordered by score = &radic;((pitch difference / 2 %)&sup2; + (diameter difference / (2 % of the diameter + 0.05 mm))&sup2;); a score of 1 or less is called close. ' +
+    'This search rule is BenchMate\'s own way of ordering the table. It is not taken from a standard and it does not prove what a thread is.' +
+    '<br><b>Sources:</b> the sizes, pitches and basic diameters are the ones in the thread tools (Thread data and limits, Pipe threads, Whitworth and BA, ACME, Trapezoidal, Constant-pitch UN, UNM), with the standards and publishers cited there. For bores, BA and NPT are not searched.</div>';
+  const ib = $('#ib', el), idv = $('#idv', el), ipv = $('#ipv', el), ipu = $('#ipu', el), out = $('#ires', el);
+  const sg = (v, dp) => { const r = +v.toFixed(dp); return (r > 0 ? '+' : '') + r.toFixed(dp); };
+  const pitchCell = c => c.tpi ? '<span class="mv">' + tpiText(c.tpi) + '</span> <span class="ms">' + fx(c.p, 4) + ' mm</span>' : '<span class="mv">' + (+c.p.toFixed(4)) + ' mm</span> <span class="ms">' + fx(W.pitch_tpi(c.p), 2) + ' TPI</span>';
+  let shown = [];
+  function setInputs() {
+    ib.querySelectorAll('button').forEach(b => { const on = +b.dataset.v === +m.bore; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    $('#idl', el).textContent = m.bore ? 'Bore diameter, across the crests' : 'Outside diameter, across the crests';
+    idv.value = +toUser(m.d).toFixed(inMode() ? 4 : 3); ipv.value = +(+m.pv).toFixed(4); ipu.value = m.pu;
+  }
+  function upd() {
+    const dv = parseFloat(idv.value), pv = parseFloat(ipv.value);
+    shown = [];
+    if (!(dv > 0 && pv > 0)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter the measured diameter and pitch.</td></tr></table></div>'; return; }
+    m.d = fromUser(dv); m.pv = pv;
+    const dM = m.d, pM = m.pu === 'tpi' ? W.pitch_tpi(pv) : pv, rows = [];
+    cands.forEach(c => {
+      const ref = m.bore ? c.minor : c.d; if (!(ref > 0)) return;
+      const s = W.thread_match(dM, pM, ref, c.p, 2);
+      if (isFinite(s)) rows.push({ c, ref, s, dd: W.thread_match(dM, pM, ref, c.p, 0), dp: W.thread_match(dM, pM, ref, c.p, 1) });
+    });
+    rows.sort((a, b) => a.s - b.s || a.c.label.localeCompare(b.c.label));
+    const head = '<div class="res mtab"><div class="h">Reading: ' + (m.bore ? 'bore ' : 'outside ') + fLen(dM) + ' ' + uLen() + ', pitch ' + (+pM.toFixed(4)) + ' mm (' + fx(W.pitch_tpi(pM), 2) + ' threads per inch)</div>';
+    if (!rows.length) { out.innerHTML = head + '<table><tr><td class="warn">No standard thread in the tables is within 6 % on both pitch and diameter. Check the readings and the pitch unit. It may be a special thread.</td></tr></table></div>'; return; }
+    shown = rows.slice(0, 12);
+    const close = rows.filter(r => r.s <= 1).length;
+    const fit = (r, i) => r.s <= 1 ? '<span class="badge confirmed">' + (i === 0 ? 'Closest' : 'Close') + '</span>' : i === 0 ? '<span class="badge review">Nearest</span>' : '<span class="ms">possible</span>';
+    out.innerHTML = head + '<table><tr><th>Thread</th><th>Fit</th><th>Standard</th><th>Pitch</th><th>' + (m.bore ? 'Basic minor Ø (nut)' : 'Basic major Ø') + '</th><th>Your Ø minus basic</th><th>Your pitch against its pitch</th></tr>' +
+      shown.map((r, i) => '<tr><td style="white-space:nowrap"><a href="#/t/' + r.c.go[0] + '" data-i="' + i + '" title="Open this thread"><b>' + rEsc(r.c.label) + '</b></a></td><td>' + fit(r, i) + '</td><td>' + rEsc(r.c.std) + '</td><td class="v">' + pitchCell(r.c) + '</td><td class="v">' + fBoth(r.ref) + '</td>' +
+        '<td class="v"><span class="mv">' + sg(toUser(r.dd), inMode() ? 4 : 3) + ' ' + uLen() + '</span></td><td class="v"><span class="mv">' + sg(r.dp * 100, 1) + ' %</span></td></tr>').join('') + '</table></div>' +
+      (close > 1 ? '<div class="note warn">More than one thread is a close fit. Check the flank angle with the gauge, measure the diameter again with a micrometer, or try a known nut or screw.</div>' : '') +
+      (close === 0 ? '<div class="note warn">Nothing is a close fit. The nearest threads are listed, but check the readings and the pitch unit first.</div>' : '') +
+      (rows.length > shown.length ? '<div class="note">' + (rows.length - shown.length) + ' more candidates further away are not shown.</div>' : '');
+  }
+  out.addEventListener('click', e => {
+    const a = e.target.closest('a[data-i]'), r = a && shown[+a.dataset.i]; if (!r) return;
+    const [, key, vals] = r.c.go;
+    RMEM[key] = Object.assign(RMEM[key] || {}, vals, key === 'thd' ? { int: +m.bore } : {});
+  });
+  ib.querySelectorAll('button').forEach(b => b.onclick = () => { m.bore = +b.dataset.v; setInputs(); upd(); });
+  ipu.onchange = () => { const pv = parseFloat(ipv.value); m.pu = ipu.value; if (pv > 0) { m.pv = +W.pitch_tpi(pv).toFixed(4); ipv.value = m.pv; } upd(); };
+  idv.oninput = upd; ipv.oninput = upd;
+  setInputs(); upd();
+}

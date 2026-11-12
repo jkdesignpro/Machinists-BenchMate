@@ -1,35 +1,14 @@
 /* Layout and components; colours and fonts come from tokens.css (shared with Alkart Mega Wizard). */
-#titlebar{display:flex;align-items:center;gap:8px;height:38px;padding:0 10px;background:var(--head);border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:8px;font-weight:600;white-space:nowrap}
-.brand .mark{height:20px;padding:0 5px;border-radius:3px;display:grid;place-items:center;background:var(--ink);color:var(--panel);font:700 10px/1 var(--sans);letter-spacing:.02em}
-.brand small{color:var(--muted);font-weight:400}
 .sp{flex:1}
-.seg{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.seg button{background:var(--panel);border:0;padding:3px 10px;cursor:pointer;height:26px}
-.seg button+button{border-left:1px solid var(--line)}
-.seg button.on{background:var(--accent);color:var(--accent-ink)}
-.btn{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:3px 10px;height:26px;cursor:pointer}
-.btn:hover{border-color:var(--muted)}
-#shell{flex:1;display:flex;min-height:0}
-#side{width:260px;flex:none;background:var(--head);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
-#search{margin:8px;width:auto}
-#list{overflow:auto;flex:1;padding-bottom:8px}
-#list h3{margin:10px 10px 3px;font:600 10.5px var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-#list .li{display:flex;align-items:stretch}
-#list .li:hover{background:var(--soft)}
-#list button.t{display:block;flex:1;min-width:0;text-align:left;background:none;border:0;border-left:2px solid transparent;padding:5px 4px 5px 12px;cursor:pointer}
-#list button.t.on{background:var(--sel);border-left-color:var(--accent)}
-#list button.star{flex:none;width:28px;display:grid;place-items:center;background:none;border:0;padding:0;cursor:pointer;color:var(--muted);opacity:0}
-#list .li:hover button.star,#list button.star:focus-visible,#list button.star.on{opacity:1}
-#list button.star.on{color:var(--accent)}
-#list button.star.on svg,.favbtn.on svg{fill:currentColor}
-#list button.star:hover{color:var(--ink)}
-#main{flex:1;overflow:auto;padding:18px 24px;min-width:0}
+/* Hard keys: every button that does something is a key with a face, an edge and a pressed state. The key that is on takes the accent. */
+.seg{display:flex;gap:3px}
+.seg button,.btn{background:linear-gradient(var(--keytop),var(--keybot));border:1px solid var(--keyedge);border-bottom-width:3px;border-radius:3px;padding:0 10px;height:28px;cursor:pointer;
+  color:var(--keyink);font:700 11px var(--sans);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.seg button:hover,.btn:hover{filter:brightness(1.12)}
+.seg button:active,.btn:active{border-bottom-width:1px;transform:translateY(2px);margin-bottom:2px}
+.seg button.on,.btn.pri{background:var(--key);color:var(--key-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.btn:disabled{opacity:.5;cursor:default;filter:none}
 .card{max-width:760px}
-.thead{display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
-.favbtn{display:inline-flex;align-items:center;gap:5px;flex:none;color:var(--muted)}
-.favbtn.on{color:var(--accent);border-color:var(--accent)}
-.favbtn span{color:var(--ink)}
 .tpick{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin:-4px 0 12px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--head)}
 .tpick label{color:var(--muted);font-size:11.5px}
 .tpick select{max-width:100%;min-width:0}
@@ -42,8 +21,10 @@ label.f[hidden]{display:none}
 label.f .row{display:flex;align-items:center;gap:6px;color:var(--ink)}
 label.f input,label.f select{flex:1;font-family:var(--mono)}
 label.f .u{color:var(--muted);min-width:34px;font-size:11.5px}
-.res{border:1px solid var(--line);background:var(--panel);border-radius:var(--r);max-width:760px}
-.res .h{padding:6px 10px;font-weight:600;background:var(--raise);border-bottom:1px solid var(--line)}
+/* Readout screens: results and tables sit on the screen colour. Tokens are re-pointed inside a screen so anything nested follows. */
+.res,.screen{--panel:var(--screen);--line:var(--screen-line);--soft:var(--screen-line);--raise:color-mix(in srgb,var(--screen) 90%,var(--ink));--head:color-mix(in srgb,var(--screen) 90%,var(--ink))}
+.res{border:2px solid var(--edge);box-shadow:inset 0 0 0 1px var(--screen-line);background:var(--screen);border-radius:var(--r);max-width:760px}
+.res .h{padding:6px 10px;font-weight:700;background:var(--raise);border-bottom:1px solid var(--line)}
 .res table{width:100%;border-collapse:collapse}
 .res td{padding:5px 10px;border-bottom:1px solid var(--soft)}
 .res td.v{font-family:var(--mono);text-align:right;font-weight:600;white-space:nowrap}
@@ -53,9 +34,7 @@ label.f .u{color:var(--muted);min-width:34px;font-size:11.5px}
 .note{margin-top:14px;max-width:760px;color:var(--muted);font-size:12px;line-height:1.55}
 .note b{color:var(--ink);font-weight:600}
 .note code{font-family:var(--mono);background:var(--soft);padding:0 4px;border-radius:3px}
-#status{height:24px;display:flex;align-items:center;padding:0 10px;border-top:1px solid var(--line);background:var(--head);color:var(--muted);font-size:11.5px}
 .tbl{font-family:var(--mono)}
-@media (max-width:760px){#side{display:none}}
 
 .card.wide{max-width:none}
 .mtab{max-width:none;overflow:auto}
@@ -75,7 +54,6 @@ label.f .u{color:var(--muted);min-width:34px;font-size:11.5px}
 
 tr.over td{background:color-mix(in srgb,var(--warn) 12%,transparent)}
 .wmsg{color:var(--warn);font-size:11.5px}
-#machine{height:26px}
 
 .mfh{margin:14px 0 6px;font-size:13px}
 .malt{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
@@ -174,7 +152,7 @@ svg.geo .gv{fill:var(--ink);font:600 13px var(--mono)}
 .sheetprint{display:none}
 pre.gcode{font-family:var(--mono);font-size:12px;line-height:1.45;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;max-width:760px;max-height:480px;overflow:auto;white-space:pre;margin:8px 0}
 @media print{
-  :root,:root[data-theme="dark"]{--bg:#fff;--panel:#fff;--ink:#000;--muted:#333;--line:#999;--soft:#ddd;--raise:#eee}
+  :root,:root[data-theme]{--bg:#fff;--panel:#fff;--ink:#000;--muted:#333;--line:#999;--soft:#ddd;--raise:#eee;--head:#eee;--screen:#fff;--screen-line:#bbb;--digit:#000;--hot:#000;--hot2:#ddd;--edge:#999;--field:#fff;--accent:#000;--accent2:#eee;--sel:#eee;--dim:#333;--glow:none;--bevel:#fff}
   html,body{height:auto;overflow:visible;display:block;background:#fff;color:#000}
   #titlebar,#side,#status,.note,.noprint,#main>.card>.thead,#main>.card>.desc{display:none!important}
   #shell,#main{display:block;overflow:visible;padding:0}
@@ -298,3 +276,160 @@ svg.geo.cnw{width:150px;max-width:150px;flex:none;margin:0}
 .gsmsg tr.gm1 td.gmk{color:var(--warn)}
 .gsmsg tr.gm2 td.gmk{color:var(--muted)}
 @media (max-width:760px){.gscv{height:320px}.gslist{flex-basis:100%;max-height:300px}}
+
+/* ===== Calculator (app/calc.js, BenchCalc) =====
+   Floating panel on wide screens, bottom sheet on narrow ones, and inline on
+   the Calculator tool page. Colours come only from the CSS tokens. */
+.bcalc{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;min-width:0}
+.bcalc[hidden],.bc-back[hidden],.bcalc .bc-use[hidden]{display:none}
+.bcalc .bc-head{display:flex;align-items:center;gap:8px;height:34px;padding:0 6px 0 10px;background:var(--head);border-bottom:1px solid var(--line);flex:none;user-select:none}
+.bcalc .bc-tgt{color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.bcalc .bc-deg button{height:22px;padding:0 8px;font:600 10.5px var(--mono)}
+.bcalc .bc-x{width:26px;height:26px;display:grid;place-items:center;background:none;border:1px solid transparent;border-radius:var(--r);cursor:pointer;color:var(--muted)}
+.bcalc .bc-x:hover{border-color:var(--line);color:var(--ink)}
+.bcalc .bc-main{display:flex;flex-direction:column;min-height:0;overflow:auto}
+.bcalc .bc-left{padding:10px;display:flex;flex-direction:column;gap:8px}
+.bcalc .bc-right{padding:0 10px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.bcalc .bc-disp{border:1px solid var(--line);border-radius:var(--r);background:var(--raise);padding:6px 8px;display:flex;flex-direction:column;gap:2px}
+.bcalc .bc-expr{width:100%;height:30px;font:14px var(--mono);background:var(--panel)}
+.bcalc .bc-res{font:600 22px/1.25 var(--mono);text-align:right;overflow-wrap:anywhere;color:var(--muted)}
+.bcalc .bc-res.ok{color:var(--ink)}
+.bcalc .bc-res.bad{font:12px var(--sans);color:var(--err);text-align:left;padding:4px 0}
+.bcalc .bc-alt{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 12px;font:11.5px var(--mono);color:var(--muted);min-height:16px}
+.bcalc .bc-alt i{font-style:normal;color:var(--warn)}
+.bcalc .bc-alt .bc-un{color:var(--accent);border:1px solid var(--accent);border-radius:3px;padding:0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+.bcalc .bc-caret{white-space:pre;color:var(--err);margin-right:auto;overflow:hidden}
+.bcalc .bc-mem{font:10.5px var(--mono);color:var(--accent)}
+.bcalc .bc-mem:empty{display:none}
+.bcalc .bc-keys{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.bcalc .bc-keys button{height:34px;min-width:0;padding:0 2px;border:1px solid var(--keyedge);border-bottom-width:3px;border-radius:var(--r2);background:linear-gradient(var(--keytop),var(--keybot));color:var(--keyink);cursor:pointer;font:12px var(--sans);white-space:nowrap;overflow:hidden}
+.bcalc .bc-keys button:hover{filter:brightness(1.08)}
+.bcalc .bc-keys button:active{border-bottom-width:1px;transform:translateY(2px)}
+.bcalc .bc-keys .num{background:linear-gradient(color-mix(in srgb,var(--keytop) 70%,var(--panel)),color-mix(in srgb,var(--keybot) 70%,var(--panel)));font:600 15px var(--mono)}
+.bcalc .bc-keys .op{font:600 15px var(--mono)}
+.bcalc .bc-keys .mem{font:600 11px var(--mono);color:var(--muted)}
+.bcalc .bc-keys .ctl{color:var(--err);font-weight:600}
+.bcalc .bc-keys .eq{background:var(--key);color:var(--key-ink);font:700 16px var(--mono)}
+.bcalc .bc-use{display:flex}
+.bcalc .bc-usebtn{flex:1;height:30px;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcalc .bc-usebtn:disabled{opacity:.5;cursor:default}
+.bcalc .bc-sec{border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.bcalc .bc-sh{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:var(--head);border-bottom:1px solid var(--line);font:600 10.5px var(--sans);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);cursor:default}
+.bcalc details.bc-sec>summary{cursor:pointer;list-style:none;justify-content:flex-start;gap:6px}
+.bcalc details.bc-sec>summary::-webkit-details-marker{display:none}
+.bcalc details.bc-sec>summary::before{content:"";width:0;height:0;border:4px solid transparent;border-left-color:currentColor;margin-right:2px}
+.bcalc details.bc-sec[open]>summary::before{border-left-color:transparent;border-top-color:currentColor;margin-top:4px}
+.bcalc details.bc-sec:not([open])>summary{border-bottom:0}
+.bcalc .bc-link{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font:inherit;text-transform:none;letter-spacing:0;font-weight:400}
+.bcalc .bc-tape{max-height:150px;overflow:auto}
+.bcalc .bc-row{display:flex;border-bottom:1px solid var(--soft)}
+.bcalc .bc-row:last-child{border-bottom:0}
+.bcalc .bc-row button{background:none;border:0;padding:3px 8px;cursor:pointer;font:11.5px var(--mono);color:var(--ink);min-width:0}
+.bcalc .bc-row button:hover{background:var(--soft)}
+.bcalc .bc-row .bc-he{flex:1;text-align:left;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bcalc .bc-row .bc-hv{font-weight:600;white-space:nowrap}
+.bcalc .bc-empty{padding:6px 8px;color:var(--muted);font-size:11.5px}
+.bcalc .bc-fsel{margin:8px 8px 0;flex-wrap:wrap}
+.bcalc .bc-fsel button{flex:1 1 auto;height:24px;padding:0 6px;font-size:11.5px}
+.bcalc .bc-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px 8px;padding:8px}
+.bcalc .bc-form label{display:flex;flex-direction:column;gap:2px;color:var(--muted);font-size:11px}
+.bcalc .bc-form input{font-family:var(--mono);width:100%}
+.bcalc .bc-fout{padding:0 8px}
+.bcalc .bc-fout table{width:100%;border-collapse:collapse;font-size:11.5px}
+.bcalc .bc-fout th{text-align:right;font:600 10.5px var(--sans);color:var(--muted);padding:2px 4px;border-bottom:1px solid var(--line)}
+.bcalc .bc-fout td{padding:1px 4px;border-bottom:1px solid var(--soft)}
+.bcalc .bc-fout td+td{text-align:right}
+.bcalc .bc-fv{background:none;border:0;padding:1px 3px;border-radius:3px;font:600 11.5px var(--mono);color:var(--ink);cursor:pointer}
+.bcalc .bc-fv:hover{background:var(--sel)}
+.bcalc .bc-fmsg{margin:0 0 4px;color:var(--muted);font-size:11.5px}
+.bcalc .bc-hint{margin:6px 8px 8px;color:var(--muted);font-size:10.5px}
+#bcalc-panel.bc-float{position:fixed;z-index:1000;width:360px;max-width:calc(100vw - 16px);max-height:calc(100vh - 24px);box-shadow:0 6px 24px rgba(0,0,0,.22)}
+#bcalc-panel.bc-float .bc-head{cursor:move}
+#bcalc-panel.bc-modal{position:fixed;z-index:1000;left:0;right:0;bottom:0;max-height:94vh;border-radius:var(--r) var(--r) 0 0;border-bottom:0}
+.bc-back{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.4)}
+.bc-inline.bcalc{max-width:900px;margin-bottom:14px}
+@media (min-width:900px){
+  .bc-inline.bcalc .bc-main{flex-direction:row;align-items:flex-start}
+  .bc-inline.bcalc .bc-left{width:380px;flex:none}
+  .bc-inline.bcalc .bc-right{flex:1;padding:10px 10px 10px 0}
+  .bc-inline.bcalc .bc-tape{max-height:220px}
+}
+@media (max-width:720px){.bcalc .bc-keys button{height:40px}}
+/* ===== end Calculator ===== */
+
+/* ===== Cycle input sections (thread milling) ===== */
+details.cysec{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);margin:0 0 8px;max-width:980px}
+details.cysec>summary{cursor:pointer;padding:7px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;list-style:none}
+details.cysec>summary::-webkit-details-marker{display:none}
+details.cysec>summary::before{content:'';width:0;height:0;border-left:5px solid var(--muted);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .12s}
+details.cysec[open]>summary::before{transform:rotate(90deg)}
+details.cysec .cysh{font-weight:600}
+details.cysec .cyst{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0}
+details.cysec .cymiss{overflow-wrap:anywhere}
+details.cysec .cysb{border-top:1px solid var(--line);padding:10px 12px 4px}
+.cystd{margin:0 0 8px}
+.cystd .f{max-width:360px}
+.cystd select{max-width:100%}
+.cystd p{margin:4px 0 0;min-height:1em}
+.cywait{border:1px dashed var(--line);border-radius:var(--r);max-width:980px}
+
+/* ===== Thread data: recent threads, copy buttons, hand-off to the programs ===== */
+.thhist{max-width:980px;margin:0 0 6px}
+.thhist>.ms{display:block;margin:0 0 4px}
+.thhist .fchips{align-items:center}
+.thhist .thclr{height:24px}
+.thgo{max-width:980px;margin:12px 0 4px}
+.thgor{flex-wrap:wrap;gap:8px}
+.thgor .seg{flex:none}
+#hres td.v .cpy{margin-left:2px}
+#hres td .cpy{white-space:nowrap}
+
+/* ===== G and M codes: operation chips and the info drawer ===== */
+.gmtags{margin:2px 0 6px}
+.gmtags .fchip:disabled{opacity:.45;cursor:default}
+.gmtags .gmtn{font-family:var(--mono);font-size:10.5px;opacity:.75}
+.gmtab tr.gmrow{cursor:pointer}
+.gmtab tr.gmrow:hover>td{background:var(--soft)}
+.gmtab tr.gmrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.gmtab tr.gmrow.open>td{background:var(--soft);border-bottom-color:transparent}
+.gmtab tr.gmdrw>td{background:var(--soft);padding:0 8px 10px}
+.gmdrawer{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);background:var(--panel);padding:10px 12px;max-width:900px;white-space:normal}
+.gmdh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.gmdh .btn{flex:none}
+.gmdl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:0 0 8px}
+.gmdl dt{color:var(--muted);font-size:11.5px}
+.gmdl dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.gmdsec{margin-top:8px}
+.gmdsec>.h{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.gmdsec table{width:100%;border-collapse:collapse}
+.gmdsec td{padding:3px 6px 3px 0;vertical-align:top;border-bottom:1px solid var(--soft)}
+.gmdsec td:first-child{white-space:nowrap;width:1%}
+.gmdsec p{margin:4px 0}
+.gmdsrc{margin:0;padding-left:18px;overflow-wrap:anywhere}
+.gmdsrc li{margin:2px 0}
+@media (max-width:600px){.gmdl{grid-template-columns:1fr}.gmdl dt{margin-top:4px}}
+
+/* ===== Keyway broaching: the user's own presets ===== */
+.cypre{border:1px solid var(--line);border-radius:var(--r);background:var(--raise);padding:8px 10px;margin:0 0 12px;max-width:980px}
+.cypreh{margin-bottom:6px}
+.cyprer{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.cyprer select{max-width:320px;min-width:0;flex:1 1 200px}
+.cyprer input{flex:1 1 180px;min-width:0;max-width:280px}
+.cyprer .btn{flex:none}
+.cypre p{margin:4px 0 0;min-height:1em}
+
+/* ===== Formula library: category chips, favourites, open calculator ===== */
+.flib-chips{max-width:980px}
+.flib-chips .fchip{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.flib-chips .fchip svg.ic{width:13px;height:13px}
+.flib-chips .gmtn,.fchip .gmtn{font-family:var(--mono);font-size:10.5px;opacity:.75}
+.fht{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.fstar{width:24px;height:24px;flex:none;border-radius:var(--r)}
+.fstar:hover{background:var(--soft)}
+.fstar .ic{width:15px;height:15px}
+.fgo{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-left:auto}
+.fh .fgo .btn{color:var(--ink)}
+@media (max-width:600px){
+  .fgo{margin-left:30px}
+}
+.gmdh .gmdc{display:block;margin-top:2px}

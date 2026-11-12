@@ -339,9 +339,9 @@ function renderGsim(el) {
   // Keyboard stepping on the canvas.
   cv.tabIndex = 0;
   cv.onkeydown = e => { if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { setStep(GS.step + 1); e.preventDefault(); } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { setStep(GS.step - 1); e.preventDefault(); } };
-  // Redraw on resize and theme change.
+  // Redraw on resize and on a theme or accent colour change.
   if (typeof ResizeObserver === 'function') { const ro = new ResizeObserver(() => { if (!document.body.contains(cv)) { ro.disconnect(); return; } view = null; draw(); }); ro.observe(cv); }
   const mo = new MutationObserver(() => { if (!document.body.contains(cv)) { mo.disconnect(); return; } draw(); });
-  mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'style'] });
   run();
 }

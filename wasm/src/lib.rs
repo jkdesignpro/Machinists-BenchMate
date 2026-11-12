@@ -17,6 +17,8 @@ f1!(mrr_turning_in3_min, c::mrr_turning_in3_min, sfm, doc, ipr);
 f1!(mrr_milling, c::mrr_milling, ae, ap, vf);
 f1!(power_kw, c::power_kw, q, kc, eta);
 f1!(rt_theoretical, c::rt_theoretical, feed, r);
+/// Milling finish: which 0 Rt per tooth, 1 Ra per tooth, 2 Rt per rev, 3 Ra per rev, 4 feed per rev.
+#[no_mangle] pub extern "C" fn mill_finish(fz: f64, z: f64, r: f64, which: f64) -> f64 { pick(c::mill_finish(fz, z, r), which) }
 f1!(ra_theoretical, c::ra_theoretical, feed, r);
 f1!(feed_for_ra, c::feed_for_ra, ra, r);
 f1!(pass_time_min, c::pass_time_min, length, feed, rpm);
@@ -155,12 +157,16 @@ f1!(coolant_topup_mix, c::coolant_topup_mix, v_now, c_now, v_full, c_target);
 f1!(coolant_concentrate_in, c::coolant_concentrate_in, vol, c, c_conc);
 f1!(frac_nearest_num, c::frac_nearest_num, x, den);
 f1!(mixed_to_decimal, c::mixed_to_decimal, whole, num, den);
+/// Nearest fraction of `x` to 1/`den`: which 0 sign, 1 whole, 2 numerator,
+/// 3 denominator (reduced), 4 error (fraction minus x).
+#[no_mangle] pub extern "C" fn frac_nearest(x: f64, den: f64, which: f64) -> f64 { pick(c::nearest_fraction(x, den), which) }
 #[no_mangle] pub extern "C" fn frac_reduce(num: f64, den: f64, which: f64) -> f64 {
     let (a, b) = c::frac_reduce(num, den); if which == 0.0 { a } else { b } }
 
 // Geometry (core/src/geometry.rs)
 f1!(tri_solve, c::solve_triangle_flat, a, b, cc, aa, bb, ccc, sol, which);
 f1!(arc_solve, c::arc_solve_flat, mode, x, y, which);
+f1!(arc_two, c::arc_two_flat, ka, a, kb, b, sol, which);
 f1!(circle_3pts, c::circle_3pts_flat, x1, y1, x2, y2, x3, y3, which);
 f1!(sine_bar_height, c::sine_bar_height, l, theta);
 f1!(sine_bar_angle, c::sine_bar_angle, l, h);
@@ -221,6 +227,9 @@ fn ints(v: &[f64]) -> Vec<u64> { v.iter().filter(|x| **x >= 1.0).map(|x| x.round
 // Other thread forms (core/src/thread_forms.rs)
 f1!(whitworth_value, c::whitworth_value_f, d, p, what);
 f1!(ba_value, c::ba_value_f, n, what);
+f1!(pitch_tpi, c::pitch_tpi, x);
+/// Thread identifier: which 0 diameter difference, 1 pitch difference (fraction), 2 score (NaN = not a candidate).
+#[no_mangle] pub extern "C" fn thread_match(d_meas: f64, p_meas: f64, d_ref: f64, p_nom: f64, which: f64) -> f64 { pick(c::thread_match(d_meas, p_meas, d_ref, p_nom), which) }
 f1!(npt_value, c::npt_value_f, d, p, l1, what);
 f1!(round_sig, c::round_sig_f, x, sig);
 // Threads round 3 (core/src/power_threads.rs)
@@ -332,6 +341,8 @@ f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
 f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
 f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
 f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);
+f1!(profile_rq_over_ra, c::profile_rq_over_ra, kind);
+f1!(rq_ra_convert, c::rq_ra_convert, x, kind, inverse);
 f1!(tap_h_limit, c::tap_h_limit, basic, n, major, which);
 f1!(tap_l_limit_min, c::tap_l_limit_min, basic, n);
 f1!(tap_d_limit, c::tap_d_limit, basic, n, step, sign);
@@ -387,6 +398,11 @@ f1!(bandsaw_chip_per_tooth, c::bandsaw_chip_per_tooth, vf, vb, tpi);
 f1!(spot_depth, c::spot_depth, dc, angle);
 f1!(centre_drill_depth, c::centre_drill_depth, dc, dp, l, angle);
 f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
+f1!(spot_chamfer_dia, c::spot_chamfer_dia, z, angle);
+f1!(saw_section, c::saw_section, shape, a, b, nx, ny, which);
+f1!(saw_cut_time, c::saw_cut_time, area, rate);
+f1!(partoff_time, c::partoff_time, d0, d1, f, vc, n_max, k, which);
+f1!(partoff_time_rpm, c::partoff_time_rpm, d0, d1, f, n);
 /// Per-tooth chip loads with runout into list_out; returns the tooth count.
 #[no_mangle] pub extern "C" fn runout_chips(fz: f64, tir: f64, z: f64) -> f64 { set_out(c::runout_chips(fz, tir, z.max(0.0) as usize)) }
 /// Multi-pass turning into list_out as (finished dia, rpm, minutes) per pass; returns the pass count.
@@ -469,6 +485,10 @@ pub extern "C" fn tnrc_arc(r: f64, tip: f64, z1: f64, x1: f64, z2: f64, x2: f64,
 // Measurement and shop maths (core/src/measure.rs)
 fn pick<const N: usize>(a: [f64; N], which: f64) -> f64 { a.get(which as usize).copied().unwrap_or(f64::NAN) }
 f1!(ball_height_in_cone, c::ball_height_in_cone, ball_d, face_d, included);
+/// Limits and middle of a tolerance: which 0 upper limit, 1 lower limit, 2 middle, 3 tolerance, 4 half the tolerance, 5 middle - nominal.
+#[no_mangle] pub extern "C" fn tol_limits(nominal: f64, dev_a: f64, dev_b: f64, which: f64) -> f64 { pick(c::tol_limits(nominal, dev_a, dev_b), which) }
+/// Wear offset change: which 0 error (measured - target), 1 change, 2 new offset value.
+#[no_mangle] pub extern "C" fn offset_adjust(measured: f64, target: f64, sense: f64, halve: f64, current: f64, which: f64) -> f64 { pick(c::offset_adjust(measured, target, sense, halve, current), which) }
 f1!(cone_face_dia_from_ball, c::cone_face_dia_from_ball, ball_d, height, included);
 /// Two balls in a tapered bore: which 0 included angle, 1 face diameter.
 #[no_mangle] pub extern "C" fn cone_two_balls(d1: f64, h1: f64, d2: f64, h2: f64, which: f64) -> f64 { pick(c::cone_from_two_balls(d1, h1, d2, h2), which) }
@@ -518,6 +538,9 @@ f1!(npv, c::npv, investment, saving, n, i, resale);
 /// Units of quantity `q` as text (`symbol|name|exact|factor` lines) into the string buffer.
 #[no_mangle] pub extern "C" fn unit_list(q: f64) -> f64 { set_str(&c::units::units_text(q as u32)) }
 #[no_mangle] pub extern "C" fn unit_convert(q: f64, from: f64, to: f64, x: f64) -> f64 { c::units::convert(q as u32, from as u32, to as u32, x) }
+f1!(dms_to_deg, c::units::dms_to_deg, d, m, s);
+#[no_mangle] pub extern "C" fn angle_form_from_deg(kind: f64, a: f64) -> f64 { c::units::angle_form_from_deg(kind as u32, a) }
+#[no_mangle] pub extern "C" fn angle_form_to_deg(kind: f64, x: f64) -> f64 { c::units::angle_form_to_deg(kind as u32, x) }
 
 // Expression calculator (core/src/expr.rs)
 static mut EXPR_POS: f64 = 0.0;
@@ -530,6 +553,18 @@ static mut EXPR_POS: f64 = 0.0;
         c::expr::Eval::Ok(v) => { set_str(""); v }
         c::expr::Eval::Err(m, i) => { set_str(&m); unsafe { *core::ptr::addr_of_mut!(EXPR_POS) = i as f64; } f64::NAN }
     } }
+static mut EXPR_USED: f64 = 0.0;
+/// As `expr_eval`, with length units allowed: `base_mm` is 25.4 in inch mode and 1 in mm mode.
+/// `expr_len_used` then says whether the expression held a length unit (1) or not (0).
+#[no_mangle] pub extern "C" fn expr_eval_u(n: f64, deg: f64, ans: f64, base_mm: f64) -> f64 {
+    let s: String = buf(n).iter().map(|c| char::from_u32(*c as u32).unwrap_or('?')).collect();
+    let (r, used) = c::expr::eval_units(&s, deg != 0.0, ans, base_mm);
+    unsafe { *core::ptr::addr_of_mut!(EXPR_USED) = if used { 1.0 } else { 0.0 }; }
+    match r {
+        c::expr::Eval::Ok(v) => { set_str(""); v }
+        c::expr::Eval::Err(m, i) => { set_str(&m); unsafe { *core::ptr::addr_of_mut!(EXPR_POS) = i as f64; } f64::NAN }
+    } }
+#[no_mangle] pub extern "C" fn expr_len_used() -> f64 { unsafe { *core::ptr::addr_of!(EXPR_USED) } }
 #[no_mangle] pub extern "C" fn expr_err_len() -> f64 { let s: &String = unsafe { &*core::ptr::addr_of!(STR) }; s.len() as f64 }
 #[no_mangle] pub extern "C" fn expr_err_pos() -> f64 { unsafe { *core::ptr::addr_of!(EXPR_POS) } }
 /// Decimal degrees to degrees, minutes, seconds: which 0, 1, 2.

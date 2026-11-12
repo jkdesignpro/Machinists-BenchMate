@@ -436,6 +436,8 @@ pub const LIMIT_POWER: u8 = 2;
 pub const LIMIT_TORQUE: u8 = 3;
 pub const LIMIT_FLUTE: u8 = 4;
 pub const LIMIT_DIAMETER: u8 = 5;
+/// Returned by [`cut_optimise`] only: ap capped at the stick-out because no flute length was given.
+pub const LIMIT_STICKOUT: u8 = 6;
 
 fn given(x: f64) -> bool { x > 0.0 && x.is_finite() }
 
@@ -504,7 +506,9 @@ pub fn proportional_limit(x: f64, y: f64, y_limit: f64) -> f64 {
 /// Cut optimiser. `vary_ae = false`: largest ap for the given ae;
 /// `true`: largest ae for the given ap. Each active limit gives
 /// x_max = x / (fraction of that limit used) ([`proportional_limit`]); the
-/// smallest wins. Geometric caps: ap <= flute length, ae <= D.
+/// smallest wins. Geometric caps: ap <= flute length (or, when no flute
+/// length is given, ap <= stick-out: a cutter cannot cut deeper than it
+/// sticks out of the holder), ae <= D.
 /// Returns (x_max, limit code). NaN and 0 if no limit is active.
 /// Assumes kc constant (in reality kc rises a little as chip thickness falls).
 pub fn cut_optimise(c: &CutInput, vary_ae: bool) -> (f64, u8) {
@@ -513,9 +517,11 @@ pub fn cut_optimise(c: &CutInput, vary_ae: bool) -> (f64, u8) {
     let mut used = r.used;
     if vary_ae { used[LIMIT_DIAMETER as usize] = c.ae / c.d; }
     else if given(c.flute_len) { used[LIMIT_FLUTE as usize] = c.ap / c.flute_len; }
+    let by_stickout = !vary_ae && !given(c.flute_len) && given(c.stickout);
+    if by_stickout { used[LIMIT_FLUTE as usize] = c.ap / c.stickout; }
     let k = binding(&used, &[LIMIT_DEFLECTION, LIMIT_POWER, LIMIT_TORQUE, LIMIT_FLUTE, LIMIT_DIAMETER]);
     if k == 0 { return (f64::NAN, 0); }
-    (proportional_limit(x, used[k as usize], 1.0), k)
+    (proportional_limit(x, used[k as usize], 1.0), if by_stickout && k == LIMIT_FLUTE { LIMIT_STICKOUT } else { k })
 }
 
 /// f64 wrapper for the WebAssembly layer: `out` selects the result.
@@ -772,6 +778,10 @@ mod tests {
         let mut c = sample(); c.defl_limit = 0.0;
         let (ap, k) = cut_optimise(&c, false);
         close(ap, 25.0, 1e-9); assert_eq!(k, LIMIT_FLUTE);
+        // No flute length given: the stick-out (40) caps ap before power (41.3).
+        let mut c2 = sample(); c2.defl_limit = 0.0; c2.flute_len = 0.0;
+        let (ap, k) = cut_optimise(&c2, false);
+        close(ap, 40.0, 1e-9); assert_eq!(k, LIMIT_STICKOUT);
         // ... and for ae the tool diameter (10) binds before power (10.3323).
         let (ae, k) = cut_optimise(&c, true);
         close(ae, 10.0, 1e-9); assert_eq!(k, LIMIT_DIAMETER);

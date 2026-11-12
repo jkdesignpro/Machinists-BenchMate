@@ -218,67 +218,85 @@ async function renderShrinkFit(el) {
 
 // ---------- Unit converter ----------
 const UNIT_STATE = { q: 0, from: 1, x: 1 };
+// Angle forms that are not a fixed factor (kinds of core units::angle_form_*), offered as extra "From" choices.
+const ANGLE_FORMS = [['dms', 'Degrees, minutes, seconds (type 29 30 15)'], ['f0', '% slope (100 tan a)'], ['f1', 'Slope 1 in n'], ['f2', 'Taper per foot (in of diameter per ft)'], ['f3', 'Taper ratio 1:x (on the diameter)'], ['f4', 'Rate of taper C = (D - d) / L']];
 function renderUnits(el) {
   const s = UNIT_STATE, W = state.W;
   const qs = mStr(W, W.unit_quantities()).split('\n');
   const list = q => mStr(W, W.unit_list(q)).split('\n').map(l => { const [sym, name, ex, k] = l.split('|'); return { sym, name, exact: ex === '1', k: +k }; });
+  const isAngle = () => qs[s.q] === 'Angle';
   const draw = () => {
-    const us = list(s.q); if (s.from >= us.length) s.from = 0;
-    el.innerHTML = '<div class="grid">' + sfield('Quantity', gsel('q', qs.map((n, i) => [i, n]), s.q), '') + sfield('Value', sinp('x', s.x, 160), '') + sfield('From', gsel('from', us.map((x, i) => [i, sesc(x.sym + ' (' + x.name + ')')]), s.from), '') + '</div><div id="ures"></div>';
+    const us = list(s.q); if (!(isAngle() && ANGLE_FORMS.some(f => f[0] === s.from)) && !(+s.from < us.length)) s.from = 0;
+    const opts = us.map((x, i) => [i, sesc(x.sym + ' (' + x.name + ')')]).concat(isAngle() ? ANGLE_FORMS : []);
+    const txt = s.from === 'dms';
+    el.innerHTML = '<div class="grid">' + sfield('Quantity', gsel('q', qs.map((n, i) => [i, n]), s.q), '') + sfield('Value', txt ? mtxt('x', s.x, 160, '29 30 15') : sinp('x', s.x, 160), '') + sfield('From', gsel('from', opts, s.from), '') + '</div><div id="ures"></div>';
     el.querySelector('[data-k="q"]').onchange = e => { s.q = +e.target.value; s.from = 1; draw(); };
-    el.querySelector('[data-k="from"]').onchange = e => { s.from = +e.target.value; calc(); };
+    el.querySelector('[data-k="from"]').onchange = e => { const v = e.target.value, wasTxt = s.from === 'dms'; s.from = /^\d+$/.test(v) ? +v : v; if (wasTxt !== (s.from === 'dms')) draw(); else calc(); };
     el.querySelector('[data-k="x"]').oninput = e => { s.x = e.target.value; calc(); };
     calc();
   };
+  const fmtv = v => { const a = Math.abs(v); return a !== 0 && (a >= 1e9 || a < 1e-4) ? v.toExponential(6) : (+v.toPrecision(10)).toLocaleString('en-GB', { maximumFractionDigits: 10 }); };
   const calc = () => {
-    const us = list(s.q), x = snum(s.x), out = el.querySelector('#ures');
+    const us = list(s.q), out = el.querySelector('#ures');
+    if (isAngle() && typeof s.from === 'string') { angleCalc(us, out); return; }
+    const x = snum(s.x);
     if (!isFinite(x)) { out.innerHTML = mMsg('Converted', 'Enter a value'); return; }
-    const fmtv = v => { const a = Math.abs(v); return a !== 0 && (a >= 1e9 || a < 1e-4) ? v.toExponential(6) : (+v.toPrecision(10)).toLocaleString('en-GB', { maximumFractionDigits: 10 }); };
     out.innerHTML = '<div class="res"><div class="h">' + sesc(fmtv(x) + ' ' + us[s.from].sym) + ' is</div><table>' + us.map((t, i) => '<tr' + (i === s.from ? ' class="on"' : '') + '><td>' + sesc(t.name) + (t.exact ? '' : ' <span class="ms">(conventional value)</span>') + '</td><td class="v">' + fmtv(W.unit_convert(s.q, s.from, i, x)) + '</td><td class="u">' + sesc(t.sym) + '</td></tr>').join('') + '</table></div>' +
-      mNote('Factors are built from the exact definitions in NIST SP 811 Appendix B (inch 0.0254 m, pound 0.45359237 kg, standard gravity 9.80665 m/s², and so on); results are shown to 10 significant digits. ' + (s.q === 12 ? 'Temperature converts a reading (20 °C = 68 °F); use "Temperature difference" for a change or an expansion coefficient (10 K = 18 °F).' : s.q === 6 ? 'mmHg, inHg and inH₂O are conventional values (standard mercury and water density with standard gravity).' : ''));
+      (isAngle() ? angleForms(W.unit_convert(s.q, s.from, 1, x)) : '') +
+      mNote('Factors are built from the exact definitions in NIST SP 811 Appendix B (inch 0.0254 m, pound 0.45359237 kg, standard gravity 9.80665 m/s², and so on); results are shown to 10 significant digits. ' + (s.q === 12 ? 'Temperature converts a reading (20 °C = 68 °F); use "Temperature difference" for a change or an expansion coefficient (10 K = 18 °F).' : s.q === 6 ? 'mmHg, inHg and inH₂O are conventional values (standard mercury and water density with standard gravity).' : isAngle() ? ANGLE_NOTE : ''));
+  };
+  const ANGLE_NOTE = 'Angle factors are exact: 1° = π/180 rad, 1 gon = π/200 rad = 0.9°, 1′ = 1/60°, 1″ = 1/3600° (NIST SP 811). Slope and taper forms are not fixed factors: % slope = 100 tan a and 1 in n with n = 1 / tan a take the angle from the horizontal (Wikipedia "Grade (slope)"); the tapers take it as the included angle of a cone: rate of taper C = (D − d) / L = 2 tan(a/2) = 1 : x with x = 1 / (2 tan(a/2)) (ISO 1119 definition, as printed in the public preview of ISO/R 1119), and taper per foot = 12 C inches of diameter per foot (Omni Calculator taper; Machinery\'s Handbook, tapers, by name). Worked in the Rust core.';
+  // Slope and taper forms of an angle in degrees.
+  const angleForms = deg => {
+    const F = k => W.angle_form_from_deg(k, deg), half = deg / 2;
+    const row = (label, v, u) => '<tr><td>' + label + '</td><td class="v">' + (isFinite(v) ? fmtv(v) : '<span class="ms">not meaningful for this angle</span>') + '</td><td class="u">' + u + '</td></tr>';
+    return '<div class="res" style="margin-top:12px"><div class="h">The same angle as degrees, minutes, seconds, slope and taper</div><table>' +
+      '<tr><td>Degrees, minutes, seconds</td><td class="v">' + mdms(W, deg) + '</td><td class="u"></td></tr>' +
+      row('As a slope from the horizontal: percent', F(0), '%') + row('As a slope: 1 in n', F(1), 'n') +
+      row('As the included angle of a taper: taper per foot', F(2), 'in/ft') + row('Taper ratio 1 : x', F(3), 'x') + row('Rate of taper C (diameter change per length)', F(4), 'per unit') +
+      '<tr><td>Half angle (each side of the taper)</td><td class="v">' + fmtv(half) + '° <span class="ms">' + mdms(W, half) + '</span></td><td class="u"></td></tr></table></div>';
+  };
+  const angleCalc = (us, out) => {
+    let deg = NaN, shown = '';
+    if (s.from === 'dms') {
+      const p = String(s.x).trim().split(/[^0-9.+-]+/).filter(Boolean).map(Number);
+      if (p.length && p.every(isFinite)) { deg = W.dms_to_deg(p[0], p[1] || 0, p[2] || 0); shown = String(s.x).trim(); }
+    } else {
+      const x = snum(s.x);
+      if (isFinite(x)) { deg = W.angle_form_to_deg(+s.from.slice(1), x); shown = fmtv(x) + ' (' + ANGLE_FORMS.find(f => f[0] === s.from)[1] + ')'; }
+    }
+    if (!isFinite(deg)) { out.innerHTML = mMsg('Converted', s.from === 'dms' ? 'Enter degrees, minutes and seconds, e.g. 29 30 15' : 'Enter a value this form allows (a slope or taper above zero)'); return; }
+    out.innerHTML = '<div class="res"><div class="h">' + sesc(shown) + ' is</div><table>' + us.map((t, i) => '<tr><td>' + sesc(t.name) + '</td><td class="v">' + fmtv(W.unit_convert(s.q, 1, i, deg)) + '</td><td class="u">' + sesc(t.sym) + '</td></tr>').join('') + '</table></div>' +
+      angleForms(deg) + mNote((s.from === 'f0' || s.from === 'f1' ? 'The angle above is the slope angle from the horizontal. ' : s.from === 'dms' ? '' : 'The angle above is the included angle of the taper. ') + ANGLE_NOTE);
   };
   draw();
 }
 
-// ---------- Expression calculator ----------
-const CALC_STATE = { e: '2 * (3.5 + 1) ^ 2', deg: 1, ans: 0, hist: [], dd: 29.5, dm: '', ds: '', dx: '', pf: 360, x1: 0, y1: 0, x2: 10, y2: 100, x: 2.5 };
+// ---------- Calculator tool page ----------
+// The calculator itself is app/calc.js (BenchCalc), rendered inline here;
+// below it: degrees-minutes-seconds, prime factors and interpolation.
+const CALC_STATE = { dd: 29.5, dm: '', ds: '', dx: '', pf: 360, x1: 0, y1: 0, x2: 10, y2: 100, x: 2.5 };
 function renderCalc(el) {
   const s = CALC_STATE, W = state.W;
-  el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f" style="grid-column:1/-1"><span>Expression</span><div class="row">' + mtxt('e', s.e, 420, 'e.g. sqrt(3)/2 * 25.4') +
-    '<button class="btn" id="cgo">=</button></div></label></div><div class="mfilter"><span>Angles in:</span>' + gseg('cdeg', [[1, 'Degrees'], [0, 'Radians']], s.deg) + '</div><div id="cres"></div><div id="chist"></div>' +
-    mNote('Operators + − * / % ^ (power, right to left: 2^3^2 = 512; −2^2 = −4), ! (factorial) and brackets. Constants pi, e, ans (last result). Functions: sin cos tan asin acos atan atan2(y, x), sinh cosh tanh, sqrt cbrt abs, ln, log (base 10), log2, exp, floor ceil round, min max hypot pow, fact ncr npr, dms(d, m, s) to decimal degrees, inv(a) involute (tan a − a, in radians). Multiplication must be written: 2*pi, not 2pi. The expression is parsed by BenchMate\'s own parser in the Rust core; nothing is run as code.') +
+  el.innerHTML = '';
+  if (window.BenchCalc) BenchCalc.render(el);
+  const x = document.createElement('div'); el.appendChild(x);
+  x.innerHTML = mNote('Typing: operators + − * / ^ (power, right to left: 2^3^2 = 512; −2^2 = −4), % (percent when nothing follows it: 200*15% = 30; remainder between two numbers: 7 % 3 = 1), ! (factorial) and brackets. Mixed numbers: 3 7/16 or 3-7/16 (no spaces); write 3 - 7/16 with spaces to subtract. Constants pi, e, ans (last result). Functions: sin cos tan asin acos atan atan2(y, x), sinh cosh tanh, sqrt cbrt abs, ln, log (base 10), log2, exp, floor ceil round, min max hypot pow mod, fact ncr npr, dms(d, m, s) to decimal degrees, inv(a) involute (tan a − a, in radians). Lengths with a unit can be mixed and come back in the app\u2019s unit: 12.7mm + 1/2 in, 3 7/16&quot;, 5\' 3 1/2&quot;, 5 thou, 25 um (units: in or &quot;, ft or \', thou, mm, cm, m, um). Angles in degrees, minutes and seconds: 29\u00B030\'15&quot;. Multiplication must be written: 2*pi, not 2pi. Enter evaluates, Ctrl+Enter uses the result in the field the calculator was opened from. The expression is parsed by BenchMate\'s own parser in the Rust core; nothing is run as code.') +
     '<h2>Degrees, minutes and seconds</h2><div class="grid">' + sfield('Degrees', sinp('dd', s.dd), '°') + sfield('Minutes', sinp('dm', s.dm), '′') + sfield('Seconds', sinp('ds', s.ds), '″') + sfield('Or decimal degrees', sinp('dx', s.dx), '°') + '</div><div id="cdms"></div>' +
     '<h2>Prime factors</h2><div class="grid">' + sfield('Whole number', sinp('pf', s.pf), '') + '</div><div id="cpf"></div>' +
     '<h2>Linear interpolation</h2><p class="desc">Read a value between two table rows.</p><div class="grid">' + sfield('x1', sinp('x1', s.x1), '') + sfield('y1', sinp('y1', s.y1), '') + sfield('x2', sinp('x2', s.x2), '') + sfield('y2', sinp('y2', s.y2), '') + sfield('x', sinp('x', s.x), '') + '</div><div id="cint"></div>';
-  const ev = (commit) => {
-    const txt = String(s.e || ''), codes = Array.from(txt).map(ch => ch.codePointAt(0));
-    const n = toBuf(W, codes), v = W.expr_eval(n, +s.deg, s.ans), out = el.querySelector('#cres');
-    if (isFinite(v)) {
-      out.innerHTML = mRes('Result', [['= ', (+v.toPrecision(12)).toLocaleString('en-GB', { maximumFractionDigits: 12, useGrouping: false }), '']]);
-      if (commit) { s.ans = v; s.hist.unshift([txt, v]); s.hist = s.hist.slice(0, 12); hist(); }
-    } else {
-      const msg = mStr(W, W.expr_err_len()), pos = W.expr_err_pos();
-      out.innerHTML = mRes('Result', [[sesc(msg) + (txt.trim() ? '<div class="ms" style="font-family:var(--mono);white-space:pre">' + sesc(txt) + '\n' + ' '.repeat(Math.min(pos, txt.length)) + '^</div>' : ''), '', '']]);
-    }
-  };
-  const hist = () => { el.querySelector('#chist').innerHTML = s.hist.length ? mRes('This session (ans = last result)', s.hist.map(([t, v]) => [sesc(t), (+v.toPrecision(12)).toLocaleString('en-GB', { maximumFractionDigits: 12, useGrouping: false }), ''])) : ''; };
-  const inp = el.querySelector('[data-k="e"]');
-  inp.oninput = () => { s.e = inp.value; ev(false); };
-  inp.onkeydown = e => { if (e.key === 'Enter') ev(true); };
-  el.querySelector('#cgo').onclick = () => ev(true);
-  el.querySelectorAll('#cdeg button').forEach(b => b.onclick = () => { s.deg = +b.dataset.v; el.querySelectorAll('#cdeg button').forEach(x => x.classList.toggle('on', x === b)); ev(false); });
-  el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k === 'e') return; i.oninput = () => { s[i.dataset.k] = i.value; if (i.dataset.k === 'dx') ['dd', 'dm', 'ds'].forEach(k => s[k] = ''); else if (['dd', 'dm', 'ds'].includes(i.dataset.k)) s.dx = ''; side(); }; });
+  x.querySelectorAll('[data-k]').forEach(i => { i.oninput = () => { s[i.dataset.k] = i.value; if (i.dataset.k === 'dx') ['dd', 'dm', 'ds'].forEach(k => s[k] = ''); else if (['dd', 'dm', 'ds'].includes(i.dataset.k)) s.dx = ''; side(); }; });
   function side() {
     const dx = snum(s.dx);
     let deg;
     if (isFinite(dx)) deg = dx; else { const d = snum(s.dd) || 0, m = snum(s.dm) || 0, sc = snum(s.ds) || 0; deg = (d < 0 ? -1 : 1) * (Math.abs(d) + m / 60 + sc / 3600); }
-    el.querySelector('#cdms').innerHTML = mRes('Angle', [['Decimal degrees', fmt(deg, 8), '°'], ['Degrees, minutes, seconds', mdms(W, deg), ''], ['Radians', fmt(deg * Math.PI / 180, 10), 'rad'], ['Minutes', fmt(deg * 60, 6), '′']]);
+    x.querySelector('#cdms').innerHTML = mRes('Angle', [['Decimal degrees', fmt(deg, 8), '°'], ['Degrees, minutes, seconds', mdms(W, deg), ''], ['Radians', fmt(deg * Math.PI / 180, 10), 'rad'], ['Minutes', fmt(deg * 60, 6), '′']]);
     const n = snum(s.pf), c = W.prime_factors(n), f = listOut(W, c);
-    el.querySelector('#cpf').innerHTML = mRes('Prime factors', [[c ? (c === 1 ? sesc(String(n)) + ' is prime' : sesc(String(n)) + ' =') : 'Enter a whole number from 2 to 10¹²', c > 1 ? f.join(' × ') : '', '']]);
+    x.querySelector('#cpf').innerHTML = mRes('Prime factors', [[c ? (c === 1 ? sesc(String(n)) + ' is prime' : sesc(String(n)) + ' =') : 'Enter a whole number from 2 to 10¹²', c > 1 ? f.join(' × ') : '', '']]);
     const y = W.interpolate(snum(s.x1), snum(s.y1), snum(s.x2), snum(s.y2), snum(s.x));
-    el.querySelector('#cint').innerHTML = mRes('Interpolated', [['y at x', isFinite(y) ? fmt(y, 6) : 'enter two different x values', '', snum(s.x) < Math.min(snum(s.x1), snum(s.x2)) || snum(s.x) > Math.max(snum(s.x1), snum(s.x2)) ? 'x is outside the two rows: this is extrapolation.' : '']]);
+    x.querySelector('#cint').innerHTML = mRes('Interpolated', [['y at x', isFinite(y) ? fmt(y, 6) : 'enter two different x values', '', snum(s.x) < Math.min(snum(s.x1), snum(s.x2)) || snum(s.x) > Math.max(snum(s.x1), snum(s.x2)) ? 'x is outside the two rows: this is extrapolation.' : '']]);
   }
-  ev(false); hist(); side();
+  side();
 }
 
 // ---------- Plane figures and solids ----------
@@ -456,13 +474,33 @@ function renderChangeGears(el) {
 
 // ---------- Shop economics ----------
 const ECO_STATE = { price: '', resale: '', years: '', rate: '', hours: '', fixed: '', kw: '', load: '', kwh: '', labour: '', bf: '', bp: '', bv: '', inv: '', save: '', pn: '', pi: '' };
+// Break-even chart: income and total cost against the number of parts. The lines are drawn from the
+// inputs to show the shape; the break-even quantity written on it is the core's result.
+function ecoChart(bf, bp, bv, q) {
+  if (typeof DK === 'undefined') return '';
+  const live = isFinite(q) && q > 0 && bf >= 0 && bp > 0 && bv >= 0;
+  const F = live ? bf : 3, P = live ? bp : 1, V = live ? bv : 0.4, Q = live ? q : 5;
+  const W = 520, H = 250, x0 = 60, x1 = 470, yb = 196, yt = 36, qmax = 2 * Q, cmax = Math.max(P * qmax, F + V * qmax);
+  const X = n => x0 + (x1 - x0) * n / qmax, Y = c => yb - (yb - yt) * c / cmax;
+  let h = DK.poly([[X(0), Y(F)], [X(Q), Y(P * Q)], [X(0), Y(0)]], 'hatch') + DK.poly([[X(Q), Y(P * Q)], [X(qmax), Y(P * qmax)], [X(qmax), Y(F + V * qmax)]], 'tool');
+  h += DK.line(x0, yt - 12, x0, yb, 'thin') + DK.line(x0, yb, x1 + 14, yb, 'thin');
+  h += DK.line(X(0), Y(0), X(qmax), Y(P * qmax), 'ln') + DK.line(X(0), Y(F), X(qmax), Y(F + V * qmax), 'hot') + DK.line(X(0), Y(F), X(qmax), Y(F), 'hid');
+  h += DK.line(X(Q), Y(P * Q), X(Q), yb, 'hid') + DK.circle(X(Q), Y(P * Q), 3.2, 'hotf');
+  h += DK.text(x0 - 8, yt - 16, 'money', { cls: 'mut', anchor: 'start' }) + DK.text(x1 + 14, yb + 16, 'parts', { cls: 'mut', anchor: 'end' });
+  h += DK.text(X(qmax) + 4, Y(P * qmax) + 4, 'income', { cls: 'txt', anchor: 'start' }) + DK.text(X(qmax) + 4, Y(F + V * qmax) + 4, 'cost', { cls: 'hott', anchor: 'start' });
+  h += DK.text(x0 - 6, Y(F) + 4, live ? fmt(bf, 0) : 'fixed', { cls: 'mut', anchor: 'end' });
+  h += DK.text(X(Q), yb + 16, live ? fmt(q, 1) + ' parts' : 'break-even', { cls: 'dimt' });
+  h += DK.text(X(Q / 3), Y((F + P * Q) / 3) + 4, 'loss', { cls: 'mut' }) + DK.text(X(Q * 5 / 3), Y((P * Q + P * qmax + F + V * qmax) / 3) + 4, 'profit', { cls: 'hott' });
+  h += DK.text(x0, H - 8, live ? 'Fixed cost, then each part adds its margin (price less variable cost).' : 'Enter the fixed cost, the price and the variable cost per part.', { cls: 'mut', anchor: 'start' });
+  return DK.svg(W, H, h, 'Break-even chart: income and cost against the number of parts');
+}
 function renderEconomics(el) {
   const s = ECO_STATE, W = state.W, cur = '(money)';
   el.innerHTML = '<p class="desc">Every input is yours: BenchMate does not suggest prices, rates or lives. Use any one currency throughout.</p>' +
     '<h2>Machine hourly rate</h2><div class="grid">' + sfield('Machine price (installed)', sinp('price', s.price), cur) + sfield('Resale value at the end', sinp('resale', s.resale), cur) + sfield('Years of use', sinp('years', s.years), 'years') +
     sfield('Interest rate (cost of the money)', sinp('rate', s.rate), '% a year') + sfield('Hours run per year', sinp('hours', s.hours), 'h') + sfield('Yearly fixed costs (floor space, service, insurance)', sinp('fixed', s.fixed), cur) +
     sfield('Machine power', sinp('kw', s.kw), 'kW') + sfield('Average load (0 to 1)', sinp('load', s.load), '') + sfield('Electricity price', sinp('kwh', s.kwh), 'per kWh') + sfield('Operator rate', sinp('labour', s.labour), 'per hour') + '</div><div id="eres1"></div>' +
-    '<h2>Break-even quantity</h2><div class="grid">' + sfield('Fixed cost of the job (setup, tooling, fixtures)', sinp('bf', s.bf), cur) + sfield('Price per part', sinp('bp', s.bp), cur) + sfield('Variable cost per part (material, machine time)', sinp('bv', s.bv), cur) + '</div><div id="eres2"></div>' +
+    '<h2>Break-even quantity</h2><div class="grid">' + sfield('Fixed cost of the job (setup, tooling, fixtures)', sinp('bf', s.bf), cur) + sfield('Price per part', sinp('bp', s.bp), cur) + sfield('Variable cost per part (material, machine time)', sinp('bv', s.bv), cur) + '</div><div id="eres2"></div><div class="tdia" id="edia" style="max-width:640px;margin-top:10px"></div>' +
     '<h2>Payback</h2><div class="grid">' + sfield('Investment', sinp('inv', s.inv), cur) + sfield('Net saving per year', sinp('save', s.save), cur) + sfield('Years to compare over', sinp('pn', s.pn), 'years') + sfield('Interest rate', sinp('pi', s.pi), '% a year') + '</div><div id="eres3"></div>';
   gbind(el, s, calc);
   function calc() {
@@ -476,6 +514,7 @@ function renderEconomics(el) {
     } else el.querySelector('#eres1').innerHTML = mMsg('Per hour run', 'Enter the price, years of use and hours run per year');
     const q = W.break_even_qty(v('bf'), v('bp'), v('bv'));
     el.querySelector('#eres2').innerHTML = isFinite(q) && v('bf') >= 0 ? mRes('Break-even', [['Parts to cover the fixed cost', fmt(q, 1), 'parts'], ['Margin per part', m(v('bp') - v('bv')), cur]]) : mMsg('Break-even', 'Enter the fixed cost and a price above the variable cost');
+    el.querySelector('#edia').innerHTML = ecoChart(v('bf'), v('bp'), v('bv'), q);
     const pb = W.payback_years(v('inv'), v('save'));
     if (isFinite(pb)) {
       const pi = (v('pi') || 0) / 100, rows = [['Simple payback', fmt(pb, 2), 'years']];

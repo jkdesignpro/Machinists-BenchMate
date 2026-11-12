@@ -87,8 +87,9 @@ function renderTriangle(el) {
 }
 
 // ---------- Arcs, chords, circle through three points ----------
-const ARC_STATE = { mode: 1, x: 50, y: 60, p: [[0, 0], [10, 0], [0, 10]] };
-const ARC_MODES = [[1, 'Radius and angle'], [2, 'Radius and chord'], [3, 'Radius and sagitta (arc height)'], [4, 'Chord and sagitta'], [5, 'Radius and arc length']];
+const ARC_STATE = { ka: 0, x: 50, kb: 1, y: 60, sol: 0, p: [[0, 0], [10, 0], [0, 10]] };
+// Kinds as in core arc_from_two: 0 radius, 1 included angle, 2 chord, 3 arc length, 4 sagitta.
+const ARC_KINDS = [[0, 'Radius'], [1, 'Included angle'], [2, 'Chord length'], [3, 'Arc length'], [4, 'Sagitta (height of the arc above the chord)']];
 function arcDiagram(r, th) {
   const t = th * Math.PI / 180, a0 = Math.PI / 2 - t / 2, a1 = Math.PI / 2 + t / 2;
   const P = a => [r * Math.cos(a), r * Math.sin(a)];
@@ -105,25 +106,32 @@ function arcDiagram(r, th) {
 }
 function renderArc(el) {
   const s = ARC_STATE, W = state.W, u = lenU(state.sys);
-  const lab = { 1: ['Radius', 'Included angle'], 2: ['Radius', 'Chord length'], 3: ['Radius', 'Sagitta (height of the arc above the chord)'], 4: ['Chord length', 'Sagitta'], 5: ['Radius', 'Arc length'] };
   const draw = () => {
-    const [l1, l2] = lab[s.mode];
-    el.innerHTML = '<div class="grid">' + sfield('Known values', gsel('mode', ARC_MODES, s.mode), '') + sfield(l1, sinp('x', s.x), u) + sfield(l2, sinp('y', s.y), +s.mode === 1 ? 'deg' : u) + '</div>' +
-      '<div id="arcdia"></div><div class="res" id="arcres"></div>' +
+    if (+s.ka === +s.kb) s.kb = (+s.ka + 1) % 5;
+    el.innerHTML = '<div class="grid">' + sfield('First known value', gsel('ka', ARC_KINDS, s.ka), '') + sfield('Value', sinp('x', s.x), +s.ka === 1 ? 'deg' : u) +
+      sfield('Second known value', gsel('kb', ARC_KINDS.filter(k => k[0] !== +s.ka), s.kb), '') + sfield('Value', sinp('y', s.y), +s.kb === 1 ? 'deg' : u) + '</div>' +
+      '<div id="arcsol"></div><div id="arcdia"></div><div class="res" id="arcres"></div>' +
       '<h2>Circle through three points</h2><p class="desc">Centre and radius of the circle through three measured points, for example three probe hits on a bore or a radius.</p>' +
       '<div class="grid">' + [0, 1, 2].map(i => sfield('Point ' + (i + 1) + ' X', sinp('p' + i + 'x', s.p[i][0]), u) + sfield('Point ' + (i + 1) + ' Y', sinp('p' + i + 'y', s.p[i][1]), u)).join('') + '</div><div class="res" id="c3res"></div>';
-    el.querySelector('[data-k="mode"]').onchange = e => { s.mode = +e.target.value; draw(); };
-    el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k === 'mode') return; i.oninput = () => { const k = i.dataset.k; if (k[0] === 'p' && k.length === 3) s.p[+k[1]][k[2] === 'x' ? 0 : 1] = i.value; else s[k] = i.value; calc(); }; });
+    el.querySelector('[data-k="ka"]').onchange = e => { s.ka = +e.target.value; s.sol = 0; draw(); };
+    el.querySelector('[data-k="kb"]').onchange = e => { s.kb = +e.target.value; s.sol = 0; draw(); };
+    el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k === 'ka' || i.dataset.k === 'kb') return; i.oninput = () => { const k = i.dataset.k; if (k[0] === 'p' && k.length === 3) s.p[+k[1]][k[2] === 'x' ? 0 : 1] = i.value; else s[k] = i.value; calc(); }; });
     calc();
   };
   const calc = () => {
-    const x = snum(s.x), y = snum(s.y), A = k => W.arc_solve(+s.mode, x, y, k), d = gdp();
-    const r = A(0), t = A(1);
-    if (r > 0 && t > 0) {
+    const x = snum(s.x), y = snum(s.y), d = gdp();
+    const n = W.arc_two(+s.ka, x, +s.kb, y, 0, 9) || 0;
+    if (s.sol >= n) s.sol = 0;
+    const A = k => W.arc_two(+s.ka, x, +s.kb, y, s.sol, k);
+    const r = A(0), t = A(1), solBox = el.querySelector('#arcsol');
+    if (n > 0 && r > 0 && t > 0) {
+      const angOf = i => W.arc_two(+s.ka, x, +s.kb, y, i, 1);
+      solBox.innerHTML = n > 1 ? '<div class="grid"><div class="f"><span>Two arcs fit these values</span><div class="row"><div class="seg" id="arcseg">' + Array.from({ length: n }, (_, i) => '<button type="button" data-i="' + i + '"' + (i === s.sol ? ' class="on"' : '') + '>' + (i === 0 ? 'Smaller' : 'Larger') + ' angle, ' + gf(angOf(i), 2) + '°</button>').join('') + '</div></div></div></div>' : '';
+      solBox.querySelectorAll('button').forEach(b => b.onclick = () => { s.sol = +b.dataset.i; calc(); });
       el.querySelector('#arcdia').innerHTML = arcDiagram(r, t);
       el.querySelector('#arcres').innerHTML = stable('Arc', [['Radius', gf(r, d + 1), u], ['Diameter', gf(A(7), d + 1), u], ['Included angle', gf(t, 4), 'deg'], ['Chord length', gf(A(2), d + 1), u], ['Arc length', gf(A(3), d + 1), u], ['Sagitta (arc height)', gf(A(4), d + 1), u], ['Segment area (between chord and arc)', gf(A(5), d), u + '²'], ['Sector area', gf(A(6), d), u + '²']]) +
-        (+s.mode === 2 || +s.mode === 4 ? '<p class="ms" style="padding:4px 10px">' + (+s.mode === 2 ? 'From a chord the minor arc (180° or less) is shown.' : 'A sagitta larger than the radius gives the major arc.') + '</p>' : '');
-    } else { el.querySelector('#arcdia').innerHTML = ''; el.querySelector('#arcres').innerHTML = stable('Arc', [['Enter two values that fit together (a chord cannot be longer than the diameter)', '', '']]); }
+        (n > 1 ? '<p class="ms" style="padding:4px 10px">' + (+s.ka + +s.kb === 2 ? 'A radius and a chord fit a minor arc and the major arc on the other side of the chord.' : 'A sagitta and an arc length fit two arcs when the sagitta is between 1/π and about 0.36 of the arc length (the ratio peaks at an included angle of about 267°).') + ' Pick the one you mean above.</p>' : '');
+    } else { solBox.innerHTML = ''; el.querySelector('#arcdia').innerHTML = ''; el.querySelector('#arcres').innerHTML = stable('Arc', [['Enter two values that fit together (a chord cannot be longer than the diameter or the arc; an angle is at most 360°)', '', '']]); }
     const p = s.p.flat().map(snum), C = k => W.circle_3pts(...p, k);
     el.querySelector('#c3res').innerHTML = p.every(isFinite) && isFinite(C(2))
       ? stable('Circle through the three points', [['Centre X', gf(C(0), d + 1), u], ['Centre Y', gf(C(1), d + 1), u], ['Radius', gf(C(2), d + 1), u], ['Diameter', gf(2 * C(2), d + 1), u]])
@@ -144,7 +152,10 @@ const GB_SETS = {
   m32: { name: 'Metric 32 pieces (one maker\'s listing)', sys: 'mm', unit: 0.0005, blocks: () => [1.005, ...GB_RANGE(1.01, 1.09, 0.01), ...GB_RANGE(1.1, 1.9, 0.1), ...GB_RANGE(1, 9, 1), 10, 20, 30, 60] },
   custom: { name: 'My own set (list the sizes)', sys: '', unit: 0, blocks: () => [] },
 };
-const SB_STATE = { L: '', ang: '', h: '', set: '', custom: '', target: '' };
+const SB_STATE = { L: '', ang: '', h: '', set: '', custom: '', target: '', wear: '' };
+// The block set you own, your own list and your wear blocks are kept between runs.
+try { const k = JSON.parse(localStorage.getItem('bm.gb') || '{}'); ['set', 'custom', 'wear'].forEach(f => { if (typeof k[f] === 'string') SB_STATE[f] = k[f]; }); if (!GB_SETS[SB_STATE.set]) SB_STATE.set = ''; } catch (e) {}
+const sbKeep = () => { try { localStorage.setItem('bm.gb', JSON.stringify({ set: SB_STATE.set, custom: SB_STATE.custom, wear: SB_STATE.wear })); } catch (e) {} };
 function sineDiagram(ang) {
   const a = Math.min(Math.max(ang || 20, 2), 60) * Math.PI / 180, L = 300, x0 = 50, y0 = 190, h = L * Math.sin(a);
   const x1 = x0 + L * Math.cos(a), y1 = y0 - h;
@@ -164,11 +175,12 @@ function renderSineBar(el) {
     const setOpts = Object.entries(GB_SETS).map(([k, v]) => [k, v.name + (v.sys ? ' (' + v.sys + ')' : '')]);
     el.innerHTML = sineDiagram(snum(s.ang)) + '<div class="grid">' + sfield('Sine bar length (centre distance of the rolls)', sinp('L', s.L), u) + sfield('Angle to set', sinp('ang', s.ang), 'deg') + sfield('Or: stack height you have', sinp('h', s.h), u) + '</div>' +
       '<div class="res" id="sbres"></div><h2>Gauge-block stack</h2>' +
-      '<div class="grid">' + sfield('Block set', gsel('set', setOpts, s.set), '') + sfield('Stack size (blank = the sine bar height above)', sinp('target', s.target), GB_SETS[s.set].sys === 'inch' ? 'in' : (GB_SETS[s.set].sys === 'mm' ? 'mm' : u)) + '</div>' +
+      '<div class="grid">' + sfield('Block set', gsel('set', setOpts, s.set), '') + sfield('Stack size (blank = the sine bar height above)', sinp('target', s.target), GB_SETS[s.set].sys === 'inch' ? 'in' : (GB_SETS[s.set].sys === 'mm' ? 'mm' : u)) +
+      sfield('Wear blocks: size of each, one at each end (blank = none)', sinp('wear', s.wear), GB_SETS[s.set].sys === 'inch' ? 'in' : (GB_SETS[s.set].sys === 'mm' ? 'mm' : u)) + '</div>' +
       (s.set === 'custom' ? '<label class="f" style="max-width:760px"><span>Block sizes in your set, one entry per block (' + u + '; list a size twice if you have two)</span><textarea data-k="custom" rows="3" style="width:100%;font-family:var(--mono);border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:6px">' + sesc(s.custom) + '</textarea></label>' : '') +
       '<div class="res" id="gbres" style="margin-top:10px"></div>';
-    el.querySelector('[data-k="set"]').onchange = e => { s.set = e.target.value; draw(); };
-    el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k !== 'set') i.oninput = () => { s[i.dataset.k] = i.value; calc(); }; });
+    el.querySelector('[data-k="set"]').onchange = e => { s.set = e.target.value; sbKeep(); draw(); };
+    el.querySelectorAll('[data-k]').forEach(i => { if (i.dataset.k !== 'set') i.oninput = () => { s[i.dataset.k] = i.value; sbKeep(); calc(); }; });
     calc();
   };
   const calc = () => {
@@ -190,10 +202,15 @@ function renderSineBar(el) {
     if (!blocks.length) { gb.innerHTML = stable('Stack', [['List the block sizes in your set', '', '']]); return; }
     if (!(target > 0)) { gb.innerHTML = stable('Stack', [['Enter a stack size or a sine bar angle', '', '']]); return; }
     const tq = Math.round(target / unit) * unit;
-    const n = W.gauge_stack(toBuf(W, blocks), tq, unit);
-    if (!(n > 0)) { gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su, [['No combination of this set makes that size (each block used once)', '', '', 'Not possible']]); return; }
+    // Wear blocks sit at both ends of the stack, so the set only has to make what is left between them.
+    const wear = snum(s.wear), hasWear = wear > 0, inner = hasWear ? Math.round((tq - 2 * wear) / unit) * unit : tq;
+    if (hasWear && !(inner > 0)) { gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su, [['Two wear blocks of ' + gf(wear, sdpp) + ' ' + su + ' are already as tall as the stack', '', '', 'Not possible']]); return; }
+    const n = W.gauge_stack(toBuf(W, blocks), inner, unit);
+    if (!(n > 0)) { gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su, [['No combination of this set makes ' + (hasWear ? gf(inner, sdpp) + ' ' + su + ' between the wear blocks' : 'that size') + ' (each block used once)', '', '', 'Not possible']]); return; }
     const used = listOut(W, n).sort((a, b) => a - b);
-    gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su + ': ' + n + ' block' + (n === 1 ? '' : 's') + ' (fewest possible)', used.map((b, i) => ['Block ' + (i + 1), gf(b, sdpp), su]).concat([['Total', gf(used.reduce((a, b) => a + b, 0), sdpp), su]])) +
+    const stackRows = used.map((b, i) => ['Block ' + (i + 1), gf(b, sdpp), su]);
+    if (hasWear) { stackRows.unshift(['Wear block (bottom)', gf(wear, sdpp), su]); stackRows.push(['Wear block (top)', gf(wear, sdpp), su]); }
+    gb.innerHTML = stable('Stack for ' + gf(tq, sdpp) + ' ' + su + ': ' + n + ' block' + (n === 1 ? '' : 's') + (hasWear ? ' between two wear blocks' : '') + ' (fewest possible)', stackRows.concat([['Total', gf(used.reduce((a, b) => a + b, 0) + (hasWear ? 2 * wear : 0), sdpp), su]])) +
       '<p class="ms" style="padding:4px 10px">' + (Math.abs(tq - target) > 1e-12 ? 'Size rounded to the set\'s smallest step (' + unit + ' ' + su + '). ' : '') + (s.set === 'm112' || s.set === 'i81' ? 'Set composition as printed by two makers (see sources); check it against the lid of your own box. ' : s.set !== 'custom' ? 'Set composition from one maker\'s listing (Mitutoyo); check it against the lid of your own box. ' : '') + 'If you use wear blocks, add them to the stack size.</p>';
   };
   draw();
