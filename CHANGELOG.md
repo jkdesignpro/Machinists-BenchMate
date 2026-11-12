@@ -16,6 +16,16 @@ Stage 4 of the plan, part 1: book references. Built on top of 0.5.0. In progress
 ### Added (machine tapers)
 - **Machine tapers** has two more families: **Jarno** No. 2 to 20 (two publishers print the same table and a third the rule behind it: large end N/8 in, small end N/10 in, length N/2 in) and **Brown & Sharpe** No. 1 to 18. For Brown & Sharpe the two publishers print the same small ends but different plug lengths, and so different large ends, for No. 4, 5, 7, 9, 10 and 11: both are shown with "Sources differ". No. 16 to 18 and the taper per foot come from one publisher and say so.
 
+### Added (gauges, pins, gear cutters)
+- New page **Sheet metal and wire gauges** (Shop maths > Stock and sheet metal): what a gauge number is in inches and mm for steel (Manufacturers' Standard), galvanized, stainless and aluminium sheet and the US Standard gauge, and for wire the American wire gauge (worked out from its rule), the British Standard Wire Gauge and the tube wall and strip series. Each table value is shown as two publishers print it; the three places where they differ show both.
+- New tool **Taper pins (inch series)** (Reference > Machine elements): No. 7/0 to No. 14, large end with commercial and precision limits, and the small end diameter for the length of the pin, with a drawing. The sizes come from one supplier's sheet of the standard and say so.
+- **Spur gear data** shows the number of the involute form cutter (set of eight) for each gear: the diametral pitch series in inch mode, the module series, which is numbered the other way round, in mm mode.
+
+### Added (gauges, pins, gear cutters)
+- New page **Sheet metal and wire gauges** (Shop maths > Stock and sheet metal): what a gauge number is in inches and mm for steel (Manufacturers' Standard), galvanized, stainless and aluminium sheet and the US Standard gauge, and for wire the American wire gauge (worked out from its rule), the British Standard Wire Gauge and the tube wall and strip series. Each table value is shown as two publishers print it; the three places where they differ show both.
+- New tool **Taper pins (inch series)** (Reference > Machine elements): No. 7/0 to No. 14, large end with commercial and precision limits, and the small end diameter for the length of the pin, with a drawing. The sizes come from one supplier's sheet of the standard and say so.
+- **Spur gear data** shows the number of the involute form cutter (set of eight) for each gear: the diametral pitch series in inch mode, the module series, which is numbered the other way round, in mm mode.
+
 ### Added (units and symbols)
 - **Unit converter**: acceleration, rotational speed, dynamic viscosity and kinematic viscosity (factors from the exact definitions in NIST SP 811, checked against its printed values).
 - New tab **Prefixes and symbols** on the Unit and fraction conversion page: the 24 SI prefixes, the seven defining constants of the SI and the Greek alphabet with what each letter stands for in BenchMate's formulas. Every entry is printed the same by two publishers.

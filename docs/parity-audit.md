@@ -52,6 +52,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, first batch, branch `claude/books`, 2026-11-12):** springs, belt and chain drives, units and symbols, Jarno and Brown & Sharpe tapers. MH118, MH301, MH306, ED2, BB4 and BB46 done; MH40, MH289, MH290, MH300, ED75 and ED76 partial. Counted from the tables below: 213 done, 239 partial, 144 missing of 596 in-scope rows, 36 %; 324 more rows to done for 90 %.
 
+**Update (0.6.0, second batch, 2026-11-12):** sheet metal and wire gauges, inch taper pins, involute cutter numbers. MH296 and BB55 done; MH214 and MH264 partial. Counted from the tables below: 215 done, 240 partial, 141 missing of 596 in-scope rows, 36 %; 322 more rows to done for 90 %.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -551,7 +553,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH211 | Self-threading and thread-forming screws; hole sizes | missing | | |
 | MH212 | T-slots, T-bolts and T-nuts | partial | `tslots` | ISO 299 T-slot dimensions and pitches; no T-bolt or T-nut dimensions |
 | MH213 | Rivets and riveted joints | out of scope? | | |
-| MH214 | Pins and studs: dowel pins, taper pins, spring pins, grooved pins, cotter pins | missing | | Dowel hole fits matter |
+| MH214 | Pins and studs: dowel pins, taper pins, spring pins, grooved pins, cotter pins | partial | `taperpin` | 0.6.0: inch taper pins (one publisher); no dowel, spring, grooved or cotter pins |
 | MH215 | Retaining rings | missing | | Groove dimensions |
 | MH216 | Wing nuts, wing screws and thumb screws | missing | | Low priority |
 | MH217 | Nails, spikes and wood screws | out of scope | | |
@@ -611,7 +613,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH261 | Gear terms, involute, diametral and circular pitch | done | `spurgear` |  |
 | MH262 | Spur gear formulas, tooth proportions, outside and root diameters | done | `spurgear` |  |
 | MH263 | Centre distance, tooth thickness, chordal addendum and thickness | done | `spurgear`, `gearmeasure` |  |
-| MH264 | Gear milling cutters (involute cutter numbers) | missing | | |
+| MH264 | Gear milling cutters (involute cutter numbers) | partial | `spurgear` | 0.6.0: cutter number of the set of eight for each gear, diametral pitch and module series; no half-number cutters, no cutter dimensions |
 | MH265 | Contact ratio, undercut, minimum teeth, enlarged pinions | done | `spurgear` | Contact ratio, fewest teeth and smallest profile shift without undercut |
 | MH266 | Backlash | missing | | |
 | MH267 | Internal gears | partial | `gearmeasure` | Measurement between pins for internal gears; no internal gear geometry or interference checks |
@@ -648,7 +650,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH293 | Adhesives and sealants, retaining compounds, threadlocking | missing | | |
 | MH294 | O-rings and glands | partial | `oring` | AS568 sizes and a squeeze, stretch and fill check; no ISO 3601-1 G series, no -9xx sizes, no back-up rings |
 | MH295 | Rolled steel sections, aluminium structural shapes | missing | | |
-| MH296 | Wire and sheet metal gauges | missing | | |
+| MH296 | Wire and sheet metal gauges | done | `gauges` | 0.6.0: sheet gauges for steel, galvanized, stainless, aluminium and US Standard; AWG by its rule, SWG, tube wall series |
 | MH297 | Wire rope | out of scope | | |
 | MH298 | Shaft alignment with dial indicators | missing | | |
 | MH299 | Fluid power: circuits, pressure and flow, tube fittings, pneumatics | missing | | Low priority |
@@ -822,7 +824,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB52 | Weights of sheet metal | done | `weight` |  |
 | BB53 | Symbols for elements; viscosity chart | missing | | Low priority |
 | BB54 | Physical properties of metals and compounds | partial | `materials` | |
-| BB55 | Sheet metal and wire gauges; bend allowance | partial | `bend` | Bend allowance; no sheet metal and wire gauge table |
+| BB55 | Sheet metal and wire gauges; bend allowance | done | `bend`, `gauges` | 0.6.0: gauge tables added |
 | BB56 | Workshop metals | partial | `materials` | |
 | BB57 | Workpiece material comparison table | done | `materials` | |
 | BB58 | Engineering plastics | partial | `materials` | 5 plastics |

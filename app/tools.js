@@ -1520,6 +1520,8 @@ const TOOLS = [
         R(n + ': tooth thickness at the tip (arc)', gi(13), u, dp + 1));
       const xm = gi(12);
       rows.push(R(n + ': smallest profile shift without undercut', xm, 'x m', 3));
+      const cn = W.involute_cutter_no(z, s === 'inch' ? 0 : 1);
+      if (isFinite(cn)) rows.push(R(n + ': involute form cutter number (' + (s === 'inch' ? 'diametral pitch' : 'module') + ' set of eight)', cn, '', 0));
     };
     one('Gear 1', g, v.z1);
     rows.push(R('Fewest teeth without undercut (x = 0)', g(11), '', 2));
@@ -1539,8 +1541,8 @@ const TOOLS = [
     }
     return rows;
   },
-  working: 'm = 1 / P in inch mode. d = z m; db = d cos α; p = π m; pb = p cos α; ha = (ha* + x) m; hf = (hf* − x) m; da = d + 2 ha; df = d − 2 hf; s = m (π/2 + 2 x tan α); thickness at diameter dy: sy = dy (s/d + inv α − inv αy), cos αy = db/dy. Undercut: z_min = 2 ha*/sin²α, x_min = ha* − z sin²α / 2. Pair: inv αw = 2 tan α (x1 + x2)/(z1 + z2) + inv α; y = (z1 + z2)/2 · (cos α / cos αw − 1); a = ((z1 + z2)/2 + y) m; dw = db / cos αw; tips for standard clearance: ha1 = (ha* + y − x2) m, ha2 = (ha* + y − x1) m. Contact ratio εα = [√(ra1² − rb1²) + √(ra2² − rb2²) − a sin αw] / pb. inv α = tan α − α (radians). The drawing below the root circle uses a radial flank instead of the real fillet, which depends on the cutter.',
-  source: 'Basic rack: ISO 53:1998 and AGMA full-depth system (cited by name: addendum 1 m, dedendum 1.25 m). Formulas and the worked example in the tests (m 3, z 12 and 24, x 0.6 and 0.36: a = 56.4999, αw = 26.0886°) from the KHK Gear Technical Reference, calculation of gear dimensions; SDP/SI Elements of Metric Gear Technology; MESYS AG online helical gear calculation. See docs/gears.md.',
+  working: 'm = 1 / P in inch mode. d = z m; db = d cos α; p = π m; pb = p cos α; ha = (ha* + x) m; hf = (hf* − x) m; da = d + 2 ha; df = d − 2 hf; s = m (π/2 + 2 x tan α); thickness at diameter dy: sy = dy (s/d + inv α − inv αy), cos αy = db/dy. Undercut: z_min = 2 ha*/sin²α, x_min = ha* − z sin²α / 2. Pair: inv αw = 2 tan α (x1 + x2)/(z1 + z2) + inv α; y = (z1 + z2)/2 · (cos α / cos αw − 1); a = ((z1 + z2)/2 + y) m; dw = db / cos αw; tips for standard clearance: ha1 = (ha* + y − x2) m, ha2 = (ha* + y − x1) m. Contact ratio εα = [√(ra1² − rb1²) + √(ra2² − rb2²) − a sin αw] / pb. inv α = tan α − α (radians). The drawing below the root circle uses a radial flank instead of the real fillet, which depends on the cutter. Form milling cutter for a gear cut one tooth space at a time: diametral pitch cutters are No. 1 (135 teeth to a rack), 2 (55 to 134), 3 (35 to 54), 4 (26 to 34), 5 (21 to 25), 6 (17 to 20), 7 (14 to 16), 8 (12 and 13); module cutters are numbered the other way round (No. 1 cuts 12 and 13 teeth). Check the range marked on the cutter: one brand marks its module cutters in the diametral pitch order, and half-number cutters split these ranges.',
+  source: 'Basic rack: ISO 53:1998 and AGMA full-depth system (cited by name: addendum 1 m, dedendum 1.25 m). Formulas and the worked example in the tests (m 3, z 12 and 24, x 0.6 and 0.36: a = 56.4999, αw = 26.0886°) from the KHK Gear Technical Reference, calculation of gear dimensions; SDP/SI Elements of Metric Gear Technology; MESYS AG online helical gear calculation. See docs/gears.md. Cutter numbers: Victor Machinery Exchange, the All Industrial Tool Supply catalogue (TTC brand) and Evolvent Design print the same ranges; see docs/sources.md.',
 },
 {
   id: 'gearmeasure', level: 'expert', group: 'Gears and splines', title: 'Gear measurement: span, pins, chordal',
@@ -2355,6 +2357,13 @@ const TOOLS = [
   source: 'Areas of plane figures; densities from the material data where Confirmed, else from your data sheet. See docs/geometry.md.',
 },
 {
+  id: 'gauges', level: 'advanced', group: 'Stock and sheet metal', title: 'Sheet metal and wire gauges',
+  desc: 'What a gauge number means in inches and mm: steel, galvanized, stainless and aluminium sheet, and the American (AWG), British (SWG) and tube wall wire gauges side by side.',
+  render: el => renderGauges(el),
+  working: 'Sheet gauges and the SWG are tables, each value as two publishers print it. AWG diameter = 0.005 in × 92^((36 − n) / 39); 0, 2/0, 3/0 and 4/0 are n = 0, −1, −2 and −3.',
+  source: 'Wikipedia, Sheet metal and Standard wire gauge; The Engineering ToolBox, gauge and weight chart and SWG table. AWG rule: Wikipedia, American wire gauge (after ASTM B258), RapidTables and Omni Calculator. See docs/sources.md, Wire and sheet metal gauges.',
+},
+{
   id: 'bend', level: 'advanced', group: 'Stock and sheet metal', title: 'Sheet-metal bend allowance',
   desc: 'Bend allowance, outside setback and bend deduction for a bend, flat length of a two-flange part, and the K-factor from a test bend.',
   fields: s => [
@@ -2841,6 +2850,35 @@ const TOOLS = [
   working: 'Chain pitch from the ANSI chain number: the digits before the last are eighths of an inch (No. 40 = 4/8 in, No. 100 = 10/8 in); the last digit is 0 for standard chain, 1 for light chain, 5 for bushed chain without rollers. Chain length in pitches: L = 2C + (N1 + N2)/2 + (N2 − N1)² / (4π² C), with C the centre distance in pitches. ' +
     'The length is rounded up to an even number of pitches, because an odd number needs an offset link. Centre distance for a length: C = 1/8 [2L − (N1 + N2) + √((2L − (N1 + N2))² − (8/π²)(N2 − N1)²)] pitches. Sprocket pitch diameter = pitch / sin(180° / N). Wrap on the small sprocket = 180° − 2 asin((D2 − D1) / 2C), the geometry of a belt on the pitch circles. Chain sag, wear elongation and the load rating are not covered.',
   source: 'Martin Sprocket & Gear, Sprocket engineering data (chain length with the constant 0.1013, pitch diameter, pitches by chain number, 30 to 50 pitches, 120° wrap); U.S. Tsubaki, RS chain drive selection (length and centre distance, small sprocket teeth); a summary of Mott, Machine Elements in Mechanical Design (the same formulas, even number of pitches); Wikipedia, Roller chain (the chain number rule). See docs/sources.md, Belts and chains.',
+},
+{
+  id: 'taperpin', level: 'advanced', group: 'Machine elements', title: 'Taper pins (inch series)',
+  desc: 'Standard inch taper pins No. 7/0 to No. 14 (taper 1/4 in per foot): large end diameter with its limits, and the small end diameter for the length of pin, which is the size of the hole before reaming.',
+  fields: s => [
+    { id: 'no', label: 'Pin number', unit: '', def: 4, options: [[-6, '7/0'], [-5, '6/0'], [-4, '5/0'], [-3, '4/0'], [-2, '3/0'], [-1, '2/0'], [0, '0'], [1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6'], [7, '7'], [8, '8'], [9, '9'], [10, '10'], [11, '11'], [12, '12'], [13, '13'], [14, '14']] },
+    { id: 'l', label: 'Length of the pin', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+  ],
+  calc: (v, W, s) => {
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 4 : 3, k = inch ? 1 : 25.4;   // the table is in inches; mm is a unit conversion
+    const D = i => W.taper_pin_dia_in(v.no, i) * k;
+    if (!isFinite(D(0))) return [];
+    const rows = [];
+    if (v.l > 0) {
+      const sm = W.taper_pin_small(D(0), v.l, 0.25);
+      rows.push(isFinite(sm) ? R('Small end diameter at this length', sm, u, dp) : R('Small end diameter', 'the pin is too long for this size: it would taper to nothing', '', 0));
+    }
+    rows.push(R('Large end diameter (basic)', D(0), u, dp), R('Large end, commercial class, largest', D(1), u, dp), R('Large end, commercial class, smallest', D(2), u, dp));
+    if (isFinite(D(3))) rows.push(R('Large end, precision class, largest', D(3), u, dp), R('Large end, precision class, smallest', D(4), u, dp));
+    else rows.push(R('Precision class', 'listed up to No. 10 only', '', 0));
+    rows.push(R('Taper on the diameter', 0.25, 'in/ft', 3), R('Included angle', W.taper_included_angle_deg(0.25, 0, 12), 'deg', 4));
+    if (!inch) rows.push(R('Note', 'This is the inch series shown in mm. Metric taper pins (ISO 2339, taper 1:50) are a different series and are not included.', '', 0));
+    return rows;
+  },
+  working: 'Small end = large end − length × 0.25 / 12 (0.02083 per unit of length). Commercial class: +0.0013 / −0.0007 in on the large end; precision class: +0.0010 / −0 in, up to No. 10. Included angle = 2 atan(0.25 / 24).',
+  source: 'Large end diameters, limits and the small end rule: a supplier\'s cut sheet of ASME B18.8.2-2000 (hbbolt.com), the only full table found, so the sizes rest on one publisher; two other suppliers print the same large end for No. 7/0, 7, 9 and 14. See docs/sources.md, Pins.',
+  proof: [{ name: 'No. 3/0 taper pin, 1 in long', sys: 'inch', vals: { no: -2, l: 1 },
+    expect: [['Small end diameter at this length', 'in', 0.1042, 0.00005], ['Large end diameter (basic)', 'in', 0.125, 0.00005]],
+    source: 'Albany County Fasteners, pin size chart: No. 3/0 taper pin, large end 0.1250 in, small end at 1 in of length 0.1042 in.', note: 'Only the rows of that chart that match the standard\'s cut sheet are used; its sizes from 2/0 up do not.' }],
 },
 {
   id: 'keys', level: 'advanced', group: 'Machine elements', title: 'Keys and keyways',

@@ -90,7 +90,7 @@ const WORKSPACES = [
   { id: 'maths', name: 'Shop maths', icon: 'triangle', blurb: 'Calculator, conversions, geometry, stock and engineering sums.', sections: [
     ['Calculator and conversion', ['calc', 'convert', 'formulas'], 'calc'],
     ['Geometry', ['triangle', 'arc', 'fillet', 'compound', 'figures', 'holepattern'], 'angle'],
-    ['Stock and sheet metal', ['weight', 'bar', 'bend'], 'material'],
+    ['Stock and sheet metal', ['weight', 'bar', 'bend', 'gauges'], 'material'],
     ['Engineering', ['section', 'beam', 'torsion', 'column', 'stressconc', 'fatigue', 'balance', 'critspeed', 'bearinglife'], 'beam'],
   ] },
   { id: 'program', name: 'Programming', icon: 'programming', blurb: 'G and M codes, macros, cycle generators, backplot and DXF.', sections: [
@@ -103,7 +103,7 @@ const WORKSPACES = [
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
     ['Materials', ['materials', 'hardness', 'heattreat', 'tempercolours', 'galvanic', 'plastics', 'metalid'], 'material'],
     ['Fasteners', ['boltgrade', 'bolttorque', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
-    ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife', 'spring', 'beltdrive', 'chaindrive'], 'bearing'],
+    ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife', 'spring', 'beltdrive', 'chaindrive', 'taperpin'], 'bearing'],
     ['Shop', ['coolant', 'economics', 'abbrev'], 'drop'],
     ['Guides', ['cncguide', 'toolwear', 'toolguide'], 'book'],
   ] },

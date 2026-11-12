@@ -285,6 +285,22 @@ def build_tapers():
     return out
 
 
+def build_gauges():
+    """Sheet metal and wire gauges: {family: [{size, field: consensus}]} in gauge order (7/0 ... 50)."""
+    ev = load_ev('gauges-evidence.json')
+    if not ev: return None
+    out = {'sources': sources_of(ev), 'families': {}, 'notes': ev.get('notes', {})}
+    for fam, sec in ev['families'].items():
+        fields = []
+        for rows in sec.values():
+            for r in rows.values():
+                for f in r:
+                    if f not in fields: fields.append(f)
+        ordr = ev['order'][fam]
+        out['families'][fam] = build_series(sec, fields, order=lambda s, o=ordr: (o.index(s) if s in o else len(o), s))
+    return out
+
+
 def build_centredrills():
     """Centre drills: inch plain and bell type (decimal inch, agree at the coarser printing) and
     metric types A, B, R (agree only when equal: '1.3' and '1.6' are different lengths)."""
@@ -1033,7 +1049,7 @@ def main():
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(), 'symbols': build_symbols(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
            'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),
-           'matref': build_matref(), 'centredrills': build_centredrills()}
+           'matref': build_matref(), 'centredrills': build_centredrills(), 'gauges': build_gauges()}
     for fam, rows in (out['centredrills'] or {}).get('families', {}).items():
         st = collections.Counter(c['status'] for r in rows for f, c in r.items() if f != 'size')
         print('  centre drills', fam, len(rows), 'sizes', dict(st))

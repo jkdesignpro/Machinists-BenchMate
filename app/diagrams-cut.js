@@ -963,6 +963,21 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Side view of a compression spring between two flat faces: free length, solid length, outside diameter');
   },
 
+  // Taper pin: side view to scale, large end on the left.
+  taperpin(v, sys, rows) {
+    const W = 520, H = 220, u = dcU(sys), dp = sys === 'inch' ? 4 : 3;
+    const D = dcRow(rows, 'Large end diameter (basic)'), d = dcRow(rows, 'Small end diameter at this length'), L = v.l;
+    if (!dcOk(D) || !dcOk(d) || !dcOk(L)) return '';
+    const sc = Math.min(330 / L, 80 / D), x0 = 80, cy = 96, len = L * sc, R = D / 2 * sc, r = d / 2 * sc;
+    let h = DK.poly([[x0, cy - R], [x0 + len, cy - r], [x0 + len, cy + r], [x0, cy + R]], 'part');
+    h += DK.cl(x0 - 16, cy, x0 + len + 16, cy);
+    h += dcDimV(cy - R, cy + R, x0 - 30, 'D ' + dcN(D, dp), { from: x0 });
+    h += dcDimV(cy - r, cy + r, x0 + len + 30, 'd ' + dcN(d, dp), { from: x0 + len });
+    h += DK.dimH(x0, x0 + len, cy + R + 34, 'length ' + dcN(L, sys === 'inch' ? 3 : 2) + ' ' + u, { from: cy + R });
+    h += dcLines(x0, cy + R + 70, ['taper 1/4 in per foot on the diameter, drawn to scale']);
+    return DK.svg(W, H, h, 'Side view of a taper pin: large end diameter D, small end diameter d, length');
+  },
+
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
   sawtpi(v, sys, rows) {
     const W = 520, H = 250, u = dcU(sys);

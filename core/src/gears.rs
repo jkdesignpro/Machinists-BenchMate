@@ -691,6 +691,17 @@ pub fn helical_pair_flat(mn: f64, z1: f64, z2: f64, alpha_n: f64, beta: f64, xn1
     helical_pair(mn, z1, z2, alpha_n, beta, xn1, xn2, ha_k, hf_k).get(which as usize).copied().unwrap_or(f64::NAN)
 }
 
+/// Number of the involute form milling cutter (set of eight) for a gear of `z` teeth.
+/// `series` 0: diametral pitch cutters (No. 1 cuts 135 teeth to a rack ... No. 8 cuts 12
+/// and 13 teeth); 1: metric module cutters, numbered the other way round (No. 1 cuts 12
+/// and 13 teeth ... No. 8 cuts 135 teeth to a rack). NaN under 12 teeth.
+pub fn involute_cutter_no(z: f64, series: f64) -> f64 {
+    if !(z >= 12.0) || z.fract() != 0.0 { return f64::NAN; }
+    let dp = if z >= 135.0 { 1.0 } else if z >= 55.0 { 2.0 } else if z >= 35.0 { 3.0 } else if z >= 26.0 { 4.0 }
+        else if z >= 21.0 { 5.0 } else if z >= 17.0 { 6.0 } else if z >= 14.0 { 7.0 } else { 8.0 };
+    match series as i32 { 0 => dp, 1 => 9.0 - dp, _ => f64::NAN }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1019,4 +1030,18 @@ mod tests {
         assert!(sae_spline(4.0, 3.0, 2.0, 0.0).is_nan() && sae_spline(4.0, 3.0, 2.0, 3.0).is_nan() && sae_spline(8.0, 1.0, 2.0, 0.0).is_nan() && sae_spline(6.0, 1.0, 0.0, 0.0).is_nan());
     }
 
+    // Victor Machinery Exchange, Travers / TTC (All Industrial catalogue p. 371) and Evolvent Design print the same
+    // ranges for diametral pitch cutters; the last two print the module series in the reverse order.
+    #[test]
+    fn involute_cutter_numbers() {
+        for (lo, hi, no) in [(135.0, 400.0, 1.0), (55.0, 134.0, 2.0), (35.0, 54.0, 3.0), (26.0, 34.0, 4.0), (21.0, 25.0, 5.0), (17.0, 20.0, 6.0), (14.0, 16.0, 7.0), (12.0, 13.0, 8.0)] {
+            for z in [lo, hi] {
+                assert_eq!(involute_cutter_no(z, 0.0), no);
+                assert_eq!(involute_cutter_no(z, 1.0), 9.0 - no);
+            }
+        }
+        assert!(involute_cutter_no(11.0, 0.0).is_nan());
+        assert!(involute_cutter_no(20.5, 0.0).is_nan());
+        assert!(involute_cutter_no(20.0, 2.0).is_nan());
+    }
 }

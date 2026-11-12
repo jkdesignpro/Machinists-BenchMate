@@ -123,7 +123,7 @@ await mode('advanced');
 // own figure, or be on this list of screens with nothing to draw: reference tables, converters,
 // managers, and three that draw a small figure of their own once something is picked.
 where = 'drawings';
-const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'symbols', 'calc', 'formulas',
+const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'symbols', 'gauges', 'calc', 'formulas',
   'machines', 'toollib', 'setupsheet', 'materials', 'tempercolours', 'heattreat', 'plastics', 'metalid',
   'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade', 'holdertorque']);
 await units('inch');
@@ -1735,6 +1735,64 @@ where = 'spring';
 }
 // Jarno tapers follow N/8, N/10, N/2 and are confirmed by two tables; Brown & Sharpe sizes where the two publishers
 // print different lengths show both.
+// Sheet metal and wire gauges: each value as two publishers print it, differences shown, AWG from the core's rule.
+where = 'gauges';
+{
+  const rows = async () => page.$$eval('#main #gres tr', t => t.slice(1).map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+  const row = (r, g) => r.find(x => x.startsWith(g + ' ')) || '';
+  await units('inch'); await open('gauges', 250);
+  await page.selectOption('#main #gf', 'sheet'); await page.waitForTimeout(80);
+  let r = await rows();
+  if (r.length !== 45 || !/^10 0\.1345 in 3\.416 mm Confirmed 0\.1382 in 3\.510 mm Confirmed 0\.1406 in 3\.571 mm Confirmed 0\.1019 in 2\.588 mm Confirmed 0\.1406 in 3\.571 mm Confirmed$/.test(row(r, '10')))
+    problems.push(`[${where}] sheet gauges: ${r.length} rows; No. 10: ${row(r, '10')}`);
+  if (!/0\.1563 in 3\.970 mm Sources differ also 0\.1562 0\.1144 in/.test(row(r, '9'))) problems.push(`[${where}] stainless No. 9 (5/32 in rounded two ways) must show both: ${row(r, '9')}`);
+  if (!/Sources differ also 0\.0641/.test(row(r, '14')) || !/Sources differ also 0\.0159/.test(row(r, '26'))) problems.push(`[${where}] aluminium No. 14 and 26 must show both printings: ${row(r, '14')} ; ${row(r, '26')}`);
+  if (!/^7\/0 - - - - 0\.5000 in 12\.700 mm Confirmed$/.test(row(r, '7/0')) || !/^38 0\.0060 in 0\.152 mm Confirmed - 0\.0062 in 0\.157 mm One source/.test(row(r, '38'))) problems.push(`[${where}] ends of the sheet table: ${row(r, '7/0')} ; ${row(r, '38')}`);
+  if (!/A gauge number is not one thickness/.test(await page.innerText('#main #gnote'))) problems.push(`[${where}] the sheet gauge note is missing`);
+  await page.selectOption('#main #gf', 'wire'); await page.waitForTimeout(80);
+  r = await rows();
+  if (r.length !== 57 || !/^10 0\.1019 in 2\.588 mm by the rule 0\.1280 in 3\.251 mm Confirmed 0\.1340 in 3\.404 mm Confirmed$/.test(row(r, '10')))
+    problems.push(`[${where}] wire gauges: ${r.length} rows; No. 10: ${row(r, '10')}`);
+  if (!/^4\/0 0\.4600 in 11\.684 mm by the rule 0\.4000 in 10\.160 mm Confirmed 0\.4540 in 11\.532 mm One source$/.test(row(r, '4/0')) || !/^36 0\.0050 in 0\.127 mm by the rule 0\.0076 in/.test(row(r, '36')))
+    problems.push(`[${where}] the two defined AWG sizes (4/0 = 0.46 in, No. 36 = 0.005 in): ${row(r, '4/0')} ; ${row(r, '36')}`);
+  if (!/^7\/0 - 0\.5000 in 12\.700 mm Confirmed -$/.test(row(r, '7/0')) || !/^50 - 0\.0010 in 0\.025 mm Confirmed -$/.test(row(r, '50')) || !/^40 0\.0031 in 0\.080 mm by the rule/.test(row(r, '40')) || !/^41 - /.test(row(r, '41')))
+    problems.push(`[${where}] ends of the wire table: ${row(r, '7/0')} ; ${row(r, '40')} ; ${row(r, '41')} ; ${row(r, '50')}`);
+  await units('mm'); await open('gauges', 200); r = await rows();
+  if (!/^16 1\.291 mm 0\.0508 in by the rule 1\.626 mm 0\.0640 in Confirmed 1\.651 mm 0\.0650 in Confirmed$/.test(row(r, '16'))) problems.push(`[${where}] No. 16 wire in mm: ${row(r, '16')}`);
+  await page.selectOption('#main #gf', 'sheet'); await page.waitForTimeout(60);
+  await units('inch');
+}
+// Taper pins (inch series) and the involute cutter number on the spur gear page.
+where = 'taperpin';
+{
+  const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+  const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, v); await page.waitForTimeout(60); };
+  const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+  await units('inch'); await mode('expert'); await open('taperpin', 150);
+  await pick('no', '4'); await put('l', '2');
+  let t = await rows();
+  if (!/Small end diameter at this length 0\.2083 in/i.test(t) || !/Large end diameter \(basic\) 0\.2500 in/.test(t) || !/commercial class, largest 0\.2513 in/.test(t) || !/commercial class, smallest 0\.2493 in/.test(t) ||
+      !/precision class, largest 0\.2510 in/.test(t) || !/Included angle 1\.1936 deg/.test(t)) problems.push(`[${where}] No. 4 pin, 2 in long: ${t}`);
+  const d = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/D 0\.25/.test(d) || !/d 0\.2083/.test(d) || !/length 2 in/.test(d)) problems.push(`[${where}] drawing: ${d}`);
+  await pick('no', '-6'); await put('l', '1'); t = await rows();
+  if (!/Small end diameter at this length 0\.0417 in/i.test(t) || !/Large end diameter \(basic\) 0\.0625 in/.test(t)) problems.push(`[${where}] No. 7/0 pin, 1 in long (0.0625 and 0.0417): ${t}`);
+  await put('l', '4'); t = await rows();
+  if (!/would taper to nothing/i.test(t)) problems.push(`[${where}] a 7/0 pin 4 in long must be refused: ${t}`);
+  await pick('no', '12'); await put('l', '2'); t = await rows();
+  if (!/Large end diameter \(basic\) 1\.0320 in/.test(t) || !/Precision class listed up to No\. 10 only/.test(t)) problems.push(`[${where}] No. 12 has no precision class: ${t}`);
+  await pick('no', '4');
+  await units('mm'); await open('taperpin', 150); await pick('no', '4'); await put('l', '50'); t = await rows();
+  if (!/Small end diameter at this length 5\.308 mm/i.test(t) || !/Large end diameter \(basic\) 6\.350 mm/.test(t) || !/inch series shown in mm/.test(t)) problems.push(`[${where}] No. 4 pin in mm: ${t}`);
+  await open('spurgear', 150); await put('z1', '12'); await put('z2', '24'); t = await rows();
+  if (!/Gear 1: involute form cutter number \(module set of eight\) 1 /.test(t + ' ') || !/Gear 2: involute form cutter number \(module set of eight\) 4 /.test(t + ' ')) problems.push(`[${where}] module cutters for 12 and 24 teeth are No. 1 and No. 4: ${t.slice(0, 1400)}`);
+  await units('inch'); await open('spurgear', 150); await put('z1', '20'); await put('z2', '135'); t = await rows();
+  if (!/Gear 1: involute form cutter number \(diametral pitch set of eight\) 6 /.test(t + ' ') || !/Gear 2: involute form cutter number \(diametral pitch set of eight\) 1 /.test(t + ' ')) problems.push(`[${where}] diametral pitch cutters for 20 and 135 teeth are No. 6 and No. 1: ${t.slice(0, 1400)}`);
+  await put('z1', '10'); t = await rows();
+  if (/Gear 1: involute form cutter number/.test(t)) problems.push(`[${where}] no cutter of the set of eight cuts 10 teeth`);
+  await put('z1', '20'); await put('z2', '40');
+  await mode('advanced');
+}
 where = 'machinetapers jarno';
 {
   await units('inch'); await open('machinetapers', 200);
