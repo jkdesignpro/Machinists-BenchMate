@@ -80,6 +80,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, fifteenth batch, 2026-11-12):** machine elements guide (`elemguide`: friction, backlash, gear materials, cams, plain bearings, leadscrews and ball screws). MH26, ED69, MH266, MH275, ED73 and MH291 from missing to done; MH280 and MH282 from missing to partial. Counted from the tables below: 361 done, 177 partial, 58 missing of 596 in-scope rows, 61 %. For 90 %, 176 more rows have to reach done.
 
+**Update (0.6.0, sixteenth batch, 2026-11-12):** drives and maintenance guide (`driveguide`: electric motors, shaft alignment, fluid power, machine vibration). MH292, MH298, MH299 and ED25 from missing to done. Counted from the tables below: 365 done, 177 partial, 54 missing of 596 in-scope rows, 61 %; 172 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -672,14 +674,14 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH289 | Belts and pulleys (flat, V, synchronous) | partial | `beltdrive` | 0.6.0: open belt length (exact and short formula), centre distance from a length, ratio, speeds, wrap; no V-belt sections, standard lengths or power ratings |
 | MH290 | Transmission chains and sprockets | partial | `chaindrive` | 0.6.0: chain length in pitches (even), centre distance, pitch by ANSI chain number, sprocket pitch diameters, wrap; no load ratings or tooth form |
 | MH291 | Ball and ACME leadscrews | done | `elemguide`, `acme`, `trapezoidal` | 0.6.0: leadscrew against ball screw (efficiency with both figures shown, self-locking, back-driving, backlash and preload, cost), thread forms, rolled and ground, critical speed rule (one source, marked); thread sizes in `acme` and `trapezoidal` |
-| MH292 | Electric motors | missing | | |
+| MH292 | Electric motors | done | `driveguide` | 0.6.0: induction motor principle, synchronous speed and slip, single phase and variable frequency drive (one source each, marked), a NEMA nameplate field by field (mostly one source, marked), frame numbers; no motor selection tables |
 | MH293 | Adhesives and sealants, retaining compounds, threadlocking | partial | `bearguide` | 0.6.0: threadlocker colours, strength, fastener size, taking apart, cure and application (cure and application one source, marked); no retaining compound selection, no sealants or structural adhesives |
 | MH294 | O-rings and glands | partial | `oring` | AS568 sizes and a squeeze, stretch and fill check; no ISO 3601-1 G series, no -9xx sizes, no back-up rings |
 | MH295 | Rolled steel sections, aluminium structural shapes | missing | | |
 | MH296 | Wire and sheet metal gauges | done | `gauges` | 0.6.0: sheet gauges for steel, galvanized, stainless, aluminium and US Standard; AWG by its rule, SWG, tube wall series |
 | MH297 | Wire rope | out of scope | | |
-| MH298 | Shaft alignment with dial indicators | missing | | |
-| MH299 | Fluid power: circuits, pressure and flow, tube fittings, pneumatics | missing | | Low priority |
+| MH298 | Shaft alignment with dial indicators | done | `driveguide` | 0.6.0: offset and angle, soft foot, rim and face against reverse dial, total indicator reading, bracket sag, the validity check, thermal growth; tolerance table from one source, marked |
+| MH299 | Fluid power: circuits, pressure and flow, tube fittings, pneumatics | done | `driveguide`, `pipethreads` | 0.6.0: cylinder force and speed, the parts of a circuit with a block diagram, open and closed centre, pumps, hydraulics against pneumatics, air preparation, nine kinds of tube and hose fitting; thread sizes in `pipethreads` |
 
 ### Measuring units
 
@@ -721,7 +723,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED22 | 5.5 Understanding acceleration | out of scope? | | |
 | ED23 | 5.6 Dynamic balancing | partial | `balance` | Permissible unbalance and two-plane split; no balancing procedure (`claude/mechanics`) |
 | ED24 | 5.7 Vibration | partial | `chatter`, `critspeed` | Natural frequency in the chatter finder and shaft critical speed; no general vibration theory |
-| ED25 | 5.8 Machine vibration | missing | | Severity limits |
+| ED25 | 5.8 Machine vibration | done | `driveguide` | 0.6.0: severity zones A to D, machine groups, rigid and flexible supports, zone boundaries as two web pages quote them from ISO 10816-3 (the standard itself was not read; the page says so), fault signatures (mostly one source, marked) |
 | ED26 | 5.9 Machinery noise | out of scope? | | |
 | ED27 | 6.1 Mechanical notation | out of scope? | | |
 | ED28 | 6.2 Engineering structures, pin joints | out of scope? | | |

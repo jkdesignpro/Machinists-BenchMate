@@ -3454,6 +3454,13 @@ const TOOLS = [
   source: 'Wikipedia, MISUMI and G.U.N.T. (friction); Wikipedia and KHK (backlash); KHK and MachineMfg (gear materials); Wikipedia, a course text and i GET IT (cams); Wikipedia, GlobalSpec and Armoloy (plain bearings); Wikipedia, Machine Design and Roton (leadscrews and ball screws). Full list with URLs in docs/sources.md.',
 },
 {
+  id: 'driveguide', level: 'advanced', group: 'Guides', title: 'Drives and maintenance guide',
+  desc: 'Electric motors (stator and rotor, synchronous speed and slip, reading the nameplate field by field), shaft alignment with dial indicators (offset and angle, soft foot, rim and face against reverse dial, bracket sag, thermal growth), fluid power (force of a cylinder, the parts of a hydraulic circuit, pumps, hydraulics against pneumatics, air preparation, tube and hose fittings), and machine vibration (severity zones A to D with their limits, and what a vibration points to). Four drawings.',
+  render: el => renderDriveGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source. The vibration limits were read from two web pages about the ISO standards, not from the standards.',
+  source: 'Machine Design, AutomationDirect and Control Engineering (motors); Fabrico, OpenExamPrep and Tractian (alignment); course slides after Cundiff, OpenExamPrep, Wikipedia, Power & Motion and AutomationPrimer (fluid power); Brennan and MISUMI (fittings); Fabrico, Vibromera and Industrial Monitor Direct (vibration). Full list with URLs in docs/sources.md.',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),
