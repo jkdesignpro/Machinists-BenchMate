@@ -1854,6 +1854,47 @@ where = 'prismoid';
   await put('D', '25'); await put('d', '12'); await put('L', '60');
   await units('inch');
 }
+// CNC mill setup guide: eleven steps, three drawings, the key table and the four tool length methods; every
+// statement carries source keys, and one that rests on a single publisher says so. The CNC guide gained units,
+// program characters, spindle direction, constant surface speed and chip load.
+where = 'millsetup';
+{
+  await open('millsetup', 200);
+  const g = await page.evaluate(() => {
+    const ps = [...document.querySelectorAll('#main p')].filter(p => !p.classList.contains('desc') && !p.closest('.whyb'));
+    const txt = p => p.innerText.replace(/\s+/g, ' ');
+    const find = re => ps.find(p => re.test(txt(p)));
+    const flagged = re => { const p = find(re); return p ? /to be verified/.test(txt(p)) : null; };
+    return { h2: document.querySelectorAll('#main h2').length, svgs: [...document.querySelectorAll('#main svg.geo')].map(v => v.getAttribute('aria-label')).join(' | '),
+      steps: (document.querySelector('#main svg.geo')?.querySelectorAll('text.gv').length) || 0,
+      tabs: [...document.querySelectorAll('#main table.gtab')].map(t => t.querySelectorAll('tr').length).join(','),
+      untagged: ps.filter(p => !p.querySelector('abbr.gsrc') && !p.querySelector('a')).length, tagged: ps.filter(p => p.querySelector('abbr.gsrc')).length,
+      home: flagged(/^Home\./), limits: flagged(/^Limits\./), clear: flagged(/^Check the way is clear/), kick: flagged(/^The kick\./), half: txt(find(/^Half the tip/) || document.body).slice(0, 400),
+      methods: [...document.querySelectorAll('#main table.gtab')][1]?.innerText.replace(/\s+/g, ' ') || '', srcs: document.querySelectorAll('#main ul.gsl li').length };
+  });
+  if (g.h2 !== 12) problems.push(`[${where}] expected 12 sections, got ${g.h2}`);
+  if (!/eleven steps/i.test(g.svgs) || !/tool length/i.test(g.svgs) || !/Edge finder/i.test(g.svgs) || g.steps !== 11) problems.push(`[${where}] three drawings and eleven numbered steps: ${g.svgs} (${g.steps})`);
+  if (g.tabs !== '9,5') problems.push(`[${where}] the key table has 8 rows and the tool length table 4: ${g.tabs}`);
+  if (g.untagged !== 0 || g.tagged < 45) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  if (g.home !== false || g.kick !== false) problems.push(`[${where}] homing and the kick are confirmed by two publishers and must not be flagged: ${g.home} ${g.kick}`);
+  if (g.limits !== true || g.clear !== true) problems.push(`[${where}] one-source statements (edge finder limits, clear path) must say to be verified: ${g.limits} ${g.clear}`);
+  if (!/0\.200 in tip that is 0\.100 in/.test(g.half) || !/2 mm or 5 mm/.test(g.half)) problems.push(`[${where}] half the tip diameter: ${g.half}`);
+  for (const m of ['A. On the part', 'B. On a block of known height', 'C. On a tool setting probe', 'D. True length from the spindle nose']) if (!g.methods.includes(m)) problems.push(`[${where}] tool length method missing: ${m}`);
+  if (g.srcs !== 13) problems.push(`[${where}] expected 13 sources listed, got ${g.srcs}`);
+  await open('cncguide', 200);
+  const c = await page.evaluate(() => {
+    const ps = [...document.querySelectorAll('#main p')]; const txt = p => p.innerText.replace(/\s+/g, ' ');
+    const flagged = re => { const p = ps.find(q => re.test(txt(q))); return p ? /to be verified/.test(txt(p)) : null; };
+    const spin = document.querySelector('#main #c-spin');
+    return { spin: spin ? spin.nextElementSibling.getAttribute('aria-label') : '', chars: [...document.querySelectorAll('#main table.gtab')].map(t => t.innerText.replace(/\s+/g, ' ')).find(t => /Block delete/.test(t) && /Program number/.test(t)) || '',
+      units: flagged(/^Inch or millimetre\. G20 sets the program to inches and G21 to millimetres/), m3: flagged(/^M03, M04, M05\./), seen: flagged(/^Seen from where\./), css: flagged(/^Constant surface speed \(lathe\)\./),
+      limit: flagged(/^Always with a speed limit\./), chip: flagged(/^Chip load \(feed per tooth\)/) };
+  });
+  if (!/M03 clockwise and M04 counterclockwise/.test(c.spin)) problems.push(`[${where}] the spindle direction drawing is missing: ${c.spin}`);
+  for (const w of ['%', 'O and a number', 'N and a number', '( )', 'End of block, or a comment', 'Block delete', 'Spaces, capitals']) if (!c.chars.includes(w)) problems.push(`[${where}] program characters table lacks ${w}`);
+  if (c.units !== false || c.m3 !== false || c.css !== false || c.limit !== false || c.chip !== false) problems.push(`[${where}] units, M03, surface speed, the speed limit and chip load each have two publishers: ${JSON.stringify(c)}`);
+  if (c.seen !== true) problems.push(`[${where}] the viewpoint for clockwise has one source and must say so: ${c.seen}`);
+}
 where = 'machinetapers jarno';
 {
   await units('inch'); await open('machinetapers', 200);

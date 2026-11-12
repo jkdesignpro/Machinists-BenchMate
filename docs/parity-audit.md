@@ -56,6 +56,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, third batch, 2026-11-12):** shop maths (old trig functions, prismoidal formula, irregular areas, tank contents, equal-area circle and square, tailstock set-over), and nine rows that the app already covered but were still marked partial or missing from before the unit converter, the surface texture page, the stock weight tool and the j and J fits existed. MH3, MH9, MH11, MH16, ED4, ED16, ED17, BB1, BB36, BB39, BB50, BB74 and BB75 done. Counted from the tables below: 228 done, 228 partial, 140 missing of 596 in-scope rows, 38 %; 309 more rows to done for 90 %.
 
+**Update (0.6.0, fourth batch, 2026-11-12):** CNC mill setup guide (`millsetup`: start-up, control keys, loading tools, four tool length methods, work offsets, first run, adjusting, shut-down), and in the CNC guide: units, program characters, spindle direction, constant surface speed, chip load. CN5, CN7, CN9, CN17, CN18, CN19, CN23, CN25, CN27 to CN34, CN52 and CN77 to CN79 done; CN26 partial. Counted from the tables below: 248 done, 223 partial, 125 missing of 596 in-scope rows, 42 %; 289 more rows to done for 90 %.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -863,11 +865,11 @@ One row per learning objective.
 | CN2 | L1 Subtractive vs additive rapid prototyping | out of scope? | | |
 | CN3 | L1 Overall CAD/CAM/CNC process | missing | | Explainer |
 | CN4 | L2 Shop safety awareness, rules, clothing, conduct | partial | `cncguide` | Short safety page (guards, dress, chips, coolant, lock-out); points to HSE/OSHA, not a full course (`claude/cnc-guide`) |
-| CN5 | L2 Safety precautions when running a new CNC program | partial | `cncguide` | Prove-out steps in the safety page (`claude/cnc-guide`) |
+| CN5 | L2 Safety precautions when running a new CNC program | done | `millsetup`, `cncguide` | 0.6.0: first-run steps with sources: plot, cut air, slow rapids, stop above the part and compare distance to go, single block |
 | CN6 | L3 Common CNC tools | partial | `toolguide` | End mills, drills, reamers, taps described; no course-specific tool list (`claude/tooling-ref`) |
-| CN7 | L3 Spindle rotation direction | partial | `gmcodes`, `cncguide` | M03 and M04 in the code lists; no drawing of the rotation direction |
+| CN7 | L3 Spindle rotation direction | done | `cncguide`, `gmcodes` | 0.6.0: M03/M04/M05 with a drawing seen from above (the viewpoint has one source, marked) |
 | CN8 | L3 Chip formation | done | `cncguide` | Shear zone, chip types, chip thickness (`claude/cnc-guide`) |
-| CN9 | L3 Chip load definition | partial | `feed`, `cutopt` | Used, not explained |
+| CN9 | L3 Chip load definition | done | `cncguide`, `feed`, `cutopt` | 0.6.0: chip load defined in the CNC guide (two publishers), with the feed formula and the link to chip thinning |
 | CN10 | L3 Climb vs conventional milling | done | `cncguide` | With drawing (`claude/cnc-guide`) |
 | CN11 | L3 Speeds and feeds from reference tables | partial | `rpm`, `feed` | Formulas only; no tables |
 | CN12 | L4 Cartesian coordinate system | done | `cncguide` | Right-handed axes (`claude/cnc-guide`) |
@@ -875,24 +877,24 @@ One row per learning objective.
 | CN14 | L4 Closed-loop servo control | out of scope? | | Machine design |
 | CN15 | L4 Machine coordinate system | done | `cncguide` | Machine coordinates, G53 (`claude/cnc-guide`) |
 | CN16 | L4 Fixture offset XY | done | `cncguide`, `setupsheet` | Explainer in the guide; offsets recorded on the setup sheet (`claude/cnc-guide`) |
-| CN17 | L4 Tool length offset with a 1-2-3 block | missing | | |
-| CN18 | L4 Fixture offset Z with 1-2-3 block and indicator | missing | | |
-| CN19 | L4 Inch and metric programming units | partial | `app.js` (unit toggle) | No G20/G21 explanation |
+| CN17 | L4 Tool length offset with a 1-2-3 block | done | `millsetup` | 0.6.0: tool lengths on a block of known height (method B), with the rule never to jog down onto the block |
+| CN18 | L4 Fixture offset Z with 1-2-3 block and indicator | done | `millsetup` | 0.6.0: work offset Z from the block or with a dial indicator (the measuring steps have one source, marked) |
+| CN19 | L4 Inch and metric programming units | done | `cncguide`, `gsim` | 0.6.0: G20/G21 in the start-up block (two publishers); the simulator converts a program between units |
 | CN20 | L5 What a CNC program is; sequence of operations | done | `cncguide` | Program as blocks, typical order of one tool (`claude/cnc-guide`) |
 | CN21 | L5 Common G-codes | done | `gmcodes` | |
 | CN22 | L5 Common M-codes | done | `gmcodes` | |
-| CN23 | L5 Special characters in a program | partial | `cncguide` | Comments and block delete; no full character list (`claude/cnc-guide`) |
+| CN23 | L5 Special characters in a program | done | `cncguide` | 0.6.0: table of program characters: %, O number, N number, brackets, semicolon, block delete, spaces and case |
 | CN24 | L5 Organisation of a simple program | done | `cncguide` | Safe start line, block anatomy, tool order (`claude/cnc-guide`) |
-| CN25 | L6 Steps to set up and run a CNC mill | missing | | |
-| CN26 | L6 Control panel layout (one control maker) | missing | | Per control profile |
-| CN27 | L6 Start and home the machine | missing | | |
-| CN28 | L6 Load tools | missing | | |
-| CN29 | L6 Set tool length offsets | missing | | |
-| CN30 | L6 Set fixture offsets | missing | | |
-| CN31 | L6 Load a program | missing | | |
-| CN32 | L6 Run a new program safely | missing | | |
-| CN33 | L6 Adjust offsets for wear and deflection | partial | `deflection` | Estimates deflection only |
-| CN34 | L6 Shut down | missing | | |
+| CN25 | L6 Steps to set up and run a CNC mill | done | `millsetup` | 0.6.0: eleven steps in order with a drawing |
+| CN26 | L6 Control panel layout (one control maker) | partial | `millsetup` | 0.6.0: Haas key groups and what they do (two publishers); no picture of where the keys are, other controls not covered |
+| CN27 | L6 Start and home the machine | done | `millsetup` | 0.6.0: checks, power on, reset, home (Z first) |
+| CN28 | L6 Load tools | done | `millsetup` | 0.6.0: tools in program order, through the spindle, how to put one in and take one out |
+| CN29 | L6 Set tool length offsets | done | `millsetup` | 0.6.0: what the offset is, the steps on the control, four methods compared |
+| CN30 | L6 Set fixture offsets | done | `millsetup` | 0.6.0: PART ZERO SET, edge finder steps with a drawing, half the tip, centre of a feature, limits |
+| CN31 | L6 Load a program | done | `millsetup` | 0.6.0: copy to memory, then select the active program |
+| CN32 | L6 Run a new program safely | done | `millsetup` | 0.6.0: plot, cut air, rapids at 25 or 5 %, stop above the part, single block, every tool |
+| CN33 | L6 Adjust offsets for wear and deflection | done | `millsetup`, `deflection` | 0.6.0: sizes brought in with the diameter and length registers, wear column, which way to change; deflection note (own reasoning, marked) and the calculator |
+| CN34 | L6 Shut down | done | `millsetup` | 0.6.0: part and tool out, chips, wipe down, power off by the manual |
 | CN35 | L7 2.5D, 3D and 4-axis parts | missing | | |
 | CN36 | L7 CAD/CAM graphics views | out of scope? | | CAM software usage |
 | CN37 | L7 Identifying 2D machining features | missing | | |
@@ -910,7 +912,7 @@ One row per learning objective.
 | CN49 | L8 Lathe workholding | partial | `cncguide` | Chuck speed, stick-out, support; no collet or chuck selection (`claude/cnc-guide`) |
 | CN50 | L8 Common lathe tools | missing | | |
 | CN51 | L8 Lathe speeds and feeds | partial | `rpm`, `passtime` | No recommendations |
-| CN52 | L8 Constant surface speed | missing | | |
+| CN52 | L8 Constant surface speed | done | `cncguide`, `partofftime` | 0.6.0: G96 and G97, why the rpm climbs, the speed limit word by control (four sources), when fixed rpm is better |
 | CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | partial | `cycg71`, `cycgroove`, `cycthread`, `cyctaper` | Turn, groove, cut-off, thread; no facing or drilling on the lathe |
 | CN54 | L8 Live tools | partial | `machines` | Live-tool speed limit check only |
 | CN55 | L9 3D tool compensation | missing | | |
@@ -935,9 +937,9 @@ One row per learning objective.
 | CN74 | App A: angle plates for multi-sided parts | missing | | |
 | CN75 | App A: shoulder bolts and dowel pins for two-sided parts | missing | | |
 | CN76 | App A: double-sided tape | missing | | |
-| CN77 | App B: tool length offset with paper | missing | | |
-| CN78 | App B: tool length offset with a 1-2-3 block from a finished face | missing | | |
-| CN79 | App B: tool length offset with a tool probe | missing | | |
+| CN77 | App B: tool length offset with paper | done | `millsetup` | 0.6.0: method A, on the part with paper or a feeler, with its drawbacks |
+| CN78 | App B: tool length offset with a 1-2-3 block from a finished face | done | `millsetup` | 0.6.0: method B with the block standing on a face milled flat |
+| CN79 | App B: tool length offset with a tool probe | done | `millsetup` | 0.6.0: method C, tool setting probe |
 | CN80 | App C: CNC process planning form | partial | `setupsheet` | Setup sheet, no operation-sequence plan |
 | CN81 | App D: G and M code reference | done | `gmcodes` | |
 | CN82 | App E: glossary | missing | | |

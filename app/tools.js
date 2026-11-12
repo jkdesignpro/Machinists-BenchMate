@@ -3331,6 +3331,13 @@ const TOOLS = [
   source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
 },
 {
+  id: 'millsetup', level: 'advanced', group: 'Guides', title: 'CNC mill setup guide',
+  desc: 'From a cold machine to a proven first part: start and home, the control panel, loading tools, four ways to measure tool lengths (paper, 1-2-3 block, probe, true length), work offsets with an edge finder or indicator, loading the program, the first run, adjusting for size and shutting down.',
+  render: el => renderMillSetup(el),
+  working: 'Reference only, in our own words. Key names are those of the Haas control, which the public guides read for this page describe. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Your machine manual governs.',
+  source: 'Haas Factory Outlet mill operator and programming manuals; Worcester Polytechnic Institute Haas quick guide; Virasak, Manufacturing Processes 4-5; camInstructor; Hurco WinMax help; Travers Tool and Protool on edge finders; LinuxCNC documentation; CIMCO CNC programming book. Listed under the guide and in docs/sources.md.',
+},
+{
   id: 'toolwear', level: 'advanced', group: 'Guides', title: 'Tool wear guide',
   desc: 'Ten ways a cutting edge wears or fails, each with our own drawing, what you see, the causes and what to try: flank wear, crater wear, notch wear, built-up edge, chipping, thermal cracking, plastic deformation, fracture, flaking and chip hammering.',
   render: el => renderToolWear(el),

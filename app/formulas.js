@@ -449,7 +449,7 @@ const FORMULAS = [
 
 // Tools that only show reference data (no formula of their own).
 const FORMULA_EXEMPT = ['holdercode', 'iso513', 'drillchart', 'tapdrill', 'gritconv', 'wheelcode', 'threaddata', 'pipethreads', 'whitworth', 'fits', 'surface', 'hardness',
-  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'toolguide', 'formulas',
+  'gmcodes', 'macroref', 'gdtguide', 'gdtfcf', 'gdtdof', 'materials', 'boltgrade', 'shcs', 'clearance', 'spanner', 'tslots', 'toollib', 'setupsheet', 'abbrev', 'cncguide', 'millsetup', 'toolguide', 'formulas',
   'tempercolours', 'heattreat', 'plastics', 'metalid'];
 
 // Library screen. FLIB.g is a group name, '' for all, or FLIB_FAV for the favourites.

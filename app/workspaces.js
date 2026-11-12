@@ -105,7 +105,7 @@ const WORKSPACES = [
     ['Fasteners', ['boltgrade', 'bolttorque', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
     ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife', 'spring', 'beltdrive', 'chaindrive', 'taperpin'], 'bearing'],
     ['Shop', ['coolant', 'economics', 'abbrev'], 'drop'],
-    ['Guides', ['cncguide', 'toolwear', 'toolguide'], 'book'],
+    ['Guides', ['cncguide', 'millsetup', 'toolwear', 'toolguide'], 'book'],
   ] },
 ];
 // Listed on the Home rail rather than in a workspace.

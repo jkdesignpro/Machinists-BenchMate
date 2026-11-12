@@ -26,6 +26,10 @@ Stage 4 of the plan, part 1: book references. Built on top of 0.5.0. In progress
 - New tool **Taper pins (inch series)** (Reference > Machine elements): No. 7/0 to No. 14, large end with commercial and precision limits, and the small end diameter for the length of the pin, with a drawing. The sizes come from one supplier's sheet of the standard and say so.
 - **Spur gear data** shows the number of the involute form cutter (set of eight) for each gear: the diametral pitch series in inch mode, the module series, which is numbered the other way round, in mm mode.
 
+### Added (CNC mill setup)
+- New page **CNC mill setup guide** (Reference > Guides): from a cold machine to a proven first part. The order of work, power on and homing, the keys of the control and what they do, loading tools, four ways to measure a tool length (on the part with paper or a feeler, on a 1-2-3 block, on a tool setting probe, true length from the spindle nose) and what each puts in the work offset Z, the work offset in X and Y with an edge finder or an indicator, loading the program, running it the first time, adjusting for size, shutting down. Three drawings. Written from 13 public sources; every statement shows its sources, and one that rests on a single publisher is marked "to be verified". Key names are those of the Haas control, which the public guides describe.
+- **CNC knowledge guide**: inch and millimetre (G20, G21), a table of the special characters in a program, spindle direction (M03, M04) with a drawing, constant surface speed (G96, G97) and its speed limit, and what chip load means.
+
 ### Added (shop maths)
 - New tool **Prismoidal formula** (Shop maths > Geometry): volume of a tapering solid from its two end faces and the section halfway.
 - New tool **Tank contents**: litres and gallons in a cylindrical tank with flat ends, lying or standing, from the depth of liquid, with a drawing.

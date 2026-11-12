@@ -86,6 +86,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Library | Formula library | done (177 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
 | Library | Tool wear information | done (ten wear types with our own drawings, causes and remedies from two makers; two types have one source and are marked) | `toolwear`, `cncguide` | U91 |
 | Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
+| Library | CNC mill setup guide (start-up, control keys, tool lengths four ways, work offsets, first run, adjusting, shut-down) | done (ours, 0.6.0; 13 public sources, single-source statements marked) | `millsetup` | |
 | Library | Tip of the day | done (own tips, Home widget) | `tips.js` | U98 |
 | Library | Assistant, community cut data | missing (assistant: stage 5, optional and off by default; a shared cut library is not in the spec for 0.2 to 1.0) | | U101, U102 |
 | Library | Indexable insert catalogue | done (decode or tap a code together; insert drawn to scale from above and in section; nose radius to the turning advisor, outline to the sketcher) | `insertcode`, `holdercode`, `iso513` | U103 |
