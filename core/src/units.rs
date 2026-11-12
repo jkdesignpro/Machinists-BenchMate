@@ -28,8 +28,9 @@ macro_rules! u { ($s:expr, $n:expr, $k:expr) => { Unit { sym: $s, name: $n, k: $
                  ($s:expr, $n:expr, $k:expr, conv) => { Unit { sym: $s, name: $n, k: $k, off: 0.0, exact: false } }; }
 
 /// Quantity names, in the order of `units(q)`.
-pub const QUANTITIES: [&str; 17] = ["Length", "Area", "Volume", "Mass", "Force", "Torque", "Pressure and stress", "Power", "Energy",
-    "Speed", "Feed rate (per minute)", "Feed (per revolution or tooth)", "Temperature", "Temperature difference", "Density", "Flow rate", "Angle"];
+pub const QUANTITIES: [&str; 21] = ["Length", "Area", "Volume", "Mass", "Force", "Torque", "Pressure and stress", "Power", "Energy",
+    "Speed", "Feed rate (per minute)", "Feed (per revolution or tooth)", "Temperature", "Temperature difference", "Density", "Flow rate", "Angle",
+    "Acceleration", "Rotational speed", "Viscosity, dynamic", "Viscosity, kinematic"];
 
 /// Units of quantity `q` (index into `QUANTITIES`). The first unit is SI.
 pub fn units(q: u32) -> Vec<Unit> {
@@ -80,6 +81,15 @@ pub fn units(q: u32) -> Vec<Unit> {
             u!("gal/min (UK)", "imperial gallon per minute", 4.546_09e-3 / 60.0), u!("ft³/min", "cubic foot per minute (CFM)", FT * FT * FT / 60.0)],
         16 => vec![u!("rad", "radian", 1.0), u!("°", "degree", PI / 180.0), u!("′", "minute of arc", PI / 10_800.0), u!("″", "second of arc", PI / 648_000.0),
             u!("gon", "gon (grad)", PI / 200.0), u!("rev", "revolution", 2.0 * PI), u!("mrad", "milliradian", 1e-3)],
+        17 => vec![u!("m/s²", "metre per second squared", 1.0), u!("mm/s²", "millimetre per second squared", 1e-3), u!("g", "standard acceleration of gravity (gn)", GN),
+            u!("ft/s²", "foot per second squared", FT), u!("in/s²", "inch per second squared", IN), u!("Gal", "gal (cm/s²)", 1e-2)],
+        18 => vec![u!("rad/s", "radian per second", 1.0), u!("rpm", "revolution per minute", 2.0 * PI / 60.0), u!("rev/s", "revolution per second", 2.0 * PI),
+            u!("°/s", "degree per second", PI / 180.0), u!("°/min", "degree per minute", PI / 10_800.0)],
+        19 => vec![u!("Pa·s", "pascal second", 1.0), u!("mPa·s", "millipascal second (centipoise, cP)", 1e-3), u!("P", "poise", 0.1),
+            u!("lbf·s/ft²", "pound-force second per square foot", LBF / (FT * FT)), u!("lbf·s/in²", "pound-force second per square inch (reyn)", LBF / (IN * IN)),
+            u!("lb/(ft·s)", "pound per foot second", LB / FT)],
+        20 => vec![u!("m²/s", "square metre per second", 1.0), u!("mm²/s", "square millimetre per second (centistokes, cSt)", 1e-6), u!("St", "stokes", 1e-4),
+            u!("ft²/s", "square foot per second", FT * FT), u!("in²/s", "square inch per second", IN * IN)],
         _ => vec![],
     }
 }
@@ -168,6 +178,15 @@ mod tests {
         rel(units(3)[8].k, 1.459_390e1, 5e-7);           // slug
         rel(units(8)[7].k, 1.055_056e3, 5e-7);           // Btu
         rel(units(9)[6].k, 0.447_04, 1e-15);             // mph exact
+        rel(units(17)[2].k, 9.806_65, 1e-15);            // standard gravity, exact
+        rel(units(17)[3].k, 0.3048, 1e-15);              // ft/s^2 exact
+        rel(units(18)[1].k, 1.047_198e-1, 5e-7);         // rpm -> rad/s
+        rel(units(18)[3].k, 1.745_329e-2, 5e-7);         // degree per second
+        rel(units(19)[3].k, 4.788_026e1, 5e-7);          // lbf s/ft^2 -> Pa s
+        rel(units(19)[4].k, 6.894_757e3, 5e-7);          // lbf s/in^2
+        rel(units(19)[5].k, 1.488_164, 5e-7);            // lb/(ft s)
+        rel(units(20)[3].k, 9.290_304e-2, 1e-15);        // ft^2/s exact
+        rel(units(20)[4].k, 6.4516e-4, 1e-15);           // in^2/s exact
     }
 
     #[test]
@@ -187,6 +206,10 @@ mod tests {
         rel(convert(16, 5, 4, 1.0), 400.0, 1e-15);
         rel(convert(16, 5, 2, 1.0), 21_600.0, 1e-15);
         rel(convert(16, 1, 3, 1.0), 3600.0, 1e-15);
+        rel(convert(17, 2, 3, 1.0), 32.174_048_556, 1e-10);  // 1 g = 32.17405 ft/s^2 (SP 811 gives the inverse factor)
+        rel(convert(18, 1, 3, 1.0), 6.0, 1e-14);             // 1 rpm = 6 deg/s
+        rel(convert(19, 1, 2, 100.0), 1.0, 1e-15);           // 100 cP = 1 P
+        rel(convert(20, 2, 1, 1.0), 100.0, 1e-13);           // 1 St = 100 cSt
     }
 
     #[test]

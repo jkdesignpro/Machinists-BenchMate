@@ -2,7 +2,7 @@
 
 A free, open-source (AGPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. For all machinists and all machines: mills, lathes, Swiss-type and more.
 
-**Status:** v0.5.0 is complete and on a pull request (0.2.0 is on main, 0.3.0 and 0.4.0 are complete and on their own pull request to main). 183 tools on 148 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
+**Status:** v0.6.0 in progress (0.2.0 is on main; 0.3.0 to 0.5.0 are complete and on pull requests to main). 187 tools on 151 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
 
 ## How the app is organised
 - **Modes** (top bar): **Simple** shows 16 everyday tools with only their main inputs; **Advanced** shows every tool; **Expert** also opens every working, constant and evidence table. A mode never changes a calculation.
@@ -96,6 +96,9 @@ Parametric 2D shapes exported as DXF for CAM: bolt circle (with outside diameter
 
 ## The extras (0.5.0)
 **Knurling** by four methods (diametral pitch, circular pitch, measure and count, trial and error with a tick-off procedure). **Grinding wheel to work rpm ratio**: whole-number and simple-fraction ratios flagged, work speeds to stay away from. **Gun drilling**: speed, feed, coolant pressure and flow from two makers side by side. A **tool wear guide** with our own drawings, causes and fixes. **M codes per builder** and **macro system variables per control**. A **material card** with a composition chart and machinability rings. **Collet nut and pull stud torque** from the makers' tables, side by side. **Gauge R&R** by the average and range method. **Thread gauge limits** for Unified threads (GO and NOT GO plug and ring). **Wire EDM**: kerf and wire offset, taper, cut time. **Rolled thread blank diameter**, and a measured hole checked on the tap drill page. **SAE parallel side splines** (4, 6, 10 and 16 splines, fits A, B and C, torque capacity; for repairs, the standard is obsolete for new designs). **Troubleshooting tables** for drilling, tapping and grinding in the CNC guide. Anything that rests on one publisher says so on the page; sources are in `docs/sources.md`.
+
+## Springs, belts and chains, units and symbols, more tapers (0.6.0)
+**Compression springs**: rate, stress with the Wahl factor, coils, solid length and pitch by end type, load at a length, drawn to scale. **Belt drives**: exact belt length, centre distance from a belt length, ratio, speeds and wrap. **Roller chain drives**: length in an even number of pitches, centre distance, sprocket pitch diameters. The **unit converter** adds acceleration, rotational speed and viscosity, with a tab for the **SI prefixes, the defining constants and the Greek alphabet**. **Machine tapers** adds Jarno and Brown & Sharpe; where the two published Brown & Sharpe tables differ, both are shown.
 
 ## Small mill and lathe calculators
 Radial chip thinning, corner and boss engagement, ball-nose cusp height and effective diameter (with tool tilt), runout and chip load, lathe feed, multi-pass roughing time, boring bar deflection with overhang guidance from three makers, C-axis feed and inverse time F, slitting saw, bandsaw chip per tooth and cut time, spot and centre drill depth. Formulas in `core/src/millturn.rs`; sources in `docs/sources.md`.

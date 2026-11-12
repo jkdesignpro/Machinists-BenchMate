@@ -71,6 +71,24 @@ const dcPl = (pts, cls) => (pts.length > 1 ? '<path class="' + (cls || 'ln') + '
 // Vertical dimension from yTop down to yBot at x (extension lines from o.from). DK.dimV puts the
 // offset on the wrong side when y1 < y2, so it is always called bottom-to-top here.
 const dcDimV = (yTop, yBot, x, text, o) => DK.dimV(Math.max(yTop, yBot), Math.min(yTop, yBot), x, text, o);
+// Two wheels joined by a belt or chain, to scale. d1 is the driving wheel (left), d2 the driven wheel (right).
+function dcTwoWheels(d1, d2, c, sys, rows, kind, dp) {
+  const W = 520, H = 250, u = dcU(sys);
+  if (!dcOk(d1) || !dcOk(d2) || !dcOk(c) || !(c > (d1 + d2) / 2)) return '';
+  const sc = Math.min(400 / (c + (d1 + d2) / 2), 150 / Math.max(d1, d2)), r1 = d1 / 2 * sc, r2 = d2 / 2 * sc, cy = 112;
+  const x1 = 40 + r1, x2 = x1 + c * sc;
+  // The spans touch each circle where the radius makes the angle a with the vertical: sin a = (r2 - r1) / c.
+  const a = Math.asin((r2 - r1) / (c * sc)), sx = Math.sin(a), cx = Math.cos(a);
+  let h = DK.circle(x1, cy, r1, 'part') + DK.circle(x2, cy, r2, 'part');
+  h += DK.line(x1 - r1 * sx, cy - r1 * cx, x2 - r2 * sx, cy - r2 * cx, 'hot') + DK.line(x1 - r1 * sx, cy + r1 * cx, x2 - r2 * sx, cy + r2 * cx, 'hot');
+  h += DK.cl(x1 - r1 - 8, cy, x2 + r2 + 8, cy) + DK.cl(x1, cy - r1 - 8, x1, cy + r1 + 8) + DK.cl(x2, cy - r2 - 8, x2, cy + r2 + 8);
+  const yb = cy + Math.max(r1, r2) + 30;
+  h += DK.dimH(x1, x2, yb, 'centres ' + dcN(c, dp) + ' ' + u, { from: cy });
+  h += DK.text(x1, cy - r1 - 14, 'driving ' + dcN(d1, dp), { cls: 'dimt' }) + DK.text(x2, cy - r2 - 14, 'driven ' + dcN(d2, dp), { cls: 'dimt' });
+  const wrap = rows.find(q => q.label.indexOf('Wrap on the small') === 0), len = rows.find(q => q.label === 'Belt length' || q.label === 'Chain length, even number of pitches');
+  h += dcLines(12, H - 26, [(len && isFinite(len.value) ? kind + ' ' + dcN(len.value, len.unit === 'pitches' ? 0 : dp) + ' ' + len.unit + '   ' : '') + (wrap && isFinite(wrap.value) ? 'wrap on the small wheel ' + dcN(wrap.value, 1) + '°' : '')]);
+  return DK.svg(W, H, h, 'Two wheels joined by a ' + kind + ': diameters, centre distance and the straight spans');
+}
 // Split a sentence into lines of at most n characters.
 const dcWrap = (t, n) => { const out = []; let cur = ''; String(t || '').split(' ').forEach(w => { if (cur && (cur + ' ' + w).length > n) { out.push(cur); cur = w; } else cur = cur ? cur + ' ' + w : w; }); if (cur) out.push(cur); return out; };
 const dcLines = (x, y, lines, o) => lines.filter(Boolean).map((t, i) => DK.text(x, y + i * 16, t, Object.assign({ cls: 'mut', anchor: 'start' }, o || {}))).join('');
@@ -915,6 +933,34 @@ Object.assign(DIAGRAMS, {
     h += dcLines(x, 128, ['depth h ' + dcN(hh, dp) + ' ' + u, n + ' splines', T && isFinite(T.value) ? 'T ' + dcN(T.value, sys === 'inch' ? 0 : 1) + ' ' + T.unit : '', T && isFinite(T.value) ? 'per inch of length' : '', T && isFinite(T.value) ? 'at 1000 psi' : '']);
     h += DK.text(W - 6, H - 6, 'the splined hole, to scale', { cls: 'mut', anchor: 'end' });
     return DK.svg(W, H, h, 'Section of an SAE parallel side splined hole: large diameter, small diameter, width and depth of the splines');
+  },
+
+  // Belt or chain round two wheels, to scale: the two circles, the straight spans tangent to both, centre distance and wrap.
+  beltdrive(v, sys, rows) { return dcTwoWheels(v.d1, v.d2, v.find === 1 ? dcRow(rows, 'Centre distance') : v.c, sys, rows, 'belt', sys === 'inch' ? 2 : 1); },
+  chaindrive(v, sys, rows) {
+    const p = dcRow(rows, 'Chain pitch'), ce = dcRow(rows, 'Centre distance for the even length');
+    return dcTwoWheels(dcRow(rows, 'Pitch diameter, driving sprocket'), dcRow(rows, 'Pitch diameter, driven sprocket'), ce, sys, rows, 'chain', sys === 'inch' ? 3 : 2, p);
+  },
+
+  // Compression spring: side view to scale, the coils as a zig-zag of the wire, with the solid length marked.
+  spring(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys), dp = sys === 'inch' ? 3 : 2;
+    const d = v.d, od = v.od, nt = dcRow(rows, 'Total coils'), ls = dcRow(rows, 'Solid length');
+    if (!dcOk(d) || !dcOk(od) || !dcOk(nt) || !dcOk(ls) || !(od > 2 * d)) return '';
+    const lf = dcOk(v.lf) && v.lf > ls ? v.lf : ls * 1.6, known = dcOk(v.lf) && v.lf > ls;
+    const sc = Math.min(330 / lf, 130 / od), x0 = 40, cy = 118, L = lf * sc, r = od / 2 * sc, w = Math.max(1.5, d * sc);
+    // One zig-zag per coil: the wire seen from the side crosses from top to bottom and back.
+    const n = Math.max(2, Math.round(nt)), step = (L - w) / n; let p = 'M' + (x0 + w / 2).toFixed(1) + ' ' + (cy + r - w / 2).toFixed(1);
+    for (let i = 0; i < n; i++) p += 'L' + (x0 + w / 2 + step * (i + 0.5)).toFixed(1) + ' ' + (cy - r + w / 2).toFixed(1) + 'L' + (x0 + w / 2 + step * (i + 1)).toFixed(1) + ' ' + (cy + r - w / 2).toFixed(1);
+    let h = '<path d="' + p + '" fill="none" stroke="currentColor" stroke-width="' + w.toFixed(1) + '" stroke-linejoin="round" stroke-linecap="round" class="part" style="fill:none"/>';
+    h += DK.line(x0 - 6, cy - r - 8, x0 - 6, cy + r + 8, 'tool') + DK.line(x0 + L + 6, cy - r - 8, x0 + L + 6, cy + r + 8, 'tool');
+    h += DK.cl(x0 - 14, cy, x0 + L + 14, cy);
+    h += DK.dimH(x0, x0 + L, cy + r + 34, (known ? 'free length ' + dcN(lf, dp) + ' ' + u : 'free length not entered'), { from: cy + r });
+    h += DK.dimH(x0, x0 + ls * sc, cy + r + 62, 'solid ' + dcN(ls, dp) + ' ' + u, { from: cy + r });
+    h += dcDimV(cy - r, cy + r, x0 + L + 36, 'OD ' + dcN(od, dp), { from: x0 + L + 6 });
+    const k = rows.find(q => q.label === 'Spring rate k');
+    h += dcLines(x0 + L + 78, cy - 30, ['wire ' + dcN(d, dp) + ' ' + u, dcN(nt, 1) + ' coils in all', k && isFinite(k.value) ? 'rate ' + dcN(k.value, sys === 'inch' ? 2 : 3) + ' ' + k.unit : '']);
+    return DK.svg(W, H, h, 'Side view of a compression spring between two flat faces: free length, solid length, outside diameter');
   },
 
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).

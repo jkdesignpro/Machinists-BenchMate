@@ -306,6 +306,15 @@ All were accessed 2026-11-10.
   - The ISO 7388-1 (SK) rows, HSK and R8 have one source so far; no free second publisher was found. Previews of the paid standards were not used.
 - **Pull studs.** Only the standard references and the thread sizes are given. Knob profiles differ between machine builders.
 
+### Jarno and Brown & Sharpe (0.6.0, read 2026-11-12)
+- **[LMS]** as above; its tables for Jarno No. 2 to 20 and Brown & Sharpe No. 1 to 18 (https://littlemachineshop.com/reference/tapers.php).
+- **[NEWMAN]** Newman Tools, "Tapers" (self-holding tapers). https://newmantools.com/tech/taper.htm . The Jarno rule with No. 8 as the example; a Brown & Sharpe table for No. 1 to 15 with diameters to five places and lengths as fractions; "standardized at 0.500 in/ft".
+- **[EE_JARNO]** Engineers Edge, "Jarno taper size chart". https://ns2.engineersedge.com/manufacturing/jarno_taper_size_chart_13464.htm . No. 2 to 20; the overall length cell of No. 16 is damaged on the page and that column is not used.
+- **Jarno.** One rule gives every size: large end N/8 in, small end N/10 in, length N/2 in, so 0.600 in per foot. Little Machine Shop and Engineers Edge print the same table for No. 2 to 20 and both follow the rule in every row; Newman Tools prints the rule. All rows are confirmed.
+- **Brown & Sharpe.** The small end diameters agree between Little Machine Shop and Newman Tools for No. 1 to 15. The plug lengths, and with them the large end diameters, differ for No. 4, 5, 7, 9, 10 and 11 (for example No. 4: 1.69 in long and 0.4207 in against 1 1/4 in long and 0.40233 in; No. 10: 5 in and 1.2597 in against 5 11/16 in and 1.28927 in). These read as the same taper made to different plug lengths, not as an error in either table, so both are shown and nothing is chosen. No. 16 to 18 and the taper per foot of each size (0.5020, 0.5024, 0.5161 for No. 10, and so on) are printed by Little Machine Shop only and are marked one source.
+- Newman's fraction lengths are entered as exact four-place decimals, so that a whole-number length is not taken to agree with a nearby two-place one.
+- Machinery's Handbook 31st edition, Part A p. 1024 (Jarno) was looked at on the publisher's online copy; its text layer is scrambled and no value was taken from it.
+
 ## Inserts, holders, cutting material groups (`data/refdata/inserts-evidence.json`, `iso513-evidence.json`, `core/src/tooling.rs`)
 ### Standards cited (current editions, iso.org listings checked 2026-11-10)
 - ISO 1832:2017 (indexable inserts for cutting tools: designation; iso.org/standard/69202).
@@ -867,6 +876,50 @@ Findings:
 - The torque figure is the handbook's rating at 1000 psi on the sides of the splines, to be scaled by the pressure the materials allow. No allowable pressure is given. SAE's summary confirms the basis (per inch of bearing length at 1000 psi) but not the formula.
 - Not readable: Engineers Edge "SAE standard spline" pages (script-only calculator, no formulas in the page text). Marks' Handbook is cited by others for the same proportions but was not read.
 - **Not included:** shaft dimensions and fits between shaft and hole, the tables' tolerances as numbers, hardened holes, broach dimensions.
+
+## Units and symbols (`core/src/units.rs`, `data/refdata/symbols-evidence.json`, tools `units`, `symbols`)
+All accessed 2026-11-12.
+
+- **Unit converter, added in 0.6.0**: acceleration (m/s², mm/s², standard gravity, ft/s², in/s², Gal), rotational speed (rad/s, rpm, rev/s, °/s, °/min), dynamic viscosity (Pa·s, mPa·s or centipoise, poise, lbf·s/ft², lbf·s/in², lb/(ft·s)) and kinematic viscosity (m²/s, mm²/s or centistokes, stokes, ft²/s, in²/s). Factors built from the exact definitions of NIST SP 811 (2008), Appendix B, as for the other quantities; the core tests check them against the values the appendix prints (rpm 1.047198 × 10⁻¹ rad/s, lbf·s/ft² 4.788026 × 10¹ Pa·s, lbf·s/in² 6.894757 × 10³ Pa·s, lb/(ft·s) 1.488164 Pa·s, ft²/s 9.290304 × 10⁻² m²/s).
+- **[BIPM_PREFIX]** BIPM, "SI prefixes". https://www.bipm.org/en/measurement-units/si-prefixes . 24 prefixes, quetta (10³⁰) to quecto (10⁻³⁰); cites CGPM Resolution 3 (2022).
+- **[NIST_PREFIX]** NIST, "Metric (SI) prefixes". https://www.nist.gov/node/428761 . The same 24; prints deka where BIPM prints deca. Both spellings are shown.
+- **[BIPM_CONST]** BIPM, "The International System of Units (SI): defining constants". https://bipm.org/measurement-units/si-defining-constants . **[NIST_SP330]** NIST SP 330, section 2, Table 1. https://www.nist.gov/node/1578986 . The seven defining constants; both print the same values.
+- **[WARWICK]** University of Warwick, mathematics undergraduate handbook, the Greek alphabet. https://warwick.ac.uk/fac/sci/maths/ughandbook2022/general/greek/ . **[ETB]** The Engineering ToolBox, "Greek alphabet". https://www.engineeringtoolbox.com/greek-alphabet-d_5.html . The same 24 letters.
+- The meaning shown beside a Greek letter is BenchMate's own: how its formula library uses the letter. Mathematical signs and letter symbols for quantities are not listed.
+
+## Springs (`core/src/springs.rs`, tool `spring`)
+All accessed 2026-11-12.
+
+- **[AMES_SPRING]** AMES (amesweb.info), "Compression spring formulas and definitions". https://amesweb.info/MechanicalSprings/compression-spring-formulas.aspx . Rate k = d⁴ G / (8 D³ Na); Wahl factor (4C − 1)/(4C − 4) + 0.615/C; stress Kw 8FD/(π d³); total coils, free length, solid height and pitch for plain, plain and ground, closed, closed and ground ends. Cites Shigley's *Mechanical Engineering Design*.
+- **[AMES_EX]** AMES, "Compression spring fatigue design example". https://amesweb.info/MechanicalSprings/Examples/CompressionSpringFatigueDesignExample.aspx . Worked example used as the proof: d 0.080 in, OD 0.625 in, 22 active coils, squared and ground, free length 4 in: k 16.89 lbf/in, C 6.81, Kw 1.22, solid 1.92, deflection to solid 2.08, pitch 0.17, stress amplitude 23.14 ksi for 22 and 8 lbf.
+- **[MECHREF]** MechRef (University of Illinois Urbana-Champaign), "Springs". https://www.mechref.org/mf/Springs . The same rate, the Wahl factor, solid length (Nt + 1) d unground and Nt d ground.
+- **[ROYMECH]** RoyMech, "Helical springs". https://roymech.org/Useful_Tables/Springs/Springs_helical.html . Wahl factor with a table by spring index (3: 1.58 to 16: 1.09, reproduced by the core), total coils and solid length by end type, "for most helical springs C is between 3 and 12". Its rate and stress formulas are images and were not read.
+- **[LEE]** Lee Spring, "Spring materials". https://leespring.com/spring-materials . **[ACXESS]** Acxess Spring, "Popular materials used for springs". https://www.acxesspring.com/popular-materials-used-for-springs.html . Modulus of rigidity G.
+
+Findings:
+- Rate, Wahl factor, stress, total coils and solid length are printed the same by two or three publishers. **Pitch by end type has one source** (AMES) and the page says so. The spring index range 3 to 12 has one source (RoyMech) and is given as a note only.
+- **Modulus of rigidity**: both makers print 11.5 × 10⁶ psi for the carbon and alloy spring steels, 10 × 10⁶ for stainless 302/304 and 316, and 11 × 10⁶ for 17-7 PH. Phosphor bronze (6.25) and beryllium copper (7) are from Lee Spring only and are marked. Acxess's stainless table lost its row labels in reading; the values were matched by column order.
+- The AMES example does not print its shear modulus; 11.75 × 10⁶ psi reproduces its rate (the makers print 11.5). The proof enters 11.75 as an own value and says so.
+- Read and not used: a calculator page (Firgelli) whose worked examples do not follow from its own formulas.
+- **Not included:** allowable stresses, buckling (one source), natural frequency and surge, extension and torsion springs, disc springs.
+
+## Belts and chains (`core/src/drives.rs`, tools `beltdrive`, `chaindrive`)
+All accessed 2026-11-12.
+
+- **[TEC_BELT]** tec-science, "Calculation of the belt length for belt drives". https://www.tec-science.com/?p=4818 . Exact length 2 e cos α + (dl + ds) π/2 + (dl − ds) α; short formula 2e + π/2 (dl + ds) + (dl − ds)²/(4e); wrap on the small pulley π − 2 arcsin((dl − ds)/2e).
+- **[OMNI_BELT]** Omni Calculator, "Belt length". https://www.omnicalculator.com/physics/belt-length . The same exact formula (written with arcsin) and the short one; examples 30 and 15 cm pulleys 1.5 m apart = 3.71 m, and 6 and 20 in pulleys 56 in apart = 153.72 in (short formula). Both reproduced by the core tests.
+- **[MARTIN]** Martin Sprocket & Gear, "Sprocket engineering data". https://www.martinsprocket.com/docs/catalogs/engineering/engineering%20catalog/sprocket-engineering-data.pdf . Pitch diameter = pitch / sin(180/Nt); chain length L = 2C + (N + n)/2 + 0.1013 (N − n)²/4C in pitches; pitch by chain number; 30 to 50 pitches of centre distance for average applications, idlers or guides at 80 pitches or more; wrap at least 120° on the small sprocket. In the PDF text the fraction bars are lost, and the pitch of No. 80 reads "1.625" where the series and Wikipedia give 1 in.
+- **[TSUBAKI]** U.S. Tsubaki, "RS chain drive selection". https://catalog.tsubaki.ca/Asset/RS-Chain-Drive-Selection_1.pdf . Chain length and centre distance in pitches (the constants 6.28 and 9.86 are readable, the layout is not); any fraction of a pitch counts as one pitch; more than 15 teeth suggested on the small sprocket.
+- **[MOTT_SUM]** "Chain drives design, part 3", a summary of R. L. Mott, *Machine Elements in Mechanical Design*. https://mechanical-design-handbook.blogspot.com/2011/03/chain-drives-design-part-3.html . L = 2C + (N2 + N1)/2 + (N2 − N1)²/(4π²C); C = (p/8)[2L − (N2 + N1) + √((2L − (N2 + N1))² − 0.81 (N2 − N1)²)]; pitch diameter p / sin(180/N); 30 to 50 pitches; even number of pitches; wrap over 120°.
+- **[WIKI_CHAIN]** Wikipedia, "Roller chain". https://en.wikipedia.org/wiki/Roller_chain . Chain number: the first digits are the pitch in eighths of an inch, the last digit 0 standard, 1 lightweight, 5 bushed without rollers; pitches for No. 25 to 80.
+- SSJ Group, "Chain length and sprocket center distance" (https://ssj-group.com/chain-length-and-sprocket-center-distance/): the same terms, with the division by the centre distance lost in the page text; round up, and prefer an even number of links.
+
+Findings:
+- The belt formulas are printed by two publishers. The wrap on the large pulley is the rest of the full turn (geometry; tec-science prints the small pulley only). The centre distance for a belt length is the exact length formula solved numerically, so no further source is needed.
+- The chain length formula is printed clearly by one page (the Mott summary); Martin and Tsubaki print the same terms with their constants (0.1013/4 = 1/(4π²); 8/9.86 = 8/π²) in text whose layout is damaged. The centre distance formula is the exact inverse of the length formula (checked in the core tests).
+- Chain pitch by number: the rule (Wikipedia) and the table (Martin) agree for every size from No. 25 to No. 240 except the damaged No. 80 cell.
+- No published worked example of a chain drive could be read, so `chaindrive` has no worked example on the page; the core tests check the formulas against the printed constants and against each other.
+- **Not included:** V-belt cross sections and standard lengths, timing belt pitches, belt tension and power ratings, crossed belts, chain load ratings, chain speed, sprocket tooth form, lubrication.
 
 ## Mechanics (`core/src/mechanics.rs`, `app/mechanics.js`, tools in `app/tools.js`)
 

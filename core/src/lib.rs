@@ -641,6 +641,8 @@ pub mod mechanics;
 pub mod inspect;
 pub use inspect::*;
 pub mod matref;
+pub mod springs;
+pub mod drives;
 pub mod cutforce;
 pub mod advisor;
 pub mod lobes;

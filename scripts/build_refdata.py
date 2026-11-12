@@ -722,6 +722,36 @@ def build_abbrev():
     return {'sources': sources_of(ev), 'rows': rows}
 
 
+def build_symbols():
+    """SI prefixes, SI defining constants and the Greek alphabet: confirmed when two publishers print the same."""
+    ev = load_ev('symbols-evidence.json')
+    if not ev: return None
+    alias = ev.get('prefix_alias', {})
+    pubs = list(ev['prefixes'])
+    prefixes = []
+    for name, sym, exp in ev['prefixes'][pubs[0]]:
+        printed = {p: [n2, s2] for p in pubs for n2, s2, e2 in ev['prefixes'][p] if e2 == exp}
+        same = len({(alias.get(n, n), s2) for n, s2 in printed.values()}) == 1
+        prefixes.append({'name': name, 'sym': sym, 'exp': exp, 'printed': printed,
+                         'status': 'confirmed' if len(printed) >= 2 and same else 'review'})
+    if len(prefixes) != 24: raise SystemExit('symbols: expected 24 SI prefixes')
+    cpubs = list(ev['constants'])
+    constants = []
+    for i, (name, sym, val, unit) in enumerate(ev['constants'][cpubs[0]]):
+        printed = {p: ev['constants'][p][i][1:] for p in cpubs if i < len(ev['constants'][p])}
+        same = len({tuple(v) for v in printed.values()}) == 1
+        constants.append({'name': name, 'sym': sym, 'value': val, 'unit': unit, 'publishers': list(printed),
+                          'status': 'confirmed' if len(printed) >= 2 and same else 'review'})
+    greek = []
+    for name, up, lo in ev['greek_letters']:
+        by = [p for p, names in ev['greek'].items() if name in names]
+        if not by: raise SystemExit(f'symbols: Greek letter {name} has no publisher')
+        greek.append({'name': name, 'upper': up, 'lower': lo, 'publishers': by, 'used': ev['greek_used'].get(name, ''),
+                      'status': 'confirmed' if len(by) >= 2 else 'review'})
+    if len(greek) != 24: raise SystemExit('symbols: expected 24 Greek letters')
+    return {'sources': sources_of(ev), 'prefixes': prefixes, 'constants': constants, 'greek': greek}
+
+
 def build_tooling():
     """Tooling reference (parity B3): tap limit steps, forming tap constants, coating
     temperatures and saw teeth rules, each with publisher consensus."""
@@ -1000,7 +1030,7 @@ def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
            'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'holdertorque': build_holdertorque(), 'threadgauge': build_threadgauge(), 'rollblank': build_rollblank(), 'gcodes': build_gcodes(),
-           'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
+           'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(), 'symbols': build_symbols(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
            'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),
            'matref': build_matref(), 'centredrills': build_centredrills()}

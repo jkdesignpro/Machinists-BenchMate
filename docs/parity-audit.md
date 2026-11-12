@@ -50,6 +50,8 @@ features are names only.
 
 Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more rows to done.
 
+**Update (0.6.0, first batch, branch `claude/books`, 2026-11-12):** springs, belt and chain drives, units and symbols, Jarno and Brown & Sharpe tapers. MH118, MH301, MH306, ED2, BB4 and BB46 done; MH40, MH289, MH290, MH300, ED75 and ED76 partial. Counted from the tables below: 213 done, 239 partial, 144 missing of 596 in-scope rows, 36 %; 324 more rows to done for 90 %.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -345,7 +347,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH37 | Columns | done | `column` | Euler and Johnson, end-condition K (`claude/mechanics`) |
 | MH38 | Plates, shells and cylinders | out of scope | | Pressure vessels |
 | MH39 | Shafts: torsion, deflection, design, keyway effect | partial | `torsion`, `critspeed` | Torsion, power, twist, critical speed; no keyway effect or combined bending and torsion design (`claude/mechanics`) |
-| MH40 | Springs: materials, stresses, compression/extension/torsion design | missing | | |
+| MH40 | Springs: materials, stresses, compression/extension/torsion design | partial | `spring` | 0.6.0: compression springs of round wire: rate, Wahl stress, coils, solid length and pitch by end type, modulus of rigidity from two makers; no allowable stresses, extension or torsion springs |
 | MH41 | Disc springs | missing | | |
 
 ### Properties, treatment and testing of materials
@@ -438,7 +440,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH115 | Tap thread limits (H and D limits), pipe and insert taps | partial | `taplimits` | Inch H and L, metric D numbers computed and checked against 1B/2B/3B and 6H/5H/7H/6G; no pipe or STI tap limits; D minimums only where OSG prints them (`claude/tooling-ref`) |
 | MH116 | Acme and square-threaded taps | missing | | |
 | MH117 | Morse tapers | done | `machinetapers` | |
-| MH118 | Brown & Sharpe and Jarno tapers | missing | | |
+| MH118 | Brown & Sharpe and Jarno tapers | done | `machinetapers` | 0.6.0: Jarno No. 2 to 20 confirmed; Brown & Sharpe No. 1 to 18, the two publishers' plug lengths differ for six sizes and both are shown |
 | MH119 | ANSI machine tapers and 7/24 tool shanks | done | `machinetapers` | |
 | MH120 | British standard tapers | missing | | |
 | MH121 | Jacobs tapers and threads | partial | `machinetapers` | Tapers only; no Jacobs threaded mounts |
@@ -639,8 +641,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH286 | Lubrication theory, lubricants, contamination | out of scope? | | |
 | MH287 | Couplings, clutches, brakes | out of scope? | | Cutting clutch teeth is the only machining part |
 | MH288 | Keys and keyseats (metric, inch, Woodruff), keyseat depths | partial | `keys` | Metric (DIN 6885-1 / ISO 773) and inch (ASME B17.1) parallel keys and keyseat depths; no Woodruff (no second source) |
-| MH289 | Belts and pulleys (flat, V, synchronous) | missing | | |
-| MH290 | Transmission chains and sprockets | missing | | |
+| MH289 | Belts and pulleys (flat, V, synchronous) | partial | `beltdrive` | 0.6.0: open belt length (exact and short formula), centre distance from a length, ratio, speeds, wrap; no V-belt sections, standard lengths or power ratings |
+| MH290 | Transmission chains and sprockets | partial | `chaindrive` | 0.6.0: chain length in pitches (even), centre distance, pitch by ANSI chain number, sprocket pitch diameters, wrap; no load ratings or tooth form |
 | MH291 | Ball and ACME leadscrews | missing | | |
 | MH292 | Electric motors | missing | | |
 | MH293 | Adhesives and sealants, retaining compounds, threadlocking | missing | | |
@@ -655,20 +657,20 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH300 | Greek alphabet, abbreviations, mathematical signs, letter symbols | missing | | |
-| MH301 | SI system, prefixes, US customary system, constants | partial | `units` | US customary and SI units; no prefix or constants table (`claude/measure-maths`) |
+| MH300 | Greek alphabet, abbreviations, mathematical signs, letter symbols | partial | `symbols`, `abbrev` | 0.6.0: Greek alphabet (two publishers) and drawing abbreviations; no mathematical signs or letter symbols for quantities |
+| MH301 | SI system, prefixes, US customary system, constants | done | `units`, `symbols` | 0.6.0: SI prefixes (BIPM and NIST) and the seven defining constants beside the unit converter |
 | MH302 | Length conversions (inches, fractions, mm, feet) | done | `fraction` | |
 | MH303 | Area, volume and flow conversions | done | `units` | Area, volume, flow (`claude/measure-maths`) |
 | MH304 | Mass, density, pressure, force and torque conversions | done | `units` | Mass, density, pressure, force, torque (`claude/measure-maths`) |
 | MH305 | Energy, power, heat and temperature conversions | done | `units` | Energy, power, temperature and temperature difference (`claude/measure-maths`) |
-| MH306 | Velocity, acceleration, viscosity and miscellaneous units | partial | `units` | Speed, feed and angle; no acceleration or viscosity (`claude/measure-maths`) |
+| MH306 | Velocity, acceleration, viscosity and miscellaneous units | done | `units` | 0.6.0: acceleration, rotational speed, dynamic and kinematic viscosity added |
 
 ## 3. Engineers' Data Book (Clifford Matthews)
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | ED1 | 1.1-1.7 Engineering careers (7 entries) | out of scope | | |
-| ED2 | 2.1 Greek alphabet | missing | | |
+| ED2 | 2.1 Greek alphabet | done | `symbols` | 0.6.0 |
 | ED3 | 2.2 Units systems | partial | `units` | SI and US customary conversions; no units-system explainer (`claude/measure-maths`) |
 | ED4 | 2.3 Units and conversions | partial | `fraction` | Length only |
 | ED5 | 2.4 Consistency of units | out of scope? | | |
@@ -741,8 +743,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED72 | 13.8 Shaft couplings | out of scope? | | |
 | ED73 | 13.9 Cam mechanisms | missing | | |
 | ED74 | 13.10 Clutches | out of scope? | | |
-| ED75 | 13.11 Pulley mechanisms | missing | | |
-| ED76 | 13.12 Drive types | missing | | |
+| ED75 | 13.11 Pulley mechanisms | partial | `beltdrive` | 0.6.0: belt length, ratio and wrap for two pulleys; no rope and block pulley systems |
+| ED76 | 13.12 Drive types | partial | `beltdrive`, `chaindrive`, `geartrain` | 0.6.0: belt, chain and gear drives each have a calculator; no comparison of drive types |
 | ED77 | 14.1-14.3 ISO 9001 quality systems and certification | out of scope? | | Management system |
 | ED78 | 14.4 Taguchi methods | missing | | Low priority |
 | ED79 | 14.5 Statistical process control | done | `capability`, `ctrlchart` | Cp/Cpk; X-bar/R and individuals/MR charts; run rules not applied (`claude/inspection-2`) |
@@ -769,7 +771,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB1 | Conversion factors inch/metric | partial | `fraction` | Length only |
 | BB2 | Drill size and decimal equivalent chart | done | `drillchart` | |
 | BB3 | Spanner selection chart | done | `spanner` | (`claude/fasteners`) |
-| BB4 | Torque conversion chart | missing | | |
+| BB4 | Torque conversion chart | done | `units` | Torque units convert in the unit converter (N·m, lbf·ft, lbf·in, ozf·in, kgf·m, kgf·cm) |
 | BB5 | Socket size cross-reference inch/metric | partial | `spanner` | Lookup of a spanner size against metric and inch heads; no socket cross-reference chart |
 | BB6 | Abbreviations for standard threads | partial | `threaddata` | Series names only |
 | BB7 | Thread forms used in engineering | partial | `threaddata`, `pipethreads`, `whitworth`, `acme`, `trapezoidal`, `buttress` | ACME, trapezoidal and buttress added; no forms overview drawing (`claude/threads-3`) |
@@ -811,7 +813,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB43 | T-slots | done | `tslots` | (`claude/fasteners`) |
 | BB44 | Keys and keyways | partial | `keys` | Parallel keys metric and inch; no Woodruff |
 | BB45 | Spur gear calculations | done | `spurgear` |  |
-| BB46 | Belt and gear drive calculations | partial | `geartrain` | Gear trains; no belt drives |
+| BB46 | Belt and gear drive calculations | done | `geartrain`, `beltdrive` | 0.6.0: belt drives added |
 | BB47 | V-belt cross sections | missing | | |
 | BB48 | Bolts and nuts identification and grades | done | `boltgrade` | (`claude/fasteners`) |
 | BB49 | Bolt and screw heads, types and drives | partial | `shcs` | Socket head cap screws only; no other head types or drives |

@@ -20,7 +20,7 @@ const HUBS = {
   drilldepth: { title: 'Drill point and spot depth', icon: 'drill', desc: 'Point length to add to a drilled depth, spot and centre drill depths.',
     tabs: [['drillpoint', 'Point length'], ['spotdepth', 'Spot and centre drill']] },
   convert: { title: 'Unit and fraction conversion', icon: 'units', desc: 'Convert units, and fractions to decimals and millimetres.',
-    tabs: [['units', 'Units', 1], ['fraction', 'Fractions', 1]] },
+    tabs: [['units', 'Units', 1], ['fraction', 'Fractions', 1], ['symbols', 'Prefixes and symbols']] },
   fitlookup: { title: 'Limits and fits', icon: 'fit', desc: 'ISO 286 and ANSI inch fits, with general tolerances.',
     tabs: [['fits', 'ISO fits', 1], ['ansifits', 'ANSI inch fits', 1], ['gentol', 'General tolerances']] },
   surfacefin: { title: 'Surface finish', icon: 'surface', desc: 'Roughness conversions and symbols, and the finish a turning tool or a milling cutter will leave.',
@@ -103,7 +103,7 @@ const WORKSPACES = [
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
     ['Materials', ['materials', 'hardness', 'heattreat', 'tempercolours', 'galvanic', 'plastics', 'metalid'], 'material'],
     ['Fasteners', ['boltgrade', 'bolttorque', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
-    ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife'], 'bearing'],
+    ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife', 'spring', 'beltdrive', 'chaindrive'], 'bearing'],
     ['Shop', ['coolant', 'economics', 'abbrev'], 'drop'],
     ['Guides', ['cncguide', 'toolwear', 'toolguide'], 'book'],
   ] },

@@ -123,6 +123,8 @@ async function renderWhitworth(el) {
 const TAPER_FAMILIES = {
   morse: { title: 'Morse tapers', fields: [['d_gauge_in', 'Gauge (large end) diameter', 'in'], ['small_in', 'Small end diameter', 'in'], ['length_in', 'Length', 'in'], ['tpf_in', 'Taper per foot', 'tpf']], prefix: 'MT' },
   jacobs: { title: 'Jacobs (drill chuck) tapers', fields: [['large_in', 'Large end diameter', 'in'], ['small_in', 'Small end diameter', 'in'], ['length_in', 'Length', 'in']], prefix: 'JT' },
+  jarno: { title: 'Jarno tapers', fields: [['large_in', 'Large end diameter', 'in'], ['small_in', 'Small end diameter', 'in'], ['length_in', 'Length', 'in'], ['tpf_in', 'Taper per foot', 'tpf']], prefix: 'No.' },
+  brownsharpe: { title: 'Brown & Sharpe tapers', fields: [['large_in', 'Large end diameter', 'in'], ['small_in', 'Small end diameter', 'in'], ['length_in', 'Length', 'in'], ['tpf_in', 'Taper per foot', 'tpf']], prefix: 'No.' },
   steep724: { title: '7:24 steep tapers (ISO 7388-1 / SK, BT, CAT)', fields: [], prefix: '' },
   hsk: { title: 'HSK hollow taper shanks (ISO 12164-1), form A', fields: [['d2_mm', 'Taper diameter d2', 'mm'], ['l1_mm', 'Shank length l1', 'mm']], prefix: 'HSK-A' },
   r8: { title: 'R8 collet', fields: [['angle', 'Included angle', 'deg'], ['body_in', 'Body (locating) diameter', 'in'], ['drawbar', 'Drawbar thread', 'text']], prefix: '' },

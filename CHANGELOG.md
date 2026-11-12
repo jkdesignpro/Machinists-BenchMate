@@ -4,6 +4,25 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-12
+Stage 4 of the plan, part 1: book references. Built on top of 0.5.0. In progress.
+
+### Added (springs, belts and chains)
+- New tool **Compression spring: rate, load and stress** (Reference > Machine elements): from the wire diameter, outside diameter, active coils and the kind of ends it gives the spring rate, spring index, Wahl stress factor, total coils, solid length and pitch, and the load and shear stress at solid, for a load or at a length, with the spring drawn to scale. Modulus of rigidity from two spring makers (two materials from one maker, marked), or your own. Checked against a published worked example.
+- New tool **Belt drive: length, ratio and wrap**: the exact length of an open belt and the usual short formula, or the centre distance a belt of a known length gives, with the speed ratio, driven speed, belt speed and the wrap on each pulley, drawn to scale. Two published examples are reproduced.
+- New tool **Roller chain drive: length and sprockets**: ANSI chain No. 25 to No. 240 or your own pitch; chain length in pitches rounded up to an even number, the centre distance that length needs, sprocket pitch diameters, ratio, driven speed and wrap, with notes when the centre distance is outside 30 to 50 pitches, the wrap is under 120° or the small sprocket has few teeth.
+- Eight entries in the formula library.
+
+### Added (machine tapers)
+- **Machine tapers** has two more families: **Jarno** No. 2 to 20 (two publishers print the same table and a third the rule behind it: large end N/8 in, small end N/10 in, length N/2 in) and **Brown & Sharpe** No. 1 to 18. For Brown & Sharpe the two publishers print the same small ends but different plug lengths, and so different large ends, for No. 4, 5, 7, 9, 10 and 11: both are shown with "Sources differ". No. 16 to 18 and the taper per foot come from one publisher and say so.
+
+### Added (units and symbols)
+- **Unit converter**: acceleration, rotational speed, dynamic viscosity and kinematic viscosity (factors from the exact definitions in NIST SP 811, checked against its printed values).
+- New tab **Prefixes and symbols** on the Unit and fraction conversion page: the 24 SI prefixes, the seven defining constants of the SI and the Greek alphabet with what each letter stands for in BenchMate's formulas. Every entry is printed the same by two publishers.
+
+### Changed
+- `docs/parity-audit.md` recounted against the app after 0.5.0: 76 rows that were still marked missing from the first audit are corrected.
+
 ## [0.5.0] - 2026-11-12
 Stage 3 of the plan: the extras. Built on top of 0.4.0.
 

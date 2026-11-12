@@ -1798,7 +1798,7 @@ const TOOLS = [
 },
 {
   id: 'machinetapers', level: 'simple', group: 'Setup', title: 'Machine tapers',
-  desc: 'Morse, Jacobs, 7:24 steep tapers (ISO 7388-1 / SK, BT, CAT), HSK-A and R8: gauge diameters, lengths, taper per foot and angle, with pull stud (retention knob) references.',
+  desc: 'Morse, Jacobs, Jarno, Brown & Sharpe, 7:24 steep tapers (ISO 7388-1 / SK, BT, CAT), HSK-A and R8: gauge diameters, lengths, taper per foot and angle, with pull stud (retention knob) references.',
   render: el => renderMachineTapers(el),
   working: 'Included angle = 2 atan(taper per unit length / 2). Values come from published tables, each with its publisher count.',
   source: 'ISO 296:1991 (Morse), ISO 7388-1:2007 and ISO 7388-2:2007 (7/24 shanks), ISO 7388-3:2016 (retention knobs), ISO 12164-1:2023 (HSK), ASME B5.50-2015 (R2025) (CAT), JIS B 6339 (BT, edition not confirmed); publishers listed under the tool.',
@@ -2556,8 +2556,15 @@ const TOOLS = [
   source: 'NIST SP 811, appendix B: inch = 0.0254 m exactly (1959 definition). See docs/shop-helpers.md.',
 },
 {
+  id: 'symbols', level: 'advanced', group: 'Shop helpers', title: 'SI prefixes, constants and Greek letters',
+  desc: 'The 24 SI prefixes from quecto to quetta, the seven constants that define the SI, and the Greek alphabet with what each letter stands for in BenchMate\'s formulas.',
+  render: el => renderSymbols(el),
+  working: 'No calculation: the values are shown as the publishers print them.',
+  source: 'BIPM, SI prefixes and SI defining constants; NIST, Metric (SI) prefixes and SP 330 Table 1; University of Warwick and The Engineering ToolBox (Greek alphabet). See docs/sources.md, Units and symbols.',
+},
+{
   id: 'units', level: 'simple', group: 'Shop helpers', title: 'Unit converter',
-  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once. Angles also convert to and from degrees-minutes-seconds, % slope, slope 1 in n, taper per foot, taper ratio 1:x and rate of taper.',
+  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow, angle, acceleration, rotational speed and viscosity (dynamic and kinematic). Every unit of the quantity at once. Angles also convert to and from degrees-minutes-seconds, % slope, slope 1 in n, taper per foot, taper ratio 1:x and rate of taper.',
   render: el => renderUnits(el),
   working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9). Angle forms: % slope = 100 tan a, 1 in n = 1 / tan a (a from the horizontal); taper C = 2 tan(a/2) = 1 : x, taper per foot = 12 C (a the included angle).',
   source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. Slope: Wikipedia "Grade (slope)". Taper: ISO/R 1119 (public preview), Omni Calculator taper. See docs/sources.md.',
@@ -2694,6 +2701,146 @@ const TOOLS = [
   render: el => renderTslots(el),
   working: 'No calculation: values as printed (min to max).',
   source: 'ISO 299:1987, DIN 650 (by name only); Engineers Edge (ASME B5.1M mm columns), iTeh preview of ISO 299.',
+},
+{
+  id: 'spring', level: 'advanced', group: 'Machine elements', title: 'Compression spring: rate, load and stress',
+  desc: 'A helical compression spring of round wire from what you can measure: wire diameter, outside diameter, coils and the kind of ends. Gives the spring rate, the solid length, the pitch, and the load and shear stress at a length or for a load, with the spring drawn to scale.',
+  fields: s => [
+    { id: 'd', label: 'Wire diameter d', unit: lenU(s), def: s === 'inch' ? 0.08 : 2 },
+    { id: 'od', label: 'Outside diameter of the coil', unit: lenU(s), def: s === 'inch' ? 0.625 : 16 },
+    { id: 'na', label: 'Active coils Na', unit: '', def: s === 'inch' ? 22 : 10 },
+    { id: 'end', label: 'Ends', unit: '', def: 3, options: [[0, 'Plain (open)'], [1, 'Plain and ground'], [2, 'Closed (squared)'], [3, 'Closed and ground']] },
+    { id: 'mat', label: 'Material', unit: '', def: 1, options: [[1, 'Carbon and alloy spring steel (music wire, hard drawn, oil tempered, CrV, CrSi)'], [2, 'Stainless steel 302, 304, 316'], [3, 'Stainless steel 17-7 PH'], [4, 'Phosphor bronze (one maker)'], [5, 'Beryllium copper (one maker)'], [0, 'Own modulus of rigidity']] },
+    { id: 'g', label: 'Modulus of rigidity G', unit: s === 'inch' ? 'psi' : 'MPa', def: '', when: v => v.mat === 0 },
+    { id: 'lf', label: 'Free length (optional)', unit: lenU(s), def: s === 'inch' ? 4 : '' },
+    { id: 'f', label: 'Load (optional)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { id: 'lw', label: 'Length under load (optional, needs the free length)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0 && v.od > 0 && v.na > 0)) return [];
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 3 : 2, fu = inch ? 'lbf' : 'N', ku = inch ? 'lbf/in' : 'N/mm', su = inch ? 'psi' : 'MPa';
+    const D = W.spring_mean_dia(v.od, v.d);
+    if (!isFinite(D)) return [R('Outside diameter', 'must be more than twice the wire diameter', '', 0)];
+    // Modulus: the core holds the makers' figures in psi; MPa is a unit conversion.
+    const G = v.mat === 0 ? v.g : (inch ? W.spring_g_psi(v.mat) : W.unit_convert(6, 6, 2, W.spring_g_psi(v.mat)));
+    const C = W.spring_index(D, v.d), E = k => W.spring_ends(v.end, v.na, v.d, v.lf, k), Ls = E(1);
+    const rows = [], ok = G > 0, St = (x, k) => W.spring_state(v.d, D, v.na, G, v.end, v.lf, x, k);
+    rows.push(ok ? R('Spring rate k', W.spring_rate(v.d, D, v.na, G), ku, inch ? 2 : 3) : R('Spring rate k', 'enter the modulus of rigidity', '', 0));
+    rows.push(R('Mean diameter D', D, u, dp), R('Spring index C = D / d', C, '', 2), R('Stress factor (Wahl) Kw', W.spring_wahl(C), '', 3));
+    if (v.mat !== 0) rows.push(R('Modulus of rigidity G used', G, su, 0));
+    rows.push(R('Total coils', E(0), '', 1), R('Solid length', Ls, u, dp));
+    const at = (name, F) => { rows.push(R('Load ' + name, F, fu, inch ? 2 : 1), R('Shear stress ' + name + ' (with Kw)', W.spring_stress(F, D, v.d), su, 0)); };
+    const free = v.lf > Ls;
+    if (v.lf > 0) {
+      if (!free) rows.push(R('Free length', 'is not longer than the solid length: check the coils and the ends', '', 0));
+      else {
+        rows.push(R('Pitch of the coils', E(2), u, dp), R('Travel from free to solid', St(0, 0), u, dp));
+        if (ok) at('at solid', St(0, 1));
+      }
+    }
+    if (v.f > 0 && ok) {
+      rows.push(R('Deflection for the load', St(v.f, 2), u, dp));
+      if (free) rows.push(isFinite(St(v.f, 3)) ? R('Length under the load', St(v.f, 3), u, dp) : R('Length under the load', 'the spring goes solid before it carries this load', '', 0));
+      rows.push(R('Shear stress at the load (with Kw)', W.spring_stress(v.f, D, v.d), su, 0));
+    }
+    if (v.lw > 0 && free && ok) {
+      if (v.lw >= v.lf) rows.push(R('Length under load', 'is not shorter than the free length', '', 0));
+      else if (!isFinite(St(v.lw, 4))) rows.push(R('Length under load', 'is shorter than the solid length', '', 0));
+      else at('at the length under load', St(v.lw, 4));
+    }
+    if (C < 3 || C > 12) rows.push(R('Note', 'Spring index ' + (C < 3 ? 'below 3' : 'above 12') + ': one source gives 3 to 12 as the range of most helical springs. ' + (C < 3 ? 'A tight coil is hard to wind and highly stressed on the inside.' : 'A loose coil tangles and buckles easily.'), '', 0));
+    return rows;
+  },
+  working: 'Mean diameter D = outside diameter − d. Spring index C = D / d. Rate k = G d⁴ / (8 D³ Na). Load F = k × deflection. Shear stress τ = Kw × 8 F D / (π d³), with the Wahl factor Kw = (4C − 1) / (4C − 4) + 0.615 / C for the curvature of the wire and the direct shear. ' +
+    'Total coils and solid length by the ends: plain Na and d (Nt + 1); plain and ground Na + 1 and d Nt; closed Na + 2 and d (Nt + 1); closed and ground Na + 2 and d Nt. Pitch from the free length Lf: plain (Lf − d) / Na; plain and ground Lf / (Na + 1); closed (Lf − 3d) / Na; closed and ground (Lf − 2d) / Na (one source for the pitch). ' +
+    'Modulus of rigidity as two spring makers print it: carbon and alloy spring steels 11.5 × 10⁶ psi, stainless 302, 304 and 316 10 × 10⁶ psi, 17-7 PH 11 × 10⁶ psi; phosphor bronze 6.25 and beryllium copper 7 × 10⁶ psi from one maker. The allowable stress is not given here: it depends on the wire size, the material and whether the load is steady or repeated, so compare the stress with the wire maker\'s figures. Buckling and surge are not checked.',
+  source: 'AMES (amesweb.info), Compression spring formulas; MechRef (University of Illinois), Springs; RoyMech, Helical springs (rate, Wahl factor, coils and solid length by end type). Modulus of rigidity: Lee Spring and Acxess Spring. See docs/sources.md, Springs.',
+  proof: [{ name: 'Music wire spring, 0.080 in wire, 0.625 in outside, 22 active coils, closed and ground, 4 in free, 7 lbf', sys: 'inch', vals: { d: 0.08, od: 0.625, na: 22, end: 3, mat: 0, g: 11750000, lf: 4, f: 7 },
+    expect: [['Spring rate k', 'lbf/in', 16.89, 0.005], ['Spring index C = D / d', '', 6.81, 0.005], ['Stress factor (Wahl) Kw', '', 1.22, 0.005], ['Solid length', 'in', 1.92, 0.0005], ['Travel from free to solid', 'in', 2.08, 0.0005], ['Shear stress at the load (with Kw)', 'psi', 23140, 6]],
+    source: 'AMES, Compression spring fatigue design example: k 16.89 lbf/in, C 6.81, Kw 1.22, solid height 1.92, maximum deflection 2.08, stress amplitude 23.14 ksi for loads of 22 and 8 lbf (an amplitude of 7 lbf).', note: 'The page does not print its shear modulus; 11.75 × 10⁶ psi reproduces its rate, where the two spring makers print 11.5 × 10⁶ psi for music wire.' }],
+},
+{
+  id: 'beltdrive', level: 'advanced', group: 'Machine elements', title: 'Belt drive: length, ratio and wrap',
+  desc: 'An open belt round two pulleys: the belt length for a centre distance, or the centre distance a belt of a known length gives, with the speed ratio, the driven speed, the belt speed and the angle of wrap on each pulley, drawn to scale.',
+  fields: s => [
+    { id: 'd1', label: 'Driving pulley diameter', unit: lenU(s), def: s === 'inch' ? 6 : 150 },
+    { id: 'd2', label: 'Driven pulley diameter', unit: lenU(s), def: s === 'inch' ? 20 : 300 },
+    { id: 'find', label: 'Find', unit: '', def: 0, options: [[0, 'Belt length from the centre distance'], [1, 'Centre distance from the belt length']] },
+    { id: 'c', label: 'Centre distance', unit: lenU(s), def: s === 'inch' ? 56 : 1500, when: v => v.find === 0 },
+    { id: 'len', label: 'Belt length', unit: lenU(s), def: s === 'inch' ? 153.72 : 3710, when: v => v.find === 1 },
+    { id: 'n', label: 'Driving speed (optional)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d1 > 0 && v.d2 > 0)) return [];
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 2 : 1, rows = [];
+    let c = v.c;
+    if (v.find === 1) {
+      if (!(v.len > 0)) return [];
+      c = W.belt_centre(v.d1, v.d2, v.len);
+      if (!isFinite(c)) return [R('Belt length', 'is too short to go round both pulleys with a gap between them', '', 0)];
+      rows.push(R('Centre distance', c, u, dp));
+    } else {
+      if (!(c > 0)) return [];
+      const L = W.belt_length(v.d1, v.d2, c);
+      if (!isFinite(L)) return [R('Centre distance', 'the pulleys would touch: it must be more than half the sum of the diameters', '', 0)];
+      rows.push(R('Belt length', L, u, dp), R('By the short formula', W.belt_length_approx(v.d1, v.d2, c), u, dp));
+    }
+    const small = W.belt_wrap_deg(v.d1, v.d2, c, 0);
+    rows.push(R('Speed ratio (driving speed / driven speed)', W.drive_driven_rpm(1, v.d2, v.d1), ': 1', 3),
+      R('Wrap on the small pulley', small, '°', 1), R('Wrap on the large pulley', W.belt_wrap_deg(v.d1, v.d2, c, 1), '°', 1));
+    if (v.n > 0) {
+      rows.push(R('Driven speed', W.drive_driven_rpm(v.n, v.d1, v.d2), 'RPM', 0));
+      // Belt speed is the surface speed of the driving pulley: the same core function as cutting speed.
+      rows.push(inch ? R('Belt speed', W.sfm_from_rpm(v.n, v.d1), 'ft/min', 0) : R('Belt speed', W.unit_convert(9, 1, 0, W.vc_from_rpm(v.n, v.d1)), 'm/s', 1));
+    }
+    if (v.d1 !== v.d2) rows.push(R('Note', 'Use the pitch (datum) diameters of V-belt and timing pulleys and the pitch length of the belt, not the outside sizes. Slip and belt thickness are not included.', '', 0));
+    return rows;
+  },
+  working: 'Belt length, exact: L = (D + d) π/2 + (D − d) asin((D − d) / 2C) + 2 √(C² − (D − d)² / 4), with D the large and d the small pulley diameter and C the centre distance. Short formula: L ≈ 2C + π/2 (D + d) + (D − d)² / (4C). ' +
+    'Wrap on the small pulley = 180° − 2 asin((D − d) / 2C); the large pulley has the rest of the full turn. Centre distance from a belt length: the exact length formula solved for C. Speed ratio = driven diameter / driving diameter; driven speed = driving speed × driving diameter / driven diameter; belt speed = π × driving diameter × speed.',
+  source: 'tec-science, Calculation of the belt length for belt drives (exact and short formulas, wrap angle); Omni Calculator, Belt length (the same two formulas, worked examples). See docs/sources.md, Belts and chains.',
+  proof: [{ name: 'Pulleys of 300 and 150 mm, 1500 mm apart', sys: 'mm', vals: { d1: 150, d2: 300, find: 0, c: 1500 }, expect: [['Belt length', 'mm', 3710, 5]],
+    source: 'Omni Calculator, Belt length: pulleys of 30 cm and 15 cm, 1.5 m apart, belt length 3.71 m.' },
+  { name: 'Pulleys of 6 and 20 in, 56 in apart, by the short formula', sys: 'inch', vals: { d1: 6, d2: 20, find: 0, c: 56 }, expect: [['By the short formula', 'in', 153.72, 0.005]],
+    source: 'Omni Calculator, Belt length: 6 and 20 in pulleys, 56 in apart, 153.72 in by the approximate formula.' }],
+},
+{
+  id: 'chaindrive', level: 'advanced', group: 'Machine elements', title: 'Roller chain drive: length and sprockets',
+  desc: 'A roller chain round two sprockets: the chain length in pitches for a centre distance, rounded up to an even number of pitches, the centre distance that length then needs, the sprocket pitch diameters, the ratio and the wrap on the small sprocket.',
+  fields: s => [
+    { id: 'no', label: 'Chain', unit: '', def: 40, options: [[25, 'No. 25 (1/4 in pitch)'], [35, 'No. 35 (3/8 in)'], [40, 'No. 40 (1/2 in)'], [41, 'No. 41 (1/2 in, light)'], [50, 'No. 50 (5/8 in)'], [60, 'No. 60 (3/4 in)'], [80, 'No. 80 (1 in)'], [100, 'No. 100 (1 1/4 in)'], [120, 'No. 120 (1 1/2 in)'], [140, 'No. 140 (1 3/4 in)'], [160, 'No. 160 (2 in)'], [180, 'No. 180 (2 1/4 in)'], [200, 'No. 200 (2 1/2 in)'], [240, 'No. 240 (3 in)'], [0, 'Own pitch']] },
+    { id: 'p', label: 'Chain pitch', unit: lenU(s), def: s === 'inch' ? 0.5 : 12.7, when: v => v.no === 0 },
+    { id: 'n1', label: 'Teeth on the driving sprocket', unit: '', def: 17 },
+    { id: 'n2', label: 'Teeth on the driven sprocket', unit: '', def: 51 },
+    { id: 'c', label: 'Centre distance wanted', unit: lenU(s), def: s === 'inch' ? 20 : 500 },
+    { id: 'n', label: 'Driving speed (optional)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.n1 >= 3 && v.n2 >= 3 && v.c > 0)) return [];
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 3 : 2;
+    // Chain pitch: the core gives inches from the chain number; mm is a unit conversion. Lengths in pitches are the length divided by the pitch.
+    const p = v.no === 0 ? v.p : (inch ? W.chain_pitch_in(v.no) : W.unit_convert(0, 5, 1, W.chain_pitch_in(v.no)));
+    if (!(p > 0)) return [];
+    const cp = v.c / p, L = W.chain_length_pitches(v.n1, v.n2, cp), Le = W.chain_even_links(L), ce = W.chain_centre_pitches(v.n1, v.n2, Le);
+    const d1 = W.sprocket_pitch_dia(p, v.n1), d2 = W.sprocket_pitch_dia(p, v.n2), rows = [];
+    if (!(v.c > (d1 + d2) / 2)) return [R('Centre distance', 'the sprockets would touch: it must be more than half the sum of the pitch diameters, ' + fmt((d1 + d2) / 2, dp) + ' ' + u, '', 0)];
+    rows.push(R('Chain length, even number of pitches', Le, 'pitches', 0), R('Chain length as calculated', L, 'pitches', 2), R('Chain pitch', p, u, inch ? 3 : 3),
+      R('Centre distance for the even length', ce * p, u, dp), R('Centre distance wanted, in pitches', cp, 'pitches', 1),
+      R('Pitch diameter, driving sprocket', d1, u, dp), R('Pitch diameter, driven sprocket', d2, u, dp),
+      R('Speed ratio (driving speed / driven speed)', W.drive_driven_rpm(1, v.n2, v.n1), ': 1', 3));
+    const wrap = W.belt_wrap_deg(d1, d2, ce * p, 0);
+    rows.push(R('Wrap on the small sprocket', wrap, '°', 1));
+    if (v.n > 0) rows.push(R('Driven speed', W.drive_driven_rpm(v.n, v.n1, v.n2), 'RPM', 0));
+    const notes = [];
+    if (cp < 30 || cp > 50) notes.push('The centre distance is ' + fmt(cp, 1) + ' pitches: two sources recommend 30 to 50 pitches for ordinary drives' + (cp >= 80 ? ', and guides or an idler at 80 pitches or more' : '') + '.');
+    if (wrap < 120) notes.push('The wrap on the small sprocket is under 120°: two sources ask for at least 120° so that enough teeth share the load.');
+    if (Math.min(v.n1, v.n2) < 15) notes.push('One chain maker suggests more than 15 teeth on the small sprocket.');
+    if (notes.length) rows.push(R('Note', notes.join(' '), '', 0));
+    return rows;
+  },
+  working: 'Chain pitch from the ANSI chain number: the digits before the last are eighths of an inch (No. 40 = 4/8 in, No. 100 = 10/8 in); the last digit is 0 for standard chain, 1 for light chain, 5 for bushed chain without rollers. Chain length in pitches: L = 2C + (N1 + N2)/2 + (N2 − N1)² / (4π² C), with C the centre distance in pitches. ' +
+    'The length is rounded up to an even number of pitches, because an odd number needs an offset link. Centre distance for a length: C = 1/8 [2L − (N1 + N2) + √((2L − (N1 + N2))² − (8/π²)(N2 − N1)²)] pitches. Sprocket pitch diameter = pitch / sin(180° / N). Wrap on the small sprocket = 180° − 2 asin((D2 − D1) / 2C), the geometry of a belt on the pitch circles. Chain sag, wear elongation and the load rating are not covered.',
+  source: 'Martin Sprocket & Gear, Sprocket engineering data (chain length with the constant 0.1013, pitch diameter, pitches by chain number, 30 to 50 pitches, 120° wrap); U.S. Tsubaki, RS chain drive selection (length and centre distance, small sprocket teeth); a summary of Mott, Machine Elements in Mechanical Design (the same formulas, even number of pitches); Wikipedia, Roller chain (the chain number rule). See docs/sources.md, Belts and chains.',
 },
 {
   id: 'keys', level: 'advanced', group: 'Machine elements', title: 'Keys and keyways',

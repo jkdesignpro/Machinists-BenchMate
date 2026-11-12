@@ -721,6 +721,24 @@ f1!(interpolate, c::expr::interpolate, x1, y1, x2, y2, x);
 f1!(gear_involute, c::gears::involute, deg);
 f1!(gear_inv_angle, c::gears::inv_angle_deg, inv);
 f1!(sae_spline, c::gears::sae_spline, n, fit, d_nom, which);
+f1!(spring_mean_dia, c::springs::spring_mean_dia, od, d);
+f1!(spring_index, c::springs::spring_index, dm, d);
+f1!(spring_rate, c::springs::spring_rate, d, dm, na, g);
+f1!(spring_wahl, c::springs::spring_wahl, c);
+f1!(spring_stress, c::springs::spring_stress, f, dm, d);
+f1!(spring_ends, c::springs::spring_ends, end, na, d, lf, which);
+f1!(spring_g_psi, c::springs::spring_g_psi, mat);
+f1!(spring_state, c::springs::spring_state, d, dm, na, g, end, lf, x, which);
+f1!(belt_length, c::drives::belt_length, d1, d2, cd);
+f1!(belt_length_approx, c::drives::belt_length_approx, d1, d2, cd);
+f1!(belt_wrap_deg, c::drives::belt_wrap_deg, d1, d2, cd, which);
+f1!(belt_centre, c::drives::belt_centre, d1, d2, len);
+f1!(drive_driven_rpm, c::drives::drive_driven_rpm, n, driver, driven);
+f1!(chain_pitch_in, c::drives::chain_pitch_in, number);
+f1!(chain_length_pitches, c::drives::chain_length_pitches, n1, n2, cd);
+f1!(chain_even_links, c::drives::chain_even_links, l);
+f1!(chain_centre_pitches, c::drives::chain_centre_pitches, n1, n2, l);
+f1!(sprocket_pitch_dia, c::drives::sprocket_pitch_dia, p, n);
 /// Spur gear: which 0 d, 1 db, 2 da, 3 df, 4 ha, 5 hf, 6 h, 7 p, 8 pb, 9 s, 10 e, 11 z_min, 12 x_min, 13 s at tip.
 #[no_mangle] pub extern "C" fn gear_spur(m: f64, z: f64, alpha: f64, x: f64, ha: f64, hf: f64, which: f64) -> f64 { c::gears::spur_flat(m, z, alpha, x, ha, hf, which as u32) }
 /// Spur pair: which 0 inv aw, 1 aw, 2 y, 3 a0, 4 a, 5 dw1, 6 dw2, 7 ha1, 8 ha2, 9 h, 10 da1, 11 da2, 12 df1, 13 df2, 14 contact ratio.

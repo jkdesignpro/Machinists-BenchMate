@@ -652,6 +652,25 @@ function renderScales(el) {
 }
 
 // ---------- Drawing abbreviations ----------
+// SI prefixes, SI defining constants, Greek alphabet. Reference only: every value shown is as the publishers print it.
+async function renderSymbols(el) {
+  const R = await loadRef(el); if (!R) return;
+  const S = R.symbols, pub = k => (S.sources[k] || {}).publisher || k;
+  const pow = n => '10<sup>' + (n < 0 ? '−' + (-n) : n) + '</sup>';
+  const val = v => rEsc(v).replace(/10\^(-?)(\d+)/, (m, sg, d) => '10<sup>' + (sg ? '−' : '') + d + '</sup>');
+  const names = r => { const ns = [...new Set(Object.values(r.printed).map(p => p[0]))]; return ns.length > 1 ? ns.map(rEsc).join(' or ') : rEsc(r.name); };
+  el.innerHTML = '<p class="desc">The prefixes that scale an SI unit, the seven constants that define the SI, and the Greek letters with what each stands for in BenchMate\'s formulas. Nothing is calculated here.</p>' +
+    '<h3>SI prefixes</h3><div class="res mtab" id="sympre" style="max-width:640px"><table><tr><th>Prefix</th><th>Symbol</th><th>Factor</th><th>Listed by</th></tr>' +
+    S.prefixes.map(r => '<tr><td>' + names(r) + '</td><td class="v"><b>' + rEsc(r.sym) + '</b></td><td class="v">' + pow(r.exp) + '</td><td>' + badge(r.status) + ' <span class="ms">' + Object.keys(r.printed).map(pub).map(rEsc).join(', ') + '</span></td></tr>').join('') + '</table></div>' +
+    '<div class="note">A prefix joins the unit with no space: 5 µm, 3 kN, 40 MPa. Upper and lower case matter: m is milli and M is mega, k (kilo) is lower case. The prefix for 10 is printed deca by BIPM and deka by NIST. In machining, µm (micrometre, "micron") is 0.001 mm and µin (microinch) is 0.000001 in.</div>' +
+    '<h3>The seven defining constants of the SI</h3><div class="res mtab" id="symcon" style="max-width:760px"><table><tr><th>Constant</th><th>Symbol</th><th>Value (exact)</th><th>Unit</th><th>Listed by</th></tr>' +
+    S.constants.map(r => '<tr><td>' + rEsc(r.name) + '</td><td class="v">' + rEsc(r.sym) + '</td><td class="v">' + val(r.value) + '</td><td class="u">' + rEsc(r.unit) + '</td><td>' + badge(r.status) + ' <span class="ms">' + r.publishers.map(pub).map(rEsc).join(', ') + '</span></td></tr>').join('') + '</table></div>' +
+    '<div class="note">Since 2019 every SI unit is defined by fixing these seven values. The value used most in a shop is not one of them: the standard acceleration of gravity, 9.806 65 m/s² exactly, which turns kilograms-force and pounds-force into newtons (NIST SP 811; it is the "g" in the unit converter).</div>' +
+    '<h3>Greek alphabet</h3><div class="res mtab" id="symgrk" style="max-width:760px"><table><tr><th>Name</th><th>Capital</th><th>Small</th><th>In BenchMate\'s formulas</th><th>Listed by</th></tr>' +
+    S.greek.map(r => '<tr><td>' + rEsc(r.name) + '</td><td class="v">' + rEsc(r.upper) + '</td><td class="v">' + rEsc(r.lower) + '</td><td>' + (r.used ? rEsc(r.used) : '<span class="ms">not used</span>') + '</td><td>' + badge(r.status) + '</td></tr>').join('') + '</table></div>' +
+    '<div class="note">The meanings are how BenchMate\'s own formula library uses each letter; other books use some letters differently, so read the legend of the formula in front of you. The diameter sign ⌀ on a drawing is not the Greek letter phi.</div>' +
+    '<div class="note"><b>Sources:</b><br>' + sourceList(S.sources) + '</div>';
+}
 const AB_STATE = { q: '', cat: '' };
 async function renderAbbrev(el) {
   const R = await loadRef(el); if (!R) return;

@@ -123,7 +123,7 @@ await mode('advanced');
 // own figure, or be on this list of screens with nothing to draw: reference tables, converters,
 // managers, and three that draw a small figure of their own once something is picked.
 where = 'drawings';
-const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'calc', 'formulas',
+const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'symbols', 'calc', 'formulas',
   'machines', 'toollib', 'setupsheet', 'materials', 'tempercolours', 'heattreat', 'plastics', 'metalid',
   'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade', 'holdertorque']);
 await units('inch');
@@ -1624,6 +1624,130 @@ where = 'saespline';
   await units('inch'); await open('saespline', 80);
   await pick('n', '6'); await pick('fit', '1'); await put('D', '1.5');
   await mode('advanced');
+}
+// Prefixes and symbols page (24 prefixes, 7 constants, 24 Greek letters, all confirmed by two publishers), and the
+// unit converter's acceleration, rotational speed and viscosity against NIST SP 811 factors.
+where = 'symbols';
+{
+  await units('mm'); await open('symbols', 250);
+  const tab = async id => page.$$eval('#main #' + id + ' tr', r => r.slice(1).map(t => t.innerText.replace(/\s+/g, ' ').trim()));
+  let r = await tab('sympre');
+  if (r.length !== 24 || !/^quetta Q 1030 Confirmed BIPM, NIST$/.test(r[0]) || !r.includes('deca or deka da 101 Confirmed BIPM, NIST') || !r.includes('micro µ 10−6 Confirmed BIPM, NIST') || r.some(x => !/Confirmed/.test(x)))
+    problems.push(`[${where}] SI prefixes: ${r.length} rows: ${r.join(' ; ')}`);
+  r = await tab('symcon');
+  if (r.length !== 7 || !r.some(x => /Speed of light in vacuum c 299 792 458 m\/s Confirmed BIPM, NIST/.test(x)) || !r.some(x => /Planck constant h 6\.626 070 15 × 10−34 J s Confirmed/.test(x))) problems.push(`[${where}] defining constants: ${r.join(' ; ')}`);
+  r = await tab('symgrk');
+  if (r.length !== 24 || !r.some(x => /^kappa Κ κ κ: entering angle of a cutting edge Confirmed$/.test(x)) || !r.some(x => /^omicron Ο ο not used Confirmed$/.test(x))) problems.push(`[${where}] Greek alphabet: ${r.length} rows: ${r.join(' ; ')}`);
+
+  await open('units', 150);
+  const conv = async (qname, from, x) => {
+    await page.selectOption('#main [data-k="q"]', { label: qname }); await page.waitForTimeout(60);
+    await page.selectOption('#main [data-k="from"]', String(from)); await page.waitForTimeout(40);
+    await page.fill('#main [data-k="x"]', x); await page.dispatchEvent('#main [data-k="x"]', 'input'); await page.waitForTimeout(60);
+    return (await page.innerText('#main #ures')).replace(/\s+/g, ' ');
+  };
+  let t = await conv('Acceleration', 2, '1');
+  if (!/metre per second squared 9\.80665 m\/s²/.test(t) || !/foot per second squared 32\.17404856 ft\/s²/.test(t)) problems.push(`[${where}] 1 g in m/s² and ft/s²: ${t}`);
+  t = await conv('Rotational speed', 1, '1000');
+  if (!/radian per second 104\.7197551 rad\/s/.test(t) || !/degree per second 6,000 °\/s/.test(t)) problems.push(`[${where}] 1000 rpm: ${t}`);
+  t = await conv('Viscosity, dynamic', 1, '100');
+  if (!/pascal second 0\.1 Pa·s/.test(t) || !/poise 1 P/.test(t) || !/per square foot 0\.0020885434 lbf·s\/ft²/.test(t)) problems.push(`[${where}] 100 cP: ${t}`);
+  t = await conv('Viscosity, kinematic', 1, '32');
+  if (!/square metre per second 3\.200000e-5 m²\/s/.test(t) || !/stokes 0\.32 St/.test(t)) problems.push(`[${where}] 32 cSt: ${t}`);
+  await conv('Length', 1, '');
+}
+// Compression spring (the AMES example and the makers' modulus), belt drive (Omni's two examples, the centre distance
+// back from the length) and roller chain drive (even number of pitches, centre distance for it, pitch diameters, notes).
+where = 'spring';
+{
+  const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+  const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+  const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, v); await page.waitForTimeout(60); };
+  const dia = async () => page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  await units('inch'); await open('spring', 150);
+  await put('d', '0.08'); await put('od', '0.625'); await put('na', '22'); await pick('end', '3'); await pick('mat', '1'); await put('lf', '4'); await put('f', ''); await put('lw', '');
+  let t = await rows();
+  if (!/Spring rate k 16\.53 lbf\/in/i.test(t) || !/Mean diameter D 0\.545 in/i.test(t) || !/Spring index C = D \/ d 6\.81/i.test(t) || !/Kw 1\.219/i.test(t) || !/G used 11,500,000 psi/i.test(t) || !/Total coils 24\.0/i.test(t) ||
+      !/Solid length 1\.920 in/i.test(t) || !/Pitch of the coils 0\.175 in/i.test(t) || !/Travel from free to solid 2\.080 in/i.test(t) || !/Load at solid 34\.39 lbf/i.test(t)) problems.push(`[${where}] music wire spring, makers' modulus: ${t}`);
+  let d = await dia();
+  if (!/free length 4 in/.test(d) || !/solid 1\.92 in/.test(d) || !/OD 0\.625/.test(d) || !/24 coils in all/.test(d) || !/rate 16\.53 lbf\/in/.test(d)) problems.push(`[${where}] spring drawing: ${d}`);
+  await pick('mat', '0'); await put('g', '11750000'); await put('f', '7'); t = await rows();
+  if (!/Spring rate k 16\.89 lbf\/in/i.test(t) || !/Shear stress at the load \(with Kw\) 23,13\d psi/i.test(t) || !/Length under the load 3\.586 in/i.test(t)) problems.push(`[${where}] the published example (k 16.89, 23.14 ksi at 7 lbf): ${t}`);
+  await put('f', '40'); t = await rows();
+  if (!/goes solid before it carries this load/i.test(t)) problems.push(`[${where}] a load beyond solid must be said: ${t}`);
+  await put('f', ''); await put('lw', '3'); t = await rows();
+  if (!/Load at the length under load 16\.89 lbf/i.test(t)) problems.push(`[${where}] load at 3 in (1 in of travel = the rate): ${t}`);
+  await put('lw', '1.5'); t = await rows();
+  if (!/shorter than the solid length/i.test(t)) problems.push(`[${where}] a length under solid must be refused: ${t}`);
+  await put('lw', ''); await pick('end', '2'); t = await rows();
+  if (!/Solid length 2\.000 in/i.test(t) || !/Pitch of the coils 0\.171 in/i.test(t)) problems.push(`[${where}] closed ends not ground (solid d(Nt+1) = 2.000, pitch (4 - 0.24)/22): ${t}`);
+  await pick('end', '0'); t = await rows();
+  if (!/Total coils 22\.0/i.test(t) || !/Solid length 1\.840 in/i.test(t)) problems.push(`[${where}] plain ends: ${t}`);
+  await pick('end', '3'); await pick('mat', '1'); await put('od', '0.15'); t = await rows();
+  if (!/must be more than twice the wire diameter/i.test(t)) problems.push(`[${where}] an outside diameter under 2 d must be refused: ${t}`);
+  await put('od', '0.3'); t = await rows();
+  if (!/Spring index below 3/i.test(t)) problems.push(`[${where}] spring index 2.75 should be noted: ${t}`);
+  await put('od', '0.625');
+  await units('mm'); await open('spring', 150);
+  await put('d', '2'); await put('od', '16'); await put('na', '10'); await pick('end', '3'); await pick('mat', '1'); await put('lf', ''); t = await rows();
+  if (!/Spring rate k 5\.779 N\/mm/i.test(t) || !/G used 79,290 MPa/i.test(t) || !/Solid length 24\.00 mm/i.test(t)) problems.push(`[${where}] 2 mm wire, 16 mm outside, 10 coils: ${t}`);
+
+  await units('mm'); await open('beltdrive', 150);
+  await put('d1', '150'); await put('d2', '300'); await pick('find', '0'); await put('c', '1500'); await put('n', ''); t = await rows();
+  if (!/Belt length 3,710\.6 mm/i.test(t) || !/By the short formula 3,710\.6 mm/i.test(t) || !/Speed ratio \(driving speed \/ driven speed\) 2\.000 : 1/i.test(t) || !/Wrap on the small pulley 174\.3 °/i.test(t) || !/Wrap on the large pulley 185\.7 °/i.test(t)) problems.push(`[${where}] belt, 150 and 300 mm at 1500 mm (3.71 m): ${t}`);
+  await put('n', '1450'); t = await rows();
+  if (!/Driven speed 725 RPM/i.test(t) || !/Belt speed 11\.4 m\/s/i.test(t)) problems.push(`[${where}] belt speeds at 1450 rpm: ${t}`);
+  await pick('find', '1'); await put('len', '3710.6'); t = await rows();
+  if (!/Centre distance 1,500\.0 mm/i.test(t)) problems.push(`[${where}] centre distance back from the belt length: ${t}`);
+  d = await dia();
+  if (!/centres 1500 mm/.test(d) || !/driving 150/.test(d) || !/driven 300/.test(d) || !/wrap on the small wheel 174\.3°/.test(d)) problems.push(`[${where}] belt drawing: ${d}`);
+  await put('len', '600'); t = await rows();
+  if (!/too short to go round both pulleys/i.test(t)) problems.push(`[${where}] a belt that is too short: ${t}`);
+  await put('len', '3710'); await pick('find', '0'); await put('c', '200'); t = await rows();
+  if (!/the pulleys would touch/i.test(t)) problems.push(`[${where}] pulleys that overlap: ${t}`);
+  await put('c', '1500'); await put('n', '');
+  await units('inch'); await open('beltdrive', 150);
+  await put('d1', '6'); await put('d2', '20'); await pick('find', '0'); await put('c', '56'); t = await rows();
+  if (!/Belt length 153\.72 in/i.test(t) || !/By the short formula 153\.72 in/i.test(t)) problems.push(`[${where}] belt, 6 and 20 in at 56 in (153.72 in): ${t}`);
+
+  await open('chaindrive', 150);
+  await pick('no', '40'); await put('n1', '17'); await put('n2', '51'); await put('c', '20'); await put('n', ''); t = await rows();
+  if (!/Chain length, even number of pitches 116 pitches/i.test(t) || !/as calculated 114\.73 pitches/i.test(t) || !/Chain pitch 0\.500 in/i.test(t) || !/Centre distance for the even length 20\.320 in/i.test(t) || !/in pitches 40\.0 pitches/i.test(t) ||
+      !/driving sprocket 2\.721 in/i.test(t) || !/driven sprocket 8\.122 in/i.test(t) || !/3\.000 : 1/i.test(t) || !/Wrap on the small sprocket 164\.7 °/i.test(t) || /Note/i.test(t)) problems.push(`[${where}] No. 40 chain, 17 and 51 teeth, 20 in centres: ${t}`);
+  d = await dia();
+  if (!/centres 20\.32 in/.test(d) || !/chain 116 pitches/.test(d)) problems.push(`[${where}] chain drawing: ${d}`);
+  await put('n', '900'); t = await rows();
+  if (!/Driven speed 300 RPM/i.test(t)) problems.push(`[${where}] driven sprocket speed: ${t}`);
+  await put('n', ''); await put('c', '8'); t = await rows();
+  if (!/16\.0 pitches: two sources recommend 30 to 50 pitches/i.test(t) || /under 120°/i.test(t)) problems.push(`[${where}] a short centre distance should be noted: ${t}`);
+  await put('n1', '11'); await put('n2', '80'); await put('c', '10'); t = await rows();
+  if (!/Wrap on the small sprocket 114\.6 °/i.test(t) || !/under 120°/i.test(t) || !/more than 15 teeth on the small sprocket/i.test(t)) problems.push(`[${where}] 11 and 80 teeth close together: wrap and tooth notes: ${t}`);
+  await put('n1', '17'); await put('n2', '51');
+  await put('c', '4'); t = await rows();
+  if (!/the sprockets would touch/i.test(t)) problems.push(`[${where}] sprockets that overlap: ${t}`);
+  await put('c', '20'); await pick('no', '100'); t = await rows();
+  if (!/Chain pitch 1\.250 in/i.test(t)) problems.push(`[${where}] No. 100 chain is 1 1/4 in pitch: ${t}`);
+  await pick('no', '40');
+  await units('mm'); await open('chaindrive', 150);
+  await pick('no', '40'); await put('n1', '17'); await put('n2', '51'); await put('c', '508'); t = await rows();
+  if (!/Chain pitch 12\.700 mm/i.test(t) || !/even number of pitches 116 pitches/i.test(t) || !/Centre distance for the even length 516\.12 mm/i.test(t)) problems.push(`[${where}] the same chain drive in mm: ${t}`);
+  await put('c', '500');
+}
+// Jarno tapers follow N/8, N/10, N/2 and are confirmed by two tables; Brown & Sharpe sizes where the two publishers
+// print different lengths show both.
+where = 'machinetapers jarno';
+{
+  await units('inch'); await open('machinetapers', 200);
+  await page.selectOption('#main #tf', 'jarno'); await page.waitForTimeout(80);
+  let r = await page.$$eval('#main #tres tr', t => t.slice(1).map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+  if (r.length !== 19 || !/^No\. 8 1\.0000 in .* Confirmed 0\.8000 in .* Confirmed 4\.0000 in .* Confirmed 0\.6000 in\/ft included angle 2\.86\d+ deg Confirmed$/.test(r[6]) || r.some(x => /Differs|One source/i.test(x)))
+    problems.push(`[${where}] Jarno table: ${r.length} rows; No. 8: ${r[6]}`);
+  if (!/large end is N\/8 in, the small end N\/10 in and the length N\/2 in/.test(await page.innerText('#main #tnote'))) problems.push(`[${where}] the Jarno rule is not stated`);
+  await page.selectOption('#main #tf', 'brownsharpe'); await page.waitForTimeout(80);
+  r = await page.$$eval('#main #tres tr', t => t.slice(1).map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+  if (r.length !== 18 || !/^No\. 4 0\.4207 in .* also 0\.40233 0\.3500 in .* Confirmed 1\.6900 in .* also 1\.2500/.test(r[3]) || !/^No\. 10 .* 0\.5161 in\/ft/.test(r[9]) || !/^No\. 1 0\.2392 in .* Confirmed 0\.2000 in .* Confirmed 0\.9375 in .* Confirmed/.test(r[0]))
+    problems.push(`[${where}] Brown & Sharpe table: ${r.length} rows; No. 1: ${r[0]} ; No. 4: ${r[3]} ; No. 10: ${r[9]}`);
+  await page.selectOption('#main #tf', 'morse'); await page.waitForTimeout(60);
 }
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
