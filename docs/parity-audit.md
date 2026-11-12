@@ -82,6 +82,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, sixteenth batch, 2026-11-12):** drives and maintenance guide (`driveguide`: electric motors, shaft alignment, fluid power, machine vibration). MH292, MH298, MH299 and ED25 from missing to done. Counted from the tables below: 365 done, 177 partial, 54 missing of 596 in-scope rows, 61 %; 172 more rows to done for the 90 % target.
 
+**Update (0.6.0, seventeenth batch, 2026-11-12):** fasteners guide (`fastguide`). MH208 from missing to done and MH214 from partial to done; MH201, MH209, MH211, MH215 and MH216 from missing to partial (the tables of dimensions and hole sizes are still to come); MH210 stays partial with set screw points added. Counted from the tables below: 367 done, 181 partial, 48 missing of 596 in-scope rows, 62 %; 170 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -568,22 +570,22 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH198 | Torque and tension: tightening, wrench torque, preload, friction | partial | `bolttorque` | VDI 2230 torque from preload with your own friction (cited classes shown); no torque-angle or yield-controlled tightening, no tightening factor (scatter) |
 | MH199 | Thread tensile-stress area, torque-tension relationships | done | `bolttorque` | Stress area (ISO and Unified), torque-preload relation with the share of each term (`claude/fasteners`) |
 | MH200 | Grade marks, material properties, counterfeit detection | partial | `boltgrade` | ISO 898-1, SAE J429 and ASTM A574 minimums and head marks; no counterfeit detection |
-| MH201 | Working strength, engagement length, breaking force, lock wire | missing | | Thread engagement length is a common shop question |
+| MH201 | Working strength, engagement length, breaking force, lock wire | partial | `fastguide`, `boltgrade`, `bolttorque` | 0.6.0: engagement rule of thumb from two sources (differing figures shown) and lock wire in `fastguide`; strengths in `boltgrade`, preload in `bolttorque`; no breaking force by size and no calculated engagement length yet |
 | MH202 | Inch bolts, screws, nuts and washers (dimensions) | partial | `shcs`, `spanner` | Socket head cap screw heads and hex widths across flats only; no full bolt, nut and washer dimensions |
 | MH203 | Wrench clearances | missing | | |
 | MH204 | Metric hex screws, bolts, nuts and washers | partial | `spanner` | Widths across flats (ISO 272, old DIN, JIS) only; no head heights, nuts or washers |
 | MH205 | Socket head cap screws (inch and metric) | done | `shcs` | ISO 4762 and ASME B18.3 head diameter, height and key (`claude/fasteners`) |
 | MH206 | Clearance holes for bolts, screws and studs (inch and metric) | done | `clearance` | ISO 273 fine/medium/coarse and inch close/normal/free, with disagreements (`claude/fasteners`) |
 | MH207 | Helical coil screw thread inserts (STI) | partial | `sti` | Tapped-hole sizes; no insert lengths or installation data (`claude/threads-3`) |
-| MH208 | British fasteners | missing | | |
-| MH209 | Machine screws and nuts (inch, metric, British) | missing | | |
-| MH210 | Cap screws and set screws; drill and counterbore sizes; hex keys | partial | `shcs`, `clearance`, `spanner` | Cap screws, clearance and counterbore holes and hex keys; no set screws |
-| MH211 | Self-threading and thread-forming screws; hole sizes | missing | | |
+| MH208 | British fasteners | done | `fastguide`, `whitworth` | 0.6.0: Whitworth, BSF, BA, BSP and the cycle thread, the smaller hexagons and how spanners are marked, BSW against UNC; thread sizes in `whitworth` |
+| MH209 | Machine screws and nuts (inch, metric, British) | partial | `fastguide` | 0.6.0: eleven head shapes and six drives with what each is chosen for; no dimensions of machine screws and nuts |
+| MH210 | Cap screws and set screws; drill and counterbore sizes; hex keys | partial | `shcs`, `clearance`, `spanner`, `fastguide` | Cap screws, clearance and counterbore holes and hex keys; 0.6.0: set screw points and their use in `fastguide`; no set screw dimensions |
+| MH211 | Self-threading and thread-forming screws; hole sizes | partial | `fastguide` | 0.6.0: thread-forming against thread-cutting, types A, AB, B, 25 and U, thread-rolling and self-drilling screws; no hole sizes |
 | MH212 | T-slots, T-bolts and T-nuts | partial | `tslots` | ISO 299 T-slot dimensions and pitches; no T-bolt or T-nut dimensions |
 | MH213 | Rivets and riveted joints | out of scope? | | |
-| MH214 | Pins and studs: dowel pins, taper pins, spring pins, grooved pins, cotter pins | partial | `taperpin` | 0.6.0: inch taper pins (one publisher); no dowel, spring, grooved or cotter pins |
-| MH215 | Retaining rings | missing | | Groove dimensions |
-| MH216 | Wing nuts, wing screws and thumb screws | missing | | Low priority |
+| MH214 | Pins and studs: dowel pins, taper pins, spring pins, grooved pins, cotter pins | done | `taperpin`, `fastguide` | 0.6.0: inch taper pins (one publisher) in `taperpin`; dowel, slotted and coiled spring, grooved, split and clevis pins with how each holds in `fastguide` (sizes from one source, marked) |
+| MH215 | Retaining rings | partial | `fastguide` | 0.6.0: seven kinds of ring, how each is fitted and what load it suits, standards named; no groove dimensions |
+| MH216 | Wing nuts, wing screws and thumb screws | partial | `fastguide` | 0.6.0: thumb and wing heads named with their limits; no dimensions |
 | MH217 | Nails, spikes and wood screws | out of scope | | |
 
 ### Threads and threading

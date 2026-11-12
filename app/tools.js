@@ -3461,6 +3461,13 @@ const TOOLS = [
   source: 'Machine Design, AutomationDirect and Control Engineering (motors); Fabrico, OpenExamPrep and Tractian (alignment); course slides after Cundiff, OpenExamPrep, Wikipedia, Power & Motion and AutomationPrimer (fluid power); Brennan and MISUMI (fittings); Fabrico, Vibromera and Industrial Monitor Direct (vibration). Full list with URLs in docs/sources.md.',
 },
 {
+  id: 'fastguide', level: 'advanced', group: 'Guides', title: 'Fasteners guide',
+  desc: 'How much thread to engage, why fasteners come loose and ten ways of locking them, safety wire (lock wire), set screw points, screw heads and drives, self-tapping screws (thread-forming against thread-cutting, the common types), pins (dowel, taper, spring, grooved, split), retaining rings, and British fasteners (Whitworth, BSF, BA, BSP and how the spanners are marked). Four drawings.',
+  render: el => renderFastGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
+  source: 'Nord-Lock and a university shop (engagement); Machine Design, Fastener Engineering and Essentra (locking); Wikipedia and the FAA (safety wire); Wikipedia, Tameson and bolts.co.uk (set screws); Accu and Essentra (heads and drives); Machine Design, Essentra and Specialty Bolt (tapping screws); Machine Design and Fastener Engineering (pins); Wikipedia and Rotor Clip (retaining rings); the Aircraft Engine Historical Society and Wikipedia (British fasteners). Full list with URLs in docs/sources.md.',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),
