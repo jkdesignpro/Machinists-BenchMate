@@ -198,7 +198,7 @@ Store list is the fuller of the two store lists.
 | U55 | Grinding equivalent diameter | done | `grindspeed` |  |
 | U56 | Grit size conversion | done | `gritconv` |  |
 | U57 | Plunge grinding | done | `grindtime` |  |
-| U58 | Grind RPM cylindricity error | missing |  |  |
+| U58 | Grind RPM cylindricity error | done | `grindratio` | 0.5.0: wheel to work rpm ratio check; single-source rule (J. Badger, Cutting Tool Engineering) |
 | U59 | Wheel and workpiece speed | done | `grindspeed` |  |
 | U60 | Surface grinding | done | `grindsurf` |  |
 

@@ -904,6 +904,28 @@ Object.assign(DIAGRAMS, {
   },
 
   // ---------------- Grinding ----------------
+  // Wheel to work rpm ratio: the wheel with its high spot; the work drawn with as many waves as the ratio (far too large)
+  // when the ratio is close to a whole number or a simple fraction, and round when it is not.
+  grindratio(v, sys, rows) {
+    const W = 520, H = 270, cy = 122, cx = 104, R0 = 72, rS = 84, cxS = cx + R0 + 3.2 + rS;
+    const ratio = dcRow(rows, 'Rpm ratio (wheel'), verdict = dcStr(rows, 'Verdict'), amp = verdict && verdict.indexOf('Close to') !== 0 ? 0 : 3.2;
+    const N = dcOk(ratio) ? dcClamp(Math.round(ratio), 2, 40) : 8, M = 360;
+    let d = '';
+    for (let i = 0; i < M; i++) { const a = i * 2 * Math.PI / M, r = R0 + amp * Math.cos(N * a); d += (i ? 'L' : 'M') + (cx + r * Math.cos(a)).toFixed(1) + ' ' + (cy - r * Math.sin(a)).toFixed(1); }
+    let h = DK.path(d + 'Z', 'part') + DK.cl(cx - R0 - 12, cy, cxS + rS + 10, cy) + DK.cl(cx, cy - R0 - 12, cx, cy + R0 + 12) + DK.cl(cxS, cy - rS - 10, cxS, cy + rS + 10);
+    h += DK.circle(cxS, cy, rS, 'tool') + DK.circle(cxS, cy, rS * 0.3, 'thin') + dcSpin(cxS, cy, rS * 0.6, rS * 0.6, 140, 40, 'dim') + dcSpin(cx, cy, R0 * 0.55, R0 * 0.55, 220, 320, 'dim');
+    // The high spot of the wheel, the once-per-revolution disturbance.
+    const ha = 2.45, hx = cxS + rS * Math.cos(ha), hy = cy - rS * Math.sin(ha);
+    h += DK.circle(hx, hy, 3.5, 'hotf') + DK.leader(hx, hy, cxS - 10, cy - rS - 26, 'high spot, once per wheel turn', { hot: true, anchor: 'start' });
+    const ns = dcRow(rows, 'Wheel rpm for that surface speed'), nsIn = dcOk(v.ns) ? v.ns : ns;
+    h += DK.text(cx, cy + R0 + 30, 'work ' + (dcOk(v.nw) ? dcN(v.nw, v.nw % 1 ? 1 : 0) + ' rpm' : 'rpm'), { cls: 'mut' }) + DK.text(cxS, cy + rS + 30, 'wheel ' + (dcOk(nsIn) ? dcN(nsIn, nsIn % 1 ? 1 : 0) + ' rpm' : 'rpm'), { cls: 'mut' });
+    const x = cxS + rS + 26, kind = !verdict ? '' : verdict.indexOf('Close to a whole') === 0 ? 'whole number:' : verdict.indexOf('Close to') === 0 ? 'simple fraction:' : 'long decimal:';
+    const kind2 = !verdict ? '' : verdict.indexOf('Close to a whole') === 0 ? 'waves build up' : verdict.indexOf('Close to') === 0 ? 'scallops' : 'waves wiped out';
+    h += DK.text(x, 70, 'rpm ratio', { cls: 'mut', anchor: 'start' }) + DK.text(x, 96, dcOk(ratio) ? dcN(ratio, 4) : 'ns / nw', { cls: 'txt', anchor: 'start', size: 18 });
+    h += dcLines(x, 126, [kind, kind2, '', dcOk(ratio) && amp ? N + ' waves drawn,' : '', dcOk(ratio) && amp ? 'far too large' : '']);
+    return DK.svg(W, H, h, 'Grinding wheel and work: the rpm ratio is the number of waves a wheel that runs out leaves per turn of the work');
+  },
+
   // Wheel and work: external, internal or surface, to scale (clamped), with the equivalent diameter as a dashed circle on the contact.
   grindspeed(v, sys, rows) {
     const W = 520, H = 290, u = dcU(sys), mode = v.mode === 1 ? 1 : v.mode === 2 ? 2 : 0, ds = v.ds, dw = v.dw;

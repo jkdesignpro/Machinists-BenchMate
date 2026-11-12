@@ -17,6 +17,12 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - New sources: Sherline, GenSwiss, Conrad Hoffman and pjsminilathe (quoting ANSI/ASME B94.6-1984). The diametral pitches now have two sources. Where the sources differ on speed, all figures are shown. Two things read and not used are listed on the page.
 - `benchmate-core` `tooling`: `knurl_pitch_around`, `knurl_pitch_from_print`, `knurl_pitch_from_wheel`, `knurl_dp_from_wheel`, `knurl_growth`, `knurl_blank_for_finish`, `knurl_trial_step_mm`; tests `knurl_measure_and_count` (Hoffman's print example and the ANSI 96 DP wheel) and `knurl_trial`.
 
+### Added (grinding: wheel to work rpm ratio)
+- New tool **Wheel to work rpm ratio (waviness check)** in Grinding, sawing and gears > Grinding. Wheel rpm (typed, or from the surface speed) divided by the work rpm, with a verdict: close to a whole number (waves from a wheel that runs out build up), close to 1/4, 1/3, 1/2, 2/3 or 3/4 (scallops), or neither (what to aim for).
+- Also shown: the work speeds to stay away from on either side, what happens as the wheel wears (at a constant surface speed the ratio passes through whole numbers; at a constant rpm it stays), the spacing of the waves on the work, and for a count of chatter marks its frequency and how it compares with the ratio.
+- The rule comes from one author (J. Badger, Cutting Tool Engineering, three columns) and is marked single-source; a 2006 paper supports the mechanism. The limit for "close to" (0.02) is BenchMate's own and is shown as such. Two small differences from the printed examples are explained in `docs/sources.md`.
+- `benchmate-core` `grinding`: `rpm_ratio`, `rpm_ratio_class`, `rpm_ratio_off_whole`, `rpm_ratio_off_fraction`, `work_rpm_for_ratio`, `marks_frequency_hz`, `wave_spacing` and helpers; tests on both published examples and on the author's good and bad ratios. Own drawing; two proofs on the page.
+
 ### Fixed
 - Knurling: the pitch round the circumference of a diagonal knurl was worked out in the page script. It now comes from the Rust core like every other number.
 

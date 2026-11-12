@@ -1124,6 +1124,56 @@ const TOOLS = [
   source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
 },
 {
+  id: 'grindratio', level: 'advanced', group: 'Grinding', title: 'Wheel to work rpm ratio (waviness check)',
+  desc: 'Cylindrical grinding: the wheel rpm divided by the work rpm. At a whole-number ratio a wheel that runs out or is out of balance puts its waves in the same place on every turn of the work. Shows the ratio, how close it is to a whole number or a simple fraction, the work speeds to stay away from, what happens as the wheel wears, and what a count of chatter marks points to.',
+  fields: s => [
+    { id: 'ds', label: 'Wheel diameter', unit: lenU(s), def: s === 'inch' ? 20 : 500 },
+    { id: 'ns', label: 'Wheel speed', unit: 'RPM', def: '' },
+    { id: 'vs', label: 'Or wheel surface speed (held as the wheel wears)', unit: s === 'inch' ? 'SFPM' : 'm/s', def: s === 'inch' ? 8000 : 40 },
+    { id: 'nw', label: 'Work speed', unit: 'RPM', def: 200 },
+    { id: 'dmin', label: 'Wheel diameter when worn (optional)', unit: lenU(s), def: '' },
+    { id: 'dw', label: 'Work diameter (optional)', unit: lenU(s), def: '' },
+    { id: 'marks', label: 'Chatter marks counted round the work (optional)', unit: '', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.ds > 0 && v.nw > 0)) return [];
+    const inch = s === 'inch', k = inch ? IN_MM : 1, toMs = x => inch ? x * FT_M / 60 : x, fromMs = x => inch ? x * 60 / FT_M : x, vU = inch ? 'SFPM' : 'm/s';
+    const byRpm = v.ns > 0, ns = byRpm ? v.ns : (v.vs > 0 ? W.wheel_rpm_ms(toMs(v.vs), v.ds * k) : NaN);
+    if (!(ns > 0)) return [];
+    const ratio = W.rpm_ratio(ns, v.nw), tol = W.rpm_ratio_tol(), cls = W.rpm_ratio_class(ratio, tol), n = Math.floor(ratio);
+    const FR = [[1, 4], [1, 3], [1, 2], [2, 3], [3, 4]], fr = FR[W.rpm_ratio_near_fraction(ratio)];
+    const rows = [R('Rpm ratio (wheel rpm / work rpm)', ratio, '', 4)];
+    rows.push(R('Verdict', cls === 1 ? 'Close to a whole number (' + Math.round(ratio) + '): a wheel that runs out or is out of balance puts its waves in the same place on every turn of the work, and they build up. Change the work speed.'
+      : cls === 2 ? 'Close to ' + (n ? n + ' ' : '') + fr[0] + '/' + fr[1] + ': the waves of one turn fall between those of the turns before in a pattern that repeats, which leaves scallops. Change the work speed.'
+        : 'Not close to a whole number or a simple fraction: each turn of the work wipes out the waves of the turn before. This is what to aim for.', '', 0));
+    rows.push(R('From the nearest whole number', W.rpm_ratio_off_whole(ratio), '', 4), R('From the nearest of 1/4, 1/3, 1/2, 2/3, 3/4', W.rpm_ratio_off_fraction(ratio), '', 4),
+      R('Limit used for "close to" (BenchMate\'s choice, see Working)', tol, '', 2));
+    if (byRpm) rows.push(R('Wheel surface speed', fromMs(W.wheel_speed_ms(v.ds * k, ns)), vU, inch ? 0 : 2)); else rows.push(R('Wheel rpm for that surface speed', ns, 'RPM', 1));
+    rows.push(R('Wheel, once per revolution', W.rev_frequency_hz(ns), 'Hz', 2), R('Waves per turn of the work from wheel runout or unbalance', ratio, '', 2));
+    if (v.dw > 0) rows.push(R('Spacing of those waves round the work', W.wave_spacing(v.dw, ratio), lenU(s), inch ? 4 : 3));
+    const avoid = [[1, 1], [3, 4], [2, 3], [1, 2], [1, 3], [1, 4], [0, 1]].map(([a, b]) => ({ r: n + a / b, t: a === 0 ? String(n) : a === b ? String(n + 1) : (n ? n + ' ' : '') + a + '/' + b })).filter(x => x.r > 0);
+    rows.push(R('Work speeds to stay away from', avoid.map(x => 'ratio ' + x.t + ': ' + W.work_rpm_for_ratio(ns, x.r).toFixed(1) + ' rpm').join('; '), '', 0));
+    if (v.dmin > 0 && v.dmin < v.ds) {
+      if (byRpm) rows.push(R('As the wheel wears', 'At a constant wheel rpm the ratio stays where it is. The surface speed falls to ' + fromMs(W.wheel_speed_ms(v.dmin * k, ns)).toFixed(inch ? 0 : 2) + ' ' + vU + ' at the worn diameter.', '', 0));
+      else {
+        const ns2 = W.wheel_rpm_ms(toMs(v.vs), v.dmin * k), r2 = W.rpm_ratio(ns2, v.nw), pass = [];
+        for (let i = Math.ceil(ratio); i <= Math.floor(r2) && pass.length < 40; i++) pass.push(i);
+        rows.push(R('Wheel rpm when worn', ns2, 'RPM', 1), R('Rpm ratio when worn', r2, '', 4),
+          R('Whole numbers passed as the wheel wears', pass.length ? pass.join(', ') + '. At a constant surface speed the wheel rpm rises as the wheel wears, so the ratio passes through these (and the fractions between). Holding the wheel rpm, or setting the work rpm from the wheel rpm so that the ratio stays the same, avoids it.' : 'None between the new and the worn diameter.', '', 0));
+      }
+    }
+    if (v.marks > 0) rows.push(R('Frequency of the marks', W.marks_frequency_hz(v.marks, v.nw), 'Hz', 1), R('Marks counted against the rpm ratio', W.marks_vs_ratio_pct(v.marks, ratio), '%', 1),
+      R('What the count points to', 'A count close to the rpm ratio points to the wheel (out of true or out of balance). To be sure, change the wheel speed and count again: marks that follow the new ratio come from the wheel; marks that stay at the same frequency are self-excited chatter.', '', 0));
+    return rows;
+  },
+  working: 'Rpm ratio = wheel rpm / work rpm. A wheel that runs out or is out of balance touches the work hardest once per wheel revolution, so it leaves that many waves per turn of the work. At a whole-number ratio the waves land in the same place on every turn and build up; at a simple fraction (1/4, 1/3, 1/2, 2/3, 3/4) they land in a pattern that repeats after a few turns; at a "long decimal" each turn wipes out the last. Work rpm for a ratio = wheel rpm / ratio. Frequency of marks = marks per turn x work rpm / 60 Hz; spacing = pi x work diameter / waves. No source gives a figure for "close to": BenchMate uses 0.02, which sits between the author\'s examples (8.0000, 9.013 and 8.9924 called bad; 9.36488 and 8.916742 called good). Varying the work rpm a few percent during the cut is the other remedy the author gives. All numbers come from the Rust core.',
+  source: 'J. Badger, "Ask the Grinding Doc", Cutting Tool Engineering: "Overcoming waviness" (15 Jun 2010), "Origins of chatter" (15 Apr 2011), "Varying the workpiece rpm" (18 Apr 2025). One author, so the rule is single-source. T. R. A. Pearce, D. C. Fricker, A. Speight, Proc. IMechE Part B, vol. 220 no. 8, 2006 (abstract only read) supports the mechanism: wheel run-out, the rpm ratio of wheel to workpiece and the shift of the waves from one work revolution to the next decide the roundness. See docs/sources.md, Grinding.',
+  proof: [{ name: 'Wheel worn from 500 to 350 mm at 40 m/s, work at 200 rpm', sys: 'mm', vals: { ds: 500, ns: '', vs: 40, nw: 200, dmin: 350, dw: '', marks: '' }, expect: [['Wheel rpm for that surface speed', 'RPM', 1528, 0.5], ['Rpm ratio (wheel', '', 7.63, 0.011], ['Wheel rpm when worn', 'RPM', 2182, 1], ['Rpm ratio when worn', '', 10.91, 0.005]],
+    source: 'J. Badger, "Overcoming waviness", Cutting Tool Engineering, 2010: 1,528 to 2,182 rpm, ratio 7.63 to 10.91, passing eight, nine and ten. (1,528 / 200 is 7.64; the article prints 7.63.)' },
+  { name: '16 in wheel at 12,000 sfm, work at 40 rpm, 70 marks counted', sys: 'inch', vals: { ds: 16, ns: '', vs: 12000, nw: 40, dmin: '', dw: '', marks: 70 }, expect: [['Rpm ratio (wheel', '', 71.65, 0.04], ['Frequency of the marks', 'Hz', 47, 0.5]],
+    source: 'J. Badger, "Origins of chatter", Cutting Tool Engineering, 2011: 2,866 rpm, ratio 71.65, 47 Hz. The article works with pi = 3.14; with pi the wheel turns 2,864.8 rpm and the ratio is 71.62.' }],
+},
+{
   id: 'grindtime', level: 'advanced', group: 'Grinding', title: 'Cylindrical traverse and plunge time',
   desc: 'Traverse rate from the cross-feed per work revolution (a fraction of the wheel width that you choose), overlap ratio and traverse grinding time, and plunge grinding time with spark-out.',
   fields: s => [

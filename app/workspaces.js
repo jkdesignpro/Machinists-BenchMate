@@ -72,7 +72,7 @@ const WORKSPACES = [
     ['Thread programs', ['threadprog'], 'code'],
   ] },
   { id: 'process', name: 'Grinding, sawing and gears', icon: 'gear', blurb: 'Grinding speeds and times, saws, gears, splines and broaching.', sections: [
-    ['Grinding', ['grindspeed', 'grindtimes', 'gritconv', 'wheelcode'], 'wheel'],
+    ['Grinding', ['grindspeed', 'grindratio', 'grindtimes', 'gritconv', 'wheelcode'], 'wheel'],
     ['Sawing', ['saws', 'slitsaw'], 'saw'],
     ['Gears', ['spurgear', 'helicalgear', 'gearmeasure', 'geartrain', 'planetary', 'worm', 'changegears', 'indexing'], 'gear'],
     ['Splines and broaching', ['spline', 'cycbroach', 'keys'], 'gear'],
@@ -118,7 +118,7 @@ const PAGE_ICON = {
   taper: 'angle', knurl: 'surface', formulas: 'book', gmcodes: 'code', materials: 'material', bolttorque: 'nut', oring: 'bearing',
   setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart',
   spline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',
-  abbrev: 'drawing', economics: 'bars', mrr: 'bars', toollife: 'clock', cutopt: 'gauge', runout: 'gauge', indexing: 'gear',
+  abbrev: 'drawing', economics: 'bars', mrr: 'bars', toollife: 'clock', cutopt: 'gauge', runout: 'gauge', indexing: 'gear', grindratio: 'wave',
 };
 
 // ---- Derived tables ----

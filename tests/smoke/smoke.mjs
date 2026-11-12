@@ -1166,6 +1166,47 @@ where = 'knurl';
   const src = await page.$eval('#main', e => e.innerText);
   for (const w of ['Sherline', 'GenSwiss', 'Conrad Hoffman', 'pjsminilathe', 'Read and not used', 'Industrial Monitor Direct']) if (!src.includes(w)) problems.push(`[${where}] the sources note should name ${w}`);
 }
+// Grinding: wheel to work rpm ratio. The two published examples, the three verdicts, wear at constant surface
+// speed against constant rpm, and the drawing (waves only when the ratio is a bad one).
+where = 'grindratio';
+{
+  await units('mm');
+  await open('grindratio', 80);
+  const set = async (k, v) => { const q = `#main [data-id="${k}"]`; await page.fill(q, String(v)); await page.dispatchEvent(q, 'input'); await page.waitForTimeout(30); };
+  const rows = () => page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).join(' ; '));
+  const has = async (re, what) => { const t = await rows(); if (!re.test(t)) problems.push(`[${where}] ${what}: ${t}`); };
+  const cap = () => page.$eval('#main .tdia svg', e => e.textContent.replace(/\s+/g, ' '));
+  // Badger 2010: 500 mm wheel at 40 m/s, work 200 rpm: 1,528 rpm, ratio 7.64 (printed 7.63); worn to 350 mm: 2,182 rpm, 10.91, passing 8, 9, 10
+  await has(/rpm ratio \(wheel rpm \/ work rpm\) 7\.6394 ; Verdict Not close/i, 'the default example should give 7.6394, not close');
+  await has(/Wheel rpm for that surface speed 1,527\.9 RPM/, 'wheel rpm 1,527.9');
+  await has(/ratio 8: 191\.0 rpm; .*ratio 7 1\/2: 203\.7 rpm; .*ratio 7: 218\.3 rpm/, 'work speeds to stay away from');
+  await set('dmin', 350);
+  await has(/Wheel rpm when worn 2,182\.7 RPM ; Rpm ratio when worn 10\.9135 +; Whole numbers passed as the wheel wears 8, 9, 10\./, 'worn to 350 mm should give 2,182.7 rpm, 10.9135 and pass 8, 9, 10');
+  let c = await cap();
+  if (!/long decimal: ?waves wiped out/.test(c) || /waves drawn/.test(c) || !/7\.6394/.test(c)) problems.push(`[${where}] the drawing of a good ratio should be round and say so: ${c}`);
+  // whole number: work at 191 rpm with the wheel at 1528 rpm is exactly 8
+  await set('ns', 1528); await set('nw', 191);
+  await has(/ratio \(wheel rpm \/ work rpm\) 8\.0000 ; Verdict Close to a whole number \(8\)/i, '1528 / 191 is 8, a whole number');
+  await has(/As the wheel wears At a constant wheel rpm the ratio stays where it is\. The surface speed falls to 28\.00 m\/s/, 'at constant rpm the ratio stays and the surface speed falls to 28.00 m/s');
+  c = await cap();
+  if (!/whole number: ?waves build up/.test(c) || !/8 waves drawn/.test(c)) problems.push(`[${where}] the drawing of a whole-number ratio should show 8 waves: ${c}`);
+  // simple fraction: 1528 / 203.7333 = 7.5
+  await set('nw', 203.7333);
+  await has(/Verdict Close to 7 1\/2: .*scallops/, '7.5 should be called a simple fraction');
+  // the author's own examples of bad and good ratios (wheel rpm chosen as ratio x 100)
+  for (const [ns, bad] of [[901.3, true], [899.24, true], [936.488, false], [891.6742, false]]) {
+    await set('ns', ns); await set('nw', 100);
+    const t = await rows();
+    if (bad !== /Verdict Close to a whole number/.test(t) || (!bad && !/Verdict Not close/.test(t))) problems.push(`[${where}] ratio ${ns / 100} should be ${bad ? 'bad' : 'good'}: ${t}`);
+  }
+  // Badger 2011, inch: 16 in wheel at 12,000 sfm, work 40 rpm, 70 marks: ratio 71.62 (printed 71.65 with pi = 3.14), 46.7 Hz
+  await units('inch'); await open('grindratio', 80);
+  await set('ds', 16); await set('ns', ''); await set('vs', 12000); await set('nw', 40); await set('marks', 70); await set('dw', 2); await set('dmin', '');
+  await has(/ratio \(wheel rpm \/ work rpm\) 71\.6197/i, '12,000 sfm on 16 in at 40 rpm is 71.6197');
+  await has(/Frequency of the marks 46\.7 Hz ; Marks counted against the rpm ratio -2\.3 % +; What the count points to .*self-excited chatter/, '70 marks at 40 rpm is 46.7 Hz, 2.3 % under the ratio');
+  await has(/Spacing of those waves round the work 0\.0877 in/, 'spacing of 71.62 waves on 2 in is 0.0877 in');
+  await has(/Wheel, once per revolution 47\.75 Hz/, 'the wheel turns at 47.75 Hz');
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

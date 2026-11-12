@@ -569,6 +569,17 @@ f1!(harmonic_order, c::harmonic_order, f, base, tol);
 // Grinding (core/src/grinding.rs)
 f1!(wheel_speed_ms, c::wheel_speed_ms, d, rpm);
 f1!(wheel_rpm_ms, c::wheel_rpm_ms, vs, d);
+f1!(rpm_ratio, c::rpm_ratio, wheel_rpm, work_rpm);
+f1!(rpm_ratio_off_whole, c::rpm_ratio_off_whole, ratio);
+f1!(rpm_ratio_near_fraction, c::rpm_ratio_near_fraction, ratio);
+f1!(rpm_ratio_off_fraction, c::rpm_ratio_off_fraction, ratio);
+#[no_mangle] pub extern "C" fn rpm_ratio_tol() -> f64 { c::rpm_ratio_tol() }
+f1!(rpm_ratio_class, c::rpm_ratio_class, ratio, tol);
+f1!(work_rpm_for_ratio, c::work_rpm_for_ratio, wheel_rpm, ratio);
+f1!(marks_frequency_hz, c::marks_frequency_hz, marks_per_rev, work_rpm);
+f1!(rev_frequency_hz, c::rev_frequency_hz, rpm);
+f1!(wave_spacing, c::wave_spacing, d, waves);
+f1!(marks_vs_ratio_pct, c::marks_vs_ratio_pct, marks_per_rev, ratio);
 f1!(speed_ratio, c::speed_ratio, vs, vw);
 f1!(equiv_dia, c::equiv_dia_f, dw, ds, mode);
 f1!(contact_length, c::contact_length, ae, de);

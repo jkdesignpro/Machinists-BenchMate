@@ -80,7 +80,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Shop | Vibration check (device sensor) | missing | | U27 |
 | Grinding | Equivalent diameter, grit conversion, plunge, surface, wheel/workpiece speed | done (grit values per publisher with disagreements shown; max wheel speed never defaulted) | `grindspeed`, `grindtime`, `grindsurf`, `gritconv` | U55-U57, U59, U60 |
 | Grinding | Wheel marking decoder | done (marking only; no shapes or selection) | `wheelcode` | MH163, BB60 (partial) |
-| Grinding | Cylindricity error from RPM | missing | | U58 |
+| Grinding | Cylindricity error from RPM | done (wheel to work rpm ratio: whole numbers and simple fractions flagged, work speeds to avoid, wheel wear, chatter mark count; rule from one author, marked single-source) | `grindratio` | U58 |
 | Gears/splines | Spur gear data, ISO 4156, ANSI B92.1, SAE J499a | missing | | U83-U86 |
 | Library | Formula library | done (151 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
 | Library | Tool wear information | done (seven wear types, causes and remedies from two makers) | `cncguide` | U91 |
