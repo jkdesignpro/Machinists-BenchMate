@@ -72,6 +72,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, eleventh batch, 2026-11-12):** bearings and seals guide (`bearguide`: bearing types, bearing numbers, tolerance classes, shaft and housing fits, mounting, radial shaft seals, threadlocker colours). MH283, MH284, ED66, ED67 and ED71 done (MH283 and MH284 were missing); MH293 and BB59 from missing to partial. Counted from the tables below: 338 done, 175 partial, 83 missing of 596 in-scope rows, 57 %. For 90 %, 199 more rows have to reach done.
 
+**Update (0.6.0, twelfth batch, 2026-11-12):** abrasive processes guide (`abrasguide`: grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding, cut-off wheels, mounted points). MH127, MH168, MH170, MH171, MH172 and BB61 from missing to done; MH161 and MH165 from missing to partial. Counted from the tables below: 344 done, 177 partial, 75 missing of 596 in-scope rows, 58 %. For 90 %, 193 more rows have to reach done.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -469,7 +471,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH124 | R8 collet | done | `machinetapers` | |
 | MH125 | ER and other collets | partial | `holdertorque` | 0.5.0: ER collet nut torque by size, bore and nut (REGO-FIX, with Techniks beside it). No collet dimensions or clamping ranges |
 | MH126 | Portable tool spindles, square drives, hex chucks | out of scope? | | Portable power tools |
-| MH127 | Mounted wheels and points | missing | | |
+| MH127 | Mounted wheels and points | done | `abrasguide` | 0.6.0: what sets the top speed (shape, size, shank, overhang), grip length, shape groups, grit (mostly one source each, marked); no table of shapes, sizes and speeds |
 | MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | partial | `cutguide` | 0.6.0: runs of teeth, rise per tooth with figures (one source, marked), the two-teeth rule for pitch, tooth proportions, chip breakers, push and pull, rotary broaching; no pitch formula (not readable in the sources), no broach design calculation |
 | MH129 | Files and burs; speeds of rotary burs | done | `shoptools`, `cutguide` | Carbide burr cuts and speeds from two makers in `shoptools`; 0.6.0: files (parts, cuts, grades, shapes, filing practice, care) |
 | MH130 | Knurls and knurling: sizes, formulas for knurled work, tolerances | partial | `knurl` | Blank diameter by four methods with a trial procedure; no tolerances on knurled work |
@@ -508,18 +510,18 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH158 | Metalworking fluids: classes, maintenance, exposure | partial | `shoptools`, `coolconc`, `coolmix` | Classes, concentration and mixing, care of mixed fluids; no exposure limits or sump maintenance schedule |
 | MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | missing | | |
 | MH160 | Machining non-metals (hard rubber, laminates) | partial | `plastics` | Machining plastics; no hard rubber or laminates |
-| MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | missing | | |
+| MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | partial | `abrasguide` | 0.6.0: grinding ratio with its range and an example, what lowers wheel wear, wheel speeds, spark-out (mostly one source each, marked); no optimum data, no forces |
 | MH162 | Grinding data selection and grindability groups | missing | | |
 | MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | done | `shoptools`, `wheelcode`, `gritconv` | Markings decoded; shapes by type number, choice of abrasive, grit and grade (the choice rests on one source, marked) |
 | MH164 | Dressing and truing; diamond sizes | partial | `shoptools` | Dressing against truing, when to dress, open and closed dressing, the tools; no diamond sizes |
-| MH165 | Diamond wheels: shapes, designations, selection | missing | | |
+| MH165 | Diamond wheels: shapes, designations, selection | partial | `abrasguide` | 0.6.0: what diamond and CBN grind, concentration table, bond, how the shape code is built, wheel speeds (shape code and speeds one source, marked); no list of body shapes, no selection table |
 | MH166 | Grinding wheel safety and safe operating speeds | partial | `grindspeed`, `wheelcode` | Speed check against the marked max speed and the rule to obey it; no full safety code (`claude/calcs-3`) |
 | MH167 | Cylindrical grinding (traverse, plunge, high speed, troubles) | partial | `grindtime`, `grindspeed` | Traverse and plunge time, speed ratio, equivalent diameter; no high-speed grinding or troubleshooting (`claude/calcs-3`) |
-| MH168 | Centerless grinding | missing | | |
+| MH168 | Centerless grinding | done | `abrasguide` | 0.6.0: arrangement with drawing, regulating wheel, work above centre, through-feed, infeed and end-feed, lobing, what it holds (figures from one source, marked) |
 | MH169 | Surface grinding | partial | `grindsurf` | Cycle time only; no wheel or feed recommendations (`claude/calcs-3`) |
-| MH170 | Offhand, belt grinding and abrasive cutting | missing | | |
-| MH171 | Honing | missing | | |
-| MH172 | Laps and lapping | missing | | |
+| MH170 | Offhand, belt grinding and abrasive cutting | done | `abrasguide`, `shoptools` | 0.6.0: belt grinding (contact wheel, platen, slack belt, speed, wheel hardness, grit, backing) and cut-off wheels (one source, marked); offhand sharpening of drills and tool bits in `shoptools` |
+| MH171 | Honing | done | `abrasguide` | 0.6.0: motions and crosshatch with drawing, speed, stock, what it holds, abrasives, oil, single-pass and plateau honing; two points where the sources differ show both |
+| MH172 | Laps and lapping | done | `abrasguide` | 0.6.0: principle with drawing, lap softer than the work, abrasives, stock, pressure, speed, grit, conditioning rings, flatness in light bands |
 | MH173 | Nontraditional: water jet, ultrasonic, abrasive flow, laser, plasma, electron beam | missing | | Low priority |
 | MH174 | CNC introduction, coordinate geometry, word address format, program structure | partial | `cncguide` | Axes, coordinate systems, block and word format, modal groups, program order; no coordinate geometry worked examples (`claude/cnc-guide`) |
 | MH175 | M-codes, G20/G21, G90/G91, S, F, inverse time feed, T | done | `gmcodes`, `rotfeed` | G and M codes per control with modal groups; inverse time feed in the rotary feed tool |
@@ -848,7 +850,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB58 | Engineering plastics | partial | `materials` | 5 plastics |
 | BB59 | Engineering adhesives | partial | `bearguide` | 0.6.0: threadlocker colours, strength, removal, cure and application; no structural adhesives, retaining compound selection or sealants |
 | BB60 | Grinding wheels: markings, specs, shapes, faces | done | `shoptools`, `wheelcode` | Markings decoded; eight shapes by type number with a drawing of six, the face of the wheel, choice of abrasive, grit and grade |
-| BB61 | Mounted wheels and points | missing | | |
+| BB61 | Mounted wheels and points | done | `abrasguide` | 0.6.0: as MH127; no table of shapes, sizes and speeds |
 | BB62 | Tungsten carbide burrs | done | `shoptools` | Cuts and what each is for; speeds by size from two makers, which differ and are both shown |
 | BB63 | Surface coatings (tool coatings) | done | `toolguide` | Ten coatings with use; max temperatures with every publisher value, confirmed only where two agree (`claude/tooling-ref`) |
 | BB64 | Relative position of cutting tool materials | done | `toolguide`, `cutguide` | Tool materials summary in `toolguide`; 0.6.0: ranking drawing by hardness with the tough and brittle ends |

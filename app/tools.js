@@ -3426,6 +3426,13 @@ const TOOLS = [
   source: 'Reliability Solutions, RapidDirect and NSK (types); JTEKT Koyo, NSK, a college hand-out and Southern Cross Bearings (numbers); Wikipedia and NSK (tolerance classes); NHBB, NRB, MinebeaMitsumi and TFL (fits); Processing Magazine, Fabrico and Schaeffler (mounting); Seals-Shop and the University of Stuttgart (shaft seals); Permabond and Fastener Engineering (threadlockers). Full list in docs/sources.md, "Bearings and seals guide".',
 },
 {
+  id: 'abrasguide', level: 'advanced', group: 'Guides', title: 'Abrasive processes guide',
+  desc: 'The abrasive processes beyond the plain grinding wheel: the grinding ratio and spark-out, centerless grinding (why the work sits above centre, through-feed and infeed, lobing), honing and the crosshatch, lapping and light bands, diamond and CBN wheels (concentration, shape code), belt grinding, cut-off wheels and mounted points.',
+  render: el => renderAbrasGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'The Open University (grinding, centreless grinding); Cutting Tool Engineering, Modern Machine Shop and Production Machining (wheel wear, centerless grinding, honing); American Machinist and Wikipedia (honing, lapping); Kemet (lapping); MISUMI, UKAM and 3M (diamond and CBN wheels); EMI Supply and Xometry (belts); Weiler (cut-off wheels); Norton and PFERD (mounted points). Full list in docs/sources.md, "Abrasive processes guide".',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),

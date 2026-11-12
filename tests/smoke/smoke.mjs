@@ -2043,6 +2043,30 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
   }
+  where = 'abrasguide';
+  g = await guide('abrasguide');
+  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '4,4,4' || g.srcs !== 21) problems.push(`[${where}] 8 sections, 3 drawings, three tables of 3 rows, 21 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 65) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Grinding ratio (G ratio)', 'No centres, no chuck', 'Above centre', 'What it is. A slow abrasive process', 'Crosshatch', 'How slow', 'What it is for', 'What it holds. Under 0.001 in', 'Abrasives', 'Single-pass honing', 'Plateau honing', 'What it is. Rubbing the work', 'The lap is the softer one', 'Lap material', 'Silicon carbide', 'Diamond cuts faster', 'Conditioning rings', 'Bright is not flat', 'Checking flatness', 'Diamond wheels grind carbide', 'One carat', 'More is not always better', 'Belt speed', 'Grit by stage', 'The speed limit is not one number'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  for (const k of ['How large', 'An example', 'Less wheel wear', 'Wheel speed. Most surface grinding', 'Spark-out', 'What grinding holds', 'Regulating wheel', 'What it is. A rubber-bonded', 'On centre', 'How far above', 'Lobing', 'Against lobing and chatter', 'Bores', 'What it holds. Diameter', 'Stock. Usually', 'Which abrasive', 'Hard and soft stones', 'Honing oil', 'Plateau finish, in figures', 'Hard and soft work', 'Stock, pressure, speed', 'Grit. 100 to 280', 'One light band', 'What lapping does not do', 'CBN wheels grind hardened steel', 'Bond', 'Shape code', 'Where the layer sits', 'Wheel speed. Diamond 1200', 'Contact wheel hardness', 'Serrated wheels', 'Backing', 'Cut-off wheels', 'Thin or thick', 'Hard or soft bond', 'Speed marking', 'Overhang', 'Grip', 'Shapes', 'Grit. 36 and coarser'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/tilted a few degrees and draws the work through between the wheels Plain cylinders of any length, bar stock/.test(row('Through-feed')) || !/Headed, stepped and profiled work/.test(row('Infeed (plunge)')) || !/fed endways up to a stop/.test(row('End-feed'))) problems.push(`[${where}] centerless rows: ${row('Through-feed')} | ${row('End-feed')}`);
+    if (!/^50 2\.2 12\.5 %/.test(row('50 ')) || !/^75 3\.3 18\.8 %/.test(row('75 ')) || !/^100 4\.4 25 %/.test(row('100 '))) problems.push(`[${where}] concentration rows: ${row('50 ')} | ${row('75 ')} | ${row('100 ')}`);
+    if (!/Most work \(EMI\); contours and hollow grinding \(Xometry\)/.test(row('Contact wheel')) || !/A fixed flat plate Flat surfaces/.test(row('Platen')) || !/the free span between two wheels/.test(row('Slack belt'))) problems.push(`[${where}] belt rows: ${row('Contact wheel')} | ${row('Platen')}`);
+    const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
+    if (fl !== 'End-feed 50') problems.push(`[${where}] only the end-feed and concentration 50 rows have one publisher: ${fl}`);
+  }
+  if (!/Values run from 2 to 200/.test(g.all) || !/12 to 25 % of the work diameter, on a blade with a 30° top face/.test(g.all) || !/100 to 250 ft\/min for the turning hone/.test(g.all) || !/start at about 65 ft\/min/.test(g.all) || !/Rz 3 to 6, Rpk at most 0\.3, Rk 0\.3 to 1\.5 and Rvk 0\.8 to 2\.0 micrometres/.test(g.all) || !/about 280 nanometres \(0\.000011 in\)/.test(g.all) || !/1A1, 6A2C/.test(g.all) || !/4000 to 6000 ft\/min/.test(g.all) || !/At least 10 mm of the shank/.test(g.all) || !/70 to 95 Shore A/.test(g.all)) problems.push(`[${where}] figures from the sources`);
+  {
+    const d = await page.$$eval('#main svg.geo', s => s.map(e => e.textContent.replace(/\s+/g, ' ')));
+    if (!/regulating wheel/.test(d[0]) || !/work rest blade/.test(d[0]) || !/its centre above/.test(d[0]) || !/leave a crosshatch/.test(d[1]) || !/stone/.test(d[1]) || !/lap, softer than the work/.test(d[2]) || !/loose abrasive/.test(d[2])) problems.push(`[${where}] drawings: ${d.map(t => t.slice(0, 40)).join(' | ')}`);
+    const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
+    if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
+  }
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);
