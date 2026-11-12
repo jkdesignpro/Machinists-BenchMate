@@ -236,7 +236,7 @@ Store list is the fuller of the two store lists.
 | U83 | Spur gear data | done | `spurgear`, `gearmeasure` |  |
 | U84 | Involute splines per ANSI B92.1 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
 | U85 | Involute splines per ISO 4156 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
-| U86 | SAE J499a splines | missing |  | SAE J499a splines are not in `spline` |
+| U86 | SAE J499a splines | done | `saespline` | 0.5.0: width, depth and small diameter for 4, 6, 10 and 16 splines in fits A, B and C, with torque capacity; largest sizes only, the tables' minus tolerances are described in words; one publisher |
 | U87 | Knurl calculator | done | `knurl` | 0.5.0: four methods (diametral pitch, circular pitch, measure and count, trial and error with a tick-off procedure) |
 | U88 | Keyway broach program generator | done | `cycbroach` |  |
 | U89 | Coolant concentration | done | `coolconc`, `coolmix` |  |
@@ -449,7 +449,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH134 | Work materials and cutting tool materials | missing | | |
 | MH135 | Cutting speed, feed, depth of cut, tool wear and tool life | partial | `toollife` | Taylor life only |
 | MH136 | Selecting cutting conditions | missing | | |
-| MH137 | Tool troubleshooting | partial | `cncguide` | Short turning and milling troubleshooting tables (chatter, finish, tool life, burrs); not a full maker guide (`claude/cnc-guide`) |
+| MH137 | Tool troubleshooting | partial | `cncguide` | Turning and milling troubleshooting tables (chatter, finish, tool life, burrs); drilling, tapping and grinding tables added in 0.5.0; not a full maker guide |
 | MH138 | Cutting speed formulas; RPM for drills and diameters | done | `rpm` | |
 | MH139 | Speeds and feeds tables for turning (by material) | missing | | Starting data from tool makers |
 | MH140 | Speeds and feeds tables for milling (by material), slit milling | missing | | |

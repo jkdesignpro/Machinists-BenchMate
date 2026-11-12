@@ -79,7 +79,7 @@ const WORKSPACES = [
     ['Sawing', ['saws', 'slitsaw'], 'saw'],
     ['Wire EDM', ['wireedm'], 'wave'],
     ['Gears', ['spurgear', 'helicalgear', 'gearmeasure', 'geartrain', 'planetary', 'worm', 'changegears', 'indexing'], 'gear'],
-    ['Splines and broaching', ['spline', 'cycbroach', 'keys'], 'gear'],
+    ['Splines and broaching', ['spline', 'saespline', 'cycbroach', 'keys'], 'gear'],
   ] },
   { id: 'inspect', name: 'Measure and inspect', icon: 'inspection', blurb: 'GD&T, fits, surface finish, gauge blocks and quality checks.', sections: [
     ['GD&T', ['gdtguide', 'gdtfcf', 'gdtpos', 'gdtprofu', 'gdtdof', 'gdtstack'], 'frame'],
@@ -121,7 +121,7 @@ const PAGE_ICON = {
   sinebar: 'angle', machines: 'machine', toollib: 'toollib', gsim: 'play', sketch: 'dxf', chatter: 'wave', boringbar: 'beam', deflection: 'beam',
   taper: 'angle', knurl: 'surface', formulas: 'book', gmcodes: 'code', materials: 'material', bolttorque: 'nut', oring: 'bearing',
   setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart', grr: 'chart',
-  spline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',
+  spline: 'gear', saespline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',
   abbrev: 'drawing', economics: 'bars', mrr: 'bars', toollife: 'clock', cutopt: 'gauge', runout: 'gauge', indexing: 'gear', grindratio: 'wave', holdertorque: 'nut',
 };
 

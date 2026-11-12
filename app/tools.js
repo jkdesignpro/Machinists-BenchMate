@@ -1700,6 +1700,34 @@ const TOOLS = [
   source: "R. Willis, Principles of Mechanism (1841), relative-speed method (by name); KHK Gear Technical Reference and SDP/SI Elements of Metric Gear Technology, section 13 (planetary gear trains). See docs/gears.md.",
 },
 {
+  id: 'saespline', level: 'expert', group: 'Gears and splines', title: 'SAE parallel side splines (4, 6, 10 and 16 splines)',
+  desc: 'Width, depth and small diameter of the old SAE straight-sided spline fittings for a nominal diameter, for a permanent fit, a fit that slides when not under load and one that slides under load, with the torque capacity per inch of length, and the section drawn to scale. For repairs and existing parts: the standard is obsolete for new designs.',
+  fields: s => [
+    { id: 'n', label: 'Number of splines', unit: '', def: 6, options: [[4, '4'], [6, '6'], [10, '10'], [16, '16']] },
+    { id: 'fit', label: 'Fit', unit: '', def: 1, options: [[1, 'A: permanent fit'], [2, 'B: to slide when not under load'], [3, 'C: to slide when under load']] },
+    { id: 'D', label: 'Nominal (large) diameter D', unit: lenU(s), def: s === 'inch' ? 1.5 : 38.1 },
+    { id: 'len', label: 'Bearing length of the splines (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.D > 0)) return [];
+    if (v.n === 4 && v.fit === 3) return [R('Fit', 'The standard has no fit C (to slide under load) for 4 splines: choose A or B, or 6 splines or more', '', 0)];
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 3 : 2, G = k => W.sae_spline(v.n, v.fit, v.D, k), Din = inch ? v.D : v.D / IN_MM;
+    // Torque: the core works in inches (inch-pounds per inch of length at 1000 psi); N m is a unit conversion.
+    const T = W.sae_spline(v.n, v.fit, Din, 3), NM = 0.1129848;
+    const rows = [R('Width of spline W', G(0), u, dp), R('Depth of spline h', G(1), u, dp), R('Small diameter d', G(2), u, dp),
+      R('Torque capacity per inch of length at 1000 psi on the sides', inch ? T : T * NM, inch ? 'in lbf' : 'N m', inch ? 0 : 1)];
+    if (v.len > 0) { const L = inch ? v.len : v.len / IN_MM; rows.push(R('Torque capacity over the bearing length, at 1000 psi', inch ? T * L : T * L * NM, inch ? 'in lbf' : 'N m', inch ? 0 : 1)); }
+    const lo = v.n === 16 ? 2 : 0.75, hi = v.n <= 6 ? 3 : 6;
+    if (Din < lo - 1e-9 || Din > hi + 1e-9) rows.push(R('Note', 'The handbook tabulates ' + v.n + '-spline fittings from ' + (lo === 2 ? '2' : '3/4') + ' to ' + hi + ' in nominal diameter. This size is outside that range: the proportions are applied as formulas.', '', 0));
+    return rows;
+  },
+  working: 'W, h and d are fixed fractions of the nominal diameter D. W: 0.241 D (4 splines), 0.250 D (6), 0.156 D (10), 0.098 D (16). Permanent fit (A): h = 0.075 D, d = 0.850 D (4 splines); 0.050 D, 0.900 D (6); 0.045 D, 0.910 D (10 and 16). To slide when not under load (B): 0.125 D, 0.750 D (4); 0.075 D, 0.850 D (6); 0.070 D, 0.860 D (10 and 16). To slide under load (C): 0.100 D, 0.800 D (6); 0.095 D, 0.810 D (10 and 16); none for 4 splines. Torque capacity T = 1000 N R h per inch of bearing length, at 1000 psi on the sides of the splines, with R = (D + d) / 4 the mean radius: scale it by the pressure your materials allow. ' +
+    'The figures are the largest size of each dimension; the handbook tables give a minus tolerance of 0.001 to 0.003 in on them, depending on size. The dimensions apply to the soft broached hole; corner radii are not over 0.015 in and the splines are parallel to the axis within 0.006 in per foot. SAE lists the standard (J499, issued January 1914, stabilized 2014; the revision known as J499a is dated 1975) as technically obsolete for new designs, and points to involute splines (ANSI B92.1) instead: see the involute spline tool.',
+  source: "Machinery's Handbook, 31st ed., SAE standard spline fittings, Tables 18 to 22, pp. 2358 to 2360 (formulas and torque capacity; one publisher, checked against 37 printed values). SAE J499, Parallel side splines for soft broached holes in fittings (SAE's public summary: scope, status, corner radii, parallelism). See docs/sources.md, SAE parallel side splines.",
+  proof: [{ name: 'A 2 in 10-spline fitting, to slide under load (10C)', sys: 'inch', vals: { n: 10, fit: 3, D: 2 }, expect: [['Width of spline W', 'in', 0.312, 5e-4], ['Small diameter d', 'in', 1.620, 5e-4], ['Torque capacity per inch of length at 1000 psi on the sides', 'in lbf', 1720, 0.6]],
+    source: "Machinery's Handbook, 31st ed., Table 20, SAE standard 10-spline fittings, p. 2360: nominal diameter 2, W 0.309 to 0.312, 10C d 1.618 to 1.620, T 1720.", note: 'The table prints each dimension as a smallest and a largest size; BenchMate gives the largest.' }],
+},
+{
   id: 'spline', level: 'expert', group: 'Gears and splines', title: 'Involute splines (ANSI B92.1, ISO 4156)',
   desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal), with one tooth space of the shaft and of the hub drawn enlarged with its pin. Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
   fields: s => [

@@ -78,7 +78,7 @@ State of the tier list above, with the stage for what is still to build.
 | 11 Inspection helpers | built | | |
 | 12 Coolant with refractometer | built | | |
 | 13 Fraction, decimal and metric quick calculator | built | | |
-| 14 Troubleshooting guide | built (turning and milling troubles in the CNC guide) | Drilling, tapping and grinding symptoms | 3 (0.5.0) |
+| 14 Troubleshooting guide | built (turning, milling, drilling, tapping and grinding troubles in the CNC guide) | | |
 | 15 G-code snippets per control profile | built (0.4.0): the cycle blocks only on every generator page, and a G-code box on the bolt circle, hole grid, drill point, spot drill depth, tap drill, spindle speed, milling feed and lathe feed pages, for Generic ISO / Fanuc-style and Haas (`docs/snippets.md`) | Other controls, once their manuals can be read | |
 | 16 Profile export and import by file | part (tool library, setup sheet, machines) | One file for everything | 5 (0.9.0) |
 | 17 Link with Alkart Mega Wizard | not planned | No links | |

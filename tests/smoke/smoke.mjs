@@ -1570,6 +1570,61 @@ where = 'rollblank';
   if (!/none larger than the thread: no engagement/i.test(t)) problems.push(`[${where}] tap drill, a hole larger than the thread: ${t}`);
   await hole('');
 }
+// CNC guide: drilling, tapping and grinding troubleshooting tables, each row with its source keys; a row with
+// one publisher is marked to be verified, a row with two is not.
+where = 'trouble';
+{
+  await open('cncguide', 150);
+  const tabs = await page.evaluate(() => ['c-trd', 'c-trtap', 'c-trg'].map(id => {
+    const h = document.querySelector('#main #' + id); let t = h && h.nextElementSibling;
+    while (t && !t.querySelector('table.gtab')) t = t.nextElementSibling;
+    const rows = t ? [...t.querySelectorAll('tr')].slice(1) : [];
+    return { n: rows.length, noSrc: rows.filter(r => !r.querySelector('abbr.gsrc')).length,
+      rows: rows.map(r => r.cells[0].innerText.trim() + '|' + [...r.querySelectorAll('abbr.gsrc')].map(a => a.textContent).join(',') + '|' + (r.querySelector('.gtbv') ? 'tbv' : 'ok')) };
+  }));
+  if (tabs[0].n !== 10 || tabs[1].n !== 8 || tabs[2].n !== 8 || tabs.some(t => t.noSrc)) problems.push(`[${where}] drilling, tapping, grinding tables should have 10, 8 and 8 rows, each with a source: ${tabs.map(t => t.n + '/' + t.noSrc).join(' ')}`);
+  const has = (i, row) => tabs[i].rows.includes(row);
+  if (!has(0, 'Hole oversize|MMC68,PTD,FMC_D|ok') || !has(0, 'Burrs where the drill comes out|MMC68|tbv') || !has(1, 'Thread oversize|FMC_T,REGAL|ok') || !has(1, 'Bell-mouthed thread (larger at the start)|FMC_T|tbv') ||
+      !has(2, 'Chatter marks|RADIAC,OKUMA_G|ok') || !has(2, 'Wheel loads or glazes|RADIAC|tbv'))
+    problems.push(`[${where}] source keys or the to-be-verified mark are wrong: ${tabs.map(t => t.rows.join(' ; ')).join(' || ')}`);
+  const toc = await page.$$eval('#main nav.gtoc a', a => a.map(x => x.getAttribute('href')).join(' '));
+  if (!/#c-trd #c-trtap #c-trg/.test(toc)) problems.push(`[${where}] the contents list should link the three new tables: ${toc}`);
+}
+// SAE parallel side splines: the handbook's printed sizes for 6A at 1.5 in and 10C at 2 in, the torque over a
+// bearing length, no fit C for 4 splines, the note outside the tabulated range, and the drawing's own figures.
+where = 'saespline';
+{
+  const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+  const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+  const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, v); await page.waitForTimeout(60); };
+  await mode('expert');
+  await units('inch'); await open('saespline', 150);
+  await pick('n', '6'); await pick('fit', '1'); await put('D', '1.5'); await put('len', '');
+  let t = await rows();
+  if (!/Width of spline W 0\.375 in/i.test(t) || !/Depth of spline h 0\.075 in/i.test(t) || !/Small diameter d 1\.350 in/i.test(t) || !/at 1000 psi on the sides 321 in lbf/i.test(t) || /Note/i.test(t) || /bearing length/i.test(t))
+    problems.push(`[${where}] 6 splines, fit A, 1.5 in (W 0.375, h 0.075, d 1.350, T 321): ${t}`);
+  let dia = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/W 0\.375/.test(dia) || !/D 1\.5 in/.test(dia) || !/d 1\.35 in/.test(dia) || !/6 splines/.test(dia) || !/T 321 in lbf/.test(dia)) problems.push(`[${where}] drawing, 6A at 1.5 in: ${dia}`);
+  await pick('n', '10'); await pick('fit', '3'); await put('D', '2'); await put('len', '2'); t = await rows();
+  if (!/Width of spline W 0\.312 in/i.test(t) || !/Small diameter d 1\.620 in/i.test(t) || !/on the sides 1,?720 in lbf/i.test(t) || !/over the bearing length, at 1000 psi 3,?439 in lbf/i.test(t))
+    problems.push(`[${where}] 10 splines, fit C, 2 in, 2 in long (W 0.312, d 1.620, T 1720 from 1719.5, 3439 over the length): ${t}`);
+  await pick('n', '4'); t = await rows();
+  if (!/no fit C \(to slide under load\) for 4 splines/i.test(t) || /Width of spline/i.test(t)) problems.push(`[${where}] 4 splines with fit C must be refused: ${t}`);
+  await pick('fit', '2'); await put('D', '1'); await put('len', ''); t = await rows();
+  if (!/Width of spline W 0\.241 in/i.test(t) || !/Depth of spline h 0\.125 in/i.test(t) || !/Small diameter d 0\.750 in/i.test(t) || !/on the sides 219 in lbf/i.test(t)) problems.push(`[${where}] 4 splines, fit B, 1 in (W 0.241, h 0.125, d 0.750, T 219): ${t}`);
+  await units('mm'); await open('saespline', 150);
+  await pick('n', '16'); await pick('fit', '1'); await put('D', '38.1'); await put('len', ''); t = await rows();
+  if (!/Width of spline W 3\.73 mm/i.test(t) || !/Small diameter d 34\.67 mm/i.test(t) || !/on the sides 87\.4 N m/i.test(t) || !/16-spline fittings from 2 to 6 in nominal diameter\. This size is outside that range/i.test(t))
+    problems.push(`[${where}] 16 splines, fit A, 38.1 mm (W 3.73, d 34.67, 87.4 N m, range note): ${t}`);
+  await put('D', '76.2'); t = await rows();
+  if (/Note/i.test(t) || !/Small diameter d 69\.34 mm/i.test(t)) problems.push(`[${where}] 16 splines at 76.2 mm is inside the tabulated range: ${t}`);
+  dia = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/16 splines/.test(dia) || !/D 76\.2 mm/.test(dia) || !/d 69\.34 mm/.test(dia)) problems.push(`[${where}] drawing, 16A at 76.2 mm: ${dia}`);
+  await pick('n', '6'); await put('D', '38.1');
+  await units('inch'); await open('saespline', 80);
+  await pick('n', '6'); await pick('fit', '1'); await put('D', '1.5');
+  await mode('advanced');
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

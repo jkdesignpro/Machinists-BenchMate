@@ -891,6 +891,32 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Wire EDM cut laid out flat: length of the path by thickness of the work');
   },
 
+  // SAE parallel side spline fitting: the splined hole in a hub, to scale (large and small diameter, width, depth).
+  saespline(v, sys, rows) {
+    const W = 520, H = 290, u = dcU(sys), dp = sys === 'inch' ? 3 : 2;
+    const w = dcRow(rows, 'Width of spline W'), hh = dcRow(rows, 'Depth of spline h'), d = dcRow(rows, 'Small diameter d'), D = v.D, n = v.n;
+    if (!dcOk(D) || !dcOk(w) || !dcOk(d) || !(n >= 4)) return '';
+    const cx = 170, cy = 148, Rb = 92, sc = Rb / (D / 2), rs = d / 2 * sc, at = Math.asin(Math.min(1, w / D)), ar = Math.asin(Math.min(1, w / d));
+    const P = (r, a) => (cx + r * Math.sin(a)).toFixed(1) + ' ' + (cy - r * Math.cos(a)).toFixed(1);
+    // The hole: clockwise round the profile, splines (keyways in the hub) reaching out to D, lands on d between them.
+    let path = '';
+    for (let i = 0; i < n; i++) {
+      const a = 2 * Math.PI * i / n, a2 = 2 * Math.PI * (i + 1) / n;
+      path += (i ? 'L' : 'M') + P(rs, a - ar) + 'L' + P(Rb, a - at) + 'A' + Rb + ' ' + Rb + ' 0 0 1 ' + P(Rb, a + at) + 'L' + P(rs, a + ar) + 'A' + rs.toFixed(1) + ' ' + rs.toFixed(1) + ' 0 0 1 ' + P(rs, a2 - ar);
+    }
+    const Ro = Rb * 1.32;
+    let h = DK.path('M' + (cx + Ro) + ' ' + cy + 'A' + Ro + ' ' + Ro + ' 0 1 0 ' + (cx - Ro) + ' ' + cy + 'A' + Ro + ' ' + Ro + ' 0 1 0 ' + (cx + Ro) + ' ' + cy + 'Z' + path + 'Z', 'hatch');
+    h += DK.cl(cx - Ro - 10, cy, cx + Ro + 10, cy) + DK.cl(cx, cy - Ro - 10, cx, cy + Ro + 10);
+    h += DK.dimH(cx - w / 2 * sc, cx + w / 2 * sc, cy - Ro - 14, 'W ' + dcN(w, dp), { from: cy - Rb });
+    const x = 330;
+    h += DK.leader(cx + Rb * Math.sin(at), cy - Rb * Math.cos(at), x - 8, 62, 'D ' + dcN(D, dp) + ' ' + u, { anchor: 'start' });
+    h += DK.leader(cx + rs * Math.sin(Math.PI / n), cy - rs * Math.cos(Math.PI / n), x - 8, 92, 'd ' + dcN(d, dp) + ' ' + u, { anchor: 'start' });
+    const T = rows.find(r => r.label.indexOf('Torque capacity per inch') === 0);
+    h += dcLines(x, 128, ['depth h ' + dcN(hh, dp) + ' ' + u, n + ' splines', T && isFinite(T.value) ? 'T ' + dcN(T.value, sys === 'inch' ? 0 : 1) + ' ' + T.unit : '', T && isFinite(T.value) ? 'per inch of length' : '', T && isFinite(T.value) ? 'at 1000 psi' : '']);
+    h += DK.text(W - 6, H - 6, 'the splined hole, to scale', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Section of an SAE parallel side splined hole: large diameter, small diameter, width and depth of the splines');
+  },
+
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
   sawtpi(v, sys, rows) {
     const W = 520, H = 250, u = dcU(sys);

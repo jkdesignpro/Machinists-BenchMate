@@ -45,6 +45,16 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - Recorded where sources differ: the macro variable number of one tool offset on Fanuc (two sources differ by one).
 - Not found in a readable form, and listed as gaps on the page: Fanuc's own M-code and system variable tables, Haas Next Generation Control variable numbers, Doosan lathe M codes.
 
+### Added (troubleshooting for drilling, tapping and grinding)
+- **CNC guide**: three new troubleshooting tables. Drilling (10 problems: hole size, straightness, breakage, chipping, wear, chips, burrs), tapping (8: thread size, breakage, chips packing, wear, built-up edge, torn and bell-mouthed threads) and grinding (8: burn, chatter, finish, loading, out of round, feed lines, waves). Written in our own words from seven public pages; every row shows its sources, and a row that rests on one publisher is marked to be verified.
+- Where two sources give opposite advice (feed against chipping at the centre of a drill) the row says so.
+
+### Added (SAE parallel side splines)
+- New tool **SAE parallel side splines** in Gears and splines (Expert): width, depth and small diameter of 4, 6, 10 and 16-spline fittings for a nominal diameter, in fits A (permanent), B (to slide when not under load) and C (to slide under load), the torque capacity per inch of length at 1000 psi and over a bearing length, and the splined hole drawn to scale. Inch and mm.
+- The formulas come from one publisher (Machinery's Handbook) and the page says so; they were checked against 37 values printed in its tables. SAE lists the standard as obsolete for new designs: the page says so and points to the involute spline tool.
+- A note appears when the size is outside the range the handbook tabulates, and 4 splines with fit C is refused (the standard has none).
+- Two entries in the formula library.
+
 ### Added (thread extras)
 - New tool **Rolled thread blank diameter** in Holes and threads > Tapping and thread data, for ISO metric (6g, 6h, 4h) and Unified (2A, 3A) threads: the blank diameter by a thread roll maker's rule (maximum pitch diameter less 0.002 in or 0.051 mm), the thread's pitch and major diameter limits, and the handbook's amounts for the size beside it. The two publishers give different rules; both are shown and nothing is merged.
 - Enter the major diameter of a trial and the page gives the change to make to the blank (one third of the difference to the middle of the limits; one source, marked so).

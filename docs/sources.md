@@ -734,6 +734,16 @@ Read for this batch on 2026-11-11 unless noted. Keys are the ones shown in the a
 - **[MMC]** Mitsubishi Materials, "Causes of tool damage" (types of cutting edge damage and solutions), course 78. https://www.mmc-carbide.com/permanent/courses/78/causes-of-tool-damage.html
 - **[SECO]** Seco Tools, "Tool wear patterns: how to recognize and to optimize them". https://www.secotools.com/article/122073
 - **Tool wear guide (`toolwear`, 0.5.0).** Both pages were read again on 2026-11-12. Three entries were added to the seven: fracture and breakage (both makers), flaking (Mitsubishi only) and chip hammering (Seco only); the last two are marked "to be verified" on the page because one maker describes them. Mitsubishi's "welding" is covered by the built-up edge entry. The split into gradual wear (flank and rake face) and sudden damage is Mitsubishi's. The drawings are our own: one base (the edge unfolded, rake face above, flank below) with the wear mark added.
+- **Drilling, tapping and grinding troubleshooting (`cncguide`, 0.5.0).** Read 2026-11-12; the tables are in our own words and each row carries the keys of the pages that support it. A row with one publisher is marked "to be verified" on the page.
+  - **[MMC68]** Mitsubishi Materials, drilling course 68, "Trouble shooting". https://www.mmc-carbide.com/permanent/courses/68/trouble-shooting.html . Solid drills: oversize, hole closing in, straightness, position and roundness, exit burrs, long chips, breakage, chipping of the outer edge and the chisel edge, margin wear.
+  - **[PTD]** Travers Tool, "Drill troubleshooting and tips", 9 March 2021, with material from Precision Twist Drill (Dormer Pramet). https://solutions.travers.com/metalworking-machining/holemaking/drill-troubleshooting-and-tips . Remedies by problem; no separate list of causes.
+  - **[FMC_D]** FM Carbide, drilling troubleshooting chart (indexable drills). https://fmcarbide.com/pages/drilling-troubleshooting-chart
+  - **[FMC_T]** FM Carbide, TechTalk "Tapping troubleshooting", 15 December 2021. https://fmcarbide.com/blogs/techtalks/tapping-troubleshooting
+  - **[REGAL]** Regal Cutting Tools, "5 common tap troubles, and how to remedy them", 30 October 2024. https://regalcuttingtools.com/5-common-tap-troubles-and-how-to-remedy-them/ . Its fifth trouble (burrs from the tap's own edge) is a product note and is not used.
+  - **[RADIAC]** Radiac Abrasives, troubleshooting tips for cylindrical grinding and for surface grinding. https://radiac.com/troubleshooting-tip-category/cylindrical-grinding/ , https://radiac.com/troubleshooting-tip-category/surface-grinding/ . One publisher: rows that rest on these two tables alone are marked to be verified.
+  - **[OKUMA_G]** Robbie Williams (Okuma America), "6 causes of grinding chatter, and how to fix them", 23 March 2016. https://okuma.com/blog/blog-grinding-chatter-fixes
+  - **Where sources differ:** chipping at the chisel edge of a drill: Mitsubishi lowers the feed at entry, Precision Twist Drill raises the feed rate; the row says so. Radiac's cylindrical table couples "wheel too coarse" with remedies for a wheel that is too hard under rough finish; only the entries that are clear are used.
+  - Not readable: Mitsubishi's drilling troubleshooting matrix on mitsubishicarbide.net (the tables are pictures); Sandvik Coromant and Kennametal drilling troubleshooting (JavaScript); Haas tap breakage page (JavaScript).
 - Sandvik Coromant's wear and troubleshooting pages (https://www.sandvik.coromant.com/en-gb/knowledge/materials/wear-on-cutting-edges and the troubleshooting-turning and troubleshooting-milling pages) need JavaScript and could not be read.
 ### Safety
 - **[HSE_EM]** Health and Safety Executive, "Using emery cloth on metalworking lathes", updated 2026-08-18. https://www.hse.gov.uk/engineering/lathes.htm . Never hold emery cloth by hand on a rotating part; use a holder in the tool post; see EIS2.
@@ -844,6 +854,19 @@ Main sources: KHK Gear Technical Reference (khkgears.us, Tables 4.3 and 4.9, and
 over-pin and chordal articles from Gear Solutions 2020); SDP/SI Elements of Metric Gear
 Technology; MESYS AG online gear calculation (calc.mesys.ch); ISO 53, ISO 21771-1, DIN 3960,
 ANSI B92.1 and ISO 4156-1 (cited by name); Engineers Edge involute spline formulas.
+
+### SAE parallel side splines (`core/src/gears.rs` `sae_spline`, tool `saespline`)
+All accessed 2026-11-12.
+
+- **[MH_SAE]** *Machinery's Handbook*, 31st ed., Industrial Press, 2020, "SAE standard spline fittings", Tables 18 to 22, pp. 2358 to 2360, read on the publisher's online copy. https://online.flippingbook.com/view/954046886/1021 to /1023 . Formulas for the width W, depth h and small diameter d of 4, 6, 10 and 16-spline fittings as fractions of the nominal diameter D, for fits A (permanent), B (to slide when not under load) and C (to slide when under load; none for 4 splines); the dimension tables (4 and 6 splines 3/4 to 3 in, 10 splines 3/4 to 6 in, 16 splines 2 to 6 in); torque capacity T = 1000 N R h in inch-pounds per inch of bearing length at 1000 psi on the sides, R the mean radius. The tables give each dimension as a smallest and a largest size (a minus tolerance of 0.001 to 0.003 in by size).
+- **[SAE_J499]** SAE International, J499, "Parallel side splines for soft broached holes in fittings", public summary on SAE Mobilus (J499_201406). https://saemobilus.sae.org/content/J499_201406 . Issued January 1914, stabilized June 2014: "technically obsolete for the design of new applications", with ANSI B92.1 involute splines named for new designs. Dimensions D, W, d, h and T for four, six, ten and sixteen-spline fittings; they apply to the soft broached hole only, with no allowance for corner radii or clearance; corner radii not over 0.015 in; splines parallel to the axis within 0.006 in per foot; a theoretical torque capacity per inch of bearing length at 1000 psi. The standard's own tables and formulas are paid and were not read. SAE Mobilus also lists a revision J499A_197510 (October 1975); that listing was seen in search results only.
+
+Findings:
+- **The formulas rest on one publisher** (the handbook) and the page says so. They were checked against 37 values printed in the handbook's own tables (Tables 18, 20 and 21): all agree to the printed figure; the 16C torque at 6 in computes to 24,760.8 against 24,760 printed.
+- The tool gives the largest size of each dimension, as the formulas do; the tables' smallest sizes (the minus tolerance) are described in words, not calculated.
+- The torque figure is the handbook's rating at 1000 psi on the sides of the splines, to be scaled by the pressure the materials allow. No allowable pressure is given. SAE's summary confirms the basis (per inch of bearing length at 1000 psi) but not the formula.
+- Not readable: Engineers Edge "SAE standard spline" pages (script-only calculator, no formulas in the page text). Marks' Handbook is cited by others for the same proportions but was not read.
+- **Not included:** shaft dimensions and fits between shaft and hole, the tables' tolerances as numbers, hardened holes, broach dimensions.
 
 ## Mechanics (`core/src/mechanics.rs`, `app/mechanics.js`, tools in `app/tools.js`)
 
