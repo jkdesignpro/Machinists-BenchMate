@@ -994,6 +994,120 @@ where = 'rotfeed';
   await units('mm');
 }
 
+// G-code snippets: a calculator's result as the cycle blocks only, in the dialect of the control picked or of the
+// active machine; the same blocks are a fold on every generator page; unsupported controls say so and write nothing.
+where = 'snippets';
+{
+  await units('mm');
+  await mode('advanced');
+  await page.evaluate(() => { SNIP_CTRL.v = null; });
+  const box = '#main details.rsnip';
+  const openBox = async () => { await page.waitForSelector(box, { timeout: 5000 }).catch(() => problems.push(`[${where}] no G-code box on this page`)); await page.evaluate(b => { const d = document.querySelector(b); if (d && !d.open) d.open = true; }, box); await page.waitForTimeout(80); };
+  const set = async (k, v) => { await page.evaluate(([b, k, v]) => { const i = document.querySelector(b + ' [data-k="' + k + '"]'); i.value = v; i.dispatchEvent(new Event(i.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); }, [box, k, String(v)]); await page.waitForTimeout(50); };
+  const snip = () => page.$eval(box + ' .snipt', e => e.textContent).catch(() => '');
+  const msg = () => page.$eval(box + ' .snipout', e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
+  // bolt circle: nothing is invented, so the speed, feed and depth are asked for first
+  await open('bolt', 80);
+  await openBox();
+  if (!/Enter the spindle speed/.test(await msg())) problems.push(`[${where}] an empty box should ask for the spindle speed: ${await msg()}`);
+  await set('rpm', 1200); await set('feed', 150);
+  if (!/Need Z depth below the R plane/.test(await msg())) problems.push(`[${where}] no depth should be asked for: ${await msg()}`);
+  await set('z', -18);
+  let t = await snip();
+  if (!t.startsWith('(BENCHMATE SNIPPET - CYCLE BLOCKS ONLY - GENERIC ISO 6983 / FANUC-STYLE - MM)\n') || !/\(BEFORE THESE BLOCKS: SPINDLE ON: S1200 M03\)/.test(t) || !/\nG99 G81 X50\.0 Y0\.0 Z-18\.0 R2\.0 F150\.0\nX25\.0 Y43\.301\nX-25\.0 Y43\.301\nX-50\.0 Y0\.0\nX-25\.0 Y-43\.301\nX25\.0 Y-43\.301\nG80\n$/.test(t)) problems.push(`[${where}] bolt circle blocks are wrong:\n${t}`);
+  if (/M30|M06|G43|^%|^O\d/m.test(t)) problems.push(`[${where}] the snippet holds parts of a whole program:\n${t}`);
+  // the dwell word differs by control: milliseconds without a point (Fanuc-style), seconds with a point (Haas)
+  await set('cycle', 82);
+  t = await snip();
+  if (!/ P300 F150\.0\n/.test(t)) problems.push(`[${where}] Fanuc-style G82 dwell should be P300:\n${t}`);
+  await set('ctrl', 1);
+  t = await snip();
+  if (!/ - HAAS - MM\)/.test(t) || !/ P0\.3 F150\.0\n/.test(t)) problems.push(`[${where}] Haas G82 dwell should be P0.3:\n${t}`);
+  // on to the full generator: same control, cycle and holes; its program holds the same cycle blocks, and its fold shows them
+  const cyc = t.split('\n').filter(l => !l.startsWith('(')).join('\n');
+  await page.click(box + ' [data-a="full"]'); await page.waitForTimeout(250);
+  const full = await page.evaluate(() => ({ h: location.hash, prog: (document.querySelector('#main #cytext') || {}).textContent || '', sn: (document.querySelector('#main #cysnip') || {}).textContent || '' }));
+  if (!/cycdrill/.test(full.h) || !full.prog.includes('\n' + cyc) || !/\(CONTROL: HAAS\)/.test(full.prog)) problems.push(`[${where}] the full generator did not get the same job:\n${full.prog.slice(0, 700)}`);
+  if (!full.sn.startsWith('(BENCHMATE SNIPPET - CYCLE BLOCKS ONLY - HAAS - MM)') || !full.sn.endsWith(cyc)) problems.push(`[${where}] the generator's "cycle blocks only" fold is wrong:\n${full.sn}`);
+  // every generator page has the fold, and its blocks are lines of its own program
+  for (const id of ['cyctmill', 'cycthread', 'cyctaper', 'cycgroove', 'cycbroach', 'cycg71', 'engrave']) {
+    await open(id, 150);
+    await page.waitForSelector('#main #cysnip', { timeout: 5000 }).catch(() => {});
+    const g = await page.evaluate(() => ({ prog: (document.querySelector('#main #cytext') || {}).textContent || '', sn: (document.querySelector('#main #cysnip') || {}).textContent || '' }));
+    const body = g.sn.split('\n').filter(l => !/^\((BENCHMATE SNIPPET|BEFORE THESE BLOCKS|CHECK EVERY LINE)/.test(l)).join('\n');
+    if (!g.sn.startsWith('(BENCHMATE SNIPPET - CYCLE BLOCKS ONLY - ') || !/\(BEFORE THESE BLOCKS: /.test(g.sn) || body.length < 10 || !g.prog.includes('\n' + body)) problems.push(`[${where}] ${id}: the cycle blocks fold is missing or not part of the program:\n${g.sn.slice(0, 400)}`);
+  }
+  // the control comes from the active machine until one is picked in a box; a control with no confirmed format writes nothing
+  await page.evaluate(() => { SNIP_CTRL.v = null; });
+  const mid = await page.evaluate(() => { const m = Profiles.upsert({ name: 'Smoke mill', type: 'Mill / machining centre', control: 'Haas NGC', rpm_max: 8000 }); Profiles.setActive(m.id); return m.id; });
+  await open('holegrid', 80); await openBox();
+  await set('rpm', 900); await set('feed', 120); await set('z', -10); await set('cycle', 83);
+  t = await snip();
+  if (!/ - HAAS - MM\)/.test(t) || !/The control comes from the active machine/.test(await msg()) || !/\nG99 G83 X0\.0 Y0\.0 Z-10\.0 R2\.0 Q4\.0 F120\.0\n/.test(t) || (t.match(/^X-?\d/gm) || []).length !== 11) problems.push(`[${where}] hole grid on a Haas machine is wrong:\n${t}\n${await msg()}`);
+  await page.evaluate(id => { Profiles.upsert({ id, name: 'Smoke mill', type: 'Mill / machining centre', control: 'Siemens 840D', rpm_max: 8000 }); }, mid);
+  await open('holegrid', 80); await openBox();
+  if (!/No blocks for Siemens 840D \(ISO mode\): its format is not confirmed/.test(await msg()) || (await snip())) problems.push(`[${where}] a Siemens machine should get no blocks and be told why: ${await msg()}`);
+  await page.evaluate(id => Profiles.remove(id), mid);
+  await page.evaluate(() => { SNIP_CTRL.v = null; });
+  // drill point: a depth at full diameter gives the depth to the point, and the cycle goes there (118 degrees, 6 mm: 1.8026 + 20)
+  await open('drillpoint', 80);
+  await page.fill('#main [data-id="depth"]', '20'); await page.dispatchEvent('#main [data-id="depth"]', 'input'); await page.waitForTimeout(60);
+  const dpRow = await page.$eval('#res', e => e.innerText.replace(/\s+/g, ' '));
+  if (!/to the drill point 21\.8026 mm/i.test(dpRow)) problems.push(`[${where}] depth to the drill point should be 21.8026: ${dpRow}`);
+  await openBox(); await set('rpm', 2000); await set('feed', 200);
+  t = await snip();
+  if (!/\nG99 G81 X0\.0 Y0\.0 Z-21\.803 R2\.0 F200\.0\nG80\n$/.test(t) || !(await page.$eval(box + ' [data-k="z"]', e => e.disabled))) problems.push(`[${where}] drill point cycle should go to Z-21.803, fixed by the page:\n${t}`);
+  await page.fill('#main [data-id="depth"]', ''); await page.dispatchEvent('#main [data-id="depth"]', 'input'); await page.waitForTimeout(60);
+  if (await page.$(box)) problems.push(`[${where}] no depth, no G-code box on the drill point page`);
+  // tap drill: the pitch comes from the thread; Fanuc-style rigid tapping starts the spindle with M29 inside the blocks
+  await open('tapdrill', 200); await openBox();
+  await set('rpm', 400); await set('z', -15);
+  t = await snip();
+  if (!/\nM29 S400\nG99 G84 X0\.0 Y0\.0 Z-15\.0 R2\.0 F600\.0\nG80\n$/.test(t) || /SPINDLE ON/.test(t) || !/Tap feed = pitch x rpm = 600\.00 mm\/min/.test(await msg())) problems.push(`[${where}] M10 x 1.5 at 400 rpm should tap at F600 with M29:\n${t}`);
+  // spot drill depth: a 90 degree spot to a 10 mm chamfer is 5 deep, with a dwell
+  await open('spotdepth', 200);
+  await page.selectOption('#main #sm', '1').catch(() => {});
+  await page.waitForTimeout(80);
+  const spotOk = await page.evaluate(() => { const a = document.querySelector('#main #sang'), d = document.querySelector('#main #sdc'); if (!a || !d) return false; a.value = '90'; a.dispatchEvent(new Event('input', { bubbles: true })); d.value = '10'; d.dispatchEvent(new Event('input', { bubbles: true })); return true; });
+  if (!spotOk) problems.push(`[${where}] spot drill page inputs not found`);
+  else {
+    await openBox(); await set('rpm', 1500); await set('feed', 100);
+    t = await snip();
+    if (!/\nG99 G82 X0\.0 Y0\.0 Z-5\.0 R2\.0 P300 F100\.0\nG80\n$/.test(t)) problems.push(`[${where}] a 90 degree spot to 10 mm should dwell at Z-5.0:\n${t}`);
+  }
+  // spindle and feed words: mill, then a lathe with constant surface speed (clamp asked for), then the feed pages
+  await open('rpm', 80); await openBox();
+  t = await snip();
+  if (t !== '(BENCHMATE SNIPPET - SPINDLE AND FEED WORDS - GENERIC ISO 6983 / FANUC-STYLE - MM)\n(CHECK EVERY LINE AGAINST YOUR CONTROL MANUAL)\nS2387 M03\n') problems.push(`[${where}] 90 m/min on 12 mm should be S2387 M03:\n${t}`);
+  await set('mach', 1); await set('css', 1);
+  if (!/Enter the maximum spindle speed for CSS/.test(await msg())) problems.push(`[${where}] constant surface speed needs the clamp: ${await msg()}`);
+  await set('vmax', 3000);
+  t = await snip();
+  if (!/\nG50 S3000\nG96 S90 M03\n$/.test(t)) problems.push(`[${where}] lathe constant surface speed words are wrong:\n${t}`);
+  await set('css', 0); await set('mach', 0);
+  await open('feed', 80); await openBox();
+  t = await snip();
+  if (!/\nS3000 M03\n\(FEED PER MINUTE, G94: PUT THIS WORD ON THE FIRST CUTTING BLOCK\)\nF600\.0\n$/.test(t)) problems.push(`[${where}] milling feed words are wrong:\n${t}`);
+  await open('lathefeed', 80);
+  await page.fill('#main [data-id="rpm"]', '1000'); await page.dispatchEvent('#main [data-id="rpm"]', 'input'); await page.waitForTimeout(60);
+  await openBox();
+  t = await snip();
+  if (!/\nG97 S1000 M03\n\(FEED PER REVOLUTION, G99: PUT THIS WORD ON THE FIRST CUTTING BLOCK\)\nF0\.15\n$/.test(t)) problems.push(`[${where}] lathe feed per revolution words are wrong:\n${t}`);
+  await set('per', 0);
+  t = await snip();
+  if (!/\(FEED PER MINUTE, G98: PUT THIS WORD ON THE FIRST CUTTING BLOCK\)\nF150\.0\n$/.test(t)) problems.push(`[${where}] lathe feed per minute words are wrong:\n${t}`);
+  await set('per', 1);
+  await page.fill('#main [data-id="rpm"]', ''); await page.dispatchEvent('#main [data-id="rpm"]', 'input');
+  // inch: four places and the inch header
+  await units('inch');
+  await open('bolt', 80); await openBox();
+  await set('rpm', 1200); await set('feed', 6); await set('z', -0.75);
+  t = await snip();
+  if (!/ - INCH\)/.test(t) || !/\nG99 G81 X2\.0 Y0\.0 Z-0\.75 R0\.1 F6\.0\nX1\.0 Y1\.7321\n/.test(t)) problems.push(`[${where}] inch bolt circle blocks are wrong:\n${t}`);
+  await units('mm');
+  await page.evaluate(() => { SNIP_CTRL.v = null; });
+}
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

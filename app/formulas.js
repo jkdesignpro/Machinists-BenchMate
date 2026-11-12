@@ -188,6 +188,7 @@ const FORMULAS = [
   F('bandsaw', 'Cut time from a cutting rate', 't = area / cutting rate', 'area: [in² or cm²]; rate: [per min]', ['STAR']),
   F('bandsaw', 'Band saw chip per tooth', 'f_tooth = down-feed / (blade speed · teeth per length)', 'down-feed: [per min]; blade speed: [ft/min or m/min]', ['KASCO', 'STAR']),
   F('drillpoint', 'Drill point length', 'h = (d / 2) / tan(θ / 2)', 'h: point length; d: drill diameter; θ: point angle', ['MH']),
+  F('drillpoint', 'Depth to program to the drill point', 'Z = L + h', 'L: hole depth at full diameter; h: point length', ['MH']),
   F('spotdepth', 'Spot drill depth for a chamfer', 'z = (Dc / 2) / tan(θ / 2)', 'z: depth from the tip; Dc: chamfer diameter; θ: tool point angle', ['OWN', 'MH']),
   F('spotdepth', 'Centre drill depth', 'z = l + (Dc − d) / (2 · tan(θ / 2))', 'l: tip to start of the cone; d: pilot diameter', ['OWN']),
   F('chatter', 'Tooth passing frequency', 'f_t = n · z / 60', 'f_t: [Hz]; n: [rpm]; z: teeth (lathe 1)', ['SMITH', 'ALT']),

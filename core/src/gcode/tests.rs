@@ -6,11 +6,55 @@ use super::*;
 fn golden(name: &str, p: &Program) {
     assert!(p.error.is_none(), "{name}: {:?}", p.error);
     let path = format!("{}/src/gcode/golden/{}.nc", env!("CARGO_MANIFEST_DIR"), name);
-    if std::env::var("BLESS").is_ok() { std::fs::write(&path, &p.text).unwrap(); return; }
+    if std::env::var("BLESS").is_ok() {
+        std::fs::write(&path, &p.text).unwrap();
+        std::fs::write(format!("{}/src/gcode/golden/snippets/{}.nc", env!("CARGO_MANIFEST_DIR"), name), &p.snippet).unwrap();
+        return;
+    }
     let want = std::fs::read_to_string(&path).unwrap_or_else(|_| panic!("missing golden file {path}; run with BLESS=1"));
     assert_eq!(p.text, want, "{name} differs from its golden file");
     check_words(name, &p.text);
     backplot_agrees(name, p);
+    check_snippet(name, p);
+}
+
+/// The cycle blocks on their own (`Program::snippet`): compared with
+/// `golden/snippets/<name>.nc`, and checked to be a run of whole lines of the
+/// program with nothing of the program's start or end in it.
+fn check_snippet(name: &str, p: &Program) {
+    let path = format!("{}/src/gcode/golden/snippets/{}.nc", env!("CARGO_MANIFEST_DIR"), name);
+    let want = std::fs::read_to_string(&path).unwrap_or_else(|_| panic!("missing golden snippet {path}; run with BLESS=1"));
+    assert_eq!(p.snippet, want, "{name}: snippet differs from its golden file");
+    snippet_rules(name, p);
+}
+
+fn snippet_rules(name: &str, p: &Program) {
+    let lines: Vec<&str> = p.snippet.lines().collect();
+    assert!(lines[0].starts_with("(BENCHMATE SNIPPET - CYCLE BLOCKS ONLY - "), "{name}: {}", lines[0]);
+    assert!(lines[0].ends_with(if p.text.contains("G21") { " - MM)" } else { " - INCH)" }), "{name}: units in the snippet header");
+    let head = lines.iter().position(|l| *l == "(CHECK EVERY LINE AGAINST YOUR CONTROL MANUAL)").unwrap_or_else(|| panic!("{name}: no check line"));
+    assert!(head >= 2, "{name}: the snippet must say what it needs before it");
+    for l in &lines[1..head] {
+        assert!(l.starts_with("(BEFORE THESE BLOCKS: ") && l.ends_with(')'), "{name}: {l}");
+        assert_eq!(l.matches('(').count(), 1, "{name}: brackets inside a comment: {l}");
+        assert_eq!(l.matches(')').count(), 1, "{name}: brackets inside a comment: {l}");
+    }
+    // the blocks are one run of whole lines of the program
+    let body = lines[head + 1..].join("\n") + "\n";
+    assert!(lines.len() > head + 1, "{name}: no blocks");
+    assert!(p.text.contains(&format!("\n{body}")), "{name}: the snippet blocks are not a run of lines of the program");
+    // nothing of the program's start or end
+    for l in &lines[head + 1..] {
+        let code = l.split('(').next().unwrap();
+        for bad in ["%", "M30", "M06", "G28", "M05", "M09", "G43", "G54", "G20", "G21"] { assert!(!code.split_whitespace().any(|w| w == bad), "{name}: {bad} in the snippet: {l}"); }
+        assert!(!code.starts_with('O') && !code.starts_with('T'), "{name}: program number or tool call in the snippet: {l}");
+    }
+    // the simulator reads the blocks on their own without errors
+    use crate::gsim::{simulate, Opts};
+    let lathe = ["g71", "g76", "g92", "taper", "groove", "cutoff", "broach_lathe"].iter().any(|k| name.starts_with(k));
+    let metric = p.text.contains("G21");
+    let s = simulate(&p.snippet, &Opts { lathe, metric_out: metric, default_metric: metric, ..Opts::default() });
+    assert_eq!(s.error_count(), 0, "{name}: snippet in the simulator: {:?}", s.msgs);
 }
 
 /// The backplot (core/src/gsim.rs) reads the generated text back: no errors,
@@ -327,4 +371,87 @@ fn engrave(metric: bool, ctrl: Ctrl, text: &str) -> EngraveJob {
         assert!(p.error.is_none(), "{name}");
         backplot_agrees(name, &p);
     }
+}
+
+// ---------------------------------------------------------------------------
+// Snippets: the cycle blocks on their own, and spindle and feed words
+
+#[test] fn snippet_drill_by_hand() {
+    // G83 at four holes on a 100 bolt circle, Generic, mm: the header says what the program set up, then the cycle to G80
+    let p = gen_drill(&drill(true, Ctrl::Generic, 83));
+    assert_eq!(p.snippet, "(BENCHMATE SNIPPET - CYCLE BLOCKS ONLY - GENERIC ISO 6983 / FANUC-STYLE - MM)\n\
+(BEFORE THESE BLOCKS: G90 G17, WORK OFFSET AND TOOL LENGTH OFFSET ACTIVE)\n\
+(BEFORE THESE BLOCKS: SPINDLE ON: S1200 M03)\n\
+(BEFORE THESE BLOCKS: TOOL AT Z25.0, THE INITIAL LEVEL)\n\
+(CHECK EVERY LINE AGAINST YOUR CONTROL MANUAL)\n\
+G99 G83 X50.0 Y0.0 Z-20.0 R2.0 Q4.0 F150.0\n\
+X0.0 Y50.0\n\
+X-50.0 Y0.0\n\
+X0.0 Y-50.0\n\
+G80\n");
+    // Fanuc-style rigid tapping: M29 S starts the spindle inside the blocks, so the header does not ask for it
+    let p = gen_drill(&drill(true, Ctrl::Generic, 84));
+    assert!(p.snippet.contains("\nM29 S1200\nG99 G84 ") && !p.snippet.contains("SPINDLE ON"), "{}", p.snippet);
+    // Haas rigid tapping has no M29: the spindle is asked for
+    let p = gen_drill(&drill(true, Ctrl::Haas, 84));
+    assert!(!p.snippet.contains("M29") && p.snippet.contains("(BEFORE THESE BLOCKS: SPINDLE ON: S1200 M03)"), "{}", p.snippet);
+    // a program that was refused has no snippet
+    let mut j = drill(true, Ctrl::Siemens, 81); j.holes.clear();
+    assert!(gen_drill(&j).snippet.is_empty());
+}
+
+#[test] fn snippet_lathe_by_hand() {
+    // G76 two-block (Generic) and one-block (Haas): the start point and the constant rpm are named, the cycle lines follow
+    let p = gen_lathe_thread(&lthread(true, Ctrl::Generic, true));
+    let l: Vec<&str> = p.snippet.lines().collect();
+    assert!(l[1].starts_with("(BEFORE THESE BLOCKS: SPINDLE ON AT CONSTANT RPM: G97 S"), "{}", l[1]);
+    assert!(l[2].starts_with("(BEFORE THESE BLOCKS: TOOL AT THE START POINT X"), "{}", l[2]);
+    assert_eq!(l.len(), 6, "{}", p.snippet);
+    assert!(l[4].starts_with("G76 P") && l[5].starts_with("G76 X"), "{}", p.snippet);
+    let p = gen_lathe_thread(&lthread(true, Ctrl::Haas, false));
+    assert!(p.snippet.lines().any(|x| x.starts_with("G76 X") && x.contains(" K") && x.contains(" D")), "{}", p.snippet);
+    // constant surface speed is spelled out for the lathe cycles
+    let p = gen_g71(&g71job(Ctrl::Generic));
+    assert!(p.snippet.contains("(BEFORE THESE BLOCKS: SPINDLE ON: G50 S") && p.snippet.contains(" THEN G96 S"), "{}", p.snippet);
+    assert!(p.snippet.trim_end().lines().last().unwrap().starts_with("G70 P"), "{}", p.snippet);
+}
+
+fn words(ctrl: Ctrl, metric: bool, lathe: bool, css: bool, per_rev: bool, feed: f64) -> Program {
+    gen_words(&WordsJob { metric, ctrl, lathe, sp: Spindle { css, v: 180.0, max_rpm: 3000.0, rpm: 1500.0 }, per_rev, feed })
+}
+
+#[test] fn spindle_and_feed_words() {
+    // mill: S and M03, feed per minute
+    let p = words(Ctrl::Haas, true, false, false, false, 150.0);
+    assert_eq!(p.text, "(BENCHMATE SNIPPET - SPINDLE AND FEED WORDS - HAAS - MM)\n\
+(CHECK EVERY LINE AGAINST YOUR CONTROL MANUAL)\n\
+S1500 M03\n\
+(FEED PER MINUTE, G94: PUT THIS WORD ON THE FIRST CUTTING BLOCK)\n\
+F150.0\n");
+    assert_eq!(p.text, p.snippet);
+    assert_eq!(p.max_rpm, 1500.0);
+    // lathe, constant surface speed: the clamp first, then G96; feed per revolution
+    let p = words(Ctrl::Generic, true, true, true, true, 0.15);
+    assert_eq!(p.text, "(BENCHMATE SNIPPET - SPINDLE AND FEED WORDS - GENERIC ISO 6983 / FANUC-STYLE - MM)\n\
+(CHECK EVERY LINE AGAINST YOUR CONTROL MANUAL)\n\
+G50 S3000\n\
+G96 S180 M03\n\
+(FEED PER REVOLUTION, G99: PUT THIS WORD ON THE FIRST CUTTING BLOCK)\n\
+F0.15\n");
+    // lathe, fixed rpm, inch, feed per minute
+    let p = words(Ctrl::Haas, false, true, false, false, 6.0);
+    assert!(p.text.contains("\nG97 S1500 M03\n(FEED PER MINUTE, G98: PUT THIS WORD ON THE FIRST CUTTING BLOCK)\nF6.0\n"), "{}", p.text);
+    assert!(p.text.starts_with("(BENCHMATE SNIPPET - SPINDLE AND FEED WORDS - HAAS - INCH)"));
+    // only a feed, or only a speed
+    let p = gen_words(&WordsJob { metric: true, ctrl: Ctrl::Generic, lathe: false, sp: Spindle { css: false, v: 0.0, max_rpm: 0.0, rpm: 0.0 }, per_rev: false, feed: 200.0 });
+    assert!(!p.text.contains("M03") && p.text.ends_with("F200.0\n"), "{}", p.text);
+    let p = words(Ctrl::Generic, true, false, false, false, 0.0);
+    assert!(p.text.ends_with("S1500 M03\n"), "{}", p.text);
+    // refusals: nothing to write, no clamp for constant surface speed, a control with no confirmed words
+    assert!(gen_words(&WordsJob { metric: true, ctrl: Ctrl::Generic, lathe: false, sp: Spindle { css: false, v: 0.0, max_rpm: 0.0, rpm: 0.0 }, per_rev: false, feed: 0.0 }).error.is_some());
+    assert!(gen_words(&WordsJob { metric: true, ctrl: Ctrl::Generic, lathe: true, sp: Spindle { css: true, v: 180.0, max_rpm: 0.0, rpm: 0.0 }, per_rev: true, feed: 0.1 }).error.is_some());
+    assert!(words(Ctrl::Okuma, true, false, false, false, 150.0).error.is_some());
+    // the flat form the screen uses
+    let p = run_flat(cyc::WORDS, &[1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 180.0, 3000.0, 0.0, 1.0, 0.15]);
+    assert!(p.error.is_none() && p.text.contains("G50 S3000\nG96 S180 M03\n") && p.text.contains("F0.15"), "{:?} {}", p.error, p.text);
 }

@@ -99,6 +99,8 @@ const TOOLS = [
     if (v.rpm > 0 && v.dia > 0) rows.push(R(s === 'inch' ? 'Surface speed at that RPM' : 'Cutting speed at that RPM', s === 'inch' ? W.sfm_from_rpm(v.rpm, v.dia) : W.vc_from_rpm(v.rpm, v.dia), spdU(s), 1));
     return rows;
   },
+  // G-code: the spindle start for this speed (a lathe can also take the surface speed with G96).
+  snip: (v, W, s, rows) => { const r = rows.find(x => x.label === 'Spindle speed'), n = r ? r.value : v.rpm; return n > 0 ? { kind: 'words', rpm: n, v: v.speed > 0 ? v.speed : undefined } : null; },
   working: 'Inch: n = 12 x SFM / (pi x D). Metric: n = 1000 x Vc / (pi x D).',
   source: "Machinery's Handbook (speeds and feeds); ISO cutting-speed symbols",
 },
@@ -119,6 +121,8 @@ const TOOLS = [
     if (v.rpm > 0 && v.z > 0 && v.vf > 0) rows.push(R('Feed per tooth', W.feed_per_tooth(v.vf, v.rpm, v.z), lenU(s), 4));
     return rows;
   },
+  // G-code: spindle start and the feed word for this table feed.
+  snip: (v, W, s, rows) => { const r = rows.find(x => x.label === 'Table feed'), f = r ? r.value : v.vf; return f > 0 ? { kind: 'words', lathe: false, rpm: v.rpm, feed: f } : null; },
   working: 'Vf = n x fz x z.',
   source: "Machinery's Handbook; Sandvik Coromant formulas and definitions",
 },
@@ -693,6 +697,12 @@ const TOOLS = [
     if (v.vf > 0) rows.push(R('Feed per revolution for that feed per minute', W.feed_per_tooth(v.vf, n, 1), feedRevU(s), s === 'inch' ? 5 : 4));
     return rows;
   },
+  // G-code: spindle start (fixed rpm, or the surface speed with G96 and a G50 clamp) and the feed word per revolution or per minute.
+  snip: (v, W, s, rows) => {
+    const val = l => { const r = rows.find(x => x.label.startsWith(l)); return r && typeof r.value === 'number' ? r.value : NaN; };
+    const n = v.rpm > 0 ? v.rpm : val('Spindle speed at that diameter'), fr = v.f > 0 ? v.f : val('Feed per revolution for'), fm = v.vf > 0 ? v.vf : val('Feed per minute');
+    return n > 0 && (fr > 0 || fm > 0) ? { kind: 'words', lathe: true, rpm: n, v: v.speed > 0 && v.dia > 0 && !(v.rpm > 0) ? v.speed : undefined, feedRev: fr, feed: fm } : null;
+  },
   working: 'Vf = fn x n; fn = Vf / n. With constant surface speed (G96) the rpm, and so the feed per minute, change with the diameter: convert at the diameter you care about.',
   source: "Sandvik Coromant turning formulas; Machinery's Handbook (feeds).",
 },
@@ -1016,13 +1026,21 @@ const TOOLS = [
 {
   id: 'drillpoint', level: 'simple', group: 'Drilling and tapping', title: 'Drill point length',
   pick: { map: { dia: 'dia', ang: 'point' }, types: ['Drill', 'Spot', 'Other'] },
-  desc: 'Axial length of the drill point.',
+  desc: 'Axial length of the drill point, and the depth to program for a hole that must be a given depth at its full diameter.',
   fields: s => [
     { id: 'dia', label: 'Drill diameter', unit: lenU(s), def: s === 'inch' ? 0.25 : 6 },
     { id: 'ang', label: 'Point angle', unit: 'deg', def: 118 },
+    { id: 'depth', label: 'Hole depth at full diameter (optional)', unit: lenU(s), def: '' },
   ],
-  calc: (v, W, s) => (v.dia > 0 && v.ang > 0 && v.ang < 180) ? [R('Point length', W.drill_point_length(v.dia, v.ang), lenU(s), 4)] : [],
-  working: 'h = (d / 2) / tan(point angle / 2).',
+  calc: (v, W, s) => {
+    if (!(v.dia > 0 && v.ang > 0 && v.ang < 180)) return [];
+    const rows = [R('Point length', W.drill_point_length(v.dia, v.ang), lenU(s), 4)];
+    if (v.depth > 0) rows.push(R('Depth to program, to the drill point', W.drill_tip_depth(v.depth, v.dia, v.ang), lenU(s), 4));
+    return rows;
+  },
+  // G-code: a drilling cycle to that depth (Z0 on the surface the depth is measured from).
+  snip: (v, W, s, rows) => { const r = rows.find(x => x.label.startsWith('Depth to program')); return r ? { kind: 'holes', from: 'the drill point page', set: { z: -(+r.value.toFixed(s === 'inch' ? 4 : 3)) } } : null; },
+  working: 'h = (d / 2) / tan(point angle / 2). Depth to program = depth at full diameter + h.',
   source: "Machinery's Handbook (drills)",
 },
 {
@@ -1676,6 +1694,11 @@ const TOOLS = [
       ],
     };
   },
+  // G-code: a drilling or tapping cycle at these holes.
+  snip: (v, W) => {
+    const h = []; for (let i = 0; i < v.n; i++) h.push([W.bolt_x(v.n, v.dia, v.start || 0, v.cx || 0, v.cy || 0, i), W.bolt_y(v.n, v.dia, v.start || 0, v.cx || 0, v.cy || 0, i)]);
+    return h.length ? { kind: 'holes', holes: h, from: 'the bolt circle' } : null;
+  },
   working: 'x = cx + (D/2) cos(a0 + 360 i / n), y = cy + (D/2) sin(a0 + 360 i / n). Angles measured counter-clockwise from +X.',
   source: "Machinery's Handbook (hole circles)",
 },
@@ -1702,6 +1725,8 @@ const TOOLS = [
     const xs = h.map(p => p[0]), ys = h.map(p => p[1]), dp = s === 'inch' ? 4 : 3;
     return [R('Number of holes', h.length, '', 0), R('First to last hole in X', Math.max(...xs) - Math.min(...xs), lenU(s), dp), R('First to last hole in Y', Math.max(...ys) - Math.min(...ys), lenU(s), dp)];
   },
+  // G-code: a drilling or tapping cycle at these holes, in the order listed.
+  snip: (v, W) => { const h = TOOLS.find(t => t.id === 'holegrid').holes(v, W); return h.length ? { kind: 'holes', holes: h, from: 'the hole grid' } : null; },
   table: (v, W, s, dpAdj) => {
     const dp = Math.max(0, Math.min(8, (s === 'inch' ? 4 : 3) + (dpAdj || 0)));
     const z = x => (Math.abs(x) < 0.5 * Math.pow(10, -dp) ? 0 : x).toFixed(dp);

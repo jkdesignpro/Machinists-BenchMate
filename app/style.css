@@ -380,6 +380,11 @@ details.cysec .cysh{font-weight:600}
 details.cysec .cyst{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0}
 details.cysec .cymiss{overflow-wrap:anywhere}
 details.cysec .cysb{border-top:1px solid var(--line);padding:10px 12px 4px}
+.rsnipbox{margin-top:10px}
+details.rsnip{margin:10px 0 0;max-width:760px}
+details.rsnip pre.gcode,details.cysnipd pre.gcode{max-height:300px}
+details.rsnip .snipnote{margin:0 0 8px}
+details.cysnipd{margin-top:12px;max-width:760px}
 .cystd{margin:0 0 8px}
 .cystd .f{max-width:360px}
 .cystd select{max-width:100%}

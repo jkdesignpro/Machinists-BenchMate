@@ -26,6 +26,7 @@ f1!(taper_included_angle_deg, c::taper_included_angle_deg, large, small, length)
 f1!(taper_per_length, c::taper_per_length, large, small, length);
 f1!(taper_small_dia, c::taper_small_dia, large, length, deg);
 f1!(drill_point_length, c::drill_point_length, dia, angle);
+f1!(drill_tip_depth, c::drill_tip_depth, depth, dia, angle);
 f1!(thread_pitch_dia_basic, c::thread_pitch_dia_basic, major, pitch);
 f1!(thread_best_wire, c::thread_best_wire, pitch);
 f1!(thread_three_wire_m, c::thread_three_wire_m, e, wire, pitch);
@@ -288,10 +289,10 @@ fn prog() -> Option<&'static c::gcode::Program> { unsafe { (*core::ptr::addr_of!
     let ok = p.error.is_none();
     unsafe { *core::ptr::addr_of_mut!(PROG) = Some(p); }
     if ok { 1.0 } else { 0.0 } }
-/// Put text into the string buffer: 0 program, 1 error, 2 warnings (one per line). Returns the length.
+/// Put text into the string buffer: 0 program, 1 error, 2 warnings (one per line), 3 the cycle blocks only (snippet). Returns the length.
 #[no_mangle] pub extern "C" fn cyc_text(which: f64) -> f64 {
     match prog() { None => set_str(""), Some(p) => match which as i32 {
-        0 => set_str(&p.text), 1 => set_str(p.error.as_deref().unwrap_or("")), _ => set_str(&p.warnings.join("\n")) } } }
+        0 => set_str(&p.text), 1 => set_str(p.error.as_deref().unwrap_or("")), 3 => set_str(&p.snippet), _ => set_str(&p.warnings.join("\n")) } } }
 /// Number of moves of the last program.
 #[no_mangle] pub extern "C" fn cyc_moves() -> f64 { prog().map(|p| p.moves.len() as f64).unwrap_or(0.0) }
 /// Move `i` field: 0 kind, 1 x, 2 y, 3 z, 4 cx, 5 cy, 6 feed/min, 7 seconds.

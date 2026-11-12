@@ -48,6 +48,11 @@ other calculator; the program layouts and wording are BenchMate's own.
 | Keyway broaching (G00/G01, G98 or G94) | yes [CIM-D] | yes [HFO-L][HAAS-MW] | not yet supported | not yet supported | not yet supported | not yet supported |
 | G71/G70 rough and finish | yes, two-block [NPTEL][IMD-G71] | yes, one-block with D [HFO-L] | not yet supported | not yet supported | not yet supported | not yet supported |
 | Text engraving (G00/G01 only; see docs/engraving.md) | yes [FAN-M][CIM] | yes [HAAS-MW] | not yet supported | not yet supported | not yet supported | not yet supported |
+| Spindle and feed words on their own (S M03, G97, G96 with G50 S, F; see docs/snippets.md) | yes [CIM-D] and the G and M code reference | yes [HFO-L] and the G and M code reference | not yet supported | not yet supported | not yet supported | not yet supported |
+
+Every generator also gives its cycle blocks on their own (a snippet), for
+pasting into a program that already has its start and end. They are the same
+lines as in the program; see `docs/snippets.md`.
 
 "Generic ISO 6983 / Fanuc-style" means the Fanuc-compatible word layout and,
 on lathes, G-code system A (G50 speed clamp, G92 threading cycle, G98/G99

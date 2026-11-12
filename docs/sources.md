@@ -334,6 +334,10 @@ All were accessed 2026-11-10.
 - **Not read:** the G93 section of the LinuxCNC G-code reference (not in the text that came back).
 - **BenchMate's own choices:** the direction of a positive angle is a box (table carries the part by default), with a row telling the user to check by jogging; no G94 feed word is printed for a block that turns and moves, because controls read it differently and only the Fadal reading has a source.
 
+### G-code snippets (`app/snippets.js`, `gcode::gen_words`, the snippet of every generator)
+- No new sources. A snippet is the cycle blocks of the program the generator already writes, so its formats and sources are those in `docs/cycles.md`. The spindle and feed words use S, M03, G97, G96 with G50 S, G98 and G99 (lathe, G-code system A) from [CIM-D] and [HFO-L] there, and G94 on mills from the Fanuc and Haas rows of the G and M code reference (`data/refdata.json`). See `docs/snippets.md`.
+- **BenchMate's own choices:** the comment lines that say what must be set before the blocks; the F word on a line of its own under a comment (no source read says these controls take F alone in a block, so it is not claimed); no blocks for a control whose format is not confirmed; no speed, feed or depth filled in by BenchMate.
+
 ### Publishers (all accessed 2026-11-10)
 - **[WALTER]** Walter AG, designation key Walter Turn cutting inserts. https://cdn2.walter-tools.com/files/a5ea48ae-5fa6-0161-3cb3-0ac22248a0fb/7f0801eb-595f-4dda-8f3c-cd3acbacc456/turning-designation-key-walter-turn-cutting-inserts-en-gb.pdf
 - **[MITSUBISHI]** Mitsubishi Materials, toolholder identification system. https://mitsubishicarbide.net/contents/mhg/de/html/product/product_guide/information/turning/bite_1.html

@@ -520,6 +520,11 @@ function mountTool(host, t, opts) {
         res.appendChild(bar);
       }
     }
+    // A tool may offer the G-code its result turns into (t.snip -> what snipBox in snippets.js draws).
+    if (!mini && t.snip && rows.length && typeof snipBox === 'function') {
+      let sp = null; try { sp = t.snip(v, state.W, sys, rows); } catch (e) { sp = null; }
+      if (sp) { const box = document.createElement('div'); box.className = 'rsnipbox'; res.appendChild(box); snipBox(box, Object.assign({ id: t.id }, sp)); }
+    }
     // A tool may add a live widget under its results (t.widget -> a function that fills the box it is given), for example a chart with a marker to drag.
     if (!mini && t.widget && rows.length) {
       let fill = null; try { fill = t.widget(v, state.W, sys, rows); } catch (e) { fill = null; }

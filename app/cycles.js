@@ -7,7 +7,8 @@
 // Uses helpers from shop.js (sesc, snum, sinp, sfield, stable) and
 // geometry.js (gsel, gfit, gsvg, gpt, toBuf, listOut, numsFrom).
 
-const CYC = { DRILL: 1, TMILL: 2, G76: 3, G92: 4, TAPER: 5, GROOVE: 6, BROACH: 7, G71: 8 };
+const CYC = { DRILL: 1, TMILL: 2, G76: 3, G92: 4, TAPER: 5, GROOVE: 6, BROACH: 7, G71: 8, WORDS: 10 };
+let CY_SNIP_OPEN = false;   // the "cycle blocks only" fold stays as the user left it
 const CTRLS = [[0, 'Generic ISO 6983 / Fanuc-style'], [1, 'Haas'], [2, 'Mitsubishi M70/M80'], [3, 'Siemens 840D (ISO mode)'], [4, 'Heidenhain (ISO)'], [5, 'Okuma OSP']];
 const CYS = {};   // per tool and unit system: input values (strings as typed)
 const cyInch = () => state.sys === 'inch';
@@ -120,6 +121,7 @@ function cyRead(ok, cycle) {
   const W = state.W, r = { ok, cycle };
   if (!ok) { r.err = cyStr(W, W.cyc_text(1)); return r; }
   r.text = cyStr(W, W.cyc_text(0));
+  r.snippet = cyStr(W, W.cyc_text(3));
   const wl = W.cyc_text(2); r.warns = wl ? cyStr(W, wl).split('\n') : [];
   r.start = [W.cyc_info(2), W.cyc_info(3), W.cyc_info(4)];
   r.maxRpm = W.cyc_info(0); r.maxFeed = W.cyc_info(1);
@@ -208,8 +210,16 @@ function cyOutput(out, s, res, job) {
     (checks.length ? '<div class="res" style="margin-top:10px">' + stable('Active machine check', checks) + '</div>' : '') +
     (res.warns.length ? '<div class="res" style="margin-top:10px">' + stable('Check before running', res.warns.map(w => [sesc(w), '', ''])) + '</div>' : '') +
     '<div class="mfilter" style="margin-top:12px"><button class="btn" id="cycopy">Copy program</button><button class="btn" id="cydl">Download ' + sesc(prog) + '.nc</button>' + (job.csv ? '<button class="btn" id="cycsv">Download hole CSV</button>' : '') + (job.more || []).map(m => '<button class="btn" id="' + m[0] + '">' + sesc(m[1]) + '</button>').join('') + '</div>' +
+    (res.snippet ? '<details class="cysec cysnipd" data-kept="1" id="cysnipd"' + (CY_SNIP_OPEN ? ' open' : '') + '><summary><span class="cysh">Cycle blocks only</span><span class="cyst ms">to paste into a program of your own</span></summary>' +
+      '<div class="cysb"><div class="mfilter"><button class="btn sm" id="cysnipcopy">Copy the blocks</button></div><pre class="gcode" id="cysnip"></pre>' +
+      '<div class="ms">The same blocks as in the program below, without its start and end. The comment lines at the top say what must already be set.</div></div></details>' : '') +
     '<pre class="gcode" id="cytext"></pre>';
   out.querySelector('#cytext').textContent = res.text;
+  if (res.snippet) {
+    out.querySelector('#cysnip').textContent = res.snippet;
+    out.querySelector('#cysnipcopy').onclick = () => copyText(res.snippet);
+    const sd = out.querySelector('#cysnipd'); sd.addEventListener('toggle', () => { CY_SNIP_OPEN = sd.open; });
+  }
   out.querySelector('#cycopy').onclick = () => { try { navigator.clipboard.writeText(res.text); } catch (e) {} };
   out.querySelector('#cydl').onclick = () => cyDownload(prog + '.nc', res.text);
   if (job.csv) out.querySelector('#cycsv').onclick = () => cyDownload('holes.csv', job.csv(), 'text/csv');
@@ -239,10 +249,12 @@ function cyHoles(s) {
   return h;
 }
 
-function renderDrillCycles(el) {
-  const defs = inch => ({ ctrl: 0, prog: 1001, tool: 1, wcs: 54, cycle: 81, rigid: 1, ret: 1, rpm: inch ? 1500 : 1500, feed: inch ? 6 : 150, pitch: inch ? 13 : 1.5,
+// First values of the drilling screen (also the first values of the snippet boxes on the calculators, snippets.js).
+const CY_DRILL_DEFS = inch => ({ ctrl: 0, prog: 1001, tool: 1, wcs: 54, cycle: 81, rigid: 1, ret: 1, rpm: inch ? 1500 : 1500, feed: inch ? 6 : 150, pitch: inch ? 13 : 1.5,
     zi: inch ? 1 : 25, r: inch ? 0.1 : 2, z: inch ? -0.75 : -20, q: inch ? 0.15 : 4, dwell: 0.3, cool: 1,
     pat: 'bolt', bd: inch ? 4 : 100, bn: 6, ba: 0, bcx: 0, bcy: 0, gx: 0, gy: 0, gnx: 3, gny: 2, gdx: inch ? 1 : 25, gdy: inch ? 1 : 25, list: inch ? '0.5 0.5\n1.5 0.5\n1.0 1.25' : '10 10\n40 10\n25 35', rapid: '' });
+function renderDrillCycles(el) {
+  const defs = CY_DRILL_DEFS;
   const tap = s => +s.cycle === 84;
   const fields = [...commonHead(CYC.DRILL),
     { k: 'cycle', label: 'Cycle', sel: [[81, 'G81 drill'], [82, 'G82 drill with dwell'], [83, 'G83 peck (full retract)'], [73, 'G73 chip break peck'], [84, 'G84 tap (right hand)']] },

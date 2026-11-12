@@ -126,6 +126,13 @@ pub fn drill_point_length(dia: f64, point_angle_deg: f64) -> f64 {
     (dia / 2.0) / (point_angle_deg.to_radians() / 2.0).tan()
 }
 
+/// Depth to program for a drilled hole that must be `depth` deep at its full
+/// diameter: the depth plus the drill point length.
+pub fn drill_tip_depth(depth: f64, dia: f64, point_angle_deg: f64) -> f64 {
+    if !(depth > 0.0 && dia > 0.0 && point_angle_deg > 0.0 && point_angle_deg < 180.0) { return f64::NAN; }
+    depth + drill_point_length(dia, point_angle_deg)
+}
+
 /// Basic pitch diameter of a 60 deg symmetric thread (UN or ISO metric):
 /// `E = D - 0.649519 P` [MH][ISO 68-1]. Pass pitch P (inches = 1/TPI, or mm).
 pub fn thread_pitch_dia_basic(major: f64, pitch: f64) -> f64 {
@@ -663,7 +670,13 @@ mod tests {
         close(taper_per_length(1.0, 0.5, 2.5), 0.2, 1e-12);
         close(taper_small_dia(1.0, 2.5, 11.4212), 0.5, 1e-4);
     }
-    #[test] fn drill_point() { close(drill_point_length(10.0, 118.0), 3.0041, 1e-3); }
+    #[test] fn drill_point() {
+        close(drill_point_length(10.0, 118.0), 3.0041, 1e-3);
+        close(drill_tip_depth(20.0, 10.0, 118.0), 23.0041, 1e-3);
+        // a 90 degree point is half the diameter long
+        close(drill_tip_depth(12.0, 8.0, 90.0), 16.0, 1e-12);
+        assert!(drill_tip_depth(0.0, 10.0, 118.0).is_nan() && drill_tip_depth(5.0, 10.0, 180.0).is_nan());
+    }
     #[test] fn thread_3wire() {
         // 1/2-13 UNC: P=1/13, E = 0.5 - 0.649519/13 = 0.450037
         let p = 1.0 / 13.0;
