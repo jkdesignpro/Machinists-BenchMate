@@ -100,6 +100,29 @@ function cnChip() {
     cnArrow(120, 150, 60, 150) + cnT(90, 168, 'work moves', 'gs', 'middle') + cnT(272, 24, 'chip', 'gv', 'end'),
     'Chip formation in orthogonal cutting');
 }
+// The worn edge "unfolded": the rake face (where the chip runs) above the edge line, the flank (the face towards
+// the work) below it, the corner at the left and the depth-of-cut line where the edge leaves the work. Own drawing,
+// the same base for every wear type so that they can be compared.
+function wearDraw(kind) {
+  const W = 300, H = 192, ye = 96, xd = 200;
+  let h = DK.rect(30, 28, 244, ye - 28, 'part') + DK.rect(30, ye, 244, 64, 'part') + DK.line(xd, 16, xd, 172, 'hid');
+  h += DK.text(268, 42, 'rake face', { cls: 'mut', anchor: 'end' }) + DK.text(268, 152, 'flank', { cls: 'mut', anchor: 'end' }) + DK.text(30, 184, 'corner', { cls: 'mut', anchor: 'start' }) + DK.text(xd, 184, 'depth-of-cut line', { cls: 'mut' });
+  const T = (x, y, t, a) => DK.text(x, y, t, { cls: 'hott', anchor: a || 'middle' });
+  const marks = {
+    flank: () => DK.path('M31 96H200V110Q116 115 31 109Z', 'tool') + T(116, 132, 'even band below the edge'),
+    crater: () => DK.path('M52 74Q116 50 180 74Q116 90 52 74Z', 'tool') + T(116, 46, 'hollow behind the edge'),
+    notch: () => DK.path('M189 96L200 70L211 96L200 130Z', 'tool') + T(184, 146, 'notch', 'end'),
+    bue: () => DK.path('M70 96Q72 70 100 78Q124 62 150 82Q162 92 156 104Q110 112 70 96Z', 'tool') + T(112, 54, 'work material stuck on'),
+    chipping: () => DK.path('M54 96l5 9l6 -9ZM94 96l7 12l5 -6l5 -6ZM150 96l6 10l8 -10Z', 'tool') + T(116, 132, 'small pieces lost'),
+    thermal: () => [58, 88, 118, 148, 178].map((x, i) => DK.line(x, 78, x + (i % 2 ? 3 : -3), 118, 'hot')).join('') + T(116, 140, 'cracks across the edge'),
+    deform: () => DK.path('M31 96Q116 124 200 96Z', 'tool') + DK.path('M44 90Q116 74 188 90', 'hot') + T(116, 140, 'edge pushed down'),
+    fracture: () => DK.path('M31 58L52 66L70 58L96 80L120 96L112 118L84 126L62 150L31 152Z', 'tool') + T(150, 136, 'piece broken away', 'start'),
+    flaking: () => DK.path('M66 96Q98 56 130 96Z', 'tool') + DK.path('M80 96Q98 72 116 96', 'hot') + DK.path('M140 96Q162 68 184 96Z', 'tool') + DK.path('M152 96Q162 82 172 96', 'hot') + T(126, 50, 'shell-shaped scars'),
+    hammer: () => DK.path('M214 96l6 -10l6 10ZM232 96l7 -12l7 12Z', 'tool') + DK.path('M150 62Q196 14 238 44Q254 60 240 78', 'hot') + DK.arrow(246, 66, 238, 82, 'hot') + T(146, 60, 'chip', 'end') + T(238, 132, 'struck here'),
+  };
+  h += (marks[kind] ? marks[kind]() : '') + DK.line(30, ye, 274, ye, 'ln');
+  return DK.svg(W, H, h, 'Worn cutting edge: ' + kind);
+}
 // Small drawings of the edge for each wear type (insert corner from the flank side and from above).
 function cnWear(kind) {
   // Insert edge seen from the flank side: rake face above the edge line (y 50), flank below.
@@ -262,6 +285,9 @@ const WEAR = [
   ['chipping', 'Chipping', 'Small pieces lost along the edge line, giving a ragged edge and a poor finish; flank wear then speeds up.', 'Impact in interrupted cuts, vibration, hard inclusions, built-up edge breaking away.', 'Make the set-up stiffer; use a tougher grade and a stronger edge (larger hone, smaller rake, wider land); lower the feed, above all at entry and exit.', ['MMC', 'SECO']],
   ['thermal', 'Thermal cracking', 'Short cracks running across the edge, from repeated heating and cooling; typical in milling and interrupted turning, and worse with coolant that reaches the edge only now and then.', 'Temperature cycles: interrupted cuts, high cutting temperature, intermittent wetting.', 'Use a sharper geometry to make less heat; a grade that resists thermal shock; cut with air, or with plenty of coolant all the time.', ['MMC', 'SECO']],
   ['deform', 'Plastic deformation', 'The edge sags or bulges under heat and pressure, so the flank and rake lose their shape; it often leads to sudden breakage.', 'High cutting force and temperature; work materials that conduct heat poorly.', 'Use a harder grade; lower speed and feed; use a larger corner radius; use coolant.', ['MMC', 'SECO']],
+  ['fracture', 'Fracture and breakage', 'A large piece of the edge or the whole corner is gone, often all at once. What is left shows a rough broken face, not a worn one.', 'Impact and thermal shock, more likely on hard work and at the start of a cut (Mitsubishi). A load greater than the edge can carry, from cutting conditions that are too heavy, or an edge already weakened by other wear (Seco). An insert that is not seated properly in its pocket (Mitsubishi).', 'Clean the pocket, seat the insert, clamp it and tighten to the right torque. Start with a smaller depth of cut and feed. Use a tougher grade and a stronger edge: larger hone and land, larger corner radius, smaller rake. For heavy interrupted cuts use a larger shank. If earlier wear weakened the edge, change it sooner.', ['MMC', 'SECO']],
+  ['flaking', 'Flaking', 'Shell-shaped pieces lifted off the face at the edge, leaving shallow curved scars.', 'The work springs back and loads the edge in compression, or welded material peels away and takes the surface with it. Common on hardened work, where the force pushing the tool away is high.', 'Mitsubishi calls it hard to avoid. Lower the feed and the cutting speed to keep the flank wear small; use a smaller corner radius. A narrower hone or a larger rake would lower the force but weaken the edge.', ['MMC']],
+  ['hammer', 'Chip hammering', 'Damage on the part of the edge that is not cutting, beyond the depth-of-cut line, where the chip curls back and strikes it. That part can break off.', 'The chip curls back onto the unused edge; more likely with a high feed together with a large depth of cut.', 'Change the feed or the depth of cut so the chip goes elsewhere; use another entering angle or another chip breaker; use a tougher grade.', ['SECO']],
 ];
 const TROUBLE_TURN = [
   ['Chatter / vibration', 'A set-up that is not stiff (long overhang, slender work); an insert that pushes too hard radially (large nose radius, blunt or negative edge).', 'Stiffen and shorten the set-up; use a sharp, positive insert with a smaller nose radius and a larger lead angle; a little more feed can calm a rubbing cut.', ['CD']],
@@ -329,8 +355,8 @@ function renderCncGuide(el) {
     cp('<b>Chip thickness</b> is set by the feed (and the entering angle in turning, the radial engagement in milling). Each chip breaker and edge works in a range of chip thickness: too thin and the edge rubs, too thick and it breaks. See the chip thinning tool for milling.', []) +
 
     '<h2 id="c-wear">Tool wear: types, causes and remedies</h2>' +
-    '<p class="desc">Change one thing at a time and keep a note of what worked. Look at the worn edge under a lens before deciding.</p>' +
-    WEAR.map(([id, name, look, cause, fix, keys]) => '<section class="gchar"><div class="gcg">' + cnWear(id) + '<dl><dt>' + name + ' ' + cnTags(keys) + '</dt><dd>' + gesc(look) + '</dd><dt>Causes</dt><dd>' + gesc(cause) + '</dd><dt>Remedies</dt><dd>' + gesc(fix) + '</dd></dl></div></section>').join('') +
+    '<p class="desc">Change one thing at a time and keep a note of what worked. Look at the worn edge under a lens before deciding. The <a href="#/t/toolwear">tool wear guide</a> has the same entries with a picture index.</p>' +
+    WEAR.map(([id, name, look, cause, fix, keys]) => '<section class="gchar"><div class="gcg"><div class="cnwd">' + wearDraw(id) + '</div><dl><dt>' + name + ' ' + cnTags(keys) + '</dt><dd>' + gesc(look) + '</dd><dt>Causes</dt><dd>' + gesc(cause) + '</dd><dt>Remedies</dt><dd>' + gesc(fix) + '</dd></dl></div></section>').join('') +
 
     '<h2 id="c-trt">Turning troubleshooting</h2>' + cnTable(['Problem', 'Likely causes', 'Try'], TROUBLE_TURN) +
     '<h2 id="c-trm">Milling troubleshooting</h2>' + cnTable(['Problem', 'Likely causes', 'Try'], TROUBLE_MILL) +
@@ -355,3 +381,25 @@ function renderCncGuide(el) {
     '<p class="desc">Full URLs and access dates are in docs/sources.md. No text, figures or tables were copied from standards, handbooks, maker catalogues or other calculators.</p>';
   el.querySelectorAll('.gtoc a').forEach(a => a.onclick = e => { e.preventDefault(); const t = el.querySelector(a.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 }
+
+// ------------------------------------------------------------------ tool wear guide
+// A picture index of the wear types, then one card each: what you see, why, and what to try. Same data as the
+// tool wear section of the CNC guide.
+const WEAR_GRADUAL = ['flank', 'crater'];
+function renderToolWear(el) {
+  el.innerHTML = '<div class="gdtguide wearg">' +
+    '<p class="desc">Clean the edge and look at it under a lens (about 10x) in good light before changing anything. Find the picture that matches, read the causes, then change one thing at a time and keep a note of what worked. The drawings show the edge unfolded: the rake face, where the chip runs, is above the edge line; the flank, the face towards the work, is below it; the corner is at the left and the dashed line is where the edge leaves the work.</p>' +
+    '<div class="weari">' + WEAR.map(([id, name]) => '<a class="weart" href="#/t/toolwear" data-w="' + id + '">' + wearDraw(id) + '<span>' + gesc(name) + '</span></a>').join('') + '</div>' +
+    WEAR.map(([id, name, look, cause, fix, keys]) => '<section class="gchar wearc" id="wear-' + id + '"><div class="gcg"><div class="weard">' + wearDraw(id) + '</div><dl>' +
+      '<dt>' + gesc(name) + ' ' + cnTags(keys) + '</dt><dd><span class="weark">' + (WEAR_GRADUAL.includes(id) ? 'Gradual wear: expected, keep it within limits' : 'Damage: find the cause') + '</span></dd>' +
+      '<dt>What you see</dt><dd>' + gesc(look) + '</dd><dt>Causes</dt><dd>' + gesc(cause) + '</dd><dt>What to try</dt><dd>' + gesc(fix) + '</dd></dl></div></section>').join('') +
+    '<div class="note"><b>How this was put together.</b> The causes and remedies are from two tool makers\' public guides, in our own words. Where they give different remedies both are named. An entry with one source key is marked "to be verified": only one of the two guides describes it. Mitsubishi separates gradual wear of the flank and rake faces from sudden damage, which the cutting conditions and the tool should be chosen to prevent; the label under each name follows that. The drawings are our own.</div>' +
+    '<div class="note"><b>Sources</b><br>' + ['MMC', 'SECO'].map(k => '<b>' + k + '</b>: ' + gesc(CNC_SOURCES[k])).join('<br>') + ', both read again 2026-11-12.</div></div>';
+  for (const a of el.querySelectorAll('.weart')) a.onclick = e => {
+    e.preventDefault();
+    const c = el.querySelector('#wear-' + a.dataset.w); if (!c) return;
+    for (const x of el.querySelectorAll('.wearc.on')) x.classList.remove('on');
+    c.classList.add('on'); c.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
+}
+

@@ -1261,6 +1261,30 @@ where = 'gundrill';
   const txt = await page.$eval('#main', e => e.innerText);
   for (const w of ['Read and not used', 'Master Fluid Solutions', 'UNISIG', 'botek', 'Hartner', 'Ingersoll', 'ISCAR']) if (!txt.includes(w)) problems.push(`[${where}] the sources note should name ${w}`);
 }
+// Tool wear guide: ten wear types, each with its own drawing, causes and remedies; the picture index jumps to
+// the card; an entry that only one maker describes is marked. The CNC guide shows the same ten.
+where = 'toolwear';
+{
+  await open('toolwear', 120);
+  const g = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('#main .wearc')];
+    return { tiles: document.querySelectorAll('#main a.weart svg.dk').length, cards: cards.length,
+      bad: cards.filter(c => !c.querySelector('.weard svg.dk') || !/What you see/.test(c.innerText) || !/Causes/.test(c.innerText) || !/What to try/.test(c.innerText) || !c.querySelector('abbr.gsrc')).map(c => c.id),
+      single: cards.filter(c => /to be verified/.test(c.innerText)).map(c => c.id).join(','),
+      gradual: cards.filter(c => /Gradual wear/i.test(c.innerText)).map(c => c.id).join(','),
+      marks: cards.map(c => c.querySelectorAll('.weard svg .tool, .weard svg .hot').length) };
+  });
+  if (g.tiles !== 10 || g.cards !== 10) problems.push(`[${where}] expected 10 tiles and 10 cards, got ${g.tiles} and ${g.cards}`);
+  if (g.bad.length) problems.push(`[${where}] cards without a drawing, the three headings or a source: ${g.bad.join(', ')}`);
+  if (g.single !== 'wear-flaking,wear-hammer') problems.push(`[${where}] flaking and chip hammering have one source each and should say so: ${g.single}`);
+  if (g.gradual !== 'wear-flank,wear-crater') problems.push(`[${where}] only flank and crater wear are gradual wear: ${g.gradual}`);
+  if (g.marks.some(n => n < 1)) problems.push(`[${where}] a drawing shows no wear mark: ${g.marks.join(' ')}`);
+  await page.click('#main a.weart[data-w="notch"]'); await page.waitForTimeout(80);
+  if (!(await page.$('#main #wear-notch.on')) || (await page.$$('#main .wearc.on')).length !== 1) problems.push(`[${where}] the picture index should mark the notch wear card`);
+  await open('cncguide', 120);
+  const n = await page.$$eval('#main .cnwd svg.dk', a => a.length);
+  if (n !== 10) problems.push(`[${where}] the CNC guide should show the same ten wear drawings, got ${n}`);
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

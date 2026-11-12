@@ -486,3 +486,14 @@ ol.ktick li.done b{text-decoration:line-through;opacity:.6}
 .kmeth[hidden]{display:none}
 ul.gdrules{margin:6px 0 0 0;padding-left:20px}
 ul.gdrules li{margin:0 0 5px 0}
+
+/* Tool wear guide: picture index and cards */
+.weari{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-width:980px;margin:10px 0 14px}
+a.weart{display:block;border:1px solid var(--line);background:var(--panel);padding:6px;text-decoration:none;color:var(--ink);text-align:center;font-size:12.5px}
+a.weart:hover,a.weart:focus-visible{border-color:var(--accent)}
+a.weart svg{display:block;width:100%;height:auto}
+.weard{flex:none;width:300px;max-width:100%}
+.weard svg,.cnwd svg{display:block;width:100%;height:auto}
+.cnwd{flex:none;width:210px;max-width:100%}
+.wearc.on{border-color:var(--accent)}
+.weark{font:600 11.5px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}

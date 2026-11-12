@@ -241,7 +241,7 @@ Store list is the fuller of the two store lists.
 | U88 | Keyway broach program generator | done | `cycbroach` |  |
 | U89 | Coolant concentration | done | `coolconc`, `coolmix` |  |
 | U90 | Bandsaw cut time | done | `bandsaw` |  |
-| U91 | Tool wear information | done | `cncguide` |  |
+| U91 | Tool wear information | done | `toolwear`, `cncguide` | 0.5.0: own page with a picture index, ten wear types, new drawings |
 
 ### G-code and programming
 

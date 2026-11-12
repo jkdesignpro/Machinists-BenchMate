@@ -2952,6 +2952,13 @@ const TOOLS = [
   source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
 },
 {
+  id: 'toolwear', level: 'advanced', group: 'Guides', title: 'Tool wear guide',
+  desc: 'Ten ways a cutting edge wears or fails, each with our own drawing, what you see, the causes and what to try: flank wear, crater wear, notch wear, built-up edge, chipping, thermal cracking, plastic deformation, fracture, flaking and chip hammering.',
+  render: el => renderToolWear(el),
+  working: 'Reference only, in our own words. Each entry carries its source keys; an entry described by only one of the two makers is marked "to be verified".',
+  source: 'Mitsubishi Materials, "Causes of tool damage" (mmc-carbide.com, course 78); Seco Tools, "Tool wear patterns: how to recognize and to optimize them" (secotools.com/article/122073). Read again 2026-11-12.',
+},
+{
   id: 'toolguide', level: 'advanced', group: 'Guides', title: 'Tooling guide',
   desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps and tap limits, saw blade pitch and broken tap removal.',
   render: el => renderToolGuide(el),

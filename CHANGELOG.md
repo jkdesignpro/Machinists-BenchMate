@@ -31,6 +31,12 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - Seven "before you drill" notes (pilot hole or bushing, whip, pressure, coolant concentration, filtering and temperature, depth, straightness), each with its sources. Five things read and not used are listed with the reason.
 - New core module `deephole` with tests; evidence file `data/refdata/gundrill-evidence.json` with build checks (tables complete, rising or falling as they must, no gap in botek's diameter rows). Own drawing.
 
+### Added (tool wear guide)
+- New page **Tool wear guide** in Reference > Guides: a picture index of ten ways an edge wears or fails, then a card for each with what you see, the causes and what to try. New own drawings: the edge "unfolded", with the rake face above the edge line and the flank below it, so the ten can be compared.
+- Three wear types added to the seven the CNC guide had: fracture and breakage, flaking, and chip hammering. Flaking and chip hammering are each described by one of the two makers and are marked.
+- Each card says whether it is gradual wear (flank and crater wear) or damage whose cause should be found.
+- The CNC guide's tool wear section shows the same ten entries with the new drawings and links to the new page.
+
 ### Fixed
 - Knurling: the pitch round the circumference of a diagonal knurl was worked out in the page script. It now comes from the Rust core like every other number.
 
