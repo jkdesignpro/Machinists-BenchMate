@@ -74,6 +74,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, twelfth batch, 2026-11-12):** abrasive processes guide (`abrasguide`: grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding, cut-off wheels, mounted points). MH127, MH168, MH170, MH171, MH172 and BB61 from missing to done; MH161 and MH165 from missing to partial. Counted from the tables below: 344 done, 177 partial, 75 missing of 596 in-scope rows, 58 %. For 90 %, 193 more rows have to reach done.
 
+**Update (0.6.0, thirteenth batch, 2026-11-12):** drawings and weld symbols guide (`drawguide`: kinds of drawing, sheets and title block, lines, views, sections, welding symbols, CAD files and model-based definition, standards). MH69, MH73, MH185, MH194, ED86 and BB71 from missing to done. Counted from the tables below: 350 done, 177 partial, 69 missing of 596 in-scope rows, 59 %. For 90 %, 187 more rows have to reach done.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -408,11 +410,11 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH69 | Drafting practices: sheet sizes, line types, section lining | missing | | |
+| MH69 | Drafting practices: sheet sizes, line types, section lining | done | `drawguide` | 0.6.0: ISO and ANSI sheet sizes, borders, title block, scales, nine line types with a drawing, hatching rules; line widths and borders one source, marked |
 | MH70 | ASME and ISO geometric symbols | done | `gdtguide` | |
 | MH71 | Surface texture symbols | done | `surface` |  |
 | MH72 | GD&T, datum referencing, positional tolerance | done | `gdtguide`, `gdtdof`, `gdttp`, `gdtfcf` | |
-| MH73 | GD&T and CAD models, digital product definition | missing | | |
+| MH73 | GD&T and CAD models, digital product definition | done | `drawguide`, `gdtguide` | 0.6.0: model-based definition, PMI, ASME Y14.41 and ISO 16792, STEP AP242, what happens to the drawing; GD&T itself in `gdtguide` |
 | MH74 | Checking designs and drawings, arrangement of views | out of scope? | | Design office work |
 | MH75 | Limits and fits basics: unilateral/bilateral tolerances | done | `fits`, `measguide` | 0.6.0: limits, unilateral and bilateral tolerances with a drawing; ISO classes in `fits` |
 | MH76 | Force, expansion and shrink fits; temperatures for shrinkage fits | done | `shrinkfit` | Shrink-fit temperatures (hub heated, shaft cooled, both) and Lame press-fit pressure, stress, torque; inputs are yours (`claude/measure-maths`) |
@@ -534,7 +536,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH182 | Subprograms, macros and parametric programming | partial | `macroref` | Macro variables, system variables and statements per control; no worked subprogram examples |
 | MH183 | Axis nomenclature | done | `cncguide` | ISO 841 right-hand rule, mill and lathe axes, rotary axes (`claude/cnc-guide`) |
 | MH184 | Total indicator reading | done | `runout`, `gdtguide`, `measguide` | Runout and total runout in the GD&T guide, runout against chip load; 0.6.0: the measuring procedure |
-| MH185 | CAD/CAM: drawing types, projections, exchange standards | missing | | |
+| MH185 | CAD/CAM: drawing types, projections, exchange standards | done | `drawguide` | 0.6.0: kinds of drawing, first and third angle with the symbols, sections, CAD exchange formats (STEP, IGES, Parasolid, STL, DXF, DWG) |
 
 ### Manufacturing processes
 
@@ -548,7 +550,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH191 | Powder metallurgy and metal additive manufacturing | out of scope? | | |
 | MH192 | Soldering and brazing | out of scope? | | Joining, like welding |
 | MH193 | Welding processes | out of scope | | |
-| MH194 | Weld and welding symbols | missing | | Drawing reading; low priority |
+| MH194 | Weld and welding symbols | done | `drawguide` | 0.6.0: parts of the symbol, arrow side and other side, fillet and groove welds, supplementary symbols, what ISO 2553 does differently, with a drawing; no full chart of every symbol |
 | MH195 | Nondestructive testing | out of scope? | | |
 | MH196 | Finishing: brushing, polishing, buffing, etching | missing | | Low priority |
 | MH197 | Conversion coatings, anodising, plating, flame spraying | partial | `coating` | Plating and coating allowance on threads only |
@@ -776,7 +778,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED83 | 15.1-15.5 Project engineering (planning, CPA, Gantt, prototyping, value analysis) | out of scope? | | |
 | ED84 | 16.1 Welding processes | out of scope | | |
 | ED85 | 16.2 Weld types and orientation | out of scope | | |
-| ED86 | 16.3 Welding symbols | missing | | Drawing reading; low priority |
+| ED86 | 16.3 Welding symbols | done | `drawguide` | 0.6.0: as MH194 |
 | ED87 | 16.4 Welding defects | out of scope | | |
 | ED88 | 16.5 Welding documentation | out of scope | | |
 | ED89 | 17.1-17.6 Non-destructive testing | out of scope? | | |
@@ -860,7 +862,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB68 | Carbide toolholder identification | done | `holdercode` |  |
 | BB69 | Carbide toolholder selection and application | partial | `holdercode` | Decoding only; no selection guide |
 | BB70 | Abbreviations used in drawings | done | `abbrev` | 65 abbreviations in our words, 34 listed by two publishers (`claude/measure-maths`) |
-| BB71 | Standards for engineering drawings | missing | | |
+| BB71 | Standards for engineering drawings | done | `drawguide` | 0.6.0: table of thirteen ISO, ASME, AWS and BS standards with what each covers (six rows one source, marked); BS 8888 |
 | BB72 | Human physical dimensions | out of scope | | |
 | BB73 | G-codes, letter addresses, miscellaneous function words | done | `gmcodes` | G and M words per control; letter-address table A-Z (NIST RS274NGC and Haas mill columns, each from its own document) under the code list (`claude/gdt-3`) |
 | BB74 | Surface roughness tables | done | `surface` | Ra, N grades and typical Ra by process from two publishers |

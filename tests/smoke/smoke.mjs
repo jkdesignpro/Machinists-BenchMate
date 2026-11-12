@@ -2067,6 +2067,36 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
   }
+  where = 'drawguide';
+  g = await guide('drawguide');
+  if (g.h2 !== 9 || g.svgs !== 3 || g.tabs !== '8,6,6,10,6,8,8,14' || g.srcs !== 26) problems.push(`[${where}] 9 sections, 3 drawings, tables of 7, 5, 5, 9, 5, 7, 7 and 13 rows, 26 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 91) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Few dimensions on an assembly', 'Balloons', 'Leaders', 'Parts list (bill of materials)', 'Title block', 'What is in it', 'Also there', 'General tolerance', 'Revision', 'Scale is stated', 'Preferred scales', 'NTS', 'First angle', 'Third angle', 'Who uses which', 'The symbol', 'Reading the symbol, first angle', 'Reading the symbol, third angle', 'Detail view', 'What a section is for', 'How it is marked', 'Hatching', 'Parts that touch', 'Thin parts', 'Not sectioned', 'Two standards', 'The parts', 'Arrow side and other side (AWS)', 'Fillet weld', 'Intermittent welds. Length', 'Groove figures', 'Weld all around', 'Field weld', 'Backing and melt-through', 'ISO 2553: the dashed line', 'ISO system A', 'Fillet size, ISO', 'Units', 'STEP versions', 'IGES trouble', 'Model-based definition (MBD)', 'PMI', 'Its standards', 'Passing it on', 'What it buys', 'Drawings do not vanish', 'Technical data package', 'It covers'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  // Four Wikipedia articles, two McGill pages and two DraftAid posts count once each.
+  for (const k of ['Working drawings', 'Bought parts', 'Hidden lines', 'A long parts list', 'How the A sizes are built', 'Which way up', 'Border, metric sheets', 'Halving', 'Border, inch sheets', 'ISO 7200', 'ISO 2768', 'Reading a scale', 'Several scales on one sheet', 'Do not scale the drawing', 'Notes', 'ISO line widths', 'Where lines fall on top of each other', 'Phantom lines', 'Views', 'How many', 'Auxiliary view', 'Ribs and spokes', 'Keys', 'Both sides', 'Sides of the joint, not of the sheet', 'The fillet symbol', 'No length given', 'Broken arrow', 'Groove angle', 'No depth given', 'CJP', 'Contour and finish', 'ISO system B', 'Process, ISO', 'Intermittent welds, ISO', 'STEP, in detail', 'Parasolid', 'STL cannot', 'DXF is plain text', 'DXF for cutting', 'Machine-readable', 'For reference only', 'BS 8888'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/^A0 841 × 1189/.test(row('A0')) || !/^A3 297 × 420/.test(row('A3')) || !/^A4 210 × 297/.test(row('A4')) || !/^A 8\.5 × 11/.test(row('A 8')) || !/^D 22 × 34/.test(row('D ')) || !/^E 34 × 44/.test(row('E '))) problems.push(`[${where}] sheet sizes: ${row('A0')} | ${row('A4')} | ${row('A 8')} | ${row('E ')}`);
+    if (!/Thick, continuous Edges and outlines that can be seen/.test(row('Visible edge')) || !/Thin, long and short dashes in turn/.test(row('Centre line')) || !/Thick chain line with an arrow at each end/.test(row('Cutting plane')) || !/one long and two short dashes/.test(row('Phantom'))) problems.push(`[${where}] line rows: ${row('Visible edge')} | ${row('Cutting plane')}`);
+    if (!/Only a quarter is cut away/.test(row('Half section')) || !/stepped to pass through features/.test(row('Offset (stepped) section')) || !/Both edges bevelled/.test(row('V ')) || !/the arrow points to the piece that is bevelled/.test(row('Bevel')) || !/Between a rounded edge and a flat one/.test(row('Flare bevel'))) problems.push(`[${where}] section and groove rows: ${row('Half section')} | ${row('Bevel')}`);
+    if (!/owned by no CAD maker/.test(row('STEP')) || !/A mesh of flat triangles, not exact surfaces/.test(row('STL')) || !/AutoCAD's own format/.test(row('DWG')) || !/^ISO 128 How a drawing is presented/.test(row('ISO 128')) || !/^ASME Y14\.41 Annotated 3D models/.test(row('ASME Y14.41')) || !/^AWS A2\.4 Welding symbols/.test(row('AWS A2.4')) || !/gathers and indexes the ISO standards/.test(row('BS 8888'))) problems.push(`[${where}] file and standard rows: ${row('STEP')} | ${row('ISO 128')} | ${row('BS 8888')}`);
+    const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ').slice(0, 2).join(' ')).join(', ');
+    if (fl !== 'Outline assembly, Weldment drawing, Revolved section, Square Edges, ISO 5457, ISO 5455, ISO 7200, ISO 2768, ASME Y14.1, ASME Y14.5') problems.push(`[${where}] the rows with one publisher: ${fl}`);
+  }
+  if (!/0\.13, 0\.18, 0\.25, 0\.35, 0\.5, 0\.7, 1\.0, 1\.4 and 2\.0 mm/.test(g.all) || !/Enlarged 2:1, 5:1, 10:1, 20:1 and 50:1; reduced 1:2, 1:5, 1:10, 1:20, 1:50 and 1:100/.test(g.all) || !/20 mm on the edge that is bound and 10 mm on the other three/.test(g.all) || !/The top view goes below the front view, and the view from the right goes on the left/.test(g.all) || !/The top view goes above the front view, and the view from the right goes on the right/.test(g.all) || !/a for the throat, z for the leg\. a4 is a throat of 4 mm/.test(g.all) || !/135 for MAG welding/.test(g.all) || !/ASME Y14\.41 and ISO 16792/.test(g.all) || !/Xometry Pro words it the other way round/.test(g.all) || !/Material Welding puts it as the arrow side above the line/.test(g.all)) problems.push(`[${where}] figures and differing statements from the sources`);
+  {
+    const d = await page.$$eval('#main svg.geo', s => s.map(e => e.textContent.replace(/\s+/g, ' ')));
+    if (!/visible edge: thick, continuous/.test(d[0]) || !/cutting plane: thick chain, arrows/.test(d[0]) || !/first angle/.test(d[1]) || !/third angle/.test(d[1]) || !/reference line/.test(d[2]) || !/other side/.test(d[2]) || !/arrow side/.test(d[2]) || !/50-150/.test(d[2])) problems.push(`[${where}] drawings: ${d.map(t => t.slice(0, 40)).join(' | ')}`);
+    // The view boxes: first angle has the top view below the front view, third angle above it.
+    const b = await page.$$eval('#main svg.geo', s => [...s[1].querySelectorAll('text')].map(t => [t.textContent, +t.getAttribute('x'), +t.getAttribute('y')]));
+    const at = (name, left) => b.find(t => t[0] === name && (t[1] < 235) === left);
+    if (!(at('top', true)[2] > at('front', true)[2] && at('right', true)[1] < at('front', true)[1] && at('top', false)[2] < at('front', false)[2] && at('right', false)[1] > at('front', false)[1])) problems.push(`[${where}] the views are laid out wrongly: ${JSON.stringify(b)}`);
+    const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
+    if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
+  }
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);

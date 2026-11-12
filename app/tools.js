@@ -3433,6 +3433,13 @@ const TOOLS = [
   source: 'The Open University (grinding, centreless grinding); Cutting Tool Engineering, Modern Machine Shop and Production Machining (wheel wear, centerless grinding, honing); American Machinist and Wikipedia (honing, lapping); Kemet (lapping); MISUMI, UKAM and 3M (diamond and CBN wheels); EMI Supply and Xometry (belts); Weiler (cut-off wheels); Norton and PFERD (mounted points). Full list in docs/sources.md, "Abrasive processes guide".',
 },
 {
+  id: 'drawguide', level: 'advanced', group: 'Guides', title: 'Drawings and weld symbols guide',
+  desc: 'How to read a drawing: detail and assembly drawings, sheet sizes (A0 to A4, ANSI A to E), the title block, scales, line types, first and third angle projection and its symbol, sections and hatching, welding symbols (AWS A2.4 and ISO 2553), CAD file formats (STEP, IGES, STL, DXF), model-based definition and the drawing standards.',
+  render: el => renderDrawGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources put a thing differently both are shown.',
+  source: 'McGill University and DraftAid (kinds of drawing, sections); Wikipedia and a Washington State open textbook (sheet sizes); Werk24 (title block); What Is Piping and a university lecture (lines); Xometry Pro and GD&T Basics (projection); TU Darmstadt (views, sections, scales); Miller Electric, WeldGuru, Clause5, Material Welding and STRUCTURE Magazine (welding symbols); Get It Made, GibbsCAM and Industrial Monitor Direct (CAD files); Sigmetrix and ETMM (model-based definition); DEVELOP3D (BS 8888). Full list in docs/sources.md, "Drawings and weld symbols guide".',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),
