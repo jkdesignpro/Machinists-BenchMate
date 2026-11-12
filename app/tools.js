@@ -2273,6 +2273,13 @@ const TOOLS = [
   source: 'NIST/SEMATECH e-Handbook of Statistical Methods 6.3.2.1 and 6.3.2.2; University of York factors for control charts; d2 and d3 computed by numerical integration (core tests). See docs/inspection.md.',
 },
 {
+  id: 'grr', level: 'expert', group: 'Inspection and quality', title: 'Gauge R&R (average and range method)',
+  desc: 'Paste the readings of a gauge study (2 to 5 appraisers, 2 to 4 trials, 2 to 10 parts): repeatability, reproducibility, gauge R&R and part variation as a share of the total variation and of the tolerance, the number of distinct categories, and a chart against the 10 % and 30 % guidelines.',
+  render: el => renderGrr(el),
+  working: 'EV = R-bar K1; AV = sqrt((X-diff K2)^2 - EV^2 / (n r)), zero when negative; GRR = sqrt(EV^2 + AV^2); PV = Rp K3; TV = sqrt(GRR^2 + PV^2); ndc = 1.41 PV / GRR cut to a whole number; percent of tolerance = 6 GRR / tolerance. K1 = 1 / d2, K2 and K3 = 1 / d2*. See the note under the tool.',
+  source: 'OriginLab, Algorithm for Gage R&R Study; Minitab support, methods and formulas for the crossed gage R&R study; sixsigmastudyguide.com, Repeatability and reproducibility; spcforexcel.com, Three Methods to Analyze Gage R&R Studies (2015); SAS/QC GAGE application. AIAG Measurement Systems Analysis, 4th ed., cited by name. See docs/inspection.md.',
+},
+{
   id: 'sampling', level: 'expert', group: 'Inspection and quality', title: 'Sampling plan OC curve',
   desc: 'For a single sampling plan (sample n, accept on c or fewer defectives): chance of accepting a lot at any percent defective, the OC curve, the 95 % and 10 % points and the AOQL, plus how ISO 2859-1 / ANSI Z1.4 choose plans (tables not reproduced).',
   render: el => renderSampling(el),

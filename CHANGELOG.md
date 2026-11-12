@@ -45,6 +45,11 @@ Stage 3 of the plan: the extras. Built on top of 0.4.0. In progress.
 - Recorded where sources differ: the macro variable number of one tool offset on Fanuc (two sources differ by one).
 - Not found in a readable form, and listed as gaps on the page: Fanuc's own M-code and system variable tables, Haas Next Generation Control variable numbers, Doosan lathe M codes.
 
+### Added (gauge R&R)
+- New tool **Gauge R&R (average and range method)** in Measure and inspect > Quality. Paste the readings of a study (2 to 5 appraisers, 2 to 4 trials, 2 to 10 parts): repeatability, reproducibility, gauge R&R and part variation, each as a share of the total variation, the gauge R&R against the tolerance, the number of distinct categories, and a bar chart against the 10 % and 30 % guidelines.
+- The constants K1, K2 and K3 are worked out in the core and checked against the published ones; two published examples and a study worked by hand are core tests. Where programs differ (d2 or d2* for the repeatability) the page says which one BenchMate uses.
+- Two entries in the formula library.
+
 ### Added (collet nut and pull stud torque)
 - New tool **Collet nut and pull stud torque** in Turning > Tooling and Milling > Tool holding. Pick the ER collet size, the nut and the collet bore: the recommended torque from REGO-FIX's table (ER 8 to ER 50, standard and mini nut), the most the maker allows (25 % more), and Techniks' figure for the same size beside it. A small bore takes much less torque than a large one in the same nut, which is why the page asks for it.
 - **Pull stud (retention knob) torque** for ISO 20 and 30, 40 and 50 taper holders from three makers (REGO-FIX, MariTool, Techniks), each as printed and in both units. They differ widely (40 taper: 50 N·m maximum, 45 to 55 ft-lb, 76 ft-lb), so all three are shown and nothing is averaged.

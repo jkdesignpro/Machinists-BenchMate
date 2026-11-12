@@ -193,3 +193,87 @@ const IT_LARGE: [[f64; 18]; 8] = [
     assert_eq!(sampling_pa_binomial(10, 10, 0.5), 1.0);
     assert!(sampling_pa_binomial(10, 1, 1.5).is_nan());
 }
+
+
+// ---- Gauge R&R, average and range method ----
+
+/// The constants the forms print: K1 by trials, K2 by appraisers, K3 by parts
+/// (spcforexcel.com, "Three Methods to Analyze Gage R&R Studies", Feb 2015:
+/// K1 = 0.5908 for 3 trials, K2 = 0.5231 for 3 operators, K3 = 0.3146 for 10
+/// parts; sixsigmastudyguide.com: K1 = 0.4857 for 4 trials, K2 = K3 = 0.5231
+/// for 3, d2* = 1.9115 for one range of 3 and 2.080 for 9 ranges of 4).
+#[test] fn grr_constants_match_the_published_values() {
+    let k = |kind, m| (grr_k(kind, m) * 1e4).round() / 1e4;
+    assert_eq!(k(0, 2), 0.8862);
+    assert_eq!(k(0, 3), 0.5908);
+    assert_eq!(k(0, 4), 0.4857);
+    assert_eq!(k(1, 2), 0.7071);
+    assert_eq!(k(1, 3), 0.5231);
+    // K3 for 4 to 10 parts as the average and range form prints them
+    let k3 = [0.4467, 0.4030, 0.3742, 0.3534, 0.3375, 0.3249, 0.3146];
+    for (i, want) in k3.iter().enumerate() { assert_eq!(k(1, 4 + i as u32), *want, "K3 for {} parts", 4 + i); }
+    assert!((range_d2_star(1, 2) - std::f64::consts::SQRT_2).abs() < 2e-5);
+    assert!((range_d2_star(1, 3) - 1.9115).abs() < 1e-4);
+    assert!((range_d2_star(9, 4) - 2.080).abs() < 5e-4);
+    assert!(grr_k(0, 11).is_nan() && grr_k(2, 3).is_nan() && range_d2_star(0, 3).is_nan());
+}
+
+/// Published example (the summary numbers and results printed by spcforexcel.com,
+/// Feb 2015, for a study of 10 parts, 3 operators and 3 trials): average
+/// range 0.342, X-diff 0.445, Rp 3.511 give EV 0.202, AV 0.230, R&R 0.306,
+/// PV 1.104 (1.105 in the text), TV 1.146, 17.61 %, 20.04 %, 26.68 %, 96.37 %.
+/// The article works from unrounded inputs, so the percentages agree to 0.05.
+#[test] fn grr_published_example_from_summary() {
+    let g = |w| grr_from_summary(0.342, 0.445, 3.511, 10, 3, 3, 0.0, w);
+    assert!((g(0) - 0.202).abs() < 6e-4, "EV {}", g(0));
+    assert!((g(1) - 0.230).abs() < 6e-4, "AV {}", g(1));
+    assert!((g(2) - 0.306).abs() < 6e-4, "GRR {}", g(2));
+    assert!((g(3) - 1.1045).abs() < 6e-4, "PV {}", g(3));
+    assert!((g(4) - 1.146).abs() < 6e-4, "TV {}", g(4));
+    assert!((g(5) - 17.61).abs() < 0.05 && (g(6) - 20.04).abs() < 0.05 && (g(7) - 26.68).abs() < 0.05 && (g(8) - 96.37).abs() < 0.05, "{} {} {} {}", g(5), g(6), g(7), g(8));
+    assert_eq!(g(9), 5.0); // 1.41 x 1.1046 / 0.3060 = 5.09
+    assert!(g(10).is_nan() && g(11) > 0.0);
+    // tolerance: 6 GRR over the width
+    assert!((grr_from_summary(0.342, 0.445, 3.511, 10, 3, 3, 8.0, 10) - 100.0 * 6.0 * g(2) / 8.0).abs() < 1e-12);
+}
+
+/// Second published example (sixsigmastudyguide.com: 3 operators, 3 parts, 4
+/// trials, average range 0.0233, X-diff 0.0033): the value under the root of
+/// AV is negative, so AV = 0; PV 0.0105; ndc 1. The page divides by d2* for 9
+/// ranges (2.080) and gets EV 0.0112 and 73 %; the form's K1 = 1 / d2 gives
+/// 0.0113 and 73.3 %.
+#[test] fn grr_negative_root_sets_av_to_zero() {
+    let rp = 0.0105 / grr_k(1, 3);
+    let g = |w| grr_from_summary(0.0233, 0.0033, rp, 3, 3, 4, 0.0, w);
+    assert!(g(11) < 0.0 && g(1) == 0.0);
+    assert!((g(0) - 0.0233 * 0.4857).abs() < 1e-6 && (g(0) - 0.0112).abs() < 2e-4);
+    assert!((g(2) - g(0)).abs() < 1e-15);
+    assert!((g(4) - 0.0153).abs() < 2e-4 && (g(7) - 73.0).abs() < 0.6, "{} {}", g(4), g(7));
+    assert_eq!(g(9), 1.0);
+    assert!((0.0233 / range_d2_star(9, 4) - 0.0112).abs() < 5e-5);
+}
+
+/// Own small study worked by hand: 2 appraisers, 3 parts, 2 trials.
+/// A: 10.0 10.2 | 12.0 12.1 | 11.0 11.3;  B: 10.4 10.3 | 12.5 12.3 | 11.4 11.6.
+/// Ranges 0.2 0.1 0.3 0.1 0.2 0.2: R-bar 1.1 / 6. Appraiser averages 11.1 and
+/// 68.5 / 6: X-diff 0.316667. Part averages 10.225, 12.225, 11.325: Rp 2.0.
+#[test] fn grr_from_readings_by_hand() {
+    let xs = [10.0, 10.2, 12.0, 12.1, 11.0, 11.3, 10.4, 10.3, 12.5, 12.3, 11.4, 11.6];
+    let g = |w| grr_xbar_r(&xs, 3, 2, 2, 0.0, w);
+    assert!((g(20) - 1.1 / 6.0).abs() < 1e-12 && (g(21) - (68.5 / 6.0 - 11.1)).abs() < 1e-12 && (g(22) - 2.0).abs() < 1e-12);
+    assert!((g(100) - 11.1).abs() < 1e-12 && (g(201) - 12.225).abs() < 1e-12 && (g(1002) - 0.3).abs() < 1e-12 && (g(1003) - 0.1).abs() < 1e-12);
+    assert!((g(23) - (66.6 + 68.5) / 12.0).abs() < 1e-12);
+    let (k1, k2, k3) = (0.886227, 0.707107, 0.523136);
+    let ev = 1.1 / 6.0 * k1;
+    let av = ((0.3166667f64 * k2).powi(2) - ev * ev / 6.0).sqrt();
+    let grr = (ev * ev + av * av).sqrt();
+    let pv = 2.0 * k3;
+    let tv = (grr * grr + pv * pv).sqrt();
+    assert!((ev - 0.162475).abs() < 1e-5 && (av - 0.213870).abs() < 1e-5 && (grr - 0.268585).abs() < 1e-5 && (tv - 1.080196).abs() < 1e-5);
+    assert!((g(0) - ev).abs() < 2e-5 && (g(1) - av).abs() < 2e-5 && (g(2) - grr).abs() < 2e-5 && (g(3) - pv).abs() < 2e-5 && (g(4) - tv).abs() < 2e-5);
+    assert!((g(7) - 24.864).abs() < 2e-3 && g(9) == 5.0);
+    // wrong sizes, a reading that is not a number
+    assert!(grr_xbar_r(&xs, 3, 2, 3, 0.0, 0).is_nan() && grr_xbar_r(&xs[..11], 3, 2, 2, 0.0, 0).is_nan() && grr_xbar_r(&xs, 1, 2, 2, 0.0, 0).is_nan());
+    let mut bad = xs; bad[3] = f64::NAN;
+    assert!(grr_xbar_r(&bad, 3, 2, 2, 0.0, 0).is_nan());
+}

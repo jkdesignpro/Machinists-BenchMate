@@ -82,7 +82,7 @@ const WORKSPACES = [
     ['GD&T', ['gdtguide', 'gdtfcf', 'gdtpos', 'gdtprofu', 'gdtdof', 'gdtstack'], 'frame'],
     ['Fits and finish', ['fitlookup', 'tolmid', 'offsetadj', 'shrinkfit', 'surfacefin', 'prefnum'], 'fit'],
     ['Measuring', ['sinebar', 'scales', 'wires', 'tapergauge', 'dovetail', 'hardness', 'tempcomp'], 'caliper'],
-    ['Quality', ['capability', 'ctrlchart', 'sampling'], 'chart'],
+    ['Quality', ['capability', 'ctrlchart', 'grr', 'sampling'], 'chart'],
   ] },
   { id: 'maths', name: 'Shop maths', icon: 'triangle', blurb: 'Calculator, conversions, geometry, stock and engineering sums.', sections: [
     ['Calculator and conversion', ['calc', 'convert', 'formulas'], 'calc'],
@@ -117,7 +117,7 @@ const PAGE_ICON = {
   calc: 'calc', rpm: 'gauge', threaddata: 'thread', wires: 'thread', triangle: 'triangle', weight: 'material', hardness: 'bars',
   sinebar: 'angle', machines: 'machine', toollib: 'toollib', gsim: 'play', sketch: 'dxf', chatter: 'wave', boringbar: 'beam', deflection: 'beam',
   taper: 'angle', knurl: 'surface', formulas: 'book', gmcodes: 'code', materials: 'material', bolttorque: 'nut', oring: 'bearing',
-  setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart',
+  setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart', grr: 'chart',
   spline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',
   abbrev: 'drawing', economics: 'bars', mrr: 'bars', toollife: 'clock', cutopt: 'gauge', runout: 'gauge', indexing: 'gear', grindratio: 'wave', holdertorque: 'nut',
 };

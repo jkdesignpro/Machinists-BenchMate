@@ -82,12 +82,13 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Grinding | Wheel marking decoder | done (marking only; no shapes or selection) | `wheelcode` | MH163, BB60 (partial) |
 | Grinding | Cylindricity error from RPM | done (wheel to work rpm ratio: whole numbers and simple fractions flagged, work speeds to avoid, wheel wear, chatter mark count; rule from one author, marked single-source) | `grindratio` | U58 |
 | Gears/splines | Spur gear data, ISO 4156, ANSI B92.1, SAE J499a | missing | | U83-U86 |
-| Library | Formula library | done (151 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
+| Library | Formula library | done (153 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
 | Library | Tool wear information | done (ten wear types with our own drawings, causes and remedies from two makers; two types have one source and are marked) | `toolwear`, `cncguide` | U91 |
 | Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
 | Library | Tips, assistant, community cut data | missing | | U98, U101, U102 |
 | Library | Indexable insert catalogue | done (decode or tap a code together; insert drawn to scale from above and in section; nose radius to the turning advisor, outline to the sketcher) | `insertcode`, `holdercode`, `iso513` | U103 |
 | Shop | Tool library and favourites | done | `toollib` (fill into rpm, feed, arcfeed, helix, deflection, cutopt, drillpoint, tapdrill, finish); star in the side list or by the title | U106, U109 |
+| Quality | Gauge R&R (not in Ultra; idea 13) | done (average and range method: EV, AV, GRR, PV, percent of total variation and of tolerance, ndc; constants computed and checked against the published ones; ANOVA method not included) | `grr` | |
 | Shop | Collet nut and pull stud torque (not in Ultra; idea 8) | done (ER nut torque by size, bore and nut from the maker's table with a second maker beside it; pull stud torque from three makers side by side, nothing averaged) | `holdertorque` | |
 | Shop | Decimal precision, home dashboard, reorderable menu | missing | | U105, U107, U108 |
 | Platform | Inch/metric toggle | done | `app.js` | U104 |

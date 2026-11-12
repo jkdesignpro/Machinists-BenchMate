@@ -1011,6 +1011,14 @@ f1!(spc_constant_table, c::spc_constant_table_f, n, which);
 f1!(sampling, c::sampling_f, n, ac, p, lot, which);
 /// X-bar/R chart of the first `n` buffer values in subgroups of `sg`; `which` as in `spc_xbar_r`.
 #[no_mangle] pub extern "C" fn spc_xbar_r_buf(n: f64, sg: f64, which: f64) -> f64 { c::spc_xbar_r(buf(n), sg.max(0.0) as usize, which.max(0.0) as u32) }
+f1!(grr_k, c::grr_k_f, kind, m);
+f1!(range_d2_star, c::range_d2_star_f, g, m);
+f1!(grr_from_summary, c::grr_from_summary_f, rbar, xdiff, rp, parts, appraisers, trials, tol, which);
+/// Gauge R&R from the first parts x appraisers x trials buffer values; layout and `which` as in `grr_xbar_r`.
+#[no_mangle] pub extern "C" fn grr_buf(parts: f64, appraisers: f64, trials: f64, tol: f64, which: f64) -> f64 {
+    let (p, a, t) = (parts.max(0.0) as usize, appraisers.max(0.0) as usize, trials.max(0.0) as usize);
+    if p * a * t > BUF_LEN { return f64::NAN; }
+    c::grr_xbar_r(buf((p * a * t) as f64), p, a, t, tol, which.max(0.0) as u32) }
 /// Individuals/moving range chart of the first `n` buffer values; `which` as in `spc_imr`.
 #[no_mangle] pub extern "C" fn spc_imr_buf(n: f64, which: f64) -> f64 { c::spc_imr(buf(n), which.max(0.0) as u32) }
 // Materials reference (B4): two-metal galvanic check.

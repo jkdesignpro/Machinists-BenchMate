@@ -1404,6 +1404,41 @@ where = 'holdertorque';
   const opt = await page.$eval('#main #htb', e => e.options[e.selectedIndex].textContent);
   if (!/Recommended torque 41\.3 lbf·ft 56 N·m/.test(t) || !/Do not go over 51\.6 lbf·ft 70 N·m/.test(t) || opt !== '5 to 10 mm (0.197 to 0.394 in)') problems.push(`[${where}] inch: ${opt} / ${t}`);
 }
+// Gauge R&R: the example study against an independent calculation (Python, outside the core), the hand-worked
+// study of the core test, the negative root that sets AV to zero, and the input errors.
+where = 'grr';
+{
+  await units('mm'); await open('grr', 250);
+  const res = async () => (await page.innerText('#main #grres')).replace(/\s+/g, ' ');
+  const put = async txt => { await page.fill('#main #grtext', txt); await page.dispatchEvent('#main #grtext', 'input'); await page.waitForTimeout(60); };
+  await page.click('#main #grex'); await page.waitForTimeout(120);
+  let t = await res();
+  if (!/10 parts, 3 appraisers, 2 trials \(60 readings\)/i.test(t) || !/Repeatability, EV R-bar 0\.00353 x K1 0\.8862 0\.00313 10\.8 %/.test(t) || !/Reproducibility, AV X-diff 0\.00720 x K2 0\.5231 0\.00370 12\.8 %/.test(t) ||
+      !/Gauge R&R, GRR May be acceptable \(10 to 30 %\).* 0\.00485 16\.7 %/.test(t) || !/Part variation, PV Rp 0\.09083 x K3 0\.3146 0\.02857 98\.6 %/.test(t) || !/Total variation, TV sqrt\(GRR\^2 \+ PV\^2\) 0\.02898/.test(t) ||
+      !/5 or more wanted 8 GRR against the tolerance .* 0\.02909 29\.1 %/.test(t))
+    problems.push(`[${where}] example study: ${t}`);
+  const bars = await page.$$eval('#main #grplot rect.bar', b => b.length);
+  const avg = (await page.innerText('#main #grapp')).replace(/\s+/g, ' ');
+  if (bars !== 4 || !/25\.00490 25\.00920 25\.00200 25\.00537/.test(avg)) problems.push(`[${where}] chart bars ${bars}, appraiser averages: ${avg}`);
+  await page.fill('#main [data-k="tol"]', ''); await page.dispatchEvent('#main [data-k="tol"]', 'input'); await page.waitForTimeout(60);
+  if (/against the tolerance/.test(await res())) problems.push(`[${where}] no tolerance entered, but a tolerance row is shown`);
+  await page.selectOption('#main [data-k="ap"]', '2');
+  await put('10.0 12.0 11.0\n10.2 12.1 11.3\n10.4 12.5 11.4\n10.3 12.3 11.6');
+  t = await res();
+  if (!/3 parts, 2 appraisers, 2 trials \(12 readings\)/i.test(t) || !/EV R-bar 0\.183 x K1 0\.8862 0\.162 15\.0 %/.test(t) || !/AV X-diff 0\.317 x K2 0\.7071 0\.214 19\.8 %/.test(t) || !/ 0\.269 24\.9 %/.test(t) ||
+      !/PV Rp 2\.000 x K3 0\.5231 1\.046 96\.9 %/.test(t) || !/ 1\.080 Number of distinct categories.* wanted 5$/.test(t.trim()))
+    problems.push(`[${where}] hand-worked study (2 appraisers, 2 trials, 3 parts): ${t}`);
+  await put('10.0 12.0 11.0\n10.2 12.1 11.3\n10.2 12.1 11.3\n10.0 12.0 11.0');
+  t = await res();
+  if (!/the value under the root is negative, so AV is set to zero/.test(t) || !/AV is set to zero[^%]* 0\.000 0\.0 %/.test(t)) problems.push(`[${where}] appraisers with the same average: AV must be zero and say why: ${t}`);
+  await put('10.0 12.0 11.0\n10.2 12.1\n10.4 12.5 11.4\n10.3 12.3 11.6');
+  if (!/Every line needs the same number of readings.*line 2 has 2, the first has 3/.test(await res())) problems.push(`[${where}] a short line must be named: ${await res()}`);
+  await put('10.0 12.0 11.0\n10.2 12.1 11.3\n10.4 12.5 11.4');
+  if (!/3 lines for 2 appraisers/.test(await res())) problems.push(`[${where}] 3 lines for 2 appraisers must be refused: ${await res()}`);
+  await put('10.0 12.0 abc\n10.2 12.1 11.3');
+  if (!/Not a number: abc/.test(await res())) problems.push(`[${where}] a reading that is not a number must be named: ${await res()}`);
+  await page.click('#main #grex'); await page.waitForTimeout(100);
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

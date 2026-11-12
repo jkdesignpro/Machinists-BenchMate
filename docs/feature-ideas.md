@@ -45,7 +45,7 @@ The owner asked for all 18 ideas from the review "what is missing, new ideas and
 | 10 | High-feed chip thinning (`leadthin`) | 1 (0.3.0) | built |
 | 11 | Drill thrust and torque (`drillforce`) | 1 (0.3.0) | built |
 | 12 | Tap torque (`taptorque`) | 1 (0.3.0) | built |
-| 13 | Gauge R&R | 3 (0.5.0) | to do |
+| 13 | Gauge R&R (`grr`) | 3 (0.5.0) | built (average and range method) |
 | 14 | Thread gauge limits | 3 (0.5.0) | to do |
 | 15 | Rotary axis helper (`rotpoint`, `rotfeed`) | 2 (0.4.0) | built |
 | 16 | Job time and quote | 5 (0.9.0) | to do |
