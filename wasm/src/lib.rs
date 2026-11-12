@@ -24,6 +24,8 @@ f1!(feed_for_ra, c::feed_for_ra, ra, r);
 f1!(pass_time_min, c::pass_time_min, length, feed, rpm);
 f1!(taper_included_angle_deg, c::taper_included_angle_deg, large, small, length);
 f1!(taper_per_length, c::taper_per_length, large, small, length);
+f1!(taper_half_angle_deg, c::taper_half_angle_deg, large, small, length);
+f1!(taper_tailstock_setover, c::taper_tailstock_setover, large, small, length, work_len);
 f1!(taper_small_dia, c::taper_small_dia, large, length, deg);
 f1!(drill_point_length, c::drill_point_length, dia, angle);
 f1!(drill_tip_depth, c::drill_tip_depth, depth, dia, angle);
@@ -673,6 +675,11 @@ f1!(npv, c::npv, investment, saving, n, i, resale);
 #[no_mangle] pub extern "C" fn plane_figure(kind: f64, a: f64, b: f64, cc: f64, which: f64) -> f64 { pick(c::plane_figure(kind as u32, a, b, cc), which) }
 /// Solid `kind`: which 0 volume, 1 total surface, 2 lateral surface, 3 extra.
 #[no_mangle] pub extern "C" fn solid_figure(kind: f64, a: f64, b: f64, cc: f64, which: f64) -> f64 { pick(c::solid_figure(kind as u32, a, b, cc), which) }
+f1!(prismoid_volume, c::measure::prismoid_volume, a1, am, a2, h);
+f1!(tank_contents, c::measure::tank_contents, orient, d, l, h, which);
+/// Area under the first `n` buffer values spaced `d` apart: `which` 0 trapezoidal rule, 1 Simpson's rule.
+#[no_mangle] pub extern "C" fn area_from_buf(n: f64, d: f64, which: f64) -> f64 {
+    if which as i32 == 1 { c::measure::simpson_area(buf(n), d) } else { c::measure::trapezoid_area(buf(n), d) } }
 #[no_mangle] pub extern "C" fn scale_spec(kind: f64, which: f64) -> f64 { pick(c::scale_spec(kind as u32), which) }
 #[no_mangle] pub extern "C" fn scale_reading(kind: f64, value: f64, which: f64) -> f64 { pick(c::scale_reading(kind as u32, value), which) }
 

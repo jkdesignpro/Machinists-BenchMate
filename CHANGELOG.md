@@ -26,12 +26,23 @@ Stage 4 of the plan, part 1: book references. Built on top of 0.5.0. In progress
 - New tool **Taper pins (inch series)** (Reference > Machine elements): No. 7/0 to No. 14, large end with commercial and precision limits, and the small end diameter for the length of the pin, with a drawing. The sizes come from one supplier's sheet of the standard and say so.
 - **Spur gear data** shows the number of the involute form cutter (set of eight) for each gear: the diametral pitch series in inch mode, the module series, which is numbered the other way round, in mm mode.
 
+### Added (shop maths)
+- New tool **Prismoidal formula** (Shop maths > Geometry): volume of a tapering solid from its two end faces and the section halfway.
+- New tool **Tank contents**: litres and gallons in a cylindrical tank with flat ends, lying or standing, from the depth of liquid, with a drawing.
+- New page **Irregular area from equally spaced widths**: the trapezoidal rule and Simpson's rule, checked against three published examples.
+- **Areas and volumes**: a circle shows the side of the square of equal area, a square the diameter of the circle of equal area.
+- **Calculator**: sec, csc, cot, versin (versed sine), coversin and exsec.
+- **Taper** (from Advanced mode): tailstock set-over for a taper turned between centres.
+
+### Changed
+- **Taper**: the half angle is worked out in the core, as every other result is.
+
 ### Added (units and symbols)
 - **Unit converter**: acceleration, rotational speed, dynamic viscosity and kinematic viscosity (factors from the exact definitions in NIST SP 811, checked against its printed values).
 - New tab **Prefixes and symbols** on the Unit and fraction conversion page: the 24 SI prefixes, the seven defining constants of the SI and the Greek alphabet with what each letter stands for in BenchMate's formulas. Every entry is printed the same by two publishers.
 
 ### Changed
-- `docs/parity-audit.md` recounted against the app after 0.5.0: 76 rows that were still marked missing from the first audit are corrected.
+- `docs/parity-audit.md` recounted against the app after 0.5.0: 76 rows that were still marked missing from the first audit are corrected. Nine more rows that the app already covered (unit converter, surface texture, stock weight, j and J fits) are corrected in the third batch.
 
 ## [0.5.0] - 2026-11-12
 Stage 3 of the plan: the extras. Built on top of 0.4.0.

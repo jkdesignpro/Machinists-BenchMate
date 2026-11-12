@@ -54,6 +54,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, second batch, 2026-11-12):** sheet metal and wire gauges, inch taper pins, involute cutter numbers. MH296 and BB55 done; MH214 and MH264 partial. Counted from the tables below: 215 done, 240 partial, 141 missing of 596 in-scope rows, 36 %; 322 more rows to done for 90 %.
 
+**Update (0.6.0, third batch, 2026-11-12):** shop maths (old trig functions, prismoidal formula, irregular areas, tank contents, equal-area circle and square, tailstock set-over), and nine rows that the app already covered but were still marked partial or missing from before the unit converter, the surface texture page, the stock weight tool and the j and J fits existed. MH3, MH9, MH11, MH16, ED4, ED16, ED17, BB1, BB36, BB39, BB50, BB74 and BB75 done. Counted from the tables below: 228 done, 228 partial, 140 missing of 596 in-scope rows, 38 %; 309 more rows to done for 90 %.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -307,20 +309,20 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | MH1 | Real numbers, fractions, decimals, ratio, percentage | done | `calc`, `fraction` | Expression calculator and fraction converter (`claude/measure-maths`) |
 | MH2 | Powers, roots, scientific notation, factorials, combinations | done | `calc` | Powers, roots, logs, factorials, nCr, nPr; numbers in e notation (`claude/measure-maths`) |
-| MH3 | Prime factorization and prime/factor tables | partial | `calc` | Prime factors of any whole number to 10^12; no printed factor tables (`claude/measure-maths`) |
+| MH3 | Prime factorization and prime/factor tables | done | `calc` | Prime factors of any whole number to 10^12, worked out, so no printed tables are needed |
 | MH4 | Algebra: expressions, equations, rearranging formulas, polynomials, quadratic/cubic | out of scope? | | Maths teaching, not a machining tool |
 | MH5 | Functions, logarithms, sequences | out of scope? | | |
 | MH6 | Analytic geometry: lines, slopes, circle, ellipse, sphere, parabola, hyperbola | partial | `arc`, `fillet` | Circle through three points, chord and sagitta, fillet and tangent points; no line and circle intersections, ellipse, parabola or hyperbola |
 | MH7 | Complex numbers | out of scope? | | |
 | MH8 | Pure geometry propositions and geometric constructions | missing | | |
-| MH9 | Area and volume rules (prismoidal, Pappus, irregular areas, tank contents) | partial | `figures` | Torus (Pappus), frustum, cap; no prismoidal formula, irregular areas or tank contents (`claude/measure-maths`) |
+| MH9 | Area and volume rules (prismoidal, Pappus, irregular areas, tank contents) | done | `figures`, `prismoid`, `irregular`, `tankvol` | 0.6.0: prismoidal formula, irregular areas by the trapezoidal and Simpson's rules, contents of a lying or standing cylindrical tank; torus (Pappus), frustum and cap in `figures` |
 | MH10 | Dimensions of plane figures, polygons, segments of a circle | done | `figures`, `arc` | Squares, rectangles, parallelograms, trapezoids, circles, rings, ellipses, regular polygons, sectors; segments in `arc` (`claude/measure-maths`) |
-| MH11 | Circles and squares of equal area; diagonals of squares and hexagons | partial | `figures` | Across corners and flats of any regular polygon; no equal-area circle/square table (`claude/measure-maths`) |
+| MH11 | Circles and squares of equal area; diagonals of squares and hexagons | done | `figures` | 0.6.0: side of the square and diameter of the circle of equal area; across corners and flats of any regular polygon |
 | MH12 | Volumes of solids | done | `figures` | Cube, box, cylinder, tube, cone, frustum, sphere, cap, pyramid, torus, hex bar (`claude/measure-maths`) |
 | MH13 | Trigonometry: angle measure, ratios, laws of sines and cosines, identities | partial | `triangle`, `calc` | Laws of sines and cosines in the triangle solver, any trig value in the calculator, degrees, minutes and seconds; no list of identities |
 | MH14 | Solution of right and oblique triangles | done | `triangle` |  |
 | MH15 | Angular measure conversion (degrees-minutes-seconds, radians) | done | `calc`, `units` | Decimal degrees, DMS, radians, gon, revolutions (`claude/measure-maths`) |
-| MH16 | Trig function values, versed sine, involute functions | partial | `calc` | Any trig value and the involute function; no versed sine, no printed tables (`claude/measure-maths`) |
+| MH16 | Trig function values, versed sine, involute functions | done | `calc` | 0.6.0: versed sine, coversed sine, exsecant, secant, cosecant and cotangent added; any value is worked out, so no printed tables are needed |
 | MH17 | Spherical trigonometry | out of scope? | | |
 | MH18 | Compound angles | done | `compound` | True angle from apparent angles or two tilts; swivel-and-tilt and compound sine plate settings (`claude/measure-maths`) |
 | MH19 | Interpolation | partial | `calc` | Linear interpolation only (`claude/measure-maths`) |
@@ -674,7 +676,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED1 | 1.1-1.7 Engineering careers (7 entries) | out of scope | | |
 | ED2 | 2.1 Greek alphabet | done | `symbols` | 0.6.0 |
 | ED3 | 2.2 Units systems | partial | `units` | SI and US customary conversions; no units-system explainer (`claude/measure-maths`) |
-| ED4 | 2.3 Units and conversions | partial | `fraction` | Length only |
+| ED4 | 2.3 Units and conversions | done | `units`, `fraction` | 21 quantities in the unit converter |
 | ED5 | 2.4 Consistency of units | out of scope? | | |
 | ED6 | 2.5 Dimensional analysis | out of scope? | | |
 | ED7 | 2.6 Essential engineering mathematics | partial | `calc`, `triangle` | Scientific calculator and triangle solver; no reference text |
@@ -686,8 +688,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED13 | 4.4 General tolerances (ISO 2768) | done | `gentol` | ISO 2768-1 linear, broken edges and angles, five publishers; ISO 2768-2 is withdrawn (`claude/measure-maths`) |
 | ED14 | 4.5 Holes | partial | `fits` | |
 | ED15 | 4.6 Screw threads | done | `threaddata` | |
-| ED16 | 4.7 Limits and fits | partial | `fits` | No j/J |
-| ED17 | 4.8 Surface finish | partial | `finish` | Conversions and symbols in progress |
+| ED16 | 4.7 Limits and fits | done | `fits` | j5 to j7 and J6 to J8 included |
+| ED17 | 4.8 Surface finish | done | `surface`, `finish` | Ra in both units, N grades, drawing symbols, typical Ra by process |
 | ED18 | 5.1 Equilibrium | out of scope? | | |
 | ED19 | 5.2 Motion equations | out of scope? | | |
 | ED20 | 5.3 Newton's laws | out of scope? | | |
@@ -770,7 +772,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| BB1 | Conversion factors inch/metric | partial | `fraction` | Length only |
+| BB1 | Conversion factors inch/metric | done | `units`, `fraction` | 21 quantities in the unit converter; inch fractions and decimals |
 | BB2 | Drill size and decimal equivalent chart | done | `drillchart` | |
 | BB3 | Spanner selection chart | done | `spanner` | (`claude/fasteners`) |
 | BB4 | Torque conversion chart | done | `units` | Torque units convert in the unit converter (N·m, lbf·ft, lbf·in, ozf·in, kgf·m, kgf·cm) |
@@ -805,10 +807,10 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB33 | Distance across corners of squares and hexagons | done | `figures` | Any regular polygon, across flats to across corners (`claude/measure-maths`) |
 | BB34 | Area and volume of solid figures | done | `figures` | (`claude/measure-maths`) |
 | BB35 | Tapers | done | `taper`, `machinetapers` | |
-| BB36 | Taper turning and sine bar formulae | partial | `taper` | No tailstock set-over or compound setting; sine bar in progress |
+| BB36 | Taper turning and sine bar formulae | done | `taper`, `sinebar` | 0.6.0: compound slide setting and tailstock set-over added; sine bar and gauge block stack |
 | BB37 | Dividing head / rotary table indexing | done | `indexing` |  |
 | BB38 | Tolerances and preferred fits | partial | `fits` | Preferred fits not listed |
-| BB39 | Fits for shafts and holes | partial | `fits` | No j/J |
+| BB39 | Fits for shafts and holes | done | `fits` | j5 to j7 and J6 to J8 included |
 | BB40 | Morse, Jacobs and DIN tapers | partial | `machinetapers` | DIN metric tapers missing |
 | BB41 | Milling machine tapers | done | `machinetapers` | |
 | BB42 | Pull studs and retention knobs | partial | `machinetapers`, `holdertorque` | Standard references only, no dimensions. 0.5.0: tightening torque by taper from three makers, shown side by side |
@@ -819,7 +821,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB47 | V-belt cross sections | missing | | |
 | BB48 | Bolts and nuts identification and grades | done | `boltgrade` | (`claude/fasteners`) |
 | BB49 | Bolt and screw heads, types and drives | partial | `shcs` | Socket head cap screws only; no other head types or drives |
-| BB50 | Weights of round, square and hex bars | partial | `bar` | Density entered by hand; full tool in progress (`claude/geometry`, `weight`) |
+| BB50 | Weights of round, square and hex bars | done | `weight`, `bar` | Round, hex, square, tube, flat, plate and sheet with material densities |
 | BB51 | Weights of round tubes | done | `weight` |  |
 | BB52 | Weights of sheet metal | done | `weight` |  |
 | BB53 | Symbols for elements; viscosity chart | missing | | Low priority |
@@ -843,8 +845,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB71 | Standards for engineering drawings | missing | | |
 | BB72 | Human physical dimensions | out of scope | | |
 | BB73 | G-codes, letter addresses, miscellaneous function words | done | `gmcodes` | G and M words per control; letter-address table A-Z (NIST RS274NGC and Haas mill columns, each from its own document) under the code list (`claude/gdt-3`) |
-| BB74 | Surface roughness tables | partial | `finish` | Conversions in progress (`claude/ref-data-3`) |
-| BB75 | Surface finish expected from manufacturing processes | missing | | In progress (`claude/ref-data-3`) |
+| BB74 | Surface roughness tables | done | `surface` | Ra, N grades and typical Ra by process from two publishers |
+| BB75 | Surface finish expected from manufacturing processes | done | `surface` | Typical Ra by process from two publishers |
 | BB76 | Terms used in heat treatment of steel | done | `heattreat` | 12 terms in our words (`claude/materials-ref`) |
 | BB77 | Hardening and tempering temperatures by colour | done | `tempercolours`, `heattreat` | Temper colours with three publishers, hardening and tempering temperatures (`claude/materials-ref`) |
 | BB78 | Hardness comparison chart | done | `hardness` |  |

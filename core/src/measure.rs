@@ -302,11 +302,13 @@ pub fn plane_figure(kind: u32, a: f64, b: f64, c: f64) -> [f64; 4] {
     let n = f64::NAN;
     let pos = |x: f64| x > 0.0;
     match kind {
-        0 if pos(a) => [a * a, 4.0 * a, a * 2f64.sqrt(), n],
+        // Square: the 4th value is the diameter of the circle of the same area (pi d^2 / 4 = a^2).
+        0 if pos(a) => [a * a, 4.0 * a, a * 2f64.sqrt(), 2.0 * a / PI.sqrt()],
         1 if pos(a) && pos(b) => [a * b, 2.0 * (a + b), (a * a + b * b).sqrt(), n],
         2 if pos(a) && pos(b) && c >= b => [a * b, 2.0 * (a + c), deg((b / c).asin()), n],
         3 if pos(a) && pos(b) && pos(c) => { let leg = (c * c + ((a - b) / 2.0).powi(2)).sqrt(); [(a + b) / 2.0 * c, a + b + 2.0 * leg, leg, n] }
-        4 if pos(a) => [PI * a * a / 4.0, PI * a, n, n],
+        // Circle: the 3rd value is the side of the square of the same area.
+        4 if pos(a) => [PI * a * a / 4.0, PI * a, a * PI.sqrt() / 2.0, n],
         5 if pos(a) && b >= 0.0 && b < a => [PI * (a * a - b * b) / 4.0, PI * (a + b), (a - b) / 2.0, n],
         6 if pos(a) && pos(b) => {
             // Ramanujan's second approximation of the perimeter (an approximation; see docs/sources.md).
@@ -324,6 +326,50 @@ pub fn plane_figure(kind: u32, a: f64, b: f64, c: f64) -> [f64; 4] {
         8 if pos(a) && pos(b) && b <= 360.0 => { let t = rad(b); [a * a * t / 2.0, 2.0 * a + a * t, a * t, 2.0 * a * (t / 2.0).sin()] }
         _ => [n; 4],
     }
+}
+
+/// Prismoidal formula: volume of a solid between two parallel end faces of areas `a1`
+/// and `a2`, a distance `h` apart, with the area `am` of the section halfway between:
+/// V = h (A1 + 4 Am + A2) / 6. Exact for prisms, pyramids, frustums, wedges, spheres and
+/// any solid whose section area is at most a cubic in the height.
+pub fn prismoid_volume(a1: f64, am: f64, a2: f64, h: f64) -> f64 {
+    if !(a1 >= 0.0 && am >= 0.0 && a2 >= 0.0 && h > 0.0) { return f64::NAN; }
+    h * (a1 + 4.0 * am + a2) / 6.0
+}
+
+/// Liquid in a cylindrical tank with flat ends, diameter `d`, length (or height) `l`,
+/// filled to depth `h`. `orient` 0 lying down (depth measured across the diameter):
+/// V = L [R^2 acos((R - h) / R) - (R - h) sqrt(2 R h - h^2)]; 1 standing on end
+/// (depth measured along the length): V = pi R^2 h. `which`: 0 volume of liquid,
+/// 1 volume when full, 2 fraction full.
+pub fn tank_contents(orient: f64, d: f64, l: f64, h: f64, which: f64) -> f64 {
+    if !(d > 0.0 && l > 0.0 && h >= 0.0) { return f64::NAN; }
+    let r = d / 2.0;
+    let full = PI * r * r * l;
+    let v = match orient as i32 {
+        0 if h <= d => l * (r * r * ((r - h) / r).acos() - (r - h) * (2.0 * r * h - h * h).max(0.0).sqrt()),
+        1 if h <= l => PI * r * r * h,
+        _ => return f64::NAN,
+    };
+    match which as i32 { 0 => v, 1 => full, 2 => v / full, _ => f64::NAN }
+}
+
+/// Area under equally spaced ordinates `ys`, a distance `d` apart, by the trapezoidal
+/// rule: d [(first + last) / 2 + the ones between]. At least two ordinates.
+pub fn trapezoid_area(ys: &[f64], d: f64) -> f64 {
+    if ys.len() < 2 || !(d > 0.0) || ys.iter().any(|y| !y.is_finite()) { return f64::NAN; }
+    let inner: f64 = ys[1..ys.len() - 1].iter().sum();
+    d * ((ys[0] + ys[ys.len() - 1]) / 2.0 + inner)
+}
+
+/// The same area by Simpson's rule: d/3 [first + last + 4 (2nd, 4th, ...) + 2 (3rd, 5th, ...)].
+/// Needs an odd number of ordinates (an even number of strips), at least three.
+pub fn simpson_area(ys: &[f64], d: f64) -> f64 {
+    let n = ys.len();
+    if n < 3 || n % 2 == 0 || !(d > 0.0) || ys.iter().any(|y| !y.is_finite()) { return f64::NAN; }
+    let mut s = ys[0] + ys[n - 1];
+    for (i, y) in ys.iter().enumerate().take(n - 1).skip(1) { s += if i % 2 == 1 { 4.0 * y } else { 2.0 * y }; }
+    d / 3.0 * s
 }
 
 // Solids. kind and parameters (a, b, c):
@@ -612,6 +658,9 @@ mod tests {
         close(plane_figure(7, 4.0, 1.0, 0.0)[3], 2f64.sqrt(), 1e-12);
         // Circle d 2: area pi, circumference 2 pi.
         close(plane_figure(4, 2.0, 0.0, 0.0)[0], PI, 1e-12);
+        // Circle and square of equal area: a circle of diameter 2 has the area of a square of side sqrt(pi), and back.
+        close(plane_figure(4, 2.0, 0.0, 0.0)[2], PI.sqrt(), 1e-12);
+        close(plane_figure(0, PI.sqrt(), 0.0, 0.0)[3], 2.0, 1e-12);
         // Ellipse that is a circle: perimeter exact.
         close(plane_figure(6, 2.0, 2.0, 0.0)[1], 2.0 * PI, 1e-12);
         // Ellipse a = 10, b = 5 (semi 5 and 2.5): perimeter 24.22112 (series value).
@@ -714,5 +763,47 @@ mod tests {
         // Inch caliper 1.437 -> 1.425 + 12 x 0.001.
         let r = scale_reading(6, 1.437);
         close(r[1], 1.425, 1e-12); close(r[4], 12.0, 1e-12);
+    }
+
+    // Prismoidal formula (MathWorld, Prismatoid; MATHalino, solid mensuration: prismatoid, with the storage bin
+    // 8 x 7 and 14 x 11 ft, 12 ft high: A1 56, Am 99, A2 154). Exact for the pyramid, the frustum and the sphere.
+    #[test]
+    fn prismoidal_formula() {
+        close(prismoid_volume(56.0, 99.0, 154.0, 12.0), 1212.0, 1e-9);
+        close(prismoid_volume(9.0, 9.0 / 4.0, 0.0, 5.0), solid_figure(8, 3.0, 5.0, 0.0)[0], 1e-12);
+        close(prismoid_volume(PI * 4.0, PI * 2.25, PI, 3.0), solid_figure(5, 4.0, 2.0, 3.0)[0], 1e-12);
+        close(prismoid_volume(0.0, PI, 0.0, 2.0), solid_figure(6, 2.0, 0.0, 0.0)[0], 1e-12);
+        assert!(prismoid_volume(1.0, 1.0, 1.0, 0.0).is_nan());
+    }
+
+    // Horizontal cylindrical segment (MathWorld; Math is Fun, volume of a horizontal cylinder): empty at h = 0,
+    // half at h = R, full at h = 2R.
+    #[test]
+    fn tank() {
+        close(tank_contents(0.0, 2.0, 5.0, 0.0, 0.0), 0.0, 1e-12);
+        close(tank_contents(0.0, 2.0, 5.0, 1.0, 0.0), PI * 5.0 / 2.0, 1e-12);
+        close(tank_contents(0.0, 2.0, 5.0, 2.0, 0.0), PI * 5.0, 1e-12);
+        close(tank_contents(0.0, 2.0, 5.0, 1.0, 2.0), 0.5, 1e-12);
+        // A quarter of the diameter deep: segment area R^2 (pi/3 - sqrt(3)/4) for R = 1.
+        close(tank_contents(0.0, 2.0, 1.0, 0.5, 0.0), PI / 3.0 - 3f64.sqrt() / 4.0, 1e-12);
+        close(tank_contents(1.0, 2.0, 5.0, 2.0, 0.0), PI * 2.0, 1e-12);
+        close(tank_contents(1.0, 2.0, 5.0, 2.0, 1.0), PI * 5.0, 1e-12);
+        assert!(tank_contents(0.0, 2.0, 5.0, 2.5, 0.0).is_nan());
+        assert!(tank_contents(1.0, 2.0, 5.0, 6.0, 0.0).is_nan());
+    }
+
+    // Published examples: offsets 3.6, 5.0, 6.5, 5.5, 7.3, 6.0, 4.0 m at 25 m by Simpson's rule: 843.33 m2
+    // (Geosurab surveying notes); heights 0, 30, 40, 50, 60, 22, 0 m at 20 m: about 4053 m2 (Maths at Home);
+    // offsets 12, 24, 16 m at 20 m by the trapezoidal rule: 760 m2 (Class Mathematics).
+    #[test]
+    fn irregular_areas() {
+        close(simpson_area(&[3.6, 5.0, 6.5, 5.5, 7.3, 6.0, 4.0], 25.0), 843.33, 5e-3);
+        close(simpson_area(&[0.0, 30.0, 40.0, 50.0, 60.0, 22.0, 0.0], 20.0), 4053.0, 0.5);
+        close(trapezoid_area(&[12.0, 24.0, 16.0], 20.0), 760.0, 1e-9);
+        // Simpson's rule is exact for a parabola, the trapezoidal rule for a straight line.
+        close(simpson_area(&[0.0, 1.0, 4.0, 9.0, 16.0], 1.0), 64.0 / 3.0, 1e-12);
+        close(trapezoid_area(&[1.0, 2.0, 3.0, 4.0], 2.0), 15.0, 1e-12);
+        assert!(simpson_area(&[1.0, 2.0, 3.0, 4.0], 1.0).is_nan());
+        assert!(trapezoid_area(&[1.0], 1.0).is_nan());
     }
 }

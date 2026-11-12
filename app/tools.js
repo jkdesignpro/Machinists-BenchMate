@@ -624,14 +624,23 @@ const TOOLS = [
     { id: 'D', label: 'Large diameter', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
     { id: 'd', label: 'Small diameter', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
     { id: 'L', label: 'Length', unit: lenU(s), def: s === 'inch' ? 2.5 : 60 },
+    { id: 'Lw', label: 'Whole length of the work between centres (optional, for tailstock set-over)', unit: lenU(s), def: '', level: 'advanced' },
   ],
-  calc: (v, W, s) => (v.L > 0 && v.D > v.d) ? [
-    R('Included angle', W.taper_included_angle_deg(v.D, v.d, v.L), 'deg', 4),
-    R('Half angle (slide setting)', W.taper_included_angle_deg(v.D, v.d, v.L) / 2, 'deg', 4),
-    R('Taper per unit length (diameter)', W.taper_per_length(v.D, v.d, v.L), s === 'inch' ? 'in/in' : 'mm/mm', 5),
-  ] : [],
-  working: 'tan(half angle) = (D - d) / (2 L).',
-  source: "Machinery's Handbook (tapers)",
+  calc: (v, W, s) => {
+    if (!(v.L > 0 && v.D > v.d)) return [];
+    const rows = [
+      R('Included angle', W.taper_included_angle_deg(v.D, v.d, v.L), 'deg', 4),
+      R('Half angle (slide setting)', W.taper_half_angle_deg(v.D, v.d, v.L), 'deg', 4),
+      R('Taper per unit length (diameter)', W.taper_per_length(v.D, v.d, v.L), s === 'inch' ? 'in/in' : 'mm/mm', 5),
+    ];
+    if (v.Lw > 0) {
+      const so = W.taper_tailstock_setover(v.D, v.d, v.L, v.Lw);
+      rows.push(isFinite(so) ? R('Tailstock set-over', so, lenU(s), s === 'inch' ? 4 : 3) : R('Tailstock set-over', 'the work cannot be shorter than the taper', '', 0));
+    }
+    return rows;
+  },
+  working: 'tan(half angle) = (D - d) / (2 L). Turning with the compound slide: swivel it to the half angle. Turning between centres with the tailstock set over: set-over = whole length of the work × (D - d) / (2 × length of the taper); only for slow tapers, since the centres no longer sit square in their holes.',
+  source: "Machinery's Handbook (tapers); tailstock set-over and compound slide angle as printed in two sets of lathe notes (see docs/sources.md, Taper turning).",
   proof: [{ name: 'The NPT pipe taper, 3/4 in per foot on the diameter', sys: 'inch', vals: { D: 1.75, d: 1, L: 12 }, expect: [['Half angle', 'deg', 1.79, 0.0002]],
     source: 'Wikipedia, "National pipe thread": the taper of 3/4 in per foot is printed with its half angle, 1° 47′ 24″, which is 1.7900°. ASME B1.20.1 by name.', note: 'Any two diameters 0.75 in apart over a length of 12 in have this taper.' }],
 },
@@ -1966,6 +1975,52 @@ const TOOLS = [
   source: "Machinery's Handbook 'areas and volumes' (by name); see docs/sources.md.",
 },
 {
+  id: 'prismoid', level: 'advanced', group: 'Geometry', title: 'Prismoidal formula: volume from three sections',
+  desc: 'Volume of a tapering solid (a hopper, a tapered block, a casting) from the areas of its two parallel end faces and of the section halfway between them.',
+  fields: s => [
+    { id: 'a1', label: 'Area of one end face A1', unit: lenU(s) + '²', def: s === 'inch' ? 56 : 5600 },
+    { id: 'am', label: 'Area of the section halfway Am', unit: lenU(s) + '²', def: s === 'inch' ? 99 : 9900 },
+    { id: 'a2', label: 'Area of the other end face A2', unit: lenU(s) + '²', def: s === 'inch' ? 154 : 15400 },
+    { id: 'h', label: 'Distance between the end faces h', unit: lenU(s), def: s === 'inch' ? 12 : 120 },
+  ],
+  calc: (v, W, s) => {
+    const V = W.prismoid_volume(v.a1, v.am, v.a2, v.h);
+    if (!isFinite(V)) return [];
+    const inch = s === 'inch';
+    return [R('Volume', V, lenU(s) + '³', inch ? 3 : 1), R('Volume', W.unit_convert(2, inch ? 4 : 3, 1, V), 'L', 4),
+      R('Note', 'The halfway section is measured, not averaged: for a tapering solid its area is not the mean of the two ends. For a rectangular hopper each of its sides is the mean of the matching sides of the two ends.', '', 0)];
+  },
+  working: 'V = h (A1 + 4 Am + A2) / 6. Exact for prisms, pyramids, cones, frustums, wedges and spheres (any solid whose section area is at most a cubic in the height); elsewhere an approximation, the same as Simpson\'s rule with two strips.',
+  source: 'Wolfram MathWorld, Prismatoid (the prismoidal formula); MATHalino, solid mensuration: prismatoid. See docs/sources.md, Areas and volumes by rule.',
+},
+{
+  id: 'tankvol', level: 'advanced', group: 'Geometry', title: 'Tank contents: cylinder lying or standing',
+  desc: 'How much liquid is in a cylindrical tank with flat ends (a coolant or oil drum, a sump made from pipe) from the depth on a dipstick, lying on its side or standing on end.',
+  fields: s => [
+    { id: 'orient', label: 'Tank', unit: '', def: 0, options: [[0, 'Lying on its side'], [1, 'Standing on end']] },
+    { id: 'd', label: 'Inside diameter', unit: lenU(s), def: s === 'inch' ? 22.5 : 570 },
+    { id: 'l', label: 'Inside length (height when standing)', unit: lenU(s), def: s === 'inch' ? 33.5 : 850 },
+    { id: 'h', label: 'Depth of liquid', unit: lenU(s), def: s === 'inch' ? 8 : 200 },
+  ],
+  calc: (v, W, s) => {
+    const T = k => W.tank_contents(v.orient, v.d, v.l, v.h, k), inch = s === 'inch', from = inch ? 4 : 3;
+    if (!(v.d > 0 && v.l > 0 && v.h >= 0)) return [];
+    if (!isFinite(T(0))) return [R('Depth of liquid', v.orient === 1 ? 'is more than the height of the tank' : 'is more than the diameter of the tank', '', 0)];
+    const vol = (n, x) => [R(n, W.unit_convert(2, from, 1, x), 'L', 2), R(n, W.unit_convert(2, from, 6, x), 'gal (US)', 2), R(n, W.unit_convert(2, from, 9, x), 'gal (UK)', 2)];
+    return [...vol('Liquid in the tank', T(0)), R('Full', 100 * T(2), '%', 1), ...vol('Tank when full', T(1)),
+      R('Note', 'Flat ends only: dished or domed ends hold more. A drum with ribs or a tank that is not level reads differently.', '', 0)];
+  },
+  working: 'Lying down: V = L [R² acos((R − h) / R) − (R − h) √(2 R h − h²)], the area of the circular segment times the length. Standing: V = π R² h.',
+  source: 'Wolfram MathWorld, Horizontal cylindrical segment; Math is Fun, Volume of a horizontal cylinder. Litres and gallons from the unit converter (NIST SP 811). See docs/sources.md, Areas and volumes by rule.',
+},
+{
+  id: 'irregular', level: 'advanced', group: 'Geometry', title: 'Irregular area from equally spaced widths',
+  desc: 'Area of an irregular outline (a gasket, a cam plate, a casting section) from widths measured at equal steps across it, by the trapezoidal rule and by Simpson\'s rule.',
+  render: el => renderIrregular(el),
+  working: 'Trapezoidal rule: A = d [(first + last) / 2 + all the widths between]. Simpson\'s rule: A = d/3 [first + last + 4 (2nd, 4th, …) + 2 (3rd, 5th, …)], which needs an odd number of widths (an even number of strips).',
+  source: 'Geosurab surveying notes, calculation of area of irregular figures (worked example 843.33 m²); Maths at Home, Simpson\'s 1/3 rule (worked example 4053 m²); Class Mathematics, the trapezoidal rule (worked example 760 m²). See docs/sources.md, Areas and volumes by rule.',
+},
+{
   id: 'compound', level: 'advanced', group: 'Geometry', title: 'Compound angles',
   desc: 'True angle and slope direction of a face tilted two ways, from the two drawing (apparent) angles or two successive tilts, and the settings for a swivel and tilt, a compound sine plate or the two views.',
   render: el => renderCompound(el),
@@ -2580,9 +2635,9 @@ const TOOLS = [
 },
 {
   id: 'calc', level: 'simple', group: 'Shop helpers', title: 'Calculator',
-  desc: 'Type an expression with brackets, powers, trig (degrees or radians), roots, logs and factorials. Also degrees-minutes-seconds, prime factors and linear interpolation.',
+  desc: 'Type an expression with brackets, powers, trig (degrees or radians, with secant, cosecant, cotangent, versed sine and exsecant), roots, logs and factorials. Also degrees-minutes-seconds, prime factors and linear interpolation.',
   render: el => renderCalc(el),
-  working: "BenchMate's own recursive-descent parser in the Rust core (no eval): + - * / % ^ ! and functions. Powers bind right to left and above unary minus. Involute inv a = tan a - a.",
+  working: "BenchMate's own recursive-descent parser in the Rust core (no eval): + - * / % ^ ! and functions. Powers bind right to left and above unary minus. Involute inv a = tan a - a; versed sine versin a = 1 - cos a; coversed sine 1 - sin a; exsecant sec a - 1.",
   source: 'Operator precedence as in common mathematical convention; functions from the Rust standard library (IEEE 754 double precision). See docs/sources.md.',
 },
 {

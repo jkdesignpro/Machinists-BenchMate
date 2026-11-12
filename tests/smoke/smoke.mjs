@@ -1793,6 +1793,67 @@ where = 'taperpin';
   await put('z1', '20'); await put('z2', '40');
   await mode('advanced');
 }
+// Shop maths from the books: prismoidal formula, tank contents, irregular areas, equal-area circle and square, old trig functions.
+where = 'prismoid';
+{
+  const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+  const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+  const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, v); await page.waitForTimeout(60); };
+  const dia = async () => page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  await units('inch'); await open('prismoid', 150);
+  await put('a1', '56'); await put('am', '99'); await put('a2', '154'); await put('h', '12');
+  let t = await rows();
+  if (!/Volume 1,212\.000 in³/i.test(t) || !/Volume 19\.8611 L/.test(t)) problems.push(`[${where}] the storage bin (56, 99, 154 ft² over 12 ft is 1212): ${t}`);
+  let d = await dia();
+  if (!/A1 = 56 in²/.test(d) || !/Am = 99 in²/.test(d) || !/A2 = 154 in²/.test(d) || !/h 12/.test(d)) problems.push(`[${where}] drawing: ${d}`);
+  await put('h', '0'); t = await rows();
+  if (/Volume/.test(t)) problems.push(`[${where}] no volume without a height: ${t}`);
+  await put('h', '12');
+  await open('tankvol', 150); await pick('orient', '0'); await put('d', '20'); await put('l', '30'); await put('h', '10'); t = await rows();
+  // Half full: pi x 100 x 30 / 2 = 4712.39 in³ = 77.22 L = 20.40 US gal.
+  if (!/Liquid in the tank 77\.22 L/i.test(t) || !/Liquid in the tank 20\.40 gal \(US\)/.test(t) || !/Full 50\.0 %/.test(t) || !/Tank when full 154\.44 L/.test(t)) problems.push(`[${where}] a lying tank half full: ${t}`);
+  d = await dia();
+  if (!/depth 10/.test(d) || !/diameter 20 in/.test(d) || !/50 % full/.test(d)) problems.push(`[${where}] tank drawing: ${d}`);
+  await put('h', '5'); t = await rows();
+  // A quarter of the diameter deep is 19.55 % of the circle.
+  if (!/Full 19\.6 %/.test(t)) problems.push(`[${where}] a lying tank a quarter deep holds 19.6 %: ${t}`);
+  await put('h', '21'); t = await rows();
+  if (!/more than the diameter of the tank/.test(t)) problems.push(`[${where}] a depth over the diameter must be refused: ${t}`);
+  await pick('orient', '1'); await put('h', '15'); t = await rows();
+  if (!/Full 50\.0 %/.test(t) || !/Liquid in the tank 77\.22 L/i.test(t)) problems.push(`[${where}] a standing tank half full: ${t}`);
+  await pick('orient', '0'); await put('h', '8');
+  await open('irregular', 150);
+  const irr = async (txt, step) => {
+    await page.fill('#main [data-k="text"]', txt); await page.dispatchEvent('#main [data-k="text"]', 'input');
+    await page.fill('#main [data-k="d"]', step); await page.dispatchEvent('#main [data-k="d"]', 'input'); await page.waitForTimeout(60);
+    return (await page.innerText('#main #ires')).replace(/\s+/g, ' ');
+  };
+  t = await irr('3.6 5.0 6.5 5.5 7.3 6.0 4.0', '25');
+  if (!/Widths entered 7/.test(t) || !/Simpson's rule 843\.3333 in²/.test(t) || !/trapezoidal rule 852\.5000 in²/.test(t)) problems.push(`[${where}] published offsets at 25 (Simpson 843.33): ${t}`);
+  if (!(await page.$('#main #idia svg'))) problems.push(`[${where}] the irregular area figure is missing`);
+  t = await irr('12, 24, 16', '20');
+  if (!/trapezoidal rule 760\.0000 in²/.test(t)) problems.push(`[${where}] published offsets 12, 24, 16 at 20 (trapezoidal 760): ${t}`);
+  t = await irr('1 2 3 4', '1');
+  if (!/needs an odd number of widths/.test(t) || !/trapezoidal rule 7\.5000/.test(t)) problems.push(`[${where}] four widths: Simpson's rule must say why not: ${t}`);
+  t = await irr('3.6 5.0 6.5 5.5 7.3 6.0 4.0', '25');
+  await open('figures', 150);
+  const fig = async (k, a) => { await page.selectOption('#main [data-k="kind"]', k); await page.waitForTimeout(60); await page.fill('#main [data-k="a"]', a); await page.dispatchEvent('#main [data-k="a"]', 'input'); await page.waitForTimeout(60); return (await page.innerText('#main #fres')).replace(/\s+/g, ' '); };
+  t = await fig('p4', '4');
+  if (!/Side of the square of equal area 3\.5449 in/.test(t)) problems.push(`[${where}] circle of diameter 4: square of equal area 3.5449: ${t}`);
+  t = await fig('p0', '3.5449');
+  if (!/Diameter of the circle of equal area 4\.0000 in/.test(t)) problems.push(`[${where}] and back: ${t}`);
+  await fig('p0', '4');
+  // Taper: compound slide setting and tailstock set-over (shown from Advanced mode up).
+  await units('mm'); await open('taper', 150);
+  await put('D', '30'); await put('d', '25'); await put('L', '250'); await put('Lw', '500'); t = await rows();
+  if (!/Tailstock set-over 5\.000 mm/.test(t) || !/Half angle \(slide setting\) 0\.5729 deg/.test(t)) problems.push(`[${where}] 1:50 taper 250 long on a 500 bar: set-over 5 mm: ${t}`);
+  await put('Lw', '200'); t = await rows();
+  if (!/the work cannot be shorter than the taper/.test(t)) problems.push(`[${where}] a work length under the taper length must be refused: ${t}`);
+  await put('Lw', ''); await put('D', '80'); await put('d', '50'); await put('L', '80'); t = await rows();
+  if (!/Half angle \(slide setting\) 10\.6197 deg/.test(t) || /Tailstock/.test(t)) problems.push(`[${where}] published example 80, 50 over 80: 10.62 deg: ${t}`);
+  await put('D', '25'); await put('d', '12'); await put('L', '60');
+  await units('inch');
+}
 where = 'machinetapers jarno';
 {
   await units('inch'); await open('machinetapers', 200);
@@ -1841,6 +1902,13 @@ const ce = '#main .bcalc .bc-expr';
 await page.fill(ce, '3-7/16 * 2');
 const cres = (await page.textContent('#main .bcalc .bc-res')) || '';
 if (!/^= 6\.875$/.test(cres.trim())) problems.push(`[${where}] 3-7/16 * 2: expected "= 6.875", got "${cres}"`);
+// The old shop trig functions: versed sine 1 - cos, exsecant sec - 1, and the reciprocals.
+for (const [ex, want] of [['versin(60)', '0.5'], ['exsec(60) + cot(45)', '2'], ['sec(60) * csc(30)', '4'], ['coversin(30)', '0.5']]) {
+  await page.fill(ce, ex);
+  const got = ((await page.textContent('#main .bcalc .bc-res')) || '').trim();
+  if (got !== '= ' + want) problems.push(`[${where}] ${ex}: expected "= ${want}", got "${got}"`);
+}
+await page.fill(ce, '3-7/16 * 2');
 const calt = (await page.textContent('#main .bcalc .bc-alt')) || '';
 if (!/= 6 7\/8/.test(calt) || !/in→mm 174\.625/.test(calt)) problems.push(`[${where}] fraction/mm readout wrong: "${calt}"`);
 await page.press(ce, 'Enter');

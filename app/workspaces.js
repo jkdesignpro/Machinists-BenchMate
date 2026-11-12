@@ -89,7 +89,7 @@ const WORKSPACES = [
   ] },
   { id: 'maths', name: 'Shop maths', icon: 'triangle', blurb: 'Calculator, conversions, geometry, stock and engineering sums.', sections: [
     ['Calculator and conversion', ['calc', 'convert', 'formulas'], 'calc'],
-    ['Geometry', ['triangle', 'arc', 'fillet', 'compound', 'figures', 'holepattern'], 'angle'],
+    ['Geometry', ['triangle', 'arc', 'fillet', 'compound', 'figures', 'prismoid', 'irregular', 'tankvol', 'holepattern'], 'angle'],
     ['Stock and sheet metal', ['weight', 'bar', 'bend', 'gauges'], 'material'],
     ['Engineering', ['section', 'beam', 'torsion', 'column', 'stressconc', 'fatigue', 'balance', 'critspeed', 'bearinglife'], 'beam'],
   ] },

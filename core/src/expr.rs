@@ -13,7 +13,7 @@
 //! Functions: sin cos tan asin acos atan atan2(y,x) sinh cosh tanh sqrt cbrt
 //! abs ln log (base 10) log2 exp floor ceil round min(a,b) max(a,b)
 //! hypot(a,b) fact(n) ncr(n,r) npr(n,r) dms(d,m,s) (to decimal degrees)
-//! inv(x) (involute, inv a = tan a - a) mod(a,b). Trig angles in degrees or radians.
+//! inv(x) (involute, inv a = tan a - a) sec csc cot versin (1 - cos) coversin (1 - sin) exsec (sec - 1) mod(a,b). Trig angles in degrees or radians.
 //!
 //! Shop forms (for a machinist's calculator):
 //! - Mixed numbers: `3 7/16` (space) and `3-7/16` (hyphen, no spaces) are
@@ -231,11 +231,14 @@ impl<'a> P<'a> {
         let need = |n: usize| -> Result<(), (String, usize)> { if a.len() == n { Ok(()) } else { Err((format!("{f}() takes {n} value{}", if n == 1 { "" } else { "s" }), at)) } };
         let v = match f {
             "sin" | "cos" | "tan" | "asin" | "acos" | "atan" | "sinh" | "cosh" | "tanh" | "sqrt" | "cbrt" | "abs" | "ln" | "log" | "log10" | "log2"
-            | "exp" | "floor" | "ceil" | "round" | "fact" | "inv" => {
+            | "exp" | "floor" | "ceil" | "round" | "fact" | "inv" | "sec" | "csc" | "cot" | "versin" | "vers" | "coversin" | "exsec" => {
                 need(1)?;
                 let x = a[0];
                 match f {
                     "sin" => to_r(x).sin(), "cos" => to_r(x).cos(), "tan" => to_r(x).tan(),
+                    // Reciprocal functions and the old shop functions: versed sine 1 - cos, coversed sine 1 - sin, exsecant sec - 1.
+                    "sec" => 1.0 / to_r(x).cos(), "csc" => 1.0 / to_r(x).sin(), "cot" => 1.0 / to_r(x).tan(),
+                    "versin" | "vers" => 1.0 - to_r(x).cos(), "coversin" => 1.0 - to_r(x).sin(), "exsec" => 1.0 / to_r(x).cos() - 1.0,
                     "asin" => from_r(x.asin()), "acos" => from_r(x.acos()), "atan" => from_r(x.atan()),
                     "sinh" => x.sinh(), "cosh" => x.cosh(), "tanh" => x.tanh(),
                     "sqrt" => x.sqrt(), "cbrt" => x.cbrt(), "abs" => x.abs(),
@@ -355,6 +358,11 @@ mod tests {
         close(ok("dms(29, 30, 0)", true), 29.5, 1e-15);
         // Involute of 20 deg = 0.014904 (standard gear value inv 20 = 0.0149044).
         close(ok("inv(20)", true), 0.014_904_4, 1e-7);
+        // Versed sine 1 - cos, coversed sine 1 - sin, exsecant sec - 1 (Scientific American, "10 secret trig functions"; University of Georgia, "The forgotten trigonometric functions").
+        close(ok("versin(60)", true), 0.5, 1e-12); close(ok("vers(90)", true), 1.0, 1e-12);
+        close(ok("coversin(30)", true), 0.5, 1e-12); close(ok("exsec(60)", true), 1.0, 1e-12);
+        close(ok("sec(60)", true), 2.0, 1e-12); close(ok("csc(30)", true), 2.0, 1e-12); close(ok("cot(45)", true), 1.0, 1e-12);
+        close(ok("versin(pi/3)", false), 0.5, 1e-12);
         close(ok("hypot(3, 4)", true), 5.0, 1e-15);
         assert_eq!(eval("ans * 2", true, 21.0), Eval::Ok(42.0));
     }

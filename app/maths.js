@@ -281,7 +281,7 @@ function renderCalc(el) {
   el.innerHTML = '';
   if (window.BenchCalc) BenchCalc.render(el);
   const x = document.createElement('div'); el.appendChild(x);
-  x.innerHTML = mNote('Typing: operators + − * / ^ (power, right to left: 2^3^2 = 512; −2^2 = −4), % (percent when nothing follows it: 200*15% = 30; remainder between two numbers: 7 % 3 = 1), ! (factorial) and brackets. Mixed numbers: 3 7/16 or 3-7/16 (no spaces); write 3 - 7/16 with spaces to subtract. Constants pi, e, ans (last result). Functions: sin cos tan asin acos atan atan2(y, x), sinh cosh tanh, sqrt cbrt abs, ln, log (base 10), log2, exp, floor ceil round, min max hypot pow mod, fact ncr npr, dms(d, m, s) to decimal degrees, inv(a) involute (tan a − a, in radians). Lengths with a unit can be mixed and come back in the app\u2019s unit: 12.7mm + 1/2 in, 3 7/16&quot;, 5\' 3 1/2&quot;, 5 thou, 25 um (units: in or &quot;, ft or \', thou, mm, cm, m, um). Angles in degrees, minutes and seconds: 29\u00B030\'15&quot;. Multiplication must be written: 2*pi, not 2pi. Enter evaluates, Ctrl+Enter uses the result in the field the calculator was opened from. The expression is parsed by BenchMate\'s own parser in the Rust core; nothing is run as code.') +
+  x.innerHTML = mNote('Typing: operators + − * / ^ (power, right to left: 2^3^2 = 512; −2^2 = −4), % (percent when nothing follows it: 200*15% = 30; remainder between two numbers: 7 % 3 = 1), ! (factorial) and brackets. Mixed numbers: 3 7/16 or 3-7/16 (no spaces); write 3 - 7/16 with spaces to subtract. Constants pi, e, ans (last result). Functions: sin cos tan asin acos atan atan2(y, x), sinh cosh tanh, sqrt cbrt abs, ln, log (base 10), log2, exp, floor ceil round, min max hypot pow mod, fact ncr npr, dms(d, m, s) to decimal degrees, inv(a) involute (tan a − a, in radians), sec csc cot, versin(a) versed sine (1 − cos a), coversin(a) (1 − sin a), exsec(a) (sec a − 1). Lengths with a unit can be mixed and come back in the app\u2019s unit: 12.7mm + 1/2 in, 3 7/16&quot;, 5\' 3 1/2&quot;, 5 thou, 25 um (units: in or &quot;, ft or \', thou, mm, cm, m, um). Angles in degrees, minutes and seconds: 29\u00B030\'15&quot;. Multiplication must be written: 2*pi, not 2pi. Enter evaluates, Ctrl+Enter uses the result in the field the calculator was opened from. The expression is parsed by BenchMate\'s own parser in the Rust core; nothing is run as code.') +
     '<h2>Degrees, minutes and seconds</h2><div class="grid">' + sfield('Degrees', sinp('dd', s.dd), '°') + sfield('Minutes', sinp('dm', s.dm), '′') + sfield('Seconds', sinp('ds', s.ds), '″') + sfield('Or decimal degrees', sinp('dx', s.dx), '°') + '</div><div id="cdms"></div>' +
     '<h2>Prime factors</h2><div class="grid">' + sfield('Whole number', sinp('pf', s.pf), '') + '</div><div id="cpf"></div>' +
     '<h2>Linear interpolation</h2><p class="desc">Read a value between two table rows.</p><div class="grid">' + sfield('x1', sinp('x1', s.x1), '') + sfield('y1', sinp('y1', s.y1), '') + sfield('x2', sinp('x2', s.x2), '') + sfield('y2', sinp('y2', s.y2), '') + sfield('x', sinp('x', s.x), '') + '</div><div id="cint"></div>';
@@ -302,11 +302,11 @@ function renderCalc(el) {
 // ---------- Plane figures and solids ----------
 const FIG_STATE = { kind: 'p1', a: 4, b: 2, c: 3 };
 const FIG = {
-  p0: ['Square', ['Side a'], ['Diagonal (across corners)']],
+  p0: ['Square', ['Side a'], ['Diagonal (across corners)', 'Diameter of the circle of equal area']],
   p1: ['Rectangle', ['Length a', 'Width b'], ['Diagonal']],
   p2: ['Parallelogram', ['Base a', 'Height b', 'Slant side c'], ['Acute angle (deg)']],
   p3: ['Trapezoid (isosceles)', ['Parallel side a', 'Parallel side b', 'Height c'], ['Slant side']],
-  p4: ['Circle', ['Diameter a'], []],
+  p4: ['Circle', ['Diameter a'], ['Side of the square of equal area']],
   p5: ['Ring (annulus)', ['Outside diameter a', 'Inside diameter b'], ['Wall']],
   p6: ['Ellipse', ['Major axis a (full length)', 'Minor axis b'], []],
   p7: ['Regular polygon from across flats', ['Number of sides a', 'Across flats b'], ['Side length', 'Across corners']],
@@ -406,6 +406,31 @@ function renderFigures(el) {
       (!plane(s.kind) ? mNote('For weight, multiply the volume by the density (see the stock weight tool for bar, tube and plate).') : '');
   };
   draw();
+}
+
+// ---------- Irregular area from equally spaced widths ----------
+const IRR_STATE = { text: '3.6 5.0 6.5 5.5 7.3 6.0 4.0', d: 25 };
+function renderIrregular(el) {
+  const s = IRR_STATE, W = state.W, u = lenU(state.sys);
+  el.innerHTML = '<p class="desc">Rule lines across the outline at equal steps and measure the width on each line, including the two ends (enter 0 where the outline closes to a point). Type the widths in order.</p>' +
+    '<div class="grid"><label class="f" style="grid-column:1/-1"><span>Widths, in order (' + u + ')</span><div class="row"><textarea data-k="text" rows="2" style="width:100%;font-family:var(--mono)">' + sesc(s.text) + '</textarea></div></label>' +
+    sfield('Step between the lines', sinp('d', s.d), u) + '</div><div id="idia"></div><div id="ires"></div>';
+  const calc = () => {
+    const ys = parseValues(s.text), d = snum(s.d), out = el.querySelector('#ires'), dia = el.querySelector('#idia'), dp = gdp();
+    if (ys.length < 2 || !(d > 0) || ys.some(y => y < 0)) { dia.innerHTML = ''; out.innerHTML = mMsg('Area', 'Enter at least two widths (none below zero) and the step between them.'); return; }
+    const n = toBuf(W, ys), tr = W.area_from_buf(n, d, 0), si = W.area_from_buf(n, d, 1);
+    // Figure: the widths as uprights, joined along the top (layout only; the areas come from the core).
+    const Wd = 520, Hd = 200, x0 = 30, y0 = 160, top = Math.max(...ys.slice(0, n)) || 1, kx = (Wd - 60) / (n - 1), ky = 120 / top;
+    const pts = ys.slice(0, n).map((y, i) => [x0 + i * kx, y0 - y * ky]);
+    dia.innerHTML = '<svg viewBox="0 0 ' + Wd + ' ' + Hd + '" class="geo" role="img" aria-label="The widths drawn as uprights at equal steps, joined along the top"><path d="M' + x0 + ' ' + y0 + 'L' + pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('L') + 'L' + (x0 + (n - 1) * kx).toFixed(1) + ' ' + y0 + 'Z" class="gp gfill"/>' +
+      pts.map(q => '<path d="M' + q[0].toFixed(1) + ' ' + y0 + 'L' + q[0].toFixed(1) + ' ' + q[1].toFixed(1) + '" class="gm"/>').join('') +
+      gtxt([x0 + kx / 2, y0 + 18], 'step ' + gf(d, dp) + ' ' + u, 'gv', 'middle') + gtxt([Wd / 2, 20], n + ' widths, ' + (n - 1) + ' strips', 'gv', 'middle') + '</svg>';
+    const rows = [['Widths entered', String(n), ''], ['Area by the trapezoidal rule', gf(tr, dp), u + '²']];
+    rows.push(isFinite(si) ? ['Area by Simpson\'s rule', gf(si, dp), u + '²'] : ['Area by Simpson\'s rule', 'needs an odd number of widths (an even number of strips): add or drop one line', '']);
+    out.innerHTML = mRes('Irregular area', rows) + mNote('The trapezoidal rule joins the tops of the widths with straight lines, so it reads low on an outline that bulges outward and high on one that curves inward. Simpson\'s rule fits a curve through each three widths and is usually closer. More lines, closer together, improve both.');
+  };
+  el.querySelectorAll('[data-k]').forEach(i => i.oninput = () => { s[i.dataset.k] = i.value; calc(); });
+  calc();
 }
 
 // ---------- Compound angles ----------

@@ -963,6 +963,47 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Side view of a compression spring between two flat faces: free length, solid length, outside diameter');
   },
 
+  // Prismoidal formula: a tapering solid in side view (not to scale) with the two end faces and the halfway section.
+  prismoid(v, sys, rows) {
+    const W = 520, H = 230, u = dcU(sys), V = dcRow(rows, 'Volume');
+    if (!dcOk(V) || !dcOk(v.h)) return '';
+    // Half-widths in proportion to the square roots of the areas (layout only), so the larger face is drawn wider.
+    const big = Math.max(v.a1, v.am, v.a2) || 1, hw = a => Math.max(12, 130 * Math.sqrt(Math.max(0, a) / big));
+    const cx = 200, yT = 40, yB = 170, yM = (yT + yB) / 2, wT = hw(v.a2), wB = hw(v.a1), wM = hw(v.am);
+    let h = DK.poly([[cx - wB, yB], [cx + wB, yB], [cx + wM, yM], [cx + wT, yT], [cx - wT, yT], [cx - wM, yM]], 'part');
+    h += DK.line(cx - wM, yM, cx + wM, yM, 'ghost');
+    h += DK.text(cx, yT - 8, 'A2 = ' + dcN(v.a2) + ' ' + u + '²', { cls: 'txt' }) + DK.text(cx, yM - 6, 'Am = ' + dcN(v.am) + ' ' + u + '²', { cls: 'txt' }) + DK.text(cx, yB + 18, 'A1 = ' + dcN(v.a1) + ' ' + u + '²', { cls: 'txt' });
+    h += dcDimV(yT, yB, cx + 170, 'h ' + dcN(v.h), { from: cx + Math.min(wT, wB) });
+    h += dcLines(cx + 216, yM - 8, ['halfway section', 'at h / 2', 'not to scale']);
+    return DK.svg(W, H, h, 'Side view of a tapering solid: end face A1, halfway section Am, end face A2, distance h between the end faces');
+  },
+
+  // Tank contents: end view of a lying cylinder with the liquid as a segment, or side view of a standing one. To scale.
+  tankvol(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys), pc = dcRow(rows, 'Full');
+    if (!dcOk(v.d) || !dcOk(v.l) || !(v.h >= 0) || !dcOk(pc + 1)) return '';
+    let h = '';
+    if (v.orient === 1) {
+      const sc = Math.min(150 / v.d, 170 / v.l), w = v.d * sc, ht = v.l * sc, x0 = 190 - w / 2, yB = 215, lev = v.h * sc;
+      if (lev > 0) h += DK.rect(x0, yB - lev, w, lev, 'hatch');
+      h += DK.rect(x0, yB - ht, w, ht, 'part') .replace('class="part"', 'class="part" style="fill:none"');
+      h += DK.dimH(x0, x0 + w, yB + 22, 'diameter ' + dcN(v.d) + ' ' + u, { from: yB });
+      h += dcDimV(yB - lev, yB, x0 + w + 34, 'depth ' + dcN(v.h), { from: x0 + w });
+      h += dcDimV(yB - ht, yB, x0 - 34, 'height ' + dcN(v.l), { from: x0 });
+    } else {
+      const r = Math.min(85, 85), sc = r / (v.d / 2), cx = 190, cy = 118, lev = v.h * sc, yL = cy + r - lev;
+      const half = Math.sqrt(Math.max(0, r * r - (yL - cy) * (yL - cy)));   // layout only: where the liquid surface meets the wall
+      if (lev > 0 && lev < 2 * r) h += DK.path('M' + (cx - half).toFixed(1) + ' ' + yL.toFixed(1) + 'A' + r + ' ' + r + ' 0 ' + (lev > r ? 1 : 0) + ' 0 ' + (cx + half).toFixed(1) + ' ' + yL.toFixed(1) + 'Z', 'hatch');
+      else if (lev >= 2 * r) h += DK.circle(cx, cy, r, 'hatch');
+      h += DK.circle(cx, cy, r, 'thin');
+      h += DK.dimH(cx - r, cx + r, cy + r + 26, 'diameter ' + dcN(v.d) + ' ' + u, { from: cy });
+      h += dcDimV(yL, cy + r, cx + r + 34, 'depth ' + dcN(v.h), { from: cx });
+      h += dcLines(cx + r + 90, cy - 30, ['end view', 'length ' + dcN(v.l) + ' ' + u]);
+    }
+    h += dcLines(380, 200, [dcN(pc, 1) + ' % full']);
+    return DK.svg(W, H, h, 'A cylindrical tank with flat ends and the liquid in it: diameter, depth of liquid, length');
+  },
+
   // Taper pin: side view to scale, large end on the left.
   taperpin(v, sys, rows) {
     const W = 520, H = 220, u = dcU(sys), dp = sys === 'inch' ? 4 : 3;

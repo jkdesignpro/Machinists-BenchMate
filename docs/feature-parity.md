@@ -83,7 +83,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Grinding | Cylindricity error from RPM | done (wheel to work rpm ratio: whole numbers and simple fractions flagged, work speeds to avoid, wheel wear, chatter mark count; rule from one author, marked single-source) | `grindratio` | U58 |
 | Gears/splines | Spur gear data, ISO 4156, ANSI B92.1 | done (spur gear data and measurement; involute splines with basic dimensions and pin measurement, fit class tolerances not shown) | `spurgear`, `gearmeasure`, `spline` | U83-U85 |
 | Gears/splines | SAE J499a parallel side splines | done (4, 6, 10 and 16 splines, fits A, B and C: width, depth, small diameter, torque capacity, section to scale; formulas from one publisher, checked against 37 printed values and marked so) | `saespline` | U86 |
-| Library | Formula library | done (172 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
+| Library | Formula library | done (177 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
 | Library | Tool wear information | done (ten wear types with our own drawings, causes and remedies from two makers; two types have one source and are marked) | `toolwear`, `cncguide` | U91 |
 | Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
 | Library | Tip of the day | done (own tips, Home widget) | `tips.js` | U98 |
@@ -96,6 +96,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Process | Wire EDM (not in Ultra; idea 18) | done (kerf, wire offset for the first cut and the final skim, smallest inside corner radius, taper both ways with the guide distance, cut time from the cutting rate with skim cuts; gap and rate are inputs, published gap ranges that differ are both shown) | `edmoffset`, `edmtaper`, `edmtime` | |
 | Shop | Collet nut and pull stud torque (not in Ultra; idea 8) | done (ER nut torque by size, bore and nut from the maker's table with a second maker beside it; pull stud torque from three makers side by side, nothing averaged) | `holdertorque` | |
 | Machine elements | Compression springs (book rows MH40) | done for round-wire compression springs (rate, Wahl stress, coils, solid length, pitch, load at a length; modulus from two makers); extension, torsion and disc springs missing | `spring` | |
+| Geometry | Prismoidal formula, irregular areas, tank contents (book row MH9) | done (each formula from two publishers, three published examples reproduced) | `prismoid`, `irregular`, `tankvol` | |
 | Stock | Sheet metal and wire gauges (book rows MH296, BB55) | done (two publishers per table value, differences shown; AWG from its rule) | `gauges` | |
 | Machine elements | Taper pins, inch series (book row MH214) | partial (one publisher for the sizes, marked; no other pin types) | `taperpin` | |
 | Machine elements | Belt and chain drives (book rows MH289, MH290, BB46) | done for geometry (belt length exact and short, centre distance from a length, chain length in even pitches, sprocket pitch diameters, ratio, wrap); belt sections and power ratings missing | `beltdrive`, `chaindrive` | |
