@@ -4,7 +4,7 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
-## [0.4.0] - 2026-11-11
+## [0.4.0] - 2026-11-12
 Stage 2 of the plan: drawings and editors. Built on top of 0.3.0.
 
 ### Added (G-code editor and simulator)
