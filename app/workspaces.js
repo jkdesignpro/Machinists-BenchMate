@@ -91,7 +91,7 @@ const WORKSPACES = [
   ] },
   { id: 'program', name: 'Programming', icon: 'programming', blurb: 'G and M codes, macros, cycle generators, backplot and DXF.', sections: [
     ['Codes', ['gmcodes', 'macroref'], 'code'],
-    ['Cycle generators', ['cycdrill', 'threadprog', 'cyctaper', 'cycgroove', 'cycg71', 'cycbroach'], 'code'],
+    ['Cycle generators', ['cycdrill', 'threadprog', 'cyctaper', 'cycgroove', 'cycg71', 'cycbroach', 'engrave'], 'code'],
     ['Simulate and draw', ['gsim', 'sketch', 'holepattern', 'dxfshapes'], 'play'],
     ['Setup', ['setupsheet', 'tnrc', 'offsetadj'], 'sheet'],
   ] },

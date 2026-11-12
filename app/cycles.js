@@ -1,7 +1,7 @@
 'use strict';
 // G-code cycle generators: drilling and tapping, thread milling, lathe
 // threading (G76 / G92 with infeed table), taper, groove and cut-off, keyway
-// broaching, G71/G70 profile. The program text, the moves and the times all
+// broaching, G71/G70 profile (text engraving is in engrave.js). The program text, the moves and the times all
 // come from the Rust core (core/src/gcode.rs); this file reads the inputs,
 // converts units, draws the backplot and offers the downloads.
 // Uses helpers from shop.js (sesc, snum, sinp, sfield, stable) and
@@ -112,8 +112,12 @@ function cyStr(W, len) { return new TextDecoder().decode(new Uint8Array(W.memory
 function cyRun(cycle, params) {
   const W = state.W;
   const n = toBuf(W, params.map(x => (x === '' || x === undefined) ? NaN : +x));
-  const ok = W.cyc_run(cycle, n) === 1;
-  const r = { ok, cycle };
+  return cyRead(W.cyc_run(cycle, n) === 1, cycle);
+}
+
+// Read the program the core made last (by cyc_run or another generator such as engrave_program).
+function cyRead(ok, cycle) {
+  const W = state.W, r = { ok, cycle };
   if (!ok) { r.err = cyStr(W, W.cyc_text(1)); return r; }
   r.text = cyStr(W, W.cyc_text(0));
   const wl = W.cyc_text(2); r.warns = wl ? cyStr(W, wl).split('\n') : [];
@@ -199,16 +203,17 @@ function cyOutput(out, s, res, job) {
   else rows.push(['Rapid time', 'enter rapid', '', 'No rapid rate: enter one, or add it to the active machine profile']);
   const checks = cyChecks(res);
   const prog = 'O' + (s.prog || '0');
-  out.innerHTML = cyPlot(res, job.lathe) +
+  out.innerHTML = (job.plot ? job.plot(res) : cyPlot(res, job.lathe)) +
     '<div class="res" style="margin-top:10px">' + stable('Estimate (no tool change, acceleration or block processing time)', rows) + '</div>' +
     (checks.length ? '<div class="res" style="margin-top:10px">' + stable('Active machine check', checks) + '</div>' : '') +
     (res.warns.length ? '<div class="res" style="margin-top:10px">' + stable('Check before running', res.warns.map(w => [sesc(w), '', ''])) + '</div>' : '') +
-    '<div class="mfilter" style="margin-top:12px"><button class="btn" id="cycopy">Copy program</button><button class="btn" id="cydl">Download ' + sesc(prog) + '.nc</button>' + (job.csv ? '<button class="btn" id="cycsv">Download hole CSV</button>' : '') + '</div>' +
+    '<div class="mfilter" style="margin-top:12px"><button class="btn" id="cycopy">Copy program</button><button class="btn" id="cydl">Download ' + sesc(prog) + '.nc</button>' + (job.csv ? '<button class="btn" id="cycsv">Download hole CSV</button>' : '') + (job.more || []).map(m => '<button class="btn" id="' + m[0] + '">' + sesc(m[1]) + '</button>').join('') + '</div>' +
     '<pre class="gcode" id="cytext"></pre>';
   out.querySelector('#cytext').textContent = res.text;
   out.querySelector('#cycopy').onclick = () => { try { navigator.clipboard.writeText(res.text); } catch (e) {} };
   out.querySelector('#cydl').onclick = () => cyDownload(prog + '.nc', res.text);
   if (job.csv) out.querySelector('#cycsv').onclick = () => cyDownload('holes.csv', job.csv(), 'text/csv');
+  (job.more || []).forEach(m => { out.querySelector('#' + m[0]).onclick = m[2]; });
 }
 
 const cyHead = (s, metric) => [metric ? 1 : 0, +s.ctrl, snum(s.prog), snum(s.tool)];

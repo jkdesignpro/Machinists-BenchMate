@@ -1806,6 +1806,13 @@ const TOOLS = [
   source: 'Autodesk DXF Reference (TEXT, POINT, LWPOLYLINE and POLYLINE group codes, bulge, arbitrary axis algorithm, ASCII control characters, $INSUNITS) with the ezdxf documentation as the second reading; Wolfram MathWorld: Circumcircle, Circle-Circle Intersection. Each geometry routine is tested against hand values (3-4-5 triangles, unit circle). DXF files checked by reading them back and by opening them in LibreCAD, Inkscape and OpenSCAD: see docs/cad-dxf.md.',
 },
 {
+  id: 'engrave', level: 'advanced', group: 'G-code cycles', title: 'Text engraving',
+  desc: 'Type a text, pick one of nine stroke (single line) letter styles and see it to scale: on a straight line at any angle or round a circle, mirrored if wanted. Gives the size, the length engraved, the line width of a pointed cutter and the program, and sends the strokes to the simulator, the sketcher or a DXF file.',
+  render: el => renderEngrave(el),
+  working: 'The letters are stroke fonts: each letter is a few open lines for the centre of the cutter to follow, so the line width is the cutter width. The height typed is the height of the capital letters, measured on the letter H of the font. Round a circle, a distance along the foot of the letters becomes an angle = distance / radius, and long strokes are cut into short pieces so they follow the circle. Each stroke is one rapid above its start, a plunge at the plunge feed, the stroke at the cutting feed and a rapid lift; strokes that carry on from each other are joined so the cutter is not lifted. Z0 is the surface. Pointed cutter: line width = tip flat + 2 x depth x tan(half the included angle). The layout, the lengths and the program come from the Rust core.',
+  source: 'Letters: the Hershey fonts (Dr. A. V. Hershey; data format by James Hurt, Cognition, Inc.), as SVG fonts prepared by Windell H. Oskay and shipped with Inkscape; use notice in each file in data/fonts/hershey and on the Fedora licensing wiki (Hershey font licence). Program: plain G00/G01 moves, the same header as the drilling cycles (FANUC Series 0i-F Plus Operator\'s Manual; Haas Mill Programming Workbook). Pointed cutter line width: BenchMate geometry, checked against the FlatCAM groove table (60 degrees, 0.1 flat, 0.05 deep: 0.158) and the Calculator Academy chamfer example (82 degrees, 5.0 to 9.4 at 2.53 deep). See docs/engraving.md.',
+},
+{
   id: 'cycbroach', level: 'expert', group: 'G-code cycles', title: 'Keyway broaching program',
   desc: 'Keyway broaching (slotting) strokes on a lathe or a mill with the spindle locked: stroke, depth per stroke, lift on the return stroke and spring strokes.',
   render: el => renderBroachCycle(el),

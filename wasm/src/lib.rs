@@ -368,6 +368,62 @@ f1!(insert_base_ic, c::insert::base_ic, d, s, clearance_deg);
         Ok(doc) => set_text(c::dxf::write_doc(&doc, c::dxf::Units::Mm, if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 })),
         Err(e) => -set_text(e),
     } }
+// Text engraving (core/src/engrave.rs, gcode::gen_engrave). JS writes the font
+// file, then the text, where `gsim_in` says; the font and the laid-out
+// strokes are kept here between calls.
+static mut ENG_FONT: Option<c::engrave::Font> = None;
+static mut ENG_LAID: Option<c::engrave::Laid> = None;
+fn eng_in(len: f64) -> String {
+    // SAFETY: single-threaded wasm; GSIM_IN is written by JS before this call.
+    unsafe { let src = &*core::ptr::addr_of!(GSIM_IN); let n = (len.max(0.0) as usize).min(src.len()); String::from_utf8_lossy(&src[..n]).into_owned() }
+}
+fn eng_laid() -> Option<&'static c::engrave::Laid> { unsafe { (*core::ptr::addr_of!(ENG_LAID)).as_ref() } }
+/// Read the SVG font in the first `len` input bytes. Returns the number of
+/// letters, or minus the length of a message at `text_ptr`.
+#[no_mangle] pub extern "C" fn engrave_font(len: f64) -> f64 {
+    match c::engrave::Font::parse_svg(&eng_in(len)) {
+        Ok(f) => { let n = f.glyphs.len() as f64; unsafe { *core::ptr::addr_of_mut!(ENG_FONT) = Some(f); *core::ptr::addr_of_mut!(ENG_LAID) = None; } n }
+        Err(e) => { unsafe { *core::ptr::addr_of_mut!(ENG_FONT) = None; *core::ptr::addr_of_mut!(ENG_LAID) = None; } -set_text(e) }
+    } }
+/// Lay out the text in the first `len` input bytes with the font read last
+/// (see `engrave::Opts`). Returns the number of strokes and puts them in
+/// `list_out` (per stroke: point count, then x, y pairs); on bad input
+/// returns minus the length of a message at `text_ptr`.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn engrave_layout(len: f64, cap_h: f64, spacing: f64, line: f64, stretch: f64, align: f64, mode: f64, x: f64, y: f64, angle: f64, radius: f64, mirror: f64) -> f64 {
+    let text = eng_in(len);
+    let font = unsafe { (*core::ptr::addr_of!(ENG_FONT)).as_ref() };
+    let r = match font {
+        None => Err("No font is loaded.".to_string()),
+        Some(f) => c::engrave::layout(f, &text, &c::engrave::Opts { cap_h, spacing, line, stretch, align: align.clamp(0.0, 2.0) as u8, mode: mode.clamp(0.0, 9.0) as u8, x, y, angle, radius, mirror: mirror != 0.0 }),
+    };
+    match r {
+        Ok(l) => { let n = l.strokes.len() as f64; set_out(c::engrave::flat(&l)); unsafe { *core::ptr::addr_of_mut!(ENG_LAID) = Some(l); } n }
+        Err(e) => { set_out(vec![]); unsafe { *core::ptr::addr_of_mut!(ENG_LAID) = None; } -set_text(e) }
+    } }
+/// About the last layout: `which` as `engrave::info`.
+#[no_mangle] pub extern "C" fn engrave_info(which: f64) -> f64 { eng_laid().map(|l| c::engrave::info(l, which as u32)).unwrap_or(f64::NAN) }
+/// The characters the font has no letter for, as text at `text_ptr`; returns the length.
+#[no_mangle] pub extern "C" fn engrave_missing() -> f64 { set_text(eng_laid().map(|l| l.missing.iter().collect::<String>()).unwrap_or_default()) }
+/// Engraving program for the last layout; the text in the first `len` input
+/// bytes goes in the header. Read it with the `cyc_*` calls. Returns 1 if a
+/// program was made, 0 on error.
+#[no_mangle] #[allow(clippy::too_many_arguments)]
+pub extern "C" fn engrave_program(len: f64, metric: f64, ctrl: f64, prog: f64, tool: f64, wcs: f64, rpm: f64, feed: f64, plunge: f64, z_safe: f64, depth: f64, coolant: f64) -> f64 {
+    let u = |v: f64| if v.is_finite() && v > 0.0 { v.round() as u32 } else { 0 };
+    let p = c::gcode::gen_engrave(&c::gcode::EngraveJob { metric: metric != 0.0, ctrl: c::gcode::Ctrl::from_f(ctrl), prog: u(prog), tool: u(tool).max(1), wcs: u(wcs).clamp(54, 59),
+        rpm, feed, plunge, z_safe, depth, coolant: coolant != 0.0, text: eng_in(len), strokes: eng_laid().map(|l| l.strokes.clone()).unwrap_or_default() });
+    let ok = p.error.is_none();
+    unsafe { *core::ptr::addr_of_mut!(PROG) = Some(p); }
+    if ok { 1.0 } else { 0.0 } }
+/// The last layout as a DXF file (text at `text_ptr`); returns the length, 0 when there is no layout.
+#[no_mangle] pub extern "C" fn engrave_dxf(metric: f64, r12: f64) -> f64 {
+    match eng_laid() {
+        Some(l) => set_text(c::dxf::write_doc(&c::engrave::doc(l), if metric != 0.0 { c::dxf::Units::Mm } else { c::dxf::Units::Inch }, if r12 != 0.0 { c::dxf::Version::R12 } else { c::dxf::Version::R2000 })),
+        None => set_text(String::new()),
+    } }
+f1!(engrave_v_width, c::engrave::v_width, depth, angle_deg, flat);
+f1!(engrave_v_depth, c::engrave::v_depth, width, angle_deg, flat);
 f1!(knurl_blank_dia_cp, c::knurl_blank_dia_cp, p, n);
 f1!(knurl_blank_dia_dp, c::knurl_blank_dia_dp, dp, n);
 f1!(knurl_teeth_cp, c::knurl_teeth_cp, d, p);

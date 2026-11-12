@@ -864,6 +864,66 @@ where = 'gdtfcf';
   await mode('advanced');
 }
 
+// Text engraving: the font file loads, the text is laid out to the size typed, the drawing shows the strokes
+// to scale, the program holds them, and the strokes go on to the simulator and the sketcher.
+where = 'engrave';
+{
+  await units('mm');
+  await mode('advanced');
+  await open('engrave', 80);
+  await page.waitForSelector('#main #engres', { timeout: 5000 }).catch(() => problems.push(`[${where}] the letters did not load`));
+  const set = async (k, v) => { await page.evaluate(([k, v]) => { const i = document.querySelector('#main [data-k="' + k + '"]'); i.value = v; i.dispatchEvent(new Event(i.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); }, [k, v]); await page.waitForTimeout(60); };
+  const row = async label => page.$$eval('#main #engres tr', (trs, l) => { const t = trs.find(x => x.textContent.includes(l)); return t ? t.innerText.replace(/\s+/g, ' ') : ''; }, label);
+  const prog = () => page.$eval('#main #cytext', e => e.textContent).catch(() => '');
+  // one capital H, 7 mm high, in the single line font: 14/21 of the height wide (the font writes 442/662), two posts and a bar
+  await set('text', 'H'); await set('h', '7');
+  if (!/4\.674 x 7\.000 mm/.test(await row('Overall size'))) problems.push(`[${where}] an H 7 high should be 4.674 wide: ${await row('Overall size')}`);
+  if (!/ 3\s*$/.test(await row('Strokes')) || !/18\.674 mm/.test(await row('Length engraved'))) problems.push(`[${where}] an H is 3 strokes, 7 + 7 + 4.674 long: ${await row('Strokes')} / ${await row('Length engraved')}`);
+  // the drawing is to scale: the two posts are as far apart on the page as the width times the scale
+  const geo = await page.evaluate(() => { const svg = document.querySelector('#main #engsvg'), k = +svg.dataset.k; const xs = [...svg.querySelectorAll('path.engs')].flatMap(p => p.getAttribute('d').slice(1).split('L').map(q => +q.split(' ')[0])); return { k, w: Math.max(...xs) - Math.min(...xs), n: svg.querySelectorAll('path.engs').length }; });
+  if (geo.n !== 3 || Math.abs(geo.w - 4.674 * geo.k) > 0.2) problems.push(`[${where}] drawing is not to scale: ${JSON.stringify(geo)}`);
+  // the program: plunge, cut, lift for each stroke; Z0 on the surface
+  let t = await prog();
+  if ((t.match(/^G01 Z-0\.1 F100\.0$/gm) || []).length !== 3 || (t.match(/^G00 Z2\.0$/gm) || []).length !== 3) problems.push(`[${where}] program should plunge and lift three times`);
+  if (!/^X0\.0 Y0\.0 F300\.0$/m.test(t) || !/\(TEXT: H\)/.test(t) || !/\(Z0 = THE SURFACE BEING ENGRAVED\)/.test(t) || !/^G21 G17 G40 G49 G80 G90$/m.test(t)) problems.push(`[${where}] program text is wrong:\n${t.slice(0, 600)}`);
+  // position and angle: at X10 Y20 turned 90 degrees the H runs up from (10, 20) and its top is at X3
+  await set('x', '10'); await set('y', '20'); await set('angle', '90');
+  if (!/3\.000, 20\.000 mm/.test(await row('Lower left')) || !/10\.000, 24\.674 mm/.test(await row('Upper right'))) problems.push(`[${where}] turned text is in the wrong place: ${await row('Lower left')} / ${await row('Upper right')}`);
+  // round a circle, tops outward, middle of the text at the top: a lone H is centred on X of the centre; its posts sit half its width
+  // along the circle each side, so their feet are at R cos(w / 2R) above the centre and their tops at (R + height) cos(w / 2R)
+  await set('lay', '1'); await set('align', '1'); await set('radius', '50');
+  const ur = await row('Upper right'), ll = await row('Lower left');
+  const nums = x => (x.match(/-?\d+\.\d+/g) || []).map(Number);
+  if (Math.abs(nums(ll)[0] + nums(ur)[0] - 20) > 0.002 || Math.abs(nums(ur)[1] - (20 + 57 * Math.cos(4.674 / 2 / 50))) > 0.002 || Math.abs(nums(ll)[1] - (20 + 50 * Math.cos(4.674 / 2 / 50))) > 0.002 || !(await page.$('#main #engcirc'))) problems.push(`[${where}] text round a circle is wrong: ${ll} / ${ur}`);
+  // a letter the font does not have is named and left out; a pointed cutter gives the line width
+  await set('lay', '0'); await set('angle', '0'); await set('text', 'H中'); await set('vang', '90'); await set('depth', '0.2');
+  if (!/中/.test(await row('Left out')) || !/0\.400 mm/.test(await row('Line width'))) problems.push(`[${where}] missing letter or line width row is wrong: ${await row('Left out')} / ${await row('Line width')}`);
+  // every letter style loads and draws
+  for (const f of ['HersheySansMed', 'HersheySerifMed', 'HersheySerifMedItalic', 'HersheySerifBold', 'HersheySerifBoldItalic', 'HersheyScript1', 'HersheyScriptMed', 'HersheyGothEnglish']) {
+    await set('font', f);
+    await page.waitForFunction(() => document.querySelector('#main #engres'), null, { timeout: 5000 }).catch(() => {});
+    if (!/x 7\.\d{3} mm/.test(await row('Overall size'))) problems.push(`[${where}] ${f} did not draw an H 7 high: ${await row('Overall size')}`);
+  }
+  await set('font', 'HersheySans1'); await page.waitForTimeout(100);
+  // no depth: the drawing stays, the program is refused with the reason
+  await set('depth', '');
+  if (!(await page.$('#main #engsvg')) || !/Enter the depth/.test(await page.$eval('#main #cyout', e => e.innerText))) problems.push(`[${where}] a missing depth should keep the drawing and refuse the program`);
+  await set('depth', '0.1'); await set('text', 'H');
+  // on to the simulator: it runs the same program without errors; and to the sketcher: three lines arrive
+  t = await prog();
+  await page.click('#main #engsim'); await page.waitForTimeout(200);
+  const sim = await page.evaluate(() => ({ h: location.hash, same: (document.querySelector('#main textarea') || {}).value }));
+  if (!/gsim/.test(sim.h) || sim.same !== t) problems.push(`[${where}] the simulator did not get the program`);
+  await open('engrave', 120);
+  await page.click('#main #engsk'); await page.waitForTimeout(200);
+  const sk = await page.evaluate(() => ({ h: location.hash, n: state.W.sk_count ? state.W.sk_count() : -1 }));
+  if (!/sketch/.test(sk.h) || (sk.n !== -1 && sk.n !== 3)) problems.push(`[${where}] the sketcher did not get the three strokes: ${JSON.stringify(sk)}`);
+  // leave the page as it started
+  await open('engrave', 120);
+  await set('text', 'BENCHMATE'); await set('h', '5'); await set('x', '0'); await set('y', '0'); await set('vang', ''); await set('align', '0');
+  if (!(await page.$('#main #engcredit')) || !/Dr\. A\. V\. Hershey/.test(await page.$eval('#main #engcredit', e => e.textContent)) || !/James Hurt/.test(await page.$eval('#main #engcredit', e => e.textContent))) problems.push(`[${where}] the font acknowledgement is not on the page`);
+}
+
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

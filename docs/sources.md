@@ -320,6 +320,12 @@ All were accessed 2026-11-10.
 - **[TUNGALOY]** Tungaloy general catalogue 2023-2024, section B, CNMG dimension table, https://tungaloy.com/wpdata/wp-content/uploads/GC_2023-2024_G_B_Insert.pdf : D1 3.81 for IC 9.525 and 5.16 for IC 12.7 (second source for those two hole sizes; the other four are ISO 3364 only and marked one source). Only the first part of the file could be read.
 - **BenchMate's own choices:** how each shape is turned on the page; the section taken across the inscribed circle; the hole drawn as a dashed circle of 0.4 d where no table gives its size; chipbreakers, edge preparation and wiper flats not drawn.
 
+### Text engraving (`engrave`, `core/src/engrave.rs`, `data/fonts/hershey/`), accessed 2026-11-12
+- **Letters:** the Hershey fonts as SVG font files, copied unchanged from the Inkscape 1.2.2 package. Use notice and acknowledgements (Dr. A. V. Hershey; data format by James Hurt, Cognition, Inc.; SVG fonts prepared by Windell H. Oskay) are inside each file and in `data/fonts/hershey/README.md`. The same notice is on the Fedora licensing wiki, https://fedoraproject.org/wiki/Licensing/HersheyFontLicense . The README of the upstream collection (gitlab.com/oskay/svg-fonts) could not be read.
+- **Line width of a pointed cutter:** BenchMate geometry, checked against the FlatCAM wiki groove table (https://bitbucket.org/jpcgt/flatcam/wiki/V-Shaped_bits__Groove_Dimension_Tables : 60 degrees, 0.1 flat, 0.05 deep, 0.158) and the Calculator Academy chamfer example (https://calculator.academy/chamfer-diameter-calculator/ : 82 degrees, 5.0 to 9.4, 2.53 deep). Both are core tests.
+- **Program words:** as for the drilling cycles, see `docs/cycles.md`.
+- **BenchMate's own choices:** the height is measured on the capital H; curves in 10 pieces; text round a circle by angle = distance / radius; strokes inside a letter taken nearest end first. See `docs/engraving.md`.
+
 ### Publishers (all accessed 2026-11-10)
 - **[WALTER]** Walter AG, designation key Walter Turn cutting inserts. https://cdn2.walter-tools.com/files/a5ea48ae-5fa6-0161-3cb3-0ac22248a0fb/7f0801eb-595f-4dda-8f3c-cd3acbacc456/turning-designation-key-walter-turn-cutting-inserts-en-gb.pdf
 - **[MITSUBISHI]** Mitsubishi Materials, toolholder identification system. https://mitsubishicarbide.net/contents/mhg/de/html/product/product_guide/information/turning/bite_1.html

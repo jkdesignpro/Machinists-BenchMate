@@ -47,6 +47,7 @@ other calculator; the program layouts and wording are BenchMate's own.
 | Taper, groove, cut-off (G00/G01, G50, G96, G97, G41/G42) | yes [CIM-D][IMD-SYS] | yes [HFO-L] | not yet supported | not yet supported | not yet supported | not yet supported |
 | Keyway broaching (G00/G01, G98 or G94) | yes [CIM-D] | yes [HFO-L][HAAS-MW] | not yet supported | not yet supported | not yet supported | not yet supported |
 | G71/G70 rough and finish | yes, two-block [NPTEL][IMD-G71] | yes, one-block with D [HFO-L] | not yet supported | not yet supported | not yet supported | not yet supported |
+| Text engraving (G00/G01 only; see docs/engraving.md) | yes [FAN-M][CIM] | yes [HAAS-MW] | not yet supported | not yet supported | not yet supported | not yet supported |
 
 "Generic ISO 6983 / Fanuc-style" means the Fanuc-compatible word layout and,
 on lathes, G-code system A (G50 speed clamp, G92 threading cycle, G98/G99

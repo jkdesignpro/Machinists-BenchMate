@@ -125,6 +125,14 @@ function gsMachine(text) {
   return prof === 'L';
 }
 
+// Another tool hands a finished program over: it becomes the program in the editor.
+function gsOpenText(t) {
+  GS_TEXT = t; GS.step = -1;
+  try { localStorage.setItem('bm.gsim.text', t.length < 300000 ? t : ''); } catch (e) {}
+  if (GS_HIST.list.length && GS_HIST.list[GS_HIST.i] !== t) { GS_HIST.list = GS_HIST.list.slice(0, GS_HIST.i + 1); GS_HIST.list.push(t); GS_HIST.i = GS_HIST.list.length - 1; }
+  openTool('gsim');
+}
+
 function renderGsim(el, keep) {
   if (GS.timer) { clearInterval(GS.timer); GS.timer = null; }
   const inch = state.sys === 'inch', U = inch ? 'in' : 'mm';

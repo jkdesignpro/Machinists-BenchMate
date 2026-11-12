@@ -47,6 +47,15 @@ Stage 2 of the plan: drawings and editors. Built on top of 0.3.0.
 - **Linked on.** Buttons send the frame's values to the bonus and virtual condition calculator, the true position check and the unequal profile zone calculator, and open the datum explainer and the guide.
 - An invalid frame is still read box by box, under a warning that it has no defined meaning.
 
+### Added (text engraving)
+- **Text engraving** (Programming, Cycle generators): type a text, pick one of nine stroke letter styles (the Hershey fonts: sans, serif, italic, bold, script and Gothic English, single and double line), give the height of the capitals, and see the text to scale. On a straight line at any angle or round a circle with the letter tops outward or inward; start, middle or end on the position typed; letter width, letter space and line pitch; mirror image for a mould or a stamp. Accented letters and signs such as Ø, ° and ± are in the fonts; a letter a font does not have is named and left out.
+- **Results:** overall size and corners, letters, strokes (plunges), length engraved, length of the lifted moves, and the line width of a pointed cutter at the depth typed (tip flat + 2 x depth x tan of half the angle, checked against two published values).
+- **Program:** plain G00/G01 for Generic ISO / Fanuc-style and Haas, with the same warning header as the other generators, cycle time and the active machine check. Strokes inside a letter are taken nearest end first and joined where they carry on, so the cutter lifts less.
+- **Sent on:** Open in the simulator, Send to the sketcher, Save DXF (R2000 or R12). The DXF was opened in ezdxf in both forms with no errors and the same total length as the core reports.
+- The font files are shipped unchanged in `data/fonts/hershey` with their own use notice; the acknowledgements it asks for are printed on the page and in the README.
+- `benchmate-core`: new module `engrave` (SVG font reader, layout, stroke order, lengths, drawing) with 10 tests; `gcode::gen_engrave` with 2 golden programs and 3 more tests, one of which engraves every font and reads the program back in the simulator. wasm exports `engrave_font`, `engrave_layout`, `engrave_info`, `engrave_missing`, `engrave_program`, `engrave_dxf`, `engrave_v_width`, `engrave_v_depth`.
+- The G-code editor and simulator can now be handed a finished program by another page.
+
 ### Fixed
 - Insert designation: the type letter G (as in CNMG) showed no fixing hole, because no maker key that could be read printed it. ISO 3364 does.
 - DXF text strings: a caret in a text is written as caret and space, as the DXF reference asks, so it is not read as a control character.

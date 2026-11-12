@@ -1,6 +1,6 @@
 //! G-code program generators for drilling, tapping, thread milling, lathe
-//! threading, tapers, grooving and cut-off, keyway broaching and G71/G70
-//! profile roughing. Every program comes from a per-control dialect table;
+//! threading, tapers, grooving and cut-off, keyway broaching, G71/G70
+//! profile roughing and text engraving. Every program comes from a per-control dialect table;
 //! a cycle is only generated for a control whose syntax was confirmed from
 //! the maker's public manual or two independent public sources (see
 //! docs/cycles.md). Output is deterministic and covered by golden tests.
@@ -45,13 +45,14 @@ pub mod cyc {
     pub const GROOVE: u32 = 6;
     pub const BROACH: u32 = 7;
     pub const G71: u32 = 8;
+    pub const ENGRAVE: u32 = 9;
 }
 
 /// Whether a control has a confirmed generator for a cycle. Generic
 /// (Fanuc-style, G-code system A on lathes) and Haas only; everything else
 /// is "not yet supported" until its syntax is confirmed and recorded.
 pub fn supported(ctrl: Ctrl, cycle: u32) -> bool {
-    matches!(ctrl, Ctrl::Generic | Ctrl::Haas) && (1..=8).contains(&cycle)
+    matches!(ctrl, Ctrl::Generic | Ctrl::Haas) && (1..=9).contains(&cycle)
 }
 
 // ---------------------------------------------------------------------------
@@ -929,6 +930,97 @@ pub fn gen_g71(j: &G71Job) -> Program {
     b.warn.push("The roughing moves shown are BenchMate's model of G71; the control plans the real passes.".into());
     b.warn.push("F in the profile blocks (finish feed) is used by G70 only; G71 roughs at its own F.".into());
     b.done(table)
+}
+
+// ---------------------------------------------------------------------------
+// Mill: engraving along strokes (text from core/src/engrave.rs, or any open lines)
+
+#[derive(Clone, Debug)]
+pub struct EngraveJob {
+    pub metric: bool, pub ctrl: Ctrl, pub prog: u32, pub tool: u32, pub wcs: u32,
+    pub rpm: f64, pub feed: f64, pub plunge: f64,
+    /// Height above the surface for moves between strokes (Z0 is the surface).
+    pub z_safe: f64,
+    /// Depth of the engraving below the surface (a positive number).
+    pub depth: f64,
+    pub coolant: bool,
+    /// What is engraved, for the program header.
+    pub text: String,
+    /// Strokes in the XY plane; a stroke with one point is a dot.
+    pub strokes: Vec<Vec<(f64, f64)>>,
+}
+
+/// Points an engraving program may hold (keeps the text a size a control can load).
+pub const ENGRAVE_MAX_POINTS: usize = 50_000;
+
+/// Text that is safe inside a G-code comment: capitals, digits, space and a
+/// few signs; anything else (brackets above all) becomes a full stop.
+pub fn comment_text(s: &str, max: usize) -> String {
+    let t: String = s.chars().map(|c| if c == '\n' || c == '\r' || c == '\t' { ' ' } else { c })
+        .map(|c| c.to_ascii_uppercase())
+        .map(|c| if c.is_ascii_uppercase() || c.is_ascii_digit() || " .,-+/:=#*".contains(c) { c } else { '.' }).collect();
+    let t = t.split_whitespace().collect::<Vec<_>>().join(" ");
+    if t.chars().count() > max { let mut u: String = t.chars().take(max.saturating_sub(3)).collect(); u.push_str("..."); u } else { t }
+}
+
+/// Engraving program: for each stroke a rapid above its start, a plunge at
+/// the plunge feed, the stroke at the cutting feed and a rapid lift. Plain
+/// G00 and G01 moves only, so it reads the same on every control listed as
+/// supported. Z0 is the surface being engraved.
+pub fn gen_engrave(j: &EngraveJob) -> Program {
+    if !supported(j.ctrl, cyc::ENGRAVE) { return Program::err("This control is not yet supported for this program."); }
+    if j.strokes.is_empty() { return Program::err("Nothing to engrave."); }
+    let points: usize = j.strokes.iter().map(|s| s.len()).sum();
+    if points > ENGRAVE_MAX_POINTS { return Program::err("Too much to engrave in one program: shorten the text or split it."); }
+    if j.strokes.iter().flatten().any(|p| !p.0.is_finite() || !p.1.is_finite()) { return Program::err("The text position is not a number."); }
+    if !(j.rpm > 0.0) { return Program::err("Enter the spindle speed."); }
+    if !(j.feed > 0.0) { return Program::err("Enter the cutting feed."); }
+    if !(j.plunge > 0.0) { return Program::err("Enter the plunge feed."); }
+    if !(j.depth > 0.0) { return Program::err("Enter the depth of the engraving (a positive number)."); }
+    if !(j.z_safe > 0.0) { return Program::err("Enter the safe height above the surface for moves between letters."); }
+    let dp = if j.metric { 3 } else { 4 };
+    let k = 10f64.powi(dp);
+    // The program holds rounded numbers; the moves use the same ones.
+    let q = |v: f64| (v * k).round() / k;
+    let strokes: Vec<Vec<(f64, f64)>> = j.strokes.iter().map(|s| {
+        let mut out: Vec<(f64, f64)> = Vec::with_capacity(s.len());
+        for p in s { let r = (q(p.0), q(p.1)); if out.last() != Some(&r) { out.push(r); } }
+        out
+    }).filter(|s| !s.is_empty()).collect();
+    let (zs, zd) = (q(j.z_safe), -q(j.depth));
+    if zd == 0.0 { return Program::err("The depth is too small to show in the program."); }
+    let (x0, y0) = strokes[0][0];
+    let mut b = B::new(j.metric, j.ctrl, false, [x0, y0, zs]);
+    let mut notes = vec![format!("T{} - {} STROKES - DEPTH {} - SAFE Z{}", j.tool, strokes.len(), b.n(-zd), b.n(zs))];
+    let t = comment_text(&j.text, 48);
+    if !t.is_empty() { notes.push(format!("TEXT: {}", t)); }
+    notes.push("Z0 = THE SURFACE BEING ENGRAVED".into());
+    b.header(j.prog, "ENGRAVE", &notes);
+    b.l(format!("{} G17 G40 G49 G80 G90", b.units_line()));
+    b.l(format!("T{} M06", j.tool));
+    b.l(format!("G00 G{} X{} Y{}", j.wcs, b.n(x0), b.n(y0)));
+    b.l(format!("S{} M03", j.rpm.round() as i64));
+    b.rpm(j.rpm);
+    b.l(format!("G43 H{} Z{}{}", j.tool, b.n(zs), if j.coolant { " M08" } else { "" }));
+    for (i, s) in strokes.iter().enumerate() {
+        let (x, y) = s[0];
+        if i > 0 { b.l(format!("G00 X{} Y{}", b.n(x), b.n(y))); b.rapid_to(x, y, zs); }
+        b.l(format!("G01 Z{} F{}", b.n(zd), b.feed(j.plunge)));
+        b.feed_to(x, y, zd, j.plunge);
+        for (n, p) in s.iter().enumerate().skip(1) {
+            b.l(if n == 1 { format!("X{} Y{} F{}", b.n(p.0), b.n(p.1), b.feed(j.feed)) } else { format!("X{} Y{}", b.n(p.0), b.n(p.1)) });
+            b.feed_to(p.0, p.1, zd, j.feed);
+        }
+        b.l(format!("G00 Z{}", b.n(zs)));
+        let pos = b.pos; b.rapid_to(pos[0], pos[1], zs);
+    }
+    if j.coolant { b.l("M09"); }
+    b.l("M05");
+    b.l("G91 G28 Z0.");
+    b.l("G90");
+    b.footer();
+    b.warn.push("Z0 must be set on the surface being engraved. The depth is small, so an uneven or tilted surface shows: skim it, or use a spring-loaded engraving holder.".into());
+    b.done(vec![])
 }
 
 // ---------------------------------------------------------------------------

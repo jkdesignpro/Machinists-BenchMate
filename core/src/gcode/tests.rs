@@ -94,7 +94,7 @@ fn drill(metric: bool, ctrl: Ctrl, cycle: u32) -> DrillJob {
     for c in [Ctrl::Mitsubishi, Ctrl::Siemens, Ctrl::Heidenhain, Ctrl::Okuma] {
         let p = gen_drill(&drill(true, c, 81));
         assert!(p.error.is_some() && p.text.is_empty());
-        for k in 1..=8 { assert!(!supported(c, k)); }
+        for k in 1..=9 { assert!(!supported(c, k)); }
     }
 }
 
@@ -250,4 +250,81 @@ fn g71job(ctrl: Ctrl) -> G71Job {
     let mut j = drill(true, Ctrl::Generic, 83);
     j.holes = vec![(50.0, 0.0), (0.0, 50.0), (-50.0, 0.0), (0.0, -50.0)];
     assert_eq!(a.text, gen_drill(&j).text);
+}
+
+// ---- Text engraving ----
+
+fn hershey(name: &str) -> crate::engrave::Font {
+    let path = format!("{}/../data/fonts/hershey/{}.svg", env!("CARGO_MANIFEST_DIR"), name);
+    crate::engrave::Font::parse_svg(&std::fs::read_to_string(&path).unwrap_or_else(|_| panic!("missing font {path}"))).unwrap()
+}
+
+fn engrave(metric: bool, ctrl: Ctrl, text: &str) -> EngraveJob {
+    use crate::engrave::{layout, Opts};
+    let f = hershey("HersheySans1");
+    let o = Opts { cap_h: if metric { 5.0 } else { 0.2 }, spacing: 0.0, line: 0.0, stretch: 1.0, align: 0, mode: 0, x: if metric { 10.0 } else { 0.5 }, y: if metric { 20.0 } else { 1.0 }, angle: 0.0, radius: 0.0, mirror: false };
+    let l = layout(&f, text, &o).unwrap();
+    EngraveJob { metric, ctrl, prog: 7, tool: 12, wcs: 54, rpm: 12000.0, feed: if metric { 300.0 } else { 12.0 }, plunge: if metric { 100.0 } else { 4.0 },
+        z_safe: if metric { 2.0 } else { 0.1 }, depth: if metric { 0.15 } else { 0.006 }, coolant: true, text: text.to_string(), strokes: l.strokes }
+}
+
+#[test] fn engrave_generic_mm() { golden("engrave_generic_mm", &gen_engrave(&engrave(true, Ctrl::Generic, "L20 (A)"))); }
+#[test] fn engrave_haas_inch() { golden("engrave_haas_inch", &gen_engrave(&engrave(false, Ctrl::Haas, "Hi"))); }
+
+#[test] fn engrave_program_shape_and_time() {
+    // One stroke by hand: an L, 7 down and 3 across, 0.2 deep, safe height 2.
+    let j = EngraveJob { metric: true, ctrl: Ctrl::Generic, prog: 1, tool: 1, wcs: 54, rpm: 8000.0, feed: 300.0, plunge: 100.0, z_safe: 2.0, depth: 0.2, coolant: false,
+        text: "L".into(), strokes: vec![vec![(0.0, 7.0), (0.0, 0.0), (3.0, 0.0)], vec![(10.0, 0.0)]] };
+    let p = gen_engrave(&j);
+    assert!(p.error.is_none());
+    let body: Vec<&str> = p.text.lines().skip_while(|l| !l.starts_with("G43")).collect();
+    assert_eq!(body, vec!["G43 H1 Z2.0", "G01 Z-0.2 F100.0", "X0.0 Y0.0 F300.0", "X3.0 Y0.0", "G00 Z2.0", "G00 X10.0 Y0.0", "G01 Z-0.2 F100.0", "G00 Z2.0", "M05", "G91 G28 Z0.", "G90", "M30", "%"]);
+    // feed time: two plunges of 2.2 at 100 and 10 of cutting at 300; rapids: two lifts of 2.2 and 7 across
+    let (tf, tr, td) = p.time(6000.0);
+    assert!((tf - (2.0 * 2.2 / 100.0 + 10.0 / 300.0) * 60.0).abs() < 1e-9);
+    assert!((tr - (2.0 * 2.2 + 7.0) / 6000.0 * 60.0).abs() < 1e-9);
+    assert_eq!(td, 0.0);
+    assert_eq!((p.max_rpm, p.max_feed), (8000.0, 300.0));
+    assert_eq!(p.start, [0.0, 7.0, 2.0]);
+}
+
+#[test] fn engrave_refusals_and_comment_text() {
+    let ok = engrave(true, Ctrl::Generic, "A");
+    assert!(gen_engrave(&ok).error.is_none());
+    for f in [|j: &mut EngraveJob| j.rpm = 0.0, |j: &mut EngraveJob| j.feed = 0.0, |j: &mut EngraveJob| j.plunge = f64::NAN, |j: &mut EngraveJob| j.depth = 0.0,
+              |j: &mut EngraveJob| j.depth = 0.0001, |j: &mut EngraveJob| j.z_safe = 0.0, |j: &mut EngraveJob| j.strokes.clear(), |j: &mut EngraveJob| j.ctrl = Ctrl::Siemens,
+              |j: &mut EngraveJob| j.strokes[0][0].0 = f64::NAN] {
+        let mut j = ok.clone(); f(&mut j);
+        let p = gen_engrave(&j);
+        assert!(p.error.is_some() && p.text.is_empty());
+    }
+    // a bracket inside a comment would end it early: never passed through
+    assert_eq!(comment_text("Part (rev B)\n10mm ø", 48), "PART .REV B. 10MM .");
+    assert_eq!(comment_text(&"A".repeat(60), 10), "AAAAAAA...");
+    let p = gen_engrave(&engrave(true, Ctrl::Generic, "L20 (A)"));
+    assert!(p.text.contains("(TEXT: L20 .A.)"));
+    for l in p.text.lines().filter(|l| l.starts_with('(')) { assert_eq!(l.matches('(').count(), 1, "{l}"); assert!(l.ends_with(')')); }
+}
+
+#[test] fn every_hershey_font_reads_and_engraves() {
+    use crate::engrave::{bbox, layout, Opts};
+    for name in ["HersheySans1", "HersheySansMed", "HersheySerifMed", "HersheySerifMedItalic", "HersheySerifBold", "HersheySerifBoldItalic", "HersheyScript1", "HersheyScriptMed", "HersheyGothEnglish"] {
+        let f = hershey(name);
+        assert!(f.name.starts_with("Hershey"), "{name}: {}", f.name);
+        // capitals are 21 Hershey units of 31.5: 661.5, written as 662
+        assert!((f.cap - 662.0).abs() < 1e-9, "{name}: cap {}", f.cap);
+        for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,-+/()#%:=\u{b0}\u{b1}\u{d8}".chars() {
+            assert!(f.glyphs.get(&c).map(|g| !g.strokes.is_empty()) == Some(true), "{name}: no letter {c:?}");
+        }
+        let o = Opts { cap_h: 5.0, spacing: 0.0, line: 0.0, stretch: 1.0, align: 0, mode: 0, x: 0.0, y: 0.0, angle: 0.0, radius: 0.0, mirror: false };
+        let l = layout(&f, "MADE IN UK 0123456789", &o).unwrap();
+        assert!(l.missing.is_empty());
+        let b = bbox(&l.strokes).unwrap();
+        // capitals and digits stand on the baseline and reach the cap height (script and gothic capitals may swing a little past it)
+        assert!(b.0.abs() < 1e-9 && b.1 > -1.6 && b.1 <= 1e-9 && b.3 >= 5.0 - 1e-9 && b.3 < 6.6, "{name}: {b:?}");
+        let j = EngraveJob { metric: true, ctrl: Ctrl::Generic, prog: 1, tool: 1, wcs: 54, rpm: 10000.0, feed: 300.0, plunge: 100.0, z_safe: 2.0, depth: 0.1, coolant: false, text: "X".into(), strokes: l.strokes };
+        let p = gen_engrave(&j);
+        assert!(p.error.is_none(), "{name}");
+        backplot_agrees(name, &p);
+    }
 }
