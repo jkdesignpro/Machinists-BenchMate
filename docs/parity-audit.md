@@ -70,6 +70,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.6.0, tenth batch, 2026-11-12):** cutting tools guide (`cutguide`: kinds of milling cutter, tool materials ranked, twist drill terms, files and filing, broaches, boring tools). MH101, MH103, MH109, MH113, MH129 and BB64 done; MH105 and MH128 from missing to partial. Counted from the tables below: 333 done, 176 partial, 87 missing of 596 in-scope rows, 56 %. For 90 %, 204 more rows have to reach done.
 
+**Update (0.6.0, eleventh batch, 2026-11-12):** bearings and seals guide (`bearguide`: bearing types, bearing numbers, tolerance classes, shaft and housing fits, mounting, radial shaft seals, threadlocker colours). MH283, MH284, ED66, ED67 and ED71 done (MH283 and MH284 were missing); MH293 and BB59 from missing to partial. Counted from the tables below: 338 done, 175 partial, 83 missing of 596 in-scope rows, 57 %. For 90 %, 199 more rows have to reach done.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -653,8 +655,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | MH281 | Plain bearings: types, design, lubrication | out of scope? | | Design rather than machining |
 | MH282 | Plain bearings: machining bores, hardness and finish; bearing materials | missing | | |
-| MH283 | Rolling bearings: types, designation, tolerances | missing | | |
-| MH284 | Shaft and housing fits for bearings; mounting | missing | | |
+| MH283 | Rolling bearings: types, designation, tolerances | done | `bearguide` | 0.6.0: nine types with what each carries, bearing numbers (type code, series, bore number, suffixes), tolerance classes ISO, DIN and ABEC; no tolerance tables |
+| MH284 | Shaft and housing fits for bearings; mounting | done | `bearguide` | 0.6.0: which ring gets the tight fit, classes named by the sources for four cases, effects of loose and tight fits, C3, checking the seats; mounting cold and with heat, temperature limits; limits of each class in `fits` |
 | MH285 | Bearing load ratings and life (L10) | partial | `bearinglife` | ISO 281 basic rating life L10 and equivalent load with your X and Y; no modified life (aISO) or static safety factor |
 | MH286 | Lubrication theory, lubricants, contamination | out of scope? | | |
 | MH287 | Couplings, clutches, brakes | out of scope? | | Cutting clutch teeth is the only machining part |
@@ -663,7 +665,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH290 | Transmission chains and sprockets | partial | `chaindrive` | 0.6.0: chain length in pitches (even), centre distance, pitch by ANSI chain number, sprocket pitch diameters, wrap; no load ratings or tooth form |
 | MH291 | Ball and ACME leadscrews | missing | | |
 | MH292 | Electric motors | missing | | |
-| MH293 | Adhesives and sealants, retaining compounds, threadlocking | missing | | |
+| MH293 | Adhesives and sealants, retaining compounds, threadlocking | partial | `bearguide` | 0.6.0: threadlocker colours, strength, fastener size, taking apart, cure and application (cure and application one source, marked); no retaining compound selection, no sealants or structural adhesives |
 | MH294 | O-rings and glands | partial | `oring` | AS568 sizes and a squeeze, stretch and fill check; no ISO 3601-1 G series, no -9xx sizes, no back-up rings |
 | MH295 | Rolled steel sections, aluminium structural shapes | missing | | |
 | MH296 | Wire and sheet metal gauges | done | `gauges` | 0.6.0: sheet gauges for steel, galvanized, stainless, aluminium and US Standard; AWG by its rule, SWG, tube wall series |
@@ -752,12 +754,12 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED63 | 12.14 Material traceability and documentation (certificates) | done | `matguide` | 0.6.0: EN 10204 types 2.1 to 3.2, what is on a certificate, checking the heat number |
 | ED64 | 12.15 Corrosion | done | `galvanic`, `matguide` | 0.6.0: eight forms of corrosion; galvanic check in `galvanic` |
 | ED65 | 13.1 Screw fasteners | partial | `bolttorque`, `boltgrade` | Torque, preload and grades; no joint stiffness or fatigue |
-| ED66 | 13.2 Bearings | partial | `bearinglife` | Rating life only |
-| ED67 | 13.3 Ball and roller bearings | partial | `bearinglife` | Rating life only; no types, designations or fits |
+| ED66 | 13.2 Bearings | done | `bearinglife`, `bearguide` | Rating life in `bearinglife`; 0.6.0: types, fits and mounting |
+| ED67 | 13.3 Ball and roller bearings | done | `bearinglife`, `bearguide` | Rating life in `bearinglife`; 0.6.0: types, designations, tolerance classes and fits |
 | ED68 | 13.4 Bearing lifetime | done | `bearinglife` | Basic rating life L10 (`claude/fasteners`) |
 | ED69 | 13.5 Coefficient of friction | missing | | |
 | ED70 | 13.6 Gear trains | done | `geartrain` |  |
-| ED71 | 13.7 Seals | partial | `oring` | O-rings only |
+| ED71 | 13.7 Seals | done | `oring`, `bearguide` | O-ring glands in `oring`; 0.6.0: radial shaft seals (shaft roughness, lead, hardness, housing bore, fitting; mostly one source, marked). No mechanical face seals |
 | ED72 | 13.8 Shaft couplings | out of scope? | | |
 | ED73 | 13.9 Cam mechanisms | missing | | |
 | ED74 | 13.10 Clutches | out of scope? | | |
@@ -844,7 +846,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB56 | Workshop metals | done | `materials`, `matguide` | 0.6.0: families of steel, cast iron, stainless and non-ferrous metals in the materials guide |
 | BB57 | Workpiece material comparison table | done | `materials` | |
 | BB58 | Engineering plastics | partial | `materials` | 5 plastics |
-| BB59 | Engineering adhesives | missing | | |
+| BB59 | Engineering adhesives | partial | `bearguide` | 0.6.0: threadlocker colours, strength, removal, cure and application; no structural adhesives, retaining compound selection or sealants |
 | BB60 | Grinding wheels: markings, specs, shapes, faces | done | `shoptools`, `wheelcode` | Markings decoded; eight shapes by type number with a drawing of six, the face of the wheel, choice of abrasive, grit and grade |
 | BB61 | Mounted wheels and points | missing | | |
 | BB62 | Tungsten carbide burrs | done | `shoptools` | Cuts and what each is for; speeds by size from two makers, which differ and are both shown |

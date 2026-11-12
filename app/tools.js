@@ -3419,6 +3419,13 @@ const TOOLS = [
   source: 'Cutting Tool Engineering, American Machinist, MachineMfg and Wikipedia (milling cutters); CNCCookbook and AIMS Industrial (tool materials); TTE and The Engineers Post (twist drills); USDA Forest Service and Crescent Nicholson (files); American Machinist, Wikipedia and Engineers Edge (broaching); American Machinist and Cutting Tool Engineering (boring). Full list in docs/sources.md, "Cutting tools guide".',
 },
 {
+  id: 'bearguide', level: 'advanced', group: 'Guides', title: 'Bearings and seals guide',
+  desc: 'Rolling bearings for the person who fits them: what each type carries, how to read a bearing number and its suffixes (2RS, ZZ, C3), tolerance classes (P0 to P2, ABEC), which ring gets the tight fit, mounting cold and with heat, what a radial shaft seal asks of the shaft, and the threadlocker colours.',
+  render: el => renderBearGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'Reliability Solutions, RapidDirect and NSK (types); JTEKT Koyo, NSK, a college hand-out and Southern Cross Bearings (numbers); Wikipedia and NSK (tolerance classes); NHBB, NRB, MinebeaMitsumi and TFL (fits); Processing Magazine, Fabrico and Schaeffler (mounting); Seals-Shop and the University of Stuttgart (shaft seals); Permabond and Fastener Engineering (threadlockers). Full list in docs/sources.md, "Bearings and seals guide".',
+},
+{
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
   desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
   render: el => renderGlossary(el),

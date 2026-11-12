@@ -2016,6 +2016,33 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
   }
+  where = 'bearguide';
+  g = await guide('bearguide');
+  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '10,10,14,6,5,5' || g.srcs !== 21) problems.push(`[${where}] 8 sections, 3 drawings, tables of 9, 9, 13, 5, 4 and 4 rows, 21 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 57) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Thrust bearings take no radial load', 'How it is built', 'Bore number', 'The four small ones', 'Below 10 mm', 'The example above', 'Medium series', 'Makers differ', 'Which way they run', 'The rule', 'The usual case', 'Too loose', 'Too tight', 'When to ask for C3', 'Leave it wrapped', 'Where to push', 'Press, not hammer', 'How large for cold mounting', 'How hot', 'Never hotter than', 'Sealed and greased bearings', 'No oil bath', 'No flame', 'Induction heaters', 'Roughness', 'Rz, sources differ', 'No spiral'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  // Three NSK documents count as one publisher.
+  for (const k of ['Balls or rollers', 'Axial load, one way or both', 'Odd and large bores', 'Series digit', 'Inch bearings', 'What a class controls', 'What it does not', 'Normal is enough', 'Light, normal, heavy', 'Aluminium housings', 'Check the seats', 'The lower limit, in figures', 'Oil bath', 'Once it is hot', 'Plunge grinding', 'Hardness', 'Housing bore', 'How it sets', 'Colours are a habit'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/Mainly radial load High speeds; tolerates little misalignment/.test(row('Deep groove ball')) || !/Axial load only/.test(row('Thrust ball')) || !/The one thrust bearing that also takes radial load/.test(row('Spherical roller thrust'))) problems.push(`[${where}] type rows: ${row('Deep groove ball')} | ${row('Thrust ball')}`);
+    if (!/^6 Single-row deep groove ball bearing/.test(row('6 ')) || !/^7 Single-row angular contact ball bearing/.test(row('7 ')) || !/^NA Needle roller bearing/.test(row('NA ')) || !/Contact rubber seal on one side, on both sides KOYO/.test(row('RS, 2RS')) || !/Internal clearance larger than normal/.test(row('C3 '))) problems.push(`[${where}] code and suffix rows: ${row('6 ')} | ${row('RS, 2RS')} | ${row('C3 ')}`);
+    if (!/^Normal P0 ABEC 1/.test(row('Normal')) || !/^Class 4 P4 ABEC 7/.test(row('Class 4')) || !/^Class 2 P2 ABEC 9/.test(row('Class 2'))) problems.push(`[${where}] class rows: ${row('Normal')} | ${row('Class 4')}`);
+    if (!/Tight on the shaft k6 or m6 \(NRB\); j5, k5, m5 or m6 \(TFL\)/.test(row('Inner ring turns with the shaft')) || !/Sliding fit in the housing H7/.test(row('Outer ring stands still')) || !/N6 \(NHBB\)/.test(row('Outer ring turns'))) problems.push(`[${where}] fit rows: ${row('Inner ring turns with the shaft')} | ${row('Outer ring turns')}`);
+    if (!/^Blue Medium Up to 3\/4 in With hand tools/.test(row('Blue')) || !/above 550 °F/.test(row('Red'))) problems.push(`[${where}] threadlocker rows: ${row('Blue')} | ${row('Red')}`);
+    const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
+    if (fl !== 'K DB,') problems.push(`[${where}] only the K and DB, DF, DT rows have one publisher: ${fl}`);
+  }
+  if (!/04 is 20 mm, 05 is 25 mm/.test(g.all) || !/00 is 10 mm, 01 is 12 mm, 02 is 15 mm and 03 is 17 mm/.test(g.all) || !/05 times 5 is a 25 mm bore/.test(g.all) || !/120 °C by Schaeffler and Fabrico; Processing Magazine gives 125 °C \(257 °F\)/.test(g.all) || !/about 100 to 110 °C in a workshop at 20 °C/.test(g.all) || !/Ra 0\.2 to 0\.8 micrometres, with Rmax no more than 6\.3/.test(g.all) || !/55 HRC \(600 HV\), hardened at least 0\.3 mm deep/.test(g.all) || !/10 micrometres in ABEC 1, 7 in ABEC 3, 4 in ABEC 5, 2\.5 in ABEC 7 and 1\.5 in ABEC 9/.test(g.all)) problems.push(`[${where}] figures from the sources`);
+  {
+    const d = await page.$$eval('#main svg.geo', s => s.map(e => e.textContent.replace(/\s+/g, ' ')));
+    if (!/6205-2RS C3/.test(d[0]) || !/= 25 mm/.test(d[0]) || !/sliding fit, the ring stands still/.test(d[1]) || !/tight fit, the ring turns/.test(d[1]) || !/sleeve on the ring being fitted/.test(d[2]) || !/the force crosses the balls/.test(d[2])) problems.push(`[${where}] drawings: ${d.map(t => t.slice(0, 40)).join(' | ')}`);
+    const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
+    if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
+  }
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);
