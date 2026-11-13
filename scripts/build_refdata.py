@@ -784,7 +784,46 @@ def build_symbols():
         greek.append({'name': name, 'upper': up, 'lower': lo, 'publishers': by, 'used': ev['greek_used'].get(name, ''),
                       'status': 'confirmed' if len(by) >= 2 else 'review'})
     if len(greek) != 24: raise SystemExit('symbols: expected 24 Greek letters')
-    return {'sources': sources_of(ev), 'prefixes': prefixes, 'constants': constants, 'greek': greek}
+    # SI base units and the 22 derived units with special names: confirmed when two publishers print the same name and symbol
+    # (metre and meter count as the same word) and, for derived units, the same expression in other SI units.
+    srcs = ev['sources']
+    def said(keys):
+        for k in keys:
+            if k not in srcs: raise SystemExit(f'symbols: unknown source {k}')
+        n = len({srcs[k]['publisher'] for k in keys})
+        return 'confirmed' if n >= 2 else 'review' if n == 1 else 'unverified'
+    spell = lambda n: n.replace('meter', 'metre')
+    bpubs = list(ev['base_units'])
+    base = []
+    for q, name, sym in ev['base_units'][bpubs[0]]:
+        printed = {p: [n2, s2] for p in bpubs for q2, n2, s2 in ev['base_units'][p] if q2 == q}
+        same = len({(spell(n2), s2) for n2, s2 in printed.values()}) == 1
+        base.append({'quantity': q, 'name': spell(name), 'sym': sym, 'printed': printed, 'status': 'confirmed' if len(printed) >= 2 and same else 'review'})
+    if len(base) != 7: raise SystemExit('symbols: expected 7 SI base units')
+    dpubs = list(ev['derived_units'])
+    derived = []
+    for q, name, sym, other in ev['derived_units'][dpubs[0]]:
+        printed = {p: [n2, o2] for p in dpubs for q2, n2, s2, o2 in ev['derived_units'][p] if s2 == sym}
+        same = len({tuple(v) for v in printed.values()}) == 1
+        derived.append({'quantity': q, 'name': name, 'sym': sym, 'other': other, 'base': ev['derived_base'].get(sym, ''),
+                        'publishers': list(printed), 'status': 'confirmed' if len(printed) >= 2 and same else 'review'})
+    if len(derived) != 22: raise SystemExit('symbols: expected 22 derived units with special names')
+    for d in derived:
+        if not d['other'] and not d['base']: raise SystemExit(f"symbols: {d['sym']} has no expression")
+    def rows(sec, n):
+        out = []
+        for r in ev[sec]:
+            status = said(r[n])
+            if len(r) > n + 1:
+                if r[n + 1] != 'differs' or status != 'confirmed': raise SystemExit(f'symbols {sec} {r[0]}: a differing row needs two publishers')
+                status = 'differs'
+            out.append(r[:n] + [r[n], status, r[n + 2] if len(r) > n + 2 else ''])
+        return out
+    systems = [{'topic': a, 'text': b, 'src': s, 'status': st} for a, b, s, st, _ in rows('systems', 2)]
+    signs = [{'sign': a, 'meaning': b, 'src': s, 'status': st} for a, b, s, st, _ in rows('signs', 2)]
+    quantities = [{'quantity': a, 'sym': b, 'unit': c, 'src': s, 'status': st, 'who': who} for a, b, c, s, st, who in rows('quantities', 3)]
+    return {'sources': sources_of(ev), 'prefixes': prefixes, 'constants': constants, 'greek': greek,
+            'base': base, 'derived': derived, 'systems': systems, 'signs': signs, 'quantities': quantities}
 
 
 def build_tooling():

@@ -132,8 +132,10 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Machine elements | Taper pins, inch series (book row MH214) | partial (one publisher for the sizes, marked; no other pin types) | `taperpin` | |
 | Machine elements | Belt and chain drives (book rows MH289, MH290, BB46) | done for geometry (belt length exact and short, centre distance from a length, chain length in even pitches, sprocket pitch diameters, ratio, wrap); belt sections and power ratings missing | `beltdrive`, `chaindrive` | |
 | Shop | SI prefixes, defining constants, Greek alphabet (book rows MH300, MH301, ED2) | done (each entry printed the same by two publishers) | `symbols` | |
+| Shop | Systems of units, SI base and derived units, mathematical signs, letters for quantities | done (ours, 0.7.0; rows on one publisher and rows where publishers differ are marked) | `symbols` | MH300, ED3 |
+| Shop maths | Algebra in the formula library (quadratic formula, powers, logarithms, factoring) | done (ours, 0.7.0; two publishers, two entries on one) | `formulas` | ED7 |
 | Shop | Home dashboard | done (widgets, reorder and resize) | `dashboard.js` | U107 |
-| Shop | Decimal precision, reorderable menu | partial (more and fewer decimals per calculator, remembered; no global setting. Home widgets can be rearranged; the tool lists and the rail cannot) | `app.js`, `dashboard.js` | U105, U108 |
+| Shop | Decimal precision, reorderable menu | partial (more and fewer decimals per calculator, remembered, and since 0.7.0 one setting for all calculators in the display menu. Home widgets can be rearranged; the tool lists and the rail cannot) | `app.js`, `dashboard.js` | U105, U108 |
 | Platform | Inch/metric toggle | done | `app.js` | U104 |
 | Platform | Offline, web/desktop link | partial (local web app; no installable offline build) | | U110, U111 |
 | Platform | Mobile apps, languages | missing (later phase) | | U112, U113 |

@@ -415,7 +415,7 @@ function mountTool(host, t, opts) {
   const fields = t.fields(sys);
   const key = t.id + ':' + sys;
   const saved = state.vals[key] || (state.vals[key] = {});
-  const dpKey = 'bm.dp.' + t.id; let dpAdj = +lsGet(dpKey) || 0;
+  const dpKey = 'bm.dp.' + t.id; let dpOwn = +lsGet(dpKey) || 0, dpAdj = dpTotal(dpOwn);   // this calculator's own choice plus the setting for all calculators
   host.innerHTML = '<div class="tg' + (mini ? ' mini' : '') + '"><section class="pane inputs">' + (mini ? '' : '<h2>Inputs</h2>') + (!mini && t.pick && (state.mode !== 'simple' || ToolLib.all().length) ? toolPickRow(t.pick) : '') +
     '<div class="grid"></div></section><section class="pane results"><div class="res" id="' + (mini ? '' : 'res') + '"></div><div class="tdia"></div></section></div>';
   const grid = $('.grid', host), res = $('.res', host), dia = $('.tdia', host);
@@ -560,7 +560,7 @@ function mountTool(host, t, opts) {
       fields.forEach(f => { const e = els[f.id].inp, x = e.dataset.def !== undefined ? e.dataset.def : e.value; if (x !== '' && x !== undefined) q.set(f.id, x); });
       pairs.forEach(p => q.set('_src_' + p.a, src[p.a + p.b]));
       return q.toString(); },
-    decimals: d => { dpAdj = Math.max(-3, Math.min(4, dpAdj + d)); lsSet(dpKey, String(dpAdj)); update(); },
+    decimals: d => { dpOwn = Math.max(-3, Math.min(4, dpOwn + d)); lsSet(dpKey, String(dpOwn)); dpAdj = dpTotal(dpOwn); update(); },
     reset: () => { Object.keys(saved).forEach(k => delete saved[k]); saveVals(); mountToolAgain(); },
     copy: () => { if (last.length) copyText(text()); else toast('Nothing to copy yet'); },
     pin: () => { if (!last.length) { toast('Nothing to pin yet'); return; } const h = last[0];
@@ -629,6 +629,10 @@ function applyCompact() {
 function setCompact(p) { state.compactPref = p; lsSet('bm.compact', p); applyCompact(); }
 if (['on', 'off', 'auto'].includes(lsGet('bm.compact'))) state.compactPref = lsGet('bm.compact');
 
+// Decimal places for all calculators: a shift of -1 to +2 places, kept under bm.dpall and added to each calculator's own choice.
+function dpAllPref() { const n = +lsGet('bm.dpall'); return [-1, 0, 1, 2].includes(n) ? n : 0; }
+function dpTotal(own) { return Math.max(-3, Math.min(4, (own || 0) + dpAllPref())); }
+
 function initMenu() {
   const btn = $('#menubtn'), pop = $('#menupop');
   const seg = (id, opts, cur) => '<div class="seg" id="' + id + '">' + opts.map(([v, l]) => '<button data-v="' + v + '"' + (v === cur ? ' class="on"' : '') + '>' + l + '</button>').join('') + '</div>';
@@ -637,6 +641,7 @@ function initMenu() {
       '<div class="mrow macc"><span>Accent colour</span><div class="swatches" id="maccent">' +
       ACCENTS.map(([c, n]) => '<button data-c="' + c + '" title="' + n + (c === ACCENT_DEFAULT ? ' (standard)' : '') + '" aria-label="' + n + ' accent" style="background:' + c + '"' + (c === accentPref() ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"') + '></button>').join('') +
       '<label class="swpick' + (ACCENTS.some(([c]) => c === accentPref()) ? '' : ' on') + '" title="Pick any colour"><input type="color" id="maccentpick" value="' + accentPref() + '" aria-label="Pick any accent colour">' + icon('theme') + '</label></div></div>' +
+      '<div class="mrow" title="Fewer or more decimal places on every calculator, on top of each calculator\'s own setting"><span>Decimal places</span>' + seg('mdp', [['-1', '−1'], ['0', 'Std'], ['1', '+1'], ['2', '+2']], String(dpAllPref())) + '</div>' +
       '<div class="mrow"><span>Compact view</span>' + seg('mcompact', [['auto', 'Auto'], ['on', 'On'], ['off', 'Off']], state.compactPref) + '</div>' +
       '<div class="mrow narrowonly"><span>Mode</span>' + seg('mmode', MODES.map(m => [m, MODE_NAME[m]]), state.mode) + '</div>' +
       '<div class="mrow narrowonly"><span>Units</span>' + seg('munits', [['inch', 'inch'], ['mm', 'mm']], state.sys) + '</div>' +
@@ -649,6 +654,7 @@ function initMenu() {
     $$('#maccent button', pop).forEach(b => b.onclick = () => { accent(b.dataset.c); paint(); });
     $('#maccentpick', pop).oninput = e => accent(e.target.value);
     $('#maccentpick', pop).onchange = () => paint();
+    $$('#mdp button', pop).forEach(b => b.onclick = () => { lsSet('bm.dpall', b.dataset.v); paint(); if (state.route.kind !== 'home') renderMain(); });
     $$('#mcompact button', pop).forEach(b => b.onclick = () => { setCompact(b.dataset.v); paint(); });
     $$('#mmode button', pop).forEach(b => b.onclick = () => { setMode(b.dataset.v); paint(); });
     $$('#munits button', pop).forEach(b => b.onclick = () => { setUnits(b.dataset.v); paint(); });

@@ -96,6 +96,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, sixth batch, 2026-11-13):** binomial and Poisson calculator (`distrib`), "Working out coordinates" in the CNC guide, families of plastics on the plastics page. ED81, MH174, BB58 and ED62 from partial to done (BB58's note was out of date: it still counted 5 plastics). MH66 stays partial (no design data). Counted from the tables below: 389 done, 159 partial, 48 missing of 596 in-scope rows, 65 %; 148 more rows to done for the 90 % target.
 
+**Update (0.7.0, seventh batch, 2026-11-13):** units, signs and letters for quantities on the symbols page, algebra in the formula library, a decimal places setting for all calculators, second and third sources for broken tap removal. MH300, ED3, ED7, U105, BB13 and MH252 from partial to done; ED10 done on re-audit (its section belongs to the drawing chapter, and the app lists 65 drawing abbreviations). Counted from the tables below: 396 done, 152 partial, 48 missing of 596 in-scope rows, 66 %; 141 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -329,7 +331,7 @@ Store list is the fuller of the two store lists.
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | U104 | Inch/metric toggle | done | `app.js` |  |
-| U105 | Adjustable decimal precision | partial | `app.js` | More and fewer decimal places on each calculator (remembered per tool); no single global precision setting |
+| U105 | Adjustable decimal precision | done | `app.js` | More and fewer decimal places on each calculator (remembered per tool); 0.7.0: one setting for all calculators in the display menu |
 | U106 | Favourites | done | `app.js` (star button, Home widget) |  |
 | U107 | Home dashboard | done | `dashboard.js` |  |
 | U108 | Arrange menu (reorder) | partial | `dashboard.js` | Home widgets can be reordered and resized; the tool lists and the rail cannot be rearranged |
@@ -638,7 +640,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | partial | `advtap`, `toolguide` | Tap types and tapping speed (one publisher); no rake angles or lubricants |
 | MH250 | Tap drill diameter, percentage of thread, cold form tapping | done | `tapdrill` | |
 | MH251 | Tap and clearance drills; tolerances of tapped holes | done | `tapdrill`, `threaddata`, `clearance` | Clearance holes added in `clearance` (`claude/fasteners`) |
-| MH252 | Removing a broken tap | partial | `toolguide` | Summary only |
+| MH252 | Removing a broken tap | done | `toolguide` | 0.7.0: extractor, breaking up, EDM, drilling out, chemical, welding and prevention, each with two or three publishers |
 | MH253 | Tap drills and power for pipe taps | missing | | |
 | MH254 | High-speed CNC tapping; combined drilling and tapping | missing | | |
 | MH255 | Relief angles for thread cutting tools | missing | | |
@@ -701,7 +703,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH300 | Greek alphabet, abbreviations, mathematical signs, letter symbols | partial | `symbols`, `abbrev` | 0.6.0: Greek alphabet (two publishers) and drawing abbreviations; no mathematical signs or letter symbols for quantities |
+| MH300 | Greek alphabet, abbreviations, mathematical signs, letter symbols | done | `symbols`, `abbrev` | 0.6.0: Greek alphabet (two publishers) and drawing abbreviations; 0.7.0: 26 mathematical signs and the letters for 37 quantities (one-publisher rows and differing letters marked) |
 | MH301 | SI system, prefixes, US customary system, constants | done | `units`, `symbols` | 0.6.0: SI prefixes (BIPM and NIST) and the seven defining constants beside the unit converter |
 | MH302 | Length conversions (inches, fractions, mm, feet) | done | `fraction` | |
 | MH303 | Area, volume and flow conversions | done | `units` | Area, volume, flow (`claude/measure-maths`) |
@@ -715,14 +717,14 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | ED1 | 1.1-1.7 Engineering careers (7 entries) | out of scope | | |
 | ED2 | 2.1 Greek alphabet | done | `symbols` | 0.6.0 |
-| ED3 | 2.2 Units systems | partial | `units` | SI and US customary conversions; no units-system explainer (`claude/measure-maths`) |
+| ED3 | 2.2 Units systems | done | `units`, `symbols` | SI and US customary conversions; 0.7.0: how the two systems are tied together, SI base units and the 22 named derived units |
 | ED4 | 2.3 Units and conversions | done | `units`, `fraction` | 21 quantities in the unit converter |
 | ED5 | 2.4 Consistency of units | out of scope? | | |
 | ED6 | 2.5 Dimensional analysis | out of scope? | | |
-| ED7 | 2.6 Essential engineering mathematics | partial | `calc`, `triangle` | Scientific calculator and triangle solver; no reference text |
+| ED7 | 2.6 Essential engineering mathematics | done | `calc`, `triangle`, `formulas` | Scientific calculator and triangle solver; 0.7.0: the formula library carries algebra (quadratic formula, powers, logarithms, factoring), trig identities, interpolation and the normal distribution |
 | ED8 | 2.7 Maths and the real world | out of scope? | | |
 | ED9 | 3.1-3.12 Engineering design process and principles (12 entries) | out of scope? | | Design methodology |
-| ED10 | 4.1 Engineering abbreviations | partial | `abbrev` | Drawing abbreviations only (`claude/measure-maths`) |
+| ED10 | 4.1 Engineering abbreviations | done | `abbrev` | 0.7.0 re-audit: 65 drawing abbreviations from two publishers; the book section sits in its drawing and tolerancing chapter, so drawing abbreviations are what it asks for |
 | ED11 | 4.2 Datums and tolerances: principles | done | `gdtguide`, `gdtdof` | |
 | ED12 | 4.3 Toleranced dimensions | done | `gdtguide`, `gdtstack`, `measguide` | 0.6.0: plus and minus dimensioning explained with examples |
 | ED13 | 4.4 General tolerances (ISO 2768) | done | `gentol` | ISO 2768-1 linear, broken edges and angles, five publishers; ISO 2768-2 is withdrawn (`claude/measure-maths`) |
@@ -824,7 +826,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB10 | Tapping drill formulae | done | `tapdrill` | |
 | BB11 | Tapping drill sizes for cutting taps | done | `tapdrill` | |
 | BB12 | Tapping drill sizes for fluteless (forming) taps | done | `tapdrill` | |
-| BB13 | Removal of broken taps | partial | `toolguide` | Own summary of removal methods and prevention, one source so far (flagged) (`claude/tooling-ref`) |
+| BB13 | Removal of broken taps | done | `toolguide` | 0.7.0: seven statements on removal and prevention, each with two or three publishers |
 | BB14 | Coventry/OSG style chasers | missing | | |
 | BB15 | Drill sizes for screw extractors, self-tappers | missing | | |
 | BB16 | Drill sizes for socket head screws | done | `shcs`, `clearance` | (`claude/fasteners`) |

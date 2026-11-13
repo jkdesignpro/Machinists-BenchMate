@@ -2859,11 +2859,11 @@ const TOOLS = [
   source: 'NIST SP 811, appendix B: inch = 0.0254 m exactly (1959 definition). See docs/shop-helpers.md.',
 },
 {
-  id: 'symbols', level: 'advanced', group: 'Shop helpers', title: 'SI prefixes, constants and Greek letters',
-  desc: 'The 24 SI prefixes from quecto to quetta, the seven constants that define the SI, and the Greek alphabet with what each letter stands for in BenchMate\'s formulas.',
+  id: 'symbols', level: 'advanced', group: 'Shop helpers', title: 'Units, signs, symbols and Greek letters',
+  desc: 'How SI and inch-pound units are tied together, the seven SI base units and the 22 named derived units, the 24 SI prefixes from quecto to quetta, the seven constants that define the SI, mathematical signs, the letters used for quantities (F, P, σ, ρ...), and the Greek alphabet with what each letter stands for in BenchMate\'s formulas.',
   render: el => renderSymbols(el),
   working: 'No calculation: the values are shown as the publishers print them.',
-  source: 'BIPM, SI prefixes and SI defining constants; NIST, Metric (SI) prefixes and SP 330 Table 1; University of Warwick and The Engineering ToolBox (Greek alphabet). See docs/sources.md, Units and symbols.',
+  source: 'BIPM, SI prefixes and SI defining constants; NIST, Metric (SI) prefixes, SP 330 Table 1 and SP 811 chapter 4 and Appendix B; Wikipedia (SI units, the international yard and pound); Electronics Notes, mathcentre and Simple English Wikipedia (signs); The Physics Hypertextbook, Wikipedia and BYJU\'S (letters for quantities); University of Warwick and The Engineering ToolBox (Greek alphabet). See docs/sources.md, Units and symbols.',
 },
 {
   id: 'units', level: 'simple', group: 'Shop helpers', title: 'Unit converter',

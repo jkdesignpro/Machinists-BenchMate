@@ -85,4 +85,4 @@ Each paragraph of the guide carries its source keys. Confirmed by two independen
 
 - Hole saw speeds: no two independent maker charts were compared, so none are given.
 - Broaching, burrs, mounted points, files, drill and HSS toolbit sharpening, colour-coded maker taps, pipe and STI tap limits, maker grade comparison charts.
-- The research budget ran out before a second source was read for the geometry terms and broken tap removal; those statements stay flagged.
+- The research budget ran out before a second source was read for the geometry terms; those statements stay flagged. Broken tap removal got its second and third source in 0.7.0 (AIMS Industrial, MFG Shop).

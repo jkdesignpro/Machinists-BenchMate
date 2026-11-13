@@ -2535,6 +2535,53 @@ where = 'toolpaths';
     await mode('advanced');
   }
 
+  // Seventh batch of 0.7.0: units, signs and letters for quantities on the symbols page; the decimal places setting for all
+  // calculators; broken tap removal with two publishers for each method; algebra in the formula library.
+  where = 'symbols-2';
+  {
+    await units('mm'); await mode('expert'); await open('symbols', 300);
+    const tab = async id => page.$$eval('#main #' + id + ' tr', r => r.slice(1).map(t => t.innerText.replace(/\s+/g, ' ').trim()));
+    let r = await tab('symsys');
+    if (r.length !== 3 || !/yard is exactly 0\.9144 m and the avoirdupois pound exactly 0\.45359237 kg, so the inch is exactly 25\.4 mm\. Confirmed Wikipedia, NIST$/.test(r[1]) || !/One source Wikipedia$/.test(r[2])) problems.push(`[${where}] systems of units: ${r.join(' ; ')}`);
+    r = await tab('symbase');
+    if (r.length !== 7 || r[0] !== 'length metre m Confirmed NIST, Wikipedia' || !r.includes('thermodynamic temperature kelvin K Confirmed NIST, Wikipedia') || r.some(x => !/Confirmed/.test(x))) problems.push(`[${where}] base units: ${r.join(' ; ')}`);
+    r = await tab('symder');
+    if (r.length !== 22 || !r.includes('pressure, stress pascal Pa N/m² Confirmed NIST, Wikipedia') || !r.includes('force newton N m·kg·s−2 (base units, NIST) Confirmed NIST, Wikipedia') || !r.includes('power, radiant flux watt W J/s Confirmed NIST, Wikipedia') || r.some(x => !/Confirmed/.test(x))) problems.push(`[${where}] derived units: ${r.length} rows: ${r.join(' ; ')}`);
+    r = await tab('symsig');
+    if (r.length !== 26 || !r.includes('≈ is approximately equal to Confirmed Electronics Notes, mathcentre (Loughborough University), Wikipedia') || !r.includes('∥ is parallel to One source Wikipedia') || r.filter(x => /One source/.test(x)).length !== 3) problems.push(`[${where}] mathematical signs: ${r.length} rows: ${r.join(' ; ')}`);
+    r = await tab('symqty');
+    if (r.length !== 37 || !r.some(x => /^Pressure p: Wikipedia and BYJU'S; P: The Physics Hypertextbook p or P Pa Sources differ/.test(x)) || !r.some(x => /^Force F N Confirmed/.test(x)) || !r.some(x => /^Stress σ Pa One source The Physics Hypertextbook$/.test(x)) || r.filter(x => /Sources differ/.test(x)).length !== 3) problems.push(`[${where}] letters for quantities: ${r.length} rows: ${r.join(' ; ')}`);
+    if (await page.evaluate(() => ['symsys', 'symbase', 'symder', 'symsig', 'symqty'].some(id => { const e = document.querySelector('#main #' + id); return e.scrollWidth > e.clientWidth + 1; }))) problems.push(`[${where}] a table is wider than its frame`);
+    if (!(await page.$('#main a[href="#/t/units"]'))) problems.push(`[${where}] no link to the unit converter`);
+
+    where = 'decimal places';
+    await open('taper', 200);
+    const first = async () => (await page.$$eval('#main #res .rrow', x => x.slice(0, 1).map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join('');
+    const std = await first();
+    await page.click('#menubtn'); await page.waitForTimeout(100);
+    await page.click('#menupop #mdp button[data-v="2"]'); await page.waitForTimeout(150);
+    const more = await first();
+    await page.click('#menupop #mdp button[data-v="-1"]'); await page.waitForTimeout(150);
+    const fewer = await first();
+    await page.click('#menupop #mdp button[data-v="0"]'); await page.waitForTimeout(150);
+    const back = await first();
+    const places = s => ((s.match(/\d+\.(\d+)/) || [])[1] || '').length;
+    if (!(places(std) > 0) || places(more) !== places(std) + 2 || places(fewer) !== places(std) - 1 || back !== std) problems.push(`[${where}] the setting for all calculators: standard "${std}", two more "${more}", one fewer "${fewer}", back "${back}"`);
+    await page.evaluate(() => { document.querySelector('#menupop').hidden = true; });
+
+    where = 'toolguide broken taps';
+    await open('toolguide', 300);
+    const bt = await page.evaluate(() => { const h = document.querySelector('#main #t-brk'); const out = []; let n = h.nextElementSibling; while (n && n.tagName !== 'H2') { if (n.querySelector('abbr.gsrc')) out.push({ t: n.innerText.replace(/\s+/g, ' '), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; });
+    if (bt.length !== 7 || bt.some(x => x.k < 2 || x.need)) problems.push(`[${where}] each of the seven statements needs two publishers: ${bt.map(x => x.k + (x.need ? '!' : '')).join(',')}`);
+    if (!bt.some(x => /^Chemical/.test(x.t) && /for aluminium parts only/.test(x.t)) || !bt.some(x => /^EDM/.test(x.t) && /must conduct electricity/.test(x.t))) problems.push(`[${where}] text: ${bt.map(x => x.t.slice(0, 60)).join(' ; ')}`);
+
+    where = 'formulas algebra';
+    await open('formulas', 200);
+    const fq3 = await page.$('#main input[type="search"]');
+    if (fq3) { await fq3.fill('Algebra'); await fq3.dispatchEvent('input'); await page.waitForTimeout(150); const ft = (await page.$eval('#main', e => e.innerText)).replace(/\s+/g, ' '); if (!/6 of \d+ formulas/.test(ft) || !/x = \(−b ± √\(b² − 4ac\)\) \/ \(2a\)/.test(ft) || !/log_b x = ln x \/ ln b/.test(ft) || !/single source/i.test(ft)) problems.push(`[${where}] algebra in the formula library: ${ft.slice(0, 500)}`); await fq3.fill(''); await fq3.dispatchEvent('input'); }
+    await mode('advanced');
+  }
+
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);

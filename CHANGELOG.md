@@ -12,6 +12,14 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (units, signs and symbols; algebra; decimal places)
+- **Units, signs, symbols and Greek letters** (was "SI prefixes, constants and Greek letters"): how the SI and inch-pound units are tied together (the yard and pound of 1959, the inch of exactly 25.4 mm), the seven SI base units, the 22 derived units with a name of their own, 26 mathematical signs and the letters used for 37 quantities. Where publishers print different letters (torque, pressure, density) all are shown.
+- Formula library: six **algebra** entries (quadratic formula, powers, logarithms, change of base, factoring); two rest on one source and are marked.
+- **Decimal places for all calculators**: a setting in the display menu (one fewer, standard, one more, two more), added to each calculator's own setting.
+
+### Changed
+- Tool guide, **broken tap removal**: each of the seven statements now has two or three publishers, with the limits one supplier gives (a clean break of M6 or larger for an extractor, alum only for aluminium parts, 3 mm of stub for welding).
+
 ### Added (probability, coordinates, plastics)
 - New tool **Binomial and Poisson: chance of a count** (Measure and inspect > Quality): the chance of exactly a count, that count or fewer, that count or more, or a range of counts, for defectives in a sample (binomial) or events from a mean count (Poisson), with the mean, the standard deviation and a bar chart. For a binomial it shows the Poisson estimate beside the exact figure. Seven published examples are proofs on the page.
 - CNC knowledge guide: new section **Working out coordinates**: absolute and incremental, arcs by centre (I, J, K) and by radius with the warning both sources give, links to the six tools that find the missing points, and three worked examples that the core works on the page.
@@ -63,7 +71,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (sixth batch)
 - ED81 (binomial and Poisson distributions), MH174 (coordinate geometry in the CNC introduction), BB58 and ED62 (engineering plastics) from partial to done.
-- 389 done, 159 partial, 48 missing of 596 in-scope rows, 65 %; 148 more rows to done for the 90 % target.
+- Counted after the sixth batch: 389 done, 159 partial, 48 missing.
+
+### Book audit (seventh batch)
+- MH300 (mathematical signs and letter symbols), ED3 (units systems), ED7 (essential mathematics), U105 (decimal precision), BB13 and MH252 (broken taps) from partial to done; ED10 (engineering abbreviations) done on re-audit.
+- 396 done, 152 partial, 48 missing of 596 in-scope rows, 66 %; 141 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.
