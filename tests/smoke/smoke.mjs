@@ -1958,7 +1958,7 @@ where = 'toolpaths';
   if (!/8 to 12 degrees/.test(g.all) || !/6 to 9 degrees/.test(g.all) || !/20 to 50 %/.test(g.all) || !/first 100 square inches/.test(g.all) || !/about 27 to 30 m\/min/.test(g.all) || !/12 000 to 18 000 against 4 000 to 10 000/.test(g.all)) problems.push(`[${where}] drill clearance, break-in, hole saw or burr figures are missing`);
   where = 'matguide';
   g = await guide('matguide');
-  if (g.h2 !== 17 || g.svgs !== 4 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,11,9,5' || g.srcs !== 59) problems.push(`[${where}] 17 sections, 4 drawings, 15 tables, 59 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 18 || g.svgs !== 4 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,11,9,5' || g.srcs !== 64) problems.push(`[${where}] 18 sections, 4 drawings, 15 tables, 64 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 77) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four digits', 'First digit', 'A letter in the middle', 'Low, medium and high carbon', 'W, O and A name the quench', 'Austenitic grades are not hardened', 'Two ways to strength', 'H tempers, second digit', 'T651 is', 'On extrusions a fourth digit', 'Grain size tempers', 'Titanium grade 5', 'The letters', 'The number in a ZA name', 'Rockwell scales', 'Vickers angle, sources differ', 'Check the heat number first'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -1974,7 +1974,7 @@ where = 'toolpaths';
   if (!/under 0\.25 % in one, 0\.05 to 0\.30 % in the other/.test(g.all) || !/0\.0005 to 0\.003 %/.test(g.all) || !/OS025 is 0\.025 mm/.test(g.all) || !/apex angle of 120 degrees/.test(g.all) || !/about 6 % aluminium and 4 % vanadium/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   where = 'measguide';
   g = await guide('measguide');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '5,11,4,8' || g.srcs !== 24) problems.push(`[${where}] 8 sections, 3 drawings, tables of 4, 10, 3 and 7 rows, 24 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 9 || g.svgs !== 3 || g.tabs !== '5,11,4,8' || g.srcs !== 27) problems.push(`[${where}] 9 sections, 3 drawings, tables of 4, 10, 3 and 7 rows, 27 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 54) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Limit dimensions', 'A unilateral tolerance', 'Three kinds of fit', 'Three grades', 'Overall flatness', 'Repeat reading', 'The standard', 'Micrometer, five points', 'Caliper, outside jaws', 'Total indicator reading', 'Indicator. Fix it', 'How much is too much', 'Lay is the direction'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2782,10 +2782,31 @@ where = 'toolpaths';
       const row = k => rows.find(t => t.startsWith(k)) || '';
       if (!/^0\.50 ct 3000 to 12000 7000 FLEX_DD ?ORG_DD$/.test(row('0.50 ct')) || !/to be verified/.test(row('3 ct'))) problems.push(`[${where}] dressing diamonds: ${row('0.50 ct')} | ${row('3 ct')}`);
     }
-    if (s.filter(x => x.k > 0).length !== 5 || !has(s, /^Drag angle\..*5 to 15 degrees/, 3, false) || !has(s, /^Turn the diamond/, 1, true) || !s.some(x => /a 200 x 25 mm wheel \(5000\)/.test(x.t))) problems.push(`[${where}] dressing diamonds: ${brief(s)}`);
+    if (s.filter(x => x.k > 0).length !== 5 || !has(s, /^Drag angle\..*5 to 15 degrees/, 3, false) || !has(s, /^Turn the diamond/, 1, true) || !s.some(x => /where diameter times width is 5000/.test(x.t))) problems.push(`[${where}] dressing diamonds: ${brief(s)}`);
 
     s = await sect('matguide', 'mg-tsel', ['H2', 'H3']);
     if (s.filter(x => x.k > 0).length !== 9 || !has(s, /^Wear against toughness\./, 2, false) || !has(s, /^General cold work\. O1, A2 and D2/, 3, false) || !has(s, /^When the tool fails \(Crucible\)\..*after EDM/, 1, true)) problems.push(`[${where}] choosing a tool steel: ${brief(s)}`);
+    await mode('advanced');
+  }
+
+  // Fourteenth batch of 0.7.0: calibrating a surface plate, V-blocks, laminates and hard rubber, the tool signature.
+  where = 'guides-14';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || '').replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+
+    let s = await sect('measguide', 'mz-plate', ['H2']);
+    if (!has(s, /^What a calibration measures\. Two things/, 2, false) || !has(s, /^The methods named\. Cross Company names the Moody method/, 2, false) || !has(s, /^Out of limits\..*0\.001 in/, 2, false)) problems.push(`[${where}] calibrating a plate: ${brief(s)}`);
+    s = await sect('measguide', 'mz-vb', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 7 || !has(s, /^What they are for\. Holding round bar/, 2, false) || !has(s, /^What they are made of\. The two sources describe different kinds/, 2, false) || !has(s, /^The vee\. Tormach gives an included angle of 90/, 1, true) || !s.some(x => /No accuracy figures for V-blocks/.test(x.t))) problems.push(`[${where}] V-blocks: ${brief(s)}`);
+
+    s = await sect('matguide', 'mg-lam', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^What laminates are\./, 3, false) || !has(s, /^Coolant, the sources differ\./, 3, false) || !has(s, /^Heat\. Keep the work below about 150 °C/, 2, true) || !has(s, /^Hard rubber \(ebonite\)\./, 1, true) || !(await page.$('#main #mg-lam ~ p a[href="#/t/plastics"]'))) problems.push(`[${where}] laminates and hard rubber: ${brief(s)}`);
+
+    s = await sect('toolguide', 't-sig', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 3 || !has(s, /^Seven figures in a fixed order\. .*back rake, side rake, end relief, side relief, end cutting edge angle, side cutting edge angle and nose radius/, 2, false) || !has(s, /^Units\..*the sources differ/, 2, false) || !has(s, /^An example\. 0-7-6-8-15-16-0\.8/, 1, true)) problems.push(`[${where}] tool signature: ${brief(s)}`);
     await mode('advanced');
   }
 

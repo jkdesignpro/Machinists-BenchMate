@@ -1767,10 +1767,37 @@ All wording is BenchMate's own. A statement with fewer than two independent publ
 - **[FLEX_DD]** Flexovit (Saint-Gobain Abrasives), EMEA catalogue 2017, page 232, https://media.saint-gobain.com/Abrasives/Flexovit/EMEA/2017/FI_eu_2017_e-book/files/assets/basic-html/page-232.html : carat from wheel diameter times thickness (below 3000, 3000 to 12000, above 12000), a drag angle of 5 to 15 degrees, turning the diamond every four or five dressings.
 - **[ORG_DD]** Organametrisis, product page for single-point dressing diamonds, https://organametrisis.gr/en/products/sri-ct-diamantia-katharismou-diamorfwshs-smyridotroxwn : the same rule with one figure for each size from 0.25 to 3 ct. A seller; the page does not say whether each figure is a limit.
 - **[NORI_DD]** Noritake, technical support page "Dressing and trueing", https://noritake.co.jp/eng/supports/detail/17 : larger and wider wheels take a larger diamond, usual carat sizes, a tilt of about 15 degrees, depth of the dressing cut by kind of grinding. Its feed rate formula is not used.
-- The two carat tables do not agree; both are shown. The worked comparison on the page (a 200 x 25 mm wheel) is BenchMate's own multiplication.
+- The two carat tables do not agree; both are shown. (From the fourteenth batch the note names a product of 5000 as its example and no longer works out a wheel size.)
 - **Read, not used:** UKAM, "How to choose the right diamond dresser for your grinding wheel" (no figures).
 
 ### Choosing a tool steel (`app/matguide.js`, sub-section in the materials guide)
 - **[CRU_SEL]** Crucible Industries, eSelector, "Selection of tool & die steels", https://crucible.com/eselector/general/generalpart1.html : wear against toughness, the general-purpose cold work steels, the shock-resisting S grades, what to change for wear, galling, deformation and chipping. A maker of tool steels; its own brand grades are not named in the app.
 - **[PL_TS]** Protolabs, "Tool steel in manufacturing", 2025-09-11, https://www.protolabs.com/en-gb/resources/blog/tool-steel-in-manufacturing/ : uses of O1, A2, D2, S7, H13 and P20, and of high speed steel.
 - With [AIMS_SG] (twelfth batch) for the uses of O1, A2, D2, M2 and H13.
+
+## Guide sections added in the fourteenth batch of 0.7.0, accessed 2026-11-13
+
+All wording is BenchMate's own. A statement with fewer than two independent publishers is marked on the page. Where sources print different figures each is shown with its source.
+
+### Calibrating a surface plate (`app/measguide.js`, added to the surface plate section)
+- **[CROSS_SP]** Cross Company, "Why you should calibrate your surface plate" (updated 2026-08-25), https://www.crossco.com/resources/articles/why-you-should-calibrate-your-surface-plate/ (also as PDF: https://www.crossco.com/wp-content/uploads/2026/08/Why-You-Should-Calibrate-Your-Surface-Plate.pdf): overall flatness between enclosing planes, repeatability across the plate, the Moody method and profile analysis, intervals that depend on use, resurfacing or relapping when out of limits. A calibration service; no author.
+- With [STAR] and [QM_SP] (already listed; one publisher family) for the repeat reading gauge, the autocollimator, what sets the interval and lapping on site.
+
+### V-blocks (`app/measguide.js`, section in the measurement guide)
+- **[RYAN_VB]** V. Ryan, technologystudent.com, "Vee blocks", 2019, https://technologystudent.com/equip_flsh/veeblock1.html : holding round work for marking out and drilling, numbered pairs kept together, cast iron and case-hardened mild steel, clamp and support, the rule along the bar, bolting to the drill table, centre punching.
+- **[TOR_VB]** Tormach, product page "90 degree V-block and clamp set, matched pair" (item 33243), https://tormach.com/90-degree-v-block-clamp-set-matched-pair-33243.html : hardened and ground steel, matched pair, 90 degree included angle, uses for inspection, marking, milling, drilling and grinding. A seller.
+- No accuracy figures for V-blocks were found in the pages read; the page says so.
+
+### Machining laminates and hard rubber (`app/matguide.js`, section in the materials guide)
+- **[NORP_FG]** ILNorplex (Norplex-Micarta), "Laminate fabrication guide", https://www.norplex-micarta.com/wp-content/uploads/2017/07/Fab_Guide.pdf : tools for paper and glass grades, dry cutting and dust, temperature limit, undersize holes, climb milling, backing, oversize taps.
+- **[PS_TS]** M. Mush (Atlas Fibre), "Fabricating and cutting thermoset materials", The IAPD Magazine, February/March 2015, hosted by Polymershapes, https://www.polymershapes.com/wp-content/uploads/2020/04/Polymershapes_AtlasFibreCo_Article-Fabricating-Cutting-Thermoset.pdf : prints the same figures as the Norplex guide, so the two count as one publisher.
+- **[CTE_PH]** B. Taylor, Cutting Tool Engineering, "Machining phenolic: dust, wear, and tooling guide", 2023-09-15, https://ctemag.com/?p=94524 : paper and cotton phenolic, abrasive wear, carbide boring bars and drills, flood coolant for drilling, dust, undersize holes with figures from one job.
+- **[XOM_G10]** G. Paulsen, updated by J. Schadegg, Xometry, "Garolite machining", 2020-10-07, updated 2024-09-10, https://www.xometry.com/resources/machining/garolite-machining/ : glass and epoxy, diamond-coated end mills, dry or with coolant, dust collection and respirators, delamination, milling threads instead of tapping.
+- **[HAS_EB]** P. N. Hasluck (ed.), Cassell's Cyclopaedia of Mechanics, "Turning and polishing ebonite and vulcanite" (early twentieth century), https://chestofbooks.com/crafts/mechanics/Cyclopaedia/Turning-And-Polishing-Ebonite-And-Vulcanite.html : tools, speed, finishing and polishing hard rubber. The only source found for hard rubber; the statement is marked.
+- No cutting speeds are given: the figures printed are for one maker's grades or one shop's job.
+- **Read, not used:** forum threads on turning ebonite (not a publisher).
+
+### The tool signature (`app/tooling.js`, sub-section of tool geometry in the tooling guide; `data/refdata/tooling-evidence.json`)
+- **[VIK_TS]** Vikram University, course notes by S. Sharma, "Concept of rake and clearance angles and tool signature", https://vikramuniv.ac.in/files/wp-content/uploads/BE_ME_6th_sem_Concept-of-Rake__Clearance-angles_and_Tool-Signature_Shivam_Sharma.pdf : the order of the seven figures, degrees and mm, the example 0-7-6-8-15-16-0.8.
+- **[TB_TS]** Testbook, "ASA tool signature: objective questions with answers", https://testbook.com/objective-questions/mcq-on-asa-tool-signature--5eea6a0d39140f30f369e2c9 : the same order; the nose radius in inches in one answer and in mm in another, so the unit is shown as differing.
+- **Read, not used:** mfgrobots.com, an article on single-point tool geometry with no author or date that appears to repeat other pages.

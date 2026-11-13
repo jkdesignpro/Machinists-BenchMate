@@ -110,6 +110,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, thirteenth batch, 2026-11-13):** back-up rings in the bearings and seals guide; surface grinding and faults in cylindrical grinding in the abrasive processes guide; single-point diamond dressers in the shop tools guide; choosing a tool steel in the materials guide. MH54, MH164, MH167 and MH169 from partial to done; MH294 gains back-up rings and stays partial. Counted from the tables below: 431 done, 117 partial, 48 missing of 596 in-scope rows, 72 %; 106 more rows to done for the 90 % target.
 
+**Update (0.7.0, fourteenth batch, 2026-11-13):** calibrating a surface plate and V-blocks in the measurement guide; machining laminates and hard rubber in the materials guide; the tool signature in the tooling guide. MH90, MH96 and MH160 from partial to done. Counted from the tables below: 434 done, 114 partial, 48 missing of 596 in-scope rows, 73 %; 103 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -465,7 +467,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH87 | Checking shaft conditions | done | `measguide` | 0.6.0: runout of a shaft in V-blocks or between centres with a dial indicator, TIR, bent shaft against off-centre hub (several statements one source, marked) |
 | MH88 | Coordinates for hole circles; chord lengths; hole coordinate tables | done | `bolt` | |
 | MH89 | Gauge blocks and gauge block sets | done | `sinebar` | Gauge-block stack from the sets you own |
-| MH90 | Surface plates, V-blocks, parallels, angle plates and their calibration | partial | `measguide` | 0.6.0: surface plate grades, flatness, care, support and calibration interval (care and intervals from one maker, marked), 1-2-3 blocks; parallels and angle plates in `workholding`; no V-blocks, no calibration method |
+| MH90 | Surface plates, V-blocks, parallels, angle plates and their calibration | done | `measguide` | 0.6.0: surface plate grades, flatness, care, support and calibration interval (care and intervals from one maker, marked), 1-2-3 blocks; parallels and angle plates in `workholding`; 0.7.0: calibrating a plate (what is measured, the methods named, what sets the interval, lapping) and V-blocks (uses, pairs, materials, marking out, drilling). No accuracy figures for V-blocks, parallels or angle plates were found in the pages read |
 | MH91 | Measurements using light, interferometer | out of scope? | | |
 | MH92 | Micrometers, verniers, dial and digital calipers; their calibration | done | `scales`, `measguide` | Reading in `scales`; 0.6.0: checking a micrometer and a caliper against gauge blocks |
 | MH93 | Surface texture: terms, sampling lengths, roughness and waviness parameters | partial | `surface`, `measguide` | Ra, Rz, Rq ratios, N grades and symbols; 0.6.0: roughness, waviness and lay in words, P, R and W profiles, default filters (one source, marked); no waviness parameters or full list of parameters |
@@ -476,7 +478,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH96 | Single-point tool terms: contour, relief, rake, lead angles, nose radius, chipbreakers | partial | `toolguide` | Rake, clearance, entering/lead angle, helix, nose radius, chip breaker and edge hone in own words with drawings (mostly marked "needs 2nd source"); no tool signature or contour terms (`claude/tooling-ref`) |
+| MH96 | Single-point tool terms: contour, relief, rake, lead angles, nose radius, chipbreakers | done | `toolguide` | Rake, clearance, entering/lead angle, helix, nose radius, chip breaker and edge hone in own words with drawings (mostly marked "needs 2nd source"); 0.7.0: the tool signature (order of the seven figures from two publishers, the differing nose radius unit, an example) |
 | MH97 | Indexable insert identification system | done | `insertcode` | Decode and build ISO 1832 codes with evidence (`claude/ref-data-3`); status corrected on `claude/tooling-ref` |
 | MH98 | Indexable insert holder identification and selection | done | `holdercode`, `toolguide` | ISO 5608 external holder codes decoded; 0.7.0: choosing a turning tool holder (shank, overhang, clamping, interrupted cuts, hand) in the tooling guide. No holder angles: the maker's tables are pictures |
 | MH99 | Carbide blanks and carbide-tipped tool styles | missing | | |
@@ -545,7 +547,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | done | `shoptools`, `coolconc`, `coolmix` | Neat oil, emulsion, semi-synthetic and synthetic compared; which for slow heavy work and which for fast cutting; by material |
 | MH158 | Metalworking fluids: classes, maintenance, exposure | done | `shoptools`, `coolconc`, `coolmix` | Classes, concentration and mixing, care of mixed fluids; 0.7.0: what to check on a sump and when, when to change the fluid, the mist limit NIOSH recommends and how to keep mist and skin contact down |
 | MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | missing | | |
-| MH160 | Machining non-metals (hard rubber, laminates) | partial | `plastics` | Machining plastics; no hard rubber or laminates |
+| MH160 | Machining non-metals (hard rubber, laminates) | done | `plastics`, `matguide` | Machining plastics; 0.7.0: machining laminates in the materials guide (tool wear and material, dust, coolant from three sources side by side, heat, undersize holes, splitting, threads) and hard rubber from one old source, marked |
 | MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | partial | `abrasguide` | 0.6.0: grinding ratio with its range and an example, what lowers wheel wear, wheel speeds, spark-out (mostly one source each, marked); no optimum data, no forces |
 | MH162 | Grinding data selection and grindability groups | missing | | |
 | MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | done | `shoptools`, `wheelcode`, `gritconv` | Markings decoded; shapes by type number, choice of abrasive, grit and grade (the choice rests on one source, marked) |

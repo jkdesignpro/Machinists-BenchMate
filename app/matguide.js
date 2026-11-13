@@ -63,6 +63,11 @@ const MG_SOURCES = {
   CS_SG: 'Continental Steel & Tube, carbon and alloy steel grades page (a supplier; no date)',
   CRU_SEL: 'Crucible Industries, eSelector, "Selection of tool & die steels" (a maker of tool steels; crucible.com)',
   PL_TS: 'Protolabs, "Tool steel in manufacturing", 2025-09-11',
+  NORP_FG: 'ILNorplex (Norplex-Micarta), "Laminate fabrication guide" (a maker of laminates)',
+  PS_TS: 'M. Mush (Atlas Fibre), "Fabricating and cutting thermoset materials", The IAPD Magazine, 2015 (hosted by Polymershapes; prints the same figures as the Norplex guide, so it counts with it)',
+  CTE_PH: 'B. Taylor, Cutting Tool Engineering, "Machining phenolic: dust, wear, and tooling guide", 2023-09-15',
+  XOM_G10: 'G. Paulsen and J. Schadegg, Xometry, "Garolite machining", 2020-10-07, updated 2024-09-10',
+  HAS_EB: 'P. N. Hasluck, Cassell\'s Cyclopaedia of Mechanics, "Turning and polishing ebonite and vulcanite" (early 1900s; chestofbooks.com)',
   OWN: 'BenchMate reading of the rule in the sources beside it',
 };
 // Several pages of one publisher count once.
@@ -70,7 +75,7 @@ const MG_FAMILY = {
   TM_TS: 'TOTALMAT', TM_AL: 'TOTALMAT', TM_CU: 'TOTALMAT', TM_TI: 'TOTALMAT', TM_MG: 'TOTALMAT',
   MM_CS: 'MATMATCH', MM_H: 'MATMATCH', XOM_AL: 'XOMETRY', XOM_NI: 'XOMETRY', EF_TS: 'EFUNDA', EF_MG: 'EFUNDA', WP_SAE: 'WIKI', WP_CI: 'WIKI',
   WP_HARD: 'WIKI', WP_CN: 'WIKI', WP_MACH: 'WIKI', TM_HT: 'TOTALMAT', TM_SH: 'TOTALMAT', OU_PNC: 'OU', OU_IFH: 'OU',
-  WP_SS: 'WIKI', TWI_TT: 'TWI', TM_TEMP: 'TOTALMAT',
+  WP_SS: 'WIKI', TWI_TT: 'TWI', TM_TEMP: 'TOTALMAT', XOM_G10: 'XOMETRY', NORP_FG: 'NORPLEX', PS_TS: 'NORPLEX',
 };
 const mgTags = keys => guideTags(keys, MG_SOURCES, MG_FAMILY);
 const mgP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + mgTags(keys)) + '</p>';
@@ -275,7 +280,7 @@ const MG_CASE = [
 ];
 
 function renderMatGuide(el) {
-  const toc = [['mg-steel', 'Steel numbers'], ['mg-tool', 'Tool steels'], ['mg-stain', 'Stainless'], ['mg-iron', 'Cast iron'], ['mg-alu', 'Aluminium'], ['mg-cu', 'Copper tempers'], ['mg-other', 'Titanium, magnesium, nickel, zinc'], ['mg-hard', 'Hardness tests'], ['mg-harden', 'Hardenability'], ['mg-case', 'Case hardening'], ['mg-mach', 'Machinability'], ['mg-tens', 'Tensile test'], ['mg-temp', 'Heat and cold'], ['mg-use', 'Steels by use'], ['mg-corr', 'Corrosion'], ['mg-cert', 'Mill certificates']];
+  const toc = [['mg-steel', 'Steel numbers'], ['mg-tool', 'Tool steels'], ['mg-stain', 'Stainless'], ['mg-iron', 'Cast iron'], ['mg-alu', 'Aluminium'], ['mg-cu', 'Copper tempers'], ['mg-other', 'Titanium, magnesium, nickel, zinc'], ['mg-hard', 'Hardness tests'], ['mg-harden', 'Hardenability'], ['mg-case', 'Case hardening'], ['mg-mach', 'Machinability'], ['mg-tens', 'Tensile test'], ['mg-temp', 'Heat and cold'], ['mg-use', 'Steels by use'], ['mg-lam', 'Laminates and hard rubber'], ['mg-corr', 'Corrosion'], ['mg-cert', 'Mill certificates']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">How to read what is stamped on the bar and printed on the certificate: steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, the names of titanium, magnesium, nickel and zinc alloys, how each hardness test works, the forms of corrosion, and the mill certificate, in our own words. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
@@ -465,6 +470,19 @@ function renderMatGuide(el) {
     mgP('<b>Tool steels (AIMS).</b> O1 for taps, reamers and small dies; A2 for punches, knives and gauges; D2 for dies, punches and shear blades; M2 for drills, end mills and taps; H13 for die-casting, extrusion and forging dies.', ['AIMS_SG']) +
     mgP('<b>Stainless (AIMS).</b> 304 is the general-purpose grade for indoors and mild outdoor use; 316 is the grade for marine and chemical service.', ['AIMS_SG']) +
     mgP('Composition and properties grade by grade are on the cards of <a href="#/t/materials">material equivalents</a>.', null) +
+
+    '<h2 id="mg-lam">Machining laminates and hard rubber</h2>' +
+    mgP('<b>What laminates are.</b> Thermosets made of layers of paper, cotton cloth or glass cloth bonded with resin: phenolic for the paper and cotton grades, epoxy for glass grades such as G-10. They do not melt.', ['CTE_PH', 'XOM_G10', 'NORP_FG']) +
+    mgP('<b>They wear tools.</b> The fillers are abrasive and dull cutting edges quickly, the glass grades most of all.', ['CTE_PH', 'XOM_G10', 'NORP_FG']) +
+    mgP('<b>Tool material.</b> Paper and cotton grades can be cut with high speed steel, with carbide for production runs. Glass grades need carbide or diamond; Xometry suggests diamond-coated end mills.', ['NORP_FG', 'CTE_PH', 'XOM_G10']) +
+    mgP('<b>Dust.</b> Cutting makes a fine powder rather than chips, and it must not be breathed. Collect it at the machine, and wear a respirator and eye protection.', ['XOM_G10', 'CTE_PH', 'NORP_FG']) +
+    mgP('<b>Coolant, the sources differ.</b> Norplex: paper grades dry, with air or a vacuum to take the dust; glass grades dry with an exhaust, though water may be used. Cutting Tool Engineering drilled phenolic with water-based flood coolant, which also kept the dust down. Xometry: coolant cuts the dust, but medical G-10 parts are machined dry to keep them clean.', ['NORP_FG', 'CTE_PH', 'XOM_G10']) +
+    mgP('<b>Heat.</b> Keep the work below about 150 °C.', ['NORP_FG', 'PS_TS']) +
+    mgP('<b>Holes come out small.</b> Holes drilled in laminate come out undersize, and more so with a dull drill. Norplex: use a drill about 0.002 in larger than the hole. Cutting Tool Engineering: a 0.315 in drill gave holes of 0.310 to 0.314 in.', ['NORP_FG', 'CTE_PH']) +
+    mgP('<b>Layers that split.</b> Xometry: too much heat and pressure along the grain splits the layers. Norplex: climb mill only, because conventional milling lifts the layers, and back the far side with scrap when drilling through.', ['XOM_G10', 'NORP_FG']) +
+    mgP('<b>Threads, the sources differ.</b> Xometry: mill internal threads instead of tapping them, and turn or thread-mill outside threads instead of using a die. Norplex: taps cut close to size and bind in glass grades, so use carbide taps made oversize; in paper grades use a tap 0.002 in oversize.', ['XOM_G10', 'NORP_FG']) +
+    mgP('<b>Hard rubber (ebonite).</b> An old workshop cyclopaedia: sharp steel tools ground about as for brass or hardwood, a moderate speed and light cuts; rough with a round-nosed tool, finish with a flat brass-finishing tool or a scraper, and polish with emery cloth and then putty powder.', ['HAS_EB']) +
+    '<p class="desc">No speeds are given: the figures printed are for one maker\'s grades or one shop\'s job. Thermoplastics are on <a href="#/t/plastics">Machining plastics</a>.</p>' +
 
     '<h2 id="mg-corr">Forms of corrosion</h2>' +
     guideTable(['Form', 'What happens'], MG_CORR, mgTags) +

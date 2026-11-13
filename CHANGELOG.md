@@ -12,6 +12,12 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (guide sections: calibrating a surface plate, V-blocks, laminates and hard rubber, the tool signature)
+- Measurement guide: **calibrating a surface plate** (what is measured, the methods named, what sets the interval, lapping when out of limits) and a new section on **V-blocks** (uses, pairs, the two kinds of material, the vee, marking out and drilling across a bar).
+- Materials guide: **Machining laminates and hard rubber** (what laminates are, tool wear and tool material, dust, coolant with the three sources side by side, heat, undersize holes, splitting layers, threads where the sources differ, and hard rubber from one old source, marked).
+- Tooling guide: **The tool signature** (the seven figures in order, units with the differing nose radius unit, an example).
+- Shop tools guide: the note under the dressing diamond tables names a product of 5000 as its example instead of working out a wheel size.
+
 ### Added (guide sections: back-up rings, surface grinding, grinding faults, dressing diamonds, choosing a tool steel)
 - Bearings and seals guide: **Back-up rings for O-rings** (what they do, gap and hardness, when they are needed with the two differing pressure figures, which side, materials and kinds).
 - Abrasive processes guide: **Surface grinding** (the wheel for the work, wheel and table speed, down feed and cross feed from two sources that differ, the magnetic chuck) and **Faults in cylindrical grinding** (a table of eight faults with causes and remedies, and why work burns).
@@ -136,7 +142,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (thirteenth batch)
 - MH54 (tool steel selection), MH164 (dressing diamonds), MH167 (cylindrical grinding troubles) and MH169 (surface grinding) from partial to done. MH294 gains back-up rings and stays partial (no ISO 3601 G series, no -9xx sizes).
-- 431 done, 117 partial, 48 missing of 596 in-scope rows, 72 %; 106 more rows to done for the 90 % target.
+- Counted after the thirteenth batch: 431 done, 117 partial, 48 missing.
+
+### Book audit (fourteenth batch)
+- MH90 (surface plates, V-blocks and their calibration), MH96 (single-point tool terms) and MH160 (laminates and hard rubber) from partial to done.
+- 434 done, 114 partial, 48 missing of 596 in-scope rows, 73 %; 103 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.

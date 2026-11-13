@@ -1,4 +1,4 @@
-// Measurement guide (parity MH75, MH78, MH87, MH92, MH94, MH184, ED12, BB38; parts of MH90, MH93, MH95).
+// Measurement guide (parity MH75, MH78, MH87, MH90, MH92, MH94, MH184, ED12, BB38; parts of MH93, MH95).
 // All wording and drawings are BenchMate's own. Every statement carries the keys of the public sources read for
 // it (docs/sources.md, "Measurement guide"); one with fewer than two independent publishers is shown as "to be
 // verified". Where two sources give different figures both are shown.
@@ -28,6 +28,9 @@ const MZ_SOURCES = {
   HAAS_STM: 'Haas Automation, "Screw thread micrometers", instruction manual 09-0274 (text only; its table of pitch ranges could not be read)',
   RS_MIC: 'RS Components, "A complete guide to micrometers", 2023-03-07, modified 2024-05-14',
   PENN_MIC: 'Penn Tool Co., M. Elson, "Micrometer: its working principle, parts, use and precautions", 2017-04-13',
+  CROSS_SP: 'Cross Company, "Why you should calibrate your surface plate" (a calibration service; updated 2026-08-25)',
+  RYAN_VB: 'V. Ryan, technologystudent.com, "Vee blocks", 2019',
+  TOR_VB: 'Tormach, product page "90 degree V-block and clamp set, matched pair" (item 33243)',
   OWN: 'BenchMate reading of the rule in the sources beside it',
 };
 // Several pages of one publisher count once. The Quality Magazine article on surface plates repeats Starrett's text.
@@ -105,7 +108,7 @@ const MZ_LAY = [
 ];
 
 function renderMeasGuide(el) {
-  const toc = [['mz-tol', 'Writing a tolerance'], ['mz-fit', 'Preferred fits'], ['mz-plate', 'Surface plates'], ['mz-mic', 'Checking micrometers and calipers'], ['mz-thr', 'Thread and ball micrometers'], ['mz-shaft', 'Shaft runout'], ['mz-surf', 'Surface texture symbols']];
+  const toc = [['mz-tol', 'Writing a tolerance'], ['mz-fit', 'Preferred fits'], ['mz-plate', 'Surface plates'], ['mz-vb', 'V-blocks'], ['mz-mic', 'Checking micrometers and calipers'], ['mz-thr', 'Thread and ball micrometers'], ['mz-shaft', 'Shaft runout'], ['mz-surf', 'Surface texture symbols']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Inspection practice in our own words: the ways a tolerance is written, the ten preferred metric fits, surface plates and their care, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout, and the surface texture symbols on a drawing. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
@@ -141,8 +144,22 @@ function renderMeasGuide(el) {
     mzP('<b>Three supports.</b> A plate rests on three points only, placed where the maker set them, about a fifth of the length in from the ends. More supports bend the plate. A plate supported this way does not have to be levelled to be accurate.', ['STAR', 'QM_SP']) +
     mzP('<b>How often to calibrate.</b> A new plate within a year, a plate in heavy use every six months, and a monthly check of repeat readings in between.', ['STAR', 'QM_SP']) +
     mzP('<b>Temperature.</b> On a 36 by 48 by 8 in plate, one degree Fahrenheit of difference between top and bottom takes the surface from 0.000075 in to 0.000275 in convex.', ['STAR']) +
+    mzP('<b>What a calibration measures.</b> Two things: the overall flatness, the gap between the two planes that just enclose the whole surface, and the repeat reading, whether a reading taken at one spot repeats everywhere on the plate.', ['CROSS_SP', 'STAR']) +
+    mzP('<b>The methods named.</b> Cross Company names the Moody method and profile analysis for mapping the surface. Starrett names a repeat reading gauge on an electronic amplifier for local errors, and an autocollimator for the overall flatness.', ['CROSS_SP', 'QM_SP']) +
+    mzP('<b>What sets the interval.</b> Mostly how much the plate is used; Starrett adds the shop around it and the accuracy needed.', ['CROSS_SP', 'QM_SP']) +
+    mzP('<b>Out of limits.</b> A plate that fails is resurfaced by lapping. Starrett: lapping on site only when the plate is within about 0.001 in of its tolerance; further out, or pitted and nicked, it goes back to be ground and lapped.', ['CROSS_SP', 'QM_SP']) +
     mzP('<b>1-2-3 blocks</b> are hardened steel blocks of 1 by 2 by 3 in, ground on all six faces. They serve as parallels, as known heights of 1, 2 and 3 in, and bolted together as an angle plate. They are not a calibrated standard for checking a measuring tool.', ['TRAV']) +
     mzP('Parallels and angle plates are in the <a href="#/t/workholding">workholding guide</a>; setting an angle on the plate is in <a href="#/t/sinebar">sine bar</a>.', null) +
+
+    '<h2 id="mz-vb">V-blocks</h2>' +
+    mzP('<b>What they are for.</b> Holding round bar, with their clamps, for marking out and for drilling. Tormach adds inspection, milling and grinding.', ['RYAN_VB', 'TOR_VB']) +
+    mzP('<b>In pairs.</b> They are made as matched pairs, and the two blocks of a pair belong together.', ['RYAN_VB', 'TOR_VB']) +
+    mzP('<b>What they are made of.</b> The two sources describe different kinds: cast iron, accurately machined, with small ones of case-hardened mild steel (V. Ryan); hardened and ground steel (Tormach).', ['RYAN_VB', 'TOR_VB']) +
+    mzP('<b>The vee.</b> Tormach gives an included angle of 90°.', ['TOR_VB']) +
+    mzP('<b>Clamp and support.</b> One block holds the bar in its clamp and the other supports it.', ['RYAN_VB']) +
+    mzP('<b>Marking a line along a bar.</b> A rule laid along the bar while it sits in the vees makes the line easier to mark.', ['RYAN_VB']) +
+    mzP('<b>Drilling across a bar.</b> Bolt the block to the drill table, and centre punch the mark first so that the drill does not wander.', ['RYAN_VB']) +
+    '<p class="desc">No accuracy figures for V-blocks are given: none of the pages read prints any. Checking a shaft for runout in two V-blocks is in the section on shaft runout below.</p>' +
 
     '<h2 id="mz-mic">Checking micrometers and calipers</h2>' +
     mzP('<b>The standard.</b> Whatever a tool is checked against should be at least four times more accurate than the tool.', ['QM_MIC', 'MGC', 'MITU_CAL']) +

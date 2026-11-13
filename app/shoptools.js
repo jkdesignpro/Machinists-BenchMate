@@ -238,7 +238,7 @@ function renderShopTools(el) {
     '<h3 class="gcat" id="st-dd">Single-point diamond dressers</h3>' +
     stP('<b>Bigger wheel, bigger diamond.</b> The size of the diamond is chosen from the wheel: multiply its diameter by its width, both in mm, and read the carat weight off.', ['FLEX_DD', 'ORG_DD', 'NORI_DD']) +
     guideTable(['Diamond', 'Flexovit: diameter x width', 'Organametrisis: diameter x width'], ST_DD, stTags) +
-    '<p class="desc">Both figures as printed. Flexovit gives ranges; Organametrisis prints one figure for each size without saying whether it is the largest wheel for that size, so its figures are shown as they stand. They do not agree: a 200 x 25 mm wheel (5000) is 0.50 ct by Flexovit and lies between 0.25 and 0.50 ct by Organametrisis.</p>' +
+    '<p class="desc">Both figures as printed. Flexovit gives ranges; Organametrisis prints one figure for each size without saying whether it is the largest wheel for that size, so its figures are shown as they stand. They do not agree: where diameter times width is 5000, Flexovit gives 0.50 ct, while 5000 lies between the figures Organametrisis prints for 0.25 ct and 0.50 ct.</p>' +
     stP('<b>Drag angle.</b> Tilt the diamond so that it trails the wheel and touch on the centre line. Flexovit gives 5 to 15 degrees; Noritake usually 15, and says a smaller angle spoils the finish.', ['FLEX_DD', 'NORI_DD', 'PALM']) +
     stP('<b>Turn the diamond</b> in its holder every four or five dressings, so that a sharp edge keeps meeting the wheel.', ['FLEX_DD']) +
     stP('<b>Depth of each dressing pass (Noritake).</b> About 0.005 mm for precision grinding, 0.010 to 0.030 mm for general grinding, up to about 0.040 mm for rough grinding.', ['NORI_DD']) +
