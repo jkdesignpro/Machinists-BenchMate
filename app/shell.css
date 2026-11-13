@@ -340,18 +340,18 @@ body.compact .tp .card.wide{padding:12px;overflow-x:auto}
 
 /* ---- Drawings (app/dk.js) ---- */
 svg.dk{font:11.5px var(--sans);overflow:visible}
-.dk .part{fill:var(--soft);stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round}
-.dk .hatch{fill:url(#dkh);stroke:var(--ink);stroke-width:1.6;stroke-linejoin:round}
-.dk .dkhl{stroke:var(--muted);stroke-width:1;opacity:.55}
+.dk .part{fill:color-mix(in srgb,var(--soft) 60%,var(--panel));stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round}
+.dk .hatch{fill:url(#dkh);stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round}
+.dk .dkhl{stroke:var(--muted);stroke-width:.7;opacity:.7}
 .dk .ghost{fill:none;stroke:var(--muted);stroke-width:1.1;stroke-dasharray:5 4}
-.dk .ln{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round}
+.dk .ln{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-linecap:round}
 .dk .cons{fill:none;stroke:var(--accent);stroke-width:1.1;stroke-dasharray:6 3}
-.dk .thin{fill:none;stroke:var(--muted);stroke-width:1}
-.dk .hid{fill:none;stroke:var(--muted);stroke-width:1.1;stroke-dasharray:5 3}
-.dk .cl{fill:none;stroke:var(--muted);stroke-width:.9;stroke-dasharray:12 3 2 3}
-.dk .tool{fill:var(--accent2);stroke:var(--accent);stroke-width:1.6;stroke-linejoin:round}
-.dk .dim{fill:none;stroke:var(--dim);stroke-width:1}
-.dk .dim.ext{stroke-width:.8;opacity:.8}
+.dk .thin{fill:none;stroke:var(--muted);stroke-width:.7}
+.dk .hid{fill:none;stroke:var(--muted);stroke-width:.9;stroke-dasharray:5 2.5}
+.dk .cl{fill:none;stroke:var(--muted);stroke-width:.7;stroke-dasharray:16 3 2 3}
+.dk .tool{fill:var(--accent2);stroke:var(--accent);stroke-width:1.4;stroke-linejoin:round}
+.dk .dim{fill:none;stroke:var(--dim);stroke-width:.75}
+.dk .dim.ext{stroke-width:.7;opacity:.8}
 .dk .dimf{fill:var(--dim);stroke:none}
 .dk .hot{fill:none;stroke:var(--hot);stroke-width:1.5;stroke-linecap:round}
 .dk .hot.ext{stroke-width:.8}
@@ -359,8 +359,8 @@ svg.dk{font:11.5px var(--sans);overflow:visible}
 .dk text{paint-order:stroke;stroke:var(--panel);stroke-width:3.5px;stroke-linejoin:round}
 .dk .txt{fill:var(--ink)}
 .dk .mut{fill:var(--muted)}
-.dk .dimt{fill:var(--dim);font:600 12px var(--mono)}
-.dk .hott{fill:var(--hot);font:600 12px var(--mono)}
+.dk .dimt{fill:var(--dim);font:500 11.5px var(--mono)}
+.dk .hott{fill:var(--hot);font:600 11.5px var(--mono)}
 
 /* ---- Unit button in the tool header; Simple mode: bigger boxes and results ---- */
 .unitb{font:700 11.5px var(--mono);color:var(--accent);width:auto;min-width:32px;padding:0 6px}

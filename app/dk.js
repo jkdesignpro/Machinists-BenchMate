@@ -22,7 +22,7 @@ const DK = (() => {
   const f = v => (Math.round(v * 100) / 100).toString();
   const esc = t => String(t).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
   const head = (x, y, ang, cls) => { // arrowhead with its tip at (x, y), pointing along ang (radians)
-    const L = 8, W = 2.6, c = Math.cos(ang), s = Math.sin(ang);
+    const L = 9, W = 2.3, c = Math.cos(ang), s = Math.sin(ang);   // closed filled head, about 15 degrees (ISO 129)
     const bx = x - L * c, by = y - L * s;
     return '<path class="' + cls + '" d="M' + f(x) + ' ' + f(y) + 'L' + f(bx - W * s) + ' ' + f(by + W * c) + 'L' + f(bx + W * s) + ' ' + f(by - W * c) + 'Z"/>';
   };

@@ -23,7 +23,7 @@ const dcRow = (rows, label, unit) => {
 };
 const dcStr = (rows, label) => { const r = (rows || []).find(x => x.label.indexOf(label) === 0 && typeof x.value === 'string'); return r ? r.value : ''; };
 const dcHead = (x, y, ang, cls) => {
-  const L = 8, W = 2.6, c = Math.cos(ang), s = Math.sin(ang), bx = x - L * c, by = y - L * s;
+  const L = 9, W = 2.3, c = Math.cos(ang), s = Math.sin(ang), bx = x - L * c, by = y - L * s;
   return DK.poly([[x, y], [bx - W * s, by + W * c], [bx + W * s, by - W * c]], cls);
 };
 // Rotation arrow: elliptical arc from a0 to a1 (degrees, anticlockwise on screen), head at a1. cls: dim | hot.
@@ -476,7 +476,13 @@ Object.assign(DIAGRAMS, {
 
 // ---- lathe helpers ----
 // Chuck jaws gripping a part of radius R whose face is at x (part to the right).
-const dcChuck = (x, cy, R) => DK.rect(x - 36, cy - R - 34, 22, 2 * R + 68, 'hatch') + DK.rect(x - 14, cy - R - 18, 24, 18, 'hatch') + DK.rect(x - 14, cy + R, 24, 18, 'hatch');
+const dcChuck = (x, cy, R) => {
+  const t = cy - R - 34, b = cy + R + 34, c = 5;
+  const body = DK.poly([[x - 36, t + c], [x - 36 + c, t], [x - 14, t], [x - 14, b], [x - 36 + c, b], [x - 36, b - c]], 'hatch');
+  // Each jaw steps down to the part: the outer step against the body, the inner step on the part.
+  const jaw = sg => DK.poly([[x - 14, cy - sg * (R + 22)], [x - 2, cy - sg * (R + 22)], [x - 2, cy - sg * (R + 11)], [x + 10, cy - sg * (R + 11)], [x + 10, cy - sg * R], [x - 14, cy - sg * R]], 'hatch');
+  return body + jaw(1) + jaw(-1);
+};
 // Turning tool in plan view: a triangular insert with its tip at (tx, ty) and a holder shank.
 // dir +1: body to the right of the tip (turning towards the chuck on the left), -1 mirrored.
 // rot (degrees, clockwise on screen) turns the whole tool about its tip: 0 = shank straight up.
@@ -486,7 +492,9 @@ function dcInsert(tx, ty, s, dir, holder, cls, rot) {
   const P = (x, y) => [tx + (d * x) * ca - y * sa, ty + (d * x) * sa + y * ca];
   let h = '';
   if (holder !== false) { const hl = holder || 2.4 * s; h += DK.poly([P(0.22 * s, -0.42 * s), P(1.1 * s, -0.42 * s), P(1.1 * s, -0.42 * s - hl), P(0.22 * s, -0.42 * s - hl)], 'part'); }
-  return h + DK.poly([P(0, 0), P(0.98 * s, -0.17 * s), P(0.34 * s, -0.94 * s)], cls || 'tool');
+  // The insert with its clamping hole at the centre of the triangle.
+  const c = P(0.44 * s, -0.37 * s);
+  return h + DK.poly([P(0, 0), P(0.98 * s, -0.17 * s), P(0.34 * s, -0.94 * s)], cls || 'tool') + DK.circle(c[0], c[1], Math.max(1.5, 0.11 * s), cls === 'ghost' ? 'ghost' : 'ln');
 }
 // Rotation of a turning part seen from the side: arrow round a narrow ellipse at x.
 const dcTurnSpin = (x, cy, R, cls) => dcSpin(x, cy, 9, R + 10, 115, 245, cls || 'dim');

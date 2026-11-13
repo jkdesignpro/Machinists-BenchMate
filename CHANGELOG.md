@@ -4,7 +4,7 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
-## [0.8.0] - in progress
+## [0.8.0] - 2026-11-13
 Work on the feedback after using 0.7.0.
 
 ### Added (tool materials and coatings in the advisors)
@@ -40,6 +40,8 @@ Work on the feedback after using 0.7.0.
 
 ### Changed (drawings)
 - **Thread data**: the drawing is now the basic 60° profile as the standards draw it: the nut above and the screw below sharing one outline, the fundamental triangle H dashed through one tooth with its truncations H/8 and H/4, the flats P/8 and P/4, 60°, the pitch, 5/8 H, and the diameters named for the nut and the screw (D, D2, D1 and d, d2, d1).
+
+- **All drawings**: line weights in the 2:1 ratio of ISO 128 (thick outlines, thin dimension, hatching and centre lines), finer closed arrowheads, lighter dimension text and a lighter part tint, so parts read as outlines rather than blocks. The lathe chuck is drawn as a body in section with stepped jaws, and turning inserts show their clamping hole.
 
 ### Changed (sources)
 - Sources sit under their own folded **Sources** heading on every page. In the guides the source list at the bottom is folded, and the source keys after each statement and the Sources columns of the tables are hidden until you tick "Show the source keys" in any Sources fold (one setting for all pages). "to be verified" always stays in view; in tables it sits under a "Status" heading while the keys are hidden. Notes that end with a "Sources" heading fold the same way, and the advisors' tables of what each publisher prints are folded (open or shut is remembered).
