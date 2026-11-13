@@ -341,5 +341,27 @@
       s += notes('N must be a whole number of teeth, or the wheel lands between its own marks (double tracking).', 318, 162, 28);
       return DK.svg(W, H, s, 'Knurling: a whole number of teeth of pitch p around the blank diameter');
     },
+
+    // Gun drilling: a single-flute drill in its hole, with the way the coolant goes in and the chips come out, and a section.
+    gundrill() {
+      const W = 520, H = 250, yc = 112, r = 15, x0 = 78, xb = 290, xe = 336;
+      let s = DK.rect(x0, yc - 62, xe - x0, 62 - r, 'hatch') + DK.rect(x0, yc + r, xe - x0, 62 - r, 'hatch') + DK.rect(xb, yc - r, xe - xb, 2 * r, 'hatch');
+      s += DK.line(x0, yc - 62, xe, yc - 62, 'part') + DK.line(x0, yc + 62, xe, yc + 62, 'part') + DK.line(xe, yc - 62, xe, yc + 62, 'part') + DK.line(x0, yc - 62, x0, yc - r, 'part') + DK.line(x0, yc + r, x0, yc + 62, 'part');
+      // bushing against the face
+      s += DK.rect(x0 - 26, yc - r - 22, 24, 22, 'part') + DK.rect(x0 - 26, yc + r, 24, 22, 'part') + DK.text(x0 - 14, yc + r + 38, 'bushing', { cls: 'mut' }) + DK.text(x0 - 14, yc + r + 52, 'or pilot hole', { cls: 'mut' });
+      // drill: tube and tip, the flute as the lower half
+      s += DK.path('M8 ' + f(yc - r + 1.5) + 'L' + f(xb - 9) + ' ' + f(yc - r + 1.5) + 'L' + f(xb) + ' ' + f(yc - 4) + 'L' + f(xb - 5) + ' ' + f(yc + r - 1.5) + 'L8 ' + f(yc + r - 1.5), 'tool');
+      s += DK.line(8, yc + 2, xb - 4, yc + 2, 'thin') + DK.cl(2, yc, xe + 10, yc);
+      s += DK.arrow(22, yc - 7, 92, yc - 7, 'dim') + DK.arrow(xb - 22, yc + 9, xb - 92, yc + 9, 'hot');
+      s += DK.leader(40, yc - 7, 6, 14, 'coolant in, through the drill', { anchor: 'start' }) + DK.leader(xb - 60, yc + 9, 150, H - 16, 'chips and coolant out, along the flute', { hot: true, anchor: 'start' });
+      s += DK.dim(x0, yc - 76, xb, yc - 76, 'depth L') + DK.text(xe - 6, yc - 46, 'work', { cls: 'mut', anchor: 'end' });
+      // section
+      const cx = 440, cy = 104, R = 46, a0 = rad(-25), a1 = rad(-140);
+      const px = a => f(cx + R * Math.cos(a)), py = a => f(cy - R * Math.sin(a));
+      s += DK.path('M' + px(a0) + ' ' + py(a0) + 'A' + R + ' ' + R + ' 0 1 0 ' + px(a1) + ' ' + py(a1) + 'L' + f(cx) + ' ' + f(cy) + 'Z', 'tool') + DK.circle(cx - 6, cy - 22, 9, 'part');
+      s += DK.dim(cx - R, cy - R - 16, cx + R, cy - R - 16, 'Ø D') + DK.text(cx, cy + R + 40, 'section', { cls: 'mut' });
+      s += DK.leader(cx - 6, cy - 22, cx - 62, 22, 'coolant hole', { anchor: 'end' }) + DK.leader(cx + 4, cy + 26, cx + 30, cy + R + 22, 'V flute', { hot: true, anchor: 'start' });
+      return DK.svg(W, H, s, 'Gun drilling: coolant goes in through the drill and carries the chips out along the single V flute');
+    },
   });
 })();

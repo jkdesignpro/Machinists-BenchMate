@@ -16,6 +16,13 @@
 //!   2014 (speed ratio, overlap ratio = wheel width / traverse per revolution).
 //! * [BED] B. Bednarski (Saint-Gobain Abrasives), in "Working an inside job",
 //!   American Machinist, 19 Oct 2006: work speed from wheel speed and a 25:1 to 65:1 ratio.
+//! * [BADGER10] J. Badger, "Overcoming waviness", Cutting Tool Engineering, 15 Jun 2010:
+//!   rpm ratio = wheel rpm / workpiece rpm; a whole number catches the same wave every
+//!   turn, a simple fraction (1/4, 1/3, 1/2, 2/3, 3/4) leaves scallops, a long decimal
+//!   is what to aim for. [BADGER11] "Origins of chatter", same column, 15 Apr 2011:
+//!   marks per work revolution against the rpm ratio, and marks x work rpm / 60 in Hz.
+//!   [BADGER25] "Varying the workpiece rpm", same column, 18 Apr 2025: examples of
+//!   ratios to avoid and to aim for. One author: single source for the rule.
 //!   Units: mm, m/s (wheel), m/min (work), mm/min (feeds), minutes.
 
 use std::f64::consts::PI;
@@ -91,10 +98,109 @@ pub fn traverse_time(len: f64, fa: f64, nw: f64, passes: f64) -> f64 {
 /// 1 when a wheel speed exceeds its marked maximum (m/s), 0 when within, NaN when no maximum is given.
 pub fn over_marked_max(vs: f64, vmax: f64) -> f64 { if !(vmax > 0.0) { f64::NAN } else if vs > vmax { 1.0 } else { 0.0 } }
 
+// ---------------------------------------------------------------------------
+// Wheel to work rpm ratio (waviness from a wheel that runs out or is out of balance)
+// ---------------------------------------------------------------------------
+
+/// Rpm ratio: wheel rpm divided by workpiece rpm [BADGER10]. A wheel that runs
+/// out or is out of balance touches the work once per wheel revolution, so this
+/// is also the number of waves it leaves per work revolution [BADGER11].
+pub fn rpm_ratio(wheel_rpm: f64, work_rpm: f64) -> f64 { wheel_rpm / work_rpm }
+
+/// How far a ratio is from the nearest whole number (0 to 0.5).
+pub fn rpm_ratio_off_whole(ratio: f64) -> f64 { (ratio - ratio.round()).abs() }
+
+/// The simple fractions named in [BADGER10]: 1/4, 1/3, 1/2, 2/3, 3/4.
+pub const RPM_RATIO_FRACTIONS: [f64; 5] = [0.25, 1.0 / 3.0, 0.5, 2.0 / 3.0, 0.75];
+
+/// Index (0 to 4) of the fraction in [`RPM_RATIO_FRACTIONS`] nearest to the
+/// fractional part of the ratio.
+pub fn rpm_ratio_near_fraction(ratio: f64) -> f64 {
+    let fr = ratio - ratio.floor();
+    let mut best = 0usize;
+    for (i, f) in RPM_RATIO_FRACTIONS.iter().enumerate() {
+        if (fr - f).abs() < (fr - RPM_RATIO_FRACTIONS[best]).abs() { best = i; }
+    }
+    best as f64
+}
+
+/// How far the fractional part of a ratio is from the nearest of those fractions.
+pub fn rpm_ratio_off_fraction(ratio: f64) -> f64 {
+    let fr = ratio - ratio.floor();
+    (fr - RPM_RATIO_FRACTIONS[rpm_ratio_near_fraction(ratio) as usize]).abs()
+}
+
+/// BenchMate's limit for "close to": 0.02. No source gives a figure. It sits
+/// between the examples in [BADGER25]: 8.0000, 9.013 and 8.9924 are called bad
+/// (0.013 or less from a whole number), 9.36488 and 8.916742 good (0.083 from a
+/// whole number, 0.031 from 1/3).
+pub fn rpm_ratio_tol() -> f64 { 0.02 }
+
+/// Class of an rpm ratio with the limit `tol`: 1 close to a whole number, 2
+/// close to one of the simple fractions, 0 neither (a "long decimal").
+pub fn rpm_ratio_class(ratio: f64, tol: f64) -> f64 {
+    if !(ratio.is_finite() && ratio > 0.0) { return f64::NAN; }
+    if rpm_ratio_off_whole(ratio) <= tol { 1.0 } else if rpm_ratio_off_fraction(ratio) <= tol { 2.0 } else { 0.0 }
+}
+
+/// Work rpm that gives a stated rpm ratio at a wheel rpm.
+pub fn work_rpm_for_ratio(wheel_rpm: f64, ratio: f64) -> f64 { wheel_rpm / ratio }
+
+/// Frequency (Hz) of marks counted round the work: marks per revolution x
+/// work rpm / 60 [BADGER11].
+pub fn marks_frequency_hz(marks_per_rev: f64, work_rpm: f64) -> f64 { marks_per_rev * work_rpm / 60.0 }
+
+/// Once-per-revolution frequency (Hz) of a spindle: rpm / 60.
+pub fn rev_frequency_hz(rpm: f64) -> f64 { rpm / 60.0 }
+
+/// Spacing round the work of `waves` waves per revolution on diameter `d`.
+pub fn wave_spacing(d: f64, waves: f64) -> f64 { PI * d / waves }
+
+/// Difference, in percent of the ratio, between marks counted and the rpm ratio.
+pub fn marks_vs_ratio_pct(marks_per_rev: f64, ratio: f64) -> f64 { (marks_per_rev - ratio) / ratio * 100.0 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
     fn close(a: f64, b: f64, tol: f64) -> bool { (a - b).abs() <= tol }
+
+    /// [BADGER10]: 40 m/s on a wheel worn from 500 to 350 mm is 1,528 to 2,182 rpm;
+    /// with the work at 200 rpm the ratio goes from 7.63 to 10.91 (1528 / 200 is
+    /// 7.64; the article prints 7.63). [BADGER11]: 12,000 sfm on a 16 in wheel is
+    /// printed as 2,866 rpm and 9,000 sfm as 2,150 (the article uses pi = 3.14;
+    /// with pi it is 2,864.8 and 2,148.6); work at 40 rpm gives 71.65 and 53.75
+    /// (71.62 and 53.71 here); 70 marks at 40 rpm is 47 Hz.
+    #[test]
+    fn rpm_ratio_examples() {
+        let n0 = wheel_rpm_ms(40.0, 500.0); let n1 = wheel_rpm_ms(40.0, 350.0);
+        assert!(close(n0, 1528.0, 0.5) && close(n1, 2182.0, 1.0));
+        assert!(close(rpm_ratio(n0, 200.0), 7.63, 0.011) && close(rpm_ratio(n1, 200.0), 10.91, 0.005));
+        let w = crate::rpm_from_sfm(12000.0, 16.0);
+        assert!(close(w, 2866.0, 1.5) && close(w, 12000.0 * 12.0 / (PI * 16.0), 1e-9));
+        assert!(close(rpm_ratio(w, 40.0), 71.65, 0.04));
+        assert!(close(rpm_ratio(crate::rpm_from_sfm(9000.0, 16.0), 40.0), 53.75, 0.04));
+        assert!(close(marks_frequency_hz(70.0, 40.0), 47.0, 0.5));
+        assert!(close(marks_vs_ratio_pct(70.0, 71.62), -2.26, 0.01));
+        assert!(close(rev_frequency_hz(2866.0), 47.77, 0.005));
+        assert!(close(work_rpm_for_ratio(1528.0, 8.0), 191.0, 1e-9));
+        assert!(close(wave_spacing(50.0, 8.0), PI * 50.0 / 8.0, 1e-12));
+    }
+
+    /// [BADGER25] examples: 8.0000, 9.013 and 8.9924 are "round numbers" to
+    /// avoid; 9.36488 and 8.916742 are good. [BADGER10]: 7.84923785 is ideal;
+    /// 1/4, 1/3, 1/2, 2/3 and 3/4 leave scallops.
+    #[test]
+    fn rpm_ratio_classes() {
+        let t = rpm_ratio_tol();
+        for r in [8.0, 9.013, 8.9924] { assert_eq!(rpm_ratio_class(r, t), 1.0, "{r}"); }
+        for r in [9.36488, 8.916742, 7.84923785] { assert_eq!(rpm_ratio_class(r, t), 0.0, "{r}"); }
+        for (r, k) in [(7.25, 0.0), (7.0 + 1.0 / 3.0, 1.0), (7.5, 2.0), (7.0 + 2.0 / 3.0, 3.0), (7.75, 4.0)] {
+            assert_eq!(rpm_ratio_class(r, t), 2.0, "{r}");
+            assert_eq!(rpm_ratio_near_fraction(r), k, "{r}");
+        }
+        assert!(close(rpm_ratio_off_whole(9.013), 0.013, 1e-9) && close(rpm_ratio_off_fraction(9.36488), 0.031547, 1e-5));
+        assert!(rpm_ratio_class(f64::NAN, t).is_nan() && rpm_ratio_class(0.0, t).is_nan());
+    }
 
     #[test]
     fn wheel_speed() {

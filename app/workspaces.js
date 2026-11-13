@@ -49,12 +49,14 @@ const HUBS = {
     tabs: [['drillforce', 'Drill thrust and torque'], ['taptorque', 'Tap torque']] },
   saws: { title: 'Bandsaw', icon: 'saw', desc: 'Cut time and the blade pitch for the section being cut.',
     tabs: [['bandsaw', 'Cut time'], ['sawtpi', 'Blade pitch']] },
+  wireedm: { title: 'Wire EDM', icon: 'wave', desc: 'Kerf, wire offsets and corner radius, taper cuts, and cut time from the cutting rate.',
+    tabs: [['edmoffset', 'Offset and kerf'], ['edmtaper', 'Taper'], ['edmtime', 'Cut time']] },
 };
 
 const WORKSPACES = [
   { id: 'turning', name: 'Turning', icon: 'turning', blurb: 'Speeds, inserts, boring bars, tapers and cut times for lathe work.', sections: [
     ['Speeds and feeds', ['advturn', 'rpm', 'feeds', 'mrr', 'kcforce', 'toollife'], 'gauge'],
-    ['Tooling', ['inserts', 'boringbar', 'tnrc'], 'insert'],
+    ['Tooling', ['inserts', 'boringbar', 'tnrc', 'holdertorque'], 'insert'],
     ['Operations', ['turntime', 'taper', 'surfacefin', 'knurl'], 'turning'],
     ['Programs', ['cycg71', 'cycgroove', 'cyctaper', 'threadprog'], 'code'],
     ['Stock and workholding', ['bar', 'chuckforce', 'slender', 'changegears'], 'material'],
@@ -63,25 +65,27 @@ const WORKSPACES = [
     ['Speeds and feeds', ['advmill', 'advplunge', 'rpm', 'feeds', 'mrr', 'kcforce', 'cutopt', 'toollife'], 'gauge'],
     ['Engagement', ['chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
     ['Tool behaviour', ['deflection', 'runout', 'chatter'], 'wave'],
+    ['Tool holding', ['holdertorque', 'machinetapers'], 'nut'],
     ['Other milling', ['surfacefin', 'slitsaw', 'indexing'], 'saw'],
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
-    ['Drilling', ['advdrill', 'advream', 'advtap', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
-    ['Tapping and thread data', ['threaddata', 'threadid', 'taplimits', 'wires', 'sti', 'coating', 'multistart'], 'tap'],
+    ['Drilling', ['advdrill', 'advream', 'advtap', 'gundrill', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
+    ['Tapping and thread data', ['threaddata', 'threadid', 'taplimits', 'threadgauge', 'rollblank', 'wires', 'sti', 'coating', 'multistart'], 'tap'],
     ['Thread standards', ['pipethreads', 'whitworth', 'acme', 'trapezoidal', 'buttress', 'unseries', 'unm', 'unjunr'], 'thread'],
     ['Thread programs', ['threadprog'], 'code'],
   ] },
-  { id: 'process', name: 'Grinding, sawing and gears', icon: 'gear', blurb: 'Grinding speeds and times, saws, gears, splines and broaching.', sections: [
-    ['Grinding', ['grindspeed', 'grindtimes', 'gritconv', 'wheelcode'], 'wheel'],
+  { id: 'process', name: 'Grinding, sawing and gears', icon: 'gear', blurb: 'Grinding speeds and times, saws, wire EDM, gears, splines and broaching.', sections: [
+    ['Grinding', ['grindspeed', 'grindratio', 'grindtimes', 'gritconv', 'wheelcode'], 'wheel'],
     ['Sawing', ['saws', 'slitsaw'], 'saw'],
+    ['Wire EDM', ['wireedm'], 'wave'],
     ['Gears', ['spurgear', 'helicalgear', 'gearmeasure', 'geartrain', 'planetary', 'worm', 'changegears', 'indexing'], 'gear'],
-    ['Splines and broaching', ['spline', 'cycbroach', 'keys'], 'gear'],
+    ['Splines and broaching', ['spline', 'saespline', 'cycbroach', 'keys'], 'gear'],
   ] },
   { id: 'inspect', name: 'Measure and inspect', icon: 'inspection', blurb: 'GD&T, fits, surface finish, gauge blocks and quality checks.', sections: [
     ['GD&T', ['gdtguide', 'gdtfcf', 'gdtpos', 'gdtprofu', 'gdtdof', 'gdtstack'], 'frame'],
     ['Fits and finish', ['fitlookup', 'tolmid', 'offsetadj', 'shrinkfit', 'surfacefin', 'prefnum'], 'fit'],
     ['Measuring', ['sinebar', 'scales', 'wires', 'tapergauge', 'dovetail', 'hardness', 'tempcomp'], 'caliper'],
-    ['Quality', ['capability', 'ctrlchart', 'sampling'], 'chart'],
+    ['Quality', ['capability', 'ctrlchart', 'grr', 'sampling'], 'chart'],
   ] },
   { id: 'maths', name: 'Shop maths', icon: 'triangle', blurb: 'Calculator, conversions, geometry, stock and engineering sums.', sections: [
     ['Calculator and conversion', ['calc', 'convert', 'formulas'], 'calc'],
@@ -101,7 +105,7 @@ const WORKSPACES = [
     ['Fasteners', ['boltgrade', 'bolttorque', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
     ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife'], 'bearing'],
     ['Shop', ['coolant', 'economics', 'abbrev'], 'drop'],
-    ['Guides', ['cncguide', 'toolguide'], 'book'],
+    ['Guides', ['cncguide', 'toolwear', 'toolguide'], 'book'],
   ] },
 ];
 // Listed on the Home rail rather than in a workspace.
@@ -116,9 +120,9 @@ const PAGE_ICON = {
   calc: 'calc', rpm: 'gauge', threaddata: 'thread', wires: 'thread', triangle: 'triangle', weight: 'material', hardness: 'bars',
   sinebar: 'angle', machines: 'machine', toollib: 'toollib', gsim: 'play', sketch: 'dxf', chatter: 'wave', boringbar: 'beam', deflection: 'beam',
   taper: 'angle', knurl: 'surface', formulas: 'book', gmcodes: 'code', materials: 'material', bolttorque: 'nut', oring: 'bearing',
-  setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart',
-  spline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',
-  abbrev: 'drawing', economics: 'bars', mrr: 'bars', toollife: 'clock', cutopt: 'gauge', runout: 'gauge', indexing: 'gear',
+  setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart', grr: 'chart',
+  spline: 'gear', saespline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',
+  abbrev: 'drawing', economics: 'bars', mrr: 'bars', toollife: 'clock', cutopt: 'gauge', runout: 'gauge', indexing: 'gear', grindratio: 'wave', holdertorque: 'nut',
 };
 
 // ---- Derived tables ----

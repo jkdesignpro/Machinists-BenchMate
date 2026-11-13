@@ -16,6 +16,13 @@ const CNC_SOURCES = {
   HSE_EM: 'Health and Safety Executive, "Using emery cloth on metalworking lathes", updated 2026-08-18 (hse.gov.uk/engineering/lathes.htm)',
   CD: 'Carbide Depot (cutting tool distributor), turning troubleshooting table (carbidedepot.com/formulas-turning-troubleshoot.htm)',
   CDM: 'Carbide Depot (cutting tool distributor), milling troubleshooting table (carbidedepot.com/formulas-mc-troubleshoot.htm)',
+  MMC68: 'Mitsubishi Materials, drilling course 68, "Trouble shooting" (mmc-carbide.com/permanent/courses/68/trouble-shooting.html)',
+  PTD: 'Travers Tool, "Drill troubleshooting and tips", 2021, with material from Precision Twist Drill (Dormer Pramet) (solutions.travers.com)',
+  FMC_D: 'FM Carbide, drilling troubleshooting chart for indexable drills (fmcarbide.com/pages/drilling-troubleshooting-chart)',
+  FMC_T: 'FM Carbide, TechTalk "Tapping troubleshooting", 2021-12-15 (fmcarbide.com/blogs/techtalks/tapping-troubleshooting)',
+  REGAL: 'Regal Cutting Tools, "5 common tap troubles, and how to remedy them", 2024-10-30 (regalcuttingtools.com)',
+  RADIAC: 'Radiac Abrasives, troubleshooting tips: cylindrical grinding and surface grinding (radiac.com/troubleshooting-tip-category)',
+  OKUMA_G: 'R. Williams, Okuma America, "6 causes of grinding chatter, and how to fix them", 2016-03-23 (okuma.com/blog)',
   NIST: 'T. R. Kramer, F. M. Proctor, E. Messina, The NIST RS274NGC Interpreter, version 3, NISTIR 6556, 2000 (public domain)',
   LCNC: 'LinuxCNC documentation: lathe user information and G-code overview (linuxcnc.org)',
   HFO_OP: 'Haas Factory Outlet (Productivity Inc.), Haas Lathe Operator manual, rev. 12/2018',
@@ -26,7 +33,7 @@ const CNC_SOURCES = {
   IA: 'Industry Arena (CNCzone mirror) forum thread "Manual tool comp partial radius lathe", 2005-2009',
   OWN: 'BenchMate derivation (geometry), with tests in core/src/tnrc.rs',
 };
-const CNC_INDEPENDENT = { HFO_OP: 'HAAS', HFO_L: 'HAAS' }; // same publisher family counts once
+const CNC_INDEPENDENT = { HFO_OP: 'HAAS', HFO_L: 'HAAS', FMC_D: 'FMC', FMC_T: 'FMC' }; // same publisher family counts once
 // mode 'cat': a standard's own edition and status, confirmed on the standards body's catalogue.
 function cnTags(keys, mode) {
   const ks = keys || [];
@@ -99,6 +106,29 @@ function cnChip() {
     cnT(30, 104, 'uncut chip thickness', 'gs') + cnT(170, 90, 'shear plane', 'gs', 'end') + cnT(316, 66, 'rake face', 'gs') + cnT(370, 140, 'flank', 'gs') +
     cnArrow(120, 150, 60, 150) + cnT(90, 168, 'work moves', 'gs', 'middle') + cnT(272, 24, 'chip', 'gv', 'end'),
     'Chip formation in orthogonal cutting');
+}
+// The worn edge "unfolded": the rake face (where the chip runs) above the edge line, the flank (the face towards
+// the work) below it, the corner at the left and the depth-of-cut line where the edge leaves the work. Own drawing,
+// the same base for every wear type so that they can be compared.
+function wearDraw(kind) {
+  const W = 300, H = 192, ye = 96, xd = 200;
+  let h = DK.rect(30, 28, 244, ye - 28, 'part') + DK.rect(30, ye, 244, 64, 'part') + DK.line(xd, 16, xd, 172, 'hid');
+  h += DK.text(268, 42, 'rake face', { cls: 'mut', anchor: 'end' }) + DK.text(268, 152, 'flank', { cls: 'mut', anchor: 'end' }) + DK.text(30, 184, 'corner', { cls: 'mut', anchor: 'start' }) + DK.text(xd, 184, 'depth-of-cut line', { cls: 'mut' });
+  const T = (x, y, t, a) => DK.text(x, y, t, { cls: 'hott', anchor: a || 'middle' });
+  const marks = {
+    flank: () => DK.path('M31 96H200V110Q116 115 31 109Z', 'tool') + T(116, 132, 'even band below the edge'),
+    crater: () => DK.path('M52 74Q116 50 180 74Q116 90 52 74Z', 'tool') + T(116, 46, 'hollow behind the edge'),
+    notch: () => DK.path('M189 96L200 70L211 96L200 130Z', 'tool') + T(184, 146, 'notch', 'end'),
+    bue: () => DK.path('M70 96Q72 70 100 78Q124 62 150 82Q162 92 156 104Q110 112 70 96Z', 'tool') + T(112, 54, 'work material stuck on'),
+    chipping: () => DK.path('M54 96l5 9l6 -9ZM94 96l7 12l5 -6l5 -6ZM150 96l6 10l8 -10Z', 'tool') + T(116, 132, 'small pieces lost'),
+    thermal: () => [58, 88, 118, 148, 178].map((x, i) => DK.line(x, 78, x + (i % 2 ? 3 : -3), 118, 'hot')).join('') + T(116, 140, 'cracks across the edge'),
+    deform: () => DK.path('M31 96Q116 124 200 96Z', 'tool') + DK.path('M44 90Q116 74 188 90', 'hot') + T(116, 140, 'edge pushed down'),
+    fracture: () => DK.path('M31 58L52 66L70 58L96 80L120 96L112 118L84 126L62 150L31 152Z', 'tool') + T(150, 136, 'piece broken away', 'start'),
+    flaking: () => DK.path('M66 96Q98 56 130 96Z', 'tool') + DK.path('M80 96Q98 72 116 96', 'hot') + DK.path('M140 96Q162 68 184 96Z', 'tool') + DK.path('M152 96Q162 82 172 96', 'hot') + T(126, 50, 'shell-shaped scars'),
+    hammer: () => DK.path('M214 96l6 -10l6 10ZM232 96l7 -12l7 12Z', 'tool') + DK.path('M150 62Q196 14 238 44Q254 60 240 78', 'hot') + DK.arrow(246, 66, 238, 82, 'hot') + T(146, 60, 'chip', 'end') + T(238, 132, 'struck here'),
+  };
+  h += (marks[kind] ? marks[kind]() : '') + DK.line(30, ye, 274, ye, 'ln');
+  return DK.svg(W, H, h, 'Worn cutting edge: ' + kind);
 }
 // Small drawings of the edge for each wear type (insert corner from the flank side and from above).
 function cnWear(kind) {
@@ -262,6 +292,9 @@ const WEAR = [
   ['chipping', 'Chipping', 'Small pieces lost along the edge line, giving a ragged edge and a poor finish; flank wear then speeds up.', 'Impact in interrupted cuts, vibration, hard inclusions, built-up edge breaking away.', 'Make the set-up stiffer; use a tougher grade and a stronger edge (larger hone, smaller rake, wider land); lower the feed, above all at entry and exit.', ['MMC', 'SECO']],
   ['thermal', 'Thermal cracking', 'Short cracks running across the edge, from repeated heating and cooling; typical in milling and interrupted turning, and worse with coolant that reaches the edge only now and then.', 'Temperature cycles: interrupted cuts, high cutting temperature, intermittent wetting.', 'Use a sharper geometry to make less heat; a grade that resists thermal shock; cut with air, or with plenty of coolant all the time.', ['MMC', 'SECO']],
   ['deform', 'Plastic deformation', 'The edge sags or bulges under heat and pressure, so the flank and rake lose their shape; it often leads to sudden breakage.', 'High cutting force and temperature; work materials that conduct heat poorly.', 'Use a harder grade; lower speed and feed; use a larger corner radius; use coolant.', ['MMC', 'SECO']],
+  ['fracture', 'Fracture and breakage', 'A large piece of the edge or the whole corner is gone, often all at once. What is left shows a rough broken face, not a worn one.', 'Impact and thermal shock, more likely on hard work and at the start of a cut (Mitsubishi). A load greater than the edge can carry, from cutting conditions that are too heavy, or an edge already weakened by other wear (Seco). An insert that is not seated properly in its pocket (Mitsubishi).', 'Clean the pocket, seat the insert, clamp it and tighten to the right torque. Start with a smaller depth of cut and feed. Use a tougher grade and a stronger edge: larger hone and land, larger corner radius, smaller rake. For heavy interrupted cuts use a larger shank. If earlier wear weakened the edge, change it sooner.', ['MMC', 'SECO']],
+  ['flaking', 'Flaking', 'Shell-shaped pieces lifted off the face at the edge, leaving shallow curved scars.', 'The work springs back and loads the edge in compression, or welded material peels away and takes the surface with it. Common on hardened work, where the force pushing the tool away is high.', 'Mitsubishi calls it hard to avoid. Lower the feed and the cutting speed to keep the flank wear small; use a smaller corner radius. A narrower hone or a larger rake would lower the force but weaken the edge.', ['MMC']],
+  ['hammer', 'Chip hammering', 'Damage on the part of the edge that is not cutting, beyond the depth-of-cut line, where the chip curls back and strikes it. That part can break off.', 'The chip curls back onto the unused edge; more likely with a high feed together with a large depth of cut.', 'Change the feed or the depth of cut so the chip goes elsewhere; use another entering angle or another chip breaker; use a tougher grade.', ['SECO']],
 ];
 const TROUBLE_TURN = [
   ['Chatter / vibration', 'A set-up that is not stiff (long overhang, slender work); an insert that pushes too hard radially (large nose radius, blunt or negative edge).', 'Stiffen and shorten the set-up; use a sharp, positive insert with a smaller nose radius and a larger lead angle; a little more feed can calm a rubbing cut.', ['CD']],
@@ -277,13 +310,45 @@ const TROUBLE_MILL = [
   ['Burrs and breakout on edges', 'Worn edges; too much edge hone; poor entry or exit angle; zero lead angle; chip load too high or too low.', 'Change edges earlier; use a sharper edge; move the cutter centre over the part so it exits at a better angle; use a lead angle; adjust chip load.', ['CDM']],
   ['Short tool life', 'Heat (speed too high), wrong grade, built-up edge, chipping from chatter or recut chips. See the wear section to read the edge.', 'Lower the speed or raise the chip load so the chip carries the heat away; use a suitable coated grade; clear chips with air or coolant; give the chips room (larger gullets).', ['CDM', 'MMC', 'SECO']],
 ];
+const TROUBLE_DRILL = [
+  ['Hole oversize', 'The drill runs out in its holder or is not in line with the hole; the two lips are not the same height or the point is off centre; the drill is longer than it needs to be; the work moves; chips pack in the flutes.', 'Check the runout of the drill in the holder; regrind so the lips are even and the point is central; use a shorter drill; clamp the work; peck or give the chips more room if they pack.', ['MMC68', 'PTD', 'FMC_D']],
+  ['Hole undersize, or closing in', 'Heat: cutting speed too high, too little coolant reaching the cut.', 'Lower the speed; get more coolant to the point (a drill with coolant holes); check the diameter of the drill itself.', ['MMC68', 'PTD']],
+  ['Hole not straight, not round or out of position', 'Uneven lips; runout in the holder; a poor start on the surface or too much feed at entry; a starting hole that is inaccurate or too shallow; a drill that is too long; work that moves; chips packing.', 'Cut the runout; regrind the point and thin the web so it starts cleanly; lower the feed while the point enters; make a better and deeper starting hole; use a shorter drill; clamp the work.', ['MMC68', 'PTD']],
+  ['Drill breaks', 'Too much feed; a long drill; runout; work that moves; chips that are not carried out (too little coolant, flutes packed); on indexable drills also inserts not seated, an unsteady spindle or too little power.', 'Lower the feed; shorten the drill or its overhang; check runout and clamping; raise the coolant flow or peck to clear chips; check the seating of the inserts.', ['MMC68', 'PTD', 'FMC_D']],
+  ['Chipping at the outer corners or lips', 'Too much feed as the drill breaks through; runout; work that moves.', 'Lower the feed at the exit; check runout and clamping; lower the speed; a little less point clearance or a larger edge hone makes the lips stronger.', ['MMC68', 'PTD']],
+  ['Chipping at the chisel edge (centre)', 'A chisel edge that is too wide; a poor start; runout; a point that is off centre.', 'Thin the chisel edge; check runout and the point. The two sources differ on feed: Mitsubishi lowers the feed at entry, Precision Twist Drill raises the feed rate.', ['MMC68', 'PTD']],
+  ['Wear on the outer corners and margins', 'Cutting speed too high; heat at the corners.', 'Lower the speed; Precision Twist Drill also raises the feed per revolution; aim more coolant at the cut, at a higher pressure, or use a drill with coolant holes.', ['MMC68', 'PTD']],
+  ['Long, stringy chips', 'Feed too light for the chip to break; material that does not break chips well; on indexable drills too little coolant or the wrong chip breaker.', 'Raise the feed; peck (step) drill; use coolant through the drill; on indexable drills raise the coolant flow or change the chip breaker.', ['MMC68', 'FMC_D']],
+  ['Burrs where the drill comes out', 'Too much feed at the exit; too large an edge hone.', 'Lower the feed for the last part of the hole; use a smaller edge hone.', ['MMC68']],
+  ['Chatter, or a loud rough cut (indexable drills)', 'A set-up or part that is not stiff; the drill not seated in its holder; chips being cut twice; too much thrust.', 'Check the set-up and the seating; raise the coolant flow; lower the feed and raise the speed.', ['FMC_D']],
+];
+const TROUBLE_TAP = [
+  ['Thread oversize', 'A tap with the wrong limit for the class of thread; the tap not in line with the hole or loose in its holder; the feed not matching the pitch, or the holder pushing the tap.', 'Use a tap with a tighter limit (see the tap limits tool); check alignment and the holder; feed at exactly the pitch; check the hole size before tapping.', ['FMC_T', 'REGAL']],
+  ['Thread undersize (the GO gauge will not enter)', 'A tap with the wrong limit; a worn tap; a tap drill that is too small; material that closes in after the tap has passed.', 'Use a tap with a looser limit; change the worn tap; use a larger tap drill.', ['FMC_T']],
+  ['Tap breaks', 'Too much torque: a worn tap, a tap drill that is too small, too little or the wrong lubricant, speed too high; chips trapped in the flutes; the tap reaching the bottom of the hole.', 'Change the tap sooner; use a larger tap drill (see the tap drill tool for the engagement); lubricate at the cut; lower the speed; drill deeper or thread less deep; use a holder that limits the torque; see "Chips packing".', ['FMC_T', 'REGAL']],
+  ['Chips packing in the flutes', 'Not enough room for the chips, or chips that have nowhere to go.', 'Use a tap with fewer flutes; a spiral flute tap lifts the chips out of the hole, a spiral point tap pushes them ahead in a through hole; where the material allows, a forming tap makes no chips.', ['REGAL']],
+  ['Rapid wear, or the tap and chips burn', 'Speed too high; too little lubricant, or the wrong one; a tap or surface treatment that does not suit the material; a hole hardened by the drill or drilled too small; a tap with too little hook to cut freely.', 'Lower the speed; put a suitable oil or emulsion right at the cut; use a tap with a wear-resistant surface treatment; check the drilling.', ['FMC_T', 'REGAL']],
+  ['Material welding to the cutting edges (built-up edge)', 'Speed too high; too little coolant or lubricant; a worn tap or the wrong type of tap.', 'Lower the speed; improve the lubrication; change the tap; a surface treatment that resists sticking (nitride or steam oxide) helps.', ['FMC_T', 'REGAL']],
+  ['Rough or torn thread', 'The wrong type of tap; speed too high; a chamfer that is too short; chips that cannot get out; too little rake; a tap drill that is too small; chipped teeth or a badly resharpened tap; poor lubrication.', 'Choose the tap for the material and hole; lower the speed; use a longer chamfer where the hole allows; clear the chips; check the tap drill size; change or regrind the tap; improve the lubrication.', ['FMC_T']],
+  ['Bell-mouthed thread (larger at the start)', 'Too much or uneven pressure as the tap starts; axial force from the spindle on the tap; a part that is not located or clamped properly.', 'Control the feed as the tap starts; use a holder with length compensation; check the fixture.', ['FMC_T']],
+];
+const TROUBLE_GRIND = [
+  ['Burn or cracks on the work', 'A wheel that is too hard, too fine or too dense; wheel speed too high or work speed too low; a cut that is too heavy; too little coolant, or coolant aimed past the cut; a wheel that needs dressing.', 'Use a softer, coarser or more open wheel; lower the wheel speed or raise the work speed; take lighter cuts; check the coolant level and aim the nozzle at the cut; dress the wheel.', ['RADIAC']],
+  ['Chatter marks', 'A cut that is too heavy; a wheel that acts too hard; a wheel out of balance; slender work without support; vibration in the machine (loose parts, belts) or from outside; weak coolant.', 'Lighten the cut (slower infeed or traverse); make the wheel act softer: softer grade, faster work, slower wheel, coarser dress, richer coolant, one change at a time; balance the wheel and check it for cracks; support slender work with a steady rest; tighten what can vibrate.', ['RADIAC', 'OKUMA_G']],
+  ['Rough finish', 'Dressing too coarse or too fast; a diamond that is too sharp; a cut that is too heavy; traverse or work speed too fast; dirty or weak coolant.', 'Dress more slowly and lighter; take a lighter cut; slow the traverse and the work; change the coolant or correct its strength.', ['RADIAC']],
+  ['Wheel loads or glazes', 'A depth of cut that is too small; poor coolant; a worn dressing diamond.', 'Dress coarser (more infeed, faster traverse); change the coolant or use one that cleans better; change the diamond.', ['RADIAC']],
+  ['Work out of round between centres', 'Centre holes that are out of round, burred, dirty or too shallow; centres that are worn, loose or a poor fit; the work loose or too tight between centres.', 'Clean and lap the centre holes; regrind or change the centres and lubricate them; set the tailstock pressure so the work turns freely without play.', ['RADIAC']],
+  ['Spiral marks or feed lines', 'Work loose on the centres; headstock and tailstock out of line; steady rests set unevenly; traverse or work speed wrong for the finishing passes; an unsuitable wheel.', 'Clamp the headstock and tailstock and check their alignment and the centres; set the steady rests evenly; adjust the traverse and work speed for finishing.', ['RADIAC']],
+  ['Long, even waves', 'A wheel out of balance: often one that was stopped with the coolant running, so one side is soaked, or one stored where it took up moisture or oil.', 'Balance the wheel; shut the coolant off and let the wheel spin dry before stopping it; store wheels in racks off the floor.', ['RADIAC']],
+  ['Short, close waves', 'Vibration from belts, motors, the hydraulic system or other machines nearby.', 'Find the source and repair or replace the part that causes it.', ['RADIAC']],
+];
 function cnTable(head, rows) {
   return '<div class="res cntab" style="max-width:none"><table class="gtab"><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '<th>Sources</th></tr>' +
     rows.map(r => '<tr>' + r.slice(0, 3).map((c, i) => '<td>' + (i ? '' : '<b>') + gesc(c) + (i ? '' : '</b>') + '</td>').join('') + '<td>' + cnTags(r[3]) + '</td></tr>').join('') + '</table></div>';
 }
 function renderCncGuide(el) {
   const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
-    ['c-wear', 'Tool wear'], ['c-trt', 'Turning troubles'], ['c-trm', 'Milling troubles'], ['c-hold', 'Workholding'], ['c-safe', 'Safety'], ['c-src', 'Sources']];
+    ['c-wear', 'Tool wear'], ['c-trt', 'Turning troubles'], ['c-trm', 'Milling troubles'], ['c-trd', 'Drilling troubles'], ['c-trtap', 'Tapping troubles'], ['c-trg', 'Grinding troubles'], ['c-hold', 'Workholding'], ['c-safe', 'Safety'], ['c-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Written for BenchMate in our own words, with our own drawings. Each statement shows the keys of the public sources that confirm it (hover a key); anything not confirmed in two independent public sources is marked <span class="gtbv">to be verified</span>. Your machine and control manuals always win over this guide.</p>' +
@@ -329,11 +394,14 @@ function renderCncGuide(el) {
     cp('<b>Chip thickness</b> is set by the feed (and the entering angle in turning, the radial engagement in milling). Each chip breaker and edge works in a range of chip thickness: too thin and the edge rubs, too thick and it breaks. See the chip thinning tool for milling.', []) +
 
     '<h2 id="c-wear">Tool wear: types, causes and remedies</h2>' +
-    '<p class="desc">Change one thing at a time and keep a note of what worked. Look at the worn edge under a lens before deciding.</p>' +
-    WEAR.map(([id, name, look, cause, fix, keys]) => '<section class="gchar"><div class="gcg">' + cnWear(id) + '<dl><dt>' + name + ' ' + cnTags(keys) + '</dt><dd>' + gesc(look) + '</dd><dt>Causes</dt><dd>' + gesc(cause) + '</dd><dt>Remedies</dt><dd>' + gesc(fix) + '</dd></dl></div></section>').join('') +
+    '<p class="desc">Change one thing at a time and keep a note of what worked. Look at the worn edge under a lens before deciding. The <a href="#/t/toolwear">tool wear guide</a> has the same entries with a picture index.</p>' +
+    WEAR.map(([id, name, look, cause, fix, keys]) => '<section class="gchar"><div class="gcg"><div class="cnwd">' + wearDraw(id) + '</div><dl><dt>' + name + ' ' + cnTags(keys) + '</dt><dd>' + gesc(look) + '</dd><dt>Causes</dt><dd>' + gesc(cause) + '</dd><dt>Remedies</dt><dd>' + gesc(fix) + '</dd></dl></div></section>').join('') +
 
     '<h2 id="c-trt">Turning troubleshooting</h2>' + cnTable(['Problem', 'Likely causes', 'Try'], TROUBLE_TURN) +
     '<h2 id="c-trm">Milling troubleshooting</h2>' + cnTable(['Problem', 'Likely causes', 'Try'], TROUBLE_MILL) +
+    '<h2 id="c-trd">Drilling troubleshooting</h2>' + cnTable(['Problem', 'Likely causes', 'Try'], TROUBLE_DRILL) +
+    '<h2 id="c-trtap">Tapping troubleshooting</h2>' + cnTable(['Problem', 'Likely causes', 'Try'], TROUBLE_TAP) +
+    '<h2 id="c-trg">Grinding troubleshooting</h2><p class="desc">Cylindrical and surface grinding with conventional wheels. Change one thing at a time.</p>' + cnTable(['Problem', 'Likely causes', 'Try'], TROUBLE_GRIND) +
 
     '<h2 id="c-hold">Workholding basics</h2>' + cnVise() +
     cp('<b>Locate, then clamp.</b> Seat the part against fixed locating faces (the fixed jaw, parallels, a stop), then apply clamping force toward those faces. The fixed jaw and the parallels set the position; the moving jaw only holds.', []) +
@@ -355,3 +423,25 @@ function renderCncGuide(el) {
     '<p class="desc">Full URLs and access dates are in docs/sources.md. No text, figures or tables were copied from standards, handbooks, maker catalogues or other calculators.</p>';
   el.querySelectorAll('.gtoc a').forEach(a => a.onclick = e => { e.preventDefault(); const t = el.querySelector(a.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 }
+
+// ------------------------------------------------------------------ tool wear guide
+// A picture index of the wear types, then one card each: what you see, why, and what to try. Same data as the
+// tool wear section of the CNC guide.
+const WEAR_GRADUAL = ['flank', 'crater'];
+function renderToolWear(el) {
+  el.innerHTML = '<div class="gdtguide wearg">' +
+    '<p class="desc">Clean the edge and look at it under a lens (about 10x) in good light before changing anything. Find the picture that matches, read the causes, then change one thing at a time and keep a note of what worked. The drawings show the edge unfolded: the rake face, where the chip runs, is above the edge line; the flank, the face towards the work, is below it; the corner is at the left and the dashed line is where the edge leaves the work.</p>' +
+    '<div class="weari">' + WEAR.map(([id, name]) => '<a class="weart" href="#/t/toolwear" data-w="' + id + '">' + wearDraw(id) + '<span>' + gesc(name) + '</span></a>').join('') + '</div>' +
+    WEAR.map(([id, name, look, cause, fix, keys]) => '<section class="gchar wearc" id="wear-' + id + '"><div class="gcg"><div class="weard">' + wearDraw(id) + '</div><dl>' +
+      '<dt>' + gesc(name) + ' ' + cnTags(keys) + '</dt><dd><span class="weark">' + (WEAR_GRADUAL.includes(id) ? 'Gradual wear: expected, keep it within limits' : 'Damage: find the cause') + '</span></dd>' +
+      '<dt>What you see</dt><dd>' + gesc(look) + '</dd><dt>Causes</dt><dd>' + gesc(cause) + '</dd><dt>What to try</dt><dd>' + gesc(fix) + '</dd></dl></div></section>').join('') +
+    '<div class="note"><b>How this was put together.</b> The causes and remedies are from two tool makers\' public guides, in our own words. Where they give different remedies both are named. An entry with one source key is marked "to be verified": only one of the two guides describes it. Mitsubishi separates gradual wear of the flank and rake faces from sudden damage, which the cutting conditions and the tool should be chosen to prevent; the label under each name follows that. The drawings are our own.</div>' +
+    '<div class="note"><b>Sources</b><br>' + ['MMC', 'SECO'].map(k => '<b>' + k + '</b>: ' + gesc(CNC_SOURCES[k])).join('<br>') + ', both read again 2026-11-12.</div></div>';
+  for (const a of el.querySelectorAll('.weart')) a.onclick = e => {
+    e.preventDefault();
+    const c = el.querySelector('#wear-' + a.dataset.w); if (!c) return;
+    for (const x of el.querySelectorAll('.wearc.on')) x.classList.remove('on');
+    c.classList.add('on'); c.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
+}
+

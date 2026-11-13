@@ -212,6 +212,82 @@ ISO 2859-1:1999 and ANSI/ASQ Z1.4-2003 by name only (current editions not
 re-checked). Tests check the binomial sum against a direct evaluation, the
 c = 0 closed form and the Poisson sum.
 
+## 7. Gauge R&R, average and range method (`grr`, 0.5.0)
+
+A crossed study: 2 to 5 appraisers each measure the same 2 to 10 parts 2 to 4
+times. The readings are pasted as a table (one line per appraiser and trial,
+one column per part). Core: `grr_xbar_r`, `grr_from_summary`, `grr_k`,
+`range_d2_star` in `core/src/inspect.rs`.
+
+Formulas (the form every source below gives):
+
+- EV = R-bar K1 (repeatability); R-bar is the average of the ranges, one range
+  per appraiser and part.
+- AV = sqrt((X-diff K2)^2 - EV^2 / (n r)) (reproducibility), n parts, r trials;
+  zero when the value under the root is negative.
+- GRR = sqrt(EV^2 + AV^2); PV = Rp K3; TV = sqrt(GRR^2 + PV^2).
+- Each as a percentage of TV. ndc = 1.41 PV / GRR, cut to a whole number.
+- Percent of tolerance = 6 GRR / (USL - LSL).
+
+Constants: K1 = 1 / d2(r); K2 = 1 / d2*(1, appraisers); K3 = 1 / d2*(1, parts),
+with d2*(g, m)^2 = d2(m)^2 + d3(m)^2 / g. The core works d2 and d3 out by
+numerical integration (as for the control charts) and the tests check the
+results against the constants the sources print: K1 0.8862, 0.5908, 0.4857;
+K2 0.7071, 0.5231; K3 0.7071, 0.5231, 0.4467, 0.4030, 0.3742, 0.3534, 0.3375,
+0.3249, 0.3146; d2* 1.41421 (1 range of 2), 1.9115 (1 range of 3), 2.080
+(9 ranges of 4). The relation for d2* is not stated on any page read; it is
+used because it reproduces every published constant to the last digit printed.
+
+Sources (all read 2026-11-12):
+
+- OriginLab, "Algorithm for Gage R&R Study",
+  https://docs.originlab.com/app/algorithm-gg/ : the X-bar and R formulas, the
+  d2* lookups, study variation, percent of tolerance, distinct categories.
+- Minitab support, "Methods and formulas for gage R&R table in Crossed Gage
+  R&R Study": which d2* goes with which component (repeatability: g = parts x
+  operators, m = trials; reproducibility: g = 1, m = operators; parts: g = 1,
+  m = parts); percent of tolerance. The formulas themselves are images there.
+- T. Hessing and Ramana PV, sixsigmastudyguide.com, "Repeatability and
+  reproducibility": the form with K1, K2, K3; "set AV = 0" for a negative
+  root; ndc cut to a whole number; the 10 % and 30 % guidelines and ndc of 5
+  or more; a worked example (3 operators, 3 parts, 4 trials).
+- B. McNeese, spcforexcel.com, "Three Methods to Analyze Gage R&R Studies",
+  February 2015: K1 = 0.5908, K2 = 0.5231, K3 = 0.3146 and the results of a
+  study of 10 parts, 3 operators and 3 trials.
+- SAS/QC documentation, GAGE application: K1 uses d2 when operators x parts is
+  16 or more and d2* below that.
+- SigmaZone Quantum XL help (X-bar R method) and MetricGate docs: the same
+  formulas; reproducibility reported as zero when negative.
+- AIAG, *Measurement Systems Analysis*, 4th ed., 2010: cited by name by all of
+  the above; not read and not reproduced.
+
+Checks (core tests):
+
+- McNeese's printed summary numbers (average range 0.342, X-diff 0.445, Rp
+  3.511) give EV 0.202, AV 0.230, R&R 0.306, PV 1.104, TV 1.146 and 17.6 %,
+  20.0 %, 26.7 %, 96.4 %, as printed (the percentages within 0.05, because the
+  article works from unrounded inputs). The study's 90 readings are the
+  manual's and are not in the repository.
+- The sixsigmastudyguide example: negative root, AV = 0, ndc 1. That page
+  divides by d2* for nine ranges (2.080) and prints EV 0.0112 and 73 %; with
+  K1 = 1 / d2 BenchMate gives 0.0113 and 73.3 %.
+- A study worked by hand (2 appraisers, 3 parts, 2 trials).
+- The example on the page is our own made-up study; the smoke test checks it
+  against a calculation done outside the core.
+
+Where sources differ, and what BenchMate does:
+
+- **d2 or d2* for the repeatability.** The form with fixed K1 uses 1 / d2.
+  Minitab, SigmaZone and the sixsigmastudyguide example look up d2* for the
+  number of ranges, which is larger when there are few ranges, so their EV is
+  a little lower (about 3 % lower for 10 ranges of 2). BenchMate uses the form's
+  K1 and says so on the page.
+- **ndc**: cut to a whole number (sixsigmastudyguide, SigmaZone, which also
+  never shows less than 1). BenchMate cuts and does not raise it to 1.
+
+Not included: the ANOVA method, the range chart by appraiser and its control
+limit, attribute studies, bias and linearity.
+
 ## Not done in this batch
 
 - ANSI B4.1 above 19.69 in, and a second full source for ANSI B4.1 (see 1).

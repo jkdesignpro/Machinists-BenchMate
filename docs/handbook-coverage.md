@@ -71,7 +71,7 @@ current practice and says so in the tool's notes.
 | Cutting fluids, refractometer concentration | MH31 EBB | partial (concentration from Brix x the fluid's factor, mix and top-up built; fluid selection missing) | fluid maker data sheets; docs/shop-helpers.md |
 | Machining non-ferrous and plastics | MH31 | missing | material supplier machining guides |
 | EDM (wire and sinker) basics | MH31 | missing | public process guides |
-| Knurling: diameter for pitch | MH31 EBB | built (blank diameter for a whole tooth count, CP/TPI/DP, straight and 30 deg; diameter growth left to trial, makers' tables cited) | DIN 82:1973-01, DIN 403; Dorian and Hommel+Keller catalogues |
+| Knurling: diameter for pitch | MH31 EBB | built (blank diameter for a whole tooth count by four methods: DP, CP/TPI, measure and count, trial and error with a tick-off procedure; straight and 30 deg; diameter growth measured on the trial piece, makers' tables cited) | DIN 82:1973-01, DIN 403; Dorian and Hommel+Keller catalogues; Sherline, GenSwiss, C. Hoffman, pjsminilathe (quoting ANSI/ASME B94.6-1984) |
 | Broaching | MH31 | missing | geometry, maker data |
 | Indexing (dividing head, rotary table) | EBB | missing (in progress on `claude/geometry`) | own derivation (40:1 ratio arithmetic) |
 | Sine bar, sine plate, gauge block stack | MH31 EBB | missing (in progress on `claude/geometry`) | geometry; gauge sets from ISO 3650 / maker lists |

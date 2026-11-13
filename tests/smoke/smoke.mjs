@@ -125,7 +125,7 @@ await mode('advanced');
 where = 'drawings';
 const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'calc', 'formulas',
   'machines', 'toollib', 'setupsheet', 'materials', 'tempercolours', 'heattreat', 'plastics', 'metalid',
-  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade']);
+  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade', 'holdertorque']);
 await units('inch');
 const noDrawing = [];
 for (const id of meta.tools) {
@@ -1108,6 +1108,523 @@ where = 'snippets';
   await page.evaluate(() => { SNIP_CTRL.v = null; });
 }
 
+// Knurling: four methods. The published examples must come out, the method fields must swap, and the
+// tick-off procedure must keep its ticks and name a source (or say it has none) on every step.
+where = 'knurl';
+{
+  await units('inch');
+  await open('knurl', 150);
+  const set = async (id, v) => { const q = `#main #${id}`; await page.fill(q, String(v)); await page.dispatchEvent(q, 'input'); await page.waitForTimeout(30); };
+  const pick = async (id, v) => { await page.selectOption(`#main #${id}`, v); await page.waitForTimeout(40); };
+  const res = () => page.$eval('#main #kres', e => e.innerText.replace(/\s+/g, ' '));
+  const has = async (re, what) => { const t = await res(); if (!re.test(t)) problems.push(`[${where}] ${what}: ${t}`); };
+  const shown = async id => page.$eval(`#main #${id}`, e => !!e.offsetParent);
+  // 1. diametral pitch: 96 DP on 1/2 in is 48 teeth (ANSI B94.6 as quoted), 0.0327 in pitch
+  await pick('km', 'dp'); await set('kdp', 96); await set('kd', 0.5);
+  await has(/Circular pitch p 0\.0327 in/, '96 DP is 0.0327 in');
+  await has(/Teeth on the wanted diameter 48\.00/, '96 DP on 0.5 in is 48 teeth');
+  if (await shown('kp') || await shown('kl') || await shown('ktb')) problems.push(`[${where}] the DP method shows fields of another method`);
+  // 2. circular pitch: Dorian, 20 TPI at 30 degrees is 17.32 TPI round the work (0.0577 in)
+  await pick('km', 'cp'); await pick('ks', 'tpi'); await set('kp', 20); await pick('kf', '30');
+  await has(/Pitch around the circumference 0\.0577 in/, '20 TPI at 30 deg is 0.0577 in round the work');
+  if (!(await shown('kf')) || await shown('kdp')) problems.push(`[${where}] the circular pitch method shows the wrong fields`);
+  // 3. measure and count, print: Hoffman, 75 spaces in 3.535 in, 5/8 in stock, 41 teeth, 0.615 in
+  await pick('km', 'count'); await pick('kh', 'print'); await set('kl', 75); await set('kspan', 3.535); await set('kd', 0.625);
+  await has(/Circular pitch p 0\.0471 in .*Blank for 41 teeth 0\.6151 in .*Steps between whole tooth counts 0\.0150 in/, 'the Hoffman print example should give 0.0471, 41 teeth, 0.6151, 0.0150');
+  if (await shown('kf')) problems.push(`[${where}] measure and count should not ask for the pattern`);
+  // wheel: 72 teeth over 0.744 in (ANSI 96 DP wheel) is 0.0325 in and 96.77 per inch of diameter
+  await pick('kh', 'wheel'); await set('kl', 72); await set('kspan', 0.744);
+  await has(/Circular pitch p 0\.0325 in .*Teeth per inch of wheel diameter 96\.77 .*Approximate\..*one source.*64, 96, 128, 160/, 'the ANSI wheel example should give 0.0325 and 96.77, marked approximate and single-source');
+  // back to the print: its own numbers are kept
+  await pick('kh', 'print');
+  if (await page.inputValue('#main #kl') !== '75' || await page.inputValue('#main #kspan') !== '3.535') problems.push(`[${where}] the print values were lost when switching to the wheel and back`);
+  // 4. trial and error
+  await pick('km', 'trial');
+  await has(/Enter the blank you tried/, 'trial with no blank should ask for it');
+  await set('ktb', 0.615);
+  await has(/try next 0\.6100 in .*or 0\.6200 in/, 'a 0.615 blank should offer 0.610 and 0.620');
+  await set('ktk', 0.635); await set('ktf', 0.65);
+  await has(/Growth on this trial piece 0\.0200 in .*Blank for the finished diameter 0\.6300 in .*try the new blank on scrap/, 'growth 0.020 and blank 0.630 for 0.650 finished');
+  await set('ktk', 0.6);
+  await has(/Check the two diameters/, 'a knurled diameter under the blank should be questioned');
+  const steps = await page.$$eval('#main #ktick li', a => a.map(li => li.innerText.replace(/\s+/g, ' ')));
+  if (steps.length !== 9) problems.push(`[${where}] expected 9 steps, got ${steps.length}`);
+  for (const [n, t] of steps.entries()) if (!/\[[^\]]+\]$/.test(t)) problems.push(`[${where}] step ${n + 1} does not name its sources: ${t}`);
+  if (!/no source\]$/.test(steps[8] || '')) problems.push(`[${where}] the last step should be marked as BenchMate's own advice: ${steps[8]}`);
+  if (!/Dorian Tool, Sherline Products\]$/.test(steps[5] || '')) problems.push(`[${where}] the 0.005 in step should name Dorian and Sherline: ${steps[5]}`);
+  await page.click('#main #ktick li:nth-child(1) input'); await page.click('#main #ktick li:nth-child(4) input');
+  if (!/^2 of 9/.test(await page.textContent('#main #kdone'))) problems.push(`[${where}] two ticks should count as 2 of 9`);
+  // ticks and values survive a change of units (values are kept in mm)
+  await units('mm'); await open('knurl', 150);
+  if (await page.inputValue('#main #km') !== 'trial' || !/^2 of 9/.test(await page.textContent('#main #kdone'))) problems.push(`[${where}] method or ticks lost on a change of units`);
+  if (await page.inputValue('#main #ktb') !== '15.621') problems.push(`[${where}] 0.615 in should show as 15.621 mm, got ${await page.inputValue('#main #ktb')}`);
+  await has(/try next 15\.494 mm .*or 15\.748 mm/, 'the step is 0.127 mm either way');
+  await page.click('#main #kclr');
+  if (!/^0 of 9/.test(await page.textContent('#main #kdone'))) problems.push(`[${where}] Clear the ticks should clear them`);
+  await pick('km', 'cp'); await pick('ks', 'mm'); await pick('kf', '0'); await set('kp', 1); await set('kd', 20);
+  await has(/Teeth on the wanted diameter 62\.83 .*Blank for 62 teeth 19\.735 mm/, '1 mm pitch on 20 mm is 62.83 teeth, blank 19.735 for 62');
+  const src = await page.$eval('#main', e => e.innerText);
+  for (const w of ['Sherline', 'GenSwiss', 'Conrad Hoffman', 'pjsminilathe', 'Read and not used', 'Industrial Monitor Direct']) if (!src.includes(w)) problems.push(`[${where}] the sources note should name ${w}`);
+}
+// Grinding: wheel to work rpm ratio. The two published examples, the three verdicts, wear at constant surface
+// speed against constant rpm, and the drawing (waves only when the ratio is a bad one).
+where = 'grindratio';
+{
+  await units('mm');
+  await open('grindratio', 80);
+  const set = async (k, v) => { const q = `#main [data-id="${k}"]`; await page.fill(q, String(v)); await page.dispatchEvent(q, 'input'); await page.waitForTimeout(30); };
+  const rows = () => page.$eval('#res', e => [...e.querySelectorAll('.rrow')].map(t => t.innerText.replace(/\s+/g, ' ')).join(' ; '));
+  const has = async (re, what) => { const t = await rows(); if (!re.test(t)) problems.push(`[${where}] ${what}: ${t}`); };
+  const cap = () => page.$eval('#main .tdia svg', e => e.textContent.replace(/\s+/g, ' '));
+  // Badger 2010: 500 mm wheel at 40 m/s, work 200 rpm: 1,528 rpm, ratio 7.64 (printed 7.63); worn to 350 mm: 2,182 rpm, 10.91, passing 8, 9, 10
+  await has(/rpm ratio \(wheel rpm \/ work rpm\) 7\.6394 ; Verdict Not close/i, 'the default example should give 7.6394, not close');
+  await has(/Wheel rpm for that surface speed 1,527\.9 RPM/, 'wheel rpm 1,527.9');
+  await has(/ratio 8: 191\.0 rpm; .*ratio 7 1\/2: 203\.7 rpm; .*ratio 7: 218\.3 rpm/, 'work speeds to stay away from');
+  await set('dmin', 350);
+  await has(/Wheel rpm when worn 2,182\.7 RPM ; Rpm ratio when worn 10\.9135 +; Whole numbers passed as the wheel wears 8, 9, 10\./, 'worn to 350 mm should give 2,182.7 rpm, 10.9135 and pass 8, 9, 10');
+  let c = await cap();
+  if (!/long decimal: ?waves wiped out/.test(c) || /waves drawn/.test(c) || !/7\.6394/.test(c)) problems.push(`[${where}] the drawing of a good ratio should be round and say so: ${c}`);
+  // whole number: work at 191 rpm with the wheel at 1528 rpm is exactly 8
+  await set('ns', 1528); await set('nw', 191);
+  await has(/ratio \(wheel rpm \/ work rpm\) 8\.0000 ; Verdict Close to a whole number \(8\)/i, '1528 / 191 is 8, a whole number');
+  await has(/As the wheel wears At a constant wheel rpm the ratio stays where it is\. The surface speed falls to 28\.00 m\/s/, 'at constant rpm the ratio stays and the surface speed falls to 28.00 m/s');
+  c = await cap();
+  if (!/whole number: ?waves build up/.test(c) || !/8 waves drawn/.test(c)) problems.push(`[${where}] the drawing of a whole-number ratio should show 8 waves: ${c}`);
+  // simple fraction: 1528 / 203.7333 = 7.5
+  await set('nw', 203.7333);
+  await has(/Verdict Close to 7 1\/2: .*scallops/, '7.5 should be called a simple fraction');
+  // the author's own examples of bad and good ratios (wheel rpm chosen as ratio x 100)
+  for (const [ns, bad] of [[901.3, true], [899.24, true], [936.488, false], [891.6742, false]]) {
+    await set('ns', ns); await set('nw', 100);
+    const t = await rows();
+    if (bad !== /Verdict Close to a whole number/.test(t) || (!bad && !/Verdict Not close/.test(t))) problems.push(`[${where}] ratio ${ns / 100} should be ${bad ? 'bad' : 'good'}: ${t}`);
+  }
+  // Badger 2011, inch: 16 in wheel at 12,000 sfm, work 40 rpm, 70 marks: ratio 71.62 (printed 71.65 with pi = 3.14), 46.7 Hz
+  await units('inch'); await open('grindratio', 80);
+  await set('ds', 16); await set('ns', ''); await set('vs', 12000); await set('nw', 40); await set('marks', 70); await set('dw', 2); await set('dmin', '');
+  await has(/ratio \(wheel rpm \/ work rpm\) 71\.6197/i, '12,000 sfm on 16 in at 40 rpm is 71.6197');
+  await has(/Frequency of the marks 46\.7 Hz ; Marks counted against the rpm ratio -2\.3 % +; What the count points to .*self-excited chatter/, '70 marks at 40 rpm is 46.7 Hz, 2.3 % under the ratio');
+  await has(/Spacing of those waves round the work 0\.0877 in/, 'spacing of 71.62 waves on 2 in is 0.0877 in');
+  await has(/Wheel, once per revolution 47\.75 Hz/, 'the wheel turns at 47.75 Hz');
+}
+// Gun drilling: the maker's table values, straight-line values between table sizes, nothing outside the table,
+// the second maker's ranges beside them, the 20 % cut over 30 diameters and the percentage speed adjustments.
+where = 'gundrill';
+{
+  await units('inch');
+  await open('gundrill', 150);
+  const set = async (id, v) => { const q = `#main #${id}`; await page.fill(q, String(v)); await page.dispatchEvent(q, 'input'); await page.waitForTimeout(30); };
+  const pick = async (id, v) => { await page.selectOption(`#main #${id}`, v); await page.waitForTimeout(40); };
+  const res = () => page.$eval('#main #gdres', e => e.innerText.replace(/\s+/g, ' '));
+  const has = async (re, what) => { const t = await res(); if (!re.test(t)) problems.push(`[${where}] ${what}: ${t}`); };
+  // 1/2 in drill, low to medium carbon steel 12-17 HRC, high pressure: Sterling 330 SFM, 0.0008 in/rev, 525 psi, 7.0 gal/min
+  await has(/Cutting speed 330 SFM 100\.6 m\/min Sterling Gun Drills: 12-17 HRC/, 'default speed 330 SFM');
+  await has(/botek, for comparison 230 to 328 SFM 70 to 100 m\/min guide range for: Structural and carbon steel/, 'botek speed range 70 to 100 m/min');
+  await has(/Spindle speed 2521 rpm/, '330 SFM on 0.5 in is 2521 rpm');
+  await has(/Feed per revolution 0\.00080 in\/rev 0\.0203 mm\/rev Sterling Gun Drills, column "Steels, low and medium carbon"/, 'feed 0.0008 in/rev');
+  await has(/botek, for comparison 0\.00106 to 0\.00299 in\/rev 0\.0270 to 0\.0760 mm\/rev guide range for 12\.00 to 13\.99 mm/, 'botek feed range for 12.7 mm');
+  await has(/Feed rate 2\.02 in\/min 51\.2 mm\/min/, 'feed rate 2.02 in/min');
+  await has(/Coolant pressure 525 psi 36\.2 bar .*one source.*Coolant flow, single flute 7\.0 gal\/min 26\.5 l\/min .*Coolant flow, twin flute 7\.5 gal\/min .*Longest unsupported drill length 16\.0 in 406 mm at high SFM 32\.0 in 813 mm at low SFM/, 'coolant row of the 0.500 in size');
+  await has(/UNISIG starting flow, any deep hole tool 12\.5 to 15\.0 gal\/min 47\.0 to 57\.1 l\/min/, 'UNISIG 25 to 30 gal/min per inch');
+  if (/Time to drill|Depth in diameters/.test(await res())) problems.push(`[${where}] no depth entered: no depth rows expected`);
+  // between two table sizes: 0.300 in is 0.4 of the way from 0.250 to 0.375: 0.00055 in/rev, 825 psi, 3.2 gal/min
+  await set('gdd', 0.3);
+  await has(/Feed per revolution 0\.00055 in\/rev/, '0.300 in should give 0.00055 in/rev');
+  await has(/Coolant pressure 825 psi .*single flute 3\.2 gal\/min/, '0.300 in should give 825 psi and 3.2 gal/min');
+  // outside the table nothing is made up
+  await set('gdd', 1.5);
+  await has(/Feed per revolution Outside Sterling Gun Drills's table .*Coolant pressure and flow Outside Sterling Gun Drills's table/, '1.5 in is outside the table');
+  if (/Feed rate|single flute/.test(await res())) problems.push(`[${where}] outside the table there should be no feed rate or flow`);
+  await set('gdd', 0.1);
+  await has(/Feed per revolution Outside/, '0.100 in is under the table');
+  // deep hole: 0.5 in x 16 in is 32 diameters, the feed is cut by 20 % to 0.00064, 16 / (0.00064 x 2521) = 9.92 min
+  await set('gdd', 0.5); await set('gdl', 16);
+  await has(/Depth in diameters 32\.0 x D .*Feed per revolution 0\.00064 in\/rev .*cut by 20 % because the hole is over 30 diameters deep.*Time to drill the depth 9\.92 min/, '32 diameters deep: 0.00064 in/rev and 9.92 min');
+  await set('gdl', 15);
+  await has(/Depth in diameters 30\.0 x D .*Feed per revolution 0\.00080 in\/rev 0\.0203 mm\/rev Sterling Gun Drills, column "Steels, low and medium carbon" botek/, 'exactly 30 diameters: no cut');
+  // stainless 300, free machining +30 %, spray mist: 150 x 1.3 = 195 SFM; the feed column follows the material; the maker's warning shows
+  await pick('gdm', 'ss300'); await pick('gda', '0'); await pick('gdc', 'mist');
+  await has(/Cutting speed 195 SFM .*17-17 \(as printed; probably 12-17\) HRC, free machining \+30 %/, 'stainless 300 free machining on spray mist is 195 SFM');
+  await has(/guide range for: Stainless steel, austenitic.*column "Stainless 300 series, titanium, high temperature nickel alloys".*marks this material.*Spray mist:/, 'stainless: feed column, botek group, verify note and mist note');
+  if (await page.inputValue('#main #gdf') !== 'c3') problems.push(`[${where}] the feed column should follow the material`);
+  // grey cast iron has no botek rows and its own adjustments
+  await pick('gdm', 'gci'); await pick('gdc', 'hp'); await pick('gda', '1');
+  await has(/Cutting speed 160 SFM .*ni-resist -60 %/, 'grey iron Ni-Resist is 400 less 60 % = 160 SFM');
+  if (/botek/.test(await res())) problems.push(`[${where}] no botek rows expected for cast iron`);
+  // mm: 6 mm in low carbon steel: botek row 6.00 to 6.99 mm
+  await units('mm'); await open('gundrill', 150);
+  await pick('gdm', 'lc'); await set('gdd', 6); await set('gdl', '');
+  await has(/botek, for comparison 0\.0110 to 0\.0364 mm\/rev .*guide range for 6\.00 to 6\.99 mm/, 'botek row for 6 mm');
+  await has(/Coolant pressure 67\.2 bar 974 psi/, '6 mm is 974 psi by the straight line between 0.187 and 0.250 in');
+  const rules = await page.$$eval('#main ul.gdrules li', a => a.map(li => li.innerText.replace(/\s+/g, ' ')));
+  if (rules.length !== 7 || rules.some(t => !/\[[^\]]+\]$/.test(t))) problems.push(`[${where}] seven rules, each naming its sources: ${rules.length}`);
+  const txt = await page.$eval('#main', e => e.innerText);
+  for (const w of ['Read and not used', 'Master Fluid Solutions', 'UNISIG', 'botek', 'Hartner', 'Ingersoll', 'ISCAR']) if (!txt.includes(w)) problems.push(`[${where}] the sources note should name ${w}`);
+}
+// Tool wear guide: ten wear types, each with its own drawing, causes and remedies; the picture index jumps to
+// the card; an entry that only one maker describes is marked. The CNC guide shows the same ten.
+where = 'toolwear';
+{
+  await open('toolwear', 120);
+  const g = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('#main .wearc')];
+    return { tiles: document.querySelectorAll('#main a.weart svg.dk').length, cards: cards.length,
+      bad: cards.filter(c => !c.querySelector('.weard svg.dk') || !/What you see/.test(c.innerText) || !/Causes/.test(c.innerText) || !/What to try/.test(c.innerText) || !c.querySelector('abbr.gsrc')).map(c => c.id),
+      single: cards.filter(c => /to be verified/.test(c.innerText)).map(c => c.id).join(','),
+      gradual: cards.filter(c => /Gradual wear/i.test(c.innerText)).map(c => c.id).join(','),
+      marks: cards.map(c => c.querySelectorAll('.weard svg .tool, .weard svg .hot').length) };
+  });
+  if (g.tiles !== 10 || g.cards !== 10) problems.push(`[${where}] expected 10 tiles and 10 cards, got ${g.tiles} and ${g.cards}`);
+  if (g.bad.length) problems.push(`[${where}] cards without a drawing, the three headings or a source: ${g.bad.join(', ')}`);
+  if (g.single !== 'wear-flaking,wear-hammer') problems.push(`[${where}] flaking and chip hammering have one source each and should say so: ${g.single}`);
+  if (g.gradual !== 'wear-flank,wear-crater') problems.push(`[${where}] only flank and crater wear are gradual wear: ${g.gradual}`);
+  if (g.marks.some(n => n < 1)) problems.push(`[${where}] a drawing shows no wear mark: ${g.marks.join(' ')}`);
+  await page.click('#main a.weart[data-w="notch"]'); await page.waitForTimeout(80);
+  if (!(await page.$('#main #wear-notch.on')) || (await page.$$('#main .wearc.on')).length !== 1) problems.push(`[${where}] the picture index should mark the notch wear card`);
+  await open('cncguide', 120);
+  const n = await page.$$eval('#main .cnwd svg.dk', a => a.length);
+  if (n !== 10) problems.push(`[${where}] the CNC guide should show the same ten wear drawings, got ${n}`);
+}
+// Macro system variables: searchable by number per control; a one-source row says so; a number that is not
+// listed is not borrowed from another control. Builders' M-code lists (Doosan, DMG MORI, Mazak) are separate.
+where = 'sysvars';
+{
+  await open('macroref', 300);
+  const sv = async (ctrl, q) => {
+    await page.selectOption('#mrc', ctrl);
+    await page.fill('#mrq', q); await page.dispatchEvent('#mrq', 'input'); await page.waitForTimeout(60);
+    return page.$eval('#mrsv', e => e.innerText.replace(/\s+/g, ' '));
+  };
+  let t = await sv('haas', '5023');
+  if (!/\(1 of 70\)/i.test(t) || !/#5021 to #5025 Present machine position/.test(t) || !/Maker/.test(t)) problems.push(`[${where}] Haas 5023 should find the machine position row: ${t.slice(0, 160)}`);
+  t = await sv('haas', '#2001');
+  if (!/#2001 to #2200 Tool length offsets \(H\)/.test(t)) problems.push(`[${where}] Haas #2001 is the tool length offset block: ${t.slice(0, 160)}`);
+  t = await sv('fanuc', '2001');
+  if (!/\(#2001 to #2200\) Machining centre: tool length wear/.test(t) || !/Two sources/.test(t)) problems.push(`[${where}] Fanuc #2001 is the tool length wear block, from two sources: ${t.slice(0, 200)}`);
+  t = await sv('fanuc', '#3901');
+  if (!/Number of parts machined/.test(t) || !/One source/.test(t)) problems.push(`[${where}] Fanuc #3901 has one source and should say so: ${t.slice(0, 160)}`);
+  t = await sv('fanuc', '8500');
+  if (!/\(0 of \d+\)/i.test(t) || !/not borrowed from another control/.test(t)) problems.push(`[${where}] a Haas-only number must not show for Fanuc: ${t.slice(0, 160)}`);
+  t = await sv('haas', 'timer');
+  if (!/#3001 Millisecond timer/.test(t) || /#5021/.test(t)) problems.push(`[${where}] a word search should filter the Haas list: ${t.slice(0, 160)}`);
+  t = await sv('okuma', '');
+  if (!/No system variables confirmed for Okuma/.test(t) && t.trim() !== '') problems.push(`[${where}] Okuma has no system variable rows: ${t.slice(0, 120)}`);
+  await sv('fanuc', '');
+  const disF = await page.$eval('#mrnotes', e => e.innerText.replace(/\s+/g, ' '));
+  if (!/Macro variable number for one tool offset/i.test(disF) || !/#11201/.test(disF)) problems.push(`[${where}] the tool offset numbering difference should be shown for Fanuc`);
+  await page.fill('#mrq', ''); await page.dispatchEvent('#mrq', 'input');
+
+  await open('gmcodes', 300);
+  const mrow = async (ctrl, q) => {
+    await page.selectOption('#gmc', ctrl);
+    await page.fill('#gmq', q); await page.dispatchEvent('#gmq', 'input'); await page.waitForTimeout(60);
+    return page.$$eval('#gmres tr.gmrow', rs => rs.map(r => r.innerText.replace(/\s+/g, ' ')).join(' ; '));
+  };
+  const want = [['doosan', 'M29', /Rigid tapping mode on/], ['dmg', 'M29', /In-position check invalid/], ['mazak', 'M203', /Turning spindle 1 start, forward/],
+    ['doosan', 'M60', /Pallet change/], ['dmg', 'M25', /Tailstock spindle out/], ['mazak', 'M08', /Flood coolant on/]];
+  for (const [ctrl, code, re] of want) {
+    const r = await mrow(ctrl, code);
+    if (!re.test(r)) problems.push(`[${where}] ${ctrl} ${code}: ${r.slice(0, 140)}`);
+  }
+  const counts = await page.evaluate(async () => { const G = (await (await fetch('data/refdata.json')).json()).gcodes; const n = c => G.codes.filter(r => r.ctrl === c && r.kind === 'M').length; return [n('doosan'), n('dmg'), n('mazak'), G.sysvars.length].join(','); });
+  if (counts !== '118,44,47,89') problems.push(`[${where}] M rows for Doosan, DMG MORI, Mazak and system variable rows: ${counts}`);
+  await page.fill('#gmq', ''); await page.dispatchEvent('#gmq', 'input');
+  await page.selectOption('#gmc', 'haas');
+}
+// Material card: composition chart (limits as printed, per element, with the publisher count), machinability
+// rings (one per printed rating, never merged across conditions) and the property table.
+where = 'material card';
+{
+  await open('materials', 300);
+  const card = async grade => {
+    await page.fill('#msearch', grade); await page.dispatchEvent('#msearch', 'input'); await page.waitForTimeout(80);
+    await page.evaluate(g => [...document.querySelectorAll('#main .mrow')].find(r => r.querySelector('b').textContent === g).click(), grade);
+    await page.waitForTimeout(120);
+    return page.evaluate(() => ({
+      comp: [...document.querySelectorAll('#mcomp tr[data-el]')].map(r => r.dataset.el + ': ' + r.cells[1].innerText.replace(/\s+/g, ' ') + ' [' + r.cells[3].innerText.trim() + ']' + (r.querySelector('svg.cbar rect.cb-rng') ? ' bar' : '')).join(' ; '),
+      none: document.querySelector('#mcomp') ? document.querySelector('#mcomp').innerText.replace(/\s+/g, ' ') : '',
+      rings: [...document.querySelectorAll('#mmach .mrc')].map(c => c.innerText.replace(/\s+/g, ' ')).join(' ; '),
+      arcs: [...document.querySelectorAll('#mmach circle.mr-arc')].map(c => c.getAttribute('stroke-dasharray').split(' ')[0]).join(','),
+      props: !!document.querySelector('#mev .mprops'), head: document.querySelector('#mcard') ? document.querySelector('#mcard').innerText : '' }));
+  };
+  let c = await card('4140');
+  if (!/C: 0\.38 to 0\.43 2 \[Confirmed\] bar/.test(c.comp) || !/Si: 0\.15 to 0\.35 1 TimkenSteel 0\.2 to 0\.35 1 Nickel Institute \[Sources differ\]/.test(c.comp) || !/Mo: 0\.15 to 0\.25 2 \[Confirmed\]/.test(c.comp) || !/P: 0\.035 max 2/.test(c.comp))
+    problems.push(`[${where}] 4140 composition: ${c.comp}`);
+  if (c.comp.split(' ; ').length !== 7 || !c.props || !/Material card: 4140/i.test(c.head)) problems.push(`[${where}] 4140 should have 7 elements, the property table and the card heading: ${c.comp.split(' ; ').length} ${c.props} ${c.head}`);
+  if (!/^66 66 % 1 Annealed AISI 1212 = 100 % Engineers Edge ; 66 66 % 1 Annealed, cold drawn AISI 1212 = 100 % Metals Service Center Institute$/.test(c.rings)) problems.push(`[${where}] 4140 machinability rings: ${c.rings}`);
+  if (c.arcs !== '62.2,62.2') problems.push(`[${where}] a 66 % ring should be drawn a third of the way round (62.2 of 188.5): ${c.arcs}`);
+  c = await card('304');
+  if (!/C: 0\.08 max 1 Specialty Steel Industry of North America 0\.07 max 1 Atlas Steels \[Sources differ\]/.test(c.comp) || !/Ni: 8 to 10\.5 2 \[Confirmed\]/.test(c.comp) || !/Si: 0\.75 max 1 \[Needs 2nd source\]/.test(c.comp))
+    problems.push(`[${where}] 304 composition: ${c.comp}`);
+  c = await card('1018');
+  if (!/70 % 1 Cold drawn/.test(c.rings) || !/78 % 1 Not stated/.test(c.rings)) problems.push(`[${where}] 1018 has two ratings that must both show: ${c.rings}`);
+  c = await card('12L14');
+  if (!/Pb: 0\.15 to 0\.35 1 \[Needs 2nd source\]/.test(c.comp) || !/170 %/.test(c.rings)) problems.push(`[${where}] 12L14: ${c.comp} / ${c.rings}`);
+  c = await card('321');
+  if (!/Ti: 5x\(C\+N\) min 1 Specialty Steel Industry of North America 5x\(C\+N\) min, 0\.70 max 1 Atlas Steels \[Sources differ\]/.test(c.comp)) problems.push(`[${where}] 321 titanium rule: ${c.comp}`);
+  c = await card('6082');
+  if (!/No source with a composition table/.test(c.none) || c.rings) problems.push(`[${where}] 6082 has no composition yet and should say so: ${c.none.slice(0, 120)}`);
+  const nComp = await page.evaluate(async () => (await (await fetch('data/materials.json')).json()).materials.filter(m => m.composition).length);
+  if (nComp !== 37) problems.push(`[${where}] grades with a composition: ${nComp}`);
+  await page.fill('#msearch', ''); await page.dispatchEvent('#msearch', 'input');
+}
+// Collet nut and pull stud torque: the maker's table by size, bore and nut, the 25 % ceiling from the core,
+// the second maker beside it, and the pull stud table with every maker's figure and nothing merged.
+where = 'holdertorque';
+{
+  await units('mm'); await open('holdertorque', 200);
+  const pick = async (id, v) => { await page.selectOption(`#main #${id}`, v); await page.waitForTimeout(50); };
+  const res = async () => (await page.innerText('#main #htres')).replace(/\s+/g, ' ');
+  const nuts = () => page.$$eval('#main #htn option', o => o.map(x => x.value).join(','));
+  await pick('htz', 'ER 16'); await pick('htn', 'std');
+  let t = await res();
+  if (!/Recommended torque 56 N·m 41\.3 lbf·ft REGO-FIX: ER 16, bore 5 to 10 mm, Standard nut .*printed as 56 Nm Do not go over 70 N·m 51\.6 lbf·ft recommended \+ 25 %/.test(t) || !/Techniks, for comparison 61 N·m 45 lbf·ft slotted or hex nut; printed as 45 ft\/lbs/.test(t))
+    problems.push(`[${where}] ER 16, 5 to 10 mm, standard nut: ${t}`);
+  await pick('htb', String(await page.$$eval('#main #htb option', o => o.find(x => /^1\.5 to 3\.5 mm/.test(x.textContent)).value)));
+  t = await res();
+  if (!/Recommended torque 20 N·m 14\.8 lbf·ft/.test(t) || !/Do not go over 25 N·m 18\.4 lbf·ft/.test(t)) problems.push(`[${where}] a small bore takes less torque (ER 16, 1.5 to 3.5 mm is 20 N·m): ${t}`);
+  await pick('htn', 'mini'); t = await res();
+  if (!/Recommended torque 24 N·m 17\.7 lbf·ft/.test(t) || !/Do not go over 30 N·m 22\.1 lbf·ft/.test(t)) problems.push(`[${where}] ER 16 mini nut, largest bore: ${t}`);
+  await pick('htz', 'ER 32'); t = await res();
+  if (await nuts() !== 'std' || !/Recommended torque 136 N·m 100\.3 lbf·ft/.test(t) || !/Do not go over 170 N·m 125\.4 lbf·ft/.test(t) || !/Techniks, for comparison 151\.9 N·m 112 lbf·ft/.test(t))
+    problems.push(`[${where}] ER 32 has no mini nut figure and takes 136 N·m: ${await nuts()} ${t}`);
+  await pick('htz', 'ER 8'); t = await res();
+  if (await nuts() !== 'mini' || !/Recommended torque 6 N·m 4\.4 lbf·ft/.test(t) || !/Do not go over 7\.5 N·m 5\.5 lbf·ft/.test(t)) problems.push(`[${where}] ER 8 is printed for the mini nut only, 6 N·m: ${await nuts()} ${t}`);
+  await pick('htz', 'ER 50'); t = await res();
+  if (!/Recommended torque 240 N·m 177 lbf·ft/.test(t) || !/Techniks, for comparison No figure for this size/.test(t)) problems.push(`[${where}] ER 50: ${t}`);
+  const all = await page.evaluate(() => ({ n: document.querySelectorAll('#htallt tr').length - 1, hit: [...document.querySelectorAll('#htallt tr.hit')].map(r => r.innerText.replace(/\s+/g, ' ')).join('|'),
+    stud: [...document.querySelectorAll('#htstud tr[data-taper]')].map(r => r.innerText.replace(/\s+/g, ' ')).join(' ; ') }));
+  if (all.n !== 22 || !/^ER 50 6 to 36 mm 240 N·m 177 lbf·ft not printed$/.test(all.hit)) problems.push(`[${where}] full table: ${all.n} rows, marked row: ${all.hit}`);
+  if (!/40 taper 50 N·m 36\.9 lbf·ft as printed: 50 Nm, maximum 103 N·m 76 lbf·ft as printed: 76 ft-lb 61 to 74\.6 N·m 45 to 55 lbf·ft as printed: 45 to 55 ft-lb Sources differ/.test(all.stud) ||
+      !/ISO 20 not printed 27\.1 N·m 20 lbf·ft as printed: 20 ft-lb not printed One source/.test(all.stud) || !/50 taper 100 N·m 73\.8 lbf·ft as printed: 100 Nm, maximum 134\.2 N·m 99 lbf·ft/.test(all.stud))
+    problems.push(`[${where}] pull stud table must show each maker's figure as printed: ${all.stud}`);
+  await pick('htz', 'ER 16');
+  await units('inch'); await open('holdertorque', 200);
+  t = await res();
+  const opt = await page.$eval('#main #htb', e => e.options[e.selectedIndex].textContent);
+  if (!/Recommended torque 41\.3 lbf·ft 56 N·m/.test(t) || !/Do not go over 51\.6 lbf·ft 70 N·m/.test(t) || opt !== '5 to 10 mm (0.197 to 0.394 in)') problems.push(`[${where}] inch: ${opt} / ${t}`);
+}
+// Gauge R&R: the example study against an independent calculation (Python, outside the core), the hand-worked
+// study of the core test, the negative root that sets AV to zero, and the input errors.
+where = 'grr';
+{
+  await units('mm'); await open('grr', 250);
+  const res = async () => (await page.innerText('#main #grres')).replace(/\s+/g, ' ');
+  const put = async txt => { await page.fill('#main #grtext', txt); await page.dispatchEvent('#main #grtext', 'input'); await page.waitForTimeout(60); };
+  await page.click('#main #grex'); await page.waitForTimeout(120);
+  let t = await res();
+  if (!/10 parts, 3 appraisers, 2 trials \(60 readings\)/i.test(t) || !/Repeatability, EV R-bar 0\.00353 x K1 0\.8862 0\.00313 10\.8 %/.test(t) || !/Reproducibility, AV X-diff 0\.00720 x K2 0\.5231 0\.00370 12\.8 %/.test(t) ||
+      !/Gauge R&R, GRR May be acceptable \(10 to 30 %\).* 0\.00485 16\.7 %/.test(t) || !/Part variation, PV Rp 0\.09083 x K3 0\.3146 0\.02857 98\.6 %/.test(t) || !/Total variation, TV sqrt\(GRR\^2 \+ PV\^2\) 0\.02898/.test(t) ||
+      !/5 or more wanted 8 GRR against the tolerance .* 0\.02909 29\.1 %/.test(t))
+    problems.push(`[${where}] example study: ${t}`);
+  const bars = await page.$$eval('#main #grplot rect.bar', b => b.length);
+  const avg = (await page.innerText('#main #grapp')).replace(/\s+/g, ' ');
+  if (bars !== 4 || !/25\.00490 25\.00920 25\.00200 25\.00537/.test(avg)) problems.push(`[${where}] chart bars ${bars}, appraiser averages: ${avg}`);
+  await page.fill('#main [data-k="tol"]', ''); await page.dispatchEvent('#main [data-k="tol"]', 'input'); await page.waitForTimeout(60);
+  if (/against the tolerance/.test(await res())) problems.push(`[${where}] no tolerance entered, but a tolerance row is shown`);
+  await page.selectOption('#main [data-k="ap"]', '2');
+  await put('10.0 12.0 11.0\n10.2 12.1 11.3\n10.4 12.5 11.4\n10.3 12.3 11.6');
+  t = await res();
+  if (!/3 parts, 2 appraisers, 2 trials \(12 readings\)/i.test(t) || !/EV R-bar 0\.183 x K1 0\.8862 0\.162 15\.0 %/.test(t) || !/AV X-diff 0\.317 x K2 0\.7071 0\.214 19\.8 %/.test(t) || !/ 0\.269 24\.9 %/.test(t) ||
+      !/PV Rp 2\.000 x K3 0\.5231 1\.046 96\.9 %/.test(t) || !/ 1\.080 Number of distinct categories.* wanted 5$/.test(t.trim()))
+    problems.push(`[${where}] hand-worked study (2 appraisers, 2 trials, 3 parts): ${t}`);
+  await put('10.0 12.0 11.0\n10.2 12.1 11.3\n10.2 12.1 11.3\n10.0 12.0 11.0');
+  t = await res();
+  if (!/the value under the root is negative, so AV is set to zero/.test(t) || !/AV is set to zero[^%]* 0\.000 0\.0 %/.test(t)) problems.push(`[${where}] appraisers with the same average: AV must be zero and say why: ${t}`);
+  await put('10.0 12.0 11.0\n10.2 12.1\n10.4 12.5 11.4\n10.3 12.3 11.6');
+  if (!/Every line needs the same number of readings.*line 2 has 2, the first has 3/.test(await res())) problems.push(`[${where}] a short line must be named: ${await res()}`);
+  await put('10.0 12.0 11.0\n10.2 12.1 11.3\n10.4 12.5 11.4');
+  if (!/3 lines for 2 appraisers/.test(await res())) problems.push(`[${where}] 3 lines for 2 appraisers must be refused: ${await res()}`);
+  await put('10.0 12.0 abc\n10.2 12.1 11.3');
+  if (!/Not a number: abc/.test(await res())) problems.push(`[${where}] a reading that is not a number must be named: ${await res()}`);
+  await page.click('#main #grex'); await page.waitForTimeout(100);
+}
+// Thread gauge limits: the member is made to the right limit with the X tolerance on the right side, the X
+// tolerance follows pitch and diameter, the published chart is shown beside (agreeing or differing), and a
+// pitch with no X tolerance at that diameter says so.
+where = 'threadgauge';
+{
+  await units('inch'); await open('threadgauge', 250);
+  const pick = async (id, v) => { await page.selectOption(`#main #${id}`, v); await page.waitForTimeout(60); };
+  const mrow = async k => (await page.innerText(`#main tr[data-m="${k}"]`)).replace(/\s+/g, ' ');
+  const xtol = async () => (await page.innerText('#main #tgx')).replace(/\s+/g, ' ');
+  await pick('tgk', '1/4-20 UNC'); await pick('tgc', '2');
+  let t = [await xtol(), await mrow('plug-go'), await mrow('plug-nogo'), await mrow('ring-go'), await mrow('ring-nogo')];
+  if (!/0\.0003 in 0\.0076 mm 20 threads per inch, to and including 1 1\/2 in; Thread Check Inc\., Royal Oak Gage/.test(t[0]) ||
+      !/GO plug made to the smallest pitch diameter, tolerance plus 0\.2175 in 5\.5245 mm 0\.2175 in 5\.5245 mm 0\.2178 in 5\.5321 mm Chart agrees 0\.2175 in/.test(t[1]) ||
+      !/NOT GO \(HI\) plug made to the largest pitch diameter, tolerance minus 0\.2223 in .* 0\.2220 in .* 0\.2223 in .* Chart differs the chart prints 0\.2224 in; the limit worked out here is 0\.2223 in/.test(t[2]) ||
+      !/GO ring made to the largest pitch diameter, tolerance minus 0\.2164 in .* 0\.2161 in .* 0\.2164 in .* Chart agrees 0\.2164 in/.test(t[3]) ||
+      !/NOT GO \(LO\) ring made to the smallest pitch diameter, tolerance plus 0\.2127 in .* 0\.2127 in .* 0\.2130 in .* Chart agrees 0\.2127 in/.test(t[4]))
+    problems.push(`[${where}] 1/4-20 UNC class 2: ${t.join(' | ')}`);
+  const zones = await page.evaluate(() => [document.querySelectorAll('#tgplot rect.bar').length, document.querySelectorAll('#tgplot rect.tgz').length, document.querySelectorAll('#tgplot rect.tgn').length].join(','));
+  if (zones !== '2,2,2') problems.push(`[${where}] the drawing should show two thread zones with a GO and a NOT GO zone each: ${zones}`);
+  await pick('tgc', '3');
+  t = [await mrow('plug-nogo'), await mrow('ring-nogo')];
+  if (!/tolerance minus 0\.2211 in .* 0\.2208 in .* 0\.2211 in .* Chart agrees 0\.2211 in/.test(t[0]) || !/tolerance plus 0\.2147 in .* 0\.2147 in .* 0\.2150 in .* Chart agrees 0\.2147 in/.test(t[1])) problems.push(`[${where}] 1/4-20 UNC class 3: ${t.join(' | ')}`);
+  await pick('tgk', '1-8 UNC'); await pick('tgc', '2');
+  t = [await xtol(), await mrow('plug-go'), await mrow('plug-nogo')];
+  if (!/0\.0004 in 0\.0102 mm 8 threads per inch, to and including 1 1\/2 in/.test(t[0]) || !/0\.9188 in .* 0\.9188 in .* 0\.9192 in .* Chart agrees/.test(t[1]) || !/0\.9276 in .* 0\.9272 in .* 0\.9276 in .* Chart agrees 0\.9276 in/.test(t[2])) problems.push(`[${where}] 1-8 UNC takes 0.0004 in: ${t.join(' | ')}`);
+  await pick('tgk', '2-4.5 UNC');
+  t = [await xtol(), await mrow('plug-go')];
+  if (!/0\.0005 in 0\.0127 mm 4\.5 threads per inch, above 1 1\/2 in to 4 in/.test(t[0]) || !/size not in the chart/.test(t[1])) problems.push(`[${where}] 2-4.5 UNC is in the second diameter range and not in the chart: ${t.join(' | ')}`);
+  await pick('tgk', '1-1/2-6 UNC');
+  if (!/0\.0004 in .* 6 threads per inch, to and including 1 1\/2 in/.test(await xtol())) problems.push(`[${where}] 1 1/2 in is still in the first range: ${await xtol()}`);
+  await units('mm'); await open('threadgauge', 250);
+  await pick('tgk', '1/4-20 UNC');
+  t = await mrow('plug-go');
+  if (!/5\.5245 mm 0\.2175 in 5\.5245 mm 0\.2175 in 5\.5321 mm 0\.2178 in/.test(t)) problems.push(`[${where}] mm first in metric mode: ${t}`);
+}
+// Wire EDM: kerf, offsets and corner radius against the handbook's figures, the taper both ways, and cut time
+// from the rate in both unit systems.
+where = 'wireedm';
+{
+  const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+  const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+  await units('mm'); await open('edmoffset', 150);
+  let t = await rows();
+  if (!/Kerf of the first cut 0\.350 mm/i.test(t) || !/Wire offset, first cut 0\.175 mm/i.test(t) || !/Smallest inside corner radius 0\.175 mm/i.test(t)) problems.push(`[${where}] 0.25 mm wire, 0.05 mm gap: ${t}`);
+  await put('st', '0.03'); t = await rows();
+  if (!/first cut \(with the stock left on\) 0\.205 mm/i.test(t) || !/enter the spark gap of the final skim cut/i.test(t)) problems.push(`[${where}] stock left on with no skim gap: ${t}`);
+  await put('gf', '0.008'); t = await rows();
+  if (!/Wire offset, final skim cut 0\.133 mm/i.test(t) || !/Smallest inside corner radius \(after the final skim\) 0\.133 mm/i.test(t) || /Note/i.test(t)) problems.push(`[${where}] with a final skim: ${t}`);
+  const dia = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/offset 0\.205 mm/.test(dia) || !/stock 0\.03 mm per side/.test(dia) || !/radius 0\.133 mm/.test(dia)) problems.push(`[${where}] offset drawing: ${dia}`);
+  await units('inch'); await open('edmoffset', 150);
+  await put('d', '0.012'); await put('gf', '0.0003'); t = await rows();
+  if (!/Kerf of the first cut 0\.0160 in/i.test(t) || !/after the final skim\) 0\.0063 in/i.test(t)) problems.push(`[${where}] handbook figures for 0.012 in wire (kerf 0.016, radius 0.0063): ${t}`);
+  await put('g', '0.02'); t = await rows();
+  if (!/gap entered is larger than the wire diameter/i.test(t)) problems.push(`[${where}] a gap larger than the wire must be questioned: ${t}`);
+
+  await units('mm'); await open('edmtaper', 150);
+  await put('zg', '200'); t = await rows();
+  if (!/per side 0\.655 mm/i.test(t) || !/\(both sides\) 1\.309 mm/i.test(t) || !/upper and lower guide 5\.237 mm/i.test(t)) problems.push(`[${where}] 1.5 degrees over 25 mm, guides 200 mm apart: ${t}`);
+  await put('a', '50'); t = await rows();
+  if (!/angles up to 45 degrees/i.test(t)) problems.push(`[${where}] above 45 degrees needs the note: ${t}`);
+  await put('a', '90'); t = await rows();
+  if (!/Enter an angle from 0 to less than 90 degrees/i.test(t)) problems.push(`[${where}] 90 degrees must be refused: ${t}`);
+  await page.selectOption('#main [data-id="find"]', '2'); await page.waitForTimeout(80);
+  await put('land', '25'); t = await rows();
+  if (!/Taper angle per side 45(\.000)? deg/i.test(t) || !/\(both sides\) 50(\.000)? mm/i.test(t)) problems.push(`[${where}] 25 mm sideways over 25 mm is 45 degrees: ${t}`);
+  await page.selectOption('#main [data-id="find"]', '1');
+
+  await units('inch'); await open('edmtime', 150);
+  t = await rows();
+  if (!/Area of one pass 26(\.00)? in2/i.test(t) || !/Enter the cutting rate/i.test(t) || /Total/i.test(t)) problems.push(`[${where}] no rate entered: ${t}`);
+  await put('h', '10'); await put('rate', '3'); t = await rows();
+  if (!/Area of one pass 130(\.00)? in2/i.test(t) || !/Time, first cut 2,?600(\.0)? min/i.test(t) || !/first cut 0\.0050 in\/min/i.test(t) || !/Total cutting time 43\.33 h/i.test(t)) problems.push(`[${where}] 13 in through 10 in at 3 in2/h: ${t}`);
+  await page.selectOption('#main [data-id="n"]', '2'); await page.waitForTimeout(80); t = await rows();
+  if (!/Enter the cutting rate of the skim cuts/i.test(t) || /Total/i.test(t)) problems.push(`[${where}] skims with no rate must not give a total: ${t}`);
+  await put('srate', '8'); t = await rows();
+  if (!/Time, 2 skim cuts 1,?950(\.0)? min/i.test(t) || !/Total cutting time 4,?550(\.0)? min/i.test(t) || !/Total cutting time 75\.83 h/i.test(t)) problems.push(`[${where}] two skims at 8 in2/h: ${t}`);
+  await page.selectOption('#main [data-id="n"]', '0');
+  await units('mm'); await open('edmtime', 150);
+  await put('rate', '120'); t = await rows();
+  if (!/Area of one pass 16,?500 mm2/i.test(t) || !/Time, first cut 137\.5 min/i.test(t) || !/first cut 2\.40? mm\/min/i.test(t) || !/Total cutting time 2\.29 h/i.test(t)) problems.push(`[${where}] 330 mm through 50 mm at 120 mm2/min: ${t}`);
+}
+// Rolled thread blank: the maker's rule on the core's maximum pitch diameter, the handbook rows for the size,
+// the correction after a trial, and the hole check on the tap drill page.
+where = 'rollblank';
+{
+  const txt = async id => (await page.innerText('#main #' + id)).replace(/\s+/g, ' ');
+  const pick = async (id, v) => { await page.selectOption('#main #' + id, v); await page.waitForTimeout(80); };
+  const meas = async v => { await page.fill('#main #rbm', v); await page.dispatchEvent('#main #rbm', 'input'); await page.waitForTimeout(60); };
+  await units('mm'); await open('rollblank', 250);
+  await pick('rbk', 'M10x1.5'); await pick('rbc', '6g');
+  let t = await txt('rbmain');
+  if (!/Blank for M10 x 1\.5 \(coarse\) 6g Blank diameter before rolling 8\.943 mm 0\.3521 in maximum pitch diameter less 0\.051 mm; CJWinter/i.test(t) || !/Pitch diameter, maximum 8\.994 mm/.test(t) || !/Major diameter after rolling, minimum 9\.732 mm/.test(t))
+    problems.push(`[${where}] M10 x 1.5 6g: ${t}`);
+  t = await txt('rbhb');
+  if (!/1\/4 to 1\/2 in larger by 0\.0020 to 0\.0025 in \(0\.051 to 0\.064 mm\) not stated 1\/4 to 1\/2 in less by 0\.0020 to 0\.0030 in/.test(t) || /1\/2 to 1 in/.test(t)) problems.push(`[${where}] handbook rows for M10: ${t}`);
+  if (await page.$('#main #rbtrial')) problems.push(`[${where}] no trial entered, but a trial block is shown`);
+  const plot = await page.$eval('#main #rbplot svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/blank 8\.943/.test(plot) || !/8\.862/.test(plot) || !/9\.968/.test(plot)) problems.push(`[${where}] drawing: ${plot}`);
+  await meas('9.80'); t = await txt('rbtrial');
+  if (!/Major diameter measured 9\.800 mm 0\.3858 in Inside the limits Change the blank by \+0\.017 mm/.test(t) || !/next trial 8\.959 mm/.test(t)) problems.push(`[${where}] trial at 9.80 mm: ${t}`);
+  await meas('10.1'); t = await txt('rbtrial');
+  if (!/Above the maximum Change the blank by −0\.083 mm/.test(t) || !/next trial 8\.859 mm/.test(t)) problems.push(`[${where}] trial at 10.1 mm: ${t}`);
+  await meas('');
+  await pick('rbc', '6h'); t = await txt('rbmain');
+  if (!/6h Blank diameter before rolling 8\.975 mm/i.test(t)) problems.push(`[${where}] M10 x 1.5 6h: ${t}`);
+  await pick('rbc', '6g');
+  await units('inch'); await open('rollblank', 250);
+  await pick('rbk', '1/4-20 UNC'); await pick('rbc', '2'); t = await txt('rbmain');
+  if (!/1\/4-20 UNC-2A Blank diameter before rolling 0\.2144 in 5\.446 mm maximum pitch diameter less 0\.002 in/i.test(t) || !/Pitch diameter, maximum 0\.2164 in/.test(t)) problems.push(`[${where}] 1/4-20 UNC-2A: ${t}`);
+  await pick('rbc', '3'); t = await txt('rbmain');
+  if (!/UNC-3A Blank diameter before rolling 0\.2155 in/i.test(t)) problems.push(`[${where}] 1/4-20 UNC-3A: ${t}`);
+  await pick('rbc', '2');
+  await pick('rbk', '#4-40 UNC'); t = await txt('rbhb');
+  if (!/smaller than 1\/4 in less by 0\.0010 to 0\.0015 in .* ordinary grades of work/.test(t) || /larger by/.test(t)) problems.push(`[${where}] handbook row below 1/4 in: ${t}`);
+  await pick('rbk', '1-8 UNC'); t = await txt('rbhb');
+  if (!/1\/2 to 1 in or larger larger by 0\.0025 to 0\.0030 in .* above 1\/2 in less by 0\.0030 to 0\.0050 in/.test(t) || /1\/4 to 1\/2/.test(t)) problems.push(`[${where}] handbook rows above 1/2 in: ${t}`);
+  await pick('rbk', '1/4-20 UNC');
+
+  await units('mm'); await open('tapdrill', 250);
+  await pick('tk', 'M10x1.5');
+  const hole = async v => { await page.fill('#main #thm', v); await page.dispatchEvent('#main #thm', 'input'); await page.waitForTimeout(60); };
+  if (await page.$('#main #thole')) problems.push(`[${where}] tap drill: no hole entered, but a hole block is shown`);
+  await hole('8.5'); t = await txt('thole');
+  if (!/Your hole of 8\.500 mm 0\.3346 in: thread engagement Cutting tap .* 77\.0 % Forming tap/i.test(t)) problems.push(`[${where}] tap drill, 8.5 mm hole in M10 x 1.5 (cutting tap 77.0 %): ${t}`);
+  await hole('8.7'); t = await txt('thole');
+  if (!/Cutting tap .* 66\.7 % Forming tap .* 127\.5 % over 100 %/i.test(t)) problems.push(`[${where}] tap drill, 8.7 mm hole: ${t}`);
+  await hole('10.2'); t = await txt('thole');
+  if (!/none larger than the thread: no engagement/i.test(t)) problems.push(`[${where}] tap drill, a hole larger than the thread: ${t}`);
+  await hole('');
+}
+// CNC guide: drilling, tapping and grinding troubleshooting tables, each row with its source keys; a row with
+// one publisher is marked to be verified, a row with two is not.
+where = 'trouble';
+{
+  await open('cncguide', 150);
+  const tabs = await page.evaluate(() => ['c-trd', 'c-trtap', 'c-trg'].map(id => {
+    const h = document.querySelector('#main #' + id); let t = h && h.nextElementSibling;
+    while (t && !t.querySelector('table.gtab')) t = t.nextElementSibling;
+    const rows = t ? [...t.querySelectorAll('tr')].slice(1) : [];
+    return { n: rows.length, noSrc: rows.filter(r => !r.querySelector('abbr.gsrc')).length,
+      rows: rows.map(r => r.cells[0].innerText.trim() + '|' + [...r.querySelectorAll('abbr.gsrc')].map(a => a.textContent).join(',') + '|' + (r.querySelector('.gtbv') ? 'tbv' : 'ok')) };
+  }));
+  if (tabs[0].n !== 10 || tabs[1].n !== 8 || tabs[2].n !== 8 || tabs.some(t => t.noSrc)) problems.push(`[${where}] drilling, tapping, grinding tables should have 10, 8 and 8 rows, each with a source: ${tabs.map(t => t.n + '/' + t.noSrc).join(' ')}`);
+  const has = (i, row) => tabs[i].rows.includes(row);
+  if (!has(0, 'Hole oversize|MMC68,PTD,FMC_D|ok') || !has(0, 'Burrs where the drill comes out|MMC68|tbv') || !has(1, 'Thread oversize|FMC_T,REGAL|ok') || !has(1, 'Bell-mouthed thread (larger at the start)|FMC_T|tbv') ||
+      !has(2, 'Chatter marks|RADIAC,OKUMA_G|ok') || !has(2, 'Wheel loads or glazes|RADIAC|tbv'))
+    problems.push(`[${where}] source keys or the to-be-verified mark are wrong: ${tabs.map(t => t.rows.join(' ; ')).join(' || ')}`);
+  const toc = await page.$$eval('#main nav.gtoc a', a => a.map(x => x.getAttribute('href')).join(' '));
+  if (!/#c-trd #c-trtap #c-trg/.test(toc)) problems.push(`[${where}] the contents list should link the three new tables: ${toc}`);
+}
+// SAE parallel side splines: the handbook's printed sizes for 6A at 1.5 in and 10C at 2 in, the torque over a
+// bearing length, no fit C for 4 splines, the note outside the tabulated range, and the drawing's own figures.
+where = 'saespline';
+{
+  const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+  const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+  const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, v); await page.waitForTimeout(60); };
+  await mode('expert');
+  await units('inch'); await open('saespline', 150);
+  await pick('n', '6'); await pick('fit', '1'); await put('D', '1.5'); await put('len', '');
+  let t = await rows();
+  if (!/Width of spline W 0\.375 in/i.test(t) || !/Depth of spline h 0\.075 in/i.test(t) || !/Small diameter d 1\.350 in/i.test(t) || !/at 1000 psi on the sides 321 in lbf/i.test(t) || /Note/i.test(t) || /bearing length/i.test(t))
+    problems.push(`[${where}] 6 splines, fit A, 1.5 in (W 0.375, h 0.075, d 1.350, T 321): ${t}`);
+  let dia = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/W 0\.375/.test(dia) || !/D 1\.5 in/.test(dia) || !/d 1\.35 in/.test(dia) || !/6 splines/.test(dia) || !/T 321 in lbf/.test(dia)) problems.push(`[${where}] drawing, 6A at 1.5 in: ${dia}`);
+  await pick('n', '10'); await pick('fit', '3'); await put('D', '2'); await put('len', '2'); t = await rows();
+  if (!/Width of spline W 0\.312 in/i.test(t) || !/Small diameter d 1\.620 in/i.test(t) || !/on the sides 1,?720 in lbf/i.test(t) || !/over the bearing length, at 1000 psi 3,?439 in lbf/i.test(t))
+    problems.push(`[${where}] 10 splines, fit C, 2 in, 2 in long (W 0.312, d 1.620, T 1720 from 1719.5, 3439 over the length): ${t}`);
+  await pick('n', '4'); t = await rows();
+  if (!/no fit C \(to slide under load\) for 4 splines/i.test(t) || /Width of spline/i.test(t)) problems.push(`[${where}] 4 splines with fit C must be refused: ${t}`);
+  await pick('fit', '2'); await put('D', '1'); await put('len', ''); t = await rows();
+  if (!/Width of spline W 0\.241 in/i.test(t) || !/Depth of spline h 0\.125 in/i.test(t) || !/Small diameter d 0\.750 in/i.test(t) || !/on the sides 219 in lbf/i.test(t)) problems.push(`[${where}] 4 splines, fit B, 1 in (W 0.241, h 0.125, d 0.750, T 219): ${t}`);
+  await units('mm'); await open('saespline', 150);
+  await pick('n', '16'); await pick('fit', '1'); await put('D', '38.1'); await put('len', ''); t = await rows();
+  if (!/Width of spline W 3\.73 mm/i.test(t) || !/Small diameter d 34\.67 mm/i.test(t) || !/on the sides 87\.4 N m/i.test(t) || !/16-spline fittings from 2 to 6 in nominal diameter\. This size is outside that range/i.test(t))
+    problems.push(`[${where}] 16 splines, fit A, 38.1 mm (W 3.73, d 34.67, 87.4 N m, range note): ${t}`);
+  await put('D', '76.2'); t = await rows();
+  if (/Note/i.test(t) || !/Small diameter d 69\.34 mm/i.test(t)) problems.push(`[${where}] 16 splines at 76.2 mm is inside the tabulated range: ${t}`);
+  dia = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+  if (!/16 splines/.test(dia) || !/D 76\.2 mm/.test(dia) || !/d 69\.34 mm/.test(dia)) problems.push(`[${where}] drawing, 16A at 76.2 mm: ${dia}`);
+  await pick('n', '6'); await put('D', '38.1');
+  await units('inch'); await open('saespline', 80);
+  await pick('n', '6'); await pick('fit', '1'); await put('D', '1.5');
+  await mode('advanced');
+}
 // Morse taper angle is the included angle and must say so (the cited table prints the half angle).
 where = 'machinetapers morse';
 await open('machinetapers');

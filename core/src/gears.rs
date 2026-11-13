@@ -554,6 +554,31 @@ pub fn planets_assemble(zs: f64, zr: f64, n: f64) -> bool {
 // ---------------------------------------------------------------------------
 // Involute splines, flat root side fit (basic dimensions)
 
+/// SAE parallel side splines for soft broached holes (SAE J499, issued 1914;
+/// the formulas of Machinery's Handbook, 31st ed., Table 22, p. 2360).
+/// `n`: 4, 6, 10 or 16 splines. `fit`: 1 = A permanent fit, 2 = B to slide when
+/// not under load, 3 = C to slide when under load (not given for 4 splines).
+/// `d_nom`: nominal (large) diameter D. `which`: 0 = width W, 1 = depth h,
+/// 2 = small diameter d, 3 = torque capacity per unit of bearing length at a
+/// pressure of 1000 per unit area on the spline sides, T = 1000 N R h with
+/// R = (D + d) / 4 (inch-pounds per inch at 1000 psi when D is in inches).
+pub fn sae_spline(n: f64, fit: f64, d_nom: f64, which: f64) -> f64 {
+    if !(d_nom.is_finite() && d_nom > 0.0) { return f64::NAN; }
+    let col = match n as i64 { 4 => 0, 6 => 1, 10 => 2, 16 => 3, _ => return f64::NAN };
+    const W: [f64; 4] = [0.241, 0.250, 0.156, 0.098];
+    const H: [[f64; 4]; 3] = [[0.075, 0.050, 0.045, 0.045], [0.125, 0.075, 0.070, 0.070], [f64::NAN, 0.100, 0.095, 0.095]];
+    const D: [[f64; 4]; 3] = [[0.850, 0.900, 0.910, 0.910], [0.750, 0.850, 0.860, 0.860], [f64::NAN, 0.800, 0.810, 0.810]];
+    let row = match fit as i64 { 1 => 0, 2 => 1, 3 => 2, _ => return f64::NAN };
+    let (h, d) = (H[row][col] * d_nom, D[row][col] * d_nom);
+    match which as i64 {
+        0 => if h.is_nan() { f64::NAN } else { W[col] * d_nom },
+        1 => h,
+        2 => d,
+        3 => 1000.0 * n * ((d_nom + d) / 4.0) * h,
+        _ => f64::NAN,
+    }
+}
+
 /// Basic dimensions of an involute spline. `m` is the module (ISO 4156) or
 /// 1 / P (ANSI B92.1, P = the first number of the pitch fraction). Major and
 /// minor diameters use factors c for d = m (z + c):
@@ -968,4 +993,30 @@ mod tests {
         close(p[0], -p[n - 2], 1e-12); close(p[1], p[n - 1], 1e-12);
         for c in p.chunks(2) { let r = c[0].hypot(c[1]); assert!(r <= g.da / 2.0 + 1e-9 && r >= g.df / 2.0 - 1e-9); }
     }
+    /// SAE parallel side splines against the values printed in Machinery's
+    /// Handbook, 31st ed., Tables 18, 20 and 21 (pp. 2359-2360): the maximum of
+    /// each dimension and the torque capacity T.
+    #[test]
+    fn sae_parallel_side_splines() {
+        let c = |a: f64, b: f64, tol: f64| assert!((a - b).abs() <= tol, "{a} vs {b}");
+        // 4A and 4B at 3/4 and 2 in.
+        c(sae_spline(4.0, 1.0, 0.75, 0.0), 0.181, 5e-4); c(sae_spline(4.0, 1.0, 0.75, 2.0), 0.637, 6e-4); c(sae_spline(4.0, 1.0, 0.75, 1.0), 0.056, 5e-4);
+        c(sae_spline(4.0, 1.0, 0.75, 3.0), 78.0, 0.5); c(sae_spline(4.0, 2.0, 0.75, 3.0), 123.0, 0.5);
+        c(sae_spline(4.0, 1.0, 2.0, 0.0), 0.482, 1e-9); c(sae_spline(4.0, 1.0, 2.0, 2.0), 1.700, 1e-9); c(sae_spline(4.0, 1.0, 2.0, 1.0), 0.150, 1e-9);
+        c(sae_spline(4.0, 1.0, 2.0, 3.0), 555.0, 0.5); c(sae_spline(4.0, 2.0, 2.0, 2.0), 1.500, 1e-9); c(sae_spline(4.0, 2.0, 2.0, 1.0), 0.250, 1e-9); c(sae_spline(4.0, 2.0, 2.0, 3.0), 875.0, 0.5);
+        c(sae_spline(4.0, 1.0, 3.0, 0.0), 0.723, 1e-9); c(sae_spline(4.0, 1.0, 3.0, 3.0), 1249.0, 0.5); c(sae_spline(4.0, 2.0, 3.0, 3.0), 1969.0, 0.5);
+        // 6A, 6B, 6C at 3 in.
+        c(sae_spline(6.0, 1.0, 3.0, 0.0), 0.750, 1e-9); c(sae_spline(6.0, 1.0, 3.0, 2.0), 2.700, 1e-9); c(sae_spline(6.0, 1.0, 3.0, 3.0), 1283.0, 0.6);
+        c(sae_spline(6.0, 2.0, 3.0, 2.0), 2.550, 1e-9); c(sae_spline(6.0, 2.0, 3.0, 3.0), 1873.0, 0.5); c(sae_spline(6.0, 3.0, 3.0, 2.0), 2.400, 1e-9); c(sae_spline(6.0, 3.0, 3.0, 3.0), 2430.0, 0.5);
+        // 10A, 10B, 10C at 2 and 6 in.
+        c(sae_spline(10.0, 1.0, 2.0, 0.0), 0.312, 1e-9); c(sae_spline(10.0, 1.0, 2.0, 2.0), 1.820, 1e-9); c(sae_spline(10.0, 1.0, 2.0, 3.0), 860.0, 0.6);
+        c(sae_spline(10.0, 2.0, 2.0, 2.0), 1.720, 1e-9); c(sae_spline(10.0, 2.0, 2.0, 3.0), 1302.0, 0.5); c(sae_spline(10.0, 3.0, 2.0, 2.0), 1.620, 1e-9); c(sae_spline(10.0, 3.0, 2.0, 3.0), 1720.0, 0.6);
+        c(sae_spline(10.0, 1.0, 6.0, 0.0), 0.936, 1e-9); c(sae_spline(10.0, 1.0, 6.0, 3.0), 7735.0, 0.6); c(sae_spline(10.0, 2.0, 6.0, 3.0), 11718.0, 0.6); c(sae_spline(10.0, 3.0, 6.0, 3.0), 15475.0, 0.6);
+        // 16A, 16B, 16C at 2 and 6 in.
+        c(sae_spline(16.0, 1.0, 2.0, 0.0), 0.196, 1e-9); c(sae_spline(16.0, 1.0, 2.0, 3.0), 1375.0, 0.5); c(sae_spline(16.0, 2.0, 2.0, 3.0), 2083.0, 0.5); c(sae_spline(16.0, 3.0, 2.0, 3.0), 2751.0, 0.5);
+        c(sae_spline(16.0, 1.0, 6.0, 0.0), 0.588, 1e-9); c(sae_spline(16.0, 1.0, 6.0, 3.0), 12377.0, 0.6); c(sae_spline(16.0, 2.0, 6.0, 3.0), 18749.0, 0.6); c(sae_spline(16.0, 3.0, 6.0, 3.0), 24760.0, 1.0); // the formula gives 24760.8
+        // No fit C for 4 splines; other spline counts are not in the standard.
+        assert!(sae_spline(4.0, 3.0, 2.0, 0.0).is_nan() && sae_spline(4.0, 3.0, 2.0, 3.0).is_nan() && sae_spline(8.0, 1.0, 2.0, 0.0).is_nan() && sae_spline(6.0, 1.0, 0.0, 0.0).is_nan());
+    }
+
 }

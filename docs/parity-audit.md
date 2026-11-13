@@ -164,7 +164,7 @@ Store list is the fuller of the two store lists.
 | U31 | Tap drill size (cut and form, % thread 55-85) | done | `tapdrill` |  |
 | U32 | Center drill dimensions / center drill hole depth | done | `spotdepth` |  |
 | U33 | Reaming speeds, feeds and allowance | done | `advream` |  |
-| U34 | Gun drill calculators | missing |  |  |
+| U34 | Gun drill calculators | done | `gundrill` | 0.5.0: speed, feed, coolant pressure and flow, unsupported length, time; Sterling's tables with botek's ranges beside them for the steels |
 | U35 | Tapping speed calculators | partial | `advtap` | Tapping advisor: speed from one publisher's table for general purpose cutting taps, held to the machine's top speed and feed, feed = pitch x rpm, time, tapping cycle. No speeds for forming taps or by tap coating; no second publisher found (`claude/advisor`) |
 | U36 | G84 tap cycle generator | done | `cycdrill` |  |
 | U37 | G81/G82/G83/G73 drill cycle generator | done | `cycdrill` |  |
@@ -173,7 +173,7 @@ Store list is the fuller of the two store lists.
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| U38 | UNC, UNF, UNEF data and class limits | done | `threaddata` | Classes other than 2A/2B are computed, not checked against published tables; no 1B/3B minor limits |
+| U38 | UNC, UNF, UNEF data and class limits | done | `threaddata` | 3A and 3B pitch limits compared with a gauge chart in 0.5.0 (15 sizes; two values differ by 0.0001 in); 1A and 1B computed, not checked; no 1B/3B minor limits |
 | U39 | UN constant-pitch and UNS (special) threads | done | `unseries`, `threaddata` (custom size) | No 4, 6, 20, 28 or 32-UN lists |
 | U40 | UNJ threads | done | `unjunr` |  |
 | U41 | UNR threads | partial | `unjunr` | UNR rule (root radius at least 0.108 P, external only) is stated; the UNR minor diameter limits are not computed |
@@ -198,7 +198,7 @@ Store list is the fuller of the two store lists.
 | U55 | Grinding equivalent diameter | done | `grindspeed` |  |
 | U56 | Grit size conversion | done | `gritconv` |  |
 | U57 | Plunge grinding | done | `grindtime` |  |
-| U58 | Grind RPM cylindricity error | missing |  |  |
+| U58 | Grind RPM cylindricity error | done | `grindratio` | 0.5.0: wheel to work rpm ratio check; single-source rule (J. Badger, Cutting Tool Engineering) |
 | U59 | Wheel and workpiece speed | done | `grindspeed` |  |
 | U60 | Surface grinding | done | `grindsurf` |  |
 
@@ -232,24 +232,24 @@ Store list is the fuller of the two store lists.
 | U79 | Unit converter | done | `units`, `fraction` |  |
 | U80 | Scientific calculator | done | `calc` |  |
 | U81 | Material weight | done | `weight`, `bar` | No angle, channel or beam sections |
-| U82 | Material property search with SFM data | partial | `materials` | Properties exist; no cutting speed, SFM or machinability data per grade |
+| U82 | Material property search with SFM data | partial | `materials` | 0.5.0: material card with a composition chart (37 steels), machinability rings and the property table. Composition for non-ferrous grades and tool steels, and cutting speed per grade, are still missing |
 | U83 | Spur gear data | done | `spurgear`, `gearmeasure` |  |
 | U84 | Involute splines per ANSI B92.1 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
 | U85 | Involute splines per ISO 4156 | partial | `spline` | Basic (nominal) dimensions only; the standard's fit class tolerances and deviations are not shown |
-| U86 | SAE J499a splines | missing |  | SAE J499a splines are not in `spline` |
-| U87 | Knurl calculator | done | `knurl` |  |
+| U86 | SAE J499a splines | done | `saespline` | 0.5.0: width, depth and small diameter for 4, 6, 10 and 16 splines in fits A, B and C, with torque capacity; largest sizes only, the tables' minus tolerances are described in words; one publisher |
+| U87 | Knurl calculator | done | `knurl` | 0.5.0: four methods (diametral pitch, circular pitch, measure and count, trial and error with a tick-off procedure) |
 | U88 | Keyway broach program generator | done | `cycbroach` |  |
 | U89 | Coolant concentration | done | `coolconc`, `coolmix` |  |
 | U90 | Bandsaw cut time | done | `bandsaw` |  |
-| U91 | Tool wear information | done | `cncguide` |  |
+| U91 | Tool wear information | done | `toolwear`, `cncguide` | 0.5.0: own page with a picture index, ten wear types, new drawings |
 
 ### G-code and programming
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | U92 | G-code reference | done | `gmcodes` |  |
-| U93 | M-code reference | done | `gmcodes` | Heidenhain, Mazak and Siemens ISO M codes are gaps; builder-specific M codes are flagged |
-| U94 | Custom macro information | partial | `macroref` | Mitsubishi variable ranges and IF/WHILE not yet confirmed |
+| U93 | M-code reference | done | `gmcodes` | 0.5.0: builders' lists added for Doosan (HP5100), DMG MORI (Mori Seiki NL) and Mazak (INTEGREX e). Heidenhain and Siemens ISO M codes are gaps; Fanuc's own M-code chapter could not be read |
+| U94 | Custom macro information | done | `macroref` | 0.5.0: system variables searchable by number (Haas 70 rows from the maker; Fanuc 19 rows, 10 of them marked one source). Mitsubishi variable ranges and IF/WHILE not yet confirmed (listed as gaps on the page) |
 | U95 | G-code simulator (2D/3D, cycle time) | partial | `gsim` | Editor with undo, line insert and delete, renumber, strip and inch/mm conversion; 2D and 3D wire backplot with a view cube, step playback, lathe or mill told from the program, cycle time. G71 to G76 are reported, not drawn; no stock removal |
 | U96 | 2D CAD and DXF generator (snapping, angle measure) | yes | `sketch`, `dxfbolt`, `dxfgrid`, `dxfslot`, `dxfrect`, `dxfpoly`, `dxfring`, `dxfprofile` | 0.4.0: 2D sketcher with points, lines, arcs, circles, rectangles and text on layers, nine snaps including tangent and square, typed points, measure, angle between two lines, undo, DXF in and out; plus the parametric shapes. No trim, fillet, offset or DIMENSION entities (left out on purpose, docs/cad-dxf.md) |
 
@@ -349,7 +349,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH49 | Elastic properties; effect of temperature on strength | partial | `materials` | E for 27 entries; no temperature effect |
 | MH50 | Standard steels: classification, AISI/SAE/UNS numbering | partial | `materials` | Equivalents only; no numbering-system explainer |
 | MH51 | Identifying metals | partial | `metalid` | Spark, magnet and chip tests (one source); no chemical spot tests |
-| MH52 | Compositions of carbon, alloy and stainless steels | missing | | Chemistry not stored |
+| MH52 | Compositions of carbon, alloy and stainless steels | partial | `materials` | 0.5.0: 37 grades, limits from two public sources each where found (see docs/material-equivalents.md) |
 | MH53 | Applications and mechanical properties of steels | partial | `materials` | Properties for some grades; no applications |
 | MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials` | 10 tool-steel grades as equivalents; no selection guide, faults or heat treatment |
 | MH55 | Tool steel mill forms, machining allowances, decarburization limits | missing | | |
@@ -432,7 +432,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH122 | Spindle noses, draw-in bolts, V-flange shanks and retention knobs | partial | `machinetapers` | Retention knob standard references only; no dimensions |
 | MH123 | Plug and ring gauges for tapers | missing | | |
 | MH124 | R8 collet | done | `machinetapers` | |
-| MH125 | ER and other collets | missing | | |
+| MH125 | ER and other collets | partial | `holdertorque` | 0.5.0: ER collet nut torque by size, bore and nut (REGO-FIX, with Techniks beside it). No collet dimensions or clamping ranges |
 | MH126 | Portable tool spindles, square drives, hex chucks | out of scope? | | Portable power tools |
 | MH127 | Mounted wheels and points | missing | | |
 | MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | missing | | |
@@ -449,7 +449,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH134 | Work materials and cutting tool materials | missing | | |
 | MH135 | Cutting speed, feed, depth of cut, tool wear and tool life | partial | `toollife` | Taylor life only |
 | MH136 | Selecting cutting conditions | missing | | |
-| MH137 | Tool troubleshooting | partial | `cncguide` | Short turning and milling troubleshooting tables (chatter, finish, tool life, burrs); not a full maker guide (`claude/cnc-guide`) |
+| MH137 | Tool troubleshooting | partial | `cncguide` | Turning and milling troubleshooting tables (chatter, finish, tool life, burrs); drilling, tapping and grinding tables added in 0.5.0; not a full maker guide |
 | MH138 | Cutting speed formulas; RPM for drills and diameters | done | `rpm` | |
 | MH139 | Speeds and feeds tables for turning (by material) | missing | | Starting data from tool makers |
 | MH140 | Speeds and feeds tables for milling (by material), slit milling | missing | | |
@@ -506,7 +506,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH186 | Sheet metal: shearing, blanking force, stripper force | missing | | Low priority |
 | MH187 | Sheet metal bending (bend allowance) | missing | | In progress (`claude/geometry`, `bend`) |
 | MH188 | Stretch forming, dies, presses, tube bending | out of scope? | | Press shop, not machining |
-| MH189 | EDM: terms, process, wire EDM | missing | | |
+| MH189 | EDM: terms, process, wire EDM | partial | `edmoffset`, `edmtaper`, `edmtime` | Wire EDM kerf, offset, corner radius, taper and cut time (0.5.0). Sinker EDM and rate tables not covered |
 | MH190 | Metal casting, moulding and extrusion | out of scope | | Casting process detail |
 | MH191 | Powder metallurgy and metal additive manufacturing | out of scope? | | |
 | MH192 | Soldering and brazing | out of scope? | | Joining, like welding |
@@ -575,7 +575,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH245 | Measuring threads: pitch, lead, thread and ball micrometers | missing | | |
 | MH246 | Three-wire method, best wire sizes, formulas | partial | `wires` | 60, 55, 30, 29 degree; no lead-angle correction (`claude/threads-3`) |
 | MH247 | Wire measurement of Whitworth, ACME, stub ACME, taper and buttress threads | partial | `wires`, `acme`, `trapezoidal` | Whitworth, ACME, Stub ACME and trapezoidal; no taper or buttress wires (`claude/threads-3`) |
-| MH248 | Thread gauges, gauge tolerances | missing | | |
+| MH248 | Thread gauges, gauge tolerances | partial | `threadgauge` | 0.5.0: GO and NOT GO plug and ring pitch diameter limits for Unified 2A, 2B, 3A, 3B with the X tolerance; no metric (ISO 1502), no setting plugs |
 | MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | missing | | |
 | MH250 | Tap drill diameter, percentage of thread, cold form tapping | done | `tapdrill` | |
 | MH251 | Tap and clearance drills; tolerances of tapped holes | done | `tapdrill`, `threaddata`, `clearance` | Clearance holes added in `clearance` (`claude/fasteners`) |
@@ -704,7 +704,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED48 | 10 Fluid equipment: turbines, refrigeration, diesel engines, heat exchangers, pumps (6 entries) | out of scope | | |
 | ED49 | 11 Pressure vessels and flanges (7 entries) | out of scope | | |
 | ED50 | 12.1 Crystals: order and disorder | out of scope? | | |
-| ED51 | 12.2 Carbon steels | partial | `materials` | No compositions, heat treatment |
+| ED51 | 12.2 Carbon steels | partial | `materials` | 0.5.0: compositions for nine carbon steels; no heat treatment per grade |
 | ED52 | 12.3 Low-alloy steels | partial | `materials` | |
 | ED53 | 12.4 Alloy steels | partial | `materials` | |
 | ED54 | 12.5 Cast iron | partial | `materials` | |
@@ -794,7 +794,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB39 | Fits for shafts and holes | partial | `fits` | No j/J |
 | BB40 | Morse, Jacobs and DIN tapers | partial | `machinetapers` | DIN metric tapers missing |
 | BB41 | Milling machine tapers | done | `machinetapers` | |
-| BB42 | Pull studs and retention knobs | partial | `machinetapers` | Standard references only, no dimensions |
+| BB42 | Pull studs and retention knobs | partial | `machinetapers`, `holdertorque` | Standard references only, no dimensions. 0.5.0: tightening torque by taper from three makers, shown side by side |
 | BB43 | T-slots | done | `tslots` | (`claude/fasteners`) |
 | BB44 | Keys and keyways | partial | `keys` | Parallel keys metric and inch; no Woodruff |
 | BB45 | Spur gear calculations | missing | | |

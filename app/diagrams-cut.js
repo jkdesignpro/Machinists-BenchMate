@@ -829,6 +829,94 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Bandsaw cut through a section');
   },
 
+  // Wire EDM, seen along the wire: the wire in its kerf, the stock left on and the finished profile (to scale).
+  edmoffset(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys), d = v.d, g = v.g;
+    if (!dcOk(d) || !(g >= 0)) return '';
+    const st = dcOk(v.st) ? v.st : 0, kerf = dcRow(rows, 'Kerf of the first cut'), off = dcRow(rows, 'Wire offset, first cut'), rmin = dcRow(rows, 'Smallest inside corner radius');
+    if (!dcOk(kerf) || !dcOk(off)) return '';
+    const s = 130 / Math.max(kerf, off * 1.6), xc = 180, y0 = 44, y1 = 196, dp = sys === 'inch' ? 4 : 3;
+    const xl = xc - kerf / 2 * s, xr = xc + kerf / 2 * s, xp = xc + off * s;
+    let h = DK.rect(20, y0, xl - 20, y1 - y0, 'hatch') + DK.rect(xp, y0, 330 - xp, y1 - y0, 'hatch');
+    if (st > 0) h += DK.rect(xr, y0, xp - xr, y1 - y0, 'part') + DK.text((xr + xp) / 2, y0 - 6, 'stock', { cls: 'mut' });
+    h += DK.line(xp, y0, xp, y1 + 14, 'hot') + DK.text(xp + 6, y1 + 14, 'finished profile', { cls: 'hott', anchor: 'start' });
+    h += DK.circle(xc, 104, d / 2 * s, 'tool') + DK.cl(xc, y0 - 8, xc, y1 + 8);
+    h += DK.text(60, y0 + 18, 'scrap side', { cls: 'mut' }) + DK.text(xc, y0 - 12, 'wire', { cls: 'mut' });
+    h += DK.dimH(xl, xr, y1 + 34, 'kerf ' + dcN(kerf, dp) + ' ' + u, { from: y1 + 2, below: true });
+    h += DK.dimH(xc, xp, 180, 'offset', { hot: true });
+    const x = 346;
+    h += dcResult(x, 56, 'offset ' + dcN(off, dp) + ' ' + u, 'wire centre to finished profile');
+    h += dcLines(x, 104, ['wire Ø ' + dcN(d, dp) + ' ' + u, 'gap ' + dcN(g, dp) + ' ' + u + ' per side', st > 0 ? 'stock ' + dcN(st, dp) + ' ' + u + ' per side' : '', dcOk(rmin) ? 'smallest inside' : '', dcOk(rmin) ? 'radius ' + dcN(rmin, dp) + ' ' + u : '']);
+    h += DK.text(W - 6, H - 6, 'seen along the wire; to scale', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Wire in its kerf: wire diameter, spark gap, stock and the offset to the finished profile');
+  },
+
+  // Wire EDM taper: the wire leaning through the work between the guides. The angle is drawn larger than it is when small.
+  edmtaper(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), dp = sys === 'inch' ? 4 : 3;
+    if (!dcOk(v.h)) return '';
+    const a = v.find === 2 ? dcRow(rows, 'Taper angle per side') : v.a, land = v.find === 2 ? v.land : dcRow(rows, 'Sideways distance over the height');
+    if (!(a >= 0 && a < 90)) return '';
+    const ad = dcClamp(a, 16, 38), t = Math.tan(dcRad(ad)), yt = 92, yb = 192, xb = 150, xt = xb + (yb - yt) * t;
+    const yg0 = 40, yg1 = 244, xa = x => xb + (yb - x) * t; // x of the wire at height y
+    let h = DK.poly([[xt, yt], [330, yt], [330, yb], [xb, yb]], 'hatch') + DK.poly([[30, yt], [xt - 14, yt], [xb - 14, yb], [30, yb]], 'part');
+    h += DK.line(xa(yg1), yg1, xa(yg0), yg0, 'hot');
+    h += DK.rect(xa(yg0) - 16, yg0 - 12, 32, 12, 'tool') + DK.rect(xa(yg1) - 16, yg1, 32, 12, 'tool');
+    h += DK.text(xa(yg0) + 22, yg0 - 2, 'upper guide', { cls: 'mut', anchor: 'start' }) + DK.text(xa(yg1) + 22, yg1 + 10, 'lower guide', { cls: 'mut', anchor: 'start' });
+    h += DK.line(xb, yb, xb, yt - 30, 'thin') + DK.angle(xb, yb, 118, 90 - ad, 90, '', { hot: true }) + DK.text(xb - 8, yt - 14, dcN(a, 3) + '°', { cls: 'hott', anchor: 'end' });
+    h += dcDimV(yt, yb, 356, 'height ' + dcL(v.h, u, 'h'), { from: 332 });
+    if (dcOk(land)) h += DK.dimH(xb, xt, yb + 28, '', { from: yb + 2 }) + DK.text(xt + 24, yb + 32, dcN(land, dp) + ' ' + u, { cls: 'dimt', anchor: 'start' });
+    h += DK.text(60, (yt + yb) / 2 + 4, 'slug', { cls: 'mut' });
+    const x = 386, both = dcRow(rows, 'Difference in size'), gd = dcRow(rows, 'Sideways distance between the upper and lower guide');
+    h += dcLines(x, 96, [dcOk(both) ? 'top to bottom,' : '', dcOk(both) ? 'both sides:' : '', dcOk(both) ? dcN(both, dp) + ' ' + u : '', dcOk(gd) ? 'between guides:' : '', dcOk(gd) ? dcN(gd, dp) + ' ' + u : '']);
+    h += DK.text(W - 6, H - 6, ad !== a ? 'angle not to scale' : 'angle to scale', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Wire leaning through the work between the upper and lower guide for a taper cut');
+  },
+
+  // Wire EDM cut time: the cut path laid out flat, length by thickness, with the wire part of the way along.
+  edmtime(v, sys, rows) {
+    const W = 520, H = 230, u = dcU(sys);
+    if (!dcOk(v.len) || !dcOk(v.h)) return '';
+    const x0 = 30, y0 = 70, w = 300, hh = dcClamp(w * v.h / v.len, 26, 96), xw = x0 + w * 0.42;
+    const area = (rows.find(r => r.label === 'Area of one pass') || {}), tt = dcRow(rows, 'Total cutting time', 'min'), th = dcRow(rows, 'Total cutting time', 'h'), sp = dcRow(rows, 'Speed along the path, first cut');
+    let h = DK.rect(x0, y0, w, hh, 'hatch') + DK.rect(x0, y0, xw - x0, hh, 'part');
+    h += DK.line(xw, y0 - 22, xw, y0 + hh + 22, 'hot') + DK.text(xw, y0 - 28, 'wire', { cls: 'mut' });
+    h += DK.arrow(xw + 8, y0 + hh / 2, xw + 60, y0 + hh / 2, 'hot');
+    h += DK.dimH(x0, x0 + w, y0 + hh + 40, 'length of the cut path ' + dcL(v.len, u, 'L'), { from: y0 + hh + 2, below: true });
+    h += dcDimV(y0, y0 + hh, x0 + w + 30, dcL(v.h, u, 'h'), { from: x0 + w + 2 });
+    const x = 392;
+    h += DK.text(x, 60, dcOk(tt) ? 'time ' + dcN(tt, 1) + ' min' : 'time: enter a rate', { cls: 'hott', anchor: 'start' });
+    h += dcLines(x, 78, [dcOk(th) ? '(' + dcN(th, 2) + ' h)' : '', isFinite(area.value) ? 'area ' + dcN(area.value) + ' ' + dcUnit(area.unit) : '', dcOk(sp) ? 'along the path' : '', dcOk(sp) ? dcN(sp) + ' ' + dcFU(sys) : '', v.n > 0 ? v.n + (v.n === 1 ? ' skim cut' : ' skim cuts') : '']);
+    h += DK.text(W - 6, H - 6, 'the cut path laid out flat; thickness not to scale', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Wire EDM cut laid out flat: length of the path by thickness of the work');
+  },
+
+  // SAE parallel side spline fitting: the splined hole in a hub, to scale (large and small diameter, width, depth).
+  saespline(v, sys, rows) {
+    const W = 520, H = 290, u = dcU(sys), dp = sys === 'inch' ? 3 : 2;
+    const w = dcRow(rows, 'Width of spline W'), hh = dcRow(rows, 'Depth of spline h'), d = dcRow(rows, 'Small diameter d'), D = v.D, n = v.n;
+    if (!dcOk(D) || !dcOk(w) || !dcOk(d) || !(n >= 4)) return '';
+    const cx = 170, cy = 148, Rb = 92, sc = Rb / (D / 2), rs = d / 2 * sc, at = Math.asin(Math.min(1, w / D)), ar = Math.asin(Math.min(1, w / d));
+    const P = (r, a) => (cx + r * Math.sin(a)).toFixed(1) + ' ' + (cy - r * Math.cos(a)).toFixed(1);
+    // The hole: clockwise round the profile, splines (keyways in the hub) reaching out to D, lands on d between them.
+    let path = '';
+    for (let i = 0; i < n; i++) {
+      const a = 2 * Math.PI * i / n, a2 = 2 * Math.PI * (i + 1) / n;
+      path += (i ? 'L' : 'M') + P(rs, a - ar) + 'L' + P(Rb, a - at) + 'A' + Rb + ' ' + Rb + ' 0 0 1 ' + P(Rb, a + at) + 'L' + P(rs, a + ar) + 'A' + rs.toFixed(1) + ' ' + rs.toFixed(1) + ' 0 0 1 ' + P(rs, a2 - ar);
+    }
+    const Ro = Rb * 1.32;
+    let h = DK.path('M' + (cx + Ro) + ' ' + cy + 'A' + Ro + ' ' + Ro + ' 0 1 0 ' + (cx - Ro) + ' ' + cy + 'A' + Ro + ' ' + Ro + ' 0 1 0 ' + (cx + Ro) + ' ' + cy + 'Z' + path + 'Z', 'hatch');
+    h += DK.cl(cx - Ro - 10, cy, cx + Ro + 10, cy) + DK.cl(cx, cy - Ro - 10, cx, cy + Ro + 10);
+    h += DK.dimH(cx - w / 2 * sc, cx + w / 2 * sc, cy - Ro - 14, 'W ' + dcN(w, dp), { from: cy - Rb });
+    const x = 330;
+    h += DK.leader(cx + Rb * Math.sin(at), cy - Rb * Math.cos(at), x - 8, 62, 'D ' + dcN(D, dp) + ' ' + u, { anchor: 'start' });
+    h += DK.leader(cx + rs * Math.sin(Math.PI / n), cy - rs * Math.cos(Math.PI / n), x - 8, 92, 'd ' + dcN(d, dp) + ' ' + u, { anchor: 'start' });
+    const T = rows.find(r => r.label.indexOf('Torque capacity per inch') === 0);
+    h += dcLines(x, 128, ['depth h ' + dcN(hh, dp) + ' ' + u, n + ' splines', T && isFinite(T.value) ? 'T ' + dcN(T.value, sys === 'inch' ? 0 : 1) + ' ' + T.unit : '', T && isFinite(T.value) ? 'per inch of length' : '', T && isFinite(T.value) ? 'at 1000 psi' : '']);
+    h += DK.text(W - 6, H - 6, 'the splined hole, to scale', { cls: 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Section of an SAE parallel side splined hole: large diameter, small diameter, width and depth of the splines');
+  },
+
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
   sawtpi(v, sys, rows) {
     const W = 520, H = 250, u = dcU(sys);
@@ -904,6 +992,28 @@ Object.assign(DIAGRAMS, {
   },
 
   // ---------------- Grinding ----------------
+  // Wheel to work rpm ratio: the wheel with its high spot; the work drawn with as many waves as the ratio (far too large)
+  // when the ratio is close to a whole number or a simple fraction, and round when it is not.
+  grindratio(v, sys, rows) {
+    const W = 520, H = 270, cy = 122, cx = 104, R0 = 72, rS = 84, cxS = cx + R0 + 3.2 + rS;
+    const ratio = dcRow(rows, 'Rpm ratio (wheel'), verdict = dcStr(rows, 'Verdict'), amp = verdict && verdict.indexOf('Close to') !== 0 ? 0 : 3.2;
+    const N = dcOk(ratio) ? dcClamp(Math.round(ratio), 2, 40) : 8, M = 360;
+    let d = '';
+    for (let i = 0; i < M; i++) { const a = i * 2 * Math.PI / M, r = R0 + amp * Math.cos(N * a); d += (i ? 'L' : 'M') + (cx + r * Math.cos(a)).toFixed(1) + ' ' + (cy - r * Math.sin(a)).toFixed(1); }
+    let h = DK.path(d + 'Z', 'part') + DK.cl(cx - R0 - 12, cy, cxS + rS + 10, cy) + DK.cl(cx, cy - R0 - 12, cx, cy + R0 + 12) + DK.cl(cxS, cy - rS - 10, cxS, cy + rS + 10);
+    h += DK.circle(cxS, cy, rS, 'tool') + DK.circle(cxS, cy, rS * 0.3, 'thin') + dcSpin(cxS, cy, rS * 0.6, rS * 0.6, 140, 40, 'dim') + dcSpin(cx, cy, R0 * 0.55, R0 * 0.55, 220, 320, 'dim');
+    // The high spot of the wheel, the once-per-revolution disturbance.
+    const ha = 2.45, hx = cxS + rS * Math.cos(ha), hy = cy - rS * Math.sin(ha);
+    h += DK.circle(hx, hy, 3.5, 'hotf') + DK.leader(hx, hy, cxS - 10, cy - rS - 26, 'high spot, once per wheel turn', { hot: true, anchor: 'start' });
+    const ns = dcRow(rows, 'Wheel rpm for that surface speed'), nsIn = dcOk(v.ns) ? v.ns : ns;
+    h += DK.text(cx, cy + R0 + 30, 'work ' + (dcOk(v.nw) ? dcN(v.nw, v.nw % 1 ? 1 : 0) + ' rpm' : 'rpm'), { cls: 'mut' }) + DK.text(cxS, cy + rS + 30, 'wheel ' + (dcOk(nsIn) ? dcN(nsIn, nsIn % 1 ? 1 : 0) + ' rpm' : 'rpm'), { cls: 'mut' });
+    const x = cxS + rS + 26, kind = !verdict ? '' : verdict.indexOf('Close to a whole') === 0 ? 'whole number:' : verdict.indexOf('Close to') === 0 ? 'simple fraction:' : 'long decimal:';
+    const kind2 = !verdict ? '' : verdict.indexOf('Close to a whole') === 0 ? 'waves build up' : verdict.indexOf('Close to') === 0 ? 'scallops' : 'waves wiped out';
+    h += DK.text(x, 70, 'rpm ratio', { cls: 'mut', anchor: 'start' }) + DK.text(x, 96, dcOk(ratio) ? dcN(ratio, 4) : 'ns / nw', { cls: 'txt', anchor: 'start', size: 18 });
+    h += dcLines(x, 126, [kind, kind2, '', dcOk(ratio) && amp ? N + ' waves drawn,' : '', dcOk(ratio) && amp ? 'far too large' : '']);
+    return DK.svg(W, H, h, 'Grinding wheel and work: the rpm ratio is the number of waves a wheel that runs out leaves per turn of the work');
+  },
+
   // Wheel and work: external, internal or surface, to scale (clamped), with the equivalent diameter as a dashed circle on the contact.
   grindspeed(v, sys, rows) {
     const W = 520, H = 290, u = dcU(sys), mode = v.mode === 1 ? 1 : v.mode === 2 ? 2 : 0, ds = v.ds, dw = v.dw;

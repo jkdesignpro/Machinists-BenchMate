@@ -4,6 +4,94 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-12
+Stage 3 of the plan: the extras. Built on top of 0.4.0.
+
+### Changed (knurling: four methods)
+- Knurling blank diameter now has a Method box with four ways to a blank:
+  1. diametral pitch knurl (64, 96, 128, 160 DP);
+  2. circular pitch knurl (mm or TPI);
+  3. measure and count the knurl you have: from a print (spaces counted and the length they cover) or from the wheel (teeth and diameter over the teeth, marked approximate);
+  4. trial and error: a nine-step tick-off procedure, each step with its reason and its sources, plus the next blanks to try (0.005 in, 0.127 mm, either way), the growth measured on the trial piece and the blank for a wanted finished diameter at that growth.
+- Ticks and typed values stay while the app is open and survive a change of units.
+- New sources: Sherline, GenSwiss, Conrad Hoffman and pjsminilathe (quoting ANSI/ASME B94.6-1984). The diametral pitches now have two sources. Where the sources differ on speed, all figures are shown. Two things read and not used are listed on the page.
+- `benchmate-core` `tooling`: `knurl_pitch_around`, `knurl_pitch_from_print`, `knurl_pitch_from_wheel`, `knurl_dp_from_wheel`, `knurl_growth`, `knurl_blank_for_finish`, `knurl_trial_step_mm`; tests `knurl_measure_and_count` (Hoffman's print example and the ANSI 96 DP wheel) and `knurl_trial`.
+
+### Added (grinding: wheel to work rpm ratio)
+- New tool **Wheel to work rpm ratio (waviness check)** in Grinding, sawing and gears > Grinding. Wheel rpm (typed, or from the surface speed) divided by the work rpm, with a verdict: close to a whole number (waves from a wheel that runs out build up), close to 1/4, 1/3, 1/2, 2/3 or 3/4 (scallops), or neither (what to aim for).
+- Also shown: the work speeds to stay away from on either side, what happens as the wheel wears (at a constant surface speed the ratio passes through whole numbers; at a constant rpm it stays), the spacing of the waves on the work, and for a count of chatter marks its frequency and how it compares with the ratio.
+- The rule comes from one author (J. Badger, Cutting Tool Engineering, three columns) and is marked single-source; a 2006 paper supports the mechanism. The limit for "close to" (0.02) is BenchMate's own and is shown as such. Two small differences from the printed examples are explained in `docs/sources.md`.
+- `benchmate-core` `grinding`: `rpm_ratio`, `rpm_ratio_class`, `rpm_ratio_off_whole`, `rpm_ratio_off_fraction`, `work_rpm_for_ratio`, `marks_frequency_hz`, `wave_spacing` and helpers; tests on both published examples and on the author's good and bad ratios. Own drawing; two proofs on the page.
+
+### Added (gun drilling)
+- New tool **Gun drilling: speed, feed, coolant pressure and flow** in Holes and threads > Drilling, for single-flute gundrills from 0.125 to 1.000 in (3.18 to 25.4 mm).
+- Cutting speed by material and hardness (eleven material groups, for high pressure and for spray mist, with the maker's percentage adjustments), rpm, feed per revolution by diameter, feed rate and time, coolant pressure and flow, and the longest unsupported drill length.
+- The tables are Sterling Gun Drills'. For the steels, botek's guide ranges are shown on their own rows; where the two makers differ both stay visible. The pressure and flow table has one source and says so; UNISIG's general starting flow is shown beside it.
+- Over 30 diameters deep the feed is cut by 20 % (Sterling). Between table sizes values are taken on a straight line; outside the table nothing is given.
+- Seven "before you drill" notes (pilot hole or bushing, whip, pressure, coolant concentration, filtering and temperature, depth, straightness), each with its sources. Five things read and not used are listed with the reason.
+- New core module `deephole` with tests; evidence file `data/refdata/gundrill-evidence.json` with build checks (tables complete, rising or falling as they must, no gap in botek's diameter rows). Own drawing.
+
+### Added (tool wear guide)
+- New page **Tool wear guide** in Reference > Guides: a picture index of ten ways an edge wears or fails, then a card for each with what you see, the causes and what to try. New own drawings: the edge "unfolded", with the rake face above the edge line and the flank below it, so the ten can be compared.
+- Three wear types added to the seven the CNC guide had: fracture and breakage, flaking, and chip hammering. Flaking and chip hammering are each described by one of the two makers and are marked.
+- Each card says whether it is gradual wear (flank and crater wear) or damage whose cause should be found.
+- The CNC guide's tool wear section shows the same ten entries with the new drawings and links to the new page.
+
+### Added (M codes per builder, macro system variables)
+- **Macro reference: system variables.** A table of system variables per control under the macro facts, grouped (kinds of variable, inputs and outputs, tool data, alarm and timers, control state, modal values, positions, work offsets, settings, pallets). Type a number in the search box (5023, #3000) and the row whose range holds it is shown. Haas: 70 rows from the maker's mill manual (the control before the Next Generation Control). Fanuc: 19 rows, of which 10 have one source only and carry an orange "One source" badge.
+- A number that is not listed for a control is reported as not confirmed, never taken from another control: Haas and Fanuc use the #2001 block for different things (length offset on Haas, length wear on Fanuc), and the page shows both.
+- **G and M codes: three builders' M-code lists.** Doosan (HP5100 horizontal machining centre, 118 codes), DMG MORI (Mori Seiki NL lathes, 44 codes) and Mazak (INTEGREX e, 47 codes), each from the builder's own manual. They show why an M code must be checked per machine: M29 is rigid tapping on the Doosan list and switches the in-position check off on the Mori Seiki list.
+- A machine profile whose control text names Doosan, DN Solutions, DMG or Mori now opens that builder's list.
+- Recorded where sources differ: the macro variable number of one tool offset on Fanuc (two sources differ by one).
+- Not found in a readable form, and listed as gaps on the page: Fanuc's own M-code and system variable tables, Haas Next Generation Control variable numbers, Doosan lathe M codes.
+
+### Added (troubleshooting for drilling, tapping and grinding)
+- **CNC guide**: three new troubleshooting tables. Drilling (10 problems: hole size, straightness, breakage, chipping, wear, chips, burrs), tapping (8: thread size, breakage, chips packing, wear, built-up edge, torn and bell-mouthed threads) and grinding (8: burn, chatter, finish, loading, out of round, feed lines, waves). Written in our own words from seven public pages; every row shows its sources, and a row that rests on one publisher is marked to be verified.
+- Where two sources give opposite advice (feed against chipping at the centre of a drill) the row says so.
+
+### Added (SAE parallel side splines)
+- New tool **SAE parallel side splines** in Gears and splines (Expert): width, depth and small diameter of 4, 6, 10 and 16-spline fittings for a nominal diameter, in fits A (permanent), B (to slide when not under load) and C (to slide under load), the torque capacity per inch of length at 1000 psi and over a bearing length, and the splined hole drawn to scale. Inch and mm.
+- The formulas come from one publisher (Machinery's Handbook) and the page says so; they were checked against 37 values printed in its tables. SAE lists the standard as obsolete for new designs: the page says so and points to the involute spline tool.
+- A note appears when the size is outside the range the handbook tabulates, and 4 splines with fit C is refused (the standard has none).
+- Two entries in the formula library.
+
+### Added (thread extras)
+- New tool **Rolled thread blank diameter** in Holes and threads > Tapping and thread data, for ISO metric (6g, 6h, 4h) and Unified (2A, 3A) threads: the blank diameter by a thread roll maker's rule (maximum pitch diameter less 0.002 in or 0.051 mm), the thread's pitch and major diameter limits, and the handbook's amounts for the size beside it. The two publishers give different rules; both are shown and nothing is merged.
+- Enter the major diameter of a trial and the page gives the change to make to the blank (one third of the difference to the middle of the limits; one source, marked so).
+- **Tap drill size**: enter a hole as measured and the page gives the thread engagement it produces with a cutting tap and with a forming tap, with a warning over 100 % and under 50 %.
+- Two entries in the formula library.
+
+### Added (wire EDM)
+- New page **Wire EDM** in Grinding, sawing and gears, with three tabs. **Offset and kerf**: the width of the slot the wire leaves, the wire offset for the first cut (with the stock left for skim cuts) and for the final skim cut, and the smallest inside corner radius. **Taper**: how far a tapered wall moves sideways over its height, the angle from that distance, and how far apart sideways the wire guides must be. **Cut time**: area of the cut, time of the first cut and of up to four skim cuts, and the speed along the path, from the cutting rate.
+- The spark gap, the stock and the cutting rate are inputs from the machine's cutting tables. Two published ranges for the gap on the first cut differ (0.001 to 0.002 in and 0.002 to 0.003 in): the page prints both.
+- The formulas are in the core (`core/src/edm.rs`) with tests against a free EDM handbook's figures and two worked examples; five entries in the formula library.
+- Not included: cutting rates and gaps per machine and wire, sinker EDM.
+
+### Added (thread gauge limits)
+- New tool **Thread gauge limits (GO and NOT GO)** in Holes and threads > Tapping and thread data, for Unified threads in classes 2A, 2B, 3A and 3B: the pitch diameter each member of a thread plug and a thread ring is made to, the gauge maker's X tolerance for the pitch and diameter, the smallest and largest size of each member, and a drawing of where the gauge zones sit in the thread's tolerance.
+- A gauge maker's pitch diameter chart (15 common sizes) is shown beside the result. It agrees with BenchMate's thread limits in 102 of 105 values; the three that differ by 0.0001 in are shown with a "Chart differs" mark and are not changed (one of them is the 1/4-20 2B maximum already on the list of open questions).
+- Thread data: the note under the Unified classes now says that the 3A and 3B pitch limits have been compared with that chart.
+- Not included: ISO metric gauges (no public table of the ISO 1502 gauge tolerances could be read), setting plugs, wear limits.
+
+### Added (gauge R&R)
+- New tool **Gauge R&R (average and range method)** in Measure and inspect > Quality. Paste the readings of a study (2 to 5 appraisers, 2 to 4 trials, 2 to 10 parts): repeatability, reproducibility, gauge R&R and part variation, each as a share of the total variation, the gauge R&R against the tolerance, the number of distinct categories, and a bar chart against the 10 % and 30 % guidelines.
+- The constants K1, K2 and K3 are worked out in the core and checked against the published ones; two published examples and a study worked by hand are core tests. Where programs differ (d2 or d2* for the repeatability) the page says which one BenchMate uses.
+- Two entries in the formula library.
+
+### Added (collet nut and pull stud torque)
+- New tool **Collet nut and pull stud torque** in Turning > Tooling and Milling > Tool holding. Pick the ER collet size, the nut and the collet bore: the recommended torque from REGO-FIX's table (ER 8 to ER 50, standard and mini nut), the most the maker allows (25 % more), and Techniks' figure for the same size beside it. A small bore takes much less torque than a large one in the same nut, which is why the page asks for it.
+- **Pull stud (retention knob) torque** for ISO 20 and 30, 40 and 50 taper holders from three makers (REGO-FIX, MariTool, Techniks), each as printed and in both units. They differ widely (40 taper: 50 N·m maximum, 45 to 55 ft-lb, 76 ft-lb), so all three are shown and nothing is averaged.
+- Not covered, and said so on the page: other nut types and tapping collets, TG and DA collets, HSK and other holders without a pull stud, machine builders' own figures.
+
+### Added (material card: composition and machinability)
+- **Material equivalents: click a grade for its material card.** A composition chart, machinability rings and the property table, above what each source prints.
+- **Composition chart.** One row per element with the limits as printed (a range, a maximum or a minimum), a bar, how many publishers print that limit and a status. 37 steels so far: nine carbon and free-cutting steels, 4130, 4140, 4340, 8620, 52100 and 23 stainless grades. Where two sources print different limits (304 carbon and chromium, 52100, silicon of the alloy steels) both are shown.
+- **Machinability rings.** One ring per printed rating, with its condition, its reference material and the publisher. 31 steels on the "AISI 1212 = 100 %" scale from two tables; ratings for different conditions are never merged, so 1018 shows 70 % (cold drawn) and 78 % (condition not stated).
+- Not started, and said so on the card: composition of aluminium, copper, titanium, nickel and cast iron grades and of tool steels.
+
+### Fixed
+- Knurling: the pitch round the circumference of a diagonal knurl was worked out in the page script. It now comes from the Rust core like every other number.
+
 ## [0.4.0] - 2026-11-12
 Stage 2 of the plan: drawings and editors. Built on top of 0.3.0.
 

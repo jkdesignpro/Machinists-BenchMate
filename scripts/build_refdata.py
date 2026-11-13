@@ -389,7 +389,170 @@ def build_knurl():
     for pub, lst in ev['pitches_mm'].items():
         for v in lst: pubs[float(v)].append(pub)
     return {'sources': sources_of(ev), 'pitches_mm': [{'p': p, 'publishers': pubs[p], 'status': 'confirmed' if len(pubs[p]) >= 2 else 'review'} for p in sorted(pubs)],
-            'pitches_dp': [float(x) for x in ev['pitches_dp']['DORIAN']], 'din403_mm': [float(x) for x in ev['din403_mm']]}
+            'pitches_dp': [float(x) for x in ev['pitches_dp']['DORIAN']], 'din403_mm': [float(x) for x in ev['din403_mm']],
+            'pitches_dp_status': 'confirmed' if all(sorted(v) == sorted(ev['pitches_dp']['DORIAN']) for v in ev['pitches_dp'].values()) and len(ev['pitches_dp']) >= 2 else 'review',
+            'pitches_dp_publishers': sorted(ev['pitches_dp']),
+            'trial_steps': knurl_steps(ev), 'ansi_wheel_example': ev.get('ansi_wheel_example'),
+            'print_example': ev.get('print_example'), 'not_used': ev.get('not_used', [])}
+
+
+def knurl_steps(ev):
+    """Tick-off steps of the trial and error method. Every source key must exist;
+    a step with two or more independent publishers is 'confirmed', with one it is
+    'single', with none it is BenchMate's own advice ('own'). The two pjsminilathe
+    pages are one publisher."""
+    out = []
+    for st in ev.get('trial_steps', []):
+        for k in st['src']:
+            if k not in ev['sources']: raise SystemExit('knurl trial step: unknown source ' + k)
+        pubs = {ev['sources'][k]['publisher'] for k in st['src']}
+        out.append({'t': st['t'], 'why': st['why'], 'src': st['src'],
+                    'status': 'confirmed' if len(pubs) >= 2 else 'single' if pubs else 'own'})
+    return out
+
+
+def build_gundrill():
+    """Gun drilling starting values. One maker's tables (Sterling) with a second
+    maker's ranges (botek) beside them for the steels; nothing is merged. Checks
+    that the tables are complete and rise or fall the way such tables must."""
+    ev = load_ev('gundrill-evidence.json')
+    if not ev: return None
+    S = ev['sources']
+    def need(k):
+        if k not in S: raise SystemExit('gundrill: unknown source ' + k)
+    for sec in ('speed_sfm', 'feed_in_rev', 'coolant', 'botek', 'unisig_flow'): need(ev[sec]['src'])
+    cols = ev['feed_in_rev']['columns']
+    for g in ev['speed_sfm']['groups']:
+        if g['feed'] not in cols: raise SystemExit('gundrill: feed column of ' + g['id'])
+        for r in g['rows']:
+            if not (r[1] > r[2] > 0): raise SystemExit('gundrill: speed row ' + g['id'] + ' ' + r[0])
+        hp = [r[1] for r in g['rows']]
+        if hp != sorted(hp, reverse=True): raise SystemExit('gundrill: speeds of ' + g['id'] + ' should fall with hardness')
+    fr = ev['feed_in_rev']['rows']
+    if any(len(r) != 7 for r in fr) or [r[0] for r in fr] != sorted(r[0] for r in fr): raise SystemExit('gundrill: feed rows')
+    for c in range(1, 7):
+        v = [r[c] for r in fr]
+        if v != sorted(v): raise SystemExit('gundrill: feed column %d should rise with diameter' % c)
+    cr = ev['coolant']['rows']
+    if [r[1] for r in cr] != sorted((r[1] for r in cr), reverse=True) or [r[2] for r in cr] != sorted(r[2] for r in cr): raise SystemExit('gundrill: coolant rows')
+    bf = ev['botek']['feed_mm_rev']
+    for i, r in enumerate(bf):
+        if i and abs(r[0] - bf[i - 1][1] - 0.01) > 1e-9: raise SystemExit('gundrill: botek diameter rows leave a gap at %s' % r[0])
+        for lo, hi in r[2:]:
+            if not (0 < lo < hi): raise SystemExit('gundrill: botek feed range at %s' % r[0])
+    rules = []
+    for st in ev['rules']:
+        for k in st['src']: need(k)
+        pubs = {S[k]['publisher'] for k in st['src']}
+        rules.append({'t': st['t'], 'src': st['src'], 'status': 'confirmed' if len(pubs) >= 2 else 'single'})
+    return {'sources': sources_of(ev), 'speed': ev['speed_sfm'], 'feed': ev['feed_in_rev'], 'coolant': ev['coolant'],
+            'botek': {k: v for k, v in ev['botek'].items() if not k.startswith('_')}, 'unisig_flow': ev['unisig_flow'],
+            'rules': rules, 'not_used': ev['not_used']}
+
+
+def build_holdertorque():
+    """Collet nut and pull stud torque. Each maker's figures for its own holders,
+    side by side; nothing is merged. Checks that every row names a known source,
+    that the bore ranges of a collet size run upwards without overlapping and
+    that the torque never falls as the bore grows."""
+    ev = load_ev('holdertorque-evidence.json')
+    if not ev: return None
+    S = ev['sources']
+    def need(k):
+        if k not in S: raise SystemExit('holdertorque: unknown source ' + k)
+    E = ev['er']
+    need(E['src']); need(E['ceiling_src']); need(ev['techniks_nut']['src'])
+    if not (0 < E['ceiling_pct'] <= 50): raise SystemExit('holdertorque: ceiling percent')
+    last = {}
+    for size, mb, lo, hi, std, mini in E['rows']:
+        if not (0 < lo <= hi) or (std is None and mini is None): raise SystemExit('holdertorque: row %s %s' % (size, lo))
+        if size in last:
+            plo, phi, pstd, pmini = last[size]
+            if lo <= phi: raise SystemExit('holdertorque: bore ranges of %s overlap at %s' % (size, lo))
+            for a, b in ((pstd, std), (pmini, mini)):
+                if (a is None) != (b is None) or (a is not None and b < a): raise SystemExit('holdertorque: torque of %s at %s' % (size, lo))
+        last[size] = (lo, hi, std, mini)
+    sizes = list(last)
+    for size, nut, t in ev['techniks_nut']['rows']:
+        if not (t > 0 and nut): raise SystemExit('holdertorque: Techniks row ' + size)
+    studs = []
+    for r in ev['pullstud']['rows']:
+        for v in r['v']:
+            need(v['src'])
+            if v['unit'] not in ('Nm', 'ftlb') or not (0 < v['lo'] <= v['hi']): raise SystemExit('holdertorque: pull stud ' + r['taper'])
+        pubs = [S[v['src']]['publisher'] for v in r['v']]
+        if len(set(pubs)) != len(pubs): raise SystemExit('holdertorque: one figure per maker for ' + r['taper'])
+        studs.append({'taper': r['taper'], 'v': r['v'], 'status': 'single' if len(pubs) == 1 else 'differs'})
+    rules = []
+    for st in ev['rules']:
+        for k in st['src']: need(k)
+        rules.append({'t': st['t'], 'src': st['src'], 'status': 'confirmed' if len({S[k]['publisher'] for k in st['src']}) >= 2 else 'single'})
+    return {'sources': sources_of(ev), 'er': {k: v for k, v in E.items() if not k.startswith('_')}, 'sizes': sizes,
+            'techniks_nut': {k: v for k, v in ev['techniks_nut'].items() if not k.startswith('_')},
+            'pullstud': studs, 'rules': rules, 'gaps': ev['gaps']}
+
+
+def build_rollblank():
+    """Blank diameter before thread rolling: one maker's rule and the handbook's
+    amounts by size, kept apart. Checks the sources and that the handbook rows
+    are well formed."""
+    ev = load_ev('rollblank-evidence.json')
+    if not ev: return None
+    S = ev['sources']
+    for k in [ev['rule']['src'], ev['ratio']['src'], ev['handbook']['src']] + [k for n in ev['notes'] for k in n['src']]:
+        if k not in S: raise SystemExit('rollblank: unknown source ' + k)
+    if not (0 < ev['rule']['allow_in'] < 0.01) or abs(ev['rule']['allow_in'] * 25.4 - ev['rule']['allow_mm']) > 0.0005: raise SystemExit('rollblank: allowance')
+    if not (1 <= ev['ratio']['v'] <= 5): raise SystemExit('rollblank: ratio')
+    for r in ev['handbook']['rows']:
+        if r['sign'] not in (1, -1) or not (0 < r['lo'] <= r['hi'] < 0.01) or (r['to'] is not None and r['to'] <= r['from']): raise SystemExit('rollblank: handbook row ' + r['size'])
+    return {'sources': sources_of(ev), 'rule': ev['rule'], 'ratio': ev['ratio'],
+            'handbook': {'src': ev['handbook']['src'], 'rows': ev['handbook']['rows']}, 'notes': ev['notes'], 'gaps': ev['gaps']}
+
+
+def build_threadgauge():
+    """Unified thread gauge X tolerances on pitch diameter (per publisher, with
+    consensus per cell), the side each member's tolerance lies on, and a
+    published chart of gauge pitch diameters for comparison."""
+    ev = load_ev('threadgauge-evidence.json')
+    if not ev: return None
+    S = ev['sources']
+    X = ev['x_pd']
+    tpis = sorted({float(t) for pub in X['printed'].values() for t in pub}, reverse=True)
+    rows = []
+    for t in tpis:
+        key = str(int(t)) if t == int(t) else str(t)
+        cells = []
+        for c in range(len(X['ranges'])):
+            printed = {}
+            for pub, tab in X['printed'].items():
+                if pub not in S: raise SystemExit('threadgauge: unknown source ' + pub)
+                v = tab.get(key)
+                if v is not None and c < len(v) and v[c] is not None:
+                    if not (0.00005 < v[c] < 0.002): raise SystemExit('threadgauge: X tolerance %s %s' % (key, v[c]))
+                    printed[S[pub]['publisher']] = v[c]
+            if not printed: cells.append(None); continue
+            k = consensus(printed)
+            if k['status'] not in ('confirmed', 'review'): raise SystemExit('threadgauge: publishers differ at %s tpi, column %d' % (key, c))
+            cells.append({'v': k['value'], 'status': k['status'], 'pubs': k['groups'][0]['publishers']})
+        rows.append({'tpi': t, 'cells': cells})
+    for c in range(len(X['ranges'])):  # the tolerance never falls as the thread gets coarser
+        col = [r['cells'][c]['v'] for r in rows if r['cells'][c]]
+        if col != sorted(col): raise SystemExit('threadgauge: X column %d should rise as the pitch gets coarser' % c)
+    for r in rows:  # ... nor as the diameter grows
+        vals = [c['v'] for c in r['cells'] if c]
+        if vals != sorted(vals): raise SystemExit('threadgauge: X row %s' % r['tpi'])
+    seen = set()
+    for d in ev['direction']['rows']:
+        for k in d['src']:
+            if k not in S: raise SystemExit('threadgauge: unknown source ' + k)
+        if (d['gauge'], d['member']) in seen or len({S[k]['publisher'] for k in d['src']}) < 2: raise SystemExit('threadgauge: direction rows')
+        seen.add((d['gauge'], d['member']))
+    if len(seen) != 4: raise SystemExit('threadgauge: four gauge members wanted')
+    C = ev['chart']
+    for r in C['rows']:
+        if len(r) != 10 or not (r[3] < r[5] < r[4]) or not (r[7] < r[6] <= r[3]) or not (r[9] < r[8] == r[3]): raise SystemExit('threadgauge: chart row ' + r[0])
+    return {'sources': sources_of(ev), 'ranges': X['ranges'], 'x': rows, 'direction': ev['direction']['rows'],
+            'chart': {k: v for k, v in C.items() if not k.startswith('_')}, 'gaps': ev['gaps']}
 
 
 def build_grinding():
@@ -449,8 +612,28 @@ def build_gcodes():
                 seen.add(key)
             if sec != 'disagreements':
                 r['status'] = gm_status(srcs, r)
+    # System variables: a row may rest on one independent source, and is then marked "one source".
+    # 'ranges' lists every number or range named in 'var', so a search for a number finds its row.
+    seen_sv = set()
+    for r in ev.get('sysvars', []):
+        if r['ctrl'] not in ctrls: raise SystemExit(f"sysvars: unknown control {r['ctrl']}")
+        if not r.get('src') or not r.get('text') or not r.get('group'): raise SystemExit(f"sysvars {r['ctrl']} {r.get('var')}: group, text and source needed")
+        for x in r['src']:
+            if x['s'] not in srcs: raise SystemExit(f"sysvars {r['ctrl']}: unknown source {x['s']}")
+        rng = [(int(a), int(b or a)) for a, b in re.findall(r'#(\d+)(?:-#(\d+))?', r['var'])]
+        if not rng or any(a > b for a, b in rng): raise SystemExit(f"sysvars {r['ctrl']}: bad variable {r['var']}")
+        if re.sub(r'#\d+(-#\d+)?', '', r['var']).strip(' ()'): raise SystemExit(f"sysvars {r['ctrl']}: bad variable text {r['var']}")
+        key = (r['ctrl'], r['var'])
+        if key in seen_sv: raise SystemExit(f'duplicate system variable {key}')
+        seen_sv.add(key)
+        r['ranges'] = [list(x) for x in rng]
+        kinds = {srcs[x['s']]['kind'] for x in r['src']}
+        fams = {srcs[x['s']].get('family', x['s']) for x in r['src']}
+        r['status'] = 'maker' if kinds & PRIMARY else 'confirmed' if len(fams) >= 2 else 'single'
+    for c in ev['gaps']:
+        if c not in ctrls: raise SystemExit(f'gaps: unknown control {c}')
     return {'sources': srcs, 'controls': ctrls, 'codes': ev['codes'], 'macro': ev['macro'],
-            'disagreements': ev['disagreements'], 'gaps': ev['gaps']}
+            'sysvars': ev.get('sysvars', []), 'disagreements': ev['disagreements'], 'gaps': ev['gaps']}
 
 
 # ---------------------------------------------------------------- fasteners and machine elements
@@ -816,7 +999,7 @@ def matref_summary(m):
 def main():
     out = {'schema': 1, 'drills': build_drills(), 'threads': build_threads(), 'iso286': build_iso286(),
            'other_threads': build_other_threads(), 'tapers': build_tapers(), 'inserts': build_inserts(), 'iso513': build_iso513(),
-           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gcodes': build_gcodes(),
+           'surface': build_surface(), 'hardness': build_hardness(), 'knurl': build_knurl(), 'gundrill': build_gundrill(), 'holdertorque': build_holdertorque(), 'threadgauge': build_threadgauge(), 'rollblank': build_rollblank(), 'gcodes': build_gcodes(),
            'grinding': build_grinding(), 'iso2768': build_iso2768(), 'abbrev': build_abbrev(),
            'power_threads': build_power_threads(), 'tooling': build_tooling(),
            'ansi_fits': build_ansi_fits(), 'preferred': build_preferred(),

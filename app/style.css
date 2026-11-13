@@ -64,6 +64,23 @@ tr.over td{background:color-mix(in srgb,var(--warn) 12%,transparent)}
 .mrow{cursor:pointer}.mrow:hover td{background:var(--soft)}
 .kv{display:inline-block;margin:0 10px 3px 0;font-family:var(--mono);font-size:11.5px}
 .kv i{font-family:var(--sans);font-style:normal;color:var(--muted);font-size:10.5px}
+#htallt tr.hit td{background:var(--soft)}
+svg.capplot .tgz{fill:var(--accent)}
+svg.capplot .tgn{fill:var(--err)}
+.mcardh{margin:16px 0 0;font:700 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.mcomp td.cbc{width:44%;min-width:150px}
+svg.cbar{display:block;width:100%;height:12px}
+.cb-track{fill:var(--soft)}
+.cb-lo{fill:var(--line)}
+.cb-max{fill:var(--accent);opacity:.28}
+.cb-rng{fill:var(--accent)}
+.mrings{display:flex;flex-wrap:wrap;gap:10px 22px;padding:10px}
+.mrc{display:flex;gap:10px;align-items:center;max-width:330px}
+svg.mring{width:84px;height:84px;flex:none}
+.mr-track{fill:none;stroke:var(--soft);stroke-width:8}
+.mr-arc{fill:none;stroke:var(--accent);stroke-width:8}
+.mr-ref{stroke:var(--ink);stroke-width:2}
+svg.mring text{fill:var(--digit);font:700 17px var(--mono)}
 .verb{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--soft);padding:3px 6px;border-radius:3px;margin-top:3px;white-space:pre-wrap}
 
 /* GD&T: symbols, diagrams, guide, frame builder. Colours only from tokens. */
@@ -224,6 +241,8 @@ svg.geo .gacc{fill:color-mix(in srgb,var(--accent) 22%,var(--panel));stroke:var(
 .gml input{width:220px;max-width:100%}
 .gml select{max-width:100%}
 .gmbox{margin-top:12px}
+tr.svgrp td{background:var(--raise);font-size:11.5px;letter-spacing:.03em;text-transform:uppercase}
+td.svv{white-space:normal;min-width:118px}
 .gmhr{border:0;border-top:1px solid var(--soft);margin:5px 0}
 .gmcmp td{width:44%}
 .gmcmp td:first-child{width:12%}
@@ -475,3 +494,25 @@ details.cysnipd{margin-top:12px;max-width:760px}
 .gexp .gtab{margin:8px 0}
 .gexp .gtab td.v{font-family:var(--mono);text-align:right}
 .gdl{margin:8px 0}.gdl dt{font-weight:600;margin-top:6px}.gdl dd{margin:2px 0 4px;line-height:1.5}
+
+/* Knurling: tick-off procedure of the trial and error method */
+ol.ktick{margin:8px 0 8px 0;padding-left:26px;max-width:760px}
+ol.ktick li{margin:0 0 8px 0;padding:2px 0}
+ol.ktick li .chk{align-items:flex-start;gap:8px;cursor:pointer}
+ol.ktick li .chk input{margin-top:3px;flex:0 0 auto}
+ol.ktick li .ms{display:block;margin:2px 0 0 22px}
+ol.ktick li.done b{text-decoration:line-through;opacity:.6}
+.kmeth[hidden]{display:none}
+ul.gdrules{margin:6px 0 0 0;padding-left:20px}
+ul.gdrules li{margin:0 0 5px 0}
+
+/* Tool wear guide: picture index and cards */
+.weari{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-width:980px;margin:10px 0 14px}
+a.weart{display:block;border:1px solid var(--line);background:var(--panel);padding:6px;text-decoration:none;color:var(--ink);text-align:center;font-size:12.5px}
+a.weart:hover,a.weart:focus-visible{border-color:var(--accent)}
+a.weart svg{display:block;width:100%;height:auto}
+.weard{flex:none;width:300px;max-width:100%}
+.weard svg,.cnwd svg{display:block;width:100%;height:auto}
+.cnwd{flex:none;width:210px;max-width:100%}
+.wearc.on{border-color:var(--accent)}
+.weark{font:600 11.5px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}

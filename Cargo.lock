@@ -4,11 +4,11 @@ version = 4
 
 [[package]]
 name = "benchmate-core"
-version = "0.4.0"
+version = "0.5.0"
 
 [[package]]
 name = "benchmate-wasm"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "benchmate-core",
 ]

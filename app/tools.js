@@ -599,10 +599,10 @@ const TOOLS = [
 },
 {
   id: 'knurl', level: 'advanced', group: 'Turning', title: 'Knurling blank diameter',
-  desc: 'Blank diameter for a whole number of knurl teeth, straight or 30 degree diagonal and diamond, with pitch in mm, TPI or diametral pitch.',
+  desc: 'Blank diameter for a whole number of knurl teeth by four methods: diametral pitch, circular pitch (mm or TPI), measuring the knurl you have, and trial and error with a tick-off procedure. Straight or 30 degree diagonal and diamond.',
   render: el => renderKnurl(el),
-  working: 'D = n p / (pi cos h); p = 25.4 / TPI mm or pi / DP in. See the note under the tool.',
-  source: 'Dorian Tool and Hommel+Keller (Zeus) knurling catalogues; DIN 82:1973-01, DIN 403.',
+  working: 'D = n p / (pi cos h); p = 25.4 / TPI mm or pi / DP in; from a print p = span / spaces; from a wheel p = pi d / teeth. See the note under the tool.',
+  source: 'Dorian Tool and Hommel+Keller (Zeus) knurling catalogues; Sherline and GenSwiss knurling instructions; C. Hoffman and pjsminilathe (quoting ANSI/ASME B94.6-1984); DIN 82:1973-01, DIN 403.',
 },
 {
   id: 'passtime', level: 'simple', group: 'Turning', title: 'Cut time for a pass',
@@ -1024,6 +1024,89 @@ const TOOLS = [
   source: 'L.S. Starrett, Sawing starts with the material (2023); Revolution Machine Tools, Do I have the right TPI (accessed 2026-11-11). See docs/tooling.md.',
 },
 {
+  id: 'edmoffset', level: 'advanced', group: 'EDM', title: 'Wire EDM: kerf, wire offset and corner radius',
+  desc: 'Width of the slot a wire leaves, the wire offset for the first cut and for the final skim cut, and the smallest inside corner radius, from the wire diameter and the spark gap in your machine\'s cutting tables.',
+  fields: s => [
+    { id: 'd', label: 'Wire diameter', unit: lenU(s), def: s === 'inch' ? 0.01 : 0.25 },
+    { id: 'g', label: 'Spark gap on the first cut, per side', unit: lenU(s), def: s === 'inch' ? 0.002 : 0.05 },
+    { id: 'st', label: 'Stock left for skim cuts, per side (blank for none)', unit: lenU(s), def: '' },
+    { id: 'gf', label: 'Spark gap on the final skim cut, per side (blank for one cut only)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0) || !(v.g >= 0)) return [];
+    const dp = s === 'inch' ? 4 : 3, u = lenU(s), st = v.st > 0 ? v.st : 0, skim = v.gf > 0;
+    const rows = [R('Kerf of the first cut', W.edm_kerf(v.d, v.g), u, dp), R(st > 0 ? 'Wire offset, first cut (with the stock left on)' : 'Wire offset, first cut', W.edm_offset(v.d, v.g, st), u, dp)];
+    if (skim) rows.push(R('Wire offset, final skim cut', W.edm_offset(v.d, v.gf, 0), u, dp));
+    rows.push(R(skim ? 'Smallest inside corner radius (after the final skim)' : 'Smallest inside corner radius', W.edm_min_inside_radius(v.d, skim ? v.gf : v.g), u, dp));
+    if (st > 0 && !skim) rows.push(R('Note', 'Stock is left on, so skim cuts follow: enter the spark gap of the final skim cut to get its offset and the corner radius it leaves.', '', 0));
+    if (v.g > v.d) rows.push(R('Note', 'The gap entered is larger than the wire diameter. The published gaps are a small fraction of the wire: check the entry.', '', 0));
+    return rows;
+  },
+  working: 'Kerf = wire diameter + 2 x spark gap. Wire offset (the distance from the wire centre to the finished profile) = wire radius + spark gap + stock left for later cuts; with no stock it is half the kerf. Smallest inside corner radius = wire radius + spark gap of the cut that finishes the corner: the wire cannot leave a sharper inside corner. The spark gap is not a fixed number: it depends on the wire, the power setting, the material and the flushing, so take it from the machine\'s cutting tables or measure a test cut (offset = half the measured slot width). ' +
+    'Published gaps for the first cut differ: Cutting Tool Engineering (2013) gives 0.001 to 0.002 in (0.025 to 0.05 mm) with 0.010 or 0.012 in wire, the Complete EDM Handbook 0.002 to 0.003 in (0.05 to 0.076 mm). For skim cuts Cutting Tool Engineering gives 0.0005 down to 0.0001 in (0.013 to 0.0025 mm). The handbook\'s smallest inside radii (0.0063 in for 0.012 in wire, 0.0053 in for 0.010 in wire) are the wire radius plus 0.0003 in. The default gap of 0.002 in (0.05 mm) lies in both published ranges; it is an example, not a setting.',
+  source: "Complete EDM Handbook (C. Sommer and S. Sommer, Reliable EDM), chapters 2 and 5; Cimatron wire EDM help (cut width); Autodesk FeatureCAM help, \'Offset method\'; S. Woods, \'Gap guidance\', Cutting Tool Engineering, March 2013; University of Minnesota AEM wire EDM notes (taper angle); Industrial Monitor Direct knowledge base (no author named). See docs/sources.md, Wire EDM.",
+  proof: [{ name: 'A 0.012 in wire with a 0.002 in gap', sys: 'inch', vals: { d: 0.012, g: 0.002 }, expect: [['Kerf of the first cut', 'in', 0.016, 1e-9]],
+    source: 'Complete EDM Handbook, chapter 5, p. 82: a 0.012 in wire usually creates a 0.016 in kerf; p. 84: the gap between the wire and the workpiece is 0.002 to 0.003 in.' },
+  { name: 'Smallest inside radius for 0.010 in wire after skimming', sys: 'inch', vals: { d: 0.01, g: 0.002, gf: 0.0003 }, expect: [['Smallest inside corner radius (after the final skim)', 'in', 0.0053, 1e-9]],
+    source: 'Complete EDM Handbook, chapter 5, p. 83: the minimum inside radius for 0.010 in wire is 0.0053 in, achieved by skimming.', note: 'The gap of 0.0003 in is the handbook figure less the wire radius.' }],
+},
+{
+  id: 'edmtaper', level: 'advanced', group: 'EDM', title: 'Wire EDM: taper cut',
+  desc: 'How far a tapered wall moves sideways over the height of the part, the taper angle from that distance, and how far apart sideways the wire guides have to be, to check against the U and V travel of the machine.',
+  fields: s => [
+    { id: 'find', label: 'Find', unit: '', def: 1, options: [[1, 'Sideways distance from the angle'], [2, 'Angle from the sideways distance']] },
+    { id: 'h', label: 'Height of the tapered wall', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
+    { id: 'a', label: 'Taper angle per side, from the vertical', unit: 'deg', def: 1.5, when: v => v.find !== 2 },
+    { id: 'land', label: 'Sideways distance over the height, per side', unit: lenU(s), def: s === 'inch' ? 0.026 : 0.655, when: v => v.find === 2 },
+    { id: 'zg', label: 'Length of wire between the guides (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.h > 0)) return [];
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3;
+    let a = v.a;
+    const rows = [];
+    if (v.find === 2) { if (!(v.land >= 0)) return []; a = W.edm_taper_angle(v.land, v.h); rows.push(R('Taper angle per side', a, 'deg', 3)); }
+    if (!(a >= 0 && a < 90)) return [R('Angle', 'Enter an angle from 0 to less than 90 degrees', '', 0)];
+    if (v.find !== 2) rows.push(R('Sideways distance over the height, per side', W.edm_taper(v.h, a, 0), u, dp));
+    rows.push(R('Difference in size between top and bottom (both sides)', W.edm_taper(v.h, a, 1), u, dp));
+    if (v.zg > 0) rows.push(R('Sideways distance between the upper and lower guide', W.edm_taper(v.zg, a, 0), u, dp));
+    if (a > 45) rows.push(R('Note', 'The Complete EDM Handbook says machines cut angles up to 45 degrees. Check what your machine and its guides allow.', '', 0));
+    return rows;
+  },
+  working: 'Sideways distance = height x tan(angle); angle = atan(sideways distance / height). An opening or a punch tapered the same on two opposite sides differs in size between top and bottom by twice that. The same relation gives the sideways distance between the two wire guides when the height is the length of wire between them (the U and V travel the cut needs: for a taper in both U and V it is sqrt(U^2 + V^2)). Which surface the programmed size lies on (the programme plane) and the guide heights are machine settings: take them from the machine manual. Tall parts and steep angles are limited by the U and V travel and by the guides.',
+  source: "Complete EDM Handbook (C. Sommer and S. Sommer, Reliable EDM), chapters 2 and 5; Cimatron wire EDM help (cut width); Autodesk FeatureCAM help, \'Offset method\'; S. Woods, \'Gap guidance\', Cutting Tool Engineering, March 2013; University of Minnesota AEM wire EDM notes (taper angle); Industrial Monitor Direct knowledge base (no author named). See docs/sources.md, Wire EDM.",
+  proof: [{ name: 'A 1.5 degree taper over 25 mm', sys: 'metric', vals: { find: 1, h: 25, a: 1.5 }, expect: [['Sideways distance over the height, per side', 'mm', 0.655, 5e-4]],
+    source: 'Industrial Monitor Direct knowledge base, Mitsubishi FX10 taper cutting (no author named): tan(1.5 deg) = 0.02619; land per side = 0.02619 x 25 = 0.655 mm.' }],
+},
+{
+  id: 'edmtime', level: 'advanced', group: 'EDM', title: 'Wire EDM: cut time',
+  desc: 'Time for a wire cut from the cutting rate the machine maker gives (area per hour or per minute): area of the cut, time of the first cut and of the skim cuts, and the speed along the path.',
+  fields: s => [
+    { id: 'len', label: 'Length of the cut path', unit: lenU(s), def: s === 'inch' ? 13 : 330 },
+    { id: 'h', label: 'Thickness of the work', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+    { id: 'rate', label: 'Cutting rate, first cut', unit: s === 'inch' ? 'in2/h' : 'mm2/min', def: '' },
+    { id: 'n', label: 'Skim cuts', unit: '', def: 0, options: [[0, 'None'], [1, '1'], [2, '2'], [3, '3'], [4, '4']] },
+    { id: 'srate', label: 'Cutting rate, skim cuts', unit: s === 'inch' ? 'in2/h' : 'mm2/min', def: '', when: v => v.n > 0 },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.len > 0 && v.h > 0)) return [];
+    const inch = s === 'inch', n = v.n > 0 ? v.n : 0, C = k => W.edm_cut(v.len, v.h, v.rate > 0 ? v.rate : 0, n, v.srate > 0 ? v.srate : 0, k);
+    // The core returns times in the time unit of the rate: hours in inch mode, minutes in mm mode.
+    const mins = t => (inch ? t * 60 : t), hrs = t => (inch ? t : t / 60), fmin = f => (inch ? f / 60 : f);
+    const rows = [R('Area of one pass', C(0), inch ? 'in2' : 'mm2', inch ? 2 : 0)];
+    if (!(v.rate > 0)) { rows.push(R('Note', 'Enter the cutting rate for this material and thickness from the machine\'s cutting tables.', '', 0)); return rows; }
+    rows.push(R('Time, first cut', mins(C(1)), 'min', 1), R('Speed along the path, first cut', fmin(C(2)), feedMinU(s), inch ? 4 : 2));
+    if (n > 0 && v.srate > 0) rows.push(R('Time, ' + n + (n === 1 ? ' skim cut' : ' skim cuts'), mins(C(3)), 'min', 1), R('Speed along the path, skim cuts', fmin(C(5)), feedMinU(s), inch ? 4 : 2));
+    if (n > 0 && !(v.srate > 0)) rows.push(R('Note', 'Enter the cutting rate of the skim cuts to add their time.', '', 0));
+    else rows.push(R('Total cutting time', mins(C(4)), 'min', 1), R('Total cutting time', hrs(C(4)), 'h', 2));
+    return rows;
+  },
+  working: 'Area of one pass = length of the cut path x thickness of the work. Time = area / cutting rate; each skim cut goes round the same path, so it adds the same area at its own rate. Speed along the path = cutting rate / thickness. Makers rate their machines in area per time (square inches per hour, or mm2 per minute) under ideal conditions: the Complete EDM Handbook names 2 1/4 in thick hardened D2 with perfect flushing. Real rates depend on the wire, the material, the thickness and the flushing, so use the rate from the machine\'s cutting tables for the job. Threading, moving between openings and slug removal are not included. 1 in2/h = 10.75 mm2/min.',
+  source: "Complete EDM Handbook (C. Sommer and S. Sommer, Reliable EDM), chapters 2 and 5; Cimatron wire EDM help (cut width); Autodesk FeatureCAM help, \'Offset method\'; S. Woods, \'Gap guidance\', Cutting Tool Engineering, March 2013; University of Minnesota AEM wire EDM notes (taper angle); Industrial Monitor Direct knowledge base (no author named). See docs/sources.md, Wire EDM.",
+  proof: [{ name: 'A 13 in cut through 10 in at 3 in2 per hour', sys: 'inch', vals: { len: 13, h: 10, rate: 3, n: 0 }, expect: [['Area of one pass', 'in2', 130, 1e-9], ['Total cutting time', 'h', 43, 0.5]],
+    source: 'Industrial Monitor Direct knowledge base, wire EDM job pricing (no author named): cut area = cut length x workpiece height, 13 x 10 = 130 sq in; roughing at about 3 sq in per hour, about 43 hours.' }],
+},
+{
   id: 'drillpoint', level: 'simple', group: 'Drilling and tapping', title: 'Drill point length',
   pick: { map: { dia: 'dia', ang: 'point' }, types: ['Drill', 'Spot', 'Other'] },
   desc: 'Axial length of the drill point, and the depth to program for a hole that must be a given depth at its full diameter.',
@@ -1122,6 +1205,84 @@ const TOOLS = [
   },
   working: 'Wheel speed vs = pi ds ns / 60 000 m/s (ds in mm), SFPM = pi ds(in) ns / 12. Work speed vw = pi dw nw / 1000 m/min. Speed ratio q = vs x 60 / vw. Equivalent diameter de = dw ds / (dw + ds) external, dw ds / (dw - ds) internal, ds surface. Contact length lg = sqrt(ae de). Specific removal rate Q\'w = ae vw (mm3/mm/s with vw in mm/s); equivalent chip thickness heq = ae vw / vs. The maximum operating speed is marked on every wheel larger than 80 mm (or on its label or a notice) and must not be exceeded; it depends on the wheel, not on anything BenchMate can work out.',
   source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
+},
+{
+  id: 'gundrill', level: 'advanced', group: 'Drilling and tapping', title: 'Gun drilling: speed, feed, coolant pressure and flow',
+  desc: 'Starting values for a single-flute gundrill: cutting speed by material and hardness, feed per revolution by diameter, coolant pressure and flow, the longest unsupported drill length and the time to drill. One maker\'s tables with a second maker\'s ranges beside them for the steels.',
+  render: el => renderGunDrill(el),
+  working: 'rpm = 12 x SFM / (pi x D in); feed rate = feed per revolution x rpm; over 30 diameters deep the feed is cut by 20 %; table values between two sizes are taken on a straight line. See the note under the tool.',
+  source: 'Sterling Gun Drills catalogue (speed chart, feed table, oil pressure and flow); botek catalogue ELB/ZLB, Type 110 guide values (steels, for comparison); UNISIG deep hole drilling technical reference; Master Fluid Solutions technical bulletin 109; Cutting Tool Engineering, "Conventional thinking", 2016; Hartner, Ingersoll and ISCAR catalogue notes. See docs/sources.md, Gun drilling.',
+},
+{
+  id: 'threadgauge', level: 'advanced', group: 'Threads', title: 'Thread gauge limits (GO and NOT GO)',
+  desc: 'Pitch diameter limits of GO and NOT GO thread plug and ring gauges for Unified threads, classes 2A, 2B, 3A and 3B: which limit of the thread each member is made to, the gauge maker\'s X tolerance and which side it lies on, with a published gauge chart beside the result.',
+  render: el => renderThreadGauge(el),
+  working: 'GO plug: smallest internal pitch diameter, tolerance plus. NOT GO plug: largest, tolerance minus. GO ring: largest external pitch diameter, tolerance minus. NOT GO ring: smallest, tolerance plus. See the note under the tool.',
+  source: 'Thread Check Inc., catalogue p. 52 (X tolerances) and fixed limit gage fact sheet; Royal Oak Gage, class X tolerances; Vermont Gage and Westport standard pitch diameter charts. Thread limits: ASME B1.1 formulas (Thread data tool). ASME B1.2 cited by name. See docs/sources.md, Thread gauge limits.',
+},
+{
+  id: 'rollblank', level: 'advanced', group: 'Threads', title: 'Rolled thread blank diameter',
+  desc: 'Diameter to turn a blank to before thread rolling, for ISO metric and Unified external threads: a thread roll maker\'s rule from the maximum pitch diameter, the handbook\'s amounts beside it, and the correction to the blank after measuring a trial.',
+  render: el => renderRollBlank(el),
+  working: 'Blank = maximum pitch diameter less 0.002 in (0.051 mm). After a trial: change of blank = (middle of the major diameter limits less the measured major diameter) / 3. See the note under the tool.',
+  source: 'CJWinter, "Pitch diameter, major diameter, blank diameter" (2017) and Engineering bulletin: blank design (2016); Machinery\'s Handbook, 31st ed., thread rolling, p. 2188. Thread limits: ISO 965-1 and ASME B1.1 formulas (Thread data tool). See docs/sources.md, Rolled thread blank.',
+},
+{
+  id: 'holdertorque', level: 'advanced', group: 'Setup', title: 'Collet nut and pull stud torque',
+  desc: 'How tight to pull an ER collet nut, by collet size, bore and nut, with the most the maker allows, and pull stud (retention knob) torque for 30, 40 and 50 taper holders. Each maker\'s printed figures side by side; they differ, and nothing is averaged.',
+  render: el => renderHolderTorque(el),
+  working: 'The recommended torque is read from the maker\'s table (N·m); the ceiling is the recommended torque plus 25 %; N·m and lbf·ft are converted with 1 lbf·ft = 1.3558 N·m. See the note under the tool.',
+  source: 'REGO-FIX, recommended tightening torque for Hi-Q/ER clamping nuts and maximum torques for retention knobs (catalogue pp. 293 to 294); REGO-FIX, ER Technical Information, Section 14, Edition 9/2009 (the 25 % rule); Techniks torque specifications chart; MariTool retention knob FAQ. See docs/sources.md, Collet nut and pull stud torque.',
+},
+{
+  id: 'grindratio', level: 'advanced', group: 'Grinding', title: 'Wheel to work rpm ratio (waviness check)',
+  desc: 'Cylindrical grinding: the wheel rpm divided by the work rpm. At a whole-number ratio a wheel that runs out or is out of balance puts its waves in the same place on every turn of the work. Shows the ratio, how close it is to a whole number or a simple fraction, the work speeds to stay away from, what happens as the wheel wears, and what a count of chatter marks points to.',
+  fields: s => [
+    { id: 'ds', label: 'Wheel diameter', unit: lenU(s), def: s === 'inch' ? 20 : 500 },
+    { id: 'ns', label: 'Wheel speed', unit: 'RPM', def: '' },
+    { id: 'vs', label: 'Or wheel surface speed (held as the wheel wears)', unit: s === 'inch' ? 'SFPM' : 'm/s', def: s === 'inch' ? 8000 : 40 },
+    { id: 'nw', label: 'Work speed', unit: 'RPM', def: 200 },
+    { id: 'dmin', label: 'Wheel diameter when worn (optional)', unit: lenU(s), def: '' },
+    { id: 'dw', label: 'Work diameter (optional)', unit: lenU(s), def: '' },
+    { id: 'marks', label: 'Chatter marks counted round the work (optional)', unit: '', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.ds > 0 && v.nw > 0)) return [];
+    const inch = s === 'inch', k = inch ? IN_MM : 1, toMs = x => inch ? x * FT_M / 60 : x, fromMs = x => inch ? x * 60 / FT_M : x, vU = inch ? 'SFPM' : 'm/s';
+    const byRpm = v.ns > 0, ns = byRpm ? v.ns : (v.vs > 0 ? W.wheel_rpm_ms(toMs(v.vs), v.ds * k) : NaN);
+    if (!(ns > 0)) return [];
+    const ratio = W.rpm_ratio(ns, v.nw), tol = W.rpm_ratio_tol(), cls = W.rpm_ratio_class(ratio, tol), n = Math.floor(ratio);
+    const FR = [[1, 4], [1, 3], [1, 2], [2, 3], [3, 4]], fr = FR[W.rpm_ratio_near_fraction(ratio)];
+    const rows = [R('Rpm ratio (wheel rpm / work rpm)', ratio, '', 4)];
+    rows.push(R('Verdict', cls === 1 ? 'Close to a whole number (' + Math.round(ratio) + '): a wheel that runs out or is out of balance puts its waves in the same place on every turn of the work, and they build up. Change the work speed.'
+      : cls === 2 ? 'Close to ' + (n ? n + ' ' : '') + fr[0] + '/' + fr[1] + ': the waves of one turn fall between those of the turns before in a pattern that repeats, which leaves scallops. Change the work speed.'
+        : 'Not close to a whole number or a simple fraction: each turn of the work wipes out the waves of the turn before. This is what to aim for.', '', 0));
+    rows.push(R('From the nearest whole number', W.rpm_ratio_off_whole(ratio), '', 4), R('From the nearest of 1/4, 1/3, 1/2, 2/3, 3/4', W.rpm_ratio_off_fraction(ratio), '', 4),
+      R('Limit used for "close to" (BenchMate\'s choice, see Working)', tol, '', 2));
+    if (byRpm) rows.push(R('Wheel surface speed', fromMs(W.wheel_speed_ms(v.ds * k, ns)), vU, inch ? 0 : 2)); else rows.push(R('Wheel rpm for that surface speed', ns, 'RPM', 1));
+    rows.push(R('Wheel, once per revolution', W.rev_frequency_hz(ns), 'Hz', 2), R('Waves per turn of the work from wheel runout or unbalance', ratio, '', 2));
+    if (v.dw > 0) rows.push(R('Spacing of those waves round the work', W.wave_spacing(v.dw, ratio), lenU(s), inch ? 4 : 3));
+    const avoid = [[1, 1], [3, 4], [2, 3], [1, 2], [1, 3], [1, 4], [0, 1]].map(([a, b]) => ({ r: n + a / b, t: a === 0 ? String(n) : a === b ? String(n + 1) : (n ? n + ' ' : '') + a + '/' + b })).filter(x => x.r > 0);
+    rows.push(R('Work speeds to stay away from', avoid.map(x => 'ratio ' + x.t + ': ' + W.work_rpm_for_ratio(ns, x.r).toFixed(1) + ' rpm').join('; '), '', 0));
+    if (v.dmin > 0 && v.dmin < v.ds) {
+      if (byRpm) rows.push(R('As the wheel wears', 'At a constant wheel rpm the ratio stays where it is. The surface speed falls to ' + fromMs(W.wheel_speed_ms(v.dmin * k, ns)).toFixed(inch ? 0 : 2) + ' ' + vU + ' at the worn diameter.', '', 0));
+      else {
+        const ns2 = W.wheel_rpm_ms(toMs(v.vs), v.dmin * k), r2 = W.rpm_ratio(ns2, v.nw), pass = [];
+        for (let i = Math.ceil(ratio); i <= Math.floor(r2) && pass.length < 40; i++) pass.push(i);
+        rows.push(R('Wheel rpm when worn', ns2, 'RPM', 1), R('Rpm ratio when worn', r2, '', 4),
+          R('Whole numbers passed as the wheel wears', pass.length ? pass.join(', ') + '. At a constant surface speed the wheel rpm rises as the wheel wears, so the ratio passes through these (and the fractions between). Holding the wheel rpm, or setting the work rpm from the wheel rpm so that the ratio stays the same, avoids it.' : 'None between the new and the worn diameter.', '', 0));
+      }
+    }
+    if (v.marks > 0) rows.push(R('Frequency of the marks', W.marks_frequency_hz(v.marks, v.nw), 'Hz', 1), R('Marks counted against the rpm ratio', W.marks_vs_ratio_pct(v.marks, ratio), '%', 1),
+      R('What the count points to', 'A count close to the rpm ratio points to the wheel (out of true or out of balance). To be sure, change the wheel speed and count again: marks that follow the new ratio come from the wheel; marks that stay at the same frequency are self-excited chatter.', '', 0));
+    return rows;
+  },
+  working: 'Rpm ratio = wheel rpm / work rpm. A wheel that runs out or is out of balance touches the work hardest once per wheel revolution, so it leaves that many waves per turn of the work. At a whole-number ratio the waves land in the same place on every turn and build up; at a simple fraction (1/4, 1/3, 1/2, 2/3, 3/4) they land in a pattern that repeats after a few turns; at a "long decimal" each turn wipes out the last. Work rpm for a ratio = wheel rpm / ratio. Frequency of marks = marks per turn x work rpm / 60 Hz; spacing = pi x work diameter / waves. No source gives a figure for "close to": BenchMate uses 0.02, which sits between the author\'s examples (8.0000, 9.013 and 8.9924 called bad; 9.36488 and 8.916742 called good). Varying the work rpm a few percent during the cut is the other remedy the author gives. All numbers come from the Rust core.',
+  source: 'J. Badger, "Ask the Grinding Doc", Cutting Tool Engineering: "Overcoming waviness" (15 Jun 2010), "Origins of chatter" (15 Apr 2011), "Varying the workpiece rpm" (18 Apr 2025). One author, so the rule is single-source. T. R. A. Pearce, D. C. Fricker, A. Speight, Proc. IMechE Part B, vol. 220 no. 8, 2006 (abstract only read) supports the mechanism: wheel run-out, the rpm ratio of wheel to workpiece and the shift of the waves from one work revolution to the next decide the roundness. See docs/sources.md, Grinding.',
+  proof: [{ name: 'Wheel worn from 500 to 350 mm at 40 m/s, work at 200 rpm', sys: 'mm', vals: { ds: 500, ns: '', vs: 40, nw: 200, dmin: 350, dw: '', marks: '' }, expect: [['Wheel rpm for that surface speed', 'RPM', 1528, 0.5], ['Rpm ratio (wheel', '', 7.63, 0.011], ['Wheel rpm when worn', 'RPM', 2182, 1], ['Rpm ratio when worn', '', 10.91, 0.005]],
+    source: 'J. Badger, "Overcoming waviness", Cutting Tool Engineering, 2010: 1,528 to 2,182 rpm, ratio 7.63 to 10.91, passing eight, nine and ten. (1,528 / 200 is 7.64; the article prints 7.63.)' },
+  { name: '16 in wheel at 12,000 sfm, work at 40 rpm, 70 marks counted', sys: 'inch', vals: { ds: 16, ns: '', vs: 12000, nw: 40, dmin: '', dw: '', marks: 70 }, expect: [['Rpm ratio (wheel', '', 71.65, 0.04], ['Frequency of the marks', 'Hz', 47, 0.5]],
+    source: 'J. Badger, "Origins of chatter", Cutting Tool Engineering, 2011: 2,866 rpm, ratio 71.65, 47 Hz. The article works with pi = 3.14; with pi the wheel turns 2,864.8 rpm and the ratio is 71.62.' }],
 },
 {
   id: 'grindtime', level: 'advanced', group: 'Grinding', title: 'Cylindrical traverse and plunge time',
@@ -1539,6 +1700,34 @@ const TOOLS = [
   source: "R. Willis, Principles of Mechanism (1841), relative-speed method (by name); KHK Gear Technical Reference and SDP/SI Elements of Metric Gear Technology, section 13 (planetary gear trains). See docs/gears.md.",
 },
 {
+  id: 'saespline', level: 'expert', group: 'Gears and splines', title: 'SAE parallel side splines (4, 6, 10 and 16 splines)',
+  desc: 'Width, depth and small diameter of the old SAE straight-sided spline fittings for a nominal diameter, for a permanent fit, a fit that slides when not under load and one that slides under load, with the torque capacity per inch of length, and the section drawn to scale. For repairs and existing parts: the standard is obsolete for new designs.',
+  fields: s => [
+    { id: 'n', label: 'Number of splines', unit: '', def: 6, options: [[4, '4'], [6, '6'], [10, '10'], [16, '16']] },
+    { id: 'fit', label: 'Fit', unit: '', def: 1, options: [[1, 'A: permanent fit'], [2, 'B: to slide when not under load'], [3, 'C: to slide when under load']] },
+    { id: 'D', label: 'Nominal (large) diameter D', unit: lenU(s), def: s === 'inch' ? 1.5 : 38.1 },
+    { id: 'len', label: 'Bearing length of the splines (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.D > 0)) return [];
+    if (v.n === 4 && v.fit === 3) return [R('Fit', 'The standard has no fit C (to slide under load) for 4 splines: choose A or B, or 6 splines or more', '', 0)];
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 3 : 2, G = k => W.sae_spline(v.n, v.fit, v.D, k), Din = inch ? v.D : v.D / IN_MM;
+    // Torque: the core works in inches (inch-pounds per inch of length at 1000 psi); N m is a unit conversion.
+    const T = W.sae_spline(v.n, v.fit, Din, 3), NM = 0.1129848;
+    const rows = [R('Width of spline W', G(0), u, dp), R('Depth of spline h', G(1), u, dp), R('Small diameter d', G(2), u, dp),
+      R('Torque capacity per inch of length at 1000 psi on the sides', inch ? T : T * NM, inch ? 'in lbf' : 'N m', inch ? 0 : 1)];
+    if (v.len > 0) { const L = inch ? v.len : v.len / IN_MM; rows.push(R('Torque capacity over the bearing length, at 1000 psi', inch ? T * L : T * L * NM, inch ? 'in lbf' : 'N m', inch ? 0 : 1)); }
+    const lo = v.n === 16 ? 2 : 0.75, hi = v.n <= 6 ? 3 : 6;
+    if (Din < lo - 1e-9 || Din > hi + 1e-9) rows.push(R('Note', 'The handbook tabulates ' + v.n + '-spline fittings from ' + (lo === 2 ? '2' : '3/4') + ' to ' + hi + ' in nominal diameter. This size is outside that range: the proportions are applied as formulas.', '', 0));
+    return rows;
+  },
+  working: 'W, h and d are fixed fractions of the nominal diameter D. W: 0.241 D (4 splines), 0.250 D (6), 0.156 D (10), 0.098 D (16). Permanent fit (A): h = 0.075 D, d = 0.850 D (4 splines); 0.050 D, 0.900 D (6); 0.045 D, 0.910 D (10 and 16). To slide when not under load (B): 0.125 D, 0.750 D (4); 0.075 D, 0.850 D (6); 0.070 D, 0.860 D (10 and 16). To slide under load (C): 0.100 D, 0.800 D (6); 0.095 D, 0.810 D (10 and 16); none for 4 splines. Torque capacity T = 1000 N R h per inch of bearing length, at 1000 psi on the sides of the splines, with R = (D + d) / 4 the mean radius: scale it by the pressure your materials allow. ' +
+    'The figures are the largest size of each dimension; the handbook tables give a minus tolerance of 0.001 to 0.003 in on them, depending on size. The dimensions apply to the soft broached hole; corner radii are not over 0.015 in and the splines are parallel to the axis within 0.006 in per foot. SAE lists the standard (J499, issued January 1914, stabilized 2014; the revision known as J499a is dated 1975) as technically obsolete for new designs, and points to involute splines (ANSI B92.1) instead: see the involute spline tool.',
+  source: "Machinery's Handbook, 31st ed., SAE standard spline fittings, Tables 18 to 22, pp. 2358 to 2360 (formulas and torque capacity; one publisher, checked against 37 printed values). SAE J499, Parallel side splines for soft broached holes in fittings (SAE's public summary: scope, status, corner radii, parallelism). See docs/sources.md, SAE parallel side splines.",
+  proof: [{ name: 'A 2 in 10-spline fitting, to slide under load (10C)', sys: 'inch', vals: { n: 10, fit: 3, D: 2 }, expect: [['Width of spline W', 'in', 0.312, 5e-4], ['Small diameter d', 'in', 1.620, 5e-4], ['Torque capacity per inch of length at 1000 psi on the sides', 'in lbf', 1720, 0.6]],
+    source: "Machinery's Handbook, 31st ed., Table 20, SAE standard 10-spline fittings, p. 2360: nominal diameter 2, W 0.309 to 0.312, 10C d 1.618 to 1.620, T 1720.", note: 'The table prints each dimension as a smallest and a largest size; BenchMate gives the largest.' }],
+},
+{
   id: 'spline', level: 'expert', group: 'Gears and splines', title: 'Involute splines (ANSI B92.1, ISO 4156)',
   desc: '30° flat root side fit involute splines: pitch and base diameters, circular pitch, basic tooth thickness and space width, major and minor diameters, measurement over pins (external) and between pins (internal), with one tooth space of the shaft and of the hub drawn enlarged with its pin. Basic (nominal) values only: the standards then apply fit class tolerances and deviations, which are not shown.',
   fields: s => [
@@ -1915,17 +2104,17 @@ const TOOLS = [
 },
 {
   id: 'gmcodes', level: 'simple', group: 'G-code reference', title: 'G and M codes',
-  desc: 'G and M codes per control: generic ISO 6983 / RS-274, Fanuc (lathe systems A/B/C), Haas, Mitsubishi M70/M80 and MELDAS 60, Siemens 840D native and ISO mode, Heidenhain DIN/ISO, Okuma OSP and Mazak EIA/ISO. Search by code or word, filter mill or lathe, compare two controls side by side. Every row shows its source.',
+  desc: 'G and M codes per control: generic ISO 6983 / RS-274, Fanuc (lathe systems A/B/C), Haas, Mitsubishi M70/M80 and MELDAS 60, Siemens 840D native and ISO mode, Heidenhain DIN/ISO, Okuma OSP and Mazak EIA/ISO, and the M-code lists machine builders print for a Doosan machining centre, Mori Seiki (DMG MORI) NL lathes and the Mazak INTEGREX e. Search by code or word, filter mill or lathe, compare two controls side by side. Every row shows its source.',
   render: el => renderGmCodes(el),
-  working: 'Nothing is calculated. A code is listed for a control only when the maker\'s (or machine builder\'s) public document prints it, or two independent public sources agree; otherwise it shows as not confirmed for that control. Meanings are BenchMate\'s own short wording. The default control comes from the active machine profile. The same number can mean different things on different controls (G70 is a lathe finishing cycle on Fanuc, a bolt circle on a Haas mill and inch mode on Siemens): always check your machine\'s own manual.',
-  source: 'NIST RS274NGC v3 (NISTIR 6556, public domain); ISO 6983-1:2009 cited by name; LinuxCNC docs; FANUC 0i-F and 0i-F Plus manuals; Haas operator manual, mill workbook, lathe card and Haas Factory Outlet lathe manual; Mitsubishi M70L manual, MELDAS 60 manual and training texts; Siemens SINUMERIK G/M handbook and ISO Milling manual; HEIDENHAIN TNC 320 ISO manual; Okuma OSP-P200L manual; Mazak EIA/ISO turning manual. Full list under the table and in docs/gm-codes.md.',
+  working: 'Nothing is calculated. A code is listed for a control only when the maker\'s (or machine builder\'s) public document prints it, or two independent public sources agree; otherwise it shows as not confirmed for that control. Meanings are BenchMate\'s own short wording. The default control comes from the active machine profile. The same number can mean different things on different controls (G70 is a lathe finishing cycle on Fanuc, a bolt circle on a Haas mill and inch mode on Siemens): always check your machine\'s own manual. M codes above all: the machine builder assigns most of them (M29 is rigid tapping on the Doosan list and switches the in-position check off on the Mori Seiki list).',
+  source: 'NIST RS274NGC v3 (NISTIR 6556, public domain); ISO 6983-1:2009 cited by name; LinuxCNC docs; FANUC 0i-F and 0i-F Plus manuals; Haas operator manual, mill workbook, lathe card and Haas Factory Outlet lathe manual; Mitsubishi M70L manual, MELDAS 60 manual and training texts; Siemens SINUMERIK G/M handbook and ISO Milling manual; HEIDENHAIN TNC 320 ISO manual; Okuma OSP-P200L manual; Mazak EIA/ISO turning manual and INTEGREX e programming manual; Doosan HP5100 maintenance manual; Mori Seiki NL user\'s manual. Full list under the table and in docs/gm-codes.md.',
 },
 {
   id: 'macroref', level: 'expert', group: 'G-code reference', title: 'Macro reference',
-  desc: 'Macro and parameter programming per control: Fanuc Custom Macro B variables and IF / WHILE, Haas macros, Siemens R parameters and control structures, Heidenhain Q-parameter jumps, Okuma VC variables and IF branches, with sources and the places where sources disagree.',
+  desc: 'Macro and parameter programming per control: Fanuc Custom Macro B variables and IF / WHILE, Haas macros, Siemens R parameters and control structures, Heidenhain Q-parameter jumps, Okuma VC variables and IF branches. System variables for Haas and Fanuc that can be searched by number (type 5023 or #3000). With sources and the places where sources disagree.',
   render: el => renderMacroRef(el),
   working: 'Nothing is calculated. Statements are in BenchMate\'s own words with the source section beside each. Variable ranges and system variable numbers depend on the control model, its options and the machine builder: check your manual before writing to any variable.',
-  source: 'Tornos B Macro guide (2017); CNCCookbook; Haas Macro Programming Information (2017); Siemens SINUMERIK Job Planning manual (03/2013) and ISO Milling manual; HEIDENHAIN TNC 426 B ISO manual; ICAM pre-processor syntax pages; Okuma OSP-P200L manual and Okuma America blog. See docs/gm-codes.md.',
+  source: 'Tornos B Macro guide (2017); CNCCookbook; Haas Macro Programming Information (2017); Siemens SINUMERIK Job Planning manual (03/2013) and ISO Milling manual; HEIDENHAIN TNC 426 B ISO manual; ICAM pre-processor syntax pages; Okuma OSP-P200L manual and Okuma America blog. System variables: Haas Mill Operator\'s Manual 96-8000 Rev AC (2010); for Fanuc, Tornos, CNCCookbook and cncmacrosimulator.com. See docs/gm-codes.md.',
 },
 {
   id: 'dxfbolt', level: 'advanced', group: 'CAD / DXF', title: 'Bolt circle DXF',
@@ -2209,6 +2398,13 @@ const TOOLS = [
   source: 'NIST/SEMATECH e-Handbook of Statistical Methods 6.3.2.1 and 6.3.2.2; University of York factors for control charts; d2 and d3 computed by numerical integration (core tests). See docs/inspection.md.',
 },
 {
+  id: 'grr', level: 'expert', group: 'Inspection and quality', title: 'Gauge R&R (average and range method)',
+  desc: 'Paste the readings of a gauge study (2 to 5 appraisers, 2 to 4 trials, 2 to 10 parts): repeatability, reproducibility, gauge R&R and part variation as a share of the total variation and of the tolerance, the number of distinct categories, and a chart against the 10 % and 30 % guidelines.',
+  render: el => renderGrr(el),
+  working: 'EV = R-bar K1; AV = sqrt((X-diff K2)^2 - EV^2 / (n r)), zero when negative; GRR = sqrt(EV^2 + AV^2); PV = Rp K3; TV = sqrt(GRR^2 + PV^2); ndc = 1.41 PV / GRR cut to a whole number; percent of tolerance = 6 GRR / tolerance. K1 = 1 / d2, K2 and K3 = 1 / d2*. See the note under the tool.',
+  source: 'OriginLab, Algorithm for Gage R&R Study; Minitab support, methods and formulas for the crossed gage R&R study; sixsigmastudyguide.com, Repeatability and reproducibility; spcforexcel.com, Three Methods to Analyze Gage R&R Studies (2015); SAS/QC GAGE application. AIAG Measurement Systems Analysis, 4th ed., cited by name. See docs/inspection.md.',
+},
+{
   id: 'sampling', level: 'expert', group: 'Inspection and quality', title: 'Sampling plan OC curve',
   desc: 'For a single sampling plan (sample n, accept on c or fewer defectives): chance of accepting a lot at any percent defective, the OC curve, the 95 % and 10 % points and the AOQL, plus how ISO 2859-1 / ANSI Z1.4 choose plans (tables not reproduced).',
   render: el => renderSampling(el),
@@ -2417,7 +2613,7 @@ const TOOLS = [
 },
 {
   id: 'materials', level: 'simple', group: 'Materials', title: 'Material equivalents',
-  desc: 'Find comparable grades for steels, aluminium, copper alloys, titanium, nickel alloys and cast irons across US, European, UK, Japanese and Chinese systems. Every value shows how many independent publishers print it, and you can see exactly what each source says.',
+  desc: 'Find comparable grades for steels, aluminium, copper alloys, titanium, nickel alloys and cast irons across US, European, UK, Japanese and Chinese systems. Every value shows how many independent publishers print it, and you can see exactly what each source says. Click a grade for its material card: composition chart, machinability rings and properties.',
   render: el => renderMaterials(el),
   working: 'Equivalents are comparable grades, not identical: chemistry and properties differ between standards. Check the actual standard or mill certificate before substituting.',
   source: 'Listed under the table and in docs/sources.md. Confirmed = two or more independent publishers agree on the key designation and none disagree with equal support.',
@@ -2893,6 +3089,13 @@ const TOOLS = [
   render: el => renderCncGuide(el),
   working: 'Reference only. Your machine and control manuals govern. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
   source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'toolwear', level: 'advanced', group: 'Guides', title: 'Tool wear guide',
+  desc: 'Ten ways a cutting edge wears or fails, each with our own drawing, what you see, the causes and what to try: flank wear, crater wear, notch wear, built-up edge, chipping, thermal cracking, plastic deformation, fracture, flaking and chip hammering.',
+  render: el => renderToolWear(el),
+  working: 'Reference only, in our own words. Each entry carries its source keys; an entry described by only one of the two makers is marked "to be verified".',
+  source: 'Mitsubishi Materials, "Causes of tool damage" (mmc-carbide.com, course 78); Seco Tools, "Tool wear patterns: how to recognize and to optimize them" (secotools.com/article/122073). Read again 2026-11-12.',
 },
 {
   id: 'toolguide', level: 'advanced', group: 'Guides', title: 'Tooling guide',

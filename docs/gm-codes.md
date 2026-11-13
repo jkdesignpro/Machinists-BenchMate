@@ -38,27 +38,31 @@ output dialects: 0 Generic ISO 6983 / Fanuc-style, 1 Haas, 2 Mitsubishi M70/M80,
 3 Siemens 840D ISO mode, 4 Heidenhain ISO, 5 Okuma OSP. Each control here has
 `cycles_ctrl` with that number: `generic` and `fanuc` = 0, `haas` = 1,
 `mitsubishi` = 2, `siemens-iso` = 3, `heidenhain` = 4, `okuma` = 5. `meldas`,
-`siemens` (native) and `mazak` have no generator dialect (`null`).
+`siemens` (native), `mazak`, `doosan` and `dmg` have no generator dialect (`null`).
+`doosan` and `dmg` hold a machine builder's M codes only; a machine profile is
+matched to them last, after the control makers, so "Doosan, Fanuc 0i" opens Fanuc.
 
 ## Coverage (codes confirmed per control)
 
 Rows can cover mill and lathe at once, so the mill and lathe columns overlap.
 "Maker" includes builder, distributor and public-report sources.
 
-| Control | G rows | M rows | Mill | Lathe | Maker | Two sources | Options marked | Macro facts | Gap notes |
-|---|---|---|---|---|---|---|---|---|---|
-| Generic ISO 6983 / RS-274 (NIST RS274NGC) | 52 | 14 | 66 | 0 | 66 | 0 | 0 | 0 | 2 |
-| Fanuc (0i-F / 0i-F Plus; 30i family) | 138 | 2 | 86 | 60 | 136 | 4 | 8 | 11 | 5 |
-| Haas (NGC mill and lathe) | 169 | 98 | 132 | 135 | 267 | 0 | 64 | 11 | 2 |
-| Mitsubishi M70 / M80 / M800 | 66 | 8 | 19 | 70 | 74 | 0 | 9 | 2 | 3 |
-| Mitsubishi MELDAS 60/60S (legacy lathe) | 65 | 0 | 0 | 65 | 65 | 0 | 6 | 1 | 2 |
-| Siemens 840D sl (native) | 32 | 10 | 42 | 42 | 42 | 0 | 1 | 6 | 2 |
-| Siemens 840D sl (ISO mode, milling) | 83 | 0 | 83 | 0 | 83 | 0 | 6 | 0 | 2 |
-| Heidenhain TNC (DIN/ISO) | 37 | 0 | 37 | 0 | 37 | 0 | 0 | 1 | 2 |
-| Okuma OSP (lathe, P200L/P20L) | 14 | 41 | 0 | 55 | 55 | 0 | 6 | 3 | 3 |
-| Mazak (EIA/ISO, turning) | 74 | 0 | 0 | 74 | 74 | 0 | 16 | 1 | 3 |
+| Control | G rows | M rows | Mill | Lathe | Maker | Two sources | Options marked | Macro facts | System variables | Gap notes |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Generic ISO 6983 / RS-274 (NIST RS274NGC) | 52 | 14 | 66 | 0 | 66 | 0 | 0 | 0 | 0 | 2 |
+| Fanuc (0i-F / 0i-F Plus; 30i family) | 138 | 2 | 86 | 60 | 136 | 4 | 8 | 11 | 19 | 6 |
+| Haas (NGC mill and lathe) | 169 | 98 | 132 | 135 | 267 | 0 | 64 | 11 | 70 | 4 |
+| Mitsubishi M70 / M80 / M800 | 66 | 8 | 19 | 70 | 74 | 0 | 9 | 2 | 0 | 3 |
+| Mitsubishi MELDAS 60/60S (legacy lathe) | 65 | 0 | 0 | 65 | 65 | 0 | 6 | 1 | 0 | 2 |
+| Siemens 840D sl (native) | 32 | 10 | 42 | 42 | 42 | 0 | 1 | 6 | 0 | 2 |
+| Siemens 840D sl (ISO mode, milling) | 83 | 0 | 83 | 0 | 83 | 0 | 6 | 0 | 0 | 2 |
+| Heidenhain TNC (DIN/ISO) | 37 | 0 | 37 | 0 | 37 | 0 | 0 | 1 | 0 | 2 |
+| Okuma OSP (lathe, P200L/P20L) | 14 | 41 | 0 | 55 | 55 | 0 | 6 | 3 | 0 | 3 |
+| Mazak (EIA/ISO turning; INTEGREX e M codes) | 74 | 47 | 47 | 121 | 121 | 0 | 18 | 1 | 0 | 4 |
+| Doosan / DN Solutions (HP5100 machining centre, M codes) | 0 | 118 | 118 | 0 | 118 | 0 | 0 | 0 | 0 | 2 |
+| DMG MORI / Mori Seiki (NL lathes, M codes) | 0 | 44 | 0 | 44 | 44 | 0 | 8 | 0 | 0 | 2 |
 
-Total 903 code rows, 36 macro facts, 9 recorded disagreements.
+Total 1112 code rows, 36 macro facts, 89 system variable rows (70 Haas from the maker; Fanuc: 4 builder, 5 two sources, 10 one source), 10 recorded disagreements.
 
 ## Sources per control (all accessed 2026-11-10)
 
@@ -133,9 +137,68 @@ MAZATROL turning CNC (incl. T-Plus) and FUSION 640T NEXUS, C734PBT018E, 08.2002,
 section 3-7 (copy attached on forums.autodesk.com). BenchMate lists the standard
 EIA/ISO mode, series A code and gives series B and C codes in the notes.
 
+**Mazak M codes (0.5.0, accessed 2026-11-12).** [MAZ_IE] Yamazaki Mazak, INTEGREX e
+Series Programming Manual: Programming Data for Post Processors, HA12PB0013E,
+04.2017 (manualslib copy), printed pages 4-13, 4-30, 5-2 and 5-64 to 5-73, with
+the table of contents as a second reading. A multi-tasking machine: M03 to M05
+are the milling spindle and M203 to M205, M303 to M305 the turning spindles.
+
+**Doosan (0.5.0, accessed 2026-11-12).** [DOO_HP] Doosan, HP5100 Maintenance
+Manual (HP51MTE87), M-code list, printed pages 268 to 271 (manualslib copy,
+viewer pages 146 to 149). Each page was read twice, the second time as the raw
+order of codes and labels so that a label split over two lines goes with the
+right code. The pages read do not name the NC control. Builder's list for one
+horizontal machining centre.
+
+**DMG MORI / Mori Seiki (0.5.0, accessed 2026-11-12).** [MORI_NL] Mori Seiki,
+NL1500, NL2000, NL2500, NL3000 User's Manual (NC units MSX-850, MSX-850III),
+manualslib copy. Only the table of contents could be read; every M code has a
+heading there that names its function. The headings were read three times and
+a code is listed only when the same heading came back (M03 and M98 from the
+Japanese heading). The page with the full M code list could not be found in the
+viewer.
+
+**System variables (0.5.0, accessed 2026-11-12).** [HAAS_OM10] Haas Automation,
+Mill Operator's Manual 96-8000 Rev AC, May 2010 (manualslib copy), macros
+chapter, printed pages 93 to 104: the system variable table and "System
+variables in-depth". This is the control before the Next Generation Control.
+[CMS] cncmacrosimulator.com, "Fanuc, Haas, Mazak system variables list"
+(independent, no author named). Fanuc rows also use [TORNOS] and [CNCC] below.
+Tried and not readable: the Haas NGC mill manual PDF (96-8210 Rev N, 2020: the
+text stops before the macros chapter), the Haas online macros page, the macro
+chapter of the Fanuc 0i-F Plus manual copy, Modern Machine Shop's custom macro
+columns (the variable lists are not in the page text), Scribd copies.
+
 **Macros.** [TORNOS] Tornos, Tips & Tricks B Macro, edition 4, 06.06.2017 (machine
 builder, FANUC-controlled machines). [CNCC] CNCCookbook, G-code parameterized
 programming (modified 27 April 2024).
+
+## System variables (0.5.0)
+
+`sysvars` in the evidence file: rows `{ctrl, group, var, text, src}`. `var` is a
+number or a range as printed (`#5021-#5025`), with a second range in brackets when
+the source gives an older and a newer number for the same thing. The build adds
+`ranges` (every number or range named in `var`) and `status`.
+
+- **Status.** `maker` when a maker's or builder's document prints the row,
+  `confirmed` when two independent sources agree, `single` when one independent
+  source prints it. Single rows are shown, with an orange "One source" badge:
+  for these numbers nothing better could be read, and the page says so. (Code
+  rows keep the stricter rule: no single-source rows.)
+- **Search.** The search box on the Macro reference page filters the macro facts
+  and the system variables together. A search that is only a number (`5023`,
+  `#3000`, `#5021-#5025`) is matched against the ranges, so `5023` finds
+  `#5021 to #5025`. Anything else is a word search.
+- **Nothing is borrowed.** A number not listed for a control shows "not
+  confirmed for this control", even when another control lists it. Haas and
+  Fanuc use the #2001 block for different things (Haas: length offset; Fanuc:
+  length wear), which is why.
+- **Table reading.** The Haas table text comes out as a column of numbers and a
+  column of labels. They were paired in order; the rows of printed pages 94 and
+  95 were read from two overlapping extractions, and the in-depth sections
+  confirm #1064 to #1068, #2001 to #2800, #3000 to #3006, #4001 to #4126,
+  #5001 to #5085, #6996 to #6999 and the pallet variables. The #3004 bit table
+  was garbled: only bit 0 (feed hold) is given.
 
 ## Disagreements recorded
 
@@ -144,6 +207,7 @@ programming (modified 27 April 2024).
 | Fanuc | G36 on the lathe | 0i-F lathe manual: G35/G36 circular threading. mfgrobots: G36/G37 automatic tool compensation X/Z. |
 | Fanuc | Choosing system A/B/C | Maker: parameter 3401 bits 6 (GSB) and 7 (GSC). Industrial Monitor Direct: bit 0. BenchMate follows the maker. |
 | Fanuc | #3000 / #3006 | Tornos: #3000 alarm stops, #3006 message without stopping. CNCCookbook: #3006 also stops. |
+| Fanuc | Macro variable number for one tool offset | cncmacrosimulator.com: ranges start at #10001, #11001 and so on (offset 200 = #11200). CNCCookbook's example: offset 200 = #11201. Both agree which block holds what. |
 | Fanuc | Common variable ranges | CNCCookbook #100-#199 and #500-#999; Tornos #150-#199 per channel and #600-#699 shared. |
 | Haas | G87 / G88 (mill) | In the 2015 workbook, not in the current online summary. |
 | Haas | M110 / M111 (lathe) | 2002 card: tailstock chuck. 2024 HFO manual: secondary spindle chuck. |
@@ -177,7 +241,19 @@ Listed per control in the evidence file (`gaps`) and on screen. The main ones:
   functions); Q-parameter ranges and D-function numbers (one source).
 - Okuma: OSP mill; G90/G91, LAP cycles, threading cycles and M08/M09 (third-party
   lists only); CALL/RTS/MODIN syntax (one source).
-- Mazak: machining centre EIA codes; M codes; rows the extraction left unclear.
+- Mazak: machining centre EIA codes; rows the extraction left unclear; M codes
+  from one machine family only (INTEGREX e), with M163, M173, M174, M562, M563,
+  M614 and the waiting codes left out because the reading was not clear.
+- Doosan: lathe (Puma, Lynx) M codes; reserved and external codes of the HP5100
+  list are left out.
+- DMG MORI: Mori Seiki NL codes whose heading did not read the same twice;
+  machining centres; machines with Siemens or Heidenhain controls.
+- System variables: Fanuc's own table (the manual's custom macro chapter could
+  not be read), so ten Fanuc rows rest on one source; Haas Next Generation
+  Control numbers; lathe system variables; every other control.
+- Fanuc M codes: the maker's auxiliary function chapter could not be read. The
+  builder lists (Doosan, DMG MORI, Mazak, Okuma) show how far M codes differ
+  between builders.
 - Not built: program characters and layout (CN23, CN24).
 
 ## Letter addresses (BB73)
@@ -194,6 +270,14 @@ small constant in `app/gmcodes.js` (`GM_ADDR`), not in the evidence file.
 
 ## Tests
 
+- `scripts/build_refdata.py` also checks every system variable row (known control
+  and source, group and text present, `var` made only of `#n` and `#n-#n`, no
+  duplicate) and that every control named under `gaps` exists.
+- Smoke block `sysvars`: number searches on the Haas list (5023, #2001), the
+  Fanuc #2001 block from two sources, a one-source row marked, a Haas-only number
+  not shown for Fanuc, a word search, the tool offset numbering difference, M29
+  on the Doosan and the Mori Seiki list (rigid tapping against in-position check),
+  three more M codes and the row counts.
 - `scripts/build_refdata.py` validates every row (source present and known,
   confirmation rule, meaning present, mill or lathe set, code format, no duplicate
   rows) and prints the per-control counts.

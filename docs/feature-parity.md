@@ -8,7 +8,7 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 
 | Area | Feature | Status | BenchMate tool | Audit rows |
 |---|---|---|---|---|
-| Turning | Cutting speed and feed recommendations by material | missing | | U1, U2 |
+| Turning | Cutting speed and feed recommendations by material | partial (turning advisor since 0.3.0: speed by material for HSS and carbide, feed from the nose radius, depth and feed held to spindle power and torque; no insert grade picker, hardness input or chip-breaker window) | `advturn` | U1, U2 |
 | Turning | Spindle speed conversion | done | `rpm` | U3 |
 | Turning | Feed rate conversion (per rev / per minute) | done | `lathefeed` | U4 |
 | Turning | Roughing pass cut time | done (passes from stock and depth, RPM per pass) | `roughtime`, `passtime` | U5 |
@@ -31,10 +31,10 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Milling | Tool runout, slitting saw speeds and feeds | done | `runout`, `slitsaw` | U22, U23 |
 | Milling | Thread milling calculator and program | done | `cyctmill` | U24, U25 |
 | Economics | Taylor tool life, cost per part, economic tool life | done (ours) | `toollife` | |
-| Drilling | Drill speed/feed recommendations | missing | | U28 |
+| Drilling | Drill speed/feed recommendations | partial (drilling advisor since 0.3.0: speed by material, feed by diameter, point length, time, removal rate, torque, thrust, power, drilling cycle; no coating factor, none found in an open source) | `advdrill` | U28 |
 | Drilling | Drill point length | done | `drillpoint` | U29 |
 | Drilling | Center drill depth / spot drill depth | partial (depth both ways; no centre drill size table) | `spotdepth` | U32 |
-| Drilling | Reaming, gun drill, tapping speed | missing | | U33-U35 |
+| Drilling | Reaming, gun drill, tapping speed | done (reaming, gun drilling) / partial (tapping speed: one publisher's table) | `advream`, `gundrill`, `advtap` | U33-U35 |
 | Reference | Drill chart (fraction, number, letter, metric) | done | `drillchart` | U30 |
 | Reference | Tap drill sizes (cut and form) | done | `tapdrill` | U31 |
 | Reference | Thread data and limits: UNC/UNF/UNEF, metric M | done | `threaddata` | U38, U43, U52 |
@@ -48,13 +48,13 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Threads | Plating and anodize allowance | partial (allowance and before-coating limits; no special-size tables) | `coating` | U44 |
 | Threads | Trapezoidal, buttress, multi-start | done (basic dimensions; no tolerances) | `trapezoidal`, `buttress`, `multistart` | |
 | Reference | ISO fits and tolerances | partial (no j/J, up to 500 mm) | `fits` | U61 |
-| Reference | G-code and M-code reference per control dialect, custom macros | done (G/M codes, ten controls with sources and compare) / partial (macros: Mitsubishi and Heidenhain thin) | `gmcodes`, `macroref` | U92-U94 |
-| Reference | Material properties | partial (properties, no SFM/machinability data; round 2 in progress) | `materials` | U82 |
+| Reference | G-code and M-code reference per control dialect, custom macros | done (G/M codes, twelve controls and builders with sources and compare; macro facts and system variables searchable by number; gaps listed on the page: Mitsubishi and Heidenhain macros are thin, Fanuc system variables partly from one source) | `gmcodes`, `macroref` | U92-U94 |
+| Reference | Material properties | partial (material card: composition chart for 37 steels, machinability rings, properties; non-ferrous compositions and cutting speed per grade missing) | `materials` | U82 |
 | Reference | Material weight | partial (bar only; full tool in progress on `claude/geometry`) | `bar` | U81 |
 | Reference | Hardness conversion | missing (in progress, `claude/ref-data-3`) | | U67 |
 | Reference | Thermal expansion | done (measurement correction, growth, shrink-fit temperatures, press-fit pressure) | `tempcomp`, `shrinkfit` | U68 |
 | Reference | Socket head cap screw holes (counterbore and clearance) | done (metric and inch; publisher disagreements shown) | `shcs`, `clearance` | U71 |
-| Reference | Knurling, reaming | missing | | U87, U33 |
+| Reference | Knurling, reaming | done (knurl blank by four methods: diametral pitch, circular pitch, measure and count, trial and error with a tick-off procedure; reaming speeds, feeds and allowance) | `knurl`, `advream` | U87, U33 |
 | Fasteners | Bolt grades, torque and preload (VDI 2230), spanner sizes, T-slots | done (beyond Ultra; friction always user-entered) | `boltgrade`, `bolttorque`, `spanner`, `tslots` | MH198-MH212 (section 2) |
 | Machine elements | Keys and keyways, O-ring glands, bearing L10 | partial (no Woodruff, no ISO 3601 G series, no bearing fits) | `keys`, `oring`, `bearinglife` | MH285, MH288, MH294 (section 2) |
 | Geometry | Bolt circle | done | `bolt` | U72 |
@@ -80,15 +80,23 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Shop | Vibration check (device sensor) | missing | | U27 |
 | Grinding | Equivalent diameter, grit conversion, plunge, surface, wheel/workpiece speed | done (grit values per publisher with disagreements shown; max wheel speed never defaulted) | `grindspeed`, `grindtime`, `grindsurf`, `gritconv` | U55-U57, U59, U60 |
 | Grinding | Wheel marking decoder | done (marking only; no shapes or selection) | `wheelcode` | MH163, BB60 (partial) |
-| Grinding | Cylindricity error from RPM | missing | | U58 |
-| Gears/splines | Spur gear data, ISO 4156, ANSI B92.1, SAE J499a | missing | | U83-U86 |
-| Library | Formula library | done (151 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
-| Library | Tool wear information | done (seven wear types, causes and remedies from two makers) | `cncguide` | U91 |
+| Grinding | Cylindricity error from RPM | done (wheel to work rpm ratio: whole numbers and simple fractions flagged, work speeds to avoid, wheel wear, chatter mark count; rule from one author, marked single-source) | `grindratio` | U58 |
+| Gears/splines | Spur gear data, ISO 4156, ANSI B92.1 | done (spur gear data and measurement; involute splines with basic dimensions and pin measurement, fit class tolerances not shown) | `spurgear`, `gearmeasure`, `spline` | U83-U85 |
+| Gears/splines | SAE J499a parallel side splines | done (4, 6, 10 and 16 splines, fits A, B and C: width, depth, small diameter, torque capacity, section to scale; formulas from one publisher, checked against 37 printed values and marked so) | `saespline` | U86 |
+| Library | Formula library | done (162 formulas, searchable, opens the tool; registry in `app/formulas.js`) | `formulas` | U97 |
+| Library | Tool wear information | done (ten wear types with our own drawings, causes and remedies from two makers; two types have one source and are marked) | `toolwear`, `cncguide` | U91 |
 | Library | CNC knowledge guide (axes, coordinates, offsets, program structure, climb/conventional, chips, troubleshooting, workholding, safety) | done (ours; book rows in `parity-audit.md`) | `cncguide` | |
-| Library | Tips, assistant, community cut data | missing | | U98, U101, U102 |
+| Library | Tip of the day | done (own tips, Home widget) | `tips.js` | U98 |
+| Library | Assistant, community cut data | missing (assistant: stage 5, optional and off by default; a shared cut library is not in the spec for 0.2 to 1.0) | | U101, U102 |
 | Library | Indexable insert catalogue | done (decode or tap a code together; insert drawn to scale from above and in section; nose radius to the turning advisor, outline to the sketcher) | `insertcode`, `holdercode`, `iso513` | U103 |
 | Shop | Tool library and favourites | done | `toollib` (fill into rpm, feed, arcfeed, helix, deflection, cutopt, drillpoint, tapdrill, finish); star in the side list or by the title | U106, U109 |
-| Shop | Decimal precision, home dashboard, reorderable menu | missing | | U105, U107, U108 |
+| Threads | Thread gauge limits (not in Ultra; idea 14) | done for Unified (GO and NOT GO plug and ring pitch diameters with the X tolerance, a published chart beside); ISO metric gauges missing (no public table of ISO 1502 tolerances) | `threadgauge` | |
+| Quality | Gauge R&R (not in Ultra; idea 13) | done (average and range method: EV, AV, GRR, PV, percent of total variation and of tolerance, ndc; constants computed and checked against the published ones; ANOVA method not included) | `grr` | |
+| Threads | Rolled thread blank diameter (not in Ultra; idea 10) | done (a thread roll maker's rule on the maximum pitch diameter, the handbook's amounts for the size beside it as a different rule, correction of the blank after a trial) | `rollblank` | |
+| Process | Wire EDM (not in Ultra; idea 18) | done (kerf, wire offset for the first cut and the final skim, smallest inside corner radius, taper both ways with the guide distance, cut time from the cutting rate with skim cuts; gap and rate are inputs, published gap ranges that differ are both shown) | `edmoffset`, `edmtaper`, `edmtime` | |
+| Shop | Collet nut and pull stud torque (not in Ultra; idea 8) | done (ER nut torque by size, bore and nut from the maker's table with a second maker beside it; pull stud torque from three makers side by side, nothing averaged) | `holdertorque` | |
+| Shop | Home dashboard | done (widgets, reorder and resize) | `dashboard.js` | U107 |
+| Shop | Decimal precision, reorderable menu | partial (more and fewer decimals per calculator, remembered; no global setting. Home widgets can be rearranged; the tool lists and the rail cannot) | `app.js`, `dashboard.js` | U105, U108 |
 | Platform | Inch/metric toggle | done | `app.js` | U104 |
 | Platform | Offline, web/desktop link | partial (local web app; no installable offline build) | | U110, U111 |
 | Platform | Mobile apps, languages | missing (later phase) | | U112, U113 |

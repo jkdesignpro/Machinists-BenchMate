@@ -248,3 +248,78 @@ function renderSampling(el) {
   iBind(el, s, calc);
   calc();
 }
+
+// ------------------------------------------------------------------ gauge R&R (average and range method)
+// The readings are entered as a table (one line per appraiser and trial, one column per part). The page only
+// lays them out for the core, which works every number shown; the bar chart is a drawing of those numbers.
+// The example is our own made-up study (a 25 mm diameter, three appraisers, two trials, ten parts).
+const GRR_EXAMPLE = '24.981 25.012 25.028 24.962 25.001 25.049 24.992 25.018 24.971 25.041\n24.978 25.009 25.031 24.958 24.998 25.052 24.989 25.022 24.968 25.038\n' +
+  '24.986 25.013 25.036 24.965 25.006 25.053 24.992 25.027 24.972 25.046\n24.983 25.017 25.032 24.961 25.002 25.056 24.996 25.023 24.976 25.042\n' +
+  '24.975 25.008 25.026 24.959 24.995 25.046 24.988 25.015 24.966 25.039\n24.979 25.005 25.029 24.955 24.999 25.049 24.984 25.019 24.969 25.035';
+const GRR_STATE = { ap: 3, tol: '0.1', text: GRR_EXAMPLE };
+function renderGrr(el) {
+  const s = GRR_STATE, W = state.W;
+  el.innerHTML = '<p class="desc">Gauge repeatability and reproducibility by the average and range method: how much of the spread you measure comes from the gauge (repeatability) and from the people using it (reproducibility), and how much from the parts. Each appraiser measures every part two to four times, in a random order and without seeing the other readings.</p>' +
+    '<div class="grid">' + sfield('Appraisers', iSel('ap', [2, 3, 4, 5].map(n => [n, String(n)]), s.ap), '') + sfield('Tolerance width (upper limit less lower limit), optional', sinp('tol', s.tol), 'same unit') + '</div>' +
+    '<label class="f" style="max-width:760px"><span>Readings: one line per appraiser and trial (appraiser A trial 1, A trial 2, ... then B), one column per part, 2 to 10 parts (spaces, commas or semicolons; decimal point ".")</span><textarea id="grtext" rows="7" spellcheck="false" style="width:100%;font-family:var(--mono);border:1px solid var(--line);border-radius:var(--r);background:var(--panel);color:var(--ink);padding:8px"></textarea></label>' +
+    '<div class="mfilter" style="margin-top:6px"><button class="btn" id="grex">Example data</button><button class="btn" id="grclr">Clear</button><span class="desc" style="margin:0" id="grcount"></span></div>' +
+    '<div id="grplot"></div><div class="res mtab" id="grres" style="margin-top:10px;max-width:760px"></div><div id="grapp"></div>' +
+    '<div class="note"><b>Working:</b> one range per appraiser and part (largest reading less smallest); R-bar is the average of all the ranges. X-diff is the largest appraiser average less the smallest; Rp is the largest part average less the smallest. ' +
+    'EV = R-bar x K1 (repeatability, equipment variation). AV = sqrt((X-diff x K2)^2 - EV^2 / (n r)) with n parts and r trials (reproducibility, appraiser variation); when the value under the root is negative AV is zero. GRR = sqrt(EV^2 + AV^2). PV = Rp x K3 (part variation). TV = sqrt(GRR^2 + PV^2). ' +
+    'Each is shown as a percentage of TV; the percentages do not add up to 100 because standard deviations do not add. ndc = 1.41 x PV / GRR, cut to a whole number: how many groups of parts the gauge can tell apart. Percent of tolerance = 6 x GRR / tolerance width. ' +
+    'K1 = 1 / d2 for the number of trials; K2 and K3 = 1 / d2* for one range of that many appraisers or parts. The core works d2 and d3 out by numerical integration and its tests check the results against the published constants (K1 0.8862, 0.5908, 0.4857; K2 0.7071, 0.5231; K3 0.7071 to 0.3146). ' +
+    'Some programs divide the average range by d2* for the number of ranges in the study instead of d2; with fewer than about 16 ranges their repeatability comes out a little lower.</div>' +
+    '<div class="note"><b>Reading the result</b> (guidelines of the automotive measurement systems manual, as the sources below quote them): GRR under 10 % of the total variation is acceptable; 10 to 30 % may be acceptable, depending on how important the feature is and what a better gauge would cost; over 30 % is not acceptable. ndc should be 5 or more. ' +
+    'If repeatability is the larger part, look at the gauge: wear, clamping, where on the part it is measured. If reproducibility is the larger part, look at the method: the appraisers do not measure the same way. Pick parts that cover the whole spread of the process, or PV and ndc will look worse than they are.</div>' +
+    '<div class="note"><b>Sources</b><br>OriginLab, "Algorithm for Gage R&R Study" (X-bar and R formulas, d2* lookups, study variation, number of distinct categories); Minitab support, "Methods and formulas for gage R&R table in Crossed Gage R&R Study" (which d2* for which component, percent of tolerance); ' +
+    'T. Hessing and Ramana PV, sixsigmastudyguide.com, "Repeatability and reproducibility" (formulas with K1, K2, K3, AV set to zero, ndc cut to a whole number, guidelines, a worked example); B. McNeese, spcforexcel.com, "Three Methods to Analyze Gage R&R Studies", Feb 2015 (K1, K2, K3 and the results of a 10 part, 3 operator, 3 trial example, which the core tests reproduce); ' +
+    'SAS/QC documentation, GAGE application (d2 against d2*). All cite the AIAG Measurement Systems Analysis manual, 4th ed., 2010, which BenchMate cites by name and does not reproduce. See docs/inspection.md.</div>';
+  const ta = el.querySelector('#grtext'); ta.value = s.text;
+  const esc = rEsc;
+  function calc() {
+    const res = el.querySelector('#grres'), plot = el.querySelector('#grplot'), app = el.querySelector('#grapp'), count = el.querySelector('#grcount');
+    const stop = msg => { res.innerHTML = stable('Results', [[msg, '', '']]); plot.innerHTML = ''; app.innerHTML = ''; };
+    const lines = String(s.text).split(/\n/).map(l => l.split(/[\s,;]+/).filter(Boolean)).filter(a => a.length);
+    const ap = +s.ap, parts = lines.length ? lines[0].length : 0, bad = lines.flat().filter(t => !isFinite(Number(t)));
+    count.textContent = lines.length + ' line' + (lines.length === 1 ? '' : 's') + (parts ? ', ' + parts + ' part' + (parts === 1 ? '' : 's') + ' in the first line' : '') + '.';
+    if (!lines.length) return stop('Enter the readings, or press Example data');
+    if (bad.length) return stop('Not a number: ' + esc(bad.slice(0, 3).join(', ')));
+    if (lines.some(l => l.length !== parts)) return stop('Every line needs the same number of readings (one per part): line ' + (lines.findIndex(l => l.length !== parts) + 1) + ' has ' + lines.find(l => l.length !== parts).length + ', the first has ' + parts);
+    if (parts < 2 || parts > 10) return stop('2 to 10 parts (columns); the first line has ' + parts);
+    const trials = lines.length / ap;
+    if (trials !== Math.floor(trials) || trials < 2 || trials > 4) return stop(lines.length + ' lines for ' + ap + ' appraisers: each appraiser needs 2 to 4 lines (trials), the same number for all');
+    const xs = [];
+    for (let a = 0; a < ap; a++) for (let p = 0; p < parts; p++) for (let t = 0; t < trials; t++) xs.push(Number(lines[a * trials + t][p]));
+    new Float64Array(W.memory.buffer, W.buf_ptr(), xs.length).set(xs);
+    const tol = parseFloat(s.tol), C = k => W.grr_buf(parts, ap, trials, tol > 0 ? tol : 0, k);
+    const dp = Math.min(8, Math.max(...lines.flat().map(t => (t.split('.')[1] || '').replace(/e.*$/i, '').length)) + 2), f = x => fmt(x, dp), pc = x => fmt(x, 1) + ' %';
+    const ev = C(0), av = C(1), grr = C(2), pv = C(3), tv = C(4), pg = C(7), ndc = C(9), rad = C(11), pt = C(10);
+    if (!isFinite(tv)) return stop('The readings could not be worked');
+    const row = (name, how, v, p, cls) => '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + name + '<div class="ms">' + how + '</div></td><td class="v">' + f(v) + '</td><td class="v">' + (p === null ? '' : pc(p)) + '</td></tr>';
+    const verdict = !(grr > 0) ? 'No measurement variation found: check that the readings were not rounded too far' : pg < 10 ? 'Acceptable: under 10 %' : pg <= 30 ? 'May be acceptable (10 to 30 %): it depends on the feature and the cost of a better gauge' : 'Not acceptable: over 30 %. Improve the gauge or the method before trusting the readings';
+    res.innerHTML = '<div class="h">Gauge R&R: ' + parts + ' parts, ' + ap + ' appraisers, ' + trials + ' trials (' + xs.length + ' readings)</div><table>' +
+      '<tr><th>Source of variation</th><th>Standard deviation</th><th>% of total variation</th></tr>' +
+      row('Repeatability, EV', 'R-bar ' + f(C(20)) + ' x K1 ' + fx(C(12), 4), ev, C(5)) +
+      row('Reproducibility, AV', 'X-diff ' + f(C(21)) + ' x K2 ' + fx(C(13), 4) + (rad < 0 ? '; <span class="wmsg">the value under the root is negative, so AV is set to zero: the appraisers agree within the repeatability</span>' : ''), av, C(6)) +
+      row('Gauge R&R, GRR', esc(verdict), grr, pg, pg > 30 ? 'over' : '') +
+      row('Part variation, PV', 'Rp ' + f(C(22)) + ' x K3 ' + fx(C(14), 4), pv, C(8)) +
+      row('Total variation, TV', 'sqrt(GRR^2 + PV^2)', tv, null) +
+      '<tr' + (ndc < 5 ? ' class="over"' : '') + '><td>Number of distinct categories, ndc<div class="ms">1.41 x PV / GRR, cut to a whole number; 5 or more wanted</div></td><td class="v">' + (isFinite(ndc) ? fmt(ndc, 0) : 'no limit') + '</td><td></td></tr>' +
+      (tol > 0 ? '<tr' + (pt > 30 ? ' class="over"' : '') + '><td>GRR against the tolerance<div class="ms">6 x GRR (shown) / tolerance ' + esc(String(tol)) + '; the same 10 % and 30 % guidelines</div></td><td class="v">' + f(W.pct_adjust(grr, 500)) + '</td><td class="v">' + pc(pt) + '</td></tr>' : '') + '</table>';
+    app.innerHTML = '<div class="res mtab" style="max-width:760px;margin-top:10px"><div class="h">Appraiser averages</div><table><tr>' + lines.filter((l, i) => i % trials === 0).map((l, a) => '<th>Appraiser ' + String.fromCharCode(65 + a) + '</th>').join('') + '<th>Grand average</th></tr><tr>' +
+      Array.from({ length: ap }, (x, a) => '<td class="mv">' + f(C(100 + a)) + '</td>').join('') + '<td class="mv">' + f(C(23)) + '</td></tr></table></div>';
+    // Bar chart: each source as a percentage of the total variation, with the 10 % and 30 % guidelines.
+    const Wd = 600, L = 150, Rr = 40, T = 22, bh = 20, gap = 10, bars = [['Repeatability, EV', C(5)], ['Reproducibility, AV', C(6)], ['Gauge R&R', pg], ['Part variation, PV', C(8)]], Hd = T + bars.length * (bh + gap) + 22;
+    const X = v => L + Math.min(100, Math.max(0, v)) / 100 * (Wd - L - Rr);
+    let sv = '<svg class="capplot" viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="Percent of total variation by source"><text class="tl" x="' + L + '" y="13">percent of total variation</text>';
+    bars.forEach(([name, v], i) => { const y = T + i * (bh + gap); sv += '<text class="tl" x="' + (L - 6) + '" y="' + (y + 14) + '" text-anchor="end">' + esc(name) + '</text><rect class="bar" x="' + L + '" y="' + y + '" width="' + (X(v) - L).toFixed(1) + '" height="' + bh + '"/><text class="tl" x="' + (X(v) + 4).toFixed(1) + '" y="' + (y + 14) + '">' + pc(v) + '</text>'; });
+    [[10, 'mid'], [30, 'lim']].forEach(([v, cls]) => { sv += '<path class="' + cls + '" d="M' + X(v).toFixed(1) + ' ' + (T - 4) + 'V' + (Hd - 20) + '"/><text class="tl" x="' + X(v).toFixed(1) + '" y="' + (Hd - 7) + '" text-anchor="middle">' + v + ' %</text>'; });
+    plot.innerHTML = sv + '<path class="ax" d="M' + L + ' ' + (T - 4) + 'V' + (Hd - 20) + '"/></svg>';
+  }
+  ta.oninput = () => { s.text = ta.value; calc(); };
+  el.querySelector('#grex').onclick = () => { s.text = GRR_EXAMPLE; s.ap = 3; s.tol = '0.1'; renderGrr(el); };
+  el.querySelector('#grclr').onclick = () => { s.text = ''; ta.value = ''; calc(); };
+  iBind(el, s, calc);
+  calc();
+}
+

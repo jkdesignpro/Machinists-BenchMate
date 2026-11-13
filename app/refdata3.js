@@ -528,44 +528,416 @@ async function renderHardness(el) {
 }
 
 // ------------------------------------------------------------------ knurling
+// Four ways to a blank diameter: a diametral pitch knurl, a circular pitch
+// knurl, measuring the knurl you have (print or wheel), and trial and error
+// with a tick-off procedure. All numbers come from the Rust core; the steps
+// and their sources come from data/refdata/knurl-evidence.json.
 async function renderKnurl(el) {
   const R = await loadRef(el); if (!R) return;
   const W = state.W, K = R.knurl; if (!K) { el.textContent = 'Knurl data not built.'; return; }
-  const m = RMEM.knurl || (RMEM.knurl = { sys: 'mm', p: 1.0, form: 0, d: 20 });
+  const m = RMEM.knurl || (RMEM.knurl = { meth: inMode() ? 'dp' : 'cp', sys: 'mm', p: 1.0, dp: 96, form: 0, d: 20, how: 'print', span: null, lines: '', wd: null, wt: '', tb: null, tk: null, tf: null, ticks: [] });
+  const lenF = (id, lab, hint) => '<label class="f"><span>' + lab + '</span><div class="row"><input id="' + id + '" type="number" step="any" inputmode="decimal"' + (hint ? ' placeholder="' + hint + '"' : '') + '><span class="u">' + uLen() + '</span></div></label>';
+  const srcTag = st => st.status === 'own' ? 'BenchMate\'s advice, no source' : st.src.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ') + (st.status === 'single' ? ' (one source)' : '');
   el.innerHTML = '<div class="grid" style="max-width:760px">' +
-    '<label class="f"><span>Pitch given as</span><div class="row"><select id="ks"><option value="mm">Circular pitch, mm (DIN 82 / DIN 403)</option><option value="tpi">Teeth per inch, TPI (circular pitch)</option><option value="dp">Diametral pitch, DP (teeth per inch of diameter)</option></select></div></label>' +
-    '<label class="f"><span>Pitch</span><div class="row"><input id="kp" type="number" step="any" inputmode="decimal" list="kpl"><datalist id="kpl"></datalist><span class="u" id="kpu"></span></div></label>' +
-    '<label class="f"><span>Pattern</span><div class="row"><select id="kf"><option value="0">Straight (teeth parallel to the axis)</option><option value="30">Diagonal or diamond, 30 deg teeth</option></select></div></label>' +
-    '<label class="f"><span>Wanted diameter (finished or blank)</span><div class="row"><input id="kd" type="number" step="any" inputmode="decimal"><span class="u">' + uLen() + '</span></div></label></div><div id="kres"></div>' +
-    '<div class="note"><b>Working:</b> a knurl tracks cleanly when a whole number of teeth fits around the blank. With circular pitch p measured square to the teeth and the teeth at angle h to the axis, the pitch around the circumference is p / cos h, so teeth n = pi D cos h / p and the blank for n teeth is D = n p / (pi cos h). TPI knurls have p = 1/TPI in (25.4 / TPI mm); a diametral pitch knurl has p = pi / DP in, which makes D = n / DP for a straight knurl. Both are computed by the Rust core and checked against the Dorian and Hommel+Keller examples. ' +
-    'In practice the makers say to start from the computed blank and adjust by trial: if the knurl double tracks, change the diameter by about 0.005 in (0.13 mm) or go to the next whole tooth count. A formed knurl raises the diameter (material is pushed up), by an amount that depends on pitch, material and form, so the blank is turned below the finished size; cut knurling barely changes the diameter. These allowances are approximations from the makers\' tables, not computed here. ' +
-    'The standard metric pitches in DIN 403 are 0.5, 0.6, 0.8, 1.0, 1.2 and 1.6 mm. In the US the common diametral pitches are 64, 96, 128 and 160 DP, chosen so that standard fractional blanks hold whole tooth counts (96 and 160 DP on 1/32 in steps, 64 and 128 DP on 1/64 in steps, per Dorian).' +
-    '<br><b>Standards:</b> DIN 82:1973-01 (knurls; current per DIN Media), DIN 403 (knurling wheels; edition not confirmed here). US practice (TPI and DP knurls) follows the makers\' catalogues.</div><div class="note" id="kpitch"></div><div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '</div>';
-  const ks = $('#ks', el), kp = $('#kp', el), kf = $('#kf', el), kd = $('#kd', el);
+    '<label class="f" style="grid-column:1/-1"><span>Method</span><div class="row"><select id="km"><option value="dp">1. Diametral pitch knurl (DP, ANSI/ASME B94.6)</option><option value="cp">2. Circular pitch knurl (mm or TPI)</option><option value="count">3. Measure and count the knurl you have</option><option value="trial">4. Trial and error, step by step</option></select></div></label></div>' +
+    '<div class="grid kmeth" data-m="dp" style="max-width:760px"><label class="f"><span>Diametral pitch</span><div class="row"><input id="kdp" type="number" step="any" inputmode="decimal" list="kdpl"><datalist id="kdpl">' + K.pitches_dp.map(v => '<option value="' + v + '">').join('') + '</datalist><span class="u">DP</span></div></label></div>' +
+    '<div class="grid kmeth" data-m="cp" style="max-width:760px"><label class="f"><span>Pitch given as</span><div class="row"><select id="ks"><option value="mm">Circular pitch, mm (DIN 82 / DIN 403)</option><option value="tpi">Teeth per inch, TPI (circular pitch)</option></select></div></label>' +
+    '<label class="f"><span>Pitch</span><div class="row"><input id="kp" type="number" step="any" inputmode="decimal" list="kpl"><datalist id="kpl"></datalist><span class="u" id="kpu"></span></div></label></div>' +
+    '<div class="grid kmeth" data-m="count" style="max-width:760px"><label class="f"><span>Measured from</span><div class="row"><select id="kh"><option value="print">A print: roll the wheel along paper, count the spaces</option><option value="wheel">The wheel: count its teeth, measure over them</option></select></div></label>' +
+    '<label class="f"><span id="kll"></span><div class="row"><input id="kl" type="number" step="1" min="1" inputmode="numeric"></div></label>' + lenF('kspan', '<span id="ksl"></span>') + '</div>' +
+    '<div class="grid kmeth" data-m="dp cp" style="max-width:760px"><label class="f"><span>Pattern</span><div class="row"><select id="kf"><option value="0">Straight (teeth parallel to the axis)</option><option value="30">Diagonal or diamond, 30 deg teeth</option></select></div></label></div>' +
+    '<div class="grid kmeth" data-m="dp cp count" style="max-width:760px">' + lenF('kd', 'Wanted diameter (finished or blank)') + '</div>' +
+    '<div class="kmeth" data-m="trial"><ol class="ktick" id="ktick">' + K.trial_steps.map((st, n) => '<li><label class="chk"><input type="checkbox" data-n="' + n + '"><span><b>' + rEsc(st.t) + '</b></span></label><div class="ms">' + rEsc(st.why) + ' <i>[' + srcTag(st) + ']</i></div></li>').join('') + '</ol>' +
+    '<p><button class="btn" id="kclr" type="button">Clear the ticks</button> <span class="ms" id="kdone"></span></p>' +
+    '<div class="grid" style="max-width:760px">' + lenF('ktb', 'Blank you tried') + lenF('ktk', 'Knurled diameter measured', 'after step 8') + lenF('ktf', 'Finished diameter wanted', 'optional') + '</div></div>' +
+    '<div id="kres"></div>' +
+    '<div class="note"><b>Working:</b> a knurl tracks cleanly when a whole number of teeth fits around the blank. With circular pitch p measured square to the teeth and the teeth at angle h to the axis, the pitch around the circumference is p / cos h, so teeth n = pi D cos h / p and the blank for n teeth is D = n p / (pi cos h). TPI knurls have p = 1/TPI in (25.4 / TPI mm); a diametral pitch knurl has p = pi / DP in, which makes D = n / DP for a straight knurl. ' +
+    '<b>Measure and count:</b> a print of the wheel rolled along paper gives the pitch in the direction of rolling, p = span / spaces counted, which is the pitch around the work whatever the pattern, so D = n p / pi. Count 50 to 100 spaces to keep the error small. A wheel measured over its teeth gives p = pi d / teeth at its outside; on an ANSI diametral pitch wheel that reads a little low (see the result), so prefer the print or the maker\'s DP. ' +
+    '<b>Trial and error:</b> no pitch is needed. The page gives the next blanks to try (about 0.005 in, 0.13 mm, either way), the growth measured on the trial piece and the blank that gives the finished size at that growth. All numbers are computed by the Rust core and checked against the Dorian, Hommel+Keller, Hoffman and ANSI wheel examples. ' +
+    'A formed knurl raises the diameter (material is pushed up), by an amount that depends on pitch, material and form, so the blank is turned below the finished size; cut knurling barely changes the diameter. The makers\' allowance tables are approximations and are not tabulated here. ' +
+    'The standard metric pitches in DIN 403 are 0.5, 0.6, 0.8, 1.0, 1.2 and 1.6 mm. In the US the diametral pitches are 64, 96, 128 and 160 DP (' + (K.pitches_dp_status === 'confirmed' ? 'two sources' : 'one source') + '), chosen so that standard fractional blanks hold whole tooth counts (96 and 160 DP on 1/32 in steps, 64 and 128 DP on 1/64 in steps, per Dorian).' +
+    '<br><b>Standards:</b> DIN 82:1973-01 (knurls; current per DIN Media), DIN 403 (knurling wheels; edition not confirmed here). ANSI/ASME B94.6-1984 (knurling) is quoted from a secondary page; the standard itself was not read.</div><div class="note" id="kpitch"></div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + (K.not_used && K.not_used.length ? '<br><b>Read and not used:</b> ' + K.not_used.map(x => rEsc(x.publisher) + ', ' + rEsc(x.title) + ': ' + rEsc(x.why)).join(' ') : '') + '</div>';
+  const q = id => $('#' + id, el), km = q('km'), ks = q('ks'), kp = q('kp'), kf = q('kf'), kdp = q('kdp'), kh = q('kh'), kl = q('kl');
   $('#kpitch', el).innerHTML = '<b>Metric pitches offered by the two makers:</b> ' + K.pitches_mm.map(x => x.p.toFixed(1) + ' mm ' + (x.status === 'confirmed' ? '(both)' : '(' + rEsc(pubName(K.sources, x.publishers[0])) + ')')).join(', ') + '.';
+  // A length box bound to m[key] in mm: the stored value is kept exactly until the user types another.
+  function bindLen(id, key) {
+    const inp = q(id), orig = m[key], shown = orig > 0 ? String(+toUser(orig).toFixed(inMode() ? 4 : 3)) : '';
+    inp.value = shown; inp.oninput = upd;
+    return () => { const v = parseFloat(inp.value); m[key] = inp.value === shown ? orig : (v > 0 ? fromUser(v) : null); return m[key]; };
+  }
   function setUnits() {
-    $('#kpu', el).textContent = { mm: 'mm', tpi: 'TPI', dp: 'DP' }[ks.value];
-    $('#kpl', el).innerHTML = (ks.value === 'mm' ? K.pitches_mm.map(x => x.p) : ks.value === 'dp' ? K.pitches_dp : [10, 12, 14, 16, 20, 21, 25, 30, 33, 35, 40, 50]).map(v => '<option value="' + v + '">').join('');
+    $('#kpu', el).textContent = { mm: 'mm', tpi: 'TPI' }[ks.value];
+    $('#kpl', el).innerHTML = (ks.value === 'mm' ? K.pitches_mm.map(x => x.p) : [10, 12, 14, 16, 20, 21, 25, 30, 33, 35, 40, 50]).map(v => '<option value="' + v + '">').join('');
   }
-  ks.value = m.sys; kf.value = String(m.form); kp.value = m.p; kd.value = +toUser(m.d).toFixed(inMode() ? 4 : 3);
-  const d0 = kd.value;
-  function upd() {
-    m.sys = ks.value; m.form = +kf.value; m.p = parseFloat(kp.value);
-    const v = parseFloat(kp.value), dv = parseFloat(kd.value), out = $('#kres', el);
-    if (!(v > 0 && dv > 0)) { out.innerHTML = ''; return; }
-    const dmm = kd.value === d0 ? m.d : fromUser(dv); m.d = dmm;
-    const pmm = ks.value === 'mm' ? v : ks.value === 'tpi' ? IN_MM / v : W.knurl_dp_to_cp(v) * IN_MM;
-    const h = +kf.value, nx = W.knurl_teeth_exact(dmm, pmm, h), n0 = Math.max(1, Math.floor(nx)), n1 = Math.ceil(nx);
-    const d1 = W.knurl_blank_dia(pmm, n0, h), d2 = W.knurl_blank_dia(pmm, n1, h);
-    out.innerHTML = '<div class="res"><table>' + rowsHtml([
-      ['Circular pitch p (square to the teeth)', calcCell(fBoth(pmm), ks.value === 'mm' ? 'as entered' : ks.value === 'tpi' ? '25.4 / TPI mm' : 'pi / DP in')],
-      ['Pitch around the circumference', calcCell(fBoth(pmm / Math.cos(h * Math.PI / 180)), h ? 'p / cos ' + h + ' deg' : 'straight: equal to p')],
-      ['Teeth on the wanted diameter', calcCell(fx(nx, 2), 'pi D cos h / p')],
-      ['Blank for ' + n0 + ' teeth', calcCell(fBoth(d1), 'D = n p / (pi cos h), smaller')],
-      ['Blank for ' + n1 + ' teeth', calcCell(fBoth(d2), 'larger')],
+  function setHow() {
+    q('kll').textContent = kh.value === 'print' ? 'Spaces counted on the print' : 'Teeth on the wheel';
+    q('ksl').textContent = kh.value === 'print' ? 'Length they cover, along the direction of rolling' : 'Wheel diameter over the teeth';
+    kl.value = kh.value === 'print' ? m.lines : m.wt;
+    getSpan = bindLen('kspan', kh.value === 'print' ? 'span' : 'wd');
+  }
+  function setMeth() { for (const d of el.querySelectorAll('.kmeth')) d.hidden = !d.dataset.m.split(' ').includes(km.value); }
+  if (m.sys === 'dp') { m.sys = 'tpi'; }
+  km.value = m.meth; ks.value = m.sys; kf.value = String(m.form); kp.value = m.p; kdp.value = m.dp; kh.value = m.how;
+  let getSpan = null;
+  const getD = bindLen('kd', 'd'), getTb = bindLen('ktb', 'tb'), getTk = bindLen('ktk', 'tk'), getTf = bindLen('ktf', 'tf');
+  const ticks = [...el.querySelectorAll('#ktick input')];
+  function showTicks() {
+    ticks.forEach((c, n) => { c.checked = !!m.ticks[n]; c.closest('li').classList.toggle('done', c.checked); });
+    q('kdone').textContent = ticks.filter(c => c.checked).length + ' of ' + ticks.length + ' steps ticked';
+  }
+  ticks.forEach((c, n) => { c.onchange = () => { m.ticks[n] = c.checked; showTicks(); }; });
+  q('kclr').onclick = () => { m.ticks = []; showTicks(); };
+  function blankRows(pmm, h, dmm, how) {
+    const nx = W.knurl_teeth_exact(dmm, pmm, h), n0 = Math.max(1, Math.floor(nx)), n1 = Math.ceil(nx);
+    return [
+      ['Circular pitch p' + (h ? ' (square to the teeth)' : ''), calcCell(fBoth(pmm), how)],
+      ['Pitch around the circumference', calcCell(fBoth(W.knurl_pitch_around(pmm, h)), h ? 'p / cos ' + h + ' deg' : 'equal to p')],
+      ['Teeth on the wanted diameter', calcCell(fx(nx, 2), h ? 'pi D cos h / p' : 'pi D / p')],
+      ['Blank for ' + n0 + ' teeth', calcCell(fBoth(W.knurl_blank_dia(pmm, n0, h)), h ? 'D = n p / (pi cos h), smaller' : 'D = n p / pi, smaller')],
+      ['Blank for ' + n1 + ' teeth', calcCell(fBoth(W.knurl_blank_dia(pmm, n1, h)), 'larger')],
       ['Steps between whole tooth counts', calcCell(fBoth(W.knurl_blank_dia(pmm, 1, h)), 'one tooth more or less')],
-    ]) + '</table><p class="desc">Turn the blank to one of the two diameters (or adjust by trial), then knurl. For a formed knurl allow for the raise of diameter; check with a test piece.</p></div>';
+    ];
   }
-  ks.onchange = () => { setUnits(); kp.value = ks.value === 'mm' ? 1.0 : ks.value === 'tpi' ? 20 : 96; upd(); }; kp.oninput = upd; kf.onchange = upd; kd.oninput = upd;
-  setUnits(); upd();
+  const tail = '<p class="desc">Turn the blank to one of the two diameters, then knurl. If it does not track, go on with method 4 from that diameter. For a formed knurl allow for the raise of diameter; check with a test piece.</p>';
+  function upd() {
+    m.meth = km.value; m.sys = ks.value; m.form = +kf.value; m.how = kh.value;
+    if (parseFloat(kp.value) > 0) m.p = parseFloat(kp.value);
+    if (parseFloat(kdp.value) > 0) m.dp = parseFloat(kdp.value);
+    const out = q('kres'), dmm = getD(), h = +kf.value, nl = parseFloat(kl.value), span = getSpan();
+    if (km.value === 'count') { if (kh.value === 'print') m.lines = kl.value; else m.wt = kl.value; }
+    let rows = null, extra = '';
+    if (km.value === 'dp') {
+      const v = parseFloat(kdp.value);
+      if (v > 0 && dmm > 0) rows = blankRows(W.knurl_dp_to_cp(v) * IN_MM, h, dmm, 'pi / DP in');
+    } else if (km.value === 'cp') {
+      const v = parseFloat(kp.value);
+      if (v > 0 && dmm > 0) rows = blankRows(ks.value === 'mm' ? v : IN_MM / v, h, dmm, ks.value === 'mm' ? 'as entered' : '25.4 / TPI mm');
+    } else if (km.value === 'count') {
+      if (nl >= 1 && span > 0) {
+        const print = kh.value === 'print', pmm = print ? W.knurl_pitch_from_print(span, nl) : W.knurl_pitch_from_wheel(span, nl);
+        rows = dmm > 0 ? blankRows(pmm, 0, dmm, print ? 'span / spaces' : 'pi d / teeth, at the outside of the wheel')
+          : [['Circular pitch p', calcCell(fBoth(pmm), print ? 'span / spaces' : 'pi d / teeth')]];
+        if (!print) {
+          const X = K.ansi_wheel_example;
+          rows.push(['Teeth per inch of wheel diameter', calcCell(fx(W.knurl_dp_from_wheel(span / IN_MM, nl), 2), 'teeth / diameter in inch')]);
+          extra = '<p class="desc"><b>Approximate.</b> ' + (X ? 'An ANSI ' + rEsc(X.dp) + ' DP wheel of ' + rEsc(X.nominal_in) + ' in nominal size measures ' + rEsc(X.major_in) + ' in over its ' + rEsc(X.teeth) + ' teeth (' + rEsc(pubName(K.sources, X.src[0])) + ', one source), which gives ' + fx(W.knurl_dp_from_wheel(+X.major_in, +X.teeth), 1) + ' on this line and a pitch of ' + rEsc(X.cp_outside_in) + ' in where the nominal pitch is ' + rEsc(X.cp_nominal_in) + ' in. ' : '') +
+            'So a value a little above one of the standard diametral pitches (' + K.pitches_dp.join(', ') + ') points to that pitch: then use method 1 with it. Otherwise make a print, which measures the pitch the work sees.</p>';
+        } else extra = '<p class="desc">Measure along the direction the wheel rolled, not square to the lines of a diagonal knurl. Keep the pitch with the knurl: it does not change.</p>';
+      }
+    } else {
+      const tb = getTb(), tk = getTk(), tf = getTf(), st = W.knurl_trial_step_mm();
+      rows = [];
+      if (tb > 0) {
+        rows.push(['If it double tracks, try next', calcCell(fBoth(W.knurl_blank_for_finish(tb, st)), 'blank less ' + fx(st / IN_MM, 3) + ' in (' + fx(st, 3) + ' mm)')]);
+        rows.push(['or', calcCell(fBoth(W.knurl_blank_for_finish(tb, -st)), 'blank plus the same step')]);
+        if (tk > 0) {
+          const g = W.knurl_growth(tk, tb);
+          rows.push(['Growth on this trial piece', calcCell(fBoth(g), 'knurled diameter less blank')]);
+          if (tf > 0) rows.push(['Blank for the finished diameter', calcCell(fBoth(W.knurl_blank_for_finish(tf, g)), 'finished diameter less the growth')]);
+          if (g < 0) extra = '<p class="desc"><b>Check the two diameters:</b> the knurled diameter is smaller than the blank. A formed knurl raises the diameter; a cut knurl barely changes it.</p>';
+          else if (tf > 0) extra = '<p class="desc">Tracking depends on the diameter, so try the new blank on scrap as well before the job. The growth holds only for the same knurl, material and depth.</p>';
+        }
+      }
+      if (!rows.length) { out.innerHTML = '<p class="desc">Enter the blank you tried to get the next diameters to try.</p>'; return; }
+    }
+    out.innerHTML = rows ? '<div class="res"><table>' + rowsHtml(rows) + '</table>' + extra + (km.value === 'trial' ? '' : tail) + '</div>' : '';
+  }
+  km.onchange = () => { setMeth(); upd(); };
+  ks.onchange = () => { setUnits(); kp.value = ks.value === 'mm' ? 1.0 : 20; upd(); };
+  kh.onchange = () => { m.how = kh.value; setHow(); upd(); };
+  kp.oninput = upd; kdp.oninput = upd; kf.onchange = upd; kl.oninput = upd;
+  setUnits(); setHow(); setMeth(); showTicks(); upd();
 }
+
+// ------------------------------------------------------------------ gun drilling
+// Starting speed, feed, coolant pressure and flow for a single-flute gundrill. The tables are one maker's
+// (Sterling), with a second maker's ranges (botek) beside them for the steels and nothing merged. Lookups and
+// unit conversion happen here; every calculated number comes from the Rust core.
+async function renderGunDrill(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, K = R.gundrill; if (!K) { el.textContent = 'Gun drilling data not built.'; return; }
+  const m = RMEM.gundrill || (RMEM.gundrill = { d: 12.7, g: 'lc', h: 0, a: -1, c: 'hp', f: 'c1', depth: null });
+  const GAL_L = 3.785411784, PSI_BAR = 0.0689475729, FCOL = Object.keys(K.feed.columns);
+  const lenF = (id, lab, hint) => '<label class="f"><span>' + lab + '</span><div class="row"><input id="' + id + '" type="number" step="any" inputmode="decimal"' + (hint ? ' placeholder="' + hint + '"' : '') + '><span class="u">' + uLen() + '</span></div></label>';
+  const sel = (id, lab) => '<label class="f"><span>' + lab + '</span><div class="row"><select id="' + id + '"></select></div></label>';
+  el.innerHTML = '<div class="grid" style="max-width:760px">' + lenF('gdd', 'Drill diameter') + sel('gdm', 'Material') + sel('gdh', 'Hardness, HRC') + sel('gda', 'Speed adjustment') +
+    '<label class="f"><span>Coolant delivery</span><div class="row"><select id="gdc">' + K.speed.columns.map(c => '<option value="' + c + '">' + rEsc(K.speed.column_names[c]) + '</option>').join('') + '</select></div></label>' +
+    sel('gdf', 'Feed column of the table') + lenF('gdl', 'Hole depth', 'optional') + '</div><div id="gdres"></div>' +
+    '<div class="note"><b>Working:</b> the speed comes from Sterling\'s chart by material and hardness; rpm = 12 x SFM / (pi x D in). The feed per revolution comes from Sterling\'s table by diameter, and the pressure, flow and longest unsupported length from its oil table; between two table sizes the value is taken on a straight line, and outside the table (0.125 to 1.000 in) nothing is given. Feed rate = feed x rpm. Over 30 diameters deep the feed is cut by 20 %. ' +
+    'For the steels, botek\'s guide ranges for the same diameter are shown beside Sterling\'s figure and not mixed with it. The two makers do not agree everywhere: Sterling\'s feeds sit at or under the low end of botek\'s ranges. Start low and listen to the chips. ' +
+    'The pressure and flow table has one source (botek and ISCAR give theirs as charts that could not be read). UNISIG\'s starting flow per unit of diameter, for deep hole drilling in general, is shown beside it; it is higher, and UNISIG says it varies by tool type. These are starting values, not limits: the tool maker\'s data for your drill comes first.</div>' +
+    '<div class="note"><b>Before you drill</b><ul class="gdrules">' + K.rules.map(r => '<li>' + rEsc(r.t) + ' <i>[' + r.src.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ') + (r.status === 'single' ? ', one source' : '') + ']</i></li>').join('') + '</ul></div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '<br><b>Read and not used:</b> ' + K.not_used.map(x => rEsc(x.publisher) + ', ' + rEsc(x.title) + ': ' + rEsc(x.why)).join(' ') + '</div>';
+  const q = id => $('#' + id, el), gm = q('gdm'), gh = q('gdh'), ga = q('gda'), gc = q('gdc'), gf = q('gdf');
+  const grp = () => K.speed.groups.find(g => g.id === gm.value) || K.speed.groups[0];
+  function bindLen(id, key) {
+    const inp = q(id), orig = m[key], shown = orig > 0 ? String(+toUser(orig).toFixed(inMode() ? 4 : 3)) : '';
+    inp.value = shown; inp.oninput = upd;
+    return () => { const v = parseFloat(inp.value); m[key] = inp.value === shown ? orig : (v > 0 ? fromUser(v) : null); return m[key]; };
+  }
+  gm.innerHTML = K.speed.groups.map(g => '<option value="' + g.id + '">' + rEsc(g.name) + '</option>').join('');
+  gf.innerHTML = FCOL.map(c => '<option value="' + c + '">' + rEsc(K.feed.columns[c]) + '</option>').join('');
+  function fillGroup(keep) {
+    const G = grp();
+    gh.innerHTML = G.rows.map((r, n) => '<option value="' + n + '">' + rEsc(r[0]) + '</option>').join('');
+    ga.innerHTML = '<option value="-1">None</option>' + G.adjust.map((a, n) => '<option value="' + n + '">' + rEsc(a[0]) + ': ' + (a[1] > 0 ? '+' : '') + a[1] + ' %</option>').join('');
+    ga.disabled = !G.adjust.length;
+    if (keep) { gh.value = String(Math.min(m.h, G.rows.length - 1)); ga.value = String(m.a < G.adjust.length ? m.a : -1); gf.value = m.f; }
+    else { gh.value = '0'; ga.value = '-1'; gf.value = G.feed; }
+  }
+  // Straight line between the two table rows that bracket x (column c); null outside the table or where a cell is empty.
+  function tab(rows, x, c) {
+    if (!(x >= rows[0][0] && x <= rows[rows.length - 1][0])) return null;
+    for (let i = 0; i < rows.length - 1; i++) if (x >= rows[i][0] && x <= rows[i + 1][0]) {
+      if (rows[i][c] === null || rows[i + 1][c] === null) return x === rows[i + 1][0] ? rows[i + 1][c] : x === rows[i][0] ? rows[i][c] : null;
+      return W.lerp(x, rows[i][0], rows[i][c], rows[i + 1][0], rows[i + 1][c]);
+    }
+    return null;
+  }
+  const two = (a, ua, da, b, ub, db) => '<span class="mv">' + fx(a, da) + ' ' + ua + '</span> <span class="ms">' + fx(b, db) + ' ' + ub + '</span>';
+  const rng = (a0, a1, ua, da, b0, b1, ub, db) => '<span class="mv">' + fx(a0, da) + ' to ' + fx(a1, da) + ' ' + ua + '</span> <span class="ms">' + fx(b0, db) + ' to ' + fx(b1, db) + ' ' + ub + '</span>';
+  const lng = i => inMode() ? two(i, 'in', 1, i * IN_MM, 'mm', 0) : two(i * IN_MM, 'mm', 0, i, 'in', 1);
+  const spd = sfm => inMode() ? two(sfm, 'SFM', 0, sfm * FT_M, 'm/min', 1) : two(sfm * FT_M, 'm/min', 1, sfm, 'SFM', 0);
+  const fdr = f => inMode() ? two(f, 'in/rev', 5, f * IN_MM, 'mm/rev', 4) : two(f * IN_MM, 'mm/rev', 4, f, 'in/rev', 5);
+  const fdm = f => inMode() ? two(f, 'in/min', 2, f * IN_MM, 'mm/min', 1) : two(f * IN_MM, 'mm/min', 1, f, 'in/min', 2);
+  const prs = p => inMode() ? two(p, 'psi', 0, p * PSI_BAR, 'bar', 1) : two(p * PSI_BAR, 'bar', 1, p, 'psi', 0);
+  const flw = g => inMode() ? two(g, 'gal/min', 1, g * GAL_L, 'l/min', 1) : two(g * GAL_L, 'l/min', 1, g, 'gal/min', 1);
+  const getD = bindLen('gdd', 'd'), getL = bindLen('gdl', 'depth');
+  function upd() {
+    const G = grp(); m.g = G.id; m.h = +gh.value; m.a = +ga.value; m.c = gc.value; m.f = gf.value;
+    const dmm = getD(), depth = getL(), out = q('gdres');
+    if (!(dmm > 0)) { out.innerHTML = ''; return; }
+    const din = dmm / IN_MM, row = G.rows[m.h], sfm0 = row[1 + K.speed.columns.indexOf(m.c)], adj = m.a >= 0 ? G.adjust[m.a] : null;
+    const sfm = adj ? W.pct_adjust(sfm0, adj[1]) : sfm0, rpm = W.rpm_from_sfm(sfm, din), ST = rEsc(pubName(K.sources, K.speed.src));
+    const rows = [['Cutting speed', calcCell(spd(sfm), ST + ': ' + rEsc(row[0]) + ' HRC' + (adj ? ', ' + rEsc(adj[0].toLowerCase()) + ' ' + (adj[1] > 0 ? '+' : '') + adj[1] + ' %' : '') + (m.c === 'mist' && G.mist_note ? ', ' + rEsc(G.mist_note) : ''))]];
+    const bk = G.botek !== undefined ? K.botek : null;
+    if (bk) { const v = bk.vc_m_min[G.botek]; rows.push(['botek, for comparison', calcCell(inMode() ? rng(v[0] / FT_M, v[1] / FT_M, 'SFM', 0, v[0], v[1], 'm/min', 0) : rng(v[0], v[1], 'm/min', 0, v[0] / FT_M, v[1] / FT_M, 'SFM', 0), 'guide range for: ' + rEsc(bk.groups[G.botek]))]); }
+    rows.push(['Spindle speed', calcCell('<span class="mv">' + fx(rpm, 0) + ' rpm</span>', '12 x SFM / (pi x D)')]);
+    const ratio = depth > 0 ? W.depth_ratio(depth, dmm) : NaN, f0 = tab(K.feed.rows, din, 1 + FCOL.indexOf(m.f));
+    if (ratio > 0) rows.push(['Depth in diameters', calcCell('<span class="mv">' + fx(ratio, 1) + ' x D</span>', 'depth / diameter')]);
+    if (f0 === null) rows.push(['Feed per revolution', '<td class="v" colspan="2">Outside ' + ST + '\'s table (0.125 to 1.000 in, 3.18 to 25.4 mm). Use the drill maker\'s data.</td>']);
+    else {
+      const f = ratio > 0 ? W.gundrill_feed_for_depth(f0, ratio, K.feed.long_ratio, K.feed.long_pct) : f0, cut = f !== f0;
+      rows.push(['Feed per revolution', calcCell(fdr(f), ST + ', column "' + rEsc(K.feed.columns[m.f]) + '"' + (cut ? '; cut by ' + (-K.feed.long_pct) + ' % because the hole is over ' + K.feed.long_ratio + ' diameters deep' : ''))]);
+      if (bk) {
+        const br = bk.feed_mm_rev.find(r => dmm >= r[0] - 1e-9 && (r[1] === null || dmm < r[1] + 0.01 - 1e-9));
+        if (br) { const rg = br[2 + G.botek]; rows.push(['botek, for comparison', calcCell(inMode() ? rng(rg[0] / IN_MM, rg[1] / IN_MM, 'in/rev', 5, rg[0], rg[1], 'mm/rev', 4) : rng(rg[0], rg[1], 'mm/rev', 4, rg[0] / IN_MM, rg[1] / IN_MM, 'in/rev', 5), 'guide range for ' + fx(br[0], 2) + (br[1] === null ? ' mm and over' : ' to ' + fx(br[1], 2) + ' mm'))]); }
+        else rows.push(['botek, for comparison', '<td class="v" colspan="2">No row for this diameter (the table starts at 1.85 mm).</td>']);
+      }
+      rows.push(['Feed rate', calcCell(fdm(W.table_feed(rpm, f, 1)), 'feed x rpm')]);
+      if (depth > 0) rows.push(['Time to drill the depth', calcCell('<span class="mv">' + fx(W.drill_time_min(depth / IN_MM, 0, f, rpm), 2) + ' min</span>', 'depth / feed rate')]);
+    }
+    const psi = tab(K.coolant.rows, din, 1), gpm = tab(K.coolant.rows, din, 2), gtw = tab(K.coolant.rows, din, 3), uh = tab(K.coolant.rows, din, 4), ul = tab(K.coolant.rows, din, 5);
+    if (psi === null) rows.push(['Coolant pressure and flow', '<td class="v" colspan="2">Outside ' + ST + '\'s table (0.125 to 1.000 in, 3.18 to 25.4 mm).</td>']);
+    else {
+      rows.push(['Coolant pressure', calcCell(prs(psi), ST + ', gun drill machine with oil; one source')], ['Coolant flow, single flute', calcCell(flw(gpm), 'per spindle; one source')]);
+      if (gtw !== null) rows.push(['Coolant flow, twin flute', calcCell(flw(gtw), 'per spindle; one source')]);
+      rows.push(['Longest unsupported drill length', calcCell(lng(uh), 'at high SFM')], ['', calcCell(lng(ul), 'at low SFM')]);
+    }
+    const U = K.unisig_flow;
+    const u0 = W.flow_per_dia(U.gpm_per_in[0], din), u1 = W.flow_per_dia(U.gpm_per_in[1], din), l0 = W.flow_per_dia(U.l_min_per_mm[0], dmm), l1 = W.flow_per_dia(U.l_min_per_mm[1], dmm);
+    rows.push(['UNISIG starting flow, any deep hole tool', calcCell(inMode() ? rng(u0, u1, 'gal/min', 1, l0, l1, 'l/min', 1) : rng(l0, l1, 'l/min', 1, u0, u1, 'gal/min', 1), U.gpm_per_in.join(' to ') + ' gal/min per inch, ' + U.l_min_per_mm.join(' to ') + ' l/min per mm of diameter; it varies by tool type')]);
+    out.innerHTML = '<div class="res"><table>' + rowsHtml(rows) + '</table>' +
+      (G.verify ? '<p class="desc"><b>' + ST + ' marks this material:</b> ask the drill maker to verify the application before relying on these values.</p>' : '') +
+      (G.feed_note ? '<p class="desc">' + rEsc(G.feed_note) + '</p>' : '') +
+      (m.c === 'mist' ? '<p class="desc">Spray mist: the speed is from the spray mist column. ' + ST + ' gives the feed table for spray mist at 100 psi and more as well; the pressure and flow rows are for a gun drill machine with oil.</p>' : '') + '</div>';
+  }
+  gm.value = m.g; gc.value = m.c; fillGroup(true);
+  gm.onchange = () => { fillGroup(false); upd(); };
+  gh.onchange = upd; ga.onchange = upd; gc.onchange = upd; gf.onchange = upd;
+  upd();
+}
+
+// ------------------------------------------------------------------ collet nut and pull stud torque
+// Each maker's printed figures for its own holders, side by side and never merged. Lookups and unit conversion
+// happen here; the one calculated number (the ceiling, a percentage above the recommended torque) is the core's.
+async function renderHolderTorque(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, K = R.holdertorque; if (!K) { el.textContent = 'Holder torque data not built.'; return; }
+  const m = RMEM.holdertorque || (RMEM.holdertorque = { size: 'ER 16', nut: 'std', row: -1 });
+  const E = K.er, RG = rEsc(pubName(K.sources, E.src)), TK = rEsc(pubName(K.sources, K.techniks_nut.src));
+  const num = v => String(+v.toFixed(1));
+  // v in N·m: the user's unit first, the other beside it.
+  const tq = nm => inMode() ? '<span class="mv">' + num(nm / NM_LBFT) + ' lbf·ft</span> <span class="ms">' + num(nm) + ' N·m</span>'
+    : '<span class="mv">' + num(nm) + ' N·m</span> <span class="ms">' + num(nm / NM_LBFT) + ' lbf·ft</span>';
+  const tqr = (lo, hi) => lo === hi ? tq(lo) : inMode() ? '<span class="mv">' + num(lo / NM_LBFT) + ' to ' + num(hi / NM_LBFT) + ' lbf·ft</span> <span class="ms">' + num(lo) + ' to ' + num(hi) + ' N·m</span>'
+    : '<span class="mv">' + num(lo) + ' to ' + num(hi) + ' N·m</span> <span class="ms">' + num(lo / NM_LBFT) + ' to ' + num(hi / NM_LBFT) + ' lbf·ft</span>';
+  const nm = v => v.unit === 'Nm' ? [v.lo, v.hi] : [v.lo * NM_LBFT, v.hi * NM_LBFT];
+  const printed = v => (v.lo === v.hi ? v.lo : v.lo + ' to ' + v.hi) + (v.unit === 'Nm' ? ' Nm' : ' ft-lb') + (v.kind === 'max' ? ', maximum' : '');
+  const bore = r => (r[2] === r[3] ? num(r[2]) : num(r[2]) + ' to ' + num(r[3])) + ' mm' + (r[1] ? ', micro-bore (MB) collet' : '');
+  const boreIn = r => r[2] === r[3] ? fx(r[2] / IN_MM, 3) + ' in' : fx(r[2] / IN_MM, 3) + ' to ' + fx(r[3] / IN_MM, 3) + ' in';
+  const col = nut => nut === 'mini' ? 5 : 4;
+  const sel = (id, lab) => '<label class="f"><span>' + lab + '</span><div class="row"><select id="' + id + '"></select></div></label>';
+  const pubs = Object.keys(K.sources).filter(k => K.pullstud.some(r => r.v.some(v => v.src === k)));
+  const studCell = (r, k) => { const v = r.v.find(x => x.src === k); if (!v) return '<td class="ms">not printed</td>'; const [a, b] = nm(v); return '<td title="' + rEsc(v.as + ': ' + printed(v)) + '">' + tqr(a, b) + '<div class="ms">as printed: ' + rEsc(printed(v)) + '</div></td>'; };
+  el.innerHTML = '<div class="grid" style="max-width:760px">' + sel('htz', 'Collet size') + sel('htn', 'Clamping nut') + sel('htb', 'Collet bore (the size marked on the collet)') + '</div><div id="htres"></div>' +
+    '<div class="res mtab" style="max-width:none;margin-top:12px" id="htall"><div class="h">' + RG + ': ER collet nut torque, every row</div><div style="overflow-x:auto"><table id="htallt"></table></div></div>' +
+    '<div class="res mtab" style="max-width:none;margin-top:12px" id="htstud"><div class="h">Pull stud (retention knob) torque, by maker</div><div style="overflow-x:auto"><table><tr><th>Taper</th>' + pubs.map(k => '<th>' + rEsc(pubName(K.sources, k)) + '</th>').join('') + '<th>Status</th></tr>' +
+    K.pullstud.map(r => '<tr data-taper="' + rEsc(r.taper) + '"><td><b>' + rEsc(r.taper) + '</b></td>' + pubs.map(k => studCell(r, k)).join('') + '<td><span class="badge differs">' + (r.status === 'single' ? 'One source' : 'Sources differ') + '</span></td></tr>').join('') + '</table></div>' +
+    '<p class="ms" style="padding:4px 10px">The makers do not agree, and not by a little: compare the figures in the 40 taper row. ' + RG + ' prints its figure as a maximum. Nothing here is averaged. Use the figure of the maker of your pull stud and holder, or the machine builder\'s figure for your spindle, and tighten with a torque wrench in a holder fixture.</p></div>' +
+    '<div class="note"><b>Working:</b> the recommended torque is read from ' + RG + '\'s table by collet size, bore and nut; it is for ' + RG + '\'s nuts with standard ER and ER-UP collets. The ceiling is the recommended torque plus ' + E.ceiling_pct + ' %, the most ' + RG + ' allows. N·m and lbf·ft are converted (1 lbf·ft = 1.3558 N·m); the table is printed in N·m. ' +
+    TK + ' prints one figure per collet size, with no bore ranges; it is shown beside the first and not mixed with it. A small bore takes much less torque than a large one in the same nut: a 3 mm collet in an ER 16 takes 20 N·m, a 10 mm collet 56 N·m. Another maker\'s nut, a coated or bearing nut, or a sealed collet can need a different torque: the maker\'s sheet for your nut comes first.</div>' +
+    '<div class="note"><b>Good practice</b><ul class="gdrules">' + K.rules.map(r => '<li>' + rEsc(r.t) + ' <i>[' + r.src.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ') + (r.status === 'single' ? ', one source' : '') + ']</i></li>').join('') + '</ul></div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '<br><b>Not covered:</b> ' + K.gaps.map(rEsc).join(' ') + '</div>';
+  const q = id => $('#' + id, el), hz = q('htz'), hn = q('htn'), hb = q('htb');
+  hz.innerHTML = K.sizes.map(z => '<option>' + rEsc(z) + '</option>').join('');
+  const rowsOf = () => E.rows.map((r, i) => [r, i]).filter(([r]) => r[0] === hz.value);
+  function fillNut() {
+    const have = E.nuts.filter(n => rowsOf().some(([r]) => r[col(n.id)] !== null));
+    hn.innerHTML = have.map(n => '<option value="' + n.id + '">' + rEsc(n.name) + '</option>').join('');
+    hn.value = have.some(n => n.id === m.nut) ? m.nut : have[0].id;
+  }
+  function fillBore() {
+    const rows = rowsOf().filter(([r]) => r[col(hn.value)] !== null);
+    hb.innerHTML = rows.map(([r, i]) => '<option value="' + i + '">' + rEsc(bore(r)) + (inMode() ? ' (' + boreIn(r) + ')' : '') + '</option>').join('');
+    hb.value = String(rows.some(([, i]) => i === m.row) ? m.row : rows[rows.length - 1][1]);
+  }
+  function upd() {
+    m.size = hz.value; m.nut = hn.value; m.row = +hb.value;
+    const r = E.rows[m.row], v = r[col(m.nut)], nutName = E.nuts.find(n => n.id === m.nut).name;
+    const rows = [['Recommended torque', calcCell(tq(v), RG + ': ' + rEsc(r[0]) + ', bore ' + rEsc(bore(r)) + ', ' + rEsc(nutName) + '; printed as ' + v + ' Nm')],
+      ['Do not go over', calcCell(tq(W.pct_adjust(v, E.ceiling_pct)), 'recommended + ' + E.ceiling_pct + ' % (' + rEsc(pubName(K.sources, E.ceiling_src)) + ', 2009 edition)')]];
+    const tk = K.techniks_nut.rows.filter(t => t[0] === r[0]);
+    tk.forEach(t => rows.push([TK + ', for comparison', calcCell(tq(t[2] * NM_LBFT), rEsc(t[1]) + '; printed as ' + t[2] + ' ft/lbs, one figure for every bore')]));
+    if (!tk.length) rows.push([TK + ', for comparison', '<td class="v" colspan="2">No figure for this size.</td>']);
+    q('htres').innerHTML = '<div class="res"><table>' + rowsHtml(rows) + '</table></div>';
+    q('htallt').innerHTML = '<tr><th>Collet</th><th>Bore</th>' + E.nuts.map(n => '<th>' + rEsc(n.name) + '</th>').join('') + '</tr>' +
+      E.rows.map((x, i) => '<tr' + (i === m.row ? ' class="hit"' : '') + '><td><b>' + rEsc(x[0]) + '</b></td><td>' + rEsc(bore(x)) + '</td>' + E.nuts.map(n => '<td>' + (x[col(n.id)] === null ? '<span class="ms">not printed</span>' : tq(x[col(n.id)])) + '</td>').join('') + '</tr>').join('');
+  }
+  hz.value = K.sizes.includes(m.size) ? m.size : K.sizes[0];
+  fillNut(); fillBore();
+  hz.onchange = () => { m.row = -1; fillNut(); fillBore(); upd(); };
+  hn.onchange = () => { m.nut = hn.value; m.row = -1; fillBore(); upd(); };
+  hb.onchange = upd;
+  upd();
+}
+
+// ------------------------------------------------------------------ thread gauge limits (Unified, X tolerance)
+// Pitch diameter limits of GO and NOT GO thread plug and ring gauges. The product limits are the core's (the
+// Thread data tool's), the gauge maker's X tolerance is looked up in the published table, and the member's
+// smallest and largest size come from the core. The drawing shows where the gauge zones sit in the product zone.
+async function renderThreadGauge(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, K = R.threadgauge; if (!K) { el.textContent = 'Thread gauge data not built.'; return; }
+  const opts = threadOptions(R).filter(o => o.sys === 'unified');
+  const m = RMEM.threadgauge || (RMEM.threadgauge = { key: '1/4-20 UNC', cls: 2 });
+  if (!opts.some(o => o.key === m.key)) m.key = opts[0].key;
+  const pubs = ks => ks.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ');
+  el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f"><span>Thread (Unified inch)</span><div class="row"><select id="tgk">' + opts.map(o => '<option value="' + rEsc(o.key) + '"' + (o.key === m.key ? ' selected' : '') + '>' + rEsc(o.label) + '</option>').join('') + '</select></div></label>' +
+    '<label class="f"><span>Class</span><div class="row"><select id="tgc"><option value="2">2A external, 2B internal</option><option value="3">3A external, 3B internal</option></select></div></label></div>' +
+    '<div id="tgplot"></div><div id="tgres"></div>' +
+    '<div class="note"><b>Working:</b> each gauge member is made to one limit of the thread it checks, with the gauge maker\'s tolerance all on one side. Thread plug (checks the internal thread): GO is made to the smallest pitch diameter with the tolerance plus, NOT GO (HI) to the largest with the tolerance minus. ' +
+    'Thread ring (checks the external thread): GO is made to the largest pitch diameter with the tolerance minus, NOT GO (LO) to the smallest with the tolerance plus. A new gauge therefore never passes a thread outside its limits, and may reject one that is inside them by less than the gauge tolerance. ' +
+    'The thread\'s limits are the ones the Thread data tool works out from the ASME B1.1 formulas. The X tolerance on pitch diameter is read from the gauge makers\' table by threads per inch and diameter. The GO member must go; the NOT GO member must not. A GO gauge checks pitch diameter, lead and flank angle together over its whole length; a NOT GO gauge checks the pitch diameter only. ' +
+    'Gauges wear: have them calibrated, and a worn GO plug passes threads that are too small (the last sentence is BenchMate\'s own advice).</div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '<br><b>Not covered:</b> ' + K.gaps.map(rEsc).join(' ') + '</div>';
+  const q = id => $('#' + id, el), tk = q('tgk'), tc = q('tgc');
+  tc.value = String(m.cls);
+  const two = v => inMode() ? '<span class="mv">' + fx(v, 4) + ' in</span> <span class="ms">' + fx(v * IN_MM, 4) + ' mm</span>' : '<span class="mv">' + fx(v * IN_MM, 4) + ' mm</span> <span class="ms">' + fx(v, 4) + ' in</span>';
+  function upd() {
+    m.key = tk.value; m.cls = +tc.value;
+    const o = opts.find(x => x.key === m.key), din = o.din, tpi = o.tpi, pin = 1 / tpi, ce = m.cls, ci = m.cls + 10, out = q('tgres'), plot = q('tgplot');
+    const row = K.x.find(r => r.tpi === tpi), ri = K.ranges.findIndex(g => din > g[0] && din <= g[1]), cell = row && ri >= 0 ? row.cells[ri] : null;
+    if (!cell) { plot.innerHTML = ''; out.innerHTML = '<div class="res"><table><tr><td>The gauge makers\' table has no X tolerance for ' + tpi + ' threads per inch at this diameter. Ask the gauge maker.</td></tr></table></div>'; return; }
+    const x = cell.v, lim = { plug: { min: W.un_limit(din, pin, ci, 3), max: W.un_limit(din, pin, ci, 2) }, ring: { min: W.un_limit(din, pin, ce, 3), max: W.un_limit(din, pin, ce, 2) } };
+    const ch = K.chart.rows.find(r => Math.abs(r[1] - din) < 1e-6 && r[2] === tpi);
+    const chartOf = (gauge, member) => !ch ? null : gauge === 'plug' ? (member === 'go' ? ch[3] : ch[m.cls === 2 ? 4 : 5]) : ch[(m.cls === 2 ? 6 : 8) + (member === 'go' ? 0 : 1)];
+    const NAME = { plug: { go: 'GO plug', nogo: 'NOT GO (HI) plug' }, ring: { go: 'GO ring', nogo: 'NOT GO (LO) ring' } };
+    const mem = {};
+    const line = d => {
+      const size = lim[d.gauge][d.limit], lo = W.gauge_member_limit(size, x, d.plus ? 1 : 0, 0), hi = W.gauge_member_limit(size, x, d.plus ? 1 : 0, 1), pc = chartOf(d.gauge, d.member);
+      mem[d.gauge + d.member] = [lo, hi];
+      const cmp = pc === null ? '<span class="ms">size not in the chart</span>' : Math.abs(pc - size) < 5e-5 ? '<span class="badge confirmed">Chart agrees</span> <span class="ms">' + fx(pc, 4) + ' in</span>'
+        : '<span class="badge differs">Chart differs</span> <span class="ms">the chart prints ' + fx(pc, 4) + ' in; the limit worked out here is ' + fx(size, 4) + ' in</span>';
+      return '<tr data-m="' + d.gauge + '-' + d.member + '"><td><b>' + NAME[d.gauge][d.member] + '</b><div class="ms">made to the ' + (d.limit === 'min' ? 'smallest' : 'largest') + ' pitch diameter, tolerance ' + (d.plus ? 'plus' : 'minus') + '</div></td><td>' + two(size) + '</td><td>' + two(lo) + '</td><td>' + two(hi) + '</td><td>' + cmp + '</td></tr>';
+    };
+    const tab = (gauge, title) => '<div class="res mtab" style="max-width:none;margin-top:12px" id="tg' + gauge + '"><div class="h">' + title + '</div><div style="overflow-x:auto"><table><tr><th>Member</th><th>Thread limit</th><th>Gauge pitch diameter, smallest</th><th>largest</th><th>Published chart</th></tr>' +
+      K.direction.filter(d => d.gauge === gauge).map(line).join('') + '</table></div></div>';
+    const chartSrc = ch ? '<p class="ms" style="padding:4px 10px">Published chart: ' + pubs(K.chart.plug_src) + ' for the plug, ' + pubs(K.chart.ring_src) + ' for the ring. It prints the size each member is made to, before the gauge tolerance. Where it differs from the limit worked out here (by 0.0001 in, a rounding step), both are shown and the gauge sizes use the limit worked out here.</p>' : '';
+    const html = '<div class="res" style="margin-top:12px" id="tgx"><table>' + rowsHtml([['X tolerance on pitch diameter', calcCell(two(x), tpi + ' threads per inch, ' + rEsc(K.ranges[ri][2]) + '; ' + cell.pubs.map(rEsc).join(', ') + (cell.status === 'confirmed' ? '' : ' (one source)'))]]) + '</table></div>' +
+      tab('plug', 'Thread plug gauge for ' + rEsc(o.label) + '-' + m.cls + 'B (internal thread)') + tab('ring', 'Thread ring gauge for ' + rEsc(o.label) + '-' + m.cls + 'A (external thread)') + chartSrc;
+    out.innerHTML = html;
+    // Drawing: the product's pitch diameter zone with the two gauge zones at its ends (to scale along the axis).
+    const Wd = 600, L = 150, Rr = 30, bh = 22, T = 30, gap = 46, Hd = T + 2 * bh + gap + 30;
+    const band = (i, title, pr, go, nogo) => {
+      const pad = (pr.max - pr.min) * 0.12, X = v => L + (v - (pr.min - pad)) / (pr.max - pr.min + 2 * pad) * (Wd - L - Rr), y = T + i * (bh + gap);
+      const z = (a, b, cls) => '<rect class="' + cls + '" x="' + X(a).toFixed(1) + '" y="' + y + '" width="' + Math.max(1.5, X(b) - X(a)).toFixed(1) + '" height="' + bh + '"/>';
+      return '<text class="tl" x="' + (L - 8) + '" y="' + (y + 15) + '" text-anchor="end">' + title + '</text>' + z(pr.min, pr.max, 'bar') + z(go[0], go[1], 'tgz') + z(nogo[0], nogo[1], 'tgn') +
+        '<text class="tl" x="' + X((go[0] + go[1]) / 2).toFixed(1) + '" y="' + (y - 5) + '" text-anchor="middle">GO</text><text class="tl" x="' + X((nogo[0] + nogo[1]) / 2).toFixed(1) + '" y="' + (y - 5) + '" text-anchor="middle">NOT GO</text>' +
+        '<text class="tl" x="' + X(pr.min).toFixed(1) + '" y="' + (y + bh + 13) + '" text-anchor="middle">' + fx(inMode() ? pr.min : pr.min * IN_MM, 4) + '</text><text class="tl" x="' + X(pr.max).toFixed(1) + '" y="' + (y + bh + 13) + '" text-anchor="middle">' + fx(inMode() ? pr.max : pr.max * IN_MM, 4) + '</text>';
+    };
+    plot.innerHTML = '<svg class="capplot" viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="Where the gauge tolerance zones sit in the pitch diameter tolerance of the thread"><text class="tl" x="' + L + '" y="12">pitch diameter, ' + (inMode() ? 'in' : 'mm') + '. Pale: the thread; solid: the gauge members</text>' +
+      band(0, 'internal, ' + m.cls + 'B: plug', lim.plug, mem.pluggo, mem.plugnogo) + band(1, 'external, ' + m.cls + 'A: ring', lim.ring, mem.ringgo, mem.ringnogo) + '</svg>';
+  }
+  tk.onchange = upd; tc.onchange = upd;
+  upd();
+}
+
+// ------------------------------------------------------------------ rolled thread blank diameter
+// Blank diameter before thread rolling. The thread's limits are the core's, the maker's allowance and the
+// handbook's amounts are looked up in the reference data, and the blank and the correction after a trial
+// come from the core. Two publishers give two different rules: both are shown, nothing is merged.
+async function renderRollBlank(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, K = R.rollblank; if (!K) { el.textContent = 'Thread rolling data not built.'; return; }
+  const opts = threadOptions(R);
+  const m = RMEM.rollblank || (RMEM.rollblank = { key: 'M10x1.5', cu: '2', cm: '6g', meas: '' });
+  if (!opts.some(o => o.key === m.key)) m.key = opts[0].key;
+  const MC = { '6g': [6, 3], '6h': [6, 4], '4h': [4, 4] };
+  const grp = sys => opts.filter(o => o.sys === sys).map(o => '<option value="' + rEsc(o.key) + '"' + (o.key === m.key ? ' selected' : '') + '>' + rEsc(o.label) + '</option>').join('');
+  const cite = ks => ks.map(k => rEsc(pubName(K.sources, k))).filter((x, n, a) => a.indexOf(x) === n).join(', ');
+  el.innerHTML = '<div class="grid" style="max-width:860px"><label class="f"><span>Thread</span><div class="row"><select id="rbk"><optgroup label="ISO metric">' + grp('metric') + '</optgroup><optgroup label="Unified inch">' + grp('unified') + '</optgroup></select></div></label>' +
+    '<label class="f"><span>Class of the external thread</span><div class="row"><select id="rbc"></select></div></label>' +
+    '<label class="f"><span>Major diameter measured after a trial (optional)</span><div class="row"><input id="rbm" type="number" step="any" value="' + rEsc(m.meas) + '"><span class="u">' + uLen() + '</span></div></label></div>' +
+    '<div id="rbplot"></div><div id="rbres"></div>' +
+    '<div class="note"><b>Working:</b> a rolled thread is formed, not cut: metal pushed out of the root rises to make the crest, so the blank is turned to about the pitch diameter. The blank given here follows the thread roll maker\'s rule: maximum pitch diameter less ' + fx(K.rule.allow_in, 3) + ' in (' + fx(K.rule.allow_mm, 3) + ' mm). The pitch and major diameter limits are the ones the Thread data tool works out. ' +
+    'The handbook gives amounts above or below "the pitch diameter" by screw size and does not say which pitch diameter it means, so its figures are printed as they are and not worked into a size. ' + K.notes.map(n => rEsc(n.t) + ' <span class="ms">(' + cite(n.src) + ')</span>').join(' ') +
+    ' After a trial, measure the major diameter: the correction shown is the difference to the middle of the major diameter limits divided by ' + K.ratio.v + '. Check the finished thread with a gauge as well (the last sentence is BenchMate\'s own advice).</div>' +
+    '<div class="note"><b>Sources</b><br>' + sourceList(K.sources) + '<br><b>Not covered:</b> ' + K.gaps.map(rEsc).join(' ') + '</div>';
+  const q = id => $('#' + id, el), tk = q('rbk'), tc = q('rbc'), tm = q('rbm');
+  function classes() {
+    const o = opts.find(x => x.key === tk.value), uni = o.sys === 'unified';
+    tc.innerHTML = uni ? '<option value="2">2A</option><option value="3">3A</option>' : Object.keys(MC).map(c => '<option value="' + c + '">' + c + '</option>').join('');
+    tc.value = uni ? m.cu : m.cm;
+  }
+  function upd() {
+    m.key = tk.value; m.meas = tm.value;
+    const o = opts.find(x => x.key === m.key), uni = o.sys === 'unified', out = q('rbres'), plot = q('rbplot');
+    if (uni) m.cu = tc.value; else m.cm = tc.value;
+    // Native unit of the thread: inches for Unified, mm for metric. k turns it into mm for display.
+    const k = uni ? IN_MM : 1, L = i => (uni ? W.un_limit(o.din, 1 / o.tpi, +m.cu, i) : W.iso965_limit(o.d, o.p, MC[m.cm][0], MC[m.cm][1], i));
+    const mjMax = L(0), mjMin = L(1), pdMax = L(2), pdMin = L(3), blank = W.roll_blank_dia(pdMax, uni ? K.rule.allow_in : K.rule.allow_mm);
+    const din = o.d / IN_MM, hb = K.handbook.rows.filter(r => (r.from_excl ? din > r.from : din >= r.from) && (r.to === null || (r.to_incl ? din <= r.to : din < r.to)));
+    const amt = r => fx(r.lo, 4) + ' to ' + fx(r.hi, 4) + ' in <span class="ms">(' + fx(r.lo * IN_MM, 3) + ' to ' + fx(r.hi * IN_MM, 3) + ' mm)</span>';
+    const name = rEsc(o.label) + (uni ? '-' + m.cu + 'A' : ' ' + m.cm);
+    let html = '<div class="res" style="margin-top:12px" id="rbmain"><div class="h">Blank for ' + name + '</div><table>' + rowsHtml([
+      ['Blank diameter before rolling', calcCell('<b>' + fBoth(blank * k) + '</b>', 'maximum pitch diameter less ' + (uni ? fx(K.rule.allow_in, 3) + ' in' : fx(K.rule.allow_mm, 3) + ' mm') + '; ' + cite([K.rule.src]) + ' (one maker\'s rule)')],
+      ['Pitch diameter, maximum', calcCell(fBoth(pdMax * k), 'Thread data tool')], ['Pitch diameter, minimum', calcCell(fBoth(pdMin * k), 'Thread data tool')],
+      ['Major diameter after rolling, maximum', calcCell(fBoth(mjMax * k), 'Thread data tool')], ['Major diameter after rolling, minimum', calcCell(fBoth(mjMin * k), 'Thread data tool')]]) + '</table></div>';
+    html += '<div class="res mtab" style="max-width:none;margin-top:12px" id="rbhb"><div class="h">What the handbook prints for this size <span class="badge differs">A different rule</span></div><table><tr><th>Screw size</th><th>Blank against the pitch diameter</th><th>For</th></tr>' +
+      hb.map(r => '<tr><td>' + rEsc(r.size) + '</td><td>' + (r.sign > 0 ? 'larger by ' : 'less by ') + amt(r) + '</td><td>' + (r.use ? rEsc(r.use) : '<span class="ms">not stated</span>') + '</td></tr>').join('') +
+      '</table><p class="ms" style="padding:4px 10px">' + cite([K.handbook.src]) + ', Machinery\'s Handbook. The maker\'s rule puts the blank below the maximum pitch diameter; the handbook also gives blanks above the pitch diameter. Start from one, roll a trial and measure.</p></div>';
+    const meas = parseFloat(tm.value);
+    if (meas > 0) {
+      const mn = (inMode() ? meas * IN_MM : meas) / k, ch = W.roll_blank_change(mn, mjMax, mjMin, K.ratio.v);
+      const inside = mn <= mjMax + 1e-9 && mn >= mjMin - 1e-9;
+      html += '<div class="res" style="margin-top:12px" id="rbtrial"><div class="h">After the trial</div><table>' + rowsHtml([
+        ['Major diameter measured', calcCell(fBoth(mn * k), inside ? '<span class="badge confirmed">Inside the limits</span>' : '<span class="badge differs">' + (mn > mjMax ? 'Above the maximum' : 'Below the minimum') + '</span>')],
+        ['Change the blank by', calcCell('<b>' + (ch >= 0 ? '+' : '&minus;') + (inMode() ? fx(Math.abs(ch) * k / IN_MM, 4) + ' in' : fx(Math.abs(ch) * k, 3) + ' mm') + '</b>', 'to bring the major diameter to the middle of its limits; ' + K.ratio.v + ' to 1, ' + cite([K.ratio.src]) + ' (one source)')],
+        ['Blank diameter for the next trial', calcCell('<b>' + fBoth(W.roll_blank_dia(blank + ch, 0) * k) + '</b>', 'the blank above with the change')]]) + '</table></div>';
+    }
+    out.innerHTML = html;
+    // Drawing: the blank against the pitch and major diameter limits, to scale along the axis.
+    const Wd = 600, Lx = 170, Rr = 40, lo = Math.min(blank, pdMin), span = mjMax - lo, pad = span * 0.2, X = v => Lx + (v - (lo - pad)) / (span + 2 * pad) * (Wd - Lx - Rr);
+    const zone = (a, b, y, cls) => '<rect class="' + cls + '" x="' + X(a).toFixed(1) + '" y="' + y + '" width="' + Math.max(1.5, X(b) - X(a)).toFixed(1) + '" height="20"/>';
+    const lab = (v, y, end) => '<text class="tl" x="' + (X(v) + (end ? -5 : 5)).toFixed(1) + '" y="' + y + '" text-anchor="' + (end ? 'end' : 'start') + '">' + (inMode() ? fx(v * k / IN_MM, 4) : fx(v * k, 3)) + '</text>';
+    plot.innerHTML = '<svg class="capplot" viewBox="0 0 ' + Wd + ' 150" role="img" aria-label="The blank diameter against the pitch diameter and major diameter limits of the thread"><text class="tl" x="' + Lx + '" y="12">diameter, ' + uLen() + ' (pale: the thread\'s limits; solid: the blank)</text>' +
+      '<text class="tl" x="8" y="45">pitch diameter</text>' + zone(pdMin, pdMax, 30, 'bar') + lab(pdMin, 45, 1) + lab(pdMax, 45) +
+      '<text class="tl" x="8" y="105">major, after rolling</text>' + zone(mjMin, mjMax, 90, 'bar') + lab(mjMin, 105, 1) + lab(mjMax, 105) +
+      '<rect class="tgz" x="' + (X(blank) - 1.5).toFixed(1) + '" y="58" width="3" height="62"/><text class="tl" x="' + X(blank).toFixed(1) + '" y="138" text-anchor="middle">blank ' + (inMode() ? fx(blank * k / IN_MM, 4) : fx(blank * k, 3)) + '</text></svg>';
+  }
+  tk.onchange = () => { classes(); upd(); }; tc.onchange = upd; tm.oninput = upd;
+  classes(); upd();
+}
+

@@ -273,6 +273,114 @@ pub fn spc_imr(xs: &[f64], which: u32) -> f64 {
 }
 
 // ---------------------------------------------------------------------------
+// Gauge repeatability and reproducibility, average and range method
+
+/// d2*(g, m): the divisor that turns the average of `g` ranges, each of `m`
+/// values, into a standard deviation: d2*^2 = d2(m)^2 + d3(m)^2 / g
+/// (Patnaik's approximation, the one behind the published d2* tables: it
+/// gives 1.41421 for one range of two and 1.91155 for one range of three).
+/// For many ranges it tends to d2(m).
+pub fn range_d2_star(g: u32, m: u32) -> f64 {
+    if g < 1 || m < 2 { return f64::NAN; }
+    let (d2, d3) = (range_d2(m), range_d3(m));
+    (d2 * d2 + d3 * d3 / g as f64).sqrt()
+}
+
+/// Constants of the average and range form. `kind` 0: K1 = 1 / d2(m) for `m`
+/// trials (many ranges); `kind` 1: K2 or K3 = 1 / d2*(1, m) for one range
+/// of `m` averages (appraisers or parts). Computed once and kept.
+pub fn grr_k(kind: u32, m: u32) -> f64 {
+    use std::sync::OnceLock;
+    static K: OnceLock<[[f64; 11]; 2]> = OnceLock::new();
+    if kind > 1 || !(2..=10).contains(&m) { return f64::NAN; }
+    let t = K.get_or_init(|| {
+        let mut t = [[f64::NAN; 11]; 2];
+        for m in 2..=10u32 {
+            t[0][m as usize] = 1.0 / range_d2(m);
+            t[1][m as usize] = 1.0 / range_d2_star(1, m);
+        }
+        t
+    });
+    t[kind as usize][m as usize]
+}
+
+/// f64 interface for [`grr_k`].
+pub fn grr_k_f(kind: f64, m: f64) -> f64 { grr_k(kind.max(0.0) as u32, m.max(0.0) as u32) }
+/// f64 interface for [`range_d2_star`].
+pub fn range_d2_star_f(g: f64, m: f64) -> f64 { range_d2_star(g.max(0.0) as u32, m.max(0.0) as u32) }
+
+/// Gauge R&R by the average and range method from the three summary numbers
+/// of a study: `rbar` the average of all the ranges (one range per appraiser
+/// and part), `xdiff` the largest appraiser average less the smallest, `rp`
+/// the largest part average less the smallest.
+///   EV = R-bar K1                      repeatability (equipment variation)
+///   AV = sqrt((X-diff K2)^2 - EV^2 / (n r))  reproducibility (appraiser
+///        variation); zero when the value under the root is negative
+///   GRR = sqrt(EV^2 + AV^2),  PV = Rp K3,  TV = sqrt(GRR^2 + PV^2)
+///   ndc = 1.41 PV / GRR, cut to a whole number
+/// Parts n 2..=10, appraisers 2..=5, trials r 2..=4. `tol`: full tolerance
+/// width (0 or less: none).
+/// `which`: 0 EV, 1 AV, 2 GRR, 3 PV, 4 TV, 5 %EV, 6 %AV, 7 %GRR, 8 %PV (of
+/// TV), 9 ndc, 10 6 GRR as a percentage of the tolerance, 11 the value
+/// under the root of AV (negative: AV was set to zero), 12 K1, 13 K2, 14 K3.
+#[allow(clippy::too_many_arguments)]
+pub fn grr_from_summary(rbar: f64, xdiff: f64, rp: f64, parts: u32, appraisers: u32, trials: u32, tol: f64, which: u32) -> f64 {
+    if !(2..=10).contains(&parts) || !(2..=5).contains(&appraisers) || !(2..=4).contains(&trials) { return f64::NAN; }
+    if !(rbar >= 0.0 && xdiff >= 0.0 && rp >= 0.0) { return f64::NAN; }
+    let (k1, k2, k3) = (grr_k(0, trials), grr_k(1, appraisers), grr_k(1, parts));
+    let ev = rbar * k1;
+    let rad = (xdiff * k2).powi(2) - ev * ev / (parts * trials) as f64;
+    let av = rad.max(0.0).sqrt();
+    let grr = (ev * ev + av * av).sqrt();
+    let pv = rp * k3;
+    let tv = (grr * grr + pv * pv).sqrt();
+    let pct = |x: f64| if tv > 0.0 { 100.0 * x / tv } else { f64::NAN };
+    match which {
+        0 => ev, 1 => av, 2 => grr, 3 => pv, 4 => tv,
+        5 => pct(ev), 6 => pct(av), 7 => pct(grr), 8 => pct(pv),
+        9 => if grr > 0.0 { (1.41 * pv / grr).floor() } else if pv > 0.0 { f64::INFINITY } else { f64::NAN },
+        10 => if tol > 0.0 { 100.0 * 6.0 * grr / tol } else { f64::NAN },
+        11 => rad, 12 => k1, 13 => k2, 14 => k3,
+        _ => f64::NAN,
+    }
+}
+
+/// f64 interface for [`grr_from_summary`].
+#[allow(clippy::too_many_arguments)]
+pub fn grr_from_summary_f(rbar: f64, xdiff: f64, rp: f64, parts: f64, appraisers: f64, trials: f64, tol: f64, which: f64) -> f64 {
+    grr_from_summary(rbar, xdiff, rp, parts.max(0.0) as u32, appraisers.max(0.0) as u32, trials.max(0.0) as u32, tol, which.max(0.0) as u32)
+}
+
+/// Gauge R&R from the readings of a crossed study: every appraiser measures
+/// every part `trials` times. `xs` holds parts x appraisers x trials values,
+/// reading (appraiser a, part p, trial t) at index (a parts + p) trials + t.
+/// `which` 0..=14 as [`grr_from_summary`]; 20 R-bar, 21 X-diff, 22 Rp,
+/// 23 grand mean; 100 + a: average of appraiser a; 200 + p: average of part
+/// p; 1000 + a parts + p: range of that appraiser's readings on that part.
+pub fn grr_xbar_r(xs: &[f64], parts: usize, appraisers: usize, trials: usize, tol: f64, which: u32) -> f64 {
+    if !(2..=10).contains(&parts) || !(2..=5).contains(&appraisers) || !(2..=4).contains(&trials) { return f64::NAN; }
+    if xs.len() != parts * appraisers * trials || xs.iter().any(|x| !x.is_finite()) { return f64::NAN; }
+    let cell = |a: usize, p: usize| &xs[(a * parts + p) * trials..(a * parts + p + 1) * trials];
+    let range = |g: &[f64]| g.iter().cloned().fold(f64::NEG_INFINITY, f64::max) - g.iter().cloned().fold(f64::INFINITY, f64::min);
+    let app_avg = |a: usize| xs[a * parts * trials..(a + 1) * parts * trials].iter().sum::<f64>() / (parts * trials) as f64;
+    let part_avg = |p: usize| (0..appraisers).map(|a| cell(a, p).iter().sum::<f64>()).sum::<f64>() / (appraisers * trials) as f64;
+    let spread = |v: Vec<f64>| v.iter().cloned().fold(f64::NEG_INFINITY, f64::max) - v.iter().cloned().fold(f64::INFINITY, f64::min);
+    if which >= 1000 {
+        let i = (which - 1000) as usize;
+        return if i < parts * appraisers { range(cell(i / parts, i % parts)) } else { f64::NAN };
+    }
+    if which >= 200 { let p = (which - 200) as usize; return if p < parts { part_avg(p) } else { f64::NAN }; }
+    if which >= 100 { let a = (which - 100) as usize; return if a < appraisers { app_avg(a) } else { f64::NAN }; }
+    let rbar = (0..appraisers).flat_map(|a| (0..parts).map(move |p| (a, p))).map(|(a, p)| range(cell(a, p))).sum::<f64>() / (parts * appraisers) as f64;
+    let xdiff = spread((0..appraisers).map(app_avg).collect());
+    let rp = spread((0..parts).map(part_avg).collect());
+    match which {
+        20 => rbar, 21 => xdiff, 22 => rp, 23 => xs.iter().sum::<f64>() / xs.len() as f64,
+        _ => grr_from_summary(rbar, xdiff, rp, parts as u32, appraisers as u32, trials as u32, tol, which),
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Single sampling plans
 
 /// Probability of accepting a lot with fraction defective `p` under the plan

@@ -93,6 +93,52 @@ pub fn knurl_teeth_exact(d: f64, p_normal: f64, helix_deg: f64) -> f64 {
     std::f64::consts::PI * d * helix_deg.to_radians().cos() / p_normal
 }
 
+/// Pitch of a knurl measured along the circumference of the work, for a
+/// pitch `p_normal` square to the teeth and teeth at `helix_deg` to the axis:
+/// `p / cos(helix)`.
+pub fn knurl_pitch_around(p_normal: f64, helix_deg: f64) -> f64 {
+    p_normal / helix_deg.to_radians().cos()
+}
+
+/// Circular pitch of a knurl from a print of it: roll the wheel along paper
+/// (or a strip of soft metal), count `lines` spaces and measure the `span`
+/// they cover. `p = span / lines`.
+pub fn knurl_pitch_from_print(span: f64, lines: f64) -> f64 {
+    span / lines
+}
+
+/// Circular pitch at the outside of a knurl wheel from its diameter over the
+/// teeth and its tooth count: `pi d / teeth`. On an ANSI diametral pitch wheel
+/// this reads a little under the nominal pitch, because the nominal diameter
+/// is larger than the diameter over the teeth.
+pub fn knurl_pitch_from_wheel(dia: f64, teeth: f64) -> f64 {
+    std::f64::consts::PI * dia / teeth
+}
+
+/// Teeth per inch of diameter of a wheel measured over its teeth (`dia` in
+/// inch): `teeth / dia`. Compare with the standard diametral pitches.
+pub fn knurl_dp_from_wheel(dia_in: f64, teeth: f64) -> f64 {
+    teeth / dia_in
+}
+
+/// Growth of the diameter measured on a trial piece: knurled diameter minus
+/// the blank it was rolled on.
+pub fn knurl_growth(d_knurled: f64, d_blank: f64) -> f64 {
+    d_knurled - d_blank
+}
+
+/// Blank for a wanted knurled diameter when the growth is the one measured on
+/// a trial piece: `d_finished - growth`.
+pub fn knurl_blank_for_finish(d_finished: f64, growth: f64) -> f64 {
+    d_finished - growth
+}
+
+/// The step the makers give for changing a blank that double tracks: about
+/// 0.005 in (Dorian, Sherline), returned in mm.
+pub fn knurl_trial_step_mm() -> f64 {
+    0.005 * 25.4
+}
+
 // ---------------------------------------------------------------------------
 // Surface texture
 // ---------------------------------------------------------------------------
@@ -263,9 +309,41 @@ mod tests {
         close(25.4 / 20.0, 1.27, 1e-12);
         close(knurl_dp_to_cp(64.0) * 25.4, 1.25, 0.005);
         close(1.0 / knurl_dp_to_cp(96.0), 30.6, 0.05);
+        // 30 deg: pitch round the work is p / cos 30, 20 TPI -> 17.32 TPI (Dorian)
+        close(1.0 / knurl_pitch_around(1.0 / 20.0, 30.0), 17.32, 0.005);
+        close(knurl_pitch_around(1.0, 0.0), 1.0, 1e-12);
         // straight knurl: the general form reduces to the CP and DP forms
         close(knurl_blank_dia(1.0, 40.0, 0.0), knurl_blank_dia_cp(1.0, 40.0), 1e-12);
         close(knurl_blank_dia(knurl_dp_to_cp(96.0), 48.0, 0.0), knurl_blank_dia_dp(96.0, 48.0), 1e-12);
+    }
+
+    /// Measure and count. Conrad Hoffman's worked example (conradhoffman.com/
+    /// knurling.htm): 75 lines of a print measure 3.535 in, spacing 0.0471
+    /// (0.04713), one tooth of diameter 0.015 in, 5/8 in stock holds 41 teeth,
+    /// blank 0.615 in. ANSI/ASME B94.6 as quoted on pjsminilathe: a 3/4 in
+    /// nominal 96 DP wheel has 72 teeth and a major diameter of 0.7440 in, with
+    /// circular pitch 0.0325 at the outside and 0.0327 nominal; 96 DP on a
+    /// 1/2 in blank is 48 teeth.
+    #[test] fn knurl_measure_and_count() {
+        let p = knurl_pitch_from_print(3.535, 75.0);
+        close(p, 0.04713, 0.000005);
+        close(knurl_blank_dia_cp(p, 1.0), 0.015, 0.00005);
+        let n = knurl_teeth_exact(0.625, p, 0.0);
+        assert_eq!(n.floor(), 41.0);
+        close(knurl_blank_dia(p, 41.0, 0.0), 0.615, 0.0005);
+        close(knurl_pitch_from_wheel(0.7440, 72.0), 0.0325, 0.00005);
+        close(knurl_dp_to_cp(96.0), 0.0327, 0.00005);
+        close(knurl_dp_from_wheel(0.75, 72.0), 96.0, 1e-12);
+        close(knurl_dp_from_wheel(0.7440, 72.0), 96.77, 0.005);
+        close(knurl_teeth_dp(0.5, 96.0), 48.0, 0.0);
+    }
+
+    /// Trial and error: the growth is what the trial piece shows; the step for
+    /// a blank that double tracks is 0.005 in (Dorian; Sherline), 0.127 mm.
+    #[test] fn knurl_trial() {
+        close(knurl_growth(0.635, 0.615), 0.020, 1e-12);
+        close(knurl_blank_for_finish(0.650, 0.020), 0.630, 1e-12);
+        close(knurl_trial_step_mm(), 0.127, 1e-12);
     }
 
     /// Check the profile ratios by sampling one period of each profile.

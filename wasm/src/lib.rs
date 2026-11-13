@@ -120,6 +120,9 @@ f1!(tap_pct_form, c::tap_pct_form, d, p, hole);
 f1!(iso965_limit, c::iso965_limit_f, d, p, grade, pos, which);
 f1!(iso965_value, c::iso965_value_f, d, p, grade, what);
 f1!(un_limit, c::un_limit_f, d, p, class, which);
+f1!(gauge_member_limit, c::gauge_member_limit, size, tol, plus, which);
+f1!(roll_blank_dia, c::roll_blank_dia, pd_max, allowance);
+f1!(roll_blank_change, c::roll_blank_change, measured, major_max, major_min, ratio);
 
 // ISO limits and fits (core/src/fits.rs)
 f1!(iso286_step_mean, c::iso286_step_mean, lo, hi);
@@ -443,6 +446,13 @@ f1!(lerp, c::lerp, x, x0, y0, x1, y1);
 f1!(knurl_dp_to_cp, c::knurl_dp_to_cp, dp);
 f1!(knurl_blank_dia, c::knurl_blank_dia, p_normal, n, helix_deg);
 f1!(knurl_teeth_exact, c::knurl_teeth_exact, d, p_normal, helix_deg);
+f1!(knurl_pitch_around, c::knurl_pitch_around, p_normal, helix_deg);
+f1!(knurl_pitch_from_print, c::knurl_pitch_from_print, span, lines);
+f1!(knurl_pitch_from_wheel, c::knurl_pitch_from_wheel, dia, teeth);
+f1!(knurl_dp_from_wheel, c::knurl_dp_from_wheel, dia_in, teeth);
+f1!(knurl_growth, c::knurl_growth, d_knurled, d_blank);
+f1!(knurl_blank_for_finish, c::knurl_blank_for_finish, d_finished, growth);
+#[no_mangle] pub extern "C" fn knurl_trial_step_mm() -> f64 { c::knurl_trial_step_mm() }
 f1!(profile_rz_over_ra, c::profile_rz_over_ra, kind);
 f1!(profile_rq_over_ra, c::profile_rq_over_ra, kind);
 f1!(rq_ra_convert, c::rq_ra_convert, x, kind, inverse);
@@ -505,6 +515,12 @@ f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
 f1!(spot_chamfer_dia, c::spot_chamfer_dia, z, angle);
 f1!(saw_section, c::saw_section, shape, a, b, nx, ny, which);
 f1!(saw_cut_time, c::saw_cut_time, area, rate);
+f1!(edm_kerf, c::edm_kerf, d, gap);
+f1!(edm_offset, c::edm_offset, d, gap, stock);
+f1!(edm_min_inside_radius, c::edm_min_inside_radius, d, gap);
+f1!(edm_taper, c::edm_taper, h, angle, which);
+f1!(edm_taper_angle, c::edm_taper_angle, land, h);
+f1!(edm_cut, c::edm_cut, length, thickness, rate, skims, skim_rate, which);
 f1!(partoff_time, c::partoff_time, d0, d1, f, vc, n_max, k, which);
 f1!(partoff_time_rpm, c::partoff_time_rpm, d0, d1, f, n);
 /// Per-tooth chip loads with runout into list_out; returns the tooth count.
@@ -562,6 +578,23 @@ f1!(harmonic_order, c::harmonic_order, f, base, tol);
 // Grinding (core/src/grinding.rs)
 f1!(wheel_speed_ms, c::wheel_speed_ms, d, rpm);
 f1!(wheel_rpm_ms, c::wheel_rpm_ms, vs, d);
+f1!(rpm_ratio, c::rpm_ratio, wheel_rpm, work_rpm);
+f1!(rpm_ratio_off_whole, c::rpm_ratio_off_whole, ratio);
+f1!(rpm_ratio_near_fraction, c::rpm_ratio_near_fraction, ratio);
+f1!(rpm_ratio_off_fraction, c::rpm_ratio_off_fraction, ratio);
+#[no_mangle] pub extern "C" fn rpm_ratio_tol() -> f64 { c::rpm_ratio_tol() }
+f1!(rpm_ratio_class, c::rpm_ratio_class, ratio, tol);
+f1!(work_rpm_for_ratio, c::work_rpm_for_ratio, wheel_rpm, ratio);
+f1!(marks_frequency_hz, c::marks_frequency_hz, marks_per_rev, work_rpm);
+f1!(rev_frequency_hz, c::rev_frequency_hz, rpm);
+f1!(wave_spacing, c::wave_spacing, d, waves);
+f1!(marks_vs_ratio_pct, c::marks_vs_ratio_pct, marks_per_rev, ratio);
+f1!(depth_ratio, c::depth_ratio, depth, dia);
+f1!(pct_adjust, c::pct_adjust, v, pct);
+f1!(gundrill_feed_for_depth, c::gundrill_feed_for_depth, feed, ratio, limit, pct);
+f1!(fill_rule_flow_gpm, c::fill_rule_flow_gpm, d_in, depth_in, rpm);
+f1!(nozzle_flow_gpm, c::nozzle_flow_gpm, d_in, psi);
+f1!(flow_per_dia, c::flow_per_dia, rate, dia);
 f1!(speed_ratio, c::speed_ratio, vs, vw);
 f1!(equiv_dia, c::equiv_dia_f, dw, ds, mode);
 f1!(contact_length, c::contact_length, ae, de);
@@ -687,6 +720,7 @@ f1!(interpolate, c::expr::interpolate, x1, y1, x2, y2, x);
 // Gears and splines (core/src/gears.rs). Lengths in any one unit (module or 1/P).
 f1!(gear_involute, c::gears::involute, deg);
 f1!(gear_inv_angle, c::gears::inv_angle_deg, inv);
+f1!(sae_spline, c::gears::sae_spline, n, fit, d_nom, which);
 /// Spur gear: which 0 d, 1 db, 2 da, 3 df, 4 ha, 5 hf, 6 h, 7 p, 8 pb, 9 s, 10 e, 11 z_min, 12 x_min, 13 s at tip.
 #[no_mangle] pub extern "C" fn gear_spur(m: f64, z: f64, alpha: f64, x: f64, ha: f64, hf: f64, which: f64) -> f64 { c::gears::spur_flat(m, z, alpha, x, ha, hf, which as u32) }
 /// Spur pair: which 0 inv aw, 1 aw, 2 y, 3 a0, 4 a, 5 dw1, 6 dw2, 7 ha1, 8 ha2, 9 h, 10 da1, 11 da2, 12 df1, 13 df2, 14 contact ratio.
@@ -987,6 +1021,14 @@ f1!(spc_constant_table, c::spc_constant_table_f, n, which);
 f1!(sampling, c::sampling_f, n, ac, p, lot, which);
 /// X-bar/R chart of the first `n` buffer values in subgroups of `sg`; `which` as in `spc_xbar_r`.
 #[no_mangle] pub extern "C" fn spc_xbar_r_buf(n: f64, sg: f64, which: f64) -> f64 { c::spc_xbar_r(buf(n), sg.max(0.0) as usize, which.max(0.0) as u32) }
+f1!(grr_k, c::grr_k_f, kind, m);
+f1!(range_d2_star, c::range_d2_star_f, g, m);
+f1!(grr_from_summary, c::grr_from_summary_f, rbar, xdiff, rp, parts, appraisers, trials, tol, which);
+/// Gauge R&R from the first parts x appraisers x trials buffer values; layout and `which` as in `grr_xbar_r`.
+#[no_mangle] pub extern "C" fn grr_buf(parts: f64, appraisers: f64, trials: f64, tol: f64, which: f64) -> f64 {
+    let (p, a, t) = (parts.max(0.0) as usize, appraisers.max(0.0) as usize, trials.max(0.0) as usize);
+    if p * a * t > BUF_LEN { return f64::NAN; }
+    c::grr_xbar_r(buf((p * a * t) as f64), p, a, t, tol, which.max(0.0) as u32) }
 /// Individuals/moving range chart of the first `n` buffer values; `which` as in `spc_imr`.
 #[no_mangle] pub extern "C" fn spc_imr_buf(n: f64, which: f64) -> f64 { c::spc_imr(buf(n), which.max(0.0) as u32) }
 // Materials reference (B4): two-metal galvanic check.

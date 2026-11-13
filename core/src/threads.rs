@@ -294,10 +294,106 @@ pub fn un_limit(d: f64, p: f64, class: u32, which: u32) -> f64 {
     match which { 0 => round4(d - a), 1 => round4(d - a - tm), 2 => round4(e - a), 3 => round4(e - a - t), _ => f64::NAN }
 }
 
+/// Size limits of one member of a fixed limit gauge. The member is made to
+/// the product limit `size` with the gauge maker's tolerance `tol` all on one
+/// side: plus (`plus` > 0: GO thread plug, NOT GO thread ring) or minus (NOT
+/// GO thread plug, GO thread ring), so that a new gauge never accepts a part
+/// outside its limits. `which` 0 smallest, 1 largest size of the member.
+/// Blank diameter before thread rolling by a thread roll maker's rule: the
+/// maximum pitch diameter less an allowance (CJWinter: .002 in, .051 mm).
+pub fn roll_blank_dia(pd_max: f64, allowance: f64) -> f64 {
+    if pd_max.is_finite() && pd_max > 0.0 && allowance.is_finite() && allowance >= 0.0 && allowance < pd_max { pd_max - allowance } else { f64::NAN }
+}
+
+/// Change to make to the blank diameter after a trial: the rolled major
+/// diameter moves `ratio` times as far as the blank (CJWinter: 3 to 1), so the
+/// blank changes by (middle of the major diameter limits - measured) / ratio.
+pub fn roll_blank_change(measured: f64, major_max: f64, major_min: f64, ratio: f64) -> f64 {
+    if !(measured.is_finite() && measured > 0.0 && major_max.is_finite() && major_min.is_finite() && major_max >= major_min && ratio.is_finite() && ratio > 0.0) { return f64::NAN; }
+    ((major_max + major_min) / 2.0 - measured) / ratio
+}
+
+pub fn gauge_member_limit(size: f64, tol: f64, plus: f64, which: f64) -> f64 {
+    if !(size > 0.0 && tol >= 0.0) { return f64::NAN; }
+    let (lo, hi) = if plus > 0.0 { (size, size + tol) } else { (size - tol, size) };
+    match which as i32 { 0 => lo, 1 => hi, _ => f64::NAN }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     fn close(a: f64, b: f64, tol: f64) { assert!((a - b).abs() <= tol, "{a} vs {b}"); }
+
+    /// Rolled-thread blank: CJWinter's rule (maximum pitch diameter less .002 in
+    /// or .051 mm) and its 3 to 1 ratio between blank and major diameter.
+    #[test] fn rolled_thread_blank() {
+        let pd = un_limit(0.25, 1.0 / 20.0, 2, 2); // 1/4-20 UNC-2A maximum pitch diameter, 0.2164 in
+        assert!((pd - 0.2164).abs() < 1e-9);
+        assert!((roll_blank_dia(pd, 0.002) - 0.2144).abs() < 1e-9);
+        let pm = iso965_limit(10.0, 1.5, 6, 3, 2); // M10 x 1.5 6g maximum pitch diameter, 8.994 mm
+        assert!((pm - 8.994).abs() < 5e-4);
+        assert!((roll_blank_dia(pm, 0.051) - (pm - 0.051)).abs() < 1e-12 && (roll_blank_dia(pm, 0.051) - 8.943).abs() < 5e-4);
+        assert!(roll_blank_dia(0.0, 0.002).is_nan() && roll_blank_dia(0.2, -0.001).is_nan());
+        // .001 in on the blank is .003 in on the major diameter.
+        assert!((roll_blank_change(0.2470, 0.2500, 0.2500, 3.0) - 0.001).abs() < 1e-12);
+        // 1/4-20 UNC-2A major 0.2489 to 0.2408: middle 0.24485; a trial at 0.2430 is 0.00185 small, blank up by a third.
+        assert!((roll_blank_change(0.2430, 0.2489, 0.2408, 3.0) - 0.00185 / 3.0).abs() < 1e-12);
+        assert!(roll_blank_change(0.2430, 0.24, 0.25, 3.0).is_nan() && roll_blank_change(0.2430, 0.25, 0.24, 0.0).is_nan());
+    }
+
+    /// Gauge members: 1/4-20 UNC-2B plug with X tolerance 0.0003 in (GO made to
+    /// 0.2175 plus, NOT GO made to 0.2224 minus), and a 2A ring (GO 0.2164
+    /// minus, NOT GO 0.2127 plus).
+    #[test] fn gauge_member_limits() {
+        close(gauge_member_limit(0.2175, 0.0003, 1.0, 0.0), 0.2175, 1e-12);
+        close(gauge_member_limit(0.2175, 0.0003, 1.0, 1.0), 0.2178, 1e-12);
+        close(gauge_member_limit(0.2224, 0.0003, 0.0, 0.0), 0.2221, 1e-12);
+        close(gauge_member_limit(0.2224, 0.0003, 0.0, 1.0), 0.2224, 1e-12);
+        close(gauge_member_limit(0.2164, 0.0003, 0.0, 0.0), 0.2161, 1e-12);
+        close(gauge_member_limit(0.2127, 0.0003, 1.0, 1.0), 0.2130, 1e-12);
+        assert!(gauge_member_limit(0.0, 0.0003, 1.0, 0.0).is_nan() && gauge_member_limit(0.25, -1.0, 1.0, 0.0).is_nan() && gauge_member_limit(0.25, 0.0003, 1.0, 2.0).is_nan());
+    }
+
+    /// Pitch diameter limits against a gauge maker's standard pitch diameter
+    /// chart (Vermont Gage, catalogue p. 17; the plug columns are printed the
+    /// same by Westport): GO basic, NOT GO 2B, NOT GO 3B, ring 2A GO and NOT
+    /// GO, ring 3A GO and NOT GO for 15 sizes. 102 of the 105 values agree.
+    /// Three differ by 0.0001 in and are kept as known differences (shown on
+    /// the thread gauge page, not changed here): 6-32 3B maximum (0.1205
+    /// against 0.1204), 1/4-20 2B maximum (0.2223 against 0.2224, an open
+    /// question) and 1/2-13 3A minimum (0.4462 against 0.4463).
+    #[test] fn un_limits_against_a_gauge_chart() {
+        let rows: [(&str, f64, f64, [f64; 7]); 15] = [
+            ("4-40", 0.112, 40.0, [0.0958, 0.0991, 0.0982, 0.0950, 0.0925, 0.0958, 0.0939]),
+            ("6-32", 0.138, 32.0, [0.1177, 0.1214, 0.1204, 0.1169, 0.1141, 0.1177, 0.1156]),
+            ("10-24", 0.190, 24.0, [0.1629, 0.1672, 0.1661, 0.1619, 0.1586, 0.1629, 0.1604]),
+            ("10-32", 0.190, 32.0, [0.1697, 0.1736, 0.1726, 0.1688, 0.1658, 0.1697, 0.1674]),
+            ("1/4-20", 0.25, 20.0, [0.2175, 0.2224, 0.2211, 0.2164, 0.2127, 0.2175, 0.2147]),
+            ("1/4-28", 0.25, 28.0, [0.2268, 0.2311, 0.2300, 0.2258, 0.2225, 0.2268, 0.2243]),
+            ("5/16-18", 0.3125, 18.0, [0.2764, 0.2817, 0.2803, 0.2752, 0.2712, 0.2764, 0.2734]),
+            ("3/8-16", 0.375, 16.0, [0.3344, 0.3401, 0.3387, 0.3331, 0.3287, 0.3344, 0.3311]),
+            ("3/8-24", 0.375, 24.0, [0.3479, 0.3528, 0.3516, 0.3468, 0.3430, 0.3479, 0.3450]),
+            ("1/2-13", 0.5, 13.0, [0.4500, 0.4565, 0.4548, 0.4485, 0.4435, 0.4500, 0.4463]),
+            ("1/2-20", 0.5, 20.0, [0.4675, 0.4731, 0.4717, 0.4662, 0.4619, 0.4675, 0.4643]),
+            ("5/8-11", 0.625, 11.0, [0.5660, 0.5732, 0.5714, 0.5644, 0.5589, 0.5660, 0.5619]),
+            ("3/4-10", 0.75, 10.0, [0.6850, 0.6927, 0.6907, 0.6832, 0.6773, 0.6850, 0.6806]),
+            ("1-8", 1.0, 8.0, [0.9188, 0.9276, 0.9254, 0.9168, 0.9100, 0.9188, 0.9137]),
+            ("1-12", 1.0, 12.0, [0.9459, 0.9535, 0.9516, 0.9441, 0.9382, 0.9459, 0.9415]),
+        ];
+        let known = [("6-32", 2usize), ("1/4-20", 1), ("1/2-13", 6)];
+        let mut differ = Vec::new();
+        for (name, d, tpi, want) in rows {
+            let p = 1.0 / tpi;
+            let got = [un_limit(d, p, 12, 3), un_limit(d, p, 12, 2), un_limit(d, p, 13, 2), un_limit(d, p, 2, 2), un_limit(d, p, 2, 3), un_limit(d, p, 3, 2), un_limit(d, p, 3, 3)];
+            for i in 0..7 {
+                if (got[i] - want[i]).abs() > 1e-6 {
+                    assert!((got[i] - want[i]).abs() < 1.0001e-4, "{name} column {i}: {} against {}", got[i], want[i]);
+                    differ.push((name, i));
+                }
+            }
+        }
+        assert_eq!(differ, known);
+    }
 
     #[test] fn basic_profile_constants() {
         close(thread_basic_pitch_dia(0.0, 1.0), -0.649519, 1e-6);

@@ -419,8 +419,129 @@ All were accessed 2026-11-10.
 - **Dorian DP table.** It prints 23.6 TPI at 30 deg for 64 DP, where the formula gives 23.5; the other rows agree. Not used.
 - **Diameter growth** for form knurling is empirical and differs by maker: Dorian by TPI in inch, Hommel+Keller by material, diameter and pitch in mm. It is not tabulated; the tool tells the user to make a trial.
 
+### Four methods (0.5.0, all accessed 2026-11-12)
+The page now offers four ways to a blank: (1) a diametral pitch knurl, (2) a circular pitch knurl (mm or TPI), (3) measuring the knurl you have, from a print or from the wheel, and (4) trial and error with a tick-off procedure. The steps of the procedure are in BenchMate's own words; each names the sources it rests on, and `scripts/build_refdata.py` marks a step `confirmed` (two publishers), `single` or `own` (BenchMate's advice, said so on the page).
+
+- **[SHERLINE]** Sherline Products, knurling tool holder instructions (P/N 3004). https://sherline.com/wp-content/uploads/2023/03/3004inst_20tpi_temp.pdf
+- **[GENSWISS]** GenSwiss, knurling tips. https://genswiss.com/media/wysiwyg/support/pdf/knurlingtips.pdf
+- **[HOFFMAN]** Conrad Hoffman, knurling notes (personal site). https://conradhoffman.com/knurling.htm
+- **[PJS_ANSI]** pjsminilathe, "ANSI" knurling page (personal site quoting ANSI/ASME B94.6-1984; the standard itself was not read). https://sites.google.com/site/pjsminilathe/making-chips/knurling/ansi
+- **[PJS_TECH]** pjsminilathe, knurling techniques. https://sites.google.com/site/pjsminilathe/making-chips/knurling/techniques (same author as PJS_ANSI: the two count as one publisher).
+
+Findings:
+- **Diametral pitches 64, 96, 128, 160** are now printed by two sources (Dorian; ANSI B94.6 as quoted by pjsminilathe).
+- **Checks (core tests `knurl_measure_and_count`, `knurl_trial`).**
+  - Hoffman's print example: 75 spaces in 3.535 in is 0.0471 in; one tooth is 0.015 in of diameter; 5/8 in stock holds 41 teeth; blank 0.615 in. BenchMate: 0.04713, 0.0150, 41, 0.6151.
+  - ANSI 96 DP wheel, 3/4 in nominal: 72 teeth, major diameter 0.7440 in, circular pitch 0.0325 in at the outside and 0.0327 in nominal; 96 DP on 1/2 in is 48 teeth. BenchMate: 0.03246, 0.03272, 48.
+- **Measuring the wheel is approximate, and the page says so.** Pi x diameter over the teeth / teeth gives the pitch at the outside of the wheel, which for the ANSI wheel above is 0.8 % under the nominal pitch (teeth / diameter reads 96.77 where the wheel is 96 DP). Single source (PJS_ANSI). The page tells the user to use the DP method when the figure sits a little above a standard DP, or to make a print.
+- **A print gives the pitch round the work whatever the pattern**, when it is measured along the direction of rolling. This is geometry (the wheel rolls on the work without slipping), not a quoted statement; Hoffman's example does not discuss diagonal knurls.
+- **The 0.005 in step.** Dorian gives it for a knurl that double tracks. Sherline gives the same amount, up or down, for a diameter that does not knurl properly, and prints ".1 mm" beside it; 0.005 in is 0.127 mm, which is what the core returns.
+- **Speed: the sources differ and all are shown.** Sherline: about 100 rpm for 1/2 in of soft material. pjsminilathe: 150 to 200 rpm (the lowest speed of a mini lathe). GenSwiss, for production knurling: not above about 150 sfm (50 m/min), about 50 sfm (15 m/min) for harder steels and stainless. 100 rpm on 1/2 in is about 13 sfm, so the hobby figures are far below the production limit. Nothing is averaged; the step says to start slow.
+- **Double tracking and infeed.** GenSwiss: tracking is usually settled after one full turn of the part, and more infeed usually cures double tracking on bump and cut knurling. pjsminilathe and Hoffman: turn the spindle by hand with light pressure first.
+- **Growth** is still not tabulated. The trial method takes it from the trial piece (knurled diameter less blank) and gives the blank for a wanted finished diameter at that growth, with a warning that the new blank has to track too. GenSwiss: 0.0005 in of blank variation shows as about 0.001 in on the knurled diameter.
+- **Not used.**
+  - The Sherline chart "Approximate increase in knurled diameters": the columns did not come through in order when the PDF was read.
+  - Industrial Monitor Direct, knowledge base page on knurling cast iron: contradicts itself on the sign of the diameter allowance and on its units.
+- **Own advice, marked as such on the page:** chamfer the scrap piece; write down the blank, speed and growth that worked.
+
+## Gun drilling (`data/refdata/gundrill-evidence.json`, `core/src/deephole.rs`, `app/refdata3.js`)
+All accessed 2026-11-12. Every table used was read twice from the PDF; the two readings agree cell for cell.
+
+- **[STERLING]** Sterling Gun Drills, catalogue, "Speeds and Feeds". https://productivity.com/wp-content/uploads/pdfs/Sterling%20Gun%20Drill%20Catalog.pdf . Speed chart (SFM by material and hardness, for high pressure and for spray mist, with percentage adjustments), approximate feed rate (in/rev by diameter, six material columns), oil pressure, flow and longest unsupported length by diameter, RPM = SFM / 0.262 / diameter, "drill lengths over 30:1: reduce feed rate by 20 %".
+- **[BOTEK]** botek, catalogue ELB/ZLB, guide values for Type 110, pp. 20-21. https://botek.de/downloads/en/Catalog_ELB_ZLB_E.pdf . Cutting speed ranges for four steel groups and feed ranges by drill diameter (p. 20).
+- **[UNISIG]** UNISIG, Deep hole drilling technical reference. https://stagingxx.unisig.com/wp-content/uploads/2016/08/UNISIG-Deep-Hole-Drilling-Technical-Reference.pdf . Starting coolant flow 3.7 to 4.5 l/min per mm of tool diameter (25 to 30 gal/min per inch), "parameter values change by tooling type".
+- **[MASTERFLUID]** Master Fluid Solutions, technical bulletin 109, "Gun drilling". https://www.masterfluids.com/na/en-us/technical-information/tb.php?tbid=109
+- **[CTE2016]** K. Hanson, "Conventional thinking", *Cutting Tool Engineering*, 1 Jan 2016. https://ctemag.com/node/21113 . Quotes Drill Masters Eldorado, Sterling, UNISIG, Star SU and Iscar.
+- **[HARTNER]** Hartner catalogue pages 474-475. https://imageservice.kyocera-unimerco.com/imageandfile/getpdf/hartner_474-475.pdf
+- **[INGERSOLL]** Ingersoll Cutting Tools, gun drill catalogue excerpts. https://ssl.ingersoll-imc.com/resources/pdf/cat-002-2-excerpts-gun-drills.pdf
+- **[ISCAR]** ISCAR e-catalogue information sheet 4448. https://www.iscar.com/eCatalog/Ecat/datafileENM/INFO/4448.pdf
+
+Findings:
+- **One maker's tables, a second maker beside them.** Speed, feed, pressure and flow come from Sterling, the only source whose tables could be read whole. For the four steel groups botek's guide ranges are shown on their own rows. Nothing is averaged.
+- **The makers differ, and the page says so.** Sterling's speeds sit at or above the top of botek's ranges (low carbon steel 330 SFM = 100.6 m/min against 70 to 100; stainless 300 series 230 SFM = 70 m/min against 30 to 60). Sterling's feeds sit at or under the bottom of botek's (1/2 in in carbon steel: 0.0203 mm/rev against 0.027 to 0.076).
+- **Pressure and flow have one source.** botek and ISCAR print theirs as charts, which could not be read. Two statements quoted in [CTE2016] bracket Sterling's table: 1,500 psi and more for very small drills, 200 to 400 psi on drills of 2 in and over (Drill Masters Eldorado). UNISIG's flow figure, for deep hole drilling in general, is about twice Sterling's at 1/2 in (12.5 to 15 against 7 gal/min) and is shown on its own row.
+- **Cross-check of the feed table.** [CTE2016] quotes Sterling: "a 0.250 in gundrill in steel might feed at just 0.0005 ipr"; the table gives 0.00045.
+- **How the feed column headings were read.** The PDF text breaks the headings into fragments. Read in column order they are: steels, low and medium carbon | steels: alloy, tool, 416 stainless | stainless 300 series, titanium, high temperature nickel alloys | cast iron, grey; aluminium, free cutting | cast iron, ductile (nodular) | non-ferrous alloys, difficult to chip. The page lets the user change the column.
+- **"17-17" in the stainless 300 chart** is shown as printed, with "probably 12-17" beside it.
+- **botek's diameter labels under 10 mm** carry a stray "1" in the PDF text ("11.85 - 12.49", "6.00 - 16.99"). They are read as 1.85-2.49 up to 9.00-9.99: the limits then run without a gap into the clean row 10.00-11.99 (the build checks this), and Type 110 starts at 1.85 mm.
+- **Between table sizes** the value is taken on a straight line (BenchMate's choice, said on the page). Outside 0.125 to 1.000 in nothing is given.
+- **Checks (core tests in `deephole.rs`).** Master Fluid Solutions' two worked examples (1.1 GPM, 9.5 GPM); Sterling's rpm formula against the core's (0.262 against pi / 12); UNISIG's metric and inch flow figures agree with each other (3.7 to 4.5 l/min per mm is 24.8 to 30.2 gal/min per inch).
+- **Read and not used** (listed on the page with the reason): botek's pressure and quantity charts and its page 21; Hartner's speed table (materials cannot be matched); Ingersoll's speed table (material names missing); ISCAR's speeds, feeds and chart (indexable drills of 10 to 26 mm); Master Fluid Solutions' fill-the-hole flow rule (at gundrill speeds it asks for several times the makers' flow, and more than its own nozzle formula lets a coolant hole pass).
+- **Not readable:** *Cutting Tool Engineering*, "Gundrilling" (January 2012 PDF): the link returned the magazine's front page.
+
+## Thread gauge limits (`data/refdata/threadgauge-evidence.json`, `core/src/threads.rs`, `app/refdata3.js`)
+All accessed 2026-11-12.
+
+- **[TC_TOL]** Thread Check Inc., product catalogue, p. 52, "Gage tolerances". https://www.threadcheck.com/technical-documents/gage-tolerances-pg52.pdf . W and X tolerance tables: pitch diameter by threads per inch for four diameter ranges, major and minor diameter, half angle, lead.
+- **[ROG_X]** Royal Oak Gage, "Class X tolerances". http://www.royaloakgage.com/reference/classX.htm . The X table (to 8 in) and how the tolerances are applied to each gauge member.
+- **[TC_FACT]** Thread Check Inc., Fixed limit gage fact sheet. https://www.threadcheck.com/fixed-limit-gage-fact-sheet/technicalinfo/ . Plus on the GO plug, minus on the NOGO plug; minus on the GO ring, plus on the NOGO ring.
+- **[VG_CHART]** Vermont Gage, Standard pitch diameter chart (catalogue p. 17, copy at Willrich Precision). https://willrich.com/wp-content/uploads/2014/11/Thread-Gage-Pitch-Diameter-Chart.pdf . Plug: GO basic, NOT GO 2B and 3B. Ring: GO and NOT GO for 2A and 3A.
+- **[WP_CHART]** Westport Corporation, Standard pitch diameter chart, thread plug gages. https://westportcorp.com/blogs/thread-plug-gages/standard-pitch-diameter-chart .
+- ASME B1.2 (gauges and gauging for Unified threads) is the standard behind these tables. It is cited by name and was not read.
+
+Findings:
+- **X tolerance on pitch diameter.** Thread Check and Royal Oak print the same value in every cell both have. Only Thread Check prints the 27 threads per inch row and the 8 to 12 in column: those cells are marked single-source. The text of Thread Check's PDF runs the columns together; each row was placed by counting its values, and the placing agrees with Royal Oak's table, which keeps its columns. Thread Check's X table prints "4 1/4" where its W table and Royal Oak print 4 1/2: read as 4 1/2.
+- **Which side the tolerance lies on** (two makers and both charts): GO plug plus, NOT GO plug minus, GO ring minus, NOT GO ring plus. A reading of Vermont Gage's "Fixed Limit Thread Gages" leaflet gave "plus" for the GO ring; its own chart prints "GO = -" for rings, and the leaflet reading is not used.
+- **The chart against the core's thread limits.** 15 sizes by 7 columns (GO basic, NOT GO 2B and 3B, ring GO and NOT GO for 2A and 3A). 102 of 105 values agree. Three differ by 0.0001 in: 6-32 3B maximum (core 0.1205, chart 0.1204, two makers), 1/4-20 2B maximum (core 0.2223, chart 0.2224, two makers; this is the open rounding question already on the list) and 1/2-13 3A minimum (core 0.4462, chart 0.4463, one maker). The core is not changed: the page shows the chart's figure beside the core's with a "Chart differs" mark, and a core test pins the three so that any change shows up. This is also the first comparison of the 3A and 3B limits with a published table.
+- **Not included:** ISO metric gauges (ISO 1502: no public table of the gauge tolerances could be read), setting plugs and W tolerances, wear limits, major and minor diameters of the members, classes 1A and 1B.
+
+## Rolled thread blank (`data/refdata/rollblank-evidence.json`, `core/src/threads.rs`, `app/refdata3.js`)
+All accessed 2026-11-12.
+
+- **[CJW_PD]** CJWinter (thread roll maker), "Pitch diameter, major diameter, blank diameter: what are they?", 30 November 2017. https://www.cjwinter.com/pitch-diameter-major-diameter-blank-diameter-what-are-they . Blank diameter = maximum thread pitch diameter less .002 in [or .051 mm], for straight threads; tapered pipe threads are calculated differently.
+- **[CJW_BLANK]** CJWinter, "Engineering bulletin: blank design", 24 May 2016. https://cjwinter.com/?p=83 . A change of the blank diameter changes the major diameter by 3 to 1 (.001 in on the blank, .003 in on the major diameter).
+- **[MH_ROLL]** *Machinery's Handbook*, 31st ed., Industrial Press, 2020, thread rolling, "Diameter of blank for thread rolling", p. 2188, read on the publisher's online copy. https://online.flippingbook.com/view/954046886/842 . Read twice with the same figures. Blanks 0.002 to 0.0025 in larger than the pitch diameter for screws from 1/4 to 1/2 in and 0.0025 to 0.003 in larger for 1/2 to 1 in or larger; for a comparatively free fit 0.002 to 0.003 in less (1/4 to 1/2 in), 0.003 to 0.005 in less (above 1/2 in) and, below 1/4 in, 0.001 to 0.0015 in less for ordinary work. The outside diameter grows by about the depth of one thread. Verify by trial.
+
+Findings:
+- **The two publishers give different rules, and both are shown.** CJWinter puts the blank 0.002 in below the *maximum* pitch diameter. The handbook gives blanks above the pitch diameter as well as below it, by size, and does not say whether it means the maximum, minimum or basic pitch diameter. BenchMate calculates CJWinter's rule (it is fully stated) and prints the handbook's amounts for the size beside it without turning them into a diameter.
+- The 3 to 1 ratio rests on one source (CJWinter) and is marked so on the page.
+- The handbook's metric equivalent of the 1/4 to 1/2 in size range is printed in micrometres in one place (a misprint in the book); the inch figures are used.
+- Not readable or without figures: Modern Machine Shop, "Axial thread rolling for CNC lathe users" (1996; no blank diameter rule); Production Machining, "Taking a calculated approach to thread rolling" (2024; names the maker's calculator only).
+- **Not included:** pipe threads, the tolerance on the blank, chamfer angle and diameter, plating allowance, rolling speeds and pressures.
+
+### Hole check on the tap drill page
+The tap drill page takes a measured hole and gives the thread engagement it produces with a cutting tap and with a forming tap, from the same core formulas as the rest of the page (`tap_pct_cut`, `tap_pct_form`; sources under tap drills). No new source.
+
+## Wire EDM (`core/src/edm.rs`, tools `edmoffset`, `edmtaper`, `edmtime`)
+All accessed 2026-11-12.
+
+- **[RELEDM]** Carl Sommer and Steve Sommer, *Complete EDM Handbook*, 3rd ed. (Reliable EDM; free on the publisher's site). https://reliableedm.com/handbook.php . Chapter 2 (wire EDM fundamentals): gap of .002 to .003 in held between wire and work; wire from .001 to .014 in; angles up to 45 degrees; 2 sq in per hour printed as 21 mm2/min and 6 as 64. Chapter 5 (understanding the wire EDM process): a .012 in wire usually creates a .016 in kerf; the inside radius is set by the wire and the spark gap; minimum inside radius .0063 in for .012 in wire and .0053 in for .010 in wire, reached by skimming; speed is rated in square inches cut in one hour, under ideal conditions (2 1/4 in hardened D2, perfect flushing).
+- **[CIMA_W]** Cimatron wire EDM help, "Common parameters for all machines". https://help.cimatron.com/en/2026/wedm/common_parameters_for_all_machines.htm . Cut width = the wire's diameter + 2 times the gap (spark).
+- **[ADSK_W]** Autodesk FeatureCAM help, "Offset method". https://help.autodesk.com/cloudhelp/2024/ENU/FCAM/files/GUID-84AE09F1-379D-461C-950F-66824F60914F.htm . The compensation value is the wire radius plus the spark gap allowance plus any finishing allowance.
+- **[CTE_GAP]** Susan Woods, "Gap guidance", *Cutting Tool Engineering*, March 2013. https://ctemag.com/node/19963 . Typical gap when roughing .001 to .002 in with .010 or .012 in wire; when skimming .0005 down to .0001 in; the gap grows with the wire diameter and is smaller in oil.
+- **[UMN_EDM]** University of Minnesota, Aerospace Engineering and Mechanics (T. Shield), wire EDM notes. https://dept.aem.umn.edu/~./faculty/shield/software/xorient/edm.html . Taper angle = atan(sqrt(U^2 + V^2) / (Z3 + Z4)); Z3 + Z4 is the length of wire between the guides.
+- **[IMD_EDM]** Industrial Monitor Direct knowledge base (no author named; dated 2026): "Mitsubishi FX10 taper cutting" (land = tan(A) x height; 1.5 degrees over 25 mm is 0.655 mm) and "Wire EDM job pricing" (cut area = cut length x workpiece height; 130 sq in at about 3 sq in per hour is about 43 hours). https://industrialmonitordirect.com/blogs/knowledgebase/mitsubishi-fx10-taper-cutting-a-command-z1z2z5-land-setup , https://industrialmonitordirect.com/blogs/knowledgebase/wire-edm-job-pricing-estimating-costs-per-square-inch . Used only as a second statement of relations the other sources give, and for the two worked examples.
+- Also read, in agreement: Engineers Edge, EDM design considerations (the wire diameter must be less than twice the smallest inside corner radius); PTC Creo wire EDM parameters (spark allowance, stock allowance and wire diameter together set the path of the wire centre); MIT Center for Bits and Atoms, Sodick EDM notes (offset per side: opening a hole by .010 in takes .005 in off the offset).
+
+Findings:
+- **Kerf** = wire diameter + 2 x gap: stated by Cimatron; the handbook's .012 in wire and .016 in kerf fit it with a gap of .002 in, the low end of the handbook's own range. Confirmed.
+- **Offset** = wire radius + gap + stock left on: stated by Autodesk; PTC names the same three terms without the sum. With no stock it is half the kerf (the MIT notes and the handbook figures fit). The stock term rests on one explicit statement.
+- **Smallest inside corner radius** = wire radius + gap: the handbook says "wire diameter plus the spark gap", but its figures (.0063 and .0053 in) are the wire *radius* plus .0003 in, and Engineers Edge gives the radius form. BenchMate uses the radius. The handbook prints .0063 in as ".016 mm"; 0.0063 in is 0.16 mm.
+- **Gap on the first cut: the sources differ.** Cutting Tool Engineering: .001 to .002 in. The handbook: .002 to .003 in. Both are printed on the page; the gap is an input and nothing is averaged. The default (.002 in, 0.05 mm) lies in both ranges.
+- **Taper**: plain trigonometry, given by the university notes for the guides and by the knowledge base for the part.
+- **Cut time** = length x thickness / rate. No cutting rates are given: no two makers' tables for the same wire, material and thickness were read. The rate is an input.
+- **Not included:** rates and gaps per machine, wire and material; corner strategies; the programme plane and guide heights of a taper cut (machine settings); sinker EDM (overburn, orbit, electrode wear); small-hole EDM.
+- Not readable, so not used: the same handbook on Scribd; Modern Machine Shop, "More accurate taper cutting with wire EDM" (the article body did not load).
+
+## Collet nut and pull stud torque (`data/refdata/holdertorque-evidence.json`, `app/refdata3.js`)
+All accessed 2026-11-12. Every table used was read twice from the PDF; the two readings agree for every cell used.
+
+- **[REGO_TQ]** REGO-FIX, Technical information, "Recommended tightening torque for Hi-Q/ER clamping nuts" and "Maximum torques for retention knobs" (catalogue pp. 293 to 294). https://usa.rego-fix.com/rego_torque.pdf . Torque in Nm by collet size and bore, one column pair per nut type, for ER standard and ER-UP collets.
+- **[REGO_TI09]** REGO-FIX, ER Technical Information, Section 14, "Clamping nuts tightening torque", Edition 9/2009, pp. 14.03 to 14.04. https://www.productivity.com/wp-content/uploads/2015/05/Rego-Fix-Technical-Information-Catalog-Section.pdf . "The maximum torque must not be more than 25% above the recommended tightening torque."
+- **[TECHNIKS]** Techniks, Torque specifications chart. https://www.eoasaw.com/wp-content/uploads/TECHNIKS-TORQUE-SPECIFICATIONS-CHART.pdf . One figure in ft/lbs per collet size and nut type; retention knob torque by taper.
+- **[MARITOOL]** MariTool, Retention knobs FAQ. https://www.maritool.com/faq/Retention-Knobs . Pull stud torque ranges in ft lbs; lubrication, checking and replacement advice.
+
+Findings:
+- **One maker's collet nut table, a second maker beside it.** The table by bore is REGO-FIX's (the maker of the ER system), for its own nuts. Used: the columns ER / ERC (hex and slotted nut) and ERM / ERMC (mini nut), 22 rows from ER 8 to ER 50. Techniks prints one figure per collet size with no bore ranges and does not say whether it is a recommendation or a maximum; it is shown on its own row. For the largest bores its figures are 9 to 14 % above REGO-FIX's recommended torque for ER 11 to ER 32 and 3 % under it for ER 40, inside REGO-FIX's 25 % ceiling.
+- **Small bores take much less torque.** ER 16 with the standard nut: 8 Nm at 1 mm, 20 Nm at 1.5 to 3.5 mm, 40 Nm at 4 to 4.5 mm, 56 Nm at 5 to 10 mm. A single figure per collet size would overtighten small collets, which is why the page asks for the bore.
+- **The ceiling** is the recommended torque plus 25 % (core `pct_adjust`), from the 2009 edition; the current sheet does not repeat the sentence.
+- **Two editions of REGO-FIX's table differ.** The 2009 section is in ft-lbs only and matches the current Nm table within rounding for most rows, but not all (ER 11, 3 to 7 mm: 20 ft-lbs in 2009, 24 Nm = 17.7 ft-lb now; ER 32, 2 to 2.5 mm: 20 ft-lbs then, 24 Nm = 17.7 ft-lb now), and some bore ranges changed (ER 25 up to 16 mm then, up to 17 mm now). The current sheet is used.
+- **The current sheet's own ft-lbs table is not used.** It is rounded, and at least one cell reads oddly (ER 11, 3 to 7 mm reads 24 in both the Nm and the ft-lbs table). The lbf·ft figures on the page are converted from the Nm table (1 lbf·ft = 1.3558 N·m).
+- **Pull stud torque: the makers differ widely, and all three are shown.** 40 taper: REGO-FIX maximum 50 Nm (36.9 lbf·ft), MariTool 45 to 55 ft lbs, Techniks 76 ft/lbs (103 N·m). 50 taper: 100 Nm maximum, 75 to 90 ft lbs, 99 ft/lbs. 30 taper: 25 Nm maximum, 20 to 25 ft lbs, 36 ft/lbs. Nothing is averaged; the page says to use the figure of the maker of the stud and holder, or the machine builder's.
+- **Not transcribed:** REGO-FIX's ERB, ERMX, ERAX and MS nut columns, the ER-GB tapping collet columns and the micRun (MR) tables; the Techniks milling chuck and end mill holder sections.
+
 ## G and M codes, macros (`data/refdata/gcodes-evidence.json`, `app/gmcodes.js`)
-Full list with editions, sections, coverage counts, gaps and disagreements: **`docs/gm-codes.md`**. All accessed 2026-11-10. Summary:
+Full list with editions, sections, coverage counts, gaps and disagreements: **`docs/gm-codes.md`**. All accessed 2026-11-10; the 0.5.0 additions (macro system variables from the Haas 96-8000 Rev AC mill manual and, for Fanuc, Tornos, CNCCookbook and cncmacrosimulator.com; builders' M-code lists from the Doosan HP5100 maintenance manual, the Mori Seiki NL user's manual and the Mazak INTEGREX e programming manual) were read on 2026-11-12. Summary:
 - **Standards cited:** ISO 6983-1:2009 (program format and address words), by name only. **[NIST]** T. R. Kramer, F. M. Proctor, E. Messina, *The NIST RS274NGC Interpreter - Version 3*, NISTIR 6556, 2000 (public domain), Tables 4 and 5, section 3.6.
 - **[LCNC_OV] [LCNC_M]** LinuxCNC G-code overview (modal groups) and M-code pages.
 - **Fanuc:** [FAN_M] 0i-F Plus Operator's Manual (Machining Center), B-64694EN-2/01; [FAN_T] 0i-F lathe manual, B-64604EN-1/01 (public copies on manualmachine.com); [MFG_FT] [MFG_F31] mfgrobots.com lists; [TIE] TIE / fanucworld list; [IMD_SYS] Industrial Monitor Direct A/B/C article.
@@ -524,6 +645,18 @@ All web sources accessed 2026-11-10.
 - **[BED]** B. Bednarski (Saint-Gobain Abrasives), quoted in "Working an inside job", *American Machinist*, 19 Oct 2006. https://www.americanmachinist.com/machining-cutting/working-inside-job . Speed ratio about 25:1 to 65:1, shown as guidance, never as a default.
 - Surface grinding time (strokes x down-feed layers plus spark-out) and plunge and traverse time: own derivation from the table and wheel motions; tests are hand examples.
 - **Wheel speed:** the maximum operating speed marked on the wheel is never defaulted. Every grinding screen tells the user to obey the speed marked on the wheel or its label.
+### Wheel to work rpm ratio (`grindratio`, 0.5.0; all accessed 2026-11-12)
+- **[BADGER10]** J. Badger, "Overcoming waviness", Ask the Grinding Doc, *Cutting Tool Engineering*, 15 Jun 2010. https://ctemag.com/articles/overcoming-waviness/ . Rpm ratio = wheel rpm / workpiece rpm. A whole number catches the same wave on every turn; a fraction such as 1/4, 1/3, 1/2, 2/3, 3/4 leaves scallops; a long decimal (7.84923785) is the aim. Example: 40 m/s on a wheel worn from 500 to 350 mm is 1,528 to 2,182 rpm; with the work at 200 rpm the ratio goes from 7.63 to 10.91 through eight, nine and ten. Remedies: hold the wheel rpm, or choose wheel and work rpm together.
+- **[BADGER11]** J. Badger, "Origins of chatter", same column, 15 Apr 2011. https://ctemag.com/articles/origins-chatter/ . Count the marks per work revolution and compare with the rpm ratio; marks x work rpm / 60 is the frequency. Example: 12,000 sfm on a 16 in wheel, 2,866 rpm, work 40 rpm, ratio 71.65, 70 marks, 47 Hz; at 9,000 sfm 2,150 rpm and 53.75. Marks that follow the wheel speed come from the wheel; marks that stay at the same frequency are self-excited chatter.
+- **[BADGER25]** "Varying the workpiece rpm", same column, 18 Apr 2025. https://www.ctemag.com/node/52186 . Ratios to avoid: 8.0000, 9.013, 8.9924. Ratios to aim for: 9.36488, 8.916742. Remedy: vary the work rpm.
+- **[PEARCE]** T. R. A. Pearce, D. C. Fricker, A. Speight, "The modelling of roundness in cylindrical plunge grinding to incorporate wave shift and external vibration effects", *Proc. IMechE Part B*, vol. 220, no. 8, 2006, pp. 1347-1358. Record and abstract only: https://uwe-repository.worktribe.com/index.php/output/1041661/ . Wheel run-out is a source of roundness error; the profiles are sensitive to wheel and workpiece speeds; "wave shift" is the phase shift of the waviness from wheel eccentricity across consecutive workpiece revolutions. The paper itself was not read.
+
+Findings:
+- **Single source for the rule.** The three columns are by one author. Pearce et al. support the mechanism (the fractional part of the ratio is the shift of the waves from one work turn to the next) but give no rule in the text that could be read. The page says so.
+- **Checks (core tests `rpm_ratio_examples`, `rpm_ratio_classes`; two proofs on the page).** BenchMate gives 1,527.9 and 2,182.7 rpm, 7.64 and 10.91 for the 2010 example, and 2,864.8 rpm, 71.62 and 46.7 Hz for the 2011 one.
+- **Two small differences, shown and not hidden.** 1,528 / 200 is 7.64; the 2010 column prints 7.63. The 2011 column's 2,866 and 2,150 rpm follow from pi = 3.14; with pi they are 2,864.8 and 2,148.6, and the ratios 71.62 and 53.71 against the printed 71.65 and 53.75.
+- **The limit for "close to" is BenchMate's own: 0.02.** No source gives a figure. It sits between the author's examples: 0.013 or less from a whole number is called bad, 0.083 from a whole number and 0.031 from 1/3 are called good. The page shows the limit as a row and says whose it is.
+- **Not read:** Modern Machine Shop, "How to reduce the effect of vibration in production grinding" (1 Sep 2018): the formulas are in pictures that did not come through. Not counted.
 ### Standards cited (iso.org listings checked 2026-11-10)
 - ISO 525:2020, Bonded abrasive products, general requirements (current, confirmed 2026). https://www.iso.org/standard/78476.html
 - ISO 8486-1:1996 (macrogrits F4 to F220) and ISO 8486-2:2007 (microgrits F230 to F2000), bonded abrasives grain size (both current, confirmed 2021). https://www.iso.org/standard/15695.html , https://www.iso.org/standard/42206.html
@@ -600,6 +733,17 @@ Read for this batch on 2026-11-11 unless noted. Keys are the ones shown in the a
 - **[HARV]** Harvey Performance Company, In The Loupe, "Climb milling vs. conventional milling", 2017-05-05 (tag page). https://www.harveyperformance.com/in-the-loupe/tag/backlash-eliminator/
 - **[MMC]** Mitsubishi Materials, "Causes of tool damage" (types of cutting edge damage and solutions), course 78. https://www.mmc-carbide.com/permanent/courses/78/causes-of-tool-damage.html
 - **[SECO]** Seco Tools, "Tool wear patterns: how to recognize and to optimize them". https://www.secotools.com/article/122073
+- **Tool wear guide (`toolwear`, 0.5.0).** Both pages were read again on 2026-11-12. Three entries were added to the seven: fracture and breakage (both makers), flaking (Mitsubishi only) and chip hammering (Seco only); the last two are marked "to be verified" on the page because one maker describes them. Mitsubishi's "welding" is covered by the built-up edge entry. The split into gradual wear (flank and rake face) and sudden damage is Mitsubishi's. The drawings are our own: one base (the edge unfolded, rake face above, flank below) with the wear mark added.
+- **Drilling, tapping and grinding troubleshooting (`cncguide`, 0.5.0).** Read 2026-11-12; the tables are in our own words and each row carries the keys of the pages that support it. A row with one publisher is marked "to be verified" on the page.
+  - **[MMC68]** Mitsubishi Materials, drilling course 68, "Trouble shooting". https://www.mmc-carbide.com/permanent/courses/68/trouble-shooting.html . Solid drills: oversize, hole closing in, straightness, position and roundness, exit burrs, long chips, breakage, chipping of the outer edge and the chisel edge, margin wear.
+  - **[PTD]** Travers Tool, "Drill troubleshooting and tips", 9 March 2021, with material from Precision Twist Drill (Dormer Pramet). https://solutions.travers.com/metalworking-machining/holemaking/drill-troubleshooting-and-tips . Remedies by problem; no separate list of causes.
+  - **[FMC_D]** FM Carbide, drilling troubleshooting chart (indexable drills). https://fmcarbide.com/pages/drilling-troubleshooting-chart
+  - **[FMC_T]** FM Carbide, TechTalk "Tapping troubleshooting", 15 December 2021. https://fmcarbide.com/blogs/techtalks/tapping-troubleshooting
+  - **[REGAL]** Regal Cutting Tools, "5 common tap troubles, and how to remedy them", 30 October 2024. https://regalcuttingtools.com/5-common-tap-troubles-and-how-to-remedy-them/ . Its fifth trouble (burrs from the tap's own edge) is a product note and is not used.
+  - **[RADIAC]** Radiac Abrasives, troubleshooting tips for cylindrical grinding and for surface grinding. https://radiac.com/troubleshooting-tip-category/cylindrical-grinding/ , https://radiac.com/troubleshooting-tip-category/surface-grinding/ . One publisher: rows that rest on these two tables alone are marked to be verified.
+  - **[OKUMA_G]** Robbie Williams (Okuma America), "6 causes of grinding chatter, and how to fix them", 23 March 2016. https://okuma.com/blog/blog-grinding-chatter-fixes
+  - **Where sources differ:** chipping at the chisel edge of a drill: Mitsubishi lowers the feed at entry, Precision Twist Drill raises the feed rate; the row says so. Radiac's cylindrical table couples "wheel too coarse" with remedies for a wheel that is too hard under rough finish; only the entries that are clear are used.
+  - Not readable: Mitsubishi's drilling troubleshooting matrix on mitsubishicarbide.net (the tables are pictures); Sandvik Coromant and Kennametal drilling troubleshooting (JavaScript); Haas tap breakage page (JavaScript).
 - Sandvik Coromant's wear and troubleshooting pages (https://www.sandvik.coromant.com/en-gb/knowledge/materials/wear-on-cutting-edges and the troubleshooting-turning and troubleshooting-milling pages) need JavaScript and could not be read.
 ### Safety
 - **[HSE_EM]** Health and Safety Executive, "Using emery cloth on metalworking lathes", updated 2026-08-18. https://www.hse.gov.uk/engineering/lathes.htm . Never hold emery cloth by hand on a rotating part; use a holder in the tool post; see EIS2.
@@ -710,6 +854,19 @@ Main sources: KHK Gear Technical Reference (khkgears.us, Tables 4.3 and 4.9, and
 over-pin and chordal articles from Gear Solutions 2020); SDP/SI Elements of Metric Gear
 Technology; MESYS AG online gear calculation (calc.mesys.ch); ISO 53, ISO 21771-1, DIN 3960,
 ANSI B92.1 and ISO 4156-1 (cited by name); Engineers Edge involute spline formulas.
+
+### SAE parallel side splines (`core/src/gears.rs` `sae_spline`, tool `saespline`)
+All accessed 2026-11-12.
+
+- **[MH_SAE]** *Machinery's Handbook*, 31st ed., Industrial Press, 2020, "SAE standard spline fittings", Tables 18 to 22, pp. 2358 to 2360, read on the publisher's online copy. https://online.flippingbook.com/view/954046886/1021 to /1023 . Formulas for the width W, depth h and small diameter d of 4, 6, 10 and 16-spline fittings as fractions of the nominal diameter D, for fits A (permanent), B (to slide when not under load) and C (to slide when under load; none for 4 splines); the dimension tables (4 and 6 splines 3/4 to 3 in, 10 splines 3/4 to 6 in, 16 splines 2 to 6 in); torque capacity T = 1000 N R h in inch-pounds per inch of bearing length at 1000 psi on the sides, R the mean radius. The tables give each dimension as a smallest and a largest size (a minus tolerance of 0.001 to 0.003 in by size).
+- **[SAE_J499]** SAE International, J499, "Parallel side splines for soft broached holes in fittings", public summary on SAE Mobilus (J499_201406). https://saemobilus.sae.org/content/J499_201406 . Issued January 1914, stabilized June 2014: "technically obsolete for the design of new applications", with ANSI B92.1 involute splines named for new designs. Dimensions D, W, d, h and T for four, six, ten and sixteen-spline fittings; they apply to the soft broached hole only, with no allowance for corner radii or clearance; corner radii not over 0.015 in; splines parallel to the axis within 0.006 in per foot; a theoretical torque capacity per inch of bearing length at 1000 psi. The standard's own tables and formulas are paid and were not read. SAE Mobilus also lists a revision J499A_197510 (October 1975); that listing was seen in search results only.
+
+Findings:
+- **The formulas rest on one publisher** (the handbook) and the page says so. They were checked against 37 values printed in the handbook's own tables (Tables 18, 20 and 21): all agree to the printed figure; the 16C torque at 6 in computes to 24,760.8 against 24,760 printed.
+- The tool gives the largest size of each dimension, as the formulas do; the tables' smallest sizes (the minus tolerance) are described in words, not calculated.
+- The torque figure is the handbook's rating at 1000 psi on the sides of the splines, to be scaled by the pressure the materials allow. No allowable pressure is given. SAE's summary confirms the basis (per inch of bearing length at 1000 psi) but not the formula.
+- Not readable: Engineers Edge "SAE standard spline" pages (script-only calculator, no formulas in the page text). Marks' Handbook is cited by others for the same proportions but was not read.
+- **Not included:** shaft dimensions and fits between shaft and hole, the tables' tolerances as numbers, hardened holes, broach dimensions.
 
 ## Mechanics (`core/src/mechanics.rs`, `app/mechanics.js`, tools in `app/tools.js`)
 

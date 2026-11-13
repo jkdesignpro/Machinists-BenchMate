@@ -1,0 +1,2179 @@
+{
+ "note": "Chemical composition and machinability ratings printed by each source for steel grades (0.5.0). Composition is under \"composition\" of a printed record: elements as \"a-b\", \"max a\", \"min a\" or \"text ...\", exactly as the source limits read. See docs/material-equivalents.md.",
+ "sources": {
+  "TIMKEN_PDM": {
+   "title": "Practical Data for Metallurgists, 17th edition (chemical composition tables, pp. 4 to 7)",
+   "url": "https://timkensteel.com/what-we-make/high-performance-steel/-/media/Files/Practical_Data_Metallurgists.ashx.pdf",
+   "publisher": "TimkenSteel",
+   "accessed": "2026-11-12",
+   "revision": "17th edition (no year in the readable text)"
+  },
+  "SUMMIT_RANGES": {
+   "title": "Chemical ranges: carbon steels; rephosphorized and resulfurized carbon steels (AISI / SAE grades)",
+   "url": "https://summitsteel.com/steel-resources_summit-steel-corp/chemical-ranges/alloy-steel/",
+   "publisher": "Summit Steel Corporation",
+   "accessed": "2026-11-12",
+   "revision": "The page is titled \"Alloy Steel\" but its tables are carbon steels"
+  },
+  "NI_447": {
+   "title": "Compositions of Alloy Steels (No. 447), Table I: alloy steels, ladle chemical ranges",
+   "url": "https://www.nickelinstitute.org/media/8d91b9f21353d5f/ni_inco_447_compositionsofalloysteels.pdf",
+   "publisher": "Nickel Institute",
+   "accessed": "2026-11-12",
+   "revision": "First published by INCO in 1971; republished 2021. An older state of the SAE / AISI ranges."
+  },
+  "SSINA_COMP": {
+   "title": "Composition / Properties: chemical compositions of austenitic, ferritic, martensitic, precipitation hardening and duplex stainless steels",
+   "url": "https://www.ssina.com/?p=1291",
+   "publisher": "Specialty Steel Industry of North America",
+   "accessed": "2026-11-12",
+   "revision": "Limits from ASTM specifications for plate, sheet, strip and bar, or company data sheets. Maximums unless a range or minimum is given. P, S and Si are not listed."
+  },
+  "ATLAS_S9_COMP": {
+   "title": "Atlas Steels Product Reference Manual, Section 9: Stainless steels, \"Specified Compositions\" (pp. 3 to 4)",
+   "url": "https://atlassteels.com.au/wp-content/uploads/2021/08/Atlas-Steels-Product-Manual-Section-9.pdf",
+   "publisher": "Atlas Steels",
+   "accessed": "2026-11-12",
+   "revision": "July 2020. Values from ASTM A240M (flat rolled), or the ASTM bar or wire specification where that is the only product. Single values are maxima."
+  },
+  "MSCI_MACH": {
+   "title": "Machinability: cold drawn bars (ratings based on 100 % for AISI 1212 cold drawn bars)",
+   "url": "https://msci.org/?p=83638",
+   "publisher": "Metals Service Center Institute",
+   "accessed": "2026-11-12",
+   "revision": "The page names no author, source or date; the publisher is taken from the site address (msci.org)."
+  },
+  "EE_MACH": {
+   "title": "Steel, aluminum, magnesium: machinability index chart (1212 carbon steel = 100 %)",
+   "url": "https://host.engineersedge.com/materials/machinability-steel-aluminum.htm",
+   "publisher": "Engineers Edge",
+   "accessed": "2026-11-12",
+   "revision": "A simplified, general chart; cites no source and gives no hardness."
+  }
+ },
+ "grades": [
+  {
+   "grade": "1015",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 1015",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard carbon steel, composition ranges and limits",
+      "elements": {
+       "C": "0.13-0.18",
+       "Mn": "0.30-0.60",
+       "P": "max 0.040",
+       "S": "max 0.050"
+      },
+      "verbatim": "1015 .13/.18 .30/.60 .040 .050 | Standard Carbon Steels, p. 5. Columns: SAE No. | C | Mn | P Max | S Max"
+     }
+    },
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 1015",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE carbon steel, chemical composition limits, percent",
+      "elements": {
+       "C": "0.13-0.18",
+       "Mn": "0.30-0.60"
+      },
+      "verbatim": "1015 | .13/.18 | .30/.60 | .40 | .50 (table \"Chemical Composition Limits, percent\")",
+      "note": "This page prints P .40 and S .50 on these rows, where its other rows print .040 and .050. The two cells are not used."
+     }
+    },
+    {
+     "source": "MSCI_MACH",
+     "printed_as": "1015",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 72,
+       "unit": "%",
+       "cond": "Cold drawn",
+       "condition": "Cold drawn bar",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1015 | 72 | Columns: AISI Grade | Cold Drawn | Leaded Cold Drawn | Annealed Cold Drawn | Leaded Annealed Cold Drawn. \"All machinability ratings are based on a value of 100% for AISI 1212 Cold Drawn Bars.\""
+      }
+     ]
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "1015",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 72,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1015 | 72% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "1018",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 1018",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard carbon steel, composition ranges and limits",
+      "elements": {
+       "C": "0.15-0.20",
+       "Mn": "0.60-0.90",
+       "P": "max 0.040",
+       "S": "max 0.050"
+      },
+      "verbatim": "1018 .15/.20 .60/.90 .040 .050 | Standard Carbon Steels, p. 5. Columns: SAE No. | C | Mn | P Max | S Max"
+     }
+    },
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 1018",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE carbon steel, chemical composition limits, percent",
+      "elements": {
+       "C": "0.15-0.20",
+       "Mn": "0.60-0.90"
+      },
+      "verbatim": "1018 | .15/.20 | .60/.90 | .40 | .50 (table \"Chemical Composition Limits, percent\")",
+      "note": "This page prints P .40 and S .50 on these rows, where its other rows print .040 and .050. The two cells are not used."
+     }
+    },
+    {
+     "source": "MSCI_MACH",
+     "printed_as": "1018",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 70,
+       "unit": "%",
+       "cond": "Cold drawn",
+       "condition": "Cold drawn bar",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1018 | 70 | 92 | | | Columns: AISI Grade | Cold Drawn | Leaded Cold Drawn | Annealed Cold Drawn | Leaded Annealed Cold Drawn. \"All machinability ratings are based on a value of 100% for AISI 1212 Cold Drawn Bars.\"",
+       "note": "The second figure, 92, is for leaded 1018."
+      }
+     ]
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "1018",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 78,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1018 | 78% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "1020",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 1020",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard carbon steel, composition ranges and limits",
+      "elements": {
+       "C": "0.18-0.23",
+       "Mn": "0.30-0.60",
+       "P": "max 0.040",
+       "S": "max 0.050"
+      },
+      "verbatim": "1020 .18/.23 .30/.60 .040 .050 | Standard Carbon Steels, p. 5. Columns: SAE No. | C | Mn | P Max | S Max"
+     }
+    },
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 1020",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE carbon steel, chemical composition limits, percent",
+      "elements": {
+       "C": "0.18-0.23",
+       "Mn": "0.30-0.60"
+      },
+      "verbatim": "1020 | .18/.23 | .30/.60 | .40 | .50 (table \"Chemical Composition Limits, percent\")",
+      "note": "This page prints P .40 and S .50 on these rows, where its other rows print .040 and .050. The two cells are not used."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "1020",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 72,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1020 | 72% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "1040",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 1040",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard carbon steel, composition ranges and limits",
+      "elements": {
+       "C": "0.37-0.44",
+       "Mn": "0.60-0.90",
+       "P": "max 0.040",
+       "S": "max 0.050"
+      },
+      "verbatim": "1040 .37/.44 .60/.90 .040 .050 | Standard Carbon Steels, p. 5. Columns: SAE No. | C | Mn | P Max | S Max"
+     }
+    },
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 1040",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE carbon steel, chemical composition limits, percent",
+      "elements": {
+       "C": "0.37-0.44",
+       "Mn": "0.60-0.90"
+      },
+      "verbatim": "1040 | .37/.44 | .60/.90 | .40 | .50 (table \"Chemical Composition Limits, percent\")",
+      "note": "This page prints P .40 and S .50 on these rows, where its other rows print .040 and .050. The two cells are not used."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "1040",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 64,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1040 | 64% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "1045",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 1045",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard carbon steel, composition ranges and limits",
+      "elements": {
+       "C": "0.43-0.50",
+       "Mn": "0.60-0.90",
+       "P": "max 0.040",
+       "S": "max 0.050"
+      },
+      "verbatim": "1045 .43/.50 .60/.90 .040 .050 | Standard Carbon Steels, p. 5. Columns: SAE No. | C | Mn | P Max | S Max"
+     }
+    },
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 1045",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE carbon steel, chemical composition limits, percent",
+      "elements": {
+       "C": "0.43-0.50",
+       "Mn": "0.60-0.90"
+      },
+      "verbatim": "1045 | .43/.50 | .60/.90 | .40 | .50 (table \"Chemical Composition Limits, percent\")",
+      "note": "This page prints P .40 and S .50 on these rows, where its other rows print .040 and .050. The two cells are not used."
+     }
+    },
+    {
+     "source": "MSCI_MACH",
+     "printed_as": "1045",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 57,
+       "unit": "%",
+       "cond": "Cold drawn",
+       "condition": "Cold drawn bar",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1045 | 57 | 66 | 72 | 84 | Columns: AISI Grade | Cold Drawn | Leaded Cold Drawn | Annealed Cold Drawn | Leaded Annealed Cold Drawn. \"All machinability ratings are based on a value of 100% for AISI 1212 Cold Drawn Bars.\""
+      },
+      {
+       "prop": "machinability",
+       "value": 72,
+       "unit": "%",
+       "cond": "Annealed, cold drawn",
+       "condition": "Annealed and cold drawn bar",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1045 | 57 | 66 | 72 | 84 | Columns: AISI Grade | Cold Drawn | Leaded Cold Drawn | Annealed Cold Drawn | Leaded Annealed Cold Drawn. \"All machinability ratings are based on a value of 100% for AISI 1212 Cold Drawn Bars.\""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "1055",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 1055",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard carbon steel, composition ranges and limits",
+      "elements": {
+       "C": "0.50-0.60",
+       "Mn": "0.60-0.90",
+       "P": "max 0.040",
+       "S": "max 0.050"
+      },
+      "verbatim": "1055 .50/.60 .60/.90 .040 .050 | Standard Carbon Steels, p. 5. Columns: SAE No. | C | Mn | P Max | S Max"
+     }
+    },
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 1055",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE carbon steel, chemical composition limits, percent",
+      "elements": {
+       "C": "0.50-0.60",
+       "Mn": "0.60-0.90"
+      },
+      "verbatim": "1055 | .50/.60 | .60/.90 | .40 | .50 (table \"Chemical Composition Limits, percent\")",
+      "note": "This page prints P .40 and S .50 on these rows, where its other rows print .040 and .050. The two cells are not used."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "1213",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 1213",
+     "values": {},
+     "composition": {
+      "basis": "SAE free cutting steel, composition ranges and limits",
+      "elements": {
+       "C": "max 0.13",
+       "Mn": "0.70-1.00",
+       "P": "0.07-0.12",
+       "S": "0.24-0.33"
+      },
+      "verbatim": "1213 .13 max .70/1.00 .07/.12 .24/.33 | Free Cutting Rephosphorized and Resulphurized Steel, p. 4. Columns: SAE No. | C | Mn | P | S"
+     }
+    },
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 1213",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE heat chemical ranges and limits",
+      "elements": {
+       "C": "max 0.13",
+       "Mn": "0.70-1.00",
+       "P": "0.07-0.12",
+       "S": "0.24-0.33"
+      },
+      "verbatim": "1213 | 13 | .70/1.00 | .07/.12 | .24/.33 | Rephosphorized and Resulfurized Carbon Steels, \"Heat Chemical Ranges and Limits\". Columns: GRADE NO | C Max | Mn | P | S",
+      "note": "Footnote on the page: these steels are not commonly made to specified silicon limits. The C max cell is printed without its decimal point."
+     }
+    },
+    {
+     "source": "MSCI_MACH",
+     "printed_as": "12 13/15",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 136,
+       "unit": "%",
+       "cond": "Cold drawn",
+       "condition": "Cold drawn bar",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "12 13/15 | 136 | Columns: AISI Grade | Cold Drawn | Leaded Cold Drawn | Annealed Cold Drawn | Leaded Annealed Cold Drawn. \"All machinability ratings are based on a value of 100% for AISI 1212 Cold Drawn Bars.\"",
+       "note": "One row for 1213 and 1215."
+      }
+     ]
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "1213",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 136,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1213 | 136% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "1215",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 1215",
+     "values": {},
+     "composition": {
+      "basis": "SAE free cutting steel, composition ranges and limits",
+      "elements": {
+       "C": "max 0.09",
+       "Mn": "0.75-1.05",
+       "P": "0.04-0.09",
+       "S": "0.26-0.35"
+      },
+      "verbatim": "1215 .09 max .75/1.05 .04/.09 .26/.35 | Free Cutting Rephosphorized and Resulphurized Steel, p. 4. Columns: SAE No. | C | Mn | P | S"
+     }
+    },
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 1215",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE heat chemical ranges and limits",
+      "elements": {
+       "C": "max 0.09",
+       "Mn": "0.75-1.05",
+       "P": "0.04-0.09",
+       "S": "0.26-0.35"
+      },
+      "verbatim": "1215 | .09 | .75/1.05 | .04/.09 | .26/.35 | Rephosphorized and Resulfurized Carbon Steels, \"Heat Chemical Ranges and Limits\". Columns: GRADE NO | C Max | Mn | P | S",
+      "note": "Footnote on the page: these steels are not commonly made to specified silicon limits."
+     }
+    },
+    {
+     "source": "MSCI_MACH",
+     "printed_as": "12 13/15",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 136,
+       "unit": "%",
+       "cond": "Cold drawn",
+       "condition": "Cold drawn bar",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "12 13/15 | 136 | Columns: AISI Grade | Cold Drawn | Leaded Cold Drawn | Annealed Cold Drawn | Leaded Annealed Cold Drawn. \"All machinability ratings are based on a value of 100% for AISI 1212 Cold Drawn Bars.\"",
+       "note": "One row for 1213 and 1215."
+      }
+     ]
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "1215",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 136,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "1215 | 136% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "12L14",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SUMMIT_RANGES",
+     "printed_as": "AISI / SAE 12L14",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE heat chemical ranges and limits",
+      "elements": {
+       "C": "max 0.15",
+       "Mn": "0.85-1.15",
+       "P": "0.04-0.09",
+       "S": "0.26-0.35",
+       "Pb": "0.15-0.35"
+      },
+      "verbatim": "12L14 | 15 | .85/1.15 | .04/.09 | .26/.35 | Pb .15/.35 | Rephosphorized and Resulfurized Carbon Steels, \"Heat Chemical Ranges and Limits\". Columns: GRADE NO | C Max | Mn | P | S",
+      "note": "Footnote on the page: these steels are not commonly made to specified silicon limits. The C max cell is printed without its decimal point."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "12L14",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 170,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "12L14 | 170% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "4130",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 4130",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard alloy steel, composition ranges and limits",
+      "elements": {
+       "C": "0.28-0.33",
+       "Mn": "0.40-0.60",
+       "Si": "0.15-0.35",
+       "P": "max 0.035",
+       "S": "max 0.040",
+       "Cr": "0.80-1.10",
+       "Mo": "0.15-0.25"
+      },
+      "verbatim": "4130 .28/.33 .40/.60 .80/1.10 ... .15/.25 | Standard Alloy Steels, pp. 6 to 7. Columns: SAE No. | C | Mn | Cr | Ni | Mo | Other. Table note: \"Unless specified: Si = .15/.35, P = .035 max (SAE J1268), S = .040 max, Ni = .25 max, Cr = .20 max, Mo = .06 max\"",
+      "note": "Si, P and S are from the note under the table, not from the row. The same note gives Ni .25 max as a residual."
+     }
+    },
+    {
+     "source": "NI_447",
+     "printed_as": "AISI 4130",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE alloy steel, ladle chemical ranges (1971)",
+      "elements": {
+       "C": "0.28-0.33",
+       "Mn": "0.40-0.60",
+       "Si": "0.20-0.35",
+       "P": "max 0.035",
+       "S": "max 0.040",
+       "Cr": "0.80-1.10",
+       "Mo": "0.15-0.25"
+      },
+      "verbatim": "4130 | 0.28-0.33 | 0.40-0.60 | Ni - | Cr 0.80-1.10 | Mo 0.15-0.25 | Table I, Alloy Steels. P 0.035 max, S 0.040 max and Si 0.20-0.35 are from Notes 1 and 2 (open hearth or basic oxygen steel).",
+      "note": "Si, P and S are from the general notes of the table."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "4130 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 72,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "4130 annealed | 72% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "4140",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 4140",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard alloy steel, composition ranges and limits",
+      "elements": {
+       "C": "0.38-0.43",
+       "Mn": "0.75-1.00",
+       "Si": "0.15-0.35",
+       "P": "max 0.035",
+       "S": "max 0.040",
+       "Cr": "0.80-1.10",
+       "Mo": "0.15-0.25"
+      },
+      "verbatim": "4140 .38/.43 .75/1.00 .80/1.10 ... .15/.25 | Standard Alloy Steels, pp. 6 to 7. Columns: SAE No. | C | Mn | Cr | Ni | Mo | Other. Table note: \"Unless specified: Si = .15/.35, P = .035 max (SAE J1268), S = .040 max, Ni = .25 max, Cr = .20 max, Mo = .06 max\"",
+      "note": "Si, P and S are from the note under the table, not from the row. The same note gives Ni .25 max as a residual."
+     }
+    },
+    {
+     "source": "NI_447",
+     "printed_as": "AISI 4140",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE alloy steel, ladle chemical ranges (1971)",
+      "elements": {
+       "C": "0.38-0.43",
+       "Mn": "0.75-1.00",
+       "Si": "0.20-0.35",
+       "P": "max 0.035",
+       "S": "max 0.040",
+       "Cr": "0.80-1.10",
+       "Mo": "0.15-0.25"
+      },
+      "verbatim": "4140 | 0.38-0.43 | 0.75-1.00 | Ni - | Cr 0.80-1.10 | Mo 0.15-0.25 | Table I, Alloy Steels. P 0.035 max, S 0.040 max and Si 0.20-0.35 are from Notes 1 and 2 (open hearth or basic oxygen steel).",
+      "note": "Si, P and S are from the general notes of the table."
+     }
+    },
+    {
+     "source": "MSCI_MACH",
+     "printed_as": "4140 (ANN.)",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 66,
+       "unit": "%",
+       "cond": "Annealed, cold drawn",
+       "condition": "Printed as \"4140 (ANN.)\" in the cold drawn column",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "4140 (ANN.) | 66 | 77 | Columns: AISI Grade | Cold Drawn | Leaded Cold Drawn | Annealed Cold Drawn | Leaded Annealed Cold Drawn. \"All machinability ratings are based on a value of 100% for AISI 1212 Cold Drawn Bars.\"",
+       "note": "The second figure, 77, is for leaded 4140."
+      }
+     ]
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "4140 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 66,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "4140 annealed | 66% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "4340",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 4340",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard alloy steel, composition ranges and limits",
+      "elements": {
+       "C": "0.38-0.43",
+       "Mn": "0.60-0.80",
+       "Si": "0.15-0.35",
+       "P": "max 0.035",
+       "S": "max 0.040",
+       "Cr": "0.70-0.90",
+       "Ni": "1.65-2.00",
+       "Mo": "0.20-0.30"
+      },
+      "verbatim": "4340 .38/.43 .60/.80 .70/.90 1.65/2.00 .20/.30 | Standard Alloy Steels, pp. 6 to 7. Columns: SAE No. | C | Mn | Cr | Ni | Mo | Other. Table note: \"Unless specified: Si = .15/.35, P = .035 max (SAE J1268), S = .040 max, Ni = .25 max, Cr = .20 max, Mo = .06 max\"",
+      "note": "Si, P and S are from the note under the table, not from the row."
+     }
+    },
+    {
+     "source": "NI_447",
+     "printed_as": "AISI 4340",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE alloy steel, ladle chemical ranges (1971)",
+      "elements": {
+       "C": "0.38-0.43",
+       "Mn": "0.60-0.80",
+       "Si": "0.20-0.35",
+       "P": "max 0.035",
+       "S": "max 0.040",
+       "Cr": "0.70-0.90",
+       "Ni": "1.65-2.00",
+       "Mo": "0.20-0.30"
+      },
+      "verbatim": "4340 | 0.38-0.43 | 0.60-0.80 | Ni 1.65-2.00 | Cr 0.70-0.90 | Mo 0.20-0.30 | Table I, Alloy Steels. P 0.035 max, S 0.040 max and Si 0.20-0.35 are from Notes 1 and 2 (open hearth or basic oxygen steel).",
+      "note": "Si, P and S are from the general notes of the table."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "4340 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 57,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "4340 annealed | 57% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "8620",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 8620",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard alloy steel, composition ranges and limits",
+      "elements": {
+       "C": "0.18-0.23",
+       "Mn": "0.70-0.90",
+       "Si": "0.15-0.35",
+       "P": "max 0.035",
+       "S": "max 0.040",
+       "Cr": "0.40-0.60",
+       "Ni": "0.40-0.70",
+       "Mo": "0.15-0.25"
+      },
+      "verbatim": "8620 .18/.23 .70/.90 .40/.60 .40/.70 .15/.25 | Standard Alloy Steels, pp. 6 to 7. Columns: SAE No. | C | Mn | Cr | Ni | Mo | Other. Table note: \"Unless specified: Si = .15/.35, P = .035 max (SAE J1268), S = .040 max, Ni = .25 max, Cr = .20 max, Mo = .06 max\"",
+      "note": "Si, P and S are from the note under the table, not from the row."
+     }
+    },
+    {
+     "source": "NI_447",
+     "printed_as": "AISI 8620",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE alloy steel, ladle chemical ranges (1971)",
+      "elements": {
+       "C": "0.18-0.23",
+       "Mn": "0.70-0.90",
+       "Si": "0.20-0.35",
+       "P": "max 0.035",
+       "S": "max 0.040",
+       "Cr": "0.40-0.60",
+       "Ni": "0.40-0.70",
+       "Mo": "0.15-0.25"
+      },
+      "verbatim": "8620 | 0.18-0.23 | 0.70-0.90 | Ni 0.40-0.70 | Cr 0.40-0.60 | Mo 0.15-0.25 | Table I, Alloy Steels. P 0.035 max, S 0.040 max and Si 0.20-0.35 are from Notes 1 and 2 (open hearth or basic oxygen steel).",
+      "note": "Si, P and S are from the general notes of the table. The grade is printed as \"86--20\"."
+     }
+    },
+    {
+     "source": "MSCI_MACH",
+     "printed_as": "8620",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 66,
+       "unit": "%",
+       "cond": "Cold drawn",
+       "condition": "Cold drawn bar",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "8620 | 66 | 77 | Columns: AISI Grade | Cold Drawn | Leaded Cold Drawn | Annealed Cold Drawn | Leaded Annealed Cold Drawn. \"All machinability ratings are based on a value of 100% for AISI 1212 Cold Drawn Bars.\"",
+       "note": "The second figure, 77, is for leaded 8620."
+      }
+     ]
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "8620",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 66,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "8620 | 66% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "52100",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "TIMKEN_PDM",
+     "printed_as": "SAE 52100",
+     "values": {},
+     "composition": {
+      "basis": "SAE standard alloy steel, composition ranges and limits",
+      "elements": {
+       "C": "0.93-1.05",
+       "Mn": "0.25-0.45",
+       "Si": "0.15-0.35",
+       "P": "max 0.025",
+       "Cr": "1.35-1.60"
+      },
+      "verbatim": "52100 .93/1.05 .25/.45 1.35/1.60 ... ... P = .025 | Standard Alloy Steels, pp. 6 to 7. Columns: SAE No. | C | Mn | Cr | Ni | Mo | Other. Table note: \"Unless specified: Si = .15/.35, P = .035 max (SAE J1268), S = .040 max, Ni = .25 max, Cr = .20 max, Mo = .06 max\"",
+      "note": "The same table has a row E52100 with C .98/1.10 and Cr 1.30/1.60. The sulphur limit on the 52100 row did not read the same twice and is left out. Si is from the note under the table."
+     }
+    },
+    {
+     "source": "NI_447",
+     "printed_as": "AISI E52100",
+     "values": {},
+     "composition": {
+      "basis": "AISI / SAE alloy steel, ladle chemical ranges (1971)",
+      "elements": {
+       "C": "0.98-1.10",
+       "Mn": "0.25-0.45",
+       "Si": "0.20-0.35",
+       "P": "max 0.025",
+       "S": "max 0.025",
+       "Cr": "1.30-1.60"
+      },
+      "verbatim": "E52100 | 0.98-1.10 | 0.25-0.45 | Cr 1.30-1.60 | Table I, Alloy Steels. P 0.025 max and S 0.025 max are from the notes for basic electric furnace steel (E grades); Si 0.20-0.35.",
+      "note": "Printed as E52100 (electric furnace steel), the older form of the grade."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "52100 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 40,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "52100 annealed | 40% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "301",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "301 / UNS S30100",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.15",
+       "Mn": "max 2",
+       "Cr": "16.0-18.0",
+       "Ni": "6.0-8.0",
+       "N": "max 0.1"
+      },
+      "verbatim": "301 | S30100 | 0.15 | 16.0-18.0 | 6.0-8.0 | - | 0.1 | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "301 / UNS S30100",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.15",
+       "Mn": "max 2.00",
+       "Si": "max 1.00",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "16.0-18.0",
+       "Ni": "6.0-8.0",
+       "N": "max 0.10"
+      },
+      "verbatim": "301 S30100 0.15 2.00 1.00 0.045 0.030 16.0-18.0 6.0-8.0 0.10 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read.",
+      "note": "The Mo cell of this row could not be placed with certainty and is left out."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "303",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "303 / UNS S30300",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.15",
+       "Mn": "max 2",
+       "Cr": "17.0-19.0",
+       "Ni": "8.0-10.0",
+       "Mo": "max 0.60"
+      },
+      "verbatim": "303 | S30300 | 0.15 | 17.0-19.0 | 8.0-10.0 | 0.60 | - | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "303 / UNS S30300",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.15",
+       "Mn": "max 2.00",
+       "Si": "max 1.00",
+       "P": "max 0.2",
+       "S": "min 0.15",
+       "Cr": "17.0-19.0",
+       "Ni": "8.0-10.0"
+      },
+      "verbatim": "303 S30300 0.15 2.00 1.00 0.2 0.15min 17.0- 19.0 8.0- 10.0 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read.",
+      "note": "The Mo and N cells of this row could not be placed with certainty and are left out."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "303 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 78,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "303 annealed | 78% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "304",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "304 / UNS S30400",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2",
+       "Cr": "18.0-20.0",
+       "Ni": "8.0-10.5",
+       "N": "max 0.10"
+      },
+      "verbatim": "304 | S30400 | 0.08 | 18.0-20.0 | 8.0-10.5 | - | 0.10 | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "304 / UNS S30400",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.07",
+       "Mn": "max 2.00",
+       "Si": "max 0.75",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "17.5-19.5",
+       "Ni": "8.0-10.5",
+       "N": "max 0.10"
+      },
+      "verbatim": "304 S30400 0.07 2.00 0.75 0.045 0.030 17.5- 19.5 - 8.0- 10.5 0.10 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "304 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 45,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "304 annealed | 45% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "304L",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "304L / UNS S30403",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.03",
+       "Mn": "max 2",
+       "Cr": "18.0-20.0",
+       "Ni": "8.0-12.0",
+       "N": "max 0.1"
+      },
+      "verbatim": "304L | S30403 | 0.03 | 18.0 - 20.0 | 8.0-12.0 | - | 0.1 | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "304L / UNS S30403",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.030",
+       "Mn": "max 2.00",
+       "Si": "max 0.75",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "17.5-19.5",
+       "Ni": "8.0-10.5",
+       "N": "max 0.10"
+      },
+      "verbatim": "304L S30403 0.030 2.00 0.75 0.045 0.030 17.5- 19.5 - 8.0- 10.5 0.10 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "310S",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "310S / UNS S31008",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2",
+       "Cr": "24.0-26.0",
+       "Ni": "19.0-22.0"
+      },
+      "verbatim": "310S | S31008 | 0.08 | 24.0-26.0 | 19.0-22.0 | - | - | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "310S / UNS S31008",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2.00",
+       "Si": "max 1.50",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "24.0-26.0",
+       "Ni": "19.0-22.0"
+      },
+      "verbatim": "310S S31008 0.08 2.00 1.50 0.045 0.030 24.0-26.0 19.0-22.0 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read.",
+      "note": "The Mo and N cells of this row could not be placed with certainty and are left out."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "316",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "316 / UNS S31600",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2",
+       "Cr": "16.0-18.0",
+       "Ni": "10.0-14.0",
+       "Mo": "2.0-3.0",
+       "N": "max 0.10"
+      },
+      "verbatim": "316 | S31600 | 0.08 | 16.0-18.0 | 10.0-14.0 | 2.0-3.0 | 0.10 | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "316 / UNS S31600",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2.00",
+       "Si": "max 0.75",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "16.0-18.0",
+       "Mo": "2.00-3.00",
+       "Ni": "10.0-14.0",
+       "N": "max 0.10"
+      },
+      "verbatim": "316 S31600 0.08 2.00 0.75 0.045 0.030 16.0-18.0 2.00-3.00 10.0-14.0 0.10 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "316 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 45,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "316 annealed | 45% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "316L",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "316L / UNS S31603",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.03",
+       "Mn": "max 2",
+       "Cr": "16.0-18.0",
+       "Ni": "10.0-14.0",
+       "Mo": "2.00-3.00",
+       "N": "max 0.1"
+      },
+      "verbatim": "316L | S31603 | 0.03 | 16.0-18.0 | 10.0-14.0 | 2.00-3.00 | 0.1 | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "316L / UNS S31603",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.030",
+       "Mn": "max 2.00",
+       "Si": "max 0.75",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "16.0-18.0",
+       "Mo": "2.00-3.00",
+       "Ni": "10.0-14.0",
+       "N": "max 0.10"
+      },
+      "verbatim": "316L S31603 0.030 2.00 0.75 0.045 0.030 16.0-18.0 2.00-3.00 10.0-14.0 0.10 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "317L",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "317L / UNS S31703",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.03",
+       "Mn": "max 2",
+       "Cr": "18.0-20.0",
+       "Ni": "11.0-15.0",
+       "Mo": "3.0-4.0",
+       "N": "max 0.1"
+      },
+      "verbatim": "317L | S31703 | 0.03 | 18.0-20.0 | 11.0-15.0 | 3.0-4.0 | 0.1 | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "317L / UNS S31703",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.030",
+       "Mn": "max 2.00",
+       "Si": "max 0.75",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "18.0-20.0",
+       "Mo": "3.0-4.0",
+       "Ni": "11.0-15.0",
+       "N": "max 0.10"
+      },
+      "verbatim": "317L S31703 0.030 2.00 0.75 0.045 0.030 18.0-20.0 3.0-4.0 11.0-15.0 0.10 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "321",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "321 / UNS S32100",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2",
+       "Cr": "17.0-19.0",
+       "Ni": "9.0-12.0",
+       "N": "max 0.1",
+       "Ti": "text 5x(C+N) min"
+      },
+      "verbatim": "321 | S32100 | 0.08 | 17.0-19.0 | 9.0-12.0 | - | 0.1 | 2 | - | Ti 5x(C+N) | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "321 / UNS S32100",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2.00",
+       "Si": "max 0.75",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "17.0-19.0",
+       "Ni": "9.0-12.0",
+       "N": "max 0.10",
+       "Ti": "text 5x(C+N) min, 0.70 max"
+      },
+      "verbatim": "321 S32100 0.08 2.00 0.75 0.045 0.030 17.0-19.0 9.0-12.0 0.10 5x(C+N)min, 0.70 max Ti | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read.",
+      "note": "The Mo cell of this row could not be placed with certainty and is left out."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "321 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 36,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "321 annealed | 36% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "347",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "347 / UNS S34700",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2",
+       "Cr": "17.0-19.0",
+       "Ni": "9.0-13.0",
+       "Nb": "text 10xC min, 1.00 max"
+      },
+      "verbatim": "347 | S34700 | 0.08 | 17.0-19.0 | 9.0-13.0 | - | - | 2 | - | Cb 10xC to 1.00 | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "347 / UNS S34700",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2.00",
+       "Si": "max 0.75",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "17.0-19.0",
+       "Ni": "9.0-13.0",
+       "Nb": "text 10x(C+N) min, 1.0 max"
+      },
+      "verbatim": "347 S34700 0.08 2.00 0.75 0.045 0.030 17.0-19.0 9.0-13.0 10x(C+N)min, 1.0 max Nb | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read.",
+      "note": "The Mo and N cells of this row could not be placed with certainty and are left out."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "347 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 36,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "347 annealed | 36% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "904L",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "904L / UNS N08904",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.02",
+       "Mn": "max 2",
+       "Cr": "19.0-23.0",
+       "Ni": "23.0-28.0",
+       "Mo": "4.00-5.00",
+       "N": "max 0.1",
+       "Cu": "1.00-2.00"
+      },
+      "verbatim": "904L | N08904 | 0.02 | 19.0-23.0 | 23.0-28.0 | 4.00-5.00 | 0.1 | 2 | 1.00-2.00 | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "904L / UNS N08904",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.020",
+       "Mn": "max 2.00",
+       "Si": "max 1.00",
+       "P": "max 0.045",
+       "S": "max 0.035",
+       "Cr": "19.0-23.0",
+       "Mo": "4.00-5.00",
+       "Ni": "23.0-28.0",
+       "N": "max 0.10",
+       "Cu": "1.00-2.00"
+      },
+      "verbatim": "904L N08904 0.020 2.00 1.00 0.045 0.035 19.0-23.0 4.00-5.00 23.0-28.0 0.10 1.00-2.00 Cu | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "405",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "405 / UNS S40500",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 1",
+       "Cr": "11.5-14.5",
+       "Ni": "max 0.6",
+       "Al": "0.10-0.30"
+      },
+      "verbatim": "405 | S40500 | 0.08 | 11.5-14.5 | 0.6 | - | - | 1 | - | Al 0.10-0.30 | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "409",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "409 / UNS S40910",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.03",
+       "Mn": "max 1",
+       "Cr": "10.5-11.7",
+       "Ni": "max 0.5",
+       "N": "max 0.03",
+       "Ti": "text 6x(C+N) min, 0.50 max",
+       "Nb": "max 0.17"
+      },
+      "verbatim": "409 | S40910 | 0.03 | 10.5-11.7 | 0.5 | - | 0.03 | 1 | - | Ti 6x(C+N) to .50; Cb 0.17 | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "409 / UNS S40910",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.030",
+       "Mn": "max 1.00",
+       "Si": "max 1.00",
+       "P": "max 0.040",
+       "S": "max 0.020",
+       "Cr": "10.5-11.7",
+       "Ni": "max 0.50",
+       "N": "max 0.03",
+       "Ti": "text 6x(C+N) min, 0.50 max"
+      },
+      "verbatim": "409 S40910 0.030 1.00 1.00 0.040 0.020 10.5-11.7 - 0.50 0.03 6x(C+N)min, 0.50 max Ti | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read.",
+      "note": "Table footnote: grade 409 is now largely replaced by S40910, S40920 and S40930."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "410",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "410 / UNS S41000",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "0.08-0.15",
+       "Mn": "max 1",
+       "Cr": "11.5-13.5"
+      },
+      "verbatim": "410 | S41000 | 0.08-0.15 | 11.5-13.5 | - | - | - | 1 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "410 / UNS S41000",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "0.08-0.15",
+       "Mn": "max 1.00",
+       "Si": "max 1.00",
+       "P": "max 0.040",
+       "S": "max 0.030",
+       "Cr": "11.5-13.5",
+       "Ni": "max 0.75"
+      },
+      "verbatim": "410 S41000 0.08-0.15 1.00 1.00 0.040 0.030 11.5-13.5 - 0.75 - | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "410 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 54,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "410 annealed | 54% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "416",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "416 / UNS S41600",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.15",
+       "Mn": "max 1.25",
+       "Cr": "12.0-14.0",
+       "Mo": "max 0.60"
+      },
+      "verbatim": "416 | S41600 | 0.15 | 12.0-14.0 | - | 0.60 | - | 1.25 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "416 / UNS S41600",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.15",
+       "Mn": "max 1.25",
+       "Si": "max 1.00",
+       "P": "max 0.060",
+       "S": "min 0.15",
+       "Cr": "12.0-14.0"
+      },
+      "verbatim": "416 S41600 0.15 1.25 1.00 0.060 0.15 min 12.0-14.0 - - - | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "416 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 110,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "416 annealed | 110% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "420",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "420 / UNS S42000",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "min 0.15",
+       "Mn": "max 1",
+       "Cr": "12.0-14.0",
+       "Mo": "max 0.5"
+      },
+      "verbatim": "420 | S42000 | 0.15 min. | 12.0-14.0 | - | 0.5 | - | 1 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "420 / UNS S42000",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "min 0.15",
+       "Mn": "max 1.00",
+       "Si": "max 1.00",
+       "P": "max 0.040",
+       "S": "max 0.030",
+       "Cr": "12.0-14.0"
+      },
+      "verbatim": "420 S42000 0.15 min 1.00 1.00 0.040 0.030 12.0-14.0 - - - | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "420 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 45,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "420 annealed | 45% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "430",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "430 / UNS S43000",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.12",
+       "Mn": "max 1",
+       "Cr": "16.0-18.0",
+       "Ni": "max 0.75"
+      },
+      "verbatim": "430 | S43000 | 0.12 | 16.0-18.0 | 0.75 | - | - | 1 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "430 / UNS S43000",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.12",
+       "Mn": "max 1.00",
+       "Si": "max 1.00",
+       "P": "max 0.040",
+       "S": "max 0.030",
+       "Cr": "16.0-18.0",
+       "Ni": "max 0.75"
+      },
+      "verbatim": "430 S43000 0.12 1.00 1.00 0.040 0.030 16.0-18.0 - 0.75 - | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "430 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 54,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "430 annealed | 54% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "440C",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "440C / UNS S44004",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "0.95-1.20",
+       "Mn": "max 1",
+       "Cr": "16.0-18.0",
+       "Mo": "max 0.75"
+      },
+      "verbatim": "440C | S44004 | 0.95-1.20 | 16.0-18.0 | - | 0.75 | - | 1 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "440C / UNS S44004",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "0.95-1.20",
+       "Mn": "max 1.00",
+       "Si": "max 1.00",
+       "P": "max 0.040",
+       "S": "max 0.030",
+       "Cr": "16.0-18.0",
+       "Mo": "max 0.75"
+      },
+      "verbatim": "440C S44004 0.95-1.20 1.00 1.00 0.040 0.030 16.0-18.0 0.75 - - | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "17-4PH",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "630 / UNS S17400",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.07",
+       "Mn": "max 1",
+       "Cr": "15.0-17.5",
+       "Ni": "3.0-5.0",
+       "Cu": "3.0-5.0",
+       "Nb": "text Nb+Ta 0.15-0.45"
+      },
+      "verbatim": "630 | S17400 | 0.07 | 15.0-17.5 | 3.0-5.0 | - | - | 1 | 3.0-5.0 | Cb+Ta 0.15-0.45 | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed.",
+      "note": "Printed as 630."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "630 / UNS S17400",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.07",
+       "Mn": "max 1.00",
+       "Si": "max 1.00",
+       "P": "max 0.040",
+       "S": "max 0.030",
+       "Cr": "15.0-17.5",
+       "Ni": "3.00-5.00",
+       "Cu": "3.00-5.00",
+       "Nb": "text Nb+Ta 0.15-0.45"
+      },
+      "verbatim": "630 S17400 0.07 1.00 1.00 0.040 0.030 15.0-17.5 - 3.00-5.00 - 3.00-5.00 Cu, 0.15-0.45 Nb+Ta | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read.",
+      "note": "Printed as 630."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "17-4PH",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 48,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "17-4PH | 48% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "2205",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "2205 / UNS S32205",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.03",
+       "Mn": "max 2",
+       "Cr": "22.0-23.0",
+       "Ni": "4.5-6.5",
+       "Mo": "3.0-3.5",
+       "N": "0.14-0.20"
+      },
+      "verbatim": "2205 | S32205 | 0.03 | 22.0-23.0 | 4.5-6.5 | 3.0-3.5 | 0.14-0.20 | 2 | - | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed.",
+      "note": "The page lists 2205 twice: this row (S32205) and S31803 with Cr 21.0-23.0, Mo 2.5-3.5 and N 0.08-0.20."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "2205 / UNS S32205",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.030",
+       "Mn": "max 2.00",
+       "Si": "max 1.00",
+       "P": "max 0.030",
+       "S": "max 0.020",
+       "Cr": "22.0-23.0",
+       "Mo": "3.0-3.5",
+       "Ni": "4.5-6.5",
+       "N": "0.14-0.20"
+      },
+      "verbatim": "2205 S32205 0.030 2.00 1.00 0.030 0.020 22.0-23.0 3.0-3.5 4.5-6.5 0.14-0.20 | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "2304",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "SSINA_COMP",
+     "printed_as": "2304 / UNS S32304",
+     "values": {},
+     "composition": {
+      "basis": "ASTM specification limits (plate, sheet, strip, bar)",
+      "elements": {
+       "C": "max 0.03",
+       "Mn": "max 2.5",
+       "Cr": "21.5-24.5",
+       "Ni": "3.0-5.5",
+       "Mo": "0.05-0.60",
+       "N": "0.05-0.20",
+       "Cu": "0.05-0.60"
+      },
+      "verbatim": "2304 | S32304 | 0.03 | 21.5-24.5 | 3.0-5.5 | 0.05-0.60 | 0.05-0.20 | 2.5 | 0.05-0.60 | - | Columns: Common Name | UNS No. | C | Cr | Ni | Mo | N | Mn | Cu | Other. Maximums unless a range or minimum is given; P, S and Si not listed."
+     }
+    },
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "2304 / UNS S32304",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.030",
+       "Mn": "max 2.50",
+       "Si": "max 1.00",
+       "P": "max 0.040",
+       "S": "max 0.030",
+       "Cr": "21.5-24.5",
+       "Mo": "0.05-0.60",
+       "Ni": "3.0-5.5",
+       "N": "0.05-0.20",
+       "Cu": "0.05-0.60"
+      },
+      "verbatim": "2304 S32304 0.030 2.50 1.00 0.040 0.030 21.5-24.5 0.05-0.60 3.0-5.5 0.05-0.20 0.05-0.60 Cu | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "316Ti",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "316Ti / UNS S31635",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.08",
+       "Mn": "max 2.00",
+       "Si": "max 0.75",
+       "P": "max 0.045",
+       "S": "max 0.030",
+       "Cr": "16.0-18.0",
+       "Mo": "2.00-3.00",
+       "Ni": "10.0-14.0",
+       "N": "max 0.10",
+       "Ti": "text 5x(C+N) min, 0.70 max"
+      },
+      "verbatim": "316Ti S31635 0.08 2.00 0.75 0.045 0.030 16.0-18.0 2.00-3.00 10.0-14.0 0.10 5x(C+N)min, 0.70 max Ti | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    }
+   ]
+  },
+  {
+   "grade": "431",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "ATLAS_S9_COMP",
+     "printed_as": "431 / UNS S43100",
+     "values": {},
+     "composition": {
+      "basis": "ASTM A240M limits (flat rolled), or the ASTM bar or wire specification",
+      "elements": {
+       "C": "max 0.20",
+       "Mn": "max 1.00",
+       "Si": "max 1.00",
+       "P": "max 0.040",
+       "S": "max 0.030",
+       "Cr": "15.0-17.0",
+       "Ni": "1.25-2.50"
+      },
+      "verbatim": "431 S43100 0.20 1.00 1.00 0.040 0.030 15.0-17.0 - 1.25- 2.50 - | Columns: Grade | UNS | C | Mn | Si | P | S | Cr | Mo | Ni | N | Other. Single values are maxima; ASTM A240M. Cells in table order as read."
+     }
+    },
+    {
+     "source": "EE_MACH",
+     "printed_as": "431 annealed",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 45,
+       "unit": "%",
+       "cond": "Annealed",
+       "condition": "Annealed",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "431 annealed | 45% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "15-5PH",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "EE_MACH",
+     "printed_as": "15-5PH",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 48,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "15-5PH | 48% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "A2",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "EE_MACH",
+     "printed_as": "A-2",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 42,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "A-2 | 42% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "D2",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "EE_MACH",
+     "printed_as": "D-2",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 27,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "D-2 | 27% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "D3",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "EE_MACH",
+     "printed_as": "D-3",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 27,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "D-3 | 27% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "M2",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "EE_MACH",
+     "printed_as": "M-2",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 39,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "M-2 | 39% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "O1",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "EE_MACH",
+     "printed_as": "O-1",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 42,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "O-1 | 42% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "grade": "O2",
+   "family": "Steel",
+   "printed": [
+    {
+     "source": "EE_MACH",
+     "printed_as": "O-2",
+     "values": {},
+     "properties": [
+      {
+       "prop": "machinability",
+       "value": 42,
+       "unit": "%",
+       "cond": "Not stated",
+       "condition": "The chart gives no condition for this row",
+       "basis": "unstated",
+       "ref": "AISI 1212 = 100 %",
+       "verbatim": "O-2 | 42% | Column: Index Percent Relative to 1212 Carbon Steel. \"Carbon steel 1212 is the universal reference (1212 = 100%)\"."
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
