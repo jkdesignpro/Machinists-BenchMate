@@ -7,6 +7,28 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 ## [0.8.0] - 2026-11-13
 Work on the feedback after using 0.7.0.
 
+### Added (second feedback round, 2026-11-13)
+- **Coated threads** (Threads > Coated threads) now starts from the thread itself: pick Unified or ISO metric, type the size and pitch, the class (1A to 3B, or a grade and position such as 6g or 6H) and the coating thickness, and choose a plan. *Allowance* (external threads with an allowance) shows the allowance, the thickest coating it takes (allowance / 4 on a 60 degree thread), the limits before and after coating and the check against basic size. *Meet the limits after coating* gives the before-coating limits of pitch, major and minor diameter for external and internal threads. Checked against Thread Check's 1/2-20 example. The old typed-in mode is kept.
+- **Thread data**: the flats of the basic profile (P/8 at the major, P/4 at the minor diameter), the lead (helix) angle at the pitch diameter, and the best, largest and smallest measuring wire (0.57735 P, 1.010363 P, 0.505182 P; Thread Check prints the largest as 1.010362 P).
+- **Micro drills #98 to #107** in the drill chart: #98 to #104 from four trade charts, #105 to #107 from two. They are beyond ASME B94.11M, which stops at #97; the tool says so.
+- **Grinding** (Wheel and work speed): aggressiveness, 10^6 (vw / vs) sqrt(ae / de), with where it sits against the printed typical ranges (3 to 60, CTE; 5 to 200, Procedia CIRP), and the grit penetration depth (maximum undeformed chip thickness) when you enter the cutting point density and chip ratio.
+- **Magnesium** in Material equivalents: AZ31B, AZ80A and ZK60A with ASTM, UNS, W.-Nr., ISO and other specifications, composition limits and properties as Aircraft Materials, Smiths High Performance and MakeItFrom print them.
+- **Coatings**: AlCrSiN and polished (lapped) flutes added; colours taken out of the names, with a note that colour is no guide (makers dye coatings); each coating's tips now say what it is recommended for and what to avoid, from the makers, with disagreements side by side.
+- **Starting speeds for cermet, ceramic, CBN and PCD** by work group, as the makers print them (tooling guide and the advisors' tool material card), with sourced tips (ceramics run dry, CBN mostly for finishing and needs rigidity).
+- **Guide sections**: machining magnesium (chips, coolant, fire), high speed steel hardening and tempering with M2 from two makers side by side and cold treatment, metallurgy terms, how metals fail, micromachining, 3D tool compensation, threading insert shims and lead angle, straight pipe threads (NPSC, NPSL, NPSM, NPSF).
+- **Calculator basic view**: a Basic / Full switch; Basic shows the digits and the four functions on bigger keys only.
+- **Dashboard widgets**: size buttons S, M, W, L (new, two thirds) and F replace the cycling button, and a corner handle resizes by dragging: the width snaps to the nearest size and the height is free; double-click the handle to fit the height again.
+
+### Changed (second feedback round)
+- The side panel: clicking the open workspace (Milling, Turning...) closes it; clicking again opens it.
+- The assistant and the thread callout scan are parked for later on the roadmap (docs/feature-ideas.md).
+
+### Fixed (second feedback round)
+- Thread data and the other thread pickers: the size list was empty on opening and did not follow a change of thread type.
+
+### Not done, searched for
+- UNR external minor diameter limits and involute spline fit class tolerances (ANSI B92.1, ISO 4156): no public source prints them outside the standards themselves; the pages read are listed in docs/sources.md.
+
 ### Added (tool materials and coatings in the advisors)
 - Milling and turning advisors: the tool material can now also be cermet, ceramic, CBN or PCD. No speed table for these is built in, so the advisor asks for the maker's cutting speed for the grade (and, for milling, its chip load) and then checks the cut as before.
 - Milling, drilling and turning advisors: a new **Coating** box with 15 choices, the common ones first (uncoated, TiN, TiCN, TiAlN, AlTiN, AlCrN, ZrN, DLC, CVD diamond) and the rest under "More" (CVD multilayer on inserts, TiSiN and AlTiSiN nanocomposites, TiB2, CrN, MoS2, steam oxide). A find button beside the box narrows the list as you type.

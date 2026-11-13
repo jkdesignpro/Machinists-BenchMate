@@ -256,14 +256,14 @@ Store list is the fuller of the two store lists.
 | U41 | UNR threads | partial | `unjunr` | UNR rule (root radius at least 0.108 P, external only) is stated; the UNR minor diameter limits are not computed |
 | U42 | UNM (miniature) threads | done | `unm` |  |
 | U43 | Metric M profile threads | done | `threaddata` | Classes other than 6g/6H are computed only |
-| U44 | Special UN and metric sizes with anodize and plating allowance | partial | `coating` | Pitch diameter change and before-coating limits for any thread angle; no tables of special coated sizes |
+| U44 | Special UN and metric sizes with anodize and plating allowance | partial | `coating` | 0.8.0: before- and after-coating limits for any Unified or ISO metric size and class, allowance plan and meet-the-limits plan; no tables of special coated sizes |
 | U45 | ACME threads | done | `acme` | No 5G, 5C or 6C classes and no multi-start allowance |
 | U46 | Stub ACME threads | done | `acme` | No modified forms 1 and 2 |
 | U47 | NPT threads | done | `pipethreads` | NPT basic dimensions only; no tolerances |
 | U48 | BSPP threads | done | `pipethreads` |  |
 | U49 | STI (helical insert) threads | done | `sti` |  |
 | U50 | Whitworth BSW and BSF | done | `whitworth` | Basic dimensions only; no tolerances |
-| U51 | Thread data and over-wire measurement | done | `wires` | Lead angle neglected |
+| U51 | Thread data and over-wire measurement | done | `wires`, `threaddata` | Lead angle neglected in the measurement; 0.8.0: lead angle, flats and best, largest and smallest wire on Thread data |
 | U52 | Thread size tolerance data (menu item) | done | `threaddata` |  |
 | U53 | G76 lathe thread program generator | done | `cycthread` |  |
 | U54 | Thread programming (menu item) | done | `cycthread` |  |
@@ -433,7 +433,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH56 | Heat treatment: definitions, hardness and hardenability | done | `heattreat`, `matguide` | Terms in our words (7 of 12 used by two publishers); 0.7.0: hardness against hardenability, the Jominy end-quench test, what each depends on and the ideal critical diameter in the materials guide |
 | MH57 | Hardening, quenching, tempering temperatures, annealing, normalising | partial | `heattreat`, `tempercolours` | 12 steels side by side (2 confirmed, 16 differ); no tempering-hardness tables (no two sources agree) |
 | MH58 | Case hardening: carburising, nitriding, flame and induction hardening | done | `heattreat`, `matguide` | Terms and 4340 nitriding in the reference; 0.7.0: carburising, carbonitriding, nitriding, ferritic nitrocarburising, induction and flame hardening in the materials guide, with a table of temperatures and case depths attributed cell by cell. No temperature for induction or flame hardening in the sources read |
-| MH59 | Heat treating high-speed steels; subzero treatment | missing | | |
+| MH59 | Heat treating high-speed steels; subzero treatment | done | `matguide` | 0.8.0: M2 from two makers side by side, why double tempering, cold and cryogenic treatment |
 | MH60 | Hardness tests: Brinell, Rockwell, Vickers, Knoop, Shore, Mohs, durometer | done | `hardness`, `matguide` | 0.6.0: how Brinell, Rockwell, Vickers, Knoop, Leeb, Shore and Mohs work (indenter, load, what is measured); conversion in `hardness` |
 | MH61 | Comparison of hardness scales | done | `hardness` | Steel, approximate |
 | MH62 | Nonferrous: copper alloys | done | `materials`, `matguide` | 12 copper alloys; 0.6.0: temper classes, H00 to H10, annealed, grain size and as-manufactured tempers |
@@ -539,7 +539,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH147 | Estimating machining power: power constants, feed and wear factors | partial | `mrr`, `cutopt` | kc entered by user; no constants |
 | MH148 | Drilling thrust, torque and power | done | `holeforce` | Drilling torque, thrust and power, tapping torque |
 | MH149 | Boring: cutting force and boring bar deflection | done | `boringbar` | See U9 (`claude/calcs-3`) |
-| MH150 | Micromachining: tools, stiffness, offsets, fluids, micromilling/drilling/turning | missing | | |
+| MH150 | Micromachining: tools, stiffness, offsets, fluids, micromilling/drilling/turning | partial | `cutguide`, `drills` | 0.8.0: runout, minimum chip thickness, speed, forces, balance, coolant, measuring; micro drills #98 to #107 |
 | MH151 | Tool wear and tool life: ECT, Taylor, G and H curves | partial | `toollife` | Taylor only; no ECT or extended Taylor |
 | MH152 | Minimum cost, production rate, cost function, global optimum | partial | `toollife` | Cost per part and economic life; no max-production or feed/speed optimisation |
 | MH153 | Machine settings and calculation of costs (all operations incl. grinding) | partial | `toollife` | Single tool only |
@@ -548,7 +548,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH156 | Band saw blade selection, speeds, feeds, break-in | done | `shoptools`, `sawtpi`, `bandsaw` | Pitch rule, blade types, break-in, fault table and cut time; 0.7.0: band speeds by material from three pages side by side, chips |
 | MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | done | `shoptools`, `coolconc`, `coolmix` | Neat oil, emulsion, semi-synthetic and synthetic compared; which for slow heavy work and which for fast cutting; by material |
 | MH158 | Metalworking fluids: classes, maintenance, exposure | done | `shoptools`, `coolconc`, `coolmix` | Classes, concentration and mixing, care of mixed fluids; 0.7.0: what to check on a sump and when, when to change the fluid, the mist limit NIOSH recommends and how to keep mist and skin contact down |
-| MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | missing | | |
+| MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | partial | `matguide`, advisors | 0.8.0: machining magnesium (chips, coolant, fire); speeds for the others are in the advisors |
 | MH160 | Machining non-metals (hard rubber, laminates) | done | `plastics`, `matguide` | Machining plastics; 0.7.0: machining laminates in the materials guide (tool wear and material, dust, coolant from three sources side by side, heat, undersize holes, splitting, threads) and hard rubber from one old source, marked |
 | MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | partial | `abrasguide` | 0.6.0: grinding ratio with its range and an example, what lowers wheel wear, wheel speeds, spark-out (mostly one source each, marked); no optimum data, no forces |
 | MH162 | Grinding data selection and grindability groups | missing | | |
@@ -641,7 +641,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH234 | Buttress threads (British and 7/45 inch) | partial | `buttress` | 7/45 inch basic dimensions only; no tolerances, no British form (`claude/threads-3`) |
 | MH235 | Whitworth BSW and BSF: form, tolerances, basic dimensions | partial | `whitworth` | No tolerances |
 | MH236 | Taper pipe threads (NPT): dimensions, engagement, tolerances | partial | `pipethreads` | No tolerances |
-| MH237 | Straight pipe threads (NPSM, NPSL etc.) | missing | | |
+| MH237 | Straight pipe threads (NPSM, NPSL etc.) | partial | `threadguide` | 0.8.0: what each is for and how they seal; no dimensions |
 | MH238 | Dryseal pipe threads (NPTF) | partial | `pipethreads` | Notes only (form, sealing, related Dryseal types); no truncation limits (`claude/threads-3`) |
 | MH239 | British pipe threads (BSP) | done | `pipethreads` | |
 | MH240 | Hose coupling and fire hose threads | missing | | Low priority |
@@ -659,7 +659,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH252 | Removing a broken tap | done | `toolguide` | 0.7.0: extractor, breaking up, EDM, drilling out, chemical, welding and prevention, each with two or three publishers |
 | MH253 | Tap drills and power for pipe taps | missing | | |
 | MH254 | High-speed CNC tapping; combined drilling and tapping | missing | | |
-| MH255 | Relief angles for thread cutting tools | missing | | |
+| MH255 | Relief angles for thread cutting tools | partial | `threadguide`, `threaddata` | 0.8.0: lead angle and insert shims; no relief angle table |
 | MH256 | Lathe change gears (inch, metric, fractional, quick-change gearbox) | partial | `changegears` | Simple and compound trains from your gears for TPI, mm, module and DP; no quick-change gearbox tables (`claude/measure-maths`) |
 | MH257 | Relieving helical-fluted hobs | out of scope? | | |
 | MH258 | Thread rolling: machines, blank diameter, roll diameter, speeds | partial | `rollblank` | 0.5.0: blank diameter by a maker's rule with the handbook's amounts beside it, correction after a trial; no machines, roll diameters or speeds |
@@ -769,7 +769,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED36 | 6.10 Buckling of struts | done | `column` | Euler and Johnson (`claude/mechanics`) |
 | ED37 | 6.11 Flat circular plates | out of scope? | | |
 | ED38 | 6.12 Stress concentration factors | partial | `stressconc` | Holes in plates only (`claude/mechanics`) |
-| ED39 | 7.1 How materials fail | missing | | |
+| ED39 | 7.1 How materials fail | done | `matguide` | 0.8.0: ductile, brittle, fatigue and reading the fracture |
 | ED40 | 7.2 LEFM method | out of scope? | | |
 | ED41 | 7.3 Multi-axis stress states | out of scope? | | |
 | ED42 | 7.4 Fatigue | partial | `fatigue` | Infinite life (Goodman, Soderberg, Gerber, Marin); no finite-life S-N (`claude/mechanics`) |
@@ -824,7 +824,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED91 | 18.2 Galvanizing | out of scope? | | |
 | ED92 | 18.3 Chrome plating | done | `procguide` | 0.6.0: decorative and hard chrome, thickness and hardness from two sources (they differ, both shown), grinding after plating and edge build-up (one source, marked); thread allowance in `coating` |
 | ED93 | 18.4 Rubber linings | out of scope? | | |
-| ED94 | 19 Metallurgical terms | missing | | Glossary |
+| ED94 | 19 Metallurgical terms | done | `matguide` | 0.8.0: sixteen terms with sources |
 
 ## 4. Engineers Black Book, 2nd edition
 
@@ -971,7 +971,7 @@ One row per learning objective.
 | CN52 | L8 Constant surface speed | done | `cncguide`, `partofftime` | 0.6.0: G96 and G97, why the rpm climbs, the speed limit word by control (four sources), when fixed rpm is better |
 | CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | done | `latheguide`, `cycg71`, `cycgroove`, `cycthread`, `cyctaper` | Face, rough, finish, groove, thread, drill and cut off in order with the Haas cycles; parting off in its own section |
 | CN54 | L8 Live tools | done | `latheguide`, `machines` | What live tools are, axial and radial holders, C axis, polar interpolation, Y axis, feed per minute, limits |
-| CN55 | L9 3D tool compensation | missing | | |
+| CN55 | L9 3D tool compensation | done | `cncguide` | 0.8.0: why G41/G42 does not apply, the normal vector, Haas G141, Fanuc G41.2 |
 | CN56 | L9 3D cut tolerances | done | `toolpaths` | "3D tolerances": the chain of tolerances and what a tighter one costs (one source, marked) |
 | CN57 | L9 Geometric features in 3D toolpaths | done | `toolpaths` | Steep or shallow decides the finishing pass, with a drawing |
 | CN58 | L9 3D roughing toolpaths | done | `toolpaths` | 3D roughing in the order of work and the 3D toolpath table |
