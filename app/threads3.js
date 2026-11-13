@@ -203,18 +203,101 @@ async function renderUnjUnr(el) {
 // ------------------------------------------------------------------ coating allowance
 async function renderCoating(el) {
   const R = await loadRef(el); if (!R) return;
-  const W = state.W, A = R.power_threads, m = RMEM.coat || (RMEM.coat = { ang: 60, int: 0, e1: '', e2: '', t1: '', t2: '' });
+  const W = state.W, A = R.power_threads;
+  const m = RMEM.coat || (RMEM.coat = { src: 'thread', sys: 'unified', d: '1/2', p: '20', cls: '2', plan: 'allow', ang: 60, int: 0, e1: '', e2: '', t1: '', t2: '' });
+  if (!m.src) Object.assign(m, { src: 'thread', sys: 'unified', d: '1/2', p: '20', cls: '2', plan: 'allow' });
+  // Classes: Unified (ASME B1.1) codes as in core un_limit; ISO 965 as [grade, position code] (core iso965_limit).
+  const UN_CLS = [['1', '1A (external)'], ['2', '2A (external)'], ['3', '3A (external)'], ['11', '1B (internal)'], ['12', '2B (internal)'], ['13', '3B (internal)']];
+  const ISO_CLS = [['6.3', '6g (external)'], ['6.4', '6h (external)'], ['6.2', '6f (external)'], ['6.1', '6e (external)'], ['8.3', '8g (external)'], ['4.4', '4h (external)'], ['6.12', '6H (internal)'], ['5.12', '5H (internal)'], ['7.12', '7H (internal)'], ['6.11', '6G (internal)']];
   el.innerHTML = '<div class="grid" style="max-width:760px">' +
+    t3Sel('cm', 'Start from', t3Opt([['thread', 'A thread size and its class (worked out here)'], ['typed', 'Finished pitch diameter limits I type']], m.src)) + '</div>' +
+    '<div class="grid cth" style="max-width:760px">' +
+    t3Sel('cs', 'Thread system', t3Opt([['unified', 'Unified inch (UNC, UNF, UNEF, UN, UNS)'], ['metric', 'ISO metric']], m.sys)) +
+    '<label class="f"><span>Major diameter</span><div class="row"><input id="cd" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="' + rEsc(m.d) + '"><span class="u" id="cdu"></span></div></label>' +
+    '<label class="f"><span id="cpl">Pitch</span><div class="row"><input id="cp" type="number" step="any" inputmode="decimal" value="' + rEsc(m.p) + '"><span class="u" id="cpu"></span></div></label>' +
+    t3Sel('cc', 'Class', '') +
+    t3Sel('cpln', 'How the coating is allowed for', '') + '</div>' +
+    '<div class="grid cty" style="max-width:760px">' +
     t3Sel('ca', 'Thread form (included angle)', t3Opt([[60, '60 degrees: UN, ISO metric, NPT'], [55, '55 degrees: Whitworth, BSP'], [29, '29 degrees: ACME, Stub ACME'], [30, '30 degrees: metric trapezoidal']], m.ang)) +
     t3Sel('ci', 'Thread', t3Opt([[0, 'External (screw)'], [1, 'Internal (nut)'], [2, 'Helical insert (coated insert)']], m.int)) +
-    t3Num('ce1', 'Finished pitch diameter, max (after coating)', uLen(), m.e1) + t3Num('ce2', 'Finished pitch diameter, min (after coating)', uLen(), m.e2) +
-    t3Num('ct1', 'Coating thickness per surface, max', uLen(), m.t1) + t3Num('ct2', 'Coating thickness per surface, min', uLen(), m.t2) + '</div><div id="cres"></div>' +
-    '<div class="note"><b>Working:</b> a uniform coating of thickness t on both flanks moves each flank by t normal to itself, which changes the pitch diameter by 2 t / sin(a/2) (a = included angle): 4 t for 60 degree threads, 4.17 t at 55, 7.99 t at 29, 7.73 t at 30. Major and minor diameters change by 2 t. Before-coating limits for an external thread: pitch diameter max - 4 x max thickness and min - 4 x min thickness (60 degrees), major and minor less 2 t on the same pairing; internal threads the other way. A coated helical insert carries both threads, so the change doubles (8 t at 60 degrees). Coating thickness on threads is seldom uniform (thicker at crests and ends); this is the ideal case used by gauge makers.' +
-    '<br><b>Sources:</b> Thread Check Inc. (4:1 rule, worked 1/2-20 example reproduced in the tests), Kato Fastening Systems (4 x thickness, 8 x for inserts); ASME B1.1-2024 and ISO 965-1 treat coated threads by name; the general angle form is geometry.</div><div class="note" id="csrc"></div>';
-  const ids = ['ca', 'ci', 'ce1', 'ce2', 'ct1', 'ct2'], f = ids.map(i => $('#' + i, el));
-  function upd() {
-    const [a, it, e1, e2, t1, t2] = f.map(x => x.value);
-    Object.assign(m, { ang: +a, int: +it, e1, e2, t1, t2 });
+    t3Num('ce1', 'Finished pitch diameter, max (after coating)', uLen(), m.e1) + t3Num('ce2', 'Finished pitch diameter, min (after coating)', uLen(), m.e2) + '</div>' +
+    '<div class="grid" style="max-width:760px">' +
+    t3Num('ct1', 'Coating thickness per surface, max', '<span class="ctu">' + uLen() + '</span>', m.t1) + t3Num('ct2', 'Coating thickness per surface, min', '<span class="ctu">' + uLen() + '</span>', m.t2) + '</div><div id="cres"></div>' +
+    '<div class="note"><b>Working:</b> a uniform coating of thickness t on both flanks moves each flank by t normal to itself, which changes the pitch diameter by 2 t / sin(a/2) (a = included angle): 4 t for 60 degree threads, 4.17 t at 55, 7.99 t at 29, 7.73 t at 30. Major and minor diameters change by 2 t. A coated helical insert carries both threads, so the change doubles (8 t at 60 degrees). Coating thickness on threads is seldom uniform (thicker at crests and ends); this is the ideal case used by gauge makers.' +
+    '<br><b>From a thread and class:</b> the class limits are worked out as in Thread data (Unified: ASME B1.1 formulas; ISO metric: ISO 965-1 formulas). Two ways to allow for the coating. <b>The coating uses the allowance</b> (external 1A, 2A and ISO e, f, g only): the thread is made to its class before coating, and after coating it may grow up to basic size, checked with a class 3A (inch) or tolerance position h (metric) GO gauge and the class NOT GO gauge; the coating must then be no more than a quarter of the allowance on the pitch diameter. <b>The finished thread meets the class</b>: the class limits are the after-coating limits, and the before-coating limits are moved by the coating: external pitch diameter max less the change at the maximum thickness and min less the change at the minimum thickness, major diameters less 2 t on the same pairing; internal threads the other way (pitch diameter min plus the change at the maximum thickness, max plus at the minimum, and the minor diameter likewise with 2 t). Internal threads have no allowance, so for them this is the only way.' +
+    '<br><b>Sources:</b> Thread Check Inc. (4:1 rule and the before-coating limits, worked 1/2-20 example reproduced in the tests), Kato Fastening Systems (4 x thickness, 8 x for inserts); PEM and the Industrial Fasteners Institute (on ASTM F1941) for the allowance used by the coating and the 3A / h GO gauge after coating; PEM for the quarter of the allowance. ASME B1.1-2024 and ISO 965-1 treat coated threads by name; the general angle form is geometry.</div><div class="note" id="csrc"></div>';
+  const g = id => $('#' + id, el);
+  const uni = () => g('cs').value === 'unified';
+  function setClasses() {
+    const list = uni() ? UN_CLS : ISO_CLS;
+    if (!list.some(c => c[0] === m.cls)) m.cls = uni() ? '2' : '6.3';
+    g('cc').innerHTML = t3Opt(list, m.cls);
+    g('cdu').textContent = uni() ? 'in' : 'mm'; g('cpu').textContent = uni() ? 'TPI' : 'mm'; g('cpl').textContent = uni() ? 'Threads per inch' : 'Pitch';
+    el.querySelectorAll('.ctu').forEach(x => x.textContent = m.src === 'thread' ? (uni() ? 'in' : 'mm') : uLen());
+  }
+  // External classes with an allowance (fundamental deviation) can take the coating in it.
+  const hasAllow = () => uni() ? ['1', '2'].includes(g('cc').value) : ['6.3', '6.2', '6.1', '8.3'].includes(g('cc').value);
+  function setPlans() {
+    const al = hasAllow();
+    if (!al) m.plan = 'meet';
+    g('cpln').innerHTML = t3Opt((al ? [['allow', 'The coating uses the allowance (finished up to basic size)']] : []).concat([['meet', 'The finished thread still meets the class']]), m.plan);
+  }
+  function showSrc() {
+    const th = g('cm').value === 'thread';
+    el.querySelectorAll('.cth').forEach(x => x.style.display = th ? '' : 'none');
+    el.querySelectorAll('.cty').forEach(x => x.style.display = th ? 'none' : '');
+  }
+  const ids = ['cm', 'cs', 'cd', 'cp', 'cc', 'cpln', 'ca', 'ci', 'ce1', 'ce2', 'ct1', 'ct2'];
+  function updThread() {
+    const k = W.thread_misc(1, 60, 0), inch = uni(), cls = g('cc').value, out = $('#cres', el);
+    // Lengths of this thread are in its own units (in or mm); shown in both.
+    const toMm = x => inch ? x * IN_MM : x, U = x => fBoth(toMm(x));
+    const d = inch ? parseSize(g('cd').value) : parseFloat(g('cd').value), pin = parseFloat(g('cp').value);
+    const p = inch ? 1 / pin : pin;
+    const T1 = parseFloat(g('ct1').value), T2r = parseFloat(g('ct2').value), T2 = T2r > 0 ? T2r : T1;
+    if (!(d > 0 && p > 0 && p < d)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter the thread size.</td></tr></table></div>'; return; }
+    const ext = inch ? +cls < 10 : +cls.split('.')[1] < 10;
+    // Class limits: [major max, major min, PD max, PD min, minor min, minor max] (NaN where not toleranced here).
+    let L;
+    if (inch) {
+      const c = +cls, f = w => W.un_limit(d, p, c, w);
+      L = ext ? [f(0), f(1), f(2), f(3), NaN, NaN] : [NaN, f(1), f(2), f(3), c === 12 ? W.un_limit(d, p, 12, 6) : NaN, c === 12 ? W.un_limit(d, p, 12, 7) : NaN];
+    } else {
+      const [gr, pos] = cls.split('.').map(Number), f = w => W.iso965_limit(d, p, gr, pos, w);
+      L = ext ? [f(0), f(1), f(2), f(3), NaN, NaN] : [NaN, f(1), f(2), f(3), f(5), f(4)];
+    }
+    const name = (inch ? fx(d, 4) + ' in x ' + fx(pin, 2) + ' TPI' : 'M' + fx(d, 3) + ' x ' + fx(p, 3)) + ', class ' + (g('cc').selectedOptions[0] || {}).textContent;
+    const basicPD = W.thread_basic_pitch_dia(d, p);
+    const fin = x => isFinite(x) ? U(x) : '-';
+    const rows = [];
+    const plan = g('cpln').value;
+    rows.push(['<b>Class limits</b> (major max / min, pitch diameter max / min' + (ext ? '' : ', minor min / max') + ')', calcCell(fin(L[0]) + ' / ' + fin(L[1]) + '<br>' + fin(L[2]) + ' / ' + fin(L[3]) + (ext ? '' : '<br>' + fin(L[4]) + ' / ' + fin(L[5])), inch ? 'ASME B1.1 formulas' : 'ISO 965-1 formulas')]);
+    if (!(T1 > 0)) {
+      rows.push(['', '<td class="ms" colspan="2">Enter the coating thickness per surface.</td>']);
+    } else if (plan === 'allow' && ext) {
+      const allow = inch ? W.un_limit(d, p, +cls, 5) : (L[2] < basicPD ? basicPD - L[2] : 0);
+      const fits = k * T1 <= allow + 1e-9;
+      rows.push(['Allowance on the pitch diameter', calcCell(U(allow), inch ? 'ASME B1.1: 0.3 x Td2(2A)' : 'fundamental deviation es')]);
+      rows.push(['Largest coating per surface that fits in it', calcCell(U(allow / k), 'a quarter of the allowance')]);
+      rows.push(['Before coating: make to the class limits', calcCell(fin(L[2]) + ' / ' + fin(L[3]), 'pitch diameter max / min')]);
+      rows.push(['After coating, pitch diameter max / min', calcCell(U(L[2] + k * T1) + ' / ' + U(L[3] + k * T2), 'class limit + 4 t at the max and min thickness')]);
+      rows.push(['After coating, major diameter max / min', calcCell(U(L[0] + 2 * T1) + ' / ' + U(L[1] + 2 * T2), 'class limit + 2 t')]);
+      rows.push(['Check', fits ? calcCell('Fits: after coating the pitch diameter stays at or under basic (' + U(basicPD) + ')', 'GO gauge ' + (inch ? 'class 3A' : 'position h') + ', NOT GO the class') : '<td class="v"><span class="warn">Too thick for the allowance: the pitch diameter after coating can reach ' + U(L[2] + k * T1) + ', over basic ' + U(basicPD) + '. Use a thinner coating or make the thread smaller: choose "The finished thread still meets the class".</span></td><td></td>']);
+    } else if (ext) {
+      rows.push(['<b>Before coating, pitch diameter max / min</b>', calcCell('<b>' + U(L[2] - k * T1) + ' / ' + U(L[3] - k * T2) + '</b>', 'max - 4 t max, min - 4 t min')]);
+      rows.push(['Before coating, major diameter max / min', calcCell(U(L[0] - 2 * T1) + ' / ' + U(L[1] - 2 * T2), 'less 2 t on the same pairing')]);
+      if (L[2] - k * T1 <= L[3] - k * T2) rows.push(['Check', '<td class="v"><span class="warn">No pitch diameter tolerance left before coating: the coating range takes all of it.</span></td><td></td>']);
+    } else {
+      rows.push(['<b>Before coating, pitch diameter min / max</b>', calcCell('<b>' + U(L[3] + k * T1) + ' / ' + U(L[2] + k * T2) + '</b>', 'min + 4 t max, max + 4 t min')]);
+      rows.push(['Before coating, major diameter min', calcCell(U(L[1] + 2 * T1), 'min + 2 t max')]);
+      if (isFinite(L[4])) rows.push(['Before coating, minor diameter min / max', calcCell(U(L[4] + 2 * T1) + ' / ' + U(L[5] + 2 * T2), 'min + 2 t max, max + 2 t min')]);
+      if (L[3] + k * T1 >= L[2] + k * T2) rows.push(['Check', '<td class="v"><span class="warn">No pitch diameter tolerance left before coating: the coating range takes all of it.</span></td><td></td>']);
+    }
+    if (T1 > 0 && !(T2r > 0)) rows.push(['', '<td class="ms" colspan="2">No minimum thickness entered: the maximum is used for both.</td>']);
+    out.innerHTML = '<div class="res"><div class="h">' + rEsc(name) + '</div><table>' + rowsHtml(rows) + '</table></div>';
+  }
+  function updTyped() {
+    const [a, it, e1, e2, t1, t2] = ['ca', 'ci', 'ce1', 'ce2', 'ct1', 'ct2'].map(i => g(i).value);
     const k = W.thread_misc(1, +a, 0) * (+it === 2 ? 2 : 1), sgn = +it === 1 ? 1 : -1;
     const n = x => fromUser(parseFloat(x)), U = x => fBoth(x);
     const rows = [['Pitch diameter change per unit thickness', calcCell(fx(k, 4) + ' x t', +it === 2 ? 'insert: twice 2 / sin(a/2)' : '2 / sin(a/2)')]];
@@ -226,8 +309,17 @@ async function renderCoating(el) {
     if (rows.length === 1) rows.push(['', '<td class="ms" colspan="2">Enter the coating thickness (and the finished limits for before-coating sizes).</td>']);
     $('#cres', el).innerHTML = '<div class="res"><table>' + rowsHtml(rows) + '</table></div>';
   }
-  $('#csrc', el).innerHTML = '<b>Sources</b><br>' + sourceList(Object.fromEntries(['TC_PLATE', 'KATO_PLATE'].map(k => [k, A.sources[k]])));
-  f.forEach(x => { x.oninput = upd; x.onchange = upd; });
+  function upd(e) {
+    if (e && e.target && e.target.id === 'cs') { m.sys = g('cs').value; setClasses(); }
+    if (e && e.target && (e.target.id === 'cs' || e.target.id === 'cc')) { m.cls = g('cc').value; setPlans(); }
+    Object.assign(m, { src: g('cm').value, sys: g('cs').value, d: g('cd').value, p: g('cp').value, cls: g('cc').value, plan: g('cpln').value,
+      ang: +g('ca').value, int: +g('ci').value, e1: g('ce1').value, e2: g('ce2').value, t1: g('ct1').value, t2: g('ct2').value });
+    showSrc(); setClasses();
+    if (m.src === 'thread') updThread(); else updTyped();
+  }
+  $('#csrc', el).innerHTML = '<b>Sources</b><br>' + sourceList(Object.fromEntries(['TC_PLATE', 'KATO_PLATE', 'PEM_TI', 'IFI_F1941'].filter(k => A.sources[k]).map(k => [k, A.sources[k]])));
+  setClasses(); setPlans();
+  ids.forEach(i => { const x = g(i); x.oninput = upd; x.onchange = upd; });
   upd();
 }
 

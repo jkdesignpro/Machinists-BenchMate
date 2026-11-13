@@ -3018,7 +3018,23 @@ where = 'toolpaths';
     if ((await page.textContent('#hpu')) !== 'TPI' || !/10\.00 TPI/.test(t) || !/6\.350 mm|0\.2500 in/.test(t)) problems.push(`[${where}] 1/4 in x 10 TPI: ${t.slice(0, 200)}`);
     await page.selectOption(ty, 'mc'); await page.waitForTimeout(150);
   }
-  where = 'bandsaw-080';
+  where = 'coated-threads';
+{
+  // Before-coating limits worked out from a thread and class: Thread Check's 1/2-20 UNF example.
+  await open('coating', 300);
+  await page.selectOption('#cm', 'thread'); await page.selectOption('#cs', 'unified'); await page.fill('#cd', '1/2'); await page.fill('#cp', '20');
+  await page.selectOption('#cc', '2'); await page.dispatchEvent('#cc', 'change'); await page.selectOption('#cpln', 'meet');
+  await page.fill('#ct1', '0.0003'); await page.fill('#ct2', '0.0002'); await page.dispatchEvent('#ct2', 'input'); await page.waitForTimeout(100);
+  let t = await page.$eval('#cres', e => e.innerText.replace(/\s+/g, ' '));
+  if (!/Before coating, pitch diameter max \/ min 0\.4650 in [^/]*\/ 0\.4611 in/.test(t)) problems.push(`[${where}] 1/2-20 2A before coating: ${t.slice(0, 300)}`);
+  await page.selectOption('#cc', '12'); await page.dispatchEvent('#cc', 'change'); await page.waitForTimeout(100);
+  t = await page.$eval('#cres', e => e.innerText.replace(/\s+/g, ' '));
+  if (!/0\.4687 in [^/]*\/ 0\.4739 in/.test(t)) problems.push(`[${where}] 1/2-20 2B before coating: ${t.slice(0, 300)}`);
+  await page.selectOption('#cc', '2'); await page.dispatchEvent('#cc', 'change'); await page.selectOption('#cpln', 'allow'); await page.waitForTimeout(100);
+  t = await page.$eval('#cres', e => e.innerText.replace(/\s+/g, ' '));
+  if (!/Allowance on the pitch diameter 0\.0013 in/.test(t) || !/Fits/.test(t)) problems.push(`[${where}] 2A coating in the allowance: ${t.slice(0, 300)}`);
+}
+where = 'bandsaw-080';
   {
     await open('bandsaw', 200);
     const shapes = await page.$$eval('#main [data-id="shape"] option', a => a.map(o => o.value).join(','));
