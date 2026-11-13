@@ -12,6 +12,9 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (setup sheet: the operations in order)
+- **Setup sheet**: a table of operations in order (number, what is done, holding and set-up, tools, speed, feed, what to check), numbered in steps of 10, kept with the sheet, in the JSON export and on the printout. Sheets saved before this version open with an empty list.
+
 ### Added (guide sections: calibrating a surface plate, V-blocks, laminates and hard rubber, the tool signature)
 - Measurement guide: **calibrating a surface plate** (what is measured, the methods named, what sets the interval, lapping when out of limits) and a new section on **V-blocks** (uses, pairs, the two kinds of material, the vee, marking out and drilling across a bar).
 - Materials guide: **Machining laminates and hard rubber** (what laminates are, tool wear and tool material, dust, coolant with the three sources side by side, heat, undersize holes, splitting layers, threads where the sources differ, and hard rubber from one old source, marked).
@@ -146,7 +149,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (fourteenth batch)
 - MH90 (surface plates, V-blocks and their calibration), MH96 (single-point tool terms) and MH160 (laminates and hard rubber) from partial to done.
-- 434 done, 114 partial, 48 missing of 596 in-scope rows, 73 %; 103 more rows to done for the 90 % target.
+- Counted after the fourteenth batch: 434 done, 114 partial, 48 missing.
+
+### Book audit (fifteenth batch)
+- CN80 (process planning form) from partial to done: the setup sheet now holds the operations in order.
+- 435 done, 113 partial, 48 missing of 596 in-scope rows, 73 %; 102 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.

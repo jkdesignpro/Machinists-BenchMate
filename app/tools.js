@@ -3000,7 +3000,7 @@ const TOOLS = [
 },
 {
   id: 'setupsheet', level: 'advanced', group: 'Setup', title: 'Setup sheet',
-  desc: 'A printable setup sheet: job, machine, tool list with stick-out and offsets, work offsets and notes. Saved in this browser; export and import as JSON.',
+  desc: 'A printable setup sheet: job, machine, the operations in order (what is done, holding, tools, speed, feed, what to check), tool list with stick-out and offsets, work offsets and notes. Saved in this browser; export and import as JSON.',
   render: el => renderSetupSheet(el),
   working: 'Nothing is calculated here. Sheets are kept in this browser (localStorage) and can be moved by exporting a JSON file. Print uses a print layout without the app frame.',
   source: 'BenchMate layout.',

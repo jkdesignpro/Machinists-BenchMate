@@ -253,6 +253,7 @@ const SetupSheets = (() => {
   try { list = JSON.parse(localStorage.getItem(KEY) || '[]'); if (!Array.isArray(list)) list = []; active = localStorage.getItem(ACT) || ''; } catch (e) { list = []; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(list)); localStorage.setItem(ACT, active); } catch (e) {} };
   const blank = () => ({ id: 's' + Date.now() + Math.floor(Math.random() * 1000), job: '', part: '', rev: '', op: '', program: '', material: '', stock: '', customer: '', qty: '', date: new Date().toISOString().slice(0, 10), by: '', machine: '', units: state.sys,
+    ops: [{ n: '10', desc: '', hold: '', tools: '', speed: '', feed: '', check: '' }],
     tools: [{ t: '1', desc: '', holder: '', stick: '', h: '', d: '', note: '' }], offsets: [{ name: 'G54', x: '', y: '', z: '', note: '' }], notes: '' });
   return {
     blank, all: () => list,
@@ -268,6 +269,7 @@ const SetupSheets = (() => {
       const b = blank(); const clean = Object.assign(b, s, { id: b.id });
       clean.tools = s.tools.map(r => Object.assign({ t: '', desc: '', holder: '', stick: '', h: '', d: '', note: '' }, r));
       clean.offsets = s.offsets.map(r => Object.assign({ name: '', x: '', y: '', z: '', note: '' }, r));
+      clean.ops = Array.isArray(s.ops) ? s.ops.map(r => Object.assign({ n: '', desc: '', hold: '', tools: '', speed: '', feed: '', check: '' }, r)) : b.ops;
       list.push(clean); active = clean.id; save(); return clean;
     },
   };
@@ -275,10 +277,13 @@ const SetupSheets = (() => {
 
 function renderSetupSheet(el) {
   const S = SetupSheets, s = S.current();
+  // Sheets saved before the operation plan existed have no ops list.
+  if (!Array.isArray(s.ops)) s.ops = [];
   const u = s.units === 'mm' ? 'mm' : 'in';
   const mach = (Profiles.all().find(m => m.id === s.machine)) || null;
   const HEAD = [['job', 'Job / work order'], ['part', 'Part number'], ['rev', 'Revision'], ['op', 'Operation'], ['program', 'Program number'], ['customer', 'Customer'], ['material', 'Material'], ['stock', 'Stock size'], ['qty', 'Quantity'], ['date', 'Date'], ['by', 'Prepared by']];
   const TC = [['t', 'T no.', 60], ['desc', 'Description', 220], ['holder', 'Holder', 140], ['stick', 'Stick-out (' + u + ')', 90], ['h', 'Length offset', 90], ['d', 'Dia / radius offset', 90], ['note', 'Notes', 160]];
+  const PC = [['n', 'Op no.', 60], ['desc', 'What is done', 220], ['hold', 'Holding / set-up', 150], ['tools', 'Tools (T no.)', 100], ['speed', 'Speed', 80], ['feed', 'Feed', 80], ['check', 'Check / inspect', 160]];
   const OC = [['name', 'Work offset', 80], ['x', 'X', 100], ['y', 'Y', 100], ['z', 'Z', 100], ['note', 'Notes', 240]];
   const txt = (k, v, w, attr) => '<input type="text" ' + attr + ' value="' + sesc(v) + '" style="width:' + w + 'px">';
   const rowsHtml = (arr, cols, kind) => '<div style="overflow-x:auto"><table class="gtab sstab"><tr>' + cols.map(c => '<th>' + c[1] + '</th>').join('') + '<th></th></tr>' +
@@ -291,6 +296,7 @@ function renderSetupSheet(el) {
     '<div class="grid">' + HEAD.map(([k, l]) => '<label class="f"><span>' + l + '</span><div class="row">' + txt(k, s[k], 200, 'data-h="' + k + '"') + '</div></label>').join('') +
     '<label class="f"><span>Machine (from Machine profiles)</span><div class="row"><select data-h="machine">' + mopts + '</select></div></label>' +
     '<label class="f"><span>Units on this sheet</span><div class="row"><select data-h="units"><option value="in"' + (u === 'in' ? ' selected' : '') + '>inch</option><option value="mm"' + (u === 'mm' ? ' selected' : '') + '>mm</option></select></div></label></div>' +
+    '<h2>Operations, in order</h2>' + rowsHtml(s.ops, PC, 'p') + '<div class="mfilter" style="margin-top:6px"><button class="btn" id="padd">Add operation</button></div>' +
     '<h2>Tools</h2>' + rowsHtml(s.tools, TC, 't') + '<div class="mfilter" style="margin-top:6px"><button class="btn" id="tadd">Add tool</button></div>' +
     '<h2>Work offsets</h2>' + rowsHtml(s.offsets, OC, 'o') + '<div class="mfilter" style="margin-top:6px"><button class="btn" id="oadd">Add work offset</button></div>' +
     '<h2>Notes</h2><textarea id="snotes" rows="5" style="width:100%;max-width:880px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);padding:6px">' + sesc(s.notes) + '</textarea></div>' +
@@ -301,13 +307,16 @@ function renderSetupSheet(el) {
       (m ? '<tr><th>Machine</th><td>' + sesc([m.name, m.type, m.control].filter(Boolean).join(', ')) + '</td></tr>' : '');
     const tbl = (arr, cols) => '<table class="pt"><tr>' + cols.map(c => '<th>' + c[1] + '</th>').join('') + '</tr>' + arr.map(r => '<tr>' + cols.map(([k]) => '<td>' + sesc(r[k]) + '</td>').join('') + '</tr>').join('') + '</table>';
     el.querySelector('#sprintview').innerHTML = '<h1>Setup sheet' + (s.part ? ': ' + sesc(s.part) : '') + (s.op ? ' / ' + sesc(s.op) : '') + '</h1><table class="pkv">' + kv + '</table>' +
-      '<h2>Tools</h2>' + tbl(s.tools, TC) + '<h2>Work offsets (' + u + ')</h2>' + tbl(s.offsets, OC) + (s.notes ? '<h2>Notes</h2><div class="pnotes">' + sesc(s.notes) + '</div>' : '') +
+      (s.ops.length ? '<h2>Operations</h2>' + tbl(s.ops, PC) : '') + '<h2>Tools</h2>' + tbl(s.tools, TC) + '<h2>Work offsets (' + u + ')</h2>' + tbl(s.offsets, OC) + (s.notes ? '<h2>Notes</h2><div class="pnotes">' + sesc(s.notes) + '</div>' : '') +
       '<p class="pfoot">Machinists BenchMate setup sheet. Printed ' + new Date().toISOString().slice(0, 10) + '.</p>';
   };
   const changed = () => { S.save(); printView(); };
   el.querySelectorAll('[data-h]').forEach(i => i.oninput = i.onchange = () => { s[i.dataset.h] = i.value; changed(); if (i.dataset.h === 'units') renderSetupSheet(el); if (i.dataset.h === 'part' || i.dataset.h === 'op') { const o = el.querySelector('#ssel option[value="' + s.id + '"]'); if (o) o.textContent = [s.part || '(no part number)', s.op].filter(Boolean).join(' / '); } });
+  el.querySelectorAll('[data-p]').forEach(i => i.oninput = () => { s.ops[+i.dataset.p][i.dataset.c] = i.value; changed(); });
   el.querySelectorAll('[data-t]').forEach(i => i.oninput = () => { s.tools[+i.dataset.t][i.dataset.c] = i.value; changed(); });
   el.querySelectorAll('[data-o]').forEach(i => i.oninput = () => { s.offsets[+i.dataset.o][i.dataset.c] = i.value; changed(); });
+  el.querySelectorAll('[data-delp]').forEach(b => b.onclick = () => { s.ops.splice(+b.dataset.delp, 1); changed(); renderSetupSheet(el); });
+  el.querySelector('#padd').onclick = () => { const last = s.ops[s.ops.length - 1]; s.ops.push({ n: last && /^\d+$/.test(last.n) ? String(+last.n + 10) : (s.ops.length ? '' : '10'), desc: '', hold: '', tools: '', speed: '', feed: '', check: '' }); changed(); renderSetupSheet(el); };
   el.querySelectorAll('[data-delt]').forEach(b => b.onclick = () => { s.tools.splice(+b.dataset.delt, 1); changed(); renderSetupSheet(el); });
   el.querySelectorAll('[data-delo]').forEach(b => b.onclick = () => { s.offsets.splice(+b.dataset.delo, 1); changed(); renderSetupSheet(el); });
   el.querySelector('#tadd').onclick = () => { const last = s.tools[s.tools.length - 1]; s.tools.push({ t: last && /^\d+$/.test(last.t) ? String(+last.t + 1) : '', desc: '', holder: '', stick: '', h: '', d: '', note: '' }); changed(); renderSetupSheet(el); };

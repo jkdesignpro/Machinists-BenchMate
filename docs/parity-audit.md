@@ -112,6 +112,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, fourteenth batch, 2026-11-13):** calibrating a surface plate and V-blocks in the measurement guide; machining laminates and hard rubber in the materials guide; the tool signature in the tooling guide. MH90, MH96 and MH160 from partial to done. Counted from the tables below: 434 done, 114 partial, 48 missing of 596 in-scope rows, 73 %; 103 more rows to done for the 90 % target.
 
+**Update (0.7.0, fifteenth batch, 2026-11-13):** the setup sheet holds the operations in order. CN80 from partial to done. Counted from the tables below: 435 done, 113 partial, 48 missing of 596 in-scope rows, 73 %; 102 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -994,7 +996,7 @@ One row per learning objective.
 | CN77 | App B: tool length offset with paper | done | `millsetup` | 0.6.0: method A, on the part with paper or a feeler, with its drawbacks |
 | CN78 | App B: tool length offset with a 1-2-3 block from a finished face | done | `millsetup` | 0.6.0: method B with the block standing on a face milled flat |
 | CN79 | App B: tool length offset with a tool probe | done | `millsetup` | 0.6.0: method C, tool setting probe |
-| CN80 | App C: CNC process planning form | partial | `setupsheet` | Setup sheet, no operation-sequence plan |
+| CN80 | App C: CNC process planning form | done | `setupsheet` | Setup sheet; 0.7.0: operations in order (number, what is done, holding and set-up, tools, speed, feed, what to check), printed with the sheet |
 | CN81 | App D: G and M code reference | done | `gmcodes` | |
 | CN82 | App E: glossary | done | `glossary` | 108 terms in our own words with a search box; 97 link to the page that explains them |
 | CN83 | App F: drill chart and decimal equivalents | done | `drillchart` | |

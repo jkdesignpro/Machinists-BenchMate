@@ -2810,6 +2810,22 @@ where = 'toolpaths';
     await mode('advanced');
   }
 
+  // Setup sheet: the operations are planned in order and printed.
+  where = 'setupsheet ops';
+  {
+    await open('setupsheet', 250);
+    const before = await page.$$eval('#main [data-p][data-c="n"]', a => a.length);
+    await page.click('#main #padd'); await page.waitForTimeout(120);
+    const nums = await page.$$eval('#main [data-p][data-c="n"]', a => a.map(x => x.value));
+    const last = await page.$('#main [data-p="' + (nums.length - 1) + '"][data-c="desc"]');
+    if (last) { await last.fill('Face and centre drill'); await page.waitForTimeout(80); }
+    const pv = (await page.$eval('#main #sprintview', e => e.textContent)).replace(/\s+/g, ' ');
+    if (nums.length !== before + 1 || (before && nums.length > 1 && !/^\d+$/.test(nums[nums.length - 1])) || !/Operations/.test(pv) || !/Face and centre drill/.test(pv)) problems.push(`[${where}] operations: ${before} then ${nums.join(',')} | ${pv.slice(0, 200)}`);
+    const del = await page.$('#main [data-delp="' + (nums.length - 1) + '"]');
+    if (del) { await del.click(); await page.waitForTimeout(120); }
+    if ((await page.$$eval('#main [data-p][data-c="n"]', a => a.length)) !== before) problems.push(`[${where}] removing the added operation`);
+  }
+
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);
