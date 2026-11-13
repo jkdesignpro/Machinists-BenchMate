@@ -367,19 +367,21 @@
 
     // Rolling bearing in section with its loads, for the rating life.
     bearinglife() {
-      const W = 520, H = 250, cx = 150, cy = 126, w = 64;
-      const rows = [[40, 62, 75, 88, 104], [210, 188, 177, 164, 148]];
-      let s = '';
-      rows.forEach(([o0, o1, bc, i0, i1]) => {
-        s += DK.rect(cx - w / 2, Math.min(o0, o1), w, Math.abs(o1 - o0), 'hatch');
-        s += DK.rect(cx - w / 2, Math.min(i0, i1), w, Math.abs(i1 - i0), 'hatch');
-        s += DK.circle(cx, bc, 12.5, 'tool');
+      // Half sections above and below the axis: outer and inner rings cut (hatched) with their raceway grooves,
+      // the ball in the grooves, the shaft (not cut) in the bore.
+      const W = 520, H = 250, cx = 150, cy = 126, w = 64, xl = cx - w / 2, xr = cx + w / 2, rb = 12.5, rg = 13.5;
+      let s = DK.rect(xl - 30, 104, w + 60, 44, 'part') + DK.text(xl - 26, 119, 'shaft', { cls: 'mut', anchor: 'start' });
+      [1, -1].forEach(g => {
+        const Y = y => g > 0 ? y : 2 * cy - y, sw = g > 0 ? 0 : 1, bc = 75, gx = Math.sqrt(rg * rg - 81).toFixed(2);
+        s += DK.path('M' + xl + ' ' + Y(40) + 'H' + xr + 'V' + Y(66) + 'H' + (cx + +gx) + 'A' + rg + ' ' + rg + ' 0 0 ' + sw + ' ' + (cx - gx) + ' ' + Y(66) + 'H' + xl + 'Z', 'hatch');
+        s += DK.path('M' + xl + ' ' + Y(84) + 'H' + (cx - gx) + 'A' + rg + ' ' + rg + ' 0 0 ' + sw + ' ' + (cx + +gx) + ' ' + Y(84) + 'H' + xr + 'V' + Y(104) + 'H' + xl + 'Z', 'hatch');
+        s += DK.circle(cx, Y(bc), rb, 'tool') + DK.cl(cx, Y(bc) - 18, cx, Y(bc) + 18);
       });
       s += DK.cl(36, cy, 264, cy) + T(266, cy + 4, 'axis', 'mut');
       s += DK.arrow(cx, 4, cx, 38, 'hot') + T(cx + 8, 18, 'Fr  radial load', 'hott');
       s += DK.arrow(54, 96, cx - w / 2 - 2, 96, 'hot') + T(54, 88, 'Fa  axial', 'hott');
       s += DK.leader(cx + w / 2 - 2, 52, 222, 44, 'outer ring', { anchor: 'start' });
-      s += DK.leader(cx + 9, 66, 222, 68, 'ball', { anchor: 'start' });
+      s += DK.leader(cx + 9, 70, 222, 72, 'ball', { anchor: 'start' });
       s += DK.leader(cx + w / 2 - 2, 98, 222, 100, 'inner ring', { anchor: 'start' });
       s += col(320, 52, [['P = X Fr + Y Fa', 'txt'], ['X, Y from the catalogue', 'mut']]);
       s += col(320, 108, [['L10 = (C / P)^p', 'txt'], ['million revolutions', 'mut'], ['p = 3 ball bearings', 'mut'], ['p = 10/3 roller bearings', 'mut'], ['C: catalogue rating', 'mut']]);
