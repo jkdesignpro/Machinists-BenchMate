@@ -74,7 +74,7 @@ function engPlot(s, lay) {
 
 function renderEngrave(el) {
   const defs = inch => ({ text: 'BENCHMATE', font: 'HersheySans1', h: inch ? 0.2 : 5, stretch: 100, spacing: '', line: '', lay: 0, align: 0, x: 0, y: 0, angle: 0, radius: inch ? 1 : 25, mirror: 0,
-    vang: '', vflat: '', ctrl: 0, prog: 1001, tool: 1, wcs: 54, rpm: 10000, feed: inch ? 12 : 300, plunge: inch ? 4 : 100, zs: inch ? 0.1 : 2, depth: inch ? 0.005 : 0.1, cool: 0, rapid: '' });
+    vang: '', vflat: '', ctrl: 0, prog: 1001, tool: 1, wcs: 54, rpm: 10000, feed: inch ? 12 : 300, plunge: inch ? 4 : 100, zs: inch ? 0.1 : 2, depth: inch ? 0.005 : 0.1, cool: 0, rapid: '', arct: '' });
   const s = cyState('engrave', defs);
   const circ = x => +x.lay !== 0;
   const fields = [
@@ -101,11 +101,13 @@ function renderEngrave(el) {
     { k: 'depth', label: 'Depth below the surface', unit: cyU },
     { k: 'zs', label: 'Safe height above the surface', unit: cyU },
     { k: 'cool', label: 'Coolant', sel: [[1, 'On (M08)'], [0, 'Off']] },
+    { k: 'arct', label: 'Curves as arcs (G02, G03) within (blank = straight lines, as the letters are drawn)', unit: cyU },
     rapidField,
   ];
   const labelOf = f => typeof f.label === 'function' ? f.label(s) : f.label;
   const draw = () => {
     el.innerHTML = '<div class="grid">' + fields.filter(f => !f.show || f.show(s)).map(f => cyField(Object.assign({}, f, { label: labelOf(f) }), s)).join('') + '</div>' +
+      '<p class="desc" style="max-width:880px">The Hershey letters are drawn with straight lines (the O of the plain letters is 20 of them, at any size), and by default the program follows them line for line. Give a distance under "Curves as arcs" and each run of three or more lines that lies within it of one circle is written as a single G02 or G03 arc: fewer blocks and smoother motion, with every point and every line of the letter within that distance of the arc.</p>' +
       '<div id="engprev" style="margin-top:12px"></div><div id="cyout" style="margin-top:12px"></div>' +
       '<p class="desc" id="engcredit" style="max-width:880px;margin-top:14px">' + sesc(ENG_CREDIT) + ' The font files and their full use notice are in data/fonts/hershey.</p>';
     el.querySelectorAll('[data-k]').forEach(i => {
@@ -147,7 +149,7 @@ function renderEngrave(el) {
     prev.querySelector('#engdxf').onclick = () => saveFile('engraving.dxf', dxf(0), 'application/dxf');
     prev.querySelector('#engdxf12').onclick = () => saveFile('engraving-r12.dxf', dxf(1), 'application/dxf');
     // the program
-    const ok = W.engrave_program(gsPut(s.text), cyInch() ? 0 : 1, +s.ctrl, snum(s.prog), snum(s.tool), +s.wcs, snum(s.rpm), snum(s.feed), snum(s.plunge), snum(s.zs), dep, +s.cool) === 1;
+    const ok = W.engrave_program(gsPut(s.text), cyInch() ? 0 : 1, +s.ctrl, snum(s.prog), snum(s.tool), +s.wcs, snum(s.rpm), snum(s.feed), snum(s.plunge), snum(s.zs), dep, +s.cool, s.arct === '' ? 0 : snum(s.arct)) === 1;
     const res = cyRead(ok, 9);
     cyOutput(out, s, res, { lathe: false, plot: () => '', more: [['engsim', 'Open in the simulator', () => gsOpenText(res.text)]] });
   };

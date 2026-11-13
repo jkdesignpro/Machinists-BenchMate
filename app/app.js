@@ -188,7 +188,7 @@ const SEARCH_KEYS = {
   threaddata: 'thread sizes pitch diameter tap size major minor unc unf metric', drills: 'drill sizes number letter fractional tap drill chart',
   chipthinning: 'radial chip thinning rcte hsm adaptive', helix: 'helical interpolation ramping', deflection: 'end mill deflection stick-out',
   chatter: 'stability lobes vibration', surfacefin: 'ra finish nose radius cusp scallop', bandsaw: 'band saw cut time', weight: 'stock weight mass',
-  fitlookup: 'iso fits h7 g6 tolerance hole shaft', prefnum: 'renard r5 r10 r20 r40 r80 preferred numbers', millstrat: 'trochoidal adaptive hem hsm high efficiency dynamic milling toolpath strategy plunge high feed', gmcodes: 'g codes m codes g-code',
+  fitlookup: 'iso fits h7 g6 tolerance hole shaft', prefnum: 'renard r5 r10 r20 r40 r80 preferred numbers', backlash: 'lost motion play reversal backlash compensation worm gear', millstrat: 'trochoidal adaptive hem hsm high efficiency dynamic milling toolpath strategy plunge high feed', gmcodes: 'g codes m codes g-code',
 };
 function searchHits(q) {
   q = q.trim().toLowerCase(); if (!q) return [];

@@ -415,10 +415,10 @@ pub extern "C" fn engrave_layout(len: f64, cap_h: f64, spacing: f64, line: f64, 
 /// bytes goes in the header. Read it with the `cyc_*` calls. Returns 1 if a
 /// program was made, 0 on error.
 #[no_mangle] #[allow(clippy::too_many_arguments)]
-pub extern "C" fn engrave_program(len: f64, metric: f64, ctrl: f64, prog: f64, tool: f64, wcs: f64, rpm: f64, feed: f64, plunge: f64, z_safe: f64, depth: f64, coolant: f64) -> f64 {
+pub extern "C" fn engrave_program(len: f64, metric: f64, ctrl: f64, prog: f64, tool: f64, wcs: f64, rpm: f64, feed: f64, plunge: f64, z_safe: f64, depth: f64, coolant: f64, arc_tol: f64) -> f64 {
     let u = |v: f64| if v.is_finite() && v > 0.0 { v.round() as u32 } else { 0 };
     let p = c::gcode::gen_engrave(&c::gcode::EngraveJob { metric: metric != 0.0, ctrl: c::gcode::Ctrl::from_f(ctrl), prog: u(prog), tool: u(tool).max(1), wcs: u(wcs).clamp(54, 59),
-        rpm, feed, plunge, z_safe, depth, coolant: coolant != 0.0, text: eng_in(len), strokes: eng_laid().map(|l| l.strokes.clone()).unwrap_or_default() });
+        rpm, feed, plunge, z_safe, depth, coolant: coolant != 0.0, text: eng_in(len), strokes: eng_laid().map(|l| l.strokes.clone()).unwrap_or_default(), arc_tol: if arc_tol.is_finite() && arc_tol > 0.0 { arc_tol } else { 0.0 } });
     let ok = p.error.is_none();
     unsafe { *core::ptr::addr_of_mut!(PROG) = Some(p); }
     if ok { 1.0 } else { 0.0 } }

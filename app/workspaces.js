@@ -78,13 +78,13 @@ const WORKSPACES = [
     ['Grinding', ['grindspeed', 'grindratio', 'grindtimes', 'gritconv', 'wheelcode'], 'wheel'],
     ['Sawing', ['saws', 'slitsaw'], 'saw'],
     ['Wire EDM', ['wireedm'], 'wave'],
-    ['Gears', ['spurgear', 'helicalgear', 'gearmeasure', 'geartrain', 'planetary', 'worm', 'changegears', 'indexing'], 'gear'],
+    ['Gears', ['spurgear', 'helicalgear', 'gearmeasure', 'geartrain', 'planetary', 'worm', 'changegears', 'indexing', 'backlash'], 'gear'],
     ['Splines and broaching', ['spline', 'saespline', 'cycbroach', 'keys'], 'gear'],
   ] },
   { id: 'inspect', name: 'Measure and inspect', icon: 'inspection', blurb: 'GD&T, fits, surface finish, gauge blocks and quality checks.', sections: [
     ['GD&T', ['gdtguide', 'gdtfcf', 'gdtpos', 'gdtprofu', 'gdtdof', 'gdtstack'], 'frame'],
     ['Fits and finish', ['fitlookup', 'tolmid', 'offsetadj', 'shrinkfit', 'surfacefin', 'prefnum'], 'fit'],
-    ['Measuring', ['sinebar', 'scales', 'wires', 'tapergauge', 'dovetail', 'hardness', 'tempcomp'], 'caliper'],
+    ['Measuring', ['sinebar', 'scales', 'wires', 'tapergauge', 'dovetail', 'hardness', 'tempcomp', 'backlash'], 'caliper'],
     ['Quality', ['capability', 'normdist', 'distrib', 'ctrlchart', 'grr', 'sampling'], 'chart'],
   ] },
   { id: 'maths', name: 'Shop maths', icon: 'triangle', blurb: 'Calculator, conversions, geometry, stock and engineering sums.', sections: [
@@ -98,7 +98,7 @@ const WORKSPACES = [
     ['Cycle generators', ['cycdrill', 'threadprog', 'cyctaper', 'cycgroove', 'cycg71', 'cycbroach', 'engrave'], 'code'],
     ['Simulate and draw', ['gsim', 'sketch', 'holepattern', 'dxfshapes'], 'play'],
     ['Setup', ['setupsheet', 'tnrc', 'offsetadj'], 'sheet'],
-    ['Rotary axis', ['rotpoint', 'rotfeed'], 'angle'],
+    ['Rotary axis', ['rotpoint', 'rotfeed', 'backlash'], 'angle'],
   ] },
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
     ['Materials', ['materials', 'hardness', 'heattreat', 'tempercolours', 'galvanic', 'plastics', 'metalid'], 'material'],

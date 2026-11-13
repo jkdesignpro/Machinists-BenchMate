@@ -240,6 +240,44 @@ const TOOLS = [
   source: 'J. Ball, MoldMaking Technology 2018; D. Grandt and S. Tiehen, Productivity Inc. 2020; W. Leventon, Cutting Tool Engineering 2025; SolidCAM blog 2026; B. Kennedy, Cutting Tool Engineering 2012; American Machinist 2010; Tungaloy (high-feed milling). Statements from one publisher are marked. See docs/strategy.md.',
 },
 {
+  id: 'backlash', level: 'advanced', group: 'Machine checks', title: 'Backlash: linear and rotary axes, gears',
+  desc: 'Read the backlash (lost motion) of a machine axis from an indicator test, turn the play of a rotary axis into an angle or an angle into play at the part, and see how much backlash a gear pair gains when its centres move apart.',
+  fields: s => [
+    { id: 'mode', label: 'What to work out', unit: '', def: 1, options: [[1, 'Linear axis: lost motion from an indicator'], [2, 'Rotary axis: play and angle'], [3, 'Gear pair: backlash from the centre distance']], wide: true },
+    { id: 'r0', label: 'Indicator at the start (after coming in from one side)', unit: lenU(s), def: 0, when: v => v.mode === 1 },
+    { id: 'r1', label: 'Indicator after going out and back to the start', unit: lenU(s), def: '', when: v => v.mode === 1 },
+    { id: 'rk', label: 'You know', unit: '', def: 1, options: [[1, 'The play at a radius (measured)'], [2, 'The angle (maker\'s figure)']], when: v => v.mode === 2 },
+    { id: 'rad', label: 'Radius from the rotary axis', unit: lenU(s), def: s === 'inch' ? 4 : 100, when: v => v.mode === 2 },
+    { id: 'play', label: 'Play measured round the axis at that radius', unit: lenU(s), def: '', when: v => v.mode === 2 && v.rk === 1 },
+    { id: 'asec', label: 'Angular play', unit: 'arcsec', def: '', when: v => v.mode === 2 && v.rk === 2 },
+    { id: 'da', label: 'Centres moved apart by', unit: lenU(s), def: '', when: v => v.mode === 3 },
+    { id: 'alpha', label: 'Pressure angle', unit: 'deg', def: 20, when: v => v.mode === 3 },
+    { id: 'pd', label: 'Pitch diameter of one gear (for its angular backlash)', unit: lenU(s), def: '', when: v => v.mode === 3 },
+  ],
+  calc: (v, W, s) => {
+    const dp = s === 'inch' ? 5 : 4, u = lenU(s);
+    if (v.mode === 1) {
+      if (!isFinite(v.r1)) return [];
+      const lm = W.bl_lost_motion(v.r0 || 0, v.r1);
+      return [R('Lost motion (backlash and the rest)', lm, u, dp),
+        R('Note', 'Lost motion is the commanded move less the move seen: mostly backlash (gib clearance, the screw support bearings), plus bearing give, friction and heat (Tormach). Adjust or repair the mechanics before entering a backlash compensation (Tormach, MachMotion); the control then adds the lost travel at each reversal (Wikipedia). Machine profiles keep a measured figure per axis.', '', 0)];
+    }
+    if (v.mode === 2) {
+      if (!(v.rad > 0)) return [];
+      if (v.rk === 1) { if (!isFinite(v.play)) return []; const a = W.bl_play_to_arcsec(v.rad, v.play); return [R('Angular play', a, 'arcsec', 2), R('In arc minutes', W.bl_arcsec_to(a, 1), 'arcmin', 3), R('In degrees', W.bl_arcsec_to(a, 2), 'deg', 5)]; }
+      if (!isFinite(v.asec)) return [];
+      return [R('Play round the axis at that radius', W.bl_arcsec_to_play(v.rad, v.asec), u, dp), R('Note', 'The same angle gives more play the further out the work is: a part at twice the radius moves twice as far.', '', 0)];
+    }
+    if (!isFinite(v.da)) return [];
+    const j = W.bl_gear_centre(v.da, v.alpha, 0), rows = [R('Circular backlash gained (on the pitch circle)', j, u, dp), R('Normal backlash gained (square to the teeth)', W.bl_gear_centre(v.da, v.alpha, 1), u, dp)];
+    if (v.pd > 0) rows.push(R('Angular backlash of that gear', W.bl_gear_arcmin(j, v.pd), 'arcmin', 3));
+    rows.push(R('Note', 'KHK: do not close the centres to take backlash out; it removes the room for lubricant. Angular backlash depends on each gear\'s own radius, so give it for each gear.', '', 0));
+    return rows;
+  },
+  working: 'Lost motion = |indicator after out and back - indicator at the start| (Tormach lost motion test; MachMotion backlash test). Rotary: angle (rad) = play / radius, 1 rad = 206 264.8 arcsec; play = radius x angle. Gear pair: circular backlash j = 2 da tan(alpha), normal jn = 2 da sin(alpha) (KHK-USA); angular backlash of a gear = j / (d / 2) rad.',
+  source: 'Tormach knowledge base, Lost motion testing and gib/ACB adjustment (PCNC 440); MachMotion support, How to test for backlash; KHK-USA, B. Dengel, A primer on backlash (one publisher for the centre distance formulas); Wikipedia, Backlash (engineering). See docs/backlash.md.',
+},
+{
   id: 'helix', level: 'advanced', group: 'Milling', title: 'Helical interpolation and ramping',
   pick: { map: { d: 'dia' } },
   desc: 'Helix pitch per turn from a ramp angle, or the ramp angle from a pitch, and the axial (Z) feed. Angles are at the tool-centre path.',

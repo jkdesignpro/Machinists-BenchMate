@@ -910,7 +910,14 @@ where = 'engrave';
   // no depth: the drawing stays, the program is refused with the reason
   await set('depth', '');
   if (!(await page.$('#main #engsvg')) || !/Enter the depth/.test(await page.$eval('#main #cyout', e => e.innerText))) problems.push(`[${where}] a missing depth should keep the drawing and refuse the program`);
-  await set('depth', '0.1'); await set('text', 'H');
+  await set('depth', '0.1');
+  // 0.8.0: curves as arcs within a distance: the O becomes G02/G03 with I and J; blank keeps every line.
+  await set('text', 'O'); await set('x', '10'); await set('y', '20'); await set('h', '5'); await set('arct', '0.05'); await page.waitForTimeout(80);
+  t = await prog();
+  if ((t.match(/^G0[23] X[-\d.]+ Y[-\d.]+ I[-\d.]+ J[-\d.]+/gm) || []).length !== 4 || (t.match(/^G01 X/gm) || []).length !== 4) problems.push(`[${where}] an O 5 high with 0.05 should be 4 arcs and 4 lines:\n${t}`);
+  await set('arct', ''); await page.waitForTimeout(60);
+  if (/^G0[23] /m.test(await prog())) problems.push(`[${where}] no arcs without a distance`);
+  await set('x', '0'); await set('y', '0'); await set('h', '7'); await set('text', 'H');
   // on to the simulator: it runs the same program without errors; and to the sketcher: three lines arrive
   t = await prog();
   await page.click('#main #engsim'); await page.waitForTimeout(200);
@@ -2977,6 +2984,19 @@ where = 'toolpaths';
     const txt = await page.$eval('#msres', e => e.textContent);
     if (!/Sources differ on a light machine/.test(txt) || !/one publisher, to be verified/.test(txt)) problems.push(`[${where}] the disagreement on rigidity and the one-publisher marks should show`);
     await page.selectOption('#main [data-k="small"]', 'Not known'); await page.selectOption('#main [data-k="rig"]', 'Medium'); await page.selectOption('#main [data-k="feat"]', '3');
+  }
+  where = 'backlash-080';
+  {
+    await units('mm'); await open('backlash', 150);
+    const v = async () => page.$eval('#res', e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
+    const put = async (k, x) => { await page.fill(`#main [data-id="${k}"]`, String(x)); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(60); };
+    await put('r0', '0.002'); await put('r1', '0.014');
+    let t = await v(); if (!/0\.0120 mm/.test(t)) problems.push(`[${where}] lost motion 0.014 - 0.002 = 0.012: ${t.slice(0, 160)}`);
+    await page.selectOption('#main [data-id="mode"]', '2'); await put('rad', '100'); await put('play', '0.01');
+    t = await v(); if (!/20\.63 arcsec/.test(t)) problems.push(`[${where}] 0.01 at 100 = 20.63 arcsec: ${t.slice(0, 160)}`);
+    await page.selectOption('#main [data-id="mode"]', '3'); await put('da', '0.1'); await put('alpha', '20'); await put('pd', '60');
+    t = await v(); if (!/0\.0728 mm/.test(t) || !/0\.0684 mm/.test(t) || !/8\.342 arcmin/.test(t)) problems.push(`[${where}] KHK centre distance 0.1 at 20 deg: ${t.slice(0, 260)}`);
+    await page.click('#main .tpa button[title^="Reset"]').catch(() => {});
   }
   where = 'machines-080';
   {

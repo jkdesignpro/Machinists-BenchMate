@@ -309,16 +309,49 @@ fn engrave(metric: bool, ctrl: Ctrl, text: &str) -> EngraveJob {
     let o = Opts { cap_h: if metric { 5.0 } else { 0.2 }, spacing: 0.0, line: 0.0, stretch: 1.0, align: 0, mode: 0, x: if metric { 10.0 } else { 0.5 }, y: if metric { 20.0 } else { 1.0 }, angle: 0.0, radius: 0.0, mirror: false };
     let l = layout(&f, text, &o).unwrap();
     EngraveJob { metric, ctrl, prog: 7, tool: 12, wcs: 54, rpm: 12000.0, feed: if metric { 300.0 } else { 12.0 }, plunge: if metric { 100.0 } else { 4.0 },
-        z_safe: if metric { 2.0 } else { 0.1 }, depth: if metric { 0.15 } else { 0.006 }, coolant: true, text: text.to_string(), strokes: l.strokes }
+        z_safe: if metric { 2.0 } else { 0.1 }, depth: if metric { 0.15 } else { 0.006 }, coolant: true, text: text.to_string(), strokes: l.strokes, arc_tol: 0.0 }
 }
 
 #[test] fn engrave_generic_mm() { golden("engrave_generic_mm", &gen_engrave(&engrave(true, Ctrl::Generic, "L20 (A)"))); }
 #[test] fn engrave_haas_inch() { golden("engrave_haas_inch", &gen_engrave(&engrave(false, Ctrl::Haas, "Hi"))); }
 
+#[test] fn engrave_arc_fit() {
+    let pi = std::f64::consts::PI;
+    // 13 points on half a circle of radius 5, 15 degrees apart: each line bulges 0.043 from the arc.
+    let pts: Vec<(f64, f64)> = (0..=12).map(|k| { let a = k as f64 * pi / 12.0; (5.0 * a.cos(), 5.0 * a.sin()) }).collect();
+    let pc = fit_arcs(&pts, 0.06);
+    assert_eq!(pc.len(), 1, "{:?}", pc);
+    let (c, cw, sw) = pc[0].arc.unwrap();
+    assert!(c.0.abs() < 1e-9 && c.1.abs() < 1e-9 && !cw && (sw - pi).abs() < 1e-9);
+    assert_eq!(fit_arcs(&pts, 0.0).len(), 12);
+    assert!(fit_arcs(&pts, 0.01).iter().all(|p| p.arc.is_none()));
+    // A straight run with a corner stays lines.
+    let l = vec![(0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (3.0, 0.0), (3.0, 1.0)];
+    assert!(fit_arcs(&l, 0.05).iter().all(|p| p.arc.is_none()));
+    // An S: two half circles, the first clockwise, the second not.
+    let mut s: Vec<(f64, f64)> = (0..=8).map(|k| { let a = pi * (1.0 - k as f64 / 8.0); (5.0 + 5.0 * a.cos(), 5.0 * a.sin()) }).collect();
+    s.extend((1..=8).map(|k| { let a = pi * (1.0 + k as f64 / 8.0); (15.0 + 5.0 * a.cos(), 5.0 * a.sin()) }));
+    let arcs: Vec<bool> = fit_arcs(&s, 0.25).iter().filter_map(|p| p.arc.map(|a| a.1)).collect();
+    assert_eq!(arcs, vec![true, false]);
+}
+
+#[test] fn engrave_writes_arcs() {
+    // An O from the font, with a tolerance: the program has G02 or G03 with I and J, fewer lines than without.
+    let mut j = engrave(true, Ctrl::Generic, "O");
+    let lines = gen_engrave(&j).text.lines().count();
+    j.arc_tol = 0.05;
+    let p = gen_engrave(&j);
+    assert!(p.error.is_none());
+    assert!(p.text.lines().any(|l| (l.starts_with("G02 ") || l.starts_with("G03 ")) && l.contains(" I") && l.contains(" J")), "{}", p.text);
+    assert!(p.text.lines().count() < lines, "{} vs {}", p.text.lines().count(), lines);
+    // The path still ends where the lines end and every arc ends on the circle it names.
+    for m in p.moves.iter().filter(|m| m.kind == 2 || m.kind == 3) { assert!(m.cx.is_finite() && m.cy.is_finite()); }
+}
+
 #[test] fn engrave_program_shape_and_time() {
     // One stroke by hand: an L, 7 down and 3 across, 0.2 deep, safe height 2.
     let j = EngraveJob { metric: true, ctrl: Ctrl::Generic, prog: 1, tool: 1, wcs: 54, rpm: 8000.0, feed: 300.0, plunge: 100.0, z_safe: 2.0, depth: 0.2, coolant: false,
-        text: "L".into(), strokes: vec![vec![(0.0, 7.0), (0.0, 0.0), (3.0, 0.0)], vec![(10.0, 0.0)]] };
+        text: "L".into(), strokes: vec![vec![(0.0, 7.0), (0.0, 0.0), (3.0, 0.0)], vec![(10.0, 0.0)]], arc_tol: 0.0 };
     let p = gen_engrave(&j);
     assert!(p.error.is_none());
     let body: Vec<&str> = p.text.lines().skip_while(|l| !l.starts_with("G43")).collect();
@@ -366,7 +399,7 @@ fn engrave(metric: bool, ctrl: Ctrl, text: &str) -> EngraveJob {
         let b = bbox(&l.strokes).unwrap();
         // capitals and digits stand on the baseline and reach the cap height (script and gothic capitals may swing a little past it)
         assert!(b.0.abs() < 1e-9 && b.1 > -1.6 && b.1 <= 1e-9 && b.3 >= 5.0 - 1e-9 && b.3 < 6.6, "{name}: {b:?}");
-        let j = EngraveJob { metric: true, ctrl: Ctrl::Generic, prog: 1, tool: 1, wcs: 54, rpm: 10000.0, feed: 300.0, plunge: 100.0, z_safe: 2.0, depth: 0.1, coolant: false, text: "X".into(), strokes: l.strokes };
+        let j = EngraveJob { metric: true, ctrl: Ctrl::Generic, prog: 1, tool: 1, wcs: 54, rpm: 10000.0, feed: 300.0, plunge: 100.0, z_safe: 2.0, depth: 0.1, coolant: false, text: "X".into(), strokes: l.strokes, arc_tol: 0.0 };
         let p = gen_engrave(&j);
         assert!(p.error.is_none(), "{name}");
         backplot_agrees(name, &p);

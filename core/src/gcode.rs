@@ -998,6 +998,73 @@ pub struct EngraveJob {
     pub text: String,
     /// Strokes in the XY plane; a stroke with one point is a dot.
     pub strokes: Vec<Vec<(f64, f64)>>,
+    /// 0.8.0: when above zero, runs of short lines that lie on a circle within
+    /// this distance are written as one G02 or G03 arc (see `fit_arcs`).
+    pub arc_tol: f64,
+}
+
+/// One piece of a stroke after arc fitting: a straight move to `end`, or an
+/// arc to `end` about a centre, clockwise or not, sweeping some radians.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Piece { pub end: (f64, f64), pub arc: Option<((f64, f64), bool, f64)> }
+
+/// Circle through three points: centre and radius; None when they are in a line.
+fn circle3(a: (f64, f64), b: (f64, f64), c: (f64, f64)) -> Option<((f64, f64), f64)> {
+    let d = 2.0 * (a.0 * (b.1 - c.1) + b.0 * (c.1 - a.1) + c.0 * (a.1 - b.1));
+    if d.abs() < 1e-12 { return None; }
+    let (a2, b2, c2) = (a.0 * a.0 + a.1 * a.1, b.0 * b.0 + b.1 * b.1, c.0 * c.0 + c.1 * c.1);
+    let ux = (a2 * (b.1 - c.1) + b2 * (c.1 - a.1) + c2 * (a.1 - b.1)) / d;
+    let uy = (a2 * (c.0 - b.0) + b2 * (a.0 - c.0) + c2 * (b.0 - a.0)) / d;
+    let r = ((a.0 - ux).powi(2) + (a.1 - uy).powi(2)).sqrt();
+    if r.is_finite() { Some(((ux, uy), r)) } else { None }
+}
+
+/// Arc through pts[i..=j]: every point within `tol` of the circle through the
+/// first, middle and last points, every line within `tol` of the arc (its
+/// sagitta), always turning the same way, under a full turn, and not so flat
+/// that the lines would do. Returns (centre, clockwise, sweep in radians).
+fn arc_fit(pts: &[(f64, f64)], i: usize, j: usize, tol: f64) -> Option<((f64, f64), bool, f64)> {
+    let (c, r) = circle3(pts[i], pts[(i + j) / 2], pts[j])?;
+    let dc = |p: (f64, f64)| ((p.0 - c.0).powi(2) + (p.1 - c.1).powi(2)).sqrt();
+    let mut turn = 0.0f64;
+    for k in i..j {
+        let (p, q) = (pts[k], pts[k + 1]);
+        if (dc(q) - r).abs() > tol { return None; }
+        let l = ((q.0 - p.0).powi(2) + (q.1 - p.1).powi(2)).sqrt();
+        if l / 2.0 >= r || r - (r * r - l * l / 4.0).sqrt() > tol { return None; }
+        let a = ((p.0 - c.0) * (q.1 - c.1) - (p.1 - c.1) * (q.0 - c.0)).atan2((p.0 - c.0) * (q.0 - c.0) + (p.1 - c.1) * (q.1 - c.1));
+        if a == 0.0 || (turn != 0.0 && a.signum() != turn.signum()) { return None; }
+        turn += a;
+    }
+    let (a, b) = (pts[i], pts[j]);
+    let chord = ((b.0 - a.0).powi(2) + (b.1 - a.1).powi(2)).sqrt();
+    if turn.abs() < std::f64::consts::PI && chord / 2.0 < r && r - (r * r - chord * chord / 4.0).sqrt() <= tol { return None; }
+    if turn.abs() >= 2.0 * std::f64::consts::PI - 1e-6 { return None; }
+    Some((c, turn < 0.0, turn.abs()))
+}
+
+/// A stroke as straight pieces and arcs: from each point, the longest run of
+/// at least three lines that fits one arc within `tol` becomes that arc; the
+/// rest stay straight. tol <= 0 keeps every line as it is.
+pub fn fit_arcs(pts: &[(f64, f64)], tol: f64) -> Vec<Piece> {
+    let (mut out, n, mut i) = (Vec::new(), pts.len(), 0usize);
+    while i + 1 < n {
+        let mut best: Option<(usize, ((f64, f64), bool, f64))> = None;
+        if tol > 0.0 {
+            let mut j = i + 3;
+            while j < n && j <= i + 400 {
+                match arc_fit(pts, i, j, tol) {
+                    Some(a) => { best = Some((j, a)); j += 1; }
+                    None => { if best.is_some() || j >= i + 6 { break; } j += 1; }
+                }
+            }
+        }
+        match best {
+            Some((j, a)) => { out.push(Piece { end: pts[j], arc: Some(a) }); i = j; }
+            None => { out.push(Piece { end: pts[i + 1], arc: None }); i += 1; }
+        }
+    }
+    out
 }
 
 /// Points an engraving program may hold (keeps the text a size a control can load).
@@ -1058,9 +1125,26 @@ pub fn gen_engrave(j: &EngraveJob) -> Program {
         if i > 0 { b.l(format!("G00 X{} Y{}", b.n(x), b.n(y))); b.rapid_to(x, y, zs); }
         b.l(format!("G01 Z{} F{}", b.n(zd), b.feed(j.plunge)));
         b.feed_to(x, y, zd, j.plunge);
-        for (n, p) in s.iter().enumerate().skip(1) {
-            b.l(if n == 1 { format!("X{} Y{} F{}", b.n(p.0), b.n(p.1), b.feed(j.feed)) } else { format!("X{} Y{}", b.n(p.0), b.n(p.1)) });
-            b.feed_to(p.0, p.1, zd, j.feed);
+        // Straight moves stay modal G01; an arc names G02 or G03 with I and J from its start, and the
+        // next straight move names G01 again.
+        let (mut first, mut in_arc) = (true, false);
+        for pc in fit_arcs(s, j.arc_tol) {
+            let p = pc.end;
+            let fw = if first { format!(" F{}", b.feed(j.feed)) } else { String::new() };
+            match pc.arc {
+                Some((c, cw, sweep)) => {
+                    let st = b.pos;
+                    b.l(format!("G0{} X{} Y{} I{} J{}{}", if cw { 2 } else { 3 }, b.n(p.0), b.n(p.1), b.n(q(c.0 - st[0])), b.n(q(c.1 - st[1])), fw));
+                    b.arc_to(cw, p.0, p.1, zd, c.0, c.1, sweep, j.feed);
+                    in_arc = true;
+                }
+                None => {
+                    b.l(format!("{}X{} Y{}{}", if in_arc { "G01 " } else { "" }, b.n(p.0), b.n(p.1), fw));
+                    b.feed_to(p.0, p.1, zd, j.feed);
+                    in_arc = false;
+                }
+            }
+            first = false;
         }
         b.l(format!("G00 Z{}", b.n(zs)));
         let pos = b.pos; b.rapid_to(pos[0], pos[1], zs);
