@@ -143,6 +143,10 @@ async function renderToolGuide(el) {
     tp('<b>Forming (roll) taps</b> have no cutting edges: lobes push the metal into the thread shape, so they make no chips, need no flutes, and give a thread that is generally stronger than a cut one.', ['MSC', 'RS', 'TRAVERS']) +
     tp('They need a ductile material (aluminium, mild and low to medium alloy steels, and similar) and a larger hole than a cutting tap. Good lubrication matters because the tap works by pressure.', ['MSC', 'RS']) +
     tp('<b>Forming tap hole.</b> hole = D − 0.0068 × % × P (inch: D − 0.0068 × % / TPI; metric: D − % × P / 147.06). Use 65 to 75 % thread; forming above 75 % is not recommended. The full comparison of makers is shown under the forming mode of the ' + tgLink('tapdrill', 'Tap drill size') + ' tool.', ['BESLY', 'NAT']) +
+    tp('<b>Pipe taps</b> cut the internal threads of pipe fittings. They come straight or tapered to suit the pipe thread.', ['XO_TAP', 'CCB_TAP']) +
+    tp('<b>Extension taps</b> are taps with a long shank, for holes that are hard to reach such as the hub of a pulley.', ['XO_TAP', 'CCB_TAP']) +
+    tp('<b>Interrupted thread taps</b> have a tooth on every other thread only; Xometry gives the reason as better chip removal.', ['XO_TAP', 'CCB_TAP']) +
+    tp('<b>Combined drill and tap.</b> One tool drills the hole and taps it without a tool change.', ['XO_TAP']) +
 
     '<h3 class="gcat" id="t-rake">Rake and relief of a tap</h3>' +
     tp('<b>Rake (hook).</b> The angle of the cutting face is matched to the work material.', ['REGAL_TG', 'GSR_RAKE']) +

@@ -27,9 +27,12 @@ const TP_SOURCES = {
   MEC: 'MecSoft Corporation, "Best practices in 3 axis machining" (eBook, undated)',
   LCNC_TC: 'LinuxCNC documentation, "Tool compensation": cutter radius compensation (linuxcnc.org)',
   HFO_MP: 'Haas Factory Outlet (Productivity Inc.), Haas Mill Programming manual, revised 06/26',
+  ADSK_4AX: 'M. Deans, Autodesk Fusion blog, "Advanced manufacturing with 4-axis CNC milling", 2020-07-20',
+  CCB_4AX: 'CNC Cookbook, "4 axis CNC machining: the definitive guide", last modified 2024-07-16',
+  LCNC_OV: 'LinuxCNC documentation, "G-code overview", section on linear and rotary axes (linuxcnc.org)',
   OWN: 'BenchMate reasoning or example from the sources beside it',
 };
-const TP_FAMILY = { ADSK_2D: 'ADSK', ADSK_3D: 'ADSK' };
+const TP_FAMILY = { ADSK_2D: 'ADSK', ADSK_3D: 'ADSK', ADSK_4AX: 'ADSK', LCNC_OV: 'LCNC_TC' };
 const tpTags = keys => guideTags(keys, TP_SOURCES, TP_FAMILY);
 const tpP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + tpTags(keys)) + '</p>';
 
@@ -100,6 +103,14 @@ function renderToolpaths(el) {
     tpP('<b>2D (often called 2.5D).</b> The feature is cut by moving in X and Y; Z only sets the depth of each level. Faces, walls, pockets, slots and holes are all 2D work.', ['ADSK_2D', 'MITCBA']) +
     tpP('<b>3D.</b> The tool follows a curved surface, with Z moving together with X and Y.', ['ADSK_3D', 'MEC']) +
     tpP('<b>3+2.</b> A rotary axis turns the part or the head to a fixed angle and ordinary 2D and 3D toolpaths are run there.', ['ADSK_3D']) +
+    '<h3 class="gcat" id="tp-4ax">A fourth axis: indexing and continuous cutting</h3>' +
+    tpP('<b>The fourth axis</b> on a mill is usually the A axis: a rotary table or indexer that turns the part about X.', ['ADSK_4AX', 'CCB_4AX']) +
+    tpP('<b>Indexing (3+1).</b> The rotary axis turns the part to an angle and stops; only then does the cutting start. It reaches several sides of a part in one setup. Gear teeth cut one at a time are the usual example.', ['ADSK_4AX', 'CCB_4AX']) +
+    tpP('<b>Continuous 4-axis.</b> The rotary axis turns while the tool cuts and the other axes move with it. It makes shapes that are hard or impossible any other way; a cam lobe is the usual example.', ['ADSK_4AX', 'CCB_4AX']) +
+    tpP('<b>Wrapping.</b> A flat 2D or 3D toolpath is wrapped round a cylinder: what would have been travel along Y becomes rotation of the fourth axis.', ['ADSK_4AX', 'CCB_4AX']) +
+    tpP('<b>A brake for indexing.</b> A stopped axis has to hold against the cut, so the rotary axis is often locked with a brake once it is in position.', ['CCB_4AX']) +
+    tpP('<b>Programming.</b> Continuous work is harder to program than indexing and asks for a CAM system that can do it.', ['ADSK_4AX']) +
+    tpP('<b>Feed on a move that turns the axis.</b> What F means in feed-per-minute mode depends on which axes move in the block. Read the manual of your control before the first cut that turns the rotary axis.', ['LCNC_OV']) +
 
     '<h2 id="tp-words">The words every toolpath uses</h2>' +
     tpP('<b>Stepover</b> is how far the tool moves sideways between passes: the radial depth, or width, of cut. <b>Stepdown</b> is how far it goes down between levels: the axial depth of cut.', ['ADSK_2D', 'HELICAL']) +

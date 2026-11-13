@@ -1909,7 +1909,7 @@ where = 'toolpaths';
   // Is the statement that starts with these words marked "to be verified"? undefined when there is no such statement.
   const tbv = (g, start) => (g.flag.find(f => f[0].startsWith(start)) || [])[1];
   let g = await guide('toolpaths');
-  if (g.h2 !== 12 || g.svgs !== 3 || g.tabs !== '9,8' || g.srcs !== 8) problems.push(`[${where}] 12 sections, 3 drawings, tables of 8 and 7 rows, 8 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 12 || g.svgs !== 3 || g.tabs !== '9,8' || g.srcs !== 11) problems.push(`[${where}] 12 sections, 3 drawings, tables of 8 and 7 rows, 11 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 32) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Stepover is how far', 'Rules for G41 and G42', 'Getting in', 'Slots', 'Steep or shallow decides']) if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
   for (const k of ['The chain', 'Pencil passes run a small tool', 'Inside corners', 'Deep pockets']) if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
@@ -2018,7 +2018,7 @@ where = 'toolpaths';
   }
   where = 'bearguide';
   g = await guide('bearguide');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '10,10,14,6,5,5' || g.srcs !== 21) problems.push(`[${where}] 8 sections, 3 drawings, tables of 9, 9, 13, 5, 4 and 4 rows, 21 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 11 || g.svgs !== 3 || g.tabs !== '10,10,14,6,5,5,5' || g.srcs !== 27) problems.push(`[${where}] 11 sections, 3 drawings, tables of 9, 9, 13, 5, 4, 4 and 4 rows, 27 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 57) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Thrust bearings take no radial load', 'How it is built', 'Bore number', 'The four small ones', 'Below 10 mm', 'The example above', 'Medium series', 'Makers differ', 'Which way they run', 'The rule', 'The usual case', 'Too loose', 'Too tight', 'When to ask for C3', 'Leave it wrapped', 'Where to push', 'Press, not hammer', 'How large for cold mounting', 'How hot', 'Never hotter than', 'Sealed and greased bearings', 'No oil bath', 'No flame', 'Induction heaters', 'Roughness', 'Rz, sources differ', 'No spiral'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2034,7 +2034,7 @@ where = 'toolpaths';
     if (!/Tight on the shaft k6 or m6 \(NRB\); j5, k5, m5 or m6 \(TFL\)/.test(row('Inner ring turns with the shaft')) || !/Sliding fit in the housing H7/.test(row('Outer ring stands still')) || !/N6 \(NHBB\)/.test(row('Outer ring turns'))) problems.push(`[${where}] fit rows: ${row('Inner ring turns with the shaft')} | ${row('Outer ring turns')}`);
     if (!/^Blue Medium Up to 3\/4 in With hand tools/.test(row('Blue')) || !/above 550 °F/.test(row('Red'))) problems.push(`[${where}] threadlocker rows: ${row('Blue')} | ${row('Red')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
-    if (fl !== 'K DB,') problems.push(`[${where}] only the K and DB, DF, DT rows have one publisher: ${fl}`);
+    if (fl !== 'K DB, Cyanoacrylate') problems.push(`[${where}] only the K, the DB, DF, DT and the cyanoacrylate rows have one publisher: ${fl}`);
   }
   if (!/04 is 20 mm, 05 is 25 mm/.test(g.all) || !/00 is 10 mm, 01 is 12 mm, 02 is 15 mm and 03 is 17 mm/.test(g.all) || !/05 times 5 is a 25 mm bore/.test(g.all) || !/120 °C by Schaeffler and Fabrico; Processing Magazine gives 125 °C \(257 °F\)/.test(g.all) || !/about 100 to 110 °C in a workshop at 20 °C/.test(g.all) || !/Ra 0\.2 to 0\.8 micrometres, with Rmax no more than 6\.3/.test(g.all) || !/55 HRC \(600 HV\), hardened at least 0\.3 mm deep/.test(g.all) || !/10 micrometres in ABEC 1, 7 in ABEC 3, 4 in ABEC 5, 2\.5 in ABEC 7 and 1\.5 in ABEC 9/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   {
@@ -2133,7 +2133,7 @@ where = 'toolpaths';
   }
   where = 'elemguide';
   g = await guide('elemguide');
-  if (g.h2 !== 7 || g.svgs !== 3 || g.tabs !== '11,8,5,7,6,6,5,6' || g.srcs !== 17) problems.push(`[${where}] 7 sections, 3 drawings, tables of 10, 7, 4, 6, 5, 5, 4 and 5 rows, 17 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 10 || g.svgs !== 4 || g.tabs !== '11,8,5,7,6,6,5,6,7,9' || g.srcs !== 24) problems.push(`[${where}] 10 sections, 4 drawings, tables of 10, 7, 4, 6, 5, 5, 4, 5, 6 and 8 rows, 24 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 62) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['The basic law', 'Coefficient of friction', 'It belongs to the pair', 'Static and kinetic', 'A rough guide only', 'What it is. Backlash', 'Why gears need some', 'Accuracy', 'How it is made', 'Sharing it', 'What a cam does', 'Followers are named', 'PV. Pressure times sliding speed', 'The shaft counts too', 'Allow for heat', 'Self-locking depends', 'Friction in the nut', 'Not for running all day', 'Rolled or ground'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2149,7 +2149,7 @@ where = 'toolpaths';
     if (!/^Bronze SAE 841 14 MPa \(2000 psi\) 6\.1 m\/s \(1200 sfm\) 1\.75 MPa·m\/s \(50 000 psi·sfm\)/.test(row('Bronze SAE 841')) || !/^Bronze SAE 660 28 MPa \(4000 psi\) 3\.8 m\/s \(750 sfm\) 2\.6 MPa·m\/s \(75 000 psi·sfm\)/.test(row('Bronze SAE 660')) || !/^Nylon 3 MPa \(400 psi\) 1\.83 m\/s \(360 sfm\) 0\.11 MPa·m\/s \(3000 psi·sfm\)/.test(row('Nylon')) || !/^PTFE 3 MPa \(500 psi\) 0\.5 m\/s \(100 sfm\) 0\.04 MPa·m\/s \(1000 psi·sfm\)/.test(row('PTFE 3'))) problems.push(`[${where}] PV rows: ${row('Bronze SAE 841')} | ${row('PTFE 3')}`);
     if (!/Wikipedia: 20 to 25 % for an Acme screw\. Roton: 45 % at a lead angle of 8°, 65 % at 20° About 90 %/.test(row('Efficiency')) || !/Many are self-locking: the load cannot turn the screw Back-drives: the load can turn the screw/.test(row('Holding a load')) || !/Balls roll between the screw and the nut/.test(row('How it works')) || !/Can be preloaded so that there is no play/.test(row('Backlash'))) problems.push(`[${where}] screw rows: ${row('Efficiency')} | ${row('Holding a load')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ').slice(0, 2).join(' ')).join(', ');
-    if (fl !== 'Cast iron, Cast iron, Tungsten carbide, Cast iron, Bronze, aluminium, Aluminium Light,, Face cam, Lift The, Thrust washer, Two half, Babbitt Soft,, Cast iron, Bronze SAE, Bronze SAE, Nylon 3, PTFE 3, Backlash A') problems.push(`[${where}] the rows with one publisher: ${fl}`);
+    if (fl !== 'Cast iron, Cast iron, Tungsten carbide, Cast iron, Bronze, aluminium, Aluminium Light,, Face cam, Lift The, Thrust washer, Two half, Babbitt Soft,, Cast iron, Bronze SAE, Bronze SAE, Nylon 3, PTFE 3, Backlash A, Steady load,, Part of, Load put, Stress swings, Repeated shock, Stresses that, Automobiles 3.0, Bolts no, Heavy-duty shafting, Lifting hooks, Wire ropes') problems.push(`[${where}] the rows with one publisher: ${fl}`);
   }
   if (!/Most dry pairs lie between 0\.3 and 0\.6\. PTFE can be as low as 0\.04/.test(g.all) || !/0\.1 to 0\.4 for steel on steel/.test(g.all) || !/0\.04 in divided by the diametral pitch on average, with 0\.03 as the least and 0\.05 as the most/.test(g.all) || !/a 20° gear gains 41 % more backlash than a 14\.5° gear/.test(g.all) || !/about one sixth of the bending strength/.test(g.all) || !/glass fibre adds about 30 % and carbon fibre about 90 %/.test(g.all) || !/up to 350 HB\. Hardened gears are typically 58 to 65 HRC/.test(g.all) || !/a difference of 30 to 50 HB or more/.test(g.all) || !/0\.2 to 0\.4 µm Ra or better/.test(g.all) || !/about 0\.5 to 1\.0 times the diameter/.test(g.all) || !/greater than the tangent of the lead angle/.test(g.all) || !/at a lead angle of 8° the screw locks; at 20° the load drives it back/.test(g.all) || !/0\.15 to 0\.23 dry and 0\.10 to 0\.16 with machine oil in one source; a screw maker works with 0\.15/.test(g.all) || !/about a third of the driving torque/.test(g.all) || !/29° thread angle/.test(g.all) || !/from C0, the most precise, to C10/.test(g.all) || !/no more than 80 % of its critical speed/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   {
@@ -2161,7 +2161,7 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
-    if (links !== 'bolttorque,spurgear,gearmeasure,worm,heattreat,bearguide,fits,acme,trapezoidal') problems.push(`[${where}] links to other pages: ${links}`);
+    if (links !== 'bolttorque,spurgear,gearmeasure,worm,heattreat,bearguide,fits,acme,trapezoidal,geartrain,planetary,fatigue,column,threadstrip') problems.push(`[${where}] links to other pages: ${links}`);
   }
   where = 'driveguide';
   g = await guide('driveguide');
@@ -2641,6 +2641,48 @@ where = 'toolpaths';
     const mt = await page.$$eval('#main .mtab', t => Array.from(t[0].querySelectorAll('tr')).map(r => r.innerText.replace(/\s+/g, ' ').trim()));
     const mrow = k => mt.find(t => t.startsWith(k)) || '';
     if (mt.length !== 11 || !/Sources differ/.test(mrow('Nitric acid: stainless or not')) || !/Atlas Steels.*EngineerExcel/.test(mrow('Nitric acid: stainless or not')) || !/darkens within 2 to 4 minutes.*One source/.test(mrow('Molybdenum spot test: 304 from 316')) || !/One source/.test(mrow('Sulphur print: free-machining steel')) || !/Confirmed/.test(mrow('Magnet and stainless')) || !/Confirmed/.test(mrow('When it matters'))) problems.push(`[${where}] metal identification tests: ${mt.length} rows: ${mt.map(t => t.slice(0, 50)).join(' ; ')}`);
+    await mode('advanced');
+  }
+
+  // Tenth batch of 0.7.0: retaining compounds, sealants and structural adhesives, ratchets, elliptical gears, factors of safety,
+  // and the fourth axis in the toolpath guide.
+  where = 'guides-10';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || "").replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+
+    let s = await sect('bearguide', 'bg-ret', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 11 || !has(s, /^What they are\. Anaerobic adhesives for plain round joints, not for threads/, 2, false) || !has(s, /^The gap\. Typically up to 0\.25 mm .*Incure adds up to 0\.5 mm for some grades/, 2, false) || !has(s, /^Heat\. Grades differ/, 1, true)) problems.push(`[${where}] retaining compounds: ${brief(s)}`);
+    s = await sect('bearguide', 'bg-tseal', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 17 || !has(s, /^PTFE tape and fluid power\..*AIMS: never on hydraulic fittings/, 2, false) || !has(s, /^Flange gap\. Up to 0\.5 mm at most/, 2, false) || !has(s, /^Tape colours \(AIMS, Australia\)/, 1, true) || !has(s, /^Cut gaskets/, 1, true)) problems.push(`[${where}] thread and flange sealants: ${brief(s)}`);
+    s = await sect('bearguide', 'bg-struct', ['H2']);
+    {
+      const rows = await page.$$eval('#main table.gtab', t => Array.from(t[t.length - 1].querySelectorAll('tr')).map(r => r.innerText.replace(/\s+/g, ' ').trim()));
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 5 || !/best all-round strength on metals/.test(row('Epoxy')) || /to be verified/.test(row('Epoxy')) || !/Smell and heat while it cures \(Gluegun\.com\)/.test(row('Acrylic (MMA)')) || !/sensitive to moisture/.test(row('Polyurethane')) || !/white bloom.*to be verified/.test(row('Cyanoacrylate'))) problems.push(`[${where}] structural adhesive rows: ${rows.join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 7 || !has(s, /^Preparation decides/, 2, false) || !has(s, /^Temperature\. Two-part adhesives cure faster when warm.*60 to 80 °F/, 1, true)) problems.push(`[${where}] structural adhesives: ${brief(s)}`);
+
+    s = await sect('elemguide', 'me-rat', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 9 || !has(s, /^Lopsided teeth\. One flank of each tooth is a gentle slope, the other is steep/, 2, false) || !has(s, /^Running back\..*up to one tooth spacing/, 2, false) || !has(s, /^Tooth count\..*72 teeth needs a swing of 5°/, 1, true)) problems.push(`[${where}] ratchets: ${brief(s)}`);
+    if (!(await page.$('#main svg.geo[aria-label^="A ratchet wheel with twelve lopsided teeth"]'))) problems.push(`[${where}] the ratchet drawing is missing`);
+    s = await sect('elemguide', 'me-ell', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 7 || !has(s, /^About a focus\./, 2, false) || !has(s, /^How far the ratio swings\. Between 1\/K and K.*up to 3 for a unilobe and up to 2 for a bilobe/, 1, true) || !s.some(x => /No formula for the speed at each angle is given here/.test(x.t))) problems.push(`[${where}] elliptical gears: ${brief(s)}`);
+    s = await sect('elemguide', 'me-fos', ['H2']);
+    {
+      const rows = await page.$$eval('#main table.gtab', t => t.slice(-2).map(x => Array.from(x.querySelectorAll('tr')).map(r => r.innerText.replace(/\s+/g, ' ').trim())));
+      const row = (i, k) => rows[i].find(t => t.startsWith(k)) || '';
+      if (rows[0].length !== 7 || rows[1].length !== 9 || !/not less than 10 EE_FOS ?to be verified/.test(row(0, 'Repeated shock')) || !/^Buildings 2\.0 for each structural member 4 to 6 \(structural steel work\) WP_FOS ?ETB_FOS$/.test(row(1, 'Buildings')) || !/^Pressure vessels 3\.5 to 4\.0 3\.5 to 6 /.test(row(1, 'Pressure vessels')) || !/^Bolts no figure 8\.5 ETB_FOS ?to be verified/.test(row(1, 'Bolts'))) problems.push(`[${where}] factor of safety tables: ${rows[0].join(' | ')} || ${rows[1].join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^What the factor is\..*the load at failure divided by the load allowed/, 2, false) || !has(s, /^Typical figures, two publishers side by side\. Where both print a figure they do not agree/, 2, false) || !has(s, /^Codes come first/, 1, true)) problems.push(`[${where}] factors of safety: ${brief(s)}`);
+
+    s = await sect('toolpaths', 'tp-4ax', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 7 || !has(s, /^Indexing \(3\+1\)\. The rotary axis turns the part to an angle and stops/, 2, false) || !has(s, /^Continuous 4-axis\..*a cam lobe is the usual example/, 2, false) || !has(s, /^Wrapping\./, 2, false) || !has(s, /^Feed on a move that turns the axis/, 1, true)) problems.push(`[${where}] fourth axis: ${brief(s)}`);
+    await open('toolguide', 300);
+    const taps = await page.$$eval('#main p', ps => ps.map(p => ({ t: p.innerText.replace(/\s+/g, ' ').trim(), k: p.querySelectorAll('abbr.gsrc').length, need: !!p.querySelector('.gtbv') })));
+    if (!has(taps, /^Pipe taps cut the internal threads of pipe fittings/, 2, false) || !has(taps, /^Extension taps are taps with a long shank/, 2, false) || !has(taps, /^Interrupted thread taps have a tooth on every other thread only/, 2, false) || !has(taps, /^Combined drill and tap/, 1, true)) problems.push(`[${where}] other kinds of tap: ${brief(taps.filter(x => /taps? /.test(x.t.slice(0, 30))))}`);
     await mode('advanced');
   }
 

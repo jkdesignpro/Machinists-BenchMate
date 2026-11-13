@@ -102,6 +102,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, ninth batch, 2026-11-13):** sump care, the mist limit and bench grinder checks in the shop tools guide; tap rake and tapping fluids in the tooling guide; counterbores and counterfeit fasteners in the fasteners guide; chemical spot tests on the metal identification page. MH158, MH166, MH249, MH200 and MH51 from partial to done; MH112 gained the practice and stays partial. Counted from the tables below: 406 done, 142 partial, 48 missing of 596 in-scope rows, 68 %; 131 more rows to done for the 90 % target.
 
+**Update (0.7.0, tenth batch, 2026-11-13):** retaining compounds, thread and flange sealants and structural adhesives in the bearings and seals guide; ratchets, elliptical gears and factors of safety in the machine elements guide; a fourth axis in the milling toolpath guide; more kinds of tap in the tooling guide. MH293, BB59, ED43, MH272 and CN35 from partial to done; BB8 done with the added kinds of tap; CN6 done on re-audit. Counted from the tables below: 413 done, 135 partial, 48 missing of 596 in-scope rows, 69 %; 124 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -669,7 +671,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH269 | Hypoid and bevel gears | missing | | |
 | MH270 | Worm gearing | partial | `worm` | Basics only |
 | MH271 | Helical gearing; milling helical gears; hobbing change gears | partial | `helicalgear` | Helical gear data; no milling of helical gears or hobbing change gears |
-| MH272 | Elliptic, planetary and ratchet gearing | partial | `planetary` | Planetary sets; no elliptic or ratchet gearing |
+| MH272 | Elliptic, planetary and ratchet gearing | done | `planetary`, `elemguide` | Planetary sets (calculator); 0.7.0: ratchets (wheel and pawl, backlash, tooth count, own drawing) and elliptical gears explained in the machine elements guide. No tooth strength calculation for ratchets and no speed formula for elliptical gears (the one formula found does not agree with its own table) |
 | MH273 | Module system gear design | done | `spurgear` |  |
 | MH274 | Checking gear sizes: over wires/balls, chordal measurement | done | `gearmeasure` |  |
 | MH275 | Gear materials | done | `elemguide` | 0.6.0: seven materials with where each is used, worm and wheel pairing, plastics, heat treatment and hardness (details one source each, marked) |
@@ -695,7 +697,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH290 | Transmission chains and sprockets | partial | `chaindrive` | 0.6.0: chain length in pitches (even), centre distance, pitch by ANSI chain number, sprocket pitch diameters, wrap; no load ratings or tooth form |
 | MH291 | Ball and ACME leadscrews | done | `elemguide`, `acme`, `trapezoidal` | 0.6.0: leadscrew against ball screw (efficiency with both figures shown, self-locking, back-driving, backlash and preload, cost), thread forms, rolled and ground, critical speed rule (one source, marked); thread sizes in `acme` and `trapezoidal` |
 | MH292 | Electric motors | done | `driveguide` | 0.6.0: induction motor principle, synchronous speed and slip, single phase and variable frequency drive (one source each, marked), a NEMA nameplate field by field (mostly one source, marked), frame numbers; no motor selection tables |
-| MH293 | Adhesives and sealants, retaining compounds, threadlocking | partial | `bearguide` | 0.6.0: threadlocker colours, strength, fastener size, taking apart, cure and application (cure and application one source, marked); no retaining compound selection, no sealants or structural adhesives |
+| MH293 | Adhesives and sealants, retaining compounds, threadlocking | done | `bearguide` | 0.6.0: threadlocker colours, strength, fastener size, taking apart, cure and application; 0.7.0: retaining compounds (gaps, fit, surfaces), thread and flange sealants (anaerobic, PTFE tape, pipe dope, silicone, cut gaskets) and a table of structural adhesive families. Product figures are attributed to the supplier that prints them |
 | MH294 | O-rings and glands | partial | `oring` | AS568 sizes and a squeeze, stretch and fill check; no ISO 3601-1 G series, no -9xx sizes, no back-up rings |
 | MH295 | Rolled steel sections, aluminium structural shapes | missing | | |
 | MH296 | Wire and sheet metal gauges | done | `gauges` | 0.6.0: sheet gauges for steel, galvanized, stainless, aluminium and US Standard; AWG by its rule, SWG, tube wall series |
@@ -761,7 +763,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED40 | 7.2 LEFM method | out of scope? | | |
 | ED41 | 7.3 Multi-axis stress states | out of scope? | | |
 | ED42 | 7.4 Fatigue | partial | `fatigue` | Infinite life (Goodman, Soderberg, Gerber, Marin); no finite-life S-N (`claude/mechanics`) |
-| ED43 | 7.5 Factors of safety | partial | `fatigue`, `column` | Factors of safety for fatigue and buckling; no general guidance (`claude/mechanics`) |
+| ED43 | 7.5 Factors of safety | done | `fatigue`, `column`, `elemguide` | Factors of safety for fatigue and buckling in the calculators; 0.7.0: general guidance in the machine elements guide (definition, design against realised factor, margin of safety, a rule of thumb by kind of load, typical figures from two publishers side by side) |
 | ED44 | 7.6 United States practice | out of scope? | | |
 | ED45 | 7.7 What everything is made of | partial | `materials` | |
 | ED46 | 8 Thermodynamics and cycles (10 entries) | out of scope | | |
@@ -825,7 +827,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB5 | Socket size cross-reference inch/metric | done | `spanner` | Lookup of a spanner size against metric and inch heads; 0.7.0: metric and inch sizes in one list in order of size, each converted to the other unit |
 | BB6 | Abbreviations for standard threads | done | `threaddata`, `threadguide` | 0.7.0: 24 abbreviations (Unified, National, pipe, ACME, British, metric, knuckle, conduit, hand, external and internal) with their sources; one-publisher rows marked |
 | BB7 | Thread forms used in engineering | done | `threaddata`, `pipethreads`, `whitworth`, `acme`, `trapezoidal`, `buttress`, `threadguide` | ACME, trapezoidal and buttress data on their own pages; 0.7.0: overview of ten forms with a drawing of six |
-| BB8 | Types of ground thread taps | partial | `toolguide` | Tap types and chamfers; H limits in `taplimits` (`claude/tooling-ref`) |
+| BB8 | Types of ground thread taps | done | `toolguide` | Tap types and chamfers, forming taps, rake and relief; H limits in `taplimits`; 0.7.0: pipe taps, extension taps, interrupted thread taps, combined drill and tap |
 | BB9 | Colour-coded high-performance taps and applications | missing | | Maker-specific; low priority |
 | BB10 | Tapping drill formulae | done | `tapdrill` | |
 | BB11 | Tapping drill sizes for cutting taps | done | `tapdrill` | |
@@ -876,7 +878,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB56 | Workshop metals | done | `materials`, `matguide` | 0.6.0: families of steel, cast iron, stainless and non-ferrous metals in the materials guide |
 | BB57 | Workpiece material comparison table | done | `materials` | |
 | BB58 | Engineering plastics | done | `plastics`, `materials` | 0.7.0 re-audit: 12 plastics with service temperature, expansion, density, annealing, makers' turning data and notes; family of each plastic and the families table |
-| BB59 | Engineering adhesives | partial | `bearguide` | 0.6.0: threadlocker colours, strength, removal, cure and application; no structural adhesives, retaining compound selection or sealants |
+| BB59 | Engineering adhesives | done | `bearguide` | 0.6.0: threadlocker colours, strength, removal, cure and application; 0.7.0: retaining compounds, sealants and structural adhesives (epoxy, acrylic, polyurethane, cyanoacrylate) in the bearings and seals guide |
 | BB60 | Grinding wheels: markings, specs, shapes, faces | done | `shoptools`, `wheelcode` | Markings decoded; eight shapes by type number with a drawing of six, the face of the wheel, choice of abrasive, grit and grade |
 | BB61 | Mounted wheels and points | done | `abrasguide` | 0.6.0: as MH127; no table of shapes, sizes and speeds |
 | BB62 | Tungsten carbide burrs | done | `shoptools` | Cuts and what each is for; speeds by size from two makers, which differ and are both shown |
@@ -910,7 +912,7 @@ One row per learning objective.
 | CN3 | L1 Overall CAD/CAM/CNC process | done | `toolpaths`, `millsetup` | "From model to part" in the milling toolpath guide (CAD, CAM setup, toolpaths, simulation, post-processor; one source, marked), with the machine side in the mill setup guide |
 | CN4 | L2 Shop safety awareness, rules, clothing, conduct | partial | `cncguide` | Short safety page (guards, dress, chips, coolant, lock-out); points to HSE/OSHA, not a full course (`claude/cnc-guide`) |
 | CN5 | L2 Safety precautions when running a new CNC program | done | `millsetup`, `cncguide` | 0.6.0: first-run steps with sources: plot, cut air, slow rapids, stop above the part and compare distance to go, single block |
-| CN6 | L3 Common CNC tools | partial | `toolguide` | End mills, drills, reamers, taps described; no course-specific tool list (`claude/tooling-ref`) |
+| CN6 | L3 Common CNC tools | done | `toolguide`, `cutguide`, `toolpaths` | Re-audit 0.7.0: face mills, end mills (flat, ball, corner radius), chamfer mills, spot and centre drills, drills, reamers, taps, thread mills and boring bars are described in the tooling, cutting tools and toolpath guides. A list tied to one course is not needed |
 | CN7 | L3 Spindle rotation direction | done | `cncguide`, `gmcodes` | 0.6.0: M03/M04/M05 with a drawing seen from above (the viewpoint has one source, marked) |
 | CN8 | L3 Chip formation | done | `cncguide` | Shear zone, chip types, chip thickness (`claude/cnc-guide`) |
 | CN9 | L3 Chip load definition | done | `cncguide`, `feed`, `cutopt` | 0.6.0: chip load defined in the CNC guide (two publishers), with the feed formula and the link to chip thinning |
@@ -939,7 +941,7 @@ One row per learning objective.
 | CN32 | L6 Run a new program safely | done | `millsetup` | 0.6.0: plot, cut air, rapids at 25 or 5 %, stop above the part, single block, every tool |
 | CN33 | L6 Adjust offsets for wear and deflection | done | `millsetup`, `deflection` | 0.6.0: sizes brought in with the diameter and length registers, wear column, which way to change; deflection note (own reasoning, marked) and the calculator |
 | CN34 | L6 Shut down | done | `millsetup` | 0.6.0: part and tool out, chips, wipe down, power off by the manual |
-| CN35 | L7 2.5D, 3D and 4-axis parts | partial | `toolpaths` | 2D (2.5D), 3D and 3+2 positioning explained; no continuous 4-axis work |
+| CN35 | L7 2.5D, 3D and 4-axis parts | done | `toolpaths` | 2D (2.5D), 3D and 3+2 positioning explained; 0.7.0: a fourth axis, indexing (3+1) against continuous cutting, wrapping. Inverse time feed is not described (no readable source) |
 | CN36 | L7 CAD/CAM graphics views | out of scope? | | CAM software usage |
 | CN37 | L7 Identifying 2D machining features | done | `toolpaths` | Feature table and drawing: which toolpath for which feature |
 | CN38 | L7 Machining parameters for 2D toolpaths (stepover, stepdown) | done | `toolpaths`, `chipthin` | Stepover, stepdown, stock to leave, lead-in and lead-out |

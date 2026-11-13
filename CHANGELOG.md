@@ -12,6 +12,12 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (guide sections: adhesives, ratchets, factors of safety, fourth axis)
+- Bearings and seals guide: **Retaining compounds** (what they are for, gaps, the fit, surfaces, heat), **Thread and flange sealants** (anaerobic sealants, PTFE tape and where not to use it, pipe dope, anaerobic against silicone on flanges, cut gaskets) and **Structural adhesives** (epoxy, acrylic, polyurethane and cyanoacrylate compared in a table).
+- Machine elements guide: **Ratchets** with our own drawing of a wheel and pawl, **Elliptical gears**, and **Factors of safety** (what the factor is, design against realised factor, margin of safety, one older rule of thumb by kind of load, and typical figures from two publishers side by side where they differ).
+- Milling toolpath guide: **A fourth axis: indexing and continuous cutting** (the A axis, 3+1, continuous 4-axis, wrapping, the brake, a caution on feed).
+- Tooling guide: pipe taps, extension taps, interrupted thread taps and the combined drill and tap.
+
 ### Added (guide sections: coolant, grinders, taps, fasteners, spot tests)
 - Shop tools guide: **Looking after a sump** (what to check and when, mixing and topping up, tramp oil, when to change the fluid), **Mist and skin** (the limit NIOSH recommends for coolant mist and how to keep it down), and **Bench and pedestal grinders: before you switch on** (ring test, wheel speed, the two guard gaps, where to stand).
 - Tooling guide: **Rake and relief of a tap** and **Fluids for tapping**.
@@ -96,7 +102,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (ninth batch)
 - MH158 (metalworking fluids), MH166 (grinding wheel safety), MH249 (tapping), MH200 (grade marks and counterfeit fasteners) and MH51 (identifying metals) from partial to done. MH112 (counterboring) gained the practice and stays partial: counterbore sizes are listed for socket head cap screws only.
-- 406 done, 142 partial, 48 missing of 596 in-scope rows, 68 %; 131 more rows to done for the 90 % target.
+- Counted after the ninth batch: 406 done, 142 partial, 48 missing.
+
+### Book audit (tenth batch)
+- MH293 (adhesives and sealants), BB59 (engineering adhesives), ED43 (factors of safety), MH272 (elliptic and ratchet gearing) and CN35 (4-axis parts) from partial to done. BB8 (types of taps) done with the added kinds of tap. CN6 (common CNC tools) done on re-audit: the tools it names are described in the tooling, cutting tools and toolpath guides.
+- 413 done, 135 partial, 48 missing of 596 in-scope rows, 69 %; 124 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.

@@ -1,4 +1,4 @@
-// Machine elements guide (parity MH26, ED69, MH266, MH275, MH280, ED73, MH282, MH291).
+// Machine elements guide (parity MH26, ED69, MH266, MH275, MH280, ED73, MH282, MH291, MH272, ED43).
 // All wording and drawings are BenchMate's own. Every statement carries the keys of the public sources read for
 // it (docs/sources.md, "Machine elements guide"); one with fewer than two independent publishers is shown as
 // "to be verified". Where two sources give different figures both are shown with the source named.
@@ -22,9 +22,16 @@ const ME_SOURCES = {
   WP_BSC: 'Wikipedia, "Ball screw" (CC BY-SA)',
   MD_BS: 'Machine Design, "Ballscrews vs. lead screws", 2008-01-01',
   ROTON: 'Roton Products, Screw University, "Efficiency and backdriving"',
+  WP_RAT: 'Wikipedia, "Ratchet (device)" (CC BY-SA)',
+  FIRG_RAT: 'FIRGELLI Automations, R. Dickson, "Ratchet (device) mechanism: how it works, parts, tooth geometry, and real-world uses explained", 2026-04-26',
+  MD_NCG: 'Machine Design, J. Brown, "Noncircular gears make unconventional moves", 2000-03-01',
+  IMD_ELL: 'Industrial Monitor Direct, "Elliptical gearset for variable speed output applications", 2026-05-06',
+  WP_FOS: 'Wikipedia, "Factor of safety" (CC BY-SA)',
+  ETB_FOS: 'The Engineering ToolBox, "Factors of safety"',
+  EE_FOS: 'Engineers Edge, "Factor of safety FOS review" (no author or date shown)',
 };
 // Several pages of one publisher count once.
-const ME_FAMILY = { WP_FR: 'WIKI', WP_BL: 'WIKI', WP_CAM: 'WIKI', WP_PB: 'WIKI', WP_LS: 'WIKI', WP_BSC: 'WIKI', KHK_BL: 'KHK', KHK_GM: 'KHK' };
+const ME_FAMILY = { WP_FR: 'WIKI', WP_BL: 'WIKI', WP_CAM: 'WIKI', WP_PB: 'WIKI', WP_LS: 'WIKI', WP_BSC: 'WIKI', KHK_BL: 'KHK', KHK_GM: 'KHK', WP_RAT: 'WIKI', WP_FOS: 'WIKI', MD_NCG: 'MD_BS' };
 const meTags = keys => guideTags(keys, ME_SOURCES, ME_FAMILY);
 const meP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + meTags(keys)) + '</p>';
 const meBox = d => '<path class="gfill" d="' + d + '"/><path class="gp" d="' + d + '"/>';
@@ -135,13 +142,48 @@ const ME_SCREW = [
   ['Backlash', 'A plain nut always has some', 'Can be preloaded so that there is no play', ['WP_BL', 'WP_BSC']],
 ];
 
+// A ratchet wheel and its pawl. The teeth are laid out here (layout only): a steep flank on a radius, then a slope down to the next root.
+function meRatchet() {
+  const cx = 120, cy = 104, ro = 62, ri = 47, n = 12;
+  const pt = (r, k) => (cx + r * Math.cos(k * 2 * Math.PI / n)).toFixed(1) + ' ' + (cy + r * Math.sin(k * 2 * Math.PI / n)).toFixed(1);
+  let d = 'M' + pt(ri, 0);
+  for (let k = 0; k < n; k++) d += 'L' + pt(ro, k) + 'L' + pt(ri, k + 1);
+  return cnSvg(420, 200,
+    meBox(d + 'Z') + '<circle class="gp" cx="' + cx + '" cy="' + cy + '" r="10" style="fill:none"/>' +
+    meBox('M70 24L80 14L148 55L143.5 63.5L136 62Z') + '<circle class="gp" cx="77" cy="22" r="3"/>' +
+    '<path class="gc" d="M205 70A92 92 0 0 1 205 138M205 138L199 127M205 138L213 129"/>' +
+    '<path class="gm" d="M112 34L170 20M147 51L236 44M160 66L236 70M77 22L44 44"/>' +
+    cnT(174, 22, 'pawl, held down by a spring', 'gs') + cnT(240, 46, 'steep flank: pawl catches', 'gs') + cnT(240, 74, 'slope: pawl rides up', 'gs') +
+    cnT(40, 56, 'pivot', 'gs', 'end') + cnT(216, 108, 'free this way', 'gs') + cnT(120, 190, 'ratchet wheel', 'gs', 'middle'),
+    'A ratchet wheel with twelve lopsided teeth and a pawl resting against the steep flank of one tooth: the wheel turns freely clockwise, the pawl riding up each slope, and is stopped the other way');
+}
+const ME_FOS_LOAD = [
+  ['Steady load, strength known within narrow limits', '3', ['EE_FOS']],
+  ['Part of the load varies', 'not less than 4', ['EE_FOS']],
+  ['Load put on and taken off over and over', '5 or 6', ['EE_FOS']],
+  ['Stress swings between tension and compression', 'not less than 6', ['EE_FOS']],
+  ['Repeated shock', 'not less than 10', ['EE_FOS']],
+  ['Stresses that are complex and hard to know', 'very high; the page names 40 or more', ['EE_FOS']],
+];
+// Typical figures as two publishers print them, side by side. Where both have a figure they do not agree.
+const ME_FOS_TYP = [
+  ['Buildings', '2.0 for each structural member', '4 to 6 (structural steel work)', ['WP_FOS', 'ETB_FOS']],
+  ['Pressure vessels', '3.5 to 4.0', '3.5 to 6', ['WP_FOS', 'ETB_FOS']],
+  ['Aircraft', '1.2 to 4.0 (aircraft and spacecraft)', '1.5 to 2.5 (aircraft components)', ['WP_FOS', 'ETB_FOS']],
+  ['Automobiles', '3.0', 'no figure', ['WP_FOS']],
+  ['Bolts', 'no figure', '8.5', ['ETB_FOS']],
+  ['Heavy-duty shafting', 'no figure', '10 to 12', ['ETB_FOS']],
+  ['Lifting hooks', 'no figure', '8 to 9', ['ETB_FOS']],
+  ['Wire ropes', 'no figure', '8 to 9', ['ETB_FOS']],
+];
+
 function renderElemGuide(el) {
-  const toc = [['me-fric', 'Friction'], ['me-back', 'Backlash'], ['me-gear', 'Gear materials'], ['me-cam', 'Cams'], ['me-plain', 'Plain bearings'], ['me-screw', 'Leadscrews and ball screws']];
+  const toc = [['me-fric', 'Friction'], ['me-back', 'Backlash'], ['me-gear', 'Gear materials'], ['me-cam', 'Cams'], ['me-plain', 'Plain bearings'], ['me-screw', 'Leadscrews and ball screws'], ['me-rat', 'Ratchets'], ['me-ell', 'Elliptical gears'], ['me-fos', 'Factors of safety']];
   const two = (head, rows) => '<div class="res cntab" style="max-width:none"><table class="gtab"><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '<th>Sources</th></tr>' +
     rows.map(r => '<tr><td><b>' + gesc(r[0]) + '</b></td><td>' + gesc(r[1]) + '</td><td>' + meTags(r[2]) + '</td></tr>').join('') + '</table></div>';
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">The machine elements a machinist meets when building, fixing or setting up a machine, in our own words: friction and its coefficients, backlash, what gears are made of, cams and followers, plain bearings, and leadscrews against ball screws. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
+    '<p class="desc">The machine elements a machinist meets when building, fixing or setting up a machine, in our own words: friction and its coefficients, backlash, what gears are made of, cams and followers, plain bearings, leadscrews against ball screws, ratchets, elliptical gears, and factors of safety. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
 
     '<h2 id="me-fric">Friction</h2>' + meFric() +
     meP('<b>The basic law.</b> The friction force is proportional to the force pressing the two surfaces together.', ['WP_FR', 'GUNT', 'MISUMI']) +
@@ -229,6 +271,41 @@ function renderElemGuide(el) {
     meP('<b>Keep dirt out</b> of a ball screw. Bellows are the usual guard.', ['WP_BSC']) +
     meP('<b>Speed.</b> Run a screw at no more than 80 % of its critical speed, the speed that sets the screw vibrating at its natural frequency.', ['WP_LS']) +
     meP('Thread sizes are under <a href="#/t/acme">ACME and Stub ACME threads</a> and <a href="#/t/trapezoidal">metric trapezoidal threads</a>.', null) +
+
+    '<h2 id="me-rat">Ratchets</h2>' + meRatchet() +
+    meP('<b>What a ratchet is.</b> A device that lets a shaft or a rack move one way and stops it going back.', ['WP_RAT', 'FIRG_RAT']) +
+    meP('<b>Wheel and pawl.</b> A wheel (or a straight rack) with teeth, and a pawl: a pivoted finger that a spring holds against the teeth.', ['WP_RAT', 'FIRG_RAT']) +
+    meP('<b>Lopsided teeth.</b> One flank of each tooth is a gentle slope, the other is steep. Going the free way the pawl rides up the slope and drops in behind the next tooth; going back it catches on the steep flank.', ['WP_RAT', 'FIRG_RAT']) +
+    meP('<b>Running back.</b> A ratchet can only hold at a tooth, so it can run back by up to one tooth spacing before it stops. That free travel is the backlash of a ratchet.', ['WP_RAT', 'FIRG_RAT']) +
+    meP('<b>Tooth count.</b> The step from tooth to tooth is 360° divided by the number of teeth. The example given: a spanner head with 72 teeth needs a swing of 5°.', ['FIRG_RAT']) +
+    meP('<b>Twin pawls.</b> One guide fits two pawls where the load is heavy or where running back would be unsafe.', ['FIRG_RAT']) +
+    meP('<b>No teeth at all.</b> Where the backlash has to be small, a smooth wheel with a high-friction surface is used: the pawl bears on it at an angle and jams as soon as the wheel tries to run back.', ['WP_RAT']) +
+    meP('<b>Where you meet one.</b> Ratchet spanners and socket handles, and lever hoists, where the ratchet holds the load. Also winches and tie-down straps (FIRGELLI) and cable ties (Wikipedia).', ['WP_RAT', 'FIRG_RAT']) +
+    meP('<b>Faults with a ratchet.</b> A weak spring lets the pawl chatter or miss the next tooth at speed, and the tips of teeth that are not hard enough round off with use.', ['FIRG_RAT']) +
+
+    '<h2 id="me-ell">Elliptical gears</h2>' +
+    meP('<b>What a pair does.</b> A pair of gears that are not round turns a steady input speed into an output speed that rises and falls within each turn.', ['MD_NCG', 'IMD_ELL']) +
+    meP('<b>About a focus.</b> Two identical elliptical gears each turn about a focus of the ellipse. Machine Design calls this kind unilobe.', ['MD_NCG', 'IMD_ELL']) +
+    meP('<b>Bilobe.</b> A second kind of elliptical gear turns about its centre.', ['MD_NCG']) +
+    meP('<b>How far the ratio swings.</b> Between 1/K and K, where K depends on the shape of the gear. In practice K goes up to 3 for a unilobe and up to 2 for a bilobe gear.', ['MD_NCG']) +
+    meP('<b>A flatter ellipse</b> gives a larger swing in speed and a higher contact stress.', ['IMD_ELL']) +
+    meP('<b>What they are used for.</b> Packaging machines and conveyors. Gears that are not round can stand in for a cam or a linkage and are often simpler, more compact or more accurate.', ['MD_NCG']) +
+    meP('<b>Getting them.</b> Few are held in stock; expect them to be made to order.', ['IMD_ELL']) +
+    '<p class="desc">No formula for the speed at each angle is given here: the one page read that prints one does not agree with its own table. The two sources also count the speed changes in a turn differently, so no count is given.</p>' +
+    meP('Round gears are in <a href="#/t/geartrain">gear train ratio</a> and <a href="#/t/planetary">planetary gear set</a>.', null) +
+
+    '<h2 id="me-fos">Factors of safety</h2>' +
+    meP('<b>What the factor is.</b> How much stronger a part is than it has to be for its greatest load: the load at failure divided by the load allowed.', ['WP_FOS', 'ETB_FOS']) +
+    meP('<b>Required and real.</b> The design factor is what the code or the designer asks for. The realised factor is what the finished part has, and it must not be the smaller of the two.', ['WP_FOS']) +
+    meP('<b>Margin of safety.</b> A related figure: a margin of 0 means the part just meets what is required, and it must not be negative.', ['WP_FOS']) +
+    meP('<b>Against which strength.</b> For a ductile material the factor is often checked against yield and against ultimate strength. For a brittle one the two lie so close that the ultimate strength alone is used.', ['WP_FOS']) +
+    meP('<b>Codes come first.</b> For cranes, pressure vessels and other things covered by law the factor is laid down in the design code. For everything else there is no single standard.', ['ETB_FOS']) +
+    meP('<b>More is not free.</b> Extra strength costs weight and money. Aircraft use low design factors because weight is so costly.', ['WP_FOS']) +
+    meP('<b>The kind of load moves the factor.</b> One older rule of thumb, shown to give the picture and not as design values:', ['EE_FOS']) +
+    guideTable(['Loading', 'Factor in that rule'], ME_FOS_LOAD, meTags) +
+    meP('<b>Typical figures, two publishers side by side.</b> Where both print a figure they do not agree, and neither says in what was read which strength its figures are taken against. Both are shown; nothing is averaged.', ['WP_FOS', 'ETB_FOS']) +
+    guideTable(['', 'Wikipedia', 'The Engineering ToolBox'], ME_FOS_TYP, meTags) +
+    meP('Factors of safety at work: <a href="#/t/fatigue">fatigue</a>, <a href="#/t/column">column buckling</a> and <a href="#/t/threadstrip">thread engagement and breaking force</a>.', null) +
 
     '<h2 id="me-src">Sources</h2><ul class="gsl">' + Object.entries(ME_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
     '<p class="desc">Full URLs and access dates are in docs/sources.md, "Machine elements guide". No text, figures or tables were copied from the sources.</p>';

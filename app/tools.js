@@ -3753,10 +3753,10 @@ const TOOLS = [
 },
 {
   id: 'toolpaths', level: 'advanced', group: 'Guides', title: 'Milling toolpath guide',
-  desc: 'What each milling toolpath is for and how to set it up: from model to part, 2D and 3D, stepover and stepdown, facing, contours with cutter compensation, pockets and slots and how to enter them, chamfer and radius milling, spot, drill and tap, 3D roughing and finishing, rest machining, pencil passes and tolerances.',
+  desc: 'What each milling toolpath is for and how to set it up: from model to part, 2D and 3D, a fourth axis (indexing and continuous cutting), stepover and stepdown, facing, contours with cutter compensation, pockets and slots and how to enter them, chamfer and radius milling, spot, drill and tap, 3D roughing and finishing, rest machining, pencil passes and tolerances.',
   render: el => renderToolpaths(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. The G-code example is one to adapt, not a proven program.',
-  source: 'Autodesk Fusion blog and Inventor CAM help; MIT Center for Bits and Atoms class page; Helical Solutions Machining Guidebook (2016); MecSoft, Best practices in 3 axis machining; LinuxCNC documentation; Haas Factory Outlet mill programming manual. Listed under the guide and in docs/sources.md.',
+  source: 'Autodesk Fusion blog and Inventor CAM help; MIT Center for Bits and Atoms class page; Helical Solutions Machining Guidebook (2016); MecSoft, Best practices in 3 axis machining; LinuxCNC documentation; Haas Factory Outlet mill programming manual; CNC Cookbook (fourth axis). Listed under the guide and in docs/sources.md.',
 },
 {
   id: 'workholding', level: 'advanced', group: 'Guides', title: 'Workholding guide',
@@ -3802,10 +3802,10 @@ const TOOLS = [
 },
 {
   id: 'bearguide', level: 'advanced', group: 'Guides', title: 'Bearings and seals guide',
-  desc: 'Rolling bearings for the person who fits them: what each type carries, how to read a bearing number and its suffixes (2RS, ZZ, C3), tolerance classes (P0 to P2, ABEC), which ring gets the tight fit, mounting cold and with heat, what a radial shaft seal asks of the shaft, and the threadlocker colours.',
+  desc: 'Rolling bearings for the person who fits them: what each type carries, how to read a bearing number and its suffixes (2RS, ZZ, C3), tolerance classes (P0 to P2, ABEC), which ring gets the tight fit, mounting cold and with heat, what a radial shaft seal asks of the shaft, the threadlocker colours, retaining compounds, thread and flange sealants, and the families of structural adhesive.',
   render: el => renderBearGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
-  source: 'Reliability Solutions, RapidDirect and NSK (types); JTEKT Koyo, NSK, a college hand-out and Southern Cross Bearings (numbers); Wikipedia and NSK (tolerance classes); NHBB, NRB, MinebeaMitsumi and TFL (fits); Processing Magazine, Fabrico and Schaeffler (mounting); Seals-Shop and the University of Stuttgart (shaft seals); Permabond and Fastener Engineering (threadlockers). Full list in docs/sources.md, "Bearings and seals guide".',
+  source: 'Reliability Solutions, RapidDirect and NSK (types); JTEKT Koyo, NSK, a college hand-out and Southern Cross Bearings (numbers); Wikipedia and NSK (tolerance classes); NHBB, NRB, MinebeaMitsumi and TFL (fits); Processing Magazine, Fabrico and Schaeffler (mounting); Seals-Shop and the University of Stuttgart (shaft seals); Permabond and Fastener Engineering (threadlockers); AIMS Industrial and Incure (retaining compounds and sealants); Machine Design and Gluegun.com (structural adhesives). Full list in docs/sources.md, "Bearings and seals guide".',
 },
 {
   id: 'abrasguide', level: 'advanced', group: 'Guides', title: 'Abrasive processes guide',
@@ -3830,10 +3830,10 @@ const TOOLS = [
 },
 {
   id: 'elemguide', level: 'advanced', group: 'Guides', title: 'Machine elements guide',
-  desc: 'Friction (the laws, static and kinetic, a table of coefficients quoted source by source), backlash in gears and screws (why it is needed, how it is made, anti-backlash gears, compensation), gear materials and their heat treatment, cams and followers (kinds, base circle, pitch curve, pressure angle, rise, dwell and return), plain bearings (forms, materials, PV limits, shaft and clearance), leadscrews against ball screws (efficiency, self-locking, back-driving, preload). Three drawings.',
+  desc: 'Friction (the laws, static and kinetic, a table of coefficients quoted source by source), backlash in gears and screws (why it is needed, how it is made, anti-backlash gears, compensation), gear materials and their heat treatment, cams and followers (kinds, base circle, pitch curve, pressure angle, rise, dwell and return), plain bearings (forms, materials, PV limits, shaft and clearance), leadscrews against ball screws (efficiency, self-locking, back-driving, preload), ratchets, elliptical gears, and factors of safety with typical figures from two publishers side by side. Four drawings.',
   render: el => renderElemGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
-  source: 'Wikipedia, MISUMI and G.U.N.T. (friction); Wikipedia and KHK (backlash); KHK and MachineMfg (gear materials); Wikipedia, a course text and i GET IT (cams); Wikipedia, GlobalSpec and Armoloy (plain bearings); Wikipedia, Machine Design and Roton (leadscrews and ball screws). Full list with URLs in docs/sources.md.',
+  source: 'Wikipedia, MISUMI and G.U.N.T. (friction); Wikipedia and KHK (backlash); KHK and MachineMfg (gear materials); Wikipedia, a course text and i GET IT (cams); Wikipedia, GlobalSpec and Armoloy (plain bearings); Wikipedia, Machine Design and Roton (leadscrews and ball screws); Wikipedia and FIRGELLI (ratchets); Machine Design and Industrial Monitor Direct (elliptical gears); Wikipedia, The Engineering ToolBox and Engineers Edge (factors of safety). Full list with URLs in docs/sources.md.',
 },
 {
   id: 'driveguide', level: 'advanced', group: 'Guides', title: 'Drives and maintenance guide',
