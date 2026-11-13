@@ -1096,7 +1096,8 @@ def build_matref():
                        'general': [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in pl['general']],
                        'families': families, 'family_note': pl['_family_note']}
     mi = ev['metalid']
-    out['metalid'] = {'spark': mi['spark'], 'tests': [{'test': a, 'text': b, 'src': s, 'status': mr_said(srcs, s)} for a, b, s in mi['tests']]}
+    # A test row may carry a fourth item, 'differs', where two publishers describe the result differently.
+    out['metalid'] = {'spark': mi['spark'], 'tests': [{'test': t[0], 'text': t[1], 'src': t[2], 'status': t[3] if len(t) > 3 else mr_said(srcs, t[2])} for t in mi['tests']]}
     return out
 
 

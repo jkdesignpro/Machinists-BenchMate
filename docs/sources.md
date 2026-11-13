@@ -1579,3 +1579,42 @@ All wording is BenchMate's own. A statement with fewer than two independent publ
 - **[UNCC_BC]** University of North Carolina at Charlotte, engineering toolkit, "Belts & chains", https://engineering.charlotte.edu/academics/senior-design-program/rd-and-consulting/engineering-toolkit/mechanical/belts-chains/ : its two statements on service life contradict each other and are not used.
 - **[DE_DRV]** Design Engineering, L. Burgess, "Which is better: gear drive or belt and pulley drive system?", 2022-03-01, https://www.design-engineering.com/which-is-better-gear-drive-or-belt-and-pulley-drive-system-1004038188/
 - Only statements the pages print are used. A cell that rests on one of the three names it. Upkeep of a chain is shown as "the sources differ" (LearnMech against UNC Charlotte).
+
+## Guide sections added in the ninth batch of 0.7.0, accessed 2026-11-13
+
+All wording is BenchMate's own. A statement with fewer than two independent publishers is marked on the page.
+
+### Looking after a sump; mist and skin (`app/shoptools.js`, sections in the shop tools guide)
+- **[TRAV_COOL]** Travers Tool, "Keeping your cool: 5 steps to coolant success", 2021-05-13, https://solutions.travers.com/metalworking-machining/facilities-solutions/5-steps-to-coolant-success : refractometer, tramp oil and the bacteria under it, aeration, concentrate into water, make-up with a mix and never plain water or concentrate, chips, cleaning.
+- **[KH_COOL]** B. McGrath, Keller-Heartt, "Metalworking coolant management: practical shop checklist", 2026-04-21, https://info.kellerheartt.com/blogs/metalworking-coolant-management : what to check by the day, week, month and quarter; 5 to 10 % for most work. It gives no pH figures, and none are given in the app.
+- **[NIOSH_MWF]** NIOSH, topic page "Metalworking fluids" (archived), https://archive.cdc.gov/www_cdc_gov/niosh/topics/metalworking/default.html : recommended exposure limit of 0.4 mg/m3 thoracic particulate or 0.5 mg/m3 total particulate as a time-weighted average for up to 10 hours a day; the health effects; the preventive measures.
+- **[SAIF_MWF]** SAIF Corporation, industrial hygiene bulletin "Metalworking fluids", March 2026, https://www.saif.com/documents/SafetyandHealth/Chemicals/IH_Bulletin-Metalworking_fluids.pdf : the same limit, called non-regulatory; health effects; when to change the fluid; biocides; ventilation, splash guards, no compressed air, skin care.
+- **Not readable, not counted:** the NIOSH criteria document page 98-102 and a NIOSH checklist page (both came back empty), two MSC articles (placeholder pages).
+
+### Bench and pedestal grinders (`app/shoptools.js`, section in the shop tools guide)
+- **[ROCK_GR]** J. Brigham, Rockford Systems, "Grinder safety: understanding safeguarding standards for bench and pedestal grinders", 2017-03-01, modified 2026-04-01, https://rockfordsystems.com/?p=1612 : work rest within 1/8 in, tongue guard within 1/4 in, ring test, speed marked on the wheel, 90 degree opening, standing aside for the first minute.
+- **[ASMARK_GR]** Asmark Institute, compliance library, "Guarding and clearances, grinders", modified 2026-04-28, https://www.asmark.org/compliance-library/guarding-and-clearances-grinders/ : the two gaps, the guard over spindle end, nut and flange, 270 degrees covered.
+- **[TM_GR]** T&M Associates, safety alert "Bench grinder safety", September 2014, https://riskmanagement.conductor.nd.edu/assets/445066/bench_grinder_safety_tm_2014.pdf : the two gaps, the ring test in detail, wheel speed, eye and face protection.
+- All three report the US rule 29 CFR 1910.215. The rule itself was not read, and the page says so. 3.2 mm and 6.4 mm are our conversions of 1/8 in and 1/4 in.
+
+### Tap rake and fluids for tapping (`app/tooling.js`, sections in the tooling guide; `data/refdata/tooling-evidence.json`)
+- **[REGAL_TG]** Regal Cutting Tools, "Expert's guide to the 4 basic features of tap geometry", https://regalcuttingtools.com/node/14290 : positive and negative hook by the kind of chip, relief, back taper. Same publisher as [REGAL].
+- **[GSR_RAKE]** GSR Gustav Stursberg, "Angle of rake: the angle of rake of the tap", 2020-02-03, https://threadingtoolsguide.com/en/blog/angle-of-rake-the-angle-of-rake-of-the-tap/ : rake matched to the material group, colour rings without a common system.
+- **[AIMS_CF]** AIMS Industrial, "Cutting fluids & cutting oils: types, selection & applications guide", 2026-09-29, https://aimsindustrial.com.au/en-nz/blogs/product-guides/cutting-fluids-guide : fluids for hand and machine tapping and by material. Same publisher as [AIMS_BT]. The tapping fluid statements rest on this one source and are flagged.
+- Neither maker prints rake angles in degrees on the pages read, so the app gives none and says so.
+- **Not used:** a forum thread on cutting fluids (opinions of individual members). **Not readable:** a Cutting Tool Engineering article on taps (the link led to the magazine index).
+
+### Counterbore, spotface and countersink (`app/fastguide.js`, section in the fasteners guide)
+- **[XO_CB]** D. McClements, Xometry, "Spotface vs. counterbore holes in machining: their key differences", 2022-12-16, updated 2025-11-19, https://www.xometry.com/resources/machining/spotface-vs-counterbore-holes/
+- **[MG_CB]** B. Fowler, Machinist Guides, "Counterbores: all about", 2021-02-16, modified 2026-03-01, https://machinistguides.com/counterbores-all-about/
+- **[FIC_CB]** T. Axsom, Fictiv, "Our guide to counterbore holes", 2023-09-08, https://www.fictiv.com/articles/our-guide-to-counterbore-holes : its sentence on the order of cutting with an end mill is unclear and is not used.
+
+### Counterfeit fasteners (`app/fastguide.js`, section in the fasteners guide)
+- **[NIST_FQA]** NIST, "Compliance FAQs: Fastener Quality Act (FQA)", content last updated 2019-11-15, https://www.nist.gov/node/1679196 : what the act requires (conformance, accredited laboratory, maker's insignia, record of conformance kept five years), what it covers.
+- **[MB_CB]** B. Marciszewski, Metric Bolt, "Counterfeit bolts: risks and mitigation in military applications", 2025-04-04, modified 2025-07-18, https://www.metricbolt.com/counterfeit-bolts : a supplier's page; head marks, other signs, tests, papers, traceability.
+- **[EASA_CB]** R. A. Huber, EASA, "Counterfeit bolts: tips on how to avoid them", April 2003, https://easa.com/resources/resource-library/counterfeit-bolts-tips-on-how-to-avoid-them-1 : only the introduction is public (the act of 1990 and why it came).
+- **[LBL_SCI]** Lawrence Berkeley National Laboratory, "Suspect counterfeit items", 2020-02-18, https://assurance.lbl.gov/resource/documents/quality-assurance/suspect-counterfeit-items/ : definitions; specifications in the order and inspection on receipt. The head mark lists it links to were not read, so no list of suspect head marks is shown.
+
+### Chemical spot tests (`data/refdata/matref-evidence.json`, tool `metalid`)
+- **[ATLAS_TN1]** Atlas Steels, Tech Note No. 1, "Qualitative sorting tests for stainless steels", revised 2021-08-11, https://atlassteels.com.au/wp-content/uploads/2021/08/Atlas-Tech-Note-No-1-Qualitative-Sorting-Tests-for-Stainless-Steels-11-08-21.pdf : magnet, nitric acid, molybdenum spot test, sulphur print, and what the tests cannot do.
+- **[EE_SS]** EngineerExcel, "How to identify stainless steel", 2025-01-25, https://engineerexcel.com/how-to-identify-stainless-steel/ : magnet, analysis by XRF and OES. Its description of the nitric acid test differs from Atlas Steels and both are shown ("sources differ"). Its acid tests for 304 against 316 give no acid strengths and no safety notes and are not used.

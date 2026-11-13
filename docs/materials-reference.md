@@ -135,8 +135,15 @@ ATI's sheet names 440C in the title but gives no 440C heat treatment.
 
 Spark, magnet and chip tests from the US Navy Steelworker manual (single source; spark stream
 lengths, colours and bursts for wrought iron, low- and high-carbon steel, grey cast iron,
-stainless, nickel and Monel). File test, appearance, the stainless magnet detail and "use a
-mill certificate or PMI" are our own statements, marked to be verified.
+stainless, nickel and Monel). The file test and appearance are our own statements, marked to
+be verified.
+
+Added in 0.7.0: the magnet on stainless and "use a certificate or an analysis" now rest on
+Atlas Steels Tech Note 1 and EngineerExcel (two publishers). Three chemical spot tests from
+Atlas Steels: nitric acid (stainless or not), the molybdenum spot test (304 from 316) and the
+sulphur print (free-machining steels), each with its limits and one source. EngineerExcel
+describes the result of the nitric acid test differently, so that row is marked "sources
+differ" and prints both. URLs in docs/sources.md, "Chemical spot tests".
 
 ## Not built from batch B4
 

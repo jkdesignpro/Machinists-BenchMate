@@ -1943,7 +1943,7 @@ where = 'toolpaths';
   // hole saw table prints both charts' figures side by side.
   where = 'shoptools';
   g = await guide('shoptools');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,5,5' || g.srcs !== 19) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 4 and 4 rows, 19 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,5,5' || g.srcs !== 26) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 4 and 4 rows, 26 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 46) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four things have to be right', 'Lip clearance', 'Drill point gauge', 'Order', 'Hacksaw blades', 'Break in a new band saw blade', 'Fluid and brush', 'Bigger saw, slower', 'Speed falls with size', 'The rule', 'Dressing and truing are two jobs'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2201,7 +2201,7 @@ where = 'toolpaths';
   }
   where = 'fastguide';
   g = await guide('fastguide');
-  if (g.h2 !== 9 || g.svgs !== 4 || g.tabs !== '11,9,12,7,8,8,8' || g.srcs !== 22) problems.push(`[${where}] 9 sections, 4 drawings, tables of 10, 8, 11, 6, 7, 7 and 7 rows, 22 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 11 || g.svgs !== 4 || g.tabs !== '11,9,12,7,8,8,8' || g.srcs !== 29) problems.push(`[${where}] 11 sections, 4 drawings, tables of 10, 8, 11, 6, 7, 7 and 7 rows, 29 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 42) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['The aim. Engage enough', 'Rule of thumb. Nord-Lock', 'Vibration tests named after Junker', 'What it does. Safety wire', 'Torque first', 'Direction. Lead the wire', 'Twists. About 6 to 8', 'Once only', 'The wire is usually stainless', 'What it is. A set screw', 'What they are. A tapping screw', 'Thread-forming screws push', 'Thread-cutting screws have', 'What it is. A retaining ring', 'Whitworth. Joseph Whitworth', 'BSW and BSF', 'BA. The British Association', 'BSP is the British pipe thread', 'Spanners. A Whitworth', 'Two markings', 'Not Unified'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2230,7 +2230,7 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
-    if (links !== 'threadstrip,boltgrade,bolttorque,sti,bearguide,spanner,shcs,clearance,taperpin,whitworth,pipethreads') problems.push(`[${where}] links to other pages: ${links}`);
+    if (links !== 'threadstrip,boltgrade,bolttorque,sti,bearguide,spanner,shcs,clearance,taperpin,shcs,boltgrade,whitworth,pipethreads') problems.push(`[${where}] links to other pages: ${links}`);
   }
   where = 'threadguide';
   g = await guide('threadguide');
@@ -2608,6 +2608,39 @@ where = 'toolpaths';
     const cmp = await page.$$eval('#main #dvcmp tr', r => r.map(t => Array.from(t.children).map(c => c.innerText.replace(/\s+/g, ' ').trim())));
     if (cmp.length !== 10 || cmp[0].join('|') !== '|Belt|Chain|Gears|Sources' || !/^Slip$/.test(cmp[1][0]) || !/No slip/.test(cmp[1][2]) || !/up to 98 % \(UNC Charlotte\)/.test(cmp[2][2]) || !/The sources differ/.test(cmp[8][2]) || !/to be verified/.test(cmp[9][4]) || /to be verified/.test(cmp[1][4]) || !(await linksOk('dv-cmp'))) problems.push(`[${where}] belt, chain or gears: ${cmp.map(r => r.join(' / ').slice(0, 80)).join(' ; ')}`);
     if (await page.evaluate(() => { const e = document.querySelector('#main #dvcmp .cntab'); return e.scrollWidth > e.clientWidth + 1; })) problems.push(`[${where}] the drives table is wider than its frame`);
+    await mode('advanced');
+  }
+
+  // Ninth batch of 0.7.0: sump care and the mist limit, bench grinder checks, tap rake and tapping fluids, counterbores,
+  // counterfeit fasteners, and the chemical spot tests on the metal identification page.
+  where = 'guides-9';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: n.innerText.replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+
+    let s = await sect('shoptools', 'st-sump', ['H2', 'H3']);
+    if (s.length !== 10 || !has(s, /^Mixing\. Concentrate goes into the water/, 2, false) || !has(s, /^Topping up\. Never plain water/, 1, true) || !has(s, /^Tramp oil/, 3, false)) problems.push(`[${where}] sump care: ${brief(s)}`);
+    s = await sect('shoptools', 'st-mist', ['H2', 'H3']);
+    if (s.length !== 5 || !has(s, /^A limit for mist\. NIOSH recommends no more than 0\.4 mg\/m³ .* or 0\.5 mg\/m³ as total particulate, averaged over a working day of up to 10 hours/, 2, false) || !has(s, /^No compressed air/, 1, true)) problems.push(`[${where}] mist and skin: ${brief(s)}`);
+    s = await sect('shoptools', 'st-bench', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 11 || !has(s, /^Ring test\..*A cracked wheel sounds dead and must not be used/, 2, false) || !has(s, /^Work rest\. No more than 1\/8 in \(3\.2 mm\)/, 3, false) || !has(s, /^Tongue guard\..*no more than 1\/4 in \(6\.4 mm\)/, 3, false) || !has(s, /^Stand to one side/, 1, true)) problems.push(`[${where}] bench grinders: ${brief(s)}`);
+
+    s = await sect('toolguide', 't-rake', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 5 || !has(s, /^Rake \(hook\)\. The angle of the cutting face is matched to the work material/, 2, false) || !has(s, /^Negative hook/, 1, true) || !s.some(x => /No rake angles in degrees are given here/.test(x.t))) problems.push(`[${where}] tap rake: ${brief(s)}`);
+    s = await sect('toolguide', 't-tfluid', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 2 || !has(s, /^By material \(AIMS\)\..*Cast iron: dry where possible/, 1, true) || !(await page.$('#main button.tglink[data-id="shoptools"]'))) problems.push(`[${where}] tapping fluids: ${brief(s)}`);
+
+    s = await sect('fastguide', 'fg-cb', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^Counterbore\. A larger hole with a flat bottom/, 3, false) || !has(s, /^A spotface has no symbol of its own/, 1, true) || !s.some(x => /⌴/.test(x.t))) problems.push(`[${where}] counterbores: ${brief(s)}`);
+    s = await sect('fastguide', 'fg-fake', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^Two marks on the head/, 2, false) || !has(s, /^The US law\. The Fastener Quality Act of 1990/, 2, false) || !has(s, /^It covers metal bolts, nuts, screws and studs of 6 mm \(1\/4 in\) and larger/, 1, true)) problems.push(`[${where}] counterfeit fasteners: ${brief(s)}`);
+
+    await open('metalid', 300);
+    const mt = await page.$$eval('#main .mtab', t => Array.from(t[0].querySelectorAll('tr')).map(r => r.innerText.replace(/\s+/g, ' ').trim()));
+    const mrow = k => mt.find(t => t.startsWith(k)) || '';
+    if (mt.length !== 11 || !/Sources differ/.test(mrow('Nitric acid: stainless or not')) || !/Atlas Steels.*EngineerExcel/.test(mrow('Nitric acid: stainless or not')) || !/darkens within 2 to 4 minutes.*One source/.test(mrow('Molybdenum spot test: 304 from 316')) || !/One source/.test(mrow('Sulphur print: free-machining steel')) || !/Confirmed/.test(mrow('Magnet and stainless')) || !/Confirmed/.test(mrow('When it matters'))) problems.push(`[${where}] metal identification tests: ${mt.length} rows: ${mt.map(t => t.slice(0, 50)).join(' ; ')}`);
     await mode('advanced');
   }
 

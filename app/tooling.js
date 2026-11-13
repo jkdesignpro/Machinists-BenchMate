@@ -14,7 +14,7 @@ const TG_EXTRA = {
   OWN: { publisher: 'BenchMate', title: 'Own derivation (geometry), with tests in core/src/tooling.rs' },
 };
 // USCTI's tapping tips are GWS Tool Group's text: one publisher family.
-const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS', MSC_TM: 'MSC' };
+const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS', MSC_TM: 'MSC', REGAL_TG: 'REGAL', AIMS_CF: 'AIMS_BT' };
 let TG_SRC = TG_EXTRA;
 function tgTags(keys) {
   const ks = keys || [];
@@ -143,6 +143,18 @@ async function renderToolGuide(el) {
     tp('<b>Forming (roll) taps</b> have no cutting edges: lobes push the metal into the thread shape, so they make no chips, need no flutes, and give a thread that is generally stronger than a cut one.', ['MSC', 'RS', 'TRAVERS']) +
     tp('They need a ductile material (aluminium, mild and low to medium alloy steels, and similar) and a larger hole than a cutting tap. Good lubrication matters because the tap works by pressure.', ['MSC', 'RS']) +
     tp('<b>Forming tap hole.</b> hole = D − 0.0068 × % × P (inch: D − 0.0068 × % / TPI; metric: D − % × P / 147.06). Use 65 to 75 % thread; forming above 75 % is not recommended. The full comparison of makers is shown under the forming mode of the ' + tgLink('tapdrill', 'Tap drill size') + ' tool.', ['BESLY', 'NAT']) +
+
+    '<h3 class="gcat" id="t-rake">Rake and relief of a tap</h3>' +
+    tp('<b>Rake (hook).</b> The angle of the cutting face is matched to the work material.', ['REGAL_TG', 'GSR_RAKE']) +
+    tp('<b>Positive hook</b> for soft materials that make long, stringy chips, such as aluminium, mild steel and some stainless steels. The edge is weaker and chips more easily.', ['REGAL_TG']) +
+    tp('<b>Negative hook</b> for materials that make broken or powdery chips, such as cast iron, carbon steels and hardened material. The edge is much stronger.', ['REGAL_TG']) +
+    tp('<b>Colour rings.</b> Machine taps often carry a coloured ring for the material group they are ground for. The makers have no common system; GSR gives red for tempered steels, blue for stainless, yellow for aluminium and white for grey cast iron as the trend.', ['GSR_RAKE']) +
+    tp('<b>Relief.</b> Every tap is ground with back taper: it gets slightly smaller toward the shank. Taps for tough, hard or springy materials are also relieved behind the cutting edge of each thread.', ['REGAL_TG']) +
+    '<p class="desc">No rake angles in degrees are given here: neither maker prints them on the pages read, so the tap maker\'s catalogue is the place to look.</p>' +
+    '<h3 class="gcat" id="t-tfluid">Fluids for tapping</h3>' +
+    tp('<b>Tapping needs lubrication.</b> AIMS: a paste for hand tapping, put on the tap before each hole; neat cutting oil or an EP soluble oil for machine tapping in steel. Fully synthetic fluids form no oil film and are not suited to tapping.', ['AIMS_CF']) +
+    tp('<b>By material (AIMS).</b> Aluminium: a fluid made for aluminium, or kerosene; not an oil with active sulphur, which stains it. Stainless steel: neat EP oil, and plenty of it. Cast iron: dry where possible. Brass, copper and bronze: a light oil without active sulphur, which stains them too. Titanium: a heavy EP neat oil.', ['AIMS_CF']) +
+    '<p>The general rule for choosing a fluid, from two publishers, is in the ' + tgLink('shoptools', 'Shop tools guide') + '.</p>' +
 
     '<h2 id="t-lim">Tap limits (H, L and D numbers)</h2>' +
     tp('<b>H numbers (inch).</b> A ground-thread tap is marked with the pitch diameter band it is made to, in steps of 0.0005 in above the basic pitch diameter: H1 is basic to basic + 0.0005, H2 + 0.0005 to + 0.0010, and so on through 1 in. "GH3" is a ground thread tap to H3.', ['OSG', 'MSC']) +

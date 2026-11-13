@@ -23,6 +23,13 @@ const ST_SOURCES = {
   BACON: 'T. A. Bacon, Introduction to Machining, 11.2 "Grinding wheels" (Washington open textbook, CC BY 4.0)',
   PALM: 'Palmgren, "How to dress a grinding wheel for optimal performance", 2024-10-02',
   MMS_DRESS: 'D. Goetz (Norton, Saint-Gobain Abrasives), Modern Machine Shop, "Optimize grinding processes with proper truing and dressing tools", 2019-07-20',
+  TRAV_COOL: 'Travers Tool, "Keeping your cool: 5 steps to coolant success", 2021-05-13',
+  KH_COOL: 'B. McGrath, Keller-Heartt, "Metalworking coolant management: practical shop checklist", 2026-04-21',
+  NIOSH_MWF: 'NIOSH (US National Institute for Occupational Safety and Health), topic page "Metalworking fluids" (archived)',
+  SAIF_MWF: 'SAIF Corporation, industrial hygiene bulletin "Metalworking fluids", March 2026',
+  ROCK_GR: 'J. Brigham, Rockford Systems, "Grinder safety: understanding safeguarding standards for bench and pedestal grinders", 2017-03-01, modified 2026-04-01',
+  ASMARK_GR: 'Asmark Institute, compliance library, "Guarding and clearances, grinders", modified 2026-04-28',
+  TM_GR: 'T&M Associates, safety alert "Bench grinder safety", September 2014 (hosted by the University of Notre Dame)',
   OWN: 'BenchMate arithmetic or reasoning from the sources beside it',
 };
 // Two chapters of one open textbook count once, as do two articles in one magazine.
@@ -163,6 +170,23 @@ function renderShopTools(el) {
     stP('<b>Copper.</b> One article warns that neat oils with their additives can attack copper.', ['AM']) +
     stP('<b>Looking after it.</b> Fluids mixed with water need care: check the concentration with a refractometer and make up what evaporates. They carry more risk of skin trouble than oil does.', ['AM', 'FUCHS', 'MMS_SAW']) +
     stP('Reading a refractometer is in <a href="#/t/coolconc">coolant concentration</a>, and topping up a sump in <a href="#/t/coolmix">coolant mixing</a>.', null) +
+    '<h3 class="gcat" id="st-sump">Looking after a sump</h3>' +
+    stP('<b>Concentration.</b> Check it with a refractometer as a routine. Keller-Heartt checks every day and writes the figure down, along with the level and a look for floating oil, dirt and foam.', ['KH_COOL', 'TRAV_COOL']) +
+    stP('Keller-Heartt gives 5 to 10 % for most work and up to 12 % or more for aluminium and difficult alloys. Too weak: poor lubrication, rust and shorter tool life. Too strong: foam, mist and waste. The figure for your fluid is its maker\'s.', ['KH_COOL']) +
+    stP('<b>Mixing.</b> Concentrate goes into the water, never water into the concentrate.', ['TRAV_COOL', 'KH_COOL']) +
+    stP('<b>Topping up.</b> Never plain water and never plain concentrate: add a mix, weaker than the first charge when the sump is too strong and stronger when it is too weak.', ['TRAV_COOL']) +
+    stP('<b>Tramp oil.</b> Oil that leaks from the machine floats on the coolant. Skim it off: Travers explains that the layer shuts out the air, which suits the bacteria that spoil a sump.', ['TRAV_COOL', 'KH_COOL', 'SAIF_MWF']) +
+    stP('<b>Chips and fines.</b> Take them out regularly. They give bacteria and fungus a place to grow.', ['TRAV_COOL', 'KH_COOL']) +
+    stP('<b>By the week, month and quarter (Keller-Heartt).</b> pH tested and written down each week; dip slides for bacteria and fungi and a look at the filters each month; the water quality checked and a deeper clean each quarter.', ['KH_COOL']) +
+    stP('<b>A machine that stands idle.</b> Run the coolant for a few hours a day, or fit an aerator.', ['TRAV_COOL']) +
+    stP('<b>Cleaning.</b> Clean the sump regularly, and always before new fluid goes in.', ['TRAV_COOL', 'SAIF_MWF']) +
+    stP('<b>When to change the fluid.</b> A foul smell, slime, a change of colour or a low pH. A biocide keeps the count down but does not clear slime: that takes a clean-out and a fresh charge.', ['SAIF_MWF']) +
+    '<h3 class="gcat" id="st-mist">Mist and skin</h3>' +
+    stP('<b>A limit for mist.</b> NIOSH recommends no more than 0.4 mg/m³ of metalworking fluid aerosol as thoracic particulate, or 0.5 mg/m³ as total particulate, averaged over a working day of up to 10 hours. It is a recommendation, not a regulation.', ['NIOSH_MWF', 'SAIF_MWF']) +
+    stP('<b>Why.</b> Breathing the mist is linked with asthma, chronic bronchitis, hypersensitivity pneumonitis and poorer lung function, and skin contact with irritant and allergic dermatitis.', ['NIOSH_MWF', 'SAIF_MWF']) +
+    stP('<b>Keeping the mist in.</b> Enclosures and splash guards on the machine, and a mist collector or local exhaust that is kept in working order.', ['NIOSH_MWF', 'SAIF_MWF']) +
+    stP('<b>No compressed air</b> to blow fluid off parts or clothes.', ['SAIF_MWF']) +
+    stP('<b>Skin.</b> Gloves where they are safe near turning parts, an apron, washing with mild soap and water and not with solvent or an abrasive cleaner, and a change of clothes that are soaked with fluid.', ['SAIF_MWF', 'NIOSH_MWF']) +
 
     '<h2 id="st-wheel">Grinding wheels: shapes, dressing and truing</h2>' + stWheels() +
     stP('<b>Shapes by number.</b> Type 1 straight, type 2 cylinder, type 4 tapered, type 5 recessed on one side, type 7 recessed on both sides, type 11 flaring cup, type 12 dish, type 13 saucer.', ['BACON']) +
@@ -175,6 +199,18 @@ function renderShopTools(el) {
     stP('<b>When.</b> A wheel that is glazed or loaded, has lost its shape, needs more pressure to cut or leaves a poorer finish is due for dressing.', ['PALM']) +
     stP('<b>Open or closed.</b> Dressed open, with fresh sharp points, a wheel removes stock fast and leaves a rougher finish. Dressed closed it rubs more: a better finish, and much slower stock removal.', ['MMS_DRESS']) +
     stP('<b>Tools.</b> A single-point diamond for fine wheels and exact work, a multi-point diamond for larger wheels, crush rolls for special forms. One maker\'s guide holds the diamond at 10 to 15 degrees to the wheel and dresses every 2 to 4 hours of steady use.', ['PALM']) +
+    '<h3 class="gcat" id="st-bench">Bench and pedestal grinders: before you switch on</h3>' +
+    stP('<b>Ring test.</b> Before a wheel is mounted, tap it lightly on the side with something that is not metal, such as the handle of a screwdriver. A sound wheel gives a clear ring. A cracked wheel sounds dead and must not be used.', ['ROCK_GR', 'TM_GR']) +
+    stP('The wheel has to be dry and clean for the test. Tap it in several places round the wheel.', ['TM_GR']) +
+    stP('<b>Speed.</b> The grinder must not turn faster than the speed marked on the wheel.', ['ROCK_GR', 'TM_GR']) +
+    stP('<b>Work rest.</b> No more than 1/8 in (3.2 mm) from the wheel, so that the work cannot be dragged down between the rest and the wheel. Clamp it tight after setting it.', ['ROCK_GR', 'ASMARK_GR', 'TM_GR']) +
+    stP('<b>Tongue guard.</b> The adjustable guard at the top of the opening: no more than 1/4 in (6.4 mm) from the wheel.', ['ROCK_GR', 'ASMARK_GR', 'TM_GR']) +
+    stP('<b>Set both again as the wheel wears.</b> The gaps open up as the wheel gets smaller.', ['ROCK_GR', 'ASMARK_GR']) +
+    stP('When the rest can no longer be brought close enough, the wheel is due for replacement.', ['TM_GR']) +
+    stP('<b>Guard.</b> The hood covers the end of the spindle, the nut and the flange, and leaves no more than 90° of the wheel open.', ['ASMARK_GR', 'ROCK_GR']) +
+    stP('<b>Stand to one side</b> when the grinder starts, and let it run for a full minute before you grind: a damaged wheel is most likely to break up in that first minute.', ['ROCK_GR']) +
+    stP('<b>Eyes.</b> Safety glasses or goggles, with a face shield over them. The spark shield on the grinder does not count as eye protection.', ['TM_GR']) +
+    stP('The gaps and the 90° opening are those of the US rule 29 CFR 1910.215 as these pages report it. The rule itself was not read.', ['ROCK_GR', 'ASMARK_GR']) +
     stP('The marking on a wheel is decoded in <a href="#/t/wheelcode">grinding wheel marking</a>, and its speed is checked in <a href="#/t/grindspeed">wheel speed</a>.', null) +
 
     '<h2 id="st-src">Sources</h2><ul class="gsl">' + Object.entries(ST_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +

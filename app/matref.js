@@ -187,10 +187,10 @@ async function renderMetalId(el) {
   const M = R.matref; if (!M) { el.textContent = 'Materials reference data not built.'; return; }
   const S = M.sources, X = M.metalid, sp = X.spark;
   const len = v => v === '' ? '-' : inMode() ? 'about ' + v + ' in' : 'about ' + (v * IN_MM / 1000).toFixed(1) + ' m';
-  el.innerHTML = '<p class="desc">Quick shop tests to sort an unknown bar into a family of metals. They do not identify a grade: for that use the mill certificate, a PMI (XRF or OES) analysis or a lab.</p>' +
+  el.innerHTML = '<p class="desc">Quick shop tests to sort an unknown bar into a family of metals, and three chemical spot tests for stainless and free-machining steels. They do not identify a grade: for that use the mill certificate, a PMI (XRF or OES) analysis or a lab.</p>' +
     '<div class="res mtab" style="margin-bottom:14px"><div class="h">Tests</div><table>' + X.tests.map(t => '<tr><td><b>' + rEsc(t.test) + '</b></td><td>' + rEsc(t.text) + '</td><td>' + mrBadge(t.status) + '<div>' + mrSrcTag(S, t.src) + '</div></td></tr>').join('') + '</table></div>' +
     '<div class="res mtab"><div class="h">Spark test streams (' + rEsc(pubName(S, sp.src)) + ')</div><table><tr><th>Metal</th><th>Stream length</th><th>Volume</th><th>Colour</th><th>Bursts</th></tr>' +
     sp.rows.map(r => '<tr><td><b>' + rEsc(r[0]) + '</b></td><td class="v">' + len(r[1]) + '</td><td>' + rEsc(r[2]) + '</td><td>' + rEsc(r[3]) + '</td><td>' + rEsc(r[4]) + '</td></tr>').join('') + '</table></div>' +
     '<p class="ms" style="max-width:760px">' + mrBadge('review') + ' One source (in our words): needs a second source. ' + rEsc(sp._note) + '</p>' +
-    '<div class="note"><b>Sources</b><br>' + mrSources(S, ['NAVY_SW']) + '</div>';
+    '<div class="note"><b>Sources</b><br>' + mrSources(S, ['NAVY_SW', 'ATLAS_TN1', 'EE_SS']) + '</div>';
 }

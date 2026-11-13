@@ -3056,10 +3056,10 @@ const TOOLS = [
 },
 {
   id: 'metalid', level: 'advanced', group: 'Materials', title: 'Metal identification',
-  desc: 'Spark, magnet, chip and file tests to sort an unknown bar into a family of metals, in plain words.',
+  desc: 'Spark, magnet, chip and file tests to sort an unknown bar into a family of metals, and three chemical spot tests (nitric acid, molybdenum, sulphur print) with their limits, in plain words.',
   render: el => renderMetalId(el),
   working: 'No calculation. These tests sort metals into families only; a mill certificate or PMI analysis identifies a grade.',
-  source: 'US Navy Steelworker training manual (spark, chip and magnetic tests). See docs/materials-reference.md.',
+  source: 'US Navy Steelworker training manual (spark, chip and magnetic tests); Atlas Steels Tech Note 1 and EngineerExcel (magnet on stainless, spot tests). See docs/materials-reference.md.',
 },
 {
   id: 'boltgrade', level: 'advanced', group: 'Fasteners', title: 'Bolt grades and property classes',
@@ -3774,10 +3774,10 @@ const TOOLS = [
 },
 {
   id: 'shoptools', level: 'advanced', group: 'Guides', title: 'Shop tools guide',
-  desc: 'Bench and toolroom practice: sharpening twist drills and what a badly ground point does, grinding lathe tool bits, hacksaw and band saw blades and breaking a blade in, hole saw speeds from two charts, carbide burr speeds, choosing a cutting fluid, grinding wheel shapes, dressing and truing.',
+  desc: 'Bench and toolroom practice: sharpening twist drills and what a badly ground point does, grinding lathe tool bits, hacksaw and band saw blades and breaking a blade in, hole saw speeds from two charts, carbide burr speeds, choosing a cutting fluid, looking after a coolant sump, the recommended limit for coolant mist, grinding wheel shapes, dressing and truing, and what to check on a bench grinder before switching on.',
   render: el => renderShopTools(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Speeds are printed as the two charts give them, side by side; the cutting speed for hole saws in mild steel is our arithmetic from both charts.',
-  source: 'TTE work instruction and the Machinery Repairman manual (drills); J. A. Nilsson and mini-lathe.com (tool bits); Introduction to Machining (CC BY), Tameson, Fastenal, Sawblade.com, Modern Machine Shop (saws); RUKO chart at AutomationDirect and Remora Electrical (hole saws); Klingspor and Amana Tool (burrs); American Machinist and FUCHS (fluids); Palmgren and Norton in Modern Machine Shop (dressing). See docs/sources.md, "Shop tools guide".',
+  source: 'TTE work instruction and the Machinery Repairman manual (drills); J. A. Nilsson and mini-lathe.com (tool bits); Introduction to Machining (CC BY), Tameson, Fastenal, Sawblade.com, Modern Machine Shop (saws); RUKO chart at AutomationDirect and Remora Electrical (hole saws); Klingspor and Amana Tool (burrs); American Machinist and FUCHS (fluids); Travers Tool and Keller-Heartt (sump care); NIOSH and SAIF (mist and skin); Palmgren and Norton in Modern Machine Shop (dressing); Rockford Systems, the Asmark Institute and T&M Associates (bench grinders). See docs/sources.md, "Shop tools guide".',
 },
 {
   id: 'matguide', level: 'advanced', group: 'Guides', title: 'Materials guide',
@@ -3844,10 +3844,10 @@ const TOOLS = [
 },
 {
   id: 'fastguide', level: 'advanced', group: 'Guides', title: 'Fasteners guide',
-  desc: 'How much thread to engage, why fasteners come loose and ten ways of locking them, safety wire (lock wire), set screw points, screw heads and drives, self-tapping screws (thread-forming against thread-cutting, the common types), pins (dowel, taper, spring, grooved, split), retaining rings, and British fasteners (Whitworth, BSF, BA, BSP and how the spanners are marked). Four drawings.',
+  desc: 'How much thread to engage, why fasteners come loose and ten ways of locking them, safety wire (lock wire), set screw points, screw heads and drives, self-tapping screws (thread-forming against thread-cutting, the common types), pins (dowel, taper, spring, grooved, split), retaining rings, counterbore, spotface and countersink, counterfeit fasteners and how they are caught, and British fasteners (Whitworth, BSF, BA, BSP and how the spanners are marked). Four drawings.',
   render: el => renderFastGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
-  source: 'Nord-Lock and a university shop (engagement); Machine Design, Fastener Engineering and Essentra (locking); Wikipedia and the FAA (safety wire); Wikipedia, Tameson and bolts.co.uk (set screws); Accu and Essentra (heads and drives); Machine Design, Essentra and Specialty Bolt (tapping screws); Machine Design and Fastener Engineering (pins); Wikipedia and Rotor Clip (retaining rings); the Aircraft Engine Historical Society and Wikipedia (British fasteners). Full list with URLs in docs/sources.md.',
+  source: 'Nord-Lock and a university shop (engagement); Machine Design, Fastener Engineering and Essentra (locking); Wikipedia and the FAA (safety wire); Wikipedia, Tameson and bolts.co.uk (set screws); Accu and Essentra (heads and drives); Machine Design, Essentra and Specialty Bolt (tapping screws); Machine Design and Fastener Engineering (pins); Wikipedia and Rotor Clip (retaining rings); Xometry, Machinist Guides and Fictiv (counterbores); NIST, Metric Bolt, EASA and Lawrence Berkeley National Laboratory (counterfeit fasteners); the Aircraft Engine Historical Society and Wikipedia (British fasteners). Full list with URLs in docs/sources.md.',
 },
 {
   id: 'threadguide', level: 'advanced', group: 'Guides', title: 'Thread forms and terms',
@@ -3872,7 +3872,7 @@ const TOOLS = [
 },
 {
   id: 'toolguide', level: 'advanced', group: 'Guides', title: 'Tooling guide',
-  desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps and tap limits, thread mills and how they compare with tapping, saw blade pitch and broken tap removal.',
+  desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps with their rake and the fluids for tapping, tap limits, thread mills and how they compare with tapping, saw blade pitch and broken tap removal.',
   render: el => renderToolGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements without two independent public sources are marked "needs 2nd source". Coating temperatures show every value printed.',
   source: 'Tool and coating makers and distributors listed under the guide and in docs/tooling.md (data/refdata/tooling-evidence.json).',

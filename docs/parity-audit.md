@@ -100,6 +100,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, eighth batch, 2026-11-13):** five guide sections: thread and ball micrometers, thread mills, threading on a CNC lathe (G32, tapered and multi-start threads), subprograms with worked examples, and belt against chain against gears. MH245, MH260, MH181, MH182 and ED76 from partial to done. Counted from the tables below: 401 done, 147 partial, 48 missing of 596 in-scope rows, 67 %; 136 more rows to done for the 90 % target.
 
+**Update (0.7.0, ninth batch, 2026-11-13):** sump care, the mist limit and bench grinder checks in the shop tools guide; tap rake and tapping fluids in the tooling guide; counterbores and counterfeit fasteners in the fasteners guide; chemical spot tests on the metal identification page. MH158, MH166, MH249, MH200 and MH51 from partial to done; MH112 gained the practice and stays partial. Counted from the tables below: 406 done, 142 partial, 48 missing of 596 in-scope rows, 68 %; 131 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -411,7 +413,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH48 | Tabulated properties of ceramics, plastics, investment-casting and powder metal alloys | partial | `materials` | 5 plastics; no ceramics, casting or PM alloys |
 | MH49 | Elastic properties; effect of temperature on strength | partial | `materials` | E for 27 entries; no temperature effect |
 | MH50 | Standard steels: classification, AISI/SAE/UNS numbering | done | `materials`, `matguide` | 0.6.0: numbering explained in the materials guide (digits, 17 series, letters L, B, H); equivalents in `materials`. UNS numbers are not explained |
-| MH51 | Identifying metals | partial | `metalid` | Spark, magnet and chip tests (one source); no chemical spot tests |
+| MH51 | Identifying metals | done | `metalid` | Spark, magnet and chip tests (one source); 0.7.0: magnet on stainless with two sources, and three chemical spot tests (nitric acid, molybdenum, sulphur print) with their limits |
 | MH52 | Compositions of carbon, alloy and stainless steels | partial | `materials` | 0.5.0: 37 grades, limits from two public sources each where found (see docs/material-equivalents.md) |
 | MH53 | Applications and mechanical properties of steels | partial | `materials`, `matguide` | Properties for some grades; uses by carbon class in the materials guide; no applications by grade |
 | MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials`, `matguide` | 10 tool-steel grades as equivalents; 0.6.0: the letter groups with an example grade, quench, hardness and machinability rating (one source for the figures); no selection guide by job, faults or heat treatment |
@@ -482,7 +484,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH109 | Twist drill terms and types | done | `toolguide`, `cutguide` | Drill types and point angles 118/135/140, split point, spot drill angle in `toolguide`; 0.6.0: fourteen terms with a drawing, point, helix and lip clearance angles (the last two one source, marked) |
 | MH110 | Drill sizes: fractional, gauge, letter, metric | done | `drillchart` | |
 | MH111 | Taper-shank drills; tolerance on diameter; accuracy of drilled holes | missing | | |
-| MH112 | Counterboring, counterbore sizes for bolts | partial | `shcs` | Counterbore sizes for socket head cap screws only (two makers, shown side by side); no counterboring practice or other head types |
+| MH112 | Counterboring, counterbore sizes for bolts | partial | `shcs`, `fastguide` | Counterbore sizes for socket head cap screws only (two makers, shown side by side); 0.7.0: counterbore, spotface and countersink explained in the fasteners guide (three publishers); no counterbore sizes for other head types |
 | MH113 | Boring tools | done | `boringbar`, `cutguide` | Overhang and deflection by bar material in `boringbar`; 0.6.0: boring tool types, why holes are bored, overhang limits, insert and cutting data against chatter |
 | MH114 | Taps: forms, marking, series designations, tap terms and dimensions | partial | `toolguide` | Tap types (spiral point, spiral flute, straight, forming) and chamfer lengths; no marking, series or tap dimensions (`claude/tooling-ref`) |
 | MH115 | Tap thread limits (H and D limits), pipe and insert taps | partial | `taplimits` | Inch H and L, metric D numbers computed and checked against 1B/2B/3B and 6H/5H/7H/6G; no pipe or STI tap limits; D minimums only where OSG prints them (`claude/tooling-ref`) |
@@ -533,7 +535,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH155 | Automatic screw machines: knurling, cams, speeds, stock | partial | `bar` | Bar stock per part only; cam work missing |
 | MH156 | Band saw blade selection, speeds, feeds, break-in | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch rule, blade types, break-in, fault table and cut time; no band speeds by material |
 | MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | done | `shoptools`, `coolconc`, `coolmix` | Neat oil, emulsion, semi-synthetic and synthetic compared; which for slow heavy work and which for fast cutting; by material |
-| MH158 | Metalworking fluids: classes, maintenance, exposure | partial | `shoptools`, `coolconc`, `coolmix` | Classes, concentration and mixing, care of mixed fluids; no exposure limits or sump maintenance schedule |
+| MH158 | Metalworking fluids: classes, maintenance, exposure | done | `shoptools`, `coolconc`, `coolmix` | Classes, concentration and mixing, care of mixed fluids; 0.7.0: what to check on a sump and when, when to change the fluid, the mist limit NIOSH recommends and how to keep mist and skin contact down |
 | MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | missing | | |
 | MH160 | Machining non-metals (hard rubber, laminates) | partial | `plastics` | Machining plastics; no hard rubber or laminates |
 | MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | partial | `abrasguide` | 0.6.0: grinding ratio with its range and an example, what lowers wheel wear, wheel speeds, spark-out (mostly one source each, marked); no optimum data, no forces |
@@ -541,7 +543,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | done | `shoptools`, `wheelcode`, `gritconv` | Markings decoded; shapes by type number, choice of abrasive, grit and grade (the choice rests on one source, marked) |
 | MH164 | Dressing and truing; diamond sizes | partial | `shoptools` | Dressing against truing, when to dress, open and closed dressing, the tools; no diamond sizes |
 | MH165 | Diamond wheels: shapes, designations, selection | partial | `abrasguide` | 0.6.0: what diamond and CBN grind, concentration table, bond, how the shape code is built, wheel speeds (shape code and speeds one source, marked); no list of body shapes, no selection table |
-| MH166 | Grinding wheel safety and safe operating speeds | partial | `grindspeed`, `wheelcode` | Speed check against the marked max speed and the rule to obey it; no full safety code (`claude/calcs-3`) |
+| MH166 | Grinding wheel safety and safe operating speeds | done | `grindspeed`, `wheelcode`, `shoptools` | Speed check against the marked max speed and the rule to obey it; 0.7.0: ring test, work rest and tongue guard gaps, guard opening, where to stand and eye protection for bench and pedestal grinders (three publishers reporting the US rule; the rule itself not read) |
 | MH167 | Cylindrical grinding (traverse, plunge, high speed, troubles) | partial | `grindtime`, `grindspeed` | Traverse and plunge time, speed ratio, equivalent diameter; no high-speed grinding or troubleshooting (`claude/calcs-3`) |
 | MH168 | Centerless grinding | done | `abrasguide` | 0.6.0: arrangement with drawing, regulating wheel, work above centre, through-feed, infeed and end-feed, lobing, what it holds (figures from one source, marked) |
 | MH169 | Surface grinding | partial | `grindsurf` | Cycle time only; no wheel or feed recommendations (`claude/calcs-3`) |
@@ -585,7 +587,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | MH198 | Torque and tension: tightening, wrench torque, preload, friction | partial | `bolttorque` | VDI 2230 torque from preload with your own friction (cited classes shown); no torque-angle or yield-controlled tightening, no tightening factor (scatter) |
 | MH199 | Thread tensile-stress area, torque-tension relationships | done | `bolttorque` | Stress area (ISO and Unified), torque-preload relation with the share of each term (`claude/fasteners`) |
-| MH200 | Grade marks, material properties, counterfeit detection | partial | `boltgrade` | ISO 898-1, SAE J429 and ASTM A574 minimums and head marks; no counterfeit detection |
+| MH200 | Grade marks, material properties, counterfeit detection | done | `boltgrade`, `fastguide` | ISO 898-1, SAE J429 and ASTM A574 minimums and head marks; 0.7.0: counterfeit fasteners in the fasteners guide (the two marks, tests, papers, the Fastener Quality Act). No list of suspect head marks (not readable) |
 | MH201 | Working strength, engagement length, breaking force, lock wire | done | `threadstrip`, `fastguide`, `boltgrade`, `bolttorque` | 0.7.0: breaking force from the stress area and your own tensile strength, simplified least engagement (one source, marked) and the rules of thumb with differing sources side by side in `threadstrip`; lock wire in `fastguide`; strengths in `boltgrade`, preload in `bolttorque`. The detailed FED-STD-H28 stripping method is not built (no readable free source) |
 | MH202 | Inch bolts, screws, nuts and washers (dimensions) | partial | `shcs`, `spanner`, `hexhw` | Socket head cap screw heads and hex widths across flats; 0.7.0: inch nut width and thickness (one publisher); no inch bolt head heights (the free tables disagree) and no inch washers |
 | MH203 | Wrench clearances | missing | | |
@@ -639,7 +641,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH246 | Three-wire method, best wire sizes, formulas | partial | `wires` | 60, 55, 30, 29 degree; no lead-angle correction (`claude/threads-3`) |
 | MH247 | Wire measurement of Whitworth, ACME, stub ACME, taper and buttress threads | partial | `wires`, `acme`, `trapezoidal` | Whitworth, ACME, Stub ACME and trapezoidal; no taper or buttress wires (`claude/threads-3`) |
 | MH248 | Thread gauges, gauge tolerances | partial | `threadgauge` | 0.5.0: GO and NOT GO plug and ring pitch diameter limits for Unified 2A, 2B, 3A, 3B with the X tolerance; no metric (ISO 1502), no setting plugs |
-| MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | partial | `advtap`, `toolguide` | Tap types and tapping speed (one publisher); no rake angles or lubricants |
+| MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | done | `advtap`, `toolguide` | Tap types and tapping speed (one publisher); 0.7.0: rake (hook) by kind of chip, relief, colour rings, fluids for tapping by material (fluids on one source, marked). No rake angles in degrees: the makers read do not print them |
 | MH250 | Tap drill diameter, percentage of thread, cold form tapping | done | `tapdrill` | |
 | MH251 | Tap and clearance drills; tolerances of tapped holes | done | `tapdrill`, `threaddata`, `clearance` | Clearance holes added in `clearance` (`claude/fasteners`) |
 | MH252 | Removing a broken tap | done | `toolguide` | 0.7.0: extractor, breaking up, EDM, drilling out, chemical, welding and prevention, each with two or three publishers |

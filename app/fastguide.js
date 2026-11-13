@@ -27,6 +27,13 @@ const FG_SOURCES = {
   RC: 'Rotor Clip, F. Ellison, "Exploring retaining ring styles: a comprehensive guide", 2023-09-06',
   EH_BR: 'Aircraft Engine Historical Society, G. White, "British fastening systems", with S. Moore, "Why British spanners have dual markings"',
   WP_BSW: 'Wikipedia, "British Standard Whitworth" (CC BY-SA)',
+  XO_CB: 'D. McClements, Xometry, "Spotface vs. counterbore holes in machining: their key differences", 2022-12-16, updated 2025-11-19',
+  MG_CB: 'B. Fowler, Machinist Guides, "Counterbores: all about", 2021-02-16, modified 2026-03-01',
+  FIC_CB: 'T. Axsom, Fictiv, "Our guide to counterbore holes", 2023-09-08',
+  NIST_FQA: 'NIST, "Compliance FAQs: Fastener Quality Act (FQA)", content last updated 2019-11-15',
+  MB_CB: 'B. Marciszewski, Metric Bolt, "Counterfeit bolts: risks and mitigation in military applications", 2025-04-04 (a supplier\'s page)',
+  EASA_CB: 'R. A. Huber, EASA, "Counterfeit bolts: tips on how to avoid them", April 2003 (only the introduction is public)',
+  LBL_SCI: 'Lawrence Berkeley National Laboratory, "Suspect counterfeit items", 2020-02-18',
 };
 // Several pages of one publisher count once.
 const FG_FAMILY = { WP_SW: 'WIKI', WP_SS: 'WIKI', WP_RR: 'WIKI', WP_BSW: 'WIKI', MD_LOCK: 'ENDEAVOR', MD_TS: 'ENDEAVOR', MD_PIN: 'ENDEAVOR', ESS_LN: 'ESSENTRA', ESS_H: 'ESSENTRA', ESS_TS: 'ESSENTRA', FE_LOCK: 'FE', FE_PIN: 'FE' };
@@ -159,7 +166,7 @@ const FG_RING = [
   ['Bevelled ring', 'A 15 degree edge wedges between the groove and the part.', 'Takes up end play rigidly.', ['WP_RR']],
 ];
 function renderFastGuide(el) {
-  const toc = [['fg-eng', 'Thread engagement'], ['fg-lock', 'Keeping fasteners tight'], ['fg-set', 'Set screws'], ['fg-head', 'Heads and drives'], ['fg-tap', 'Self-tapping screws'], ['fg-pin', 'Pins'], ['fg-ring', 'Retaining rings'], ['fg-brit', 'British fasteners']];
+  const toc = [['fg-eng', 'Thread engagement'], ['fg-lock', 'Keeping fasteners tight'], ['fg-set', 'Set screws'], ['fg-head', 'Heads and drives'], ['fg-tap', 'Self-tapping screws'], ['fg-pin', 'Pins'], ['fg-ring', 'Retaining rings'], ['fg-cb', 'Counterbore and spotface'], ['fg-fake', 'Counterfeit fasteners'], ['fg-brit', 'British fasteners']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Fasteners as a machinist meets them, in our own words: how much thread to engage, what keeps a fastener tight, lock wire, set screw points, screw heads and drives, self-tapping screws, pins, retaining rings and the old British threads. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
@@ -225,6 +232,28 @@ function renderFastGuide(el) {
     guideTable(['Ring', 'Fitting', 'Notes'], FG_RING, fgTags) +
     fgP('<b>Standards.</b> ASME B18.27, DIN 471 and DIN 472.', ['WP_RR']) +
     '<p class="desc">Groove dimensions are not listed here yet.</p>' +
+
+    '<h2 id="fg-cb">Counterbore, spotface and countersink</h2>' +
+    fgP('<b>Counterbore.</b> A larger hole with a flat bottom on the same centre as a smaller one, deep enough to take the head of a screw below the surface.', ['XO_CB', 'MG_CB', 'FIC_CB']) +
+    fgP('<b>Spotface.</b> A very shallow counterbore: only deep enough to give the head or the washer a flat seat, on the rough skin of a casting for example.', ['XO_CB', 'MG_CB', 'FIC_CB']) +
+    fgP('<b>Countersink.</b> A conical seat for a screw with a tapered head. Machinist Guides lists 82°, 90° and 100° as the angles.', ['MG_CB', 'FIC_CB']) +
+    fgP('<b>On the drawing.</b> The counterbore symbol ⌴ with the diameter and the depth. Older prints write CBORE.', ['XO_CB', 'MG_CB', 'FIC_CB']) +
+    fgP('A spotface has no symbol of its own: it is the counterbore symbol with SF in it.', ['XO_CB']) +
+    fgP('<b>Making one.</b> Drill the smaller hole first, then cut the counterbore on the same centre.', ['XO_CB', 'FIC_CB']) +
+    fgP('The flat bottom needs a tool with a flat end, not a drill point.', ['XO_CB']) +
+    fgP('<b>Size.</b> The diameter is that of the head plus clearance, the depth the height of the head plus any washer.', ['FIC_CB']) +
+    fgP('Counterbore sizes for socket head cap screws are in <a href="#/t/shcs">socket head cap screws</a>.', null) +
+
+    '<h2 id="fg-fake">Counterfeit fasteners</h2>' +
+    fgP('<b>Suspect and counterfeit.</b> A suspect item is one that may not meet the specification it is sold to. A counterfeit is a copy or substitute passed off without the right to do so.', ['LBL_SCI']) +
+    fgP('<b>Two marks on the head.</b> A graded bolt carries the mark of its grade and the mark of its maker. Check both.', ['MB_CB', 'NIST_FQA']) +
+    fgP('<b>Other signs.</b> A poor finish, marks that are wrong, papers that do not match the goods. A counterfeit can still look right to an untrained eye.', ['MB_CB']) +
+    fgP('<b>Proof is a test.</b> Hardness and tensile tests, and analysis of the steel. Under the US law the tests behind a grade mark are done by an accredited laboratory.', ['MB_CB', 'NIST_FQA']) +
+    fgP('<b>Papers.</b> Ask for the certificate of the lot. The US law has the maker keep, for five years, a record with the lot number, the standard, the chemistry and grade of the material and the test results.', ['NIST_FQA', 'MB_CB']) +
+    fgP('<b>The US law.</b> The Fastener Quality Act of 1990 followed fastener failures in the 1980s. A fastener must meet the specification it is sold to.', ['NIST_FQA', 'EASA_CB']) +
+    fgP('It covers metal bolts, nuts, screws and studs of 6 mm (1/4 in) and larger, with many exemptions.', ['NIST_FQA']) +
+    fgP('<b>Buying.</b> Write the standard and the grade in the order, buy where the lot can be traced, and look at the goods when they arrive.', ['LBL_SCI', 'MB_CB']) +
+    fgP('Grade marks and what each grade must reach are in <a href="#/t/boltgrade">bolt grades and property classes</a>.', null) +
 
     '<h2 id="fg-brit">British fasteners</h2>' +
     fgP('<b>Whitworth.</b> Joseph Whitworth put forward his thread in 1841. It has an angle of 55 degrees, with rounded crests and roots.', ['EH_BR', 'WP_BSW']) +

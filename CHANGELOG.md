@@ -12,6 +12,12 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (guide sections: coolant, grinders, taps, fasteners, spot tests)
+- Shop tools guide: **Looking after a sump** (what to check and when, mixing and topping up, tramp oil, when to change the fluid), **Mist and skin** (the limit NIOSH recommends for coolant mist and how to keep it down), and **Bench and pedestal grinders: before you switch on** (ring test, wheel speed, the two guard gaps, where to stand).
+- Tooling guide: **Rake and relief of a tap** and **Fluids for tapping**.
+- Fasteners guide: **Counterbore, spotface and countersink** and **Counterfeit fasteners** (the marks on the head, tests, papers, the US Fastener Quality Act).
+- Metal identification: three **chemical spot tests** (nitric acid, molybdenum, sulphur print) with their limits; the magnet test on stainless now has two sources.
+
 ### Added (guide sections: threads, subprograms, drives)
 - Measurement guide: **Thread and ball micrometers** (what a thread micrometer reads, its anvils and how they go with the pitch, setting zero, why it does not agree with wires; ball, tube and blade micrometers).
 - Tooling guide: **Thread mills** (kinds of cutter, what thread milling does better than tapping and where tapping wins, the direction for climb milling an internal thread, several radial passes).
@@ -86,7 +92,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (eighth batch)
 - MH245 (thread and ball micrometers), MH260 (thread milling methods), MH181 (thread cutting on CNC lathes), MH182 (subprograms) and ED76 (drive types) from partial to done.
-- 401 done, 147 partial, 48 missing of 596 in-scope rows, 67 %; 136 more rows to done for the 90 % target.
+- Counted after the eighth batch: 401 done, 147 partial, 48 missing.
+
+### Book audit (ninth batch)
+- MH158 (metalworking fluids), MH166 (grinding wheel safety), MH249 (tapping), MH200 (grade marks and counterfeit fasteners) and MH51 (identifying metals) from partial to done. MH112 (counterboring) gained the practice and stays partial: counterbore sizes are listed for socket head cap screws only.
+- 406 done, 142 partial, 48 missing of 596 in-scope rows, 68 %; 131 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.
