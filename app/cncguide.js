@@ -223,7 +223,7 @@ function renderTnrc(el) {
     '<span class="tline">' + sel('e2', 'End meets', [[1, 'a diameter (keep its X)'], [2, 'a face (keep its Z)'], [0, 'nothing (square offset)']]) + '</span>' +
     '<span class="tarc">' + num('rp', 'Part arc radius R', u) + '</span>' +
     '<span class="tarc">' + sel('dir', 'Arc direction in the drawing (+X up, +Z right)', [[1, 'Counter-clockwise'], [0, 'Clockwise']]) + '</span>' +
-    '</div><div class="res" id="tres"></div><div id="tdia"></div><pre class="gcode" id="tcode"></pre>' +
+    '</div><div class="res" id="tres"></div><div id="tdia" style="max-width:560px"></div><pre class="gcode" id="tcode"></pre>' +
     '<h2>Tip directions 0 to 9</h2><p class="desc">The dot is the imaginary tip (the point the offsets measure), the circle is the nose radius, viewed with +Z to the right and +X up. Tip numbers are not the same on every control or turret layout: always check the tip chart in your own control manual.</p>' +
     '<div class="cntips">' + [1, 2, 3, 4, 5, 6, 7, 8, 0, 9].map(i => '<div class="cntipc">' + tipSvg(i) + '<div>' + gesc(TIP_TEXT[i]) + ' ' + cnTags(TIP_SRC[i]) + '</div></div>').join('') + '</div>' +
     cp('<b>Charts differ.</b> Haas names the OD turning tool tip 3 and the boring bar tip 2. MachMotion\'s chart, drawn for a rear-turret lathe, uses the same 3 x 3 layout but lists OD turning as tip 2, 6 or 1 and boring as 3, 8 or 4, so its chart is the other way up in X. The tip number must come from your own control\'s chart; BenchMate uses the Haas meaning.', ['HFO_OP', 'MACH']) +
@@ -276,24 +276,37 @@ function tnrcDiagram(S, o) {
   const tz = { 1: 1, 2: -1, 3: -1, 4: 1, 5: 1, 6: 0, 7: -1, 8: 0 }[S.tip] || 0, tx = { 1: 1, 2: 1, 3: -1, 4: -1, 5: 0, 6: 1, 7: 0, 8: -1 }[S.tip] || 0;
   let s = '';
   const a = P(S.z1, S.x1 / 2), b = P(S.z2, S.x2 / 2), a2 = P(o[0], o[1] / 2), b2 = P(o[2], o[3] / 2);
+  // Nose centres at the two ends of the tip path (tip minus r along the tip direction).
+  const cen = [[o[0], o[1] / 2], [o[2], o[3] / 2]].map(([z, x]) => P(z - tz * S.r, x - tx * S.r));
+  const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], cm = [(cen[0][0] + cen[1][0]) / 2, (cen[0][1] + cen[1][1]) / 2];
   if (S.kind === 'arc') {
     const R = S.rp * k, R2 = o[4] * k, sw = S.dir ? 0 : 1; // SVG y is down, so counter-clockwise in the drawing is sweep 0
-    s += '<path class="gp" d="M' + pt(a) + 'A' + R.toFixed(1) + ' ' + R.toFixed(1) + ' 0 0 ' + sw + ' ' + pt(b) + '"/>';
-    s += '<path class="gk" d="M' + pt(a2) + 'A' + R2.toFixed(1) + ' ' + R2.toFixed(1) + ' 0 0 ' + sw + ' ' + pt(b2) + '"/>';
+    s += DK.path('M' + pt(a) + 'A' + R.toFixed(1) + ' ' + R.toFixed(1) + ' 0 0 ' + sw + ' ' + pt(b), 'part nofill');
+    s += DK.path('M' + pt(a2) + 'A' + R2.toFixed(1) + ' ' + R2.toFixed(1) + ' 0 0 ' + sw + ' ' + pt(b2), 'hot dash');
   } else {
-    s += '<path class="gp" d="M' + pt(a) + 'L' + pt(b) + '"/><path class="gk" d="M' + pt(a2) + 'L' + pt(b2) + '"/>';
-    // the neighbouring face or diameter, as the solver assumes it (grey)
-    const dz = Math.sign(S.z2 - S.z1) || 1, dx = Math.sign(S.x2 - S.x1) || 1, L = 2.2 * S.r;
-    const nb = (e, z, x, back) => e === 1 ? [[z, x], [z + (back ? -dz : dz) * L, x]] : e === 2 ? [[z, x], [z, x + (back ? -dx : dx) * L]] : null;
-    [nb(S.e1, S.z1, S.x1 / 2, true), nb(S.e2, S.z2, S.x2 / 2, false)].forEach(q => { if (q) s += '<path class="gm" d="M' + pt(P(q[0][0], q[0][1])) + 'L' + pt(P(q[1][0], q[1][1])) + '"/>'; });
+    // The part: a hatched band on the side of the line away from the tool.
+    const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, ux = (b[0] - a[0]) / L, uy = (b[1] - a[1]) / L;
+    let nx = -uy, ny = ux; if ((cm[0] - mid[0]) * nx + (cm[1] - mid[1]) * ny > 0) { nx = -nx; ny = -ny; }
+    s += DK.poly([a, b, [b[0] + nx * 12, b[1] + ny * 12], [a[0] + nx * 12, a[1] + ny * 12]], 'hatch') + DK.line(a[0], a[1], b[0], b[1], 'part');
+    // the neighbouring face or diameter, as the solver assumes it
+    const dz = Math.sign(S.z2 - S.z1) || 1, dx = Math.sign(S.x2 - S.x1) || 1, Ln = 2.2 * S.r;
+    const nb = (e, z, x, back) => e === 1 ? [[z, x], [z + (back ? -dz : dz) * Ln, x]] : e === 2 ? [[z, x], [z, x + (back ? -dx : dx) * Ln]] : null;
+    [nb(S.e1, S.z1, S.x1 / 2, true), nb(S.e2, S.z2, S.x2 / 2, false)].forEach(q => { if (q) { const p0 = P(q[0][0], q[0][1]), p1 = P(q[1][0], q[1][1]); s += DK.line(p0[0], p0[1], p1[0], p1[1], 'part'); } });
+    s += DK.line(a2[0], a2[1], b2[0], b2[1], 'hot dash');
   }
-  [[o[0], o[1] / 2], [o[2], o[3] / 2]].forEach(([z, x]) => {
-    const c = P(z - tz * S.r, x - tx * S.r);
-    s += '<circle class="gc" cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="' + (S.r * k).toFixed(1) + '"/>';
-    const q = P(z, x); s += '<circle class="gdot" cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="3"/>';
+  // The insert nose at each end of the move, and the imaginary tip it is programmed by.
+  cen.forEach((c, n) => {
+    s += DK.circle(c[0], c[1], S.r * k, 'tool') + DK.circle(c[0], c[1], 1.6, 'dimf');
+    const q = n ? b2 : a2; s += DK.circle(q[0], q[1], 3.2, 'hotf');
+    if (tz || tx) { const tq = P((n ? o[2] : o[0]) - tz * S.r, (n ? o[3] : o[1]) / 2); const tr = P((n ? o[2] : o[0]), (n ? o[3] : o[1]) / 2 - tx * S.r);
+      s += DK.line(q[0], q[1], tq[0], tq[1], 'cons') + DK.line(q[0], q[1], tr[0], tr[1], 'cons'); }
   });
-  s += cnT(12, 16, 'part solid, tip path dashed, tip = dot', 'gs') + cnT(12, 30, 'to scale, X as radius', 'gs');
-  return cnSvg(Wd, Hd, s, 'Nose radius compensation drawing');
+  s += DK.leader(cen[1][0] + S.r * k * 0.7, cen[1][1] - S.r * k * 0.7, Wd - 200, 40, 'insert nose, r ' + DK.n(S.r, 3), { anchor: 'start' });
+  s += DK.leader(b2[0], b2[1], Wd - 200, 60, 'imaginary tip (programmed)', { anchor: 'start', hot: true });
+  // Axes: Z along the spindle, X as radius (up).
+  s += DK.arrow(14, Hd - 14, 54, Hd - 14, 'dim') + DK.text(60, Hd - 10, 'Z', { cls: 'dimt', anchor: 'start' }) + DK.arrow(14, Hd - 14, 14, Hd - 54, 'dim') + DK.text(14, Hd - 60, 'X', { cls: 'dimt' });
+  s += DK.text(12, 16, 'To scale, X as radius. Hatched: the part; dashed: the tip path to program.', { cls: 'mut', anchor: 'start' });
+  return DK.svg(Wd, Hd, s, 'Nose radius compensation drawing');
 }
 
 // ---------- Guide ----------

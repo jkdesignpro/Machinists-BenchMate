@@ -43,6 +43,8 @@ for (const kv of (opt('set') || '').split(',').filter(Boolean)) {
   if (tag === 'SELECT') await page.selectOption(sel, v); else await page.fill(sel, v);
   await page.dispatchEvent(sel, 'input');
 }
+// --fill '#id=text': type into an input by its CSS selector (fires input).
+for (const kv of (opt('fill') || '').split(';;').filter(Boolean)) { const i = kv.lastIndexOf('='); await page.fill(kv.slice(0, i), kv.slice(i + 1)); await page.dispatchEvent(kv.slice(0, i), 'input'); await page.waitForTimeout(150); }
 // --select '#id=value;;#id2=value': pick an option of a select by its CSS selector (fires change).
 for (const kv of (opt('select') || '').split(';;').filter(Boolean)) { const i = kv.lastIndexOf('='); await page.selectOption(kv.slice(0, i), kv.slice(i + 1)); await page.waitForTimeout(150); }
 for (const c of (opt('click') || '').split(';;').filter(Boolean)) { await page.click(c); await page.waitForTimeout(150); }
