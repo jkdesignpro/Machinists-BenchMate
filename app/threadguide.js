@@ -17,6 +17,9 @@ const TF_SOURCES = {
   EE_DES: 'Engineers Edge, "ANSI screw thread designations and symbols A - N" (only the rows that came through clean)',
   AFT_AB: 'AFT Fasteners, "Common fastener related abbreviations"',
   EH_BR: 'Aircraft Engine Historical Society, G. White, "British fastening systems"',
+  MMC_SHIM: 'Mitsubishi Materials, technical information, "Flank angle and lead angle" (threading insert shim selection; mmc-carbide.com)',
+  ISCAR_TH: 'ISCAR, Threading Handbook, p. 36 (helix angle, lead angle and anvil selection)',
+  CPC_PIPE: 'CPC (Colder Products Company), white paper 8008 "Understanding pipe threads: types and designations", rev. 12/22',
 };
 // The seven Wikipedia articles count as one publisher.
 const TF_FAMILY = { WP_ST: 'WIKI', WP_TA: 'WIKI', WP_TR: 'WIKI', WP_SQ: 'WIKI', WP_BUT: 'WIKI', WP_KN: 'WIKI', WP_UTS: 'WIKI' };
@@ -98,7 +101,7 @@ const TF_ABBR = [
 ];
 
 function renderThreadGuide(el) {
-  const toc = [['tf-term', 'The parts of a thread'], ['tf-lead', 'Pitch, lead and hand'], ['tf-form', 'Thread forms'], ['tf-kind', 'Coarse, fine, straight, tapered'], ['tf-abbr', 'Abbreviations']];
+  const toc = [['tf-term', 'The parts of a thread'], ['tf-lead', 'Pitch, lead and hand'], ['tf-form', 'Thread forms'], ['tf-kind', 'Coarse, fine, straight, tapered'], ['tf-shim', 'Insert shims and lead angle'], ['tf-nps', 'Straight pipe threads'], ['tf-abbr', 'Abbreviations']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Screw threads in general, in our own words: what the parts of a thread are called, pitch and lead, the common thread forms and what each is for, and the abbreviations found on drawings, taps and gauges. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers; the seven Wikipedia articles count as one. Sizes and limits are on the pages of each thread, linked below.</p>' +
@@ -140,6 +143,12 @@ function renderThreadGuide(el) {
     tfP('<b>How a Unified thread is written.</b> Diameter, threads per inch, series and class: #6-32 UNC 2B.', ['WP_UTS']) +
     tfP('See <a href="#/t/unseries">constant-pitch UN series and UNS</a> and <a href="#/t/unjunr">UNJ and UNR threads</a>. Engagement and locking are in the <a href="#/t/fastguide">fasteners guide</a>.', null) +
 
+    '<h2 id="tf-shim">Threading inserts: lead angle and shims</h2>' +
+    tfP('<b>The helix tilts the flanks.</b> A thread climbs at its lead (helix) angle, which eats into the clearance under the insert\'s flanks. The insert sits on a shim (anvil) inclined to match the lead angle; with the wrong one a flank of the insert rubs the thread.', ['MMC_SHIM', 'ISCAR_TH']) +
+    tfP('<b>Lead angle</b> = atan(lead / (pi x pitch diameter)); lead = starts x pitch. The <a href="#/t/threaddata">thread data</a> page works it out at the basic pitch diameter.', ['ISCAR_TH']) +
+    tfP('<b>When to change the shim.</b> Small diameters and coarse pitches have large lead angles and need an inclined shim; a left-hand thread needs one inclined the other way.', ['MMC_SHIM']) +
+    '<h2 id="tf-nps">Straight pipe threads (NPS)</h2>' +
+    tfP('<b>Not all pipe threads taper.</b> NPSC (couplings), NPSL (locknuts) and NPSM (mechanical joints) are straight. A straight fastening thread does not seal on the thread: a gasket or a soft packing makes the seal. NPSF is a dryseal straight thread that seals by crest and root interference, used as an internal thread for an NPTF male.', ['CPC_PIPE']) +
     '<h2 id="tf-abbr">Abbreviations</h2>' +
     guideTable(['Symbol', 'Meaning'], TF_ABBR, tfTags) +
 

@@ -44,9 +44,12 @@ const CNC_SOURCES = {
   IMD_SUB: 'Industrial Monitor Direct, "Fanuc subprogramming: M98, M99, GOTO macro reference", 2026-09-13 (its combined form of the P word is described two ways and is not used)',
   MMC_EFF: 'Mitsubishi Materials, technical information for turning tools, "Effects of cutting conditions" (mmc-carbide.com)',
   SECO_PAR: 'Seco Tools, "Tools and parameters still play a key role in machining success" (secotools.com; no author or date shown)',
+  HAAS_G141: 'Haas Automation, G-code reference "G141 3D+ cutter compensation (group 07)" (haascnc.com)',
+  ICAM_3D: 'ICAM Technologies, "How to control left or right 3D cutter compensation (Fanuc)", 2014-09-23, modified 2023-11-07',
+  CIMCO_3D: 'CIMCO, CNC book, chapter 9, "3D cutter compensation" (cimco.com)',
   OWN: 'BenchMate derivation (geometry), with tests in core/src/tnrc.rs',
 };
-const CNC_INDEPENDENT = { HFO_OP: 'HAAS', HFO_L: 'HAAS', HFO_MP: 'HAAS', LCNC_G: 'LCNC', FMC_D: 'FMC', FMC_T: 'FMC' }; // same publisher family counts once
+const CNC_INDEPENDENT = { HAAS_G141: 'HAAS', HFO_OP: 'HAAS', HFO_L: 'HAAS', HFO_MP: 'HAAS', LCNC_G: 'LCNC', FMC_D: 'FMC', FMC_T: 'FMC' }; // same publisher family counts once
 // mode 'cat': a standard's own edition and status, confirmed on the standards body's catalogue.
 function cnTags(keys, mode) {
   const ks = keys || [];
@@ -438,6 +441,12 @@ function renderCncGuide(el) {
     cp('<b>Lathe tool offsets.</b> Each turret position has X and Z geometry offsets, measured by touching the tool on the part or with a tool setter; X offsets are on diameter. T0101 calls tool 1 with offset 1.', ['HFO_OP']) +
     cp('<b>Wear offsets.</b> A second column, added to the geometry, takes the small corrections as the tool wears or a size drifts. Change the wear column, not the geometry, so the measured value is kept.', ['HFO_OP']) +
     cp('For tool nose radius compensation on the lathe, see the TNRC calculator in the Turning group.', null) +
+    '<h3 id="c-3dcomp">3D tool compensation</h3>' +
+    cp('<b>G41 and G42 work in one plane.</b> Most controls do not apply them to a 3D surface path, so a worn ball cutter on a 3D finish path is usually fixed by a new tool or a new path, not an offset.', ['CIMCO_3D', 'ICAM_3D']) +
+    cp('<b>3D compensation</b> needs the CAM system to put out, with each point, a unit vector normal to the surface (I J K). The control moves the tool along that vector by the offset in the table (geometry plus wear).', ['HAAS_G141']) +
+    cp('<b>Haas G141</b> works on G00 and G01 only; D must be programmed; the vector must have a length of 1; only the end point of each block is compensated, so it suits fine paths with small steps. Program the centre of a ball nose cutter; G40 cancels. Too much compensation can make the path cross itself.', ['HAAS_G141']) +
+    cp('<b>Fanuc five-axis</b> uses G41.2 and G42.2 with G43.4 (tool centre point); the compensation is applied in the plane square to the tool axis.', ['ICAM_3D']) +
+    cp('Check your own control\'s manual: the codes and the vector rules differ from maker to maker.', null) +
 
     '<h2 id="c-prog">Program structure</h2>' + cnBlock() +
     cp('<b>Blocks and words.</b> A program is a list of blocks (lines). Each block holds words: a letter address followed by a number (G01, X25.0, F0.15). An optional N number at the start numbers the block. The format is standardised in ISO 6983-1:2009.', ['NIST', 'MIT_EM']) +
