@@ -5,24 +5,36 @@
   const f = v => (Math.round(v * 100) / 100).toString();
   Object.assign(DIAGRAMS, {
     backlash(v, sys) {
-      const W = 520, H = 250, u = dcU(sys), mode = v.mode === 2 || v.mode === 3 ? v.mode : 1;
+      const W = 520, H = 252, u = dcU(sys), mode = v.mode === 2 || v.mode === 3 ? v.mode : 1;
       let s = '';
       if (mode === 1) {
-        // Screw, nut with clearance, slide; indicator touching the slide.
-        const y = 150;
-        s += DK.rect(40, y - 8, 330, 16, 'part') + DK.cl(24, y, 390, y);
-        for (let x = 46; x < 366; x += 12) s += DK.line(x, y - 8, x + 6, y + 8, 'thin');
-        s += DK.text(48, y + 30, 'screw', { cls: 'mut', anchor: 'start' });
-        s += DK.rect(150, y - 30, 70, 60, 'hatch') + DK.text(185, y + 46, 'nut', { cls: 'mut' });
-        s += DK.rect(130, 56, 150, 48, 'part') + DK.text(205, 84, 'slide', { cls: 'txt' });
-        // Indicator against the slide end.
-        s += DK.rect(300, 66, 46, 28, 'tool') + DK.line(300, 80, 281, 80, 'ln') + DK.circle(372, 80, 22, 'tool') + DK.line(346, 80, 350, 80, 'ln');
-        s += DK.line(372, 80, 382, 66, 'hot') + DK.text(372, 118, 'indicator', { cls: 'mut' });
+        // Half section along the screw: the nut (cut) on the screw thread, its teeth bearing on one flank with
+        // the clearance on the other (drawn far larger than it is); the slide on the nut, an indicator at its end.
+        const ya = 204, yr = 168, yc = 156, P = 24, g = 4, X0 = 150, X1 = 294;
+        let scr = 'M36 ' + ya + 'V' + yr;
+        for (let x = 36; x < 400; x += P) scr += 'L' + x + ' ' + yr + 'L' + (x + 4) + ' ' + yc + 'L' + (x + 10) + ' ' + yc + 'L' + (x + 14) + ' ' + yr;
+        scr += 'L' + (36 + Math.ceil(364 / P) * P) + ' ' + yr + 'V' + ya + 'Z';
+        s += DK.path(scr, 'part') + DK.cl(24, ya, 420, ya) + DK.text(40, ya - 8, 'screw', { cls: 'mut', anchor: 'start' });
+        // Nut outline: top, right side, then its teeth along the bottom from right to left.
+        const bot = [];
+        for (let x = 36; x < 400; x += P) if (x + 10 >= X0 && x + 28 <= X1) bot.push([x + 10 + g, yc], [x + 13.3 + g, yr - 2], [x + 24.7, yr - 2], [x + 28, yc]);
+        let nut = 'M' + X0 + ' 112H' + X1 + 'V' + yc;
+        bot.slice().reverse().forEach(q => { nut += 'L' + f(q[0]) + ' ' + f(q[1]); });
+        nut += 'L' + X0 + ' ' + yc + 'Z';
+        s += DK.path(nut, 'hatch') + DK.text((X0 + X1) / 2, 128, 'nut (cut)', { cls: 'txt' });
+        s += DK.rect(128, 62, 190, 50, 'part') + DK.text(223, 92, 'slide', { cls: 'txt' });
+        // The gap on the left flank of each tooth: the lost motion.
+        const gx = bot.length ? bot[0][0] : X0 + 20;
+        s += DK.leader(gx - 1, yc + 6, 40, 138, 'clearance', { anchor: 'start', hot: true });
+        // Dial indicator: plunger on the end of the slide.
+        const dx = 372, dy = 87;
+        s += DK.line(318, dy, dx - 26, dy, 'ln') + DK.rect(dx - 26, dy - 4, 6, 8, 'ln') + DK.circle(dx, dy, 22, 'tool') + DK.circle(dx, dy, 17, 'thin');
+        for (let k = 0; k < 20; k++) { const a = k * Math.PI / 10; s += DK.line(dx + 17 * Math.cos(a), dy + 17 * Math.sin(a), dx + (k % 5 ? 14.5 : 12.5) * Math.cos(a), dy + (k % 5 ? 14.5 : 12.5) * Math.sin(a), 'thin'); }
+        s += DK.line(dx, dy, dx + 9, dy - 11, 'hot') + DK.circle(dx, dy, 2, 'hotf') + DK.text(dx, dy + 38, 'indicator', { cls: 'mut' });
         // Out and back.
-        s += DK.arrow(140, 40, 230, 40, 'hot') + DK.arrow(230, 30, 140, 30, 'ln') + DK.text(240, 38, 'out, then back to the start', { cls: 'mut', anchor: 'start' });
-        s += DK.leader(152, y - 22, 22, 106, 'clearance in the nut', { anchor: 'start' });
-        s += DK.text(18, 222, 'Zero the indicator after coming in from one side, go out and come back:', { cls: 'mut', anchor: 'start' });
-        s += DK.text(18, 236, 'the reading left on the indicator, less the start reading, is the lost motion.', { cls: 'mut', anchor: 'start' });
+        s += DK.arrow(150, 44, 250, 44, 'hot') + DK.arrow(250, 32, 150, 32, 'ln') + DK.text(260, 42, 'out, then back to the start', { cls: 'mut', anchor: 'start' });
+        s += DK.text(18, 228, 'Zero the indicator after coming in from one side, go out and come back:', { cls: 'mut', anchor: 'start' });
+        s += DK.text(18, 242, 'the reading left on the indicator, less the start reading, is the lost motion.', { cls: 'mut', anchor: 'start' });
         return DK.svg(W, H, s, 'Indicator test for lost motion on a linear axis');
       }
       if (mode === 2) {

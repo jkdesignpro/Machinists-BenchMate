@@ -143,8 +143,11 @@
       // Vickers: pyramid; the square impression's two diagonals.
       let c = 88;
       s += T(c, 22, 'Vickers HV', 'txt', 'middle') + block(c);
-      s += DK.poly([[c, ys + 13], [c - 32, ys], [c - 32, ys - 10], [c - 14, ys - 46], [c + 14, ys - 46], [c + 32, ys - 10], [c + 32, ys]], 'tool');
-      s += T(c, ys - 56, 'diamond pyramid', 'mut', 'middle');
+      // Square-based diamond pyramid, 136° between opposite faces, set in its holder; pressed in to depth 8.
+      const tipY = ys + 8, half = 30, topY = tipY - half / Math.tan(rad(68));
+      s += DK.poly([[c - half, topY], [c - 18, topY - 22], [c - 18, topY - 44], [c + 18, topY - 44], [c + 18, topY - 22], [c + half, topY]], 'part');
+      s += DK.poly([[c, tipY], [c - half, topY], [c + half, topY]], 'tool') + DK.cl(c, topY - 52, c, ys + 22);
+      s += DK.angle(c, tipY, 20, 22, 158, '', {}) + T(c + half + 6, topY - 2, '136°', 'dimt', 'start') + T(c, topY - 54, 'diamond pyramid', 'mut', 'middle');
       const q = 18, cy1 = 178;
       s += DK.poly([[c, cy1 - q], [c + q, cy1], [c, cy1 + q], [c - q, cy1]], 'part') + DK.line(c - q, cy1, c + q, cy1, 'thin') + DK.line(c, cy1 - q, c, cy1 + q, 'thin');
       s += DK.dimH(c - q, c + q, cy1 + q + 10, 'd1', { from: cy1, below: true }) + DK.dimV(cy1 + q, cy1 - q, c + q + 14, 'd2', { from: c });

@@ -972,10 +972,19 @@ Object.assign(DIAGRAMS, {
     if (!dcOk(d) || !dcOk(od) || !dcOk(nt) || !dcOk(ls) || !(od > 2 * d)) return '';
     const lf = dcOk(v.lf) && v.lf > ls ? v.lf : ls * 1.6, known = dcOk(v.lf) && v.lf > ls;
     const sc = Math.min(330 / lf, 130 / od), x0 = 40, cy = 118, L = lf * sc, r = od / 2 * sc, w = Math.max(1.5, d * sc);
-    // One zig-zag per coil: the wire seen from the side crosses from top to bottom and back.
-    const n = Math.max(2, Math.round(nt)), step = (L - w) / n; let p = 'M' + (x0 + w / 2).toFixed(1) + ' ' + (cy + r - w / 2).toFixed(1);
-    for (let i = 0; i < n; i++) p += 'L' + (x0 + w / 2 + step * (i + 0.5)).toFixed(1) + ' ' + (cy - r + w / 2).toFixed(1) + 'L' + (x0 + w / 2 + step * (i + 1)).toFixed(1) + ' ' + (cy + r - w / 2).toFixed(1);
-    let h = '<path d="' + p + '" fill="none" stroke="currentColor" stroke-width="' + w.toFixed(1) + '" stroke-linejoin="round" stroke-linecap="round" class="part" style="fill:none"/>';
+    // Side view as drawn on a drawing: the near half of each coil as the wire (two edges, filled), the far half
+    // as thin hidden lines, the wire cut where it meets the top and bottom of the coil (small sections).
+    const n = Math.max(2, Math.round(nt)), step = (L - w) / n, yt = cy - r + w / 2, yb2 = cy + r - w / 2;
+    const bx = i => x0 + w / 2 + step * i, tx = i => x0 + w / 2 + step * (i + 0.5);
+    let h = '';
+    for (let i = 0; i < n; i++) h += DK.line(tx(i), yt, bx(i + 1), yb2, 'hid');
+    for (let i = 0; i < n; i++) {
+      // Near side: from the bottom at coil i to the top at i + 1/2, as a band the width of the wire.
+      const ax = bx(i), ay = yb2, cx2 = tx(i), cy2 = yt, len = Math.hypot(cx2 - ax, cy2 - ay), nx = -(cy2 - ay) / len * w / 2, ny = (cx2 - ax) / len * w / 2;
+      h += DK.poly([[ax + nx, ay + ny], [cx2 + nx, cy2 + ny], [cx2 - nx, cy2 - ny], [ax - nx, ay - ny]], 'part');
+    }
+    for (let i = 0; i <= n; i++) h += DK.circle(bx(i), yb2, w / 2, 'hatch');
+    for (let i = 0; i < n; i++) h += DK.circle(tx(i), yt, w / 2, 'hatch');
     h += DK.line(x0 - 6, cy - r - 8, x0 - 6, cy + r + 8, 'tool') + DK.line(x0 + L + 6, cy - r - 8, x0 + L + 6, cy + r + 8, 'tool');
     h += DK.cl(x0 - 14, cy, x0 + L + 14, cy);
     h += DK.dimH(x0, x0 + L, cy + r + 34, (known ? 'free length ' + dcN(lf, dp) + ' ' + u : 'free length not entered'), { from: cy + r });

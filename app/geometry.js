@@ -157,16 +157,25 @@ const SB_STATE = { L: '', ang: '', h: '', set: '', custom: '', target: '', wear:
 try { const k = JSON.parse(localStorage.getItem('bm.gb') || '{}'); ['set', 'custom', 'wear'].forEach(f => { if (typeof k[f] === 'string') SB_STATE[f] = k[f]; }); if (!GB_SETS[SB_STATE.set]) SB_STATE.set = ''; } catch (e) {}
 const sbKeep = () => { try { localStorage.setItem('bm.gb', JSON.stringify({ set: SB_STATE.set, custom: SB_STATE.custom, wear: SB_STATE.wear })); } catch (e) {} };
 function sineDiagram(ang) {
-  const a = Math.min(Math.max(ang || 20, 2), 60) * Math.PI / 180, L = 300, x0 = 50, y0 = 190, h = L * Math.sin(a);
-  const x1 = x0 + L * Math.cos(a), y1 = y0 - h;
-  let s = '<path class="gb" d="M20 ' + (y0 + 10) + 'H400"/>';
-  s += '<circle class="gp" cx="' + x0 + '" cy="' + y0 + '" r="10"/><circle class="gp" cx="' + x1.toFixed(1) + '" cy="' + y1.toFixed(1) + '" r="10"/>';
-  const nx = Math.sin(a) * 10, ny = Math.cos(a) * 10;
-  s += '<path class="gp" d="M' + (x0 - nx).toFixed(1) + ' ' + (y0 - ny).toFixed(1) + 'L' + (x1 - nx).toFixed(1) + ' ' + (y1 - ny).toFixed(1) + 'l' + (-2 * nx).toFixed(1) + ' ' + (-2 * ny).toFixed(1) + 'L' + (x0 - 3 * nx).toFixed(1) + ' ' + (y0 - 3 * ny).toFixed(1) + 'Z"/>';
-  s += '<rect class="gfill gp" x="' + (x1 - 14).toFixed(1) + '" y="' + (y1 + 10).toFixed(1) + '" width="28" height="' + (y0 - y1).toFixed(1) + '"/>';
-  s += '<path class="gk" d="M' + x0 + ' ' + y0 + 'L' + x1.toFixed(1) + ' ' + y1.toFixed(1) + '"/>' + gtxt([(x0 + x1) / 2 + 8, (y0 + y1) / 2 + 18], 'L', 'gv');
-  s += gtxt([x1 + 22, (y0 + y1) / 2 + 10], 'H', 'gv') + gtxt([x0 + 40, y0 - 2], 'angle', 'gs');
-  return gsvg(420, 240, s, 'Sine bar on a gauge block stack');
+  // Sine bar on a surface plate: the two rolls L apart (centres), one on the plate and one on a gauge block stack
+  // of height H, so sin(angle) = H / L. Drawn at the angle entered (20° if blank), not to a scale.
+  const a = Math.min(Math.max(ang || 20, 2), 60) * Math.PI / 180, L = 290, r = 11, x0 = 70, yp = 196, y0 = yp - r, h = L * Math.sin(a);
+  const x1 = x0 + L * Math.cos(a), y1 = y0 - h, ux = Math.cos(a), uy = -Math.sin(a), nx = -uy, ny = ux; // n points down-right of the bar
+  const P = (t, o) => [x0 + ux * t + nx * o, y0 + uy * t + ny * o];
+  let s = DK.path('M20 ' + yp + 'H420V' + (yp + 18) + 'H20Z', 'hatch') + DK.text(26, yp + 32, 'surface plate', { cls: 'mut', anchor: 'start' });
+  // Gauge blocks under the far roll, as a stack of three.
+  const bw = 34, top = y1 + r;
+  const hs = [0.5, 0.3, 0.2].map(f => f * (yp - top));
+  let yy = yp; hs.forEach(hh => { s += DK.rect(x1 - bw / 2, yy - hh, bw, hh, 'part'); yy -= hh; });
+  // The bar: a body above the line of roll centres, with the rolls under its ends.
+  s += DK.poly([P(-22, -r), P(L + 22, -r), P(L + 22, -r - 26), P(-22, -r - 26)], 'part');
+  s += DK.circle(x0, y0, r, 'tool') + DK.circle(x1, y1, r, 'tool') + DK.circle(x0, y0, 1.6, 'dimf') + DK.circle(x1, y1, 1.6, 'dimf');
+  s += DK.line(x0, y0, x1, y1, 'cl');
+  s += DK.dim(x0, y0, x1, y1, 'L (roll centres)', { off: 64 });
+  s += DK.dimV(yp, top, x1 + bw / 2 + 30, 'H', { from: x1 + bw / 2 });
+  s += DK.line(x0, y0, x0 + 120, y0, 'thin') + DK.angle(x0, y0, 70, 0, a * 180 / Math.PI, 'angle');
+  s += DK.text(420, 22, 'sin(angle) = H / L', { cls: 'dimt', anchor: 'end' });
+  return '<div class="gdk">' + DK.svg(440, 240, s, 'Sine bar on a gauge block stack') + '</div>';
 }
 function renderSineBar(el) {
   const s = SB_STATE, W = state.W, u = lenU(state.sys);
@@ -359,18 +368,34 @@ function crossSign(P, A, B) { return (A[0] - P[0]) * (B[1] - P[1]) - (A[1] - P[1
 
 // ---------- Dovetail and V-groove over pins ----------
 const DV_STATE = { mode: 'male', wmode: 'corner', w: '', h: '', alpha: 60, d: '', beta: 90, vw: '' };
-function dovetailDiagram(male) {
-  let s;
+function dovetailDiagram(male, alphaDeg) {
+  // Section across the dovetail with the flank angle as entered (60° if blank), the pins in the corners touching
+  // the face and the flank, and the measurement over (male) or between (female) the pins. Shape only, no scale.
+  const a = (alphaDeg > 5 && alphaDeg < 89 ? alphaDeg : 60) * Math.PI / 180, r = 15, d = r / Math.sin(a / 2);
+  const W0 = 440, H0 = 250, cx = 220, yb = 196, h = 100, run = h / Math.tan(a);
+  let s = '';
   if (male) {
-    s = '<path class="gb" d="M20 200H400"/><path class="gp gfill" d="M130 200L105 90H315L290 200Z"/>';
-    s += '<circle class="gp" cx="106" cy="186" r="14"/><circle class="gp" cx="314" cy="186" r="14"/>';
-    s += '<path class="gk" d="M92 225H328"/>' + gtxt([210, 238], 'measurement over pins M', 'gs', 'middle') + gtxt([210, 150], 'male', 'gs', 'middle') + gtxt([140, 196], 'W at the corners', 'gs');
+    const wb = 170, xl = cx - wb / 2, xr = cx + wb / 2;
+    s += DK.path('M30 ' + yb + 'H' + (W0 - 30) + 'V' + (yb + 22) + 'H30Z', 'hatch');
+    s += DK.poly([[xl, yb], [xl - run, yb - h], [xr + run, yb - h], [xr, yb]], 'hatch');
+    const cL = [xl - d * Math.cos(a / 2), yb - d * Math.sin(a / 2)], cR = [xr + d * Math.cos(a / 2), cL[1]];
+    s += DK.circle(cL[0], cL[1], r, 'tool') + DK.circle(cR[0], cR[1], r, 'tool') + DK.cl(cL[0], cL[1] - r - 6, cL[0], cL[1] + r + 6) + DK.cl(cR[0], cR[1] - r - 6, cR[0], cR[1] + r + 6);
+    s += DK.dimH(cL[0] - r, cR[0] + r, yb - h - 26, 'M over the pins', { from: cL[1] });
+    s += DK.dimH(xl, xr, yb - 34, 'W', { from: yb, hot: true });
+    s += DK.angle(xl, yb, 46, 180 - a * 180 / Math.PI, 180, 'α', {});
+    s += DK.cl(cx, yb - h - 12, cx, yb + 30);
   } else {
-    s = '<path class="gp gfill" d="M20 70H120L95 200H325L300 70H400V220H20Z"/>';
-    s += '<circle class="gp" cx="119" cy="186" r="14"/><circle class="gp" cx="301" cy="186" r="14"/>';
-    s += '<path class="gk" d="M133 160H287"/>' + gtxt([210, 152], 'between pins M', 'gs', 'middle') + gtxt([210, 214], 'W at the bottom corners', 'gs', 'middle') + gtxt([210, 100], 'female', 'gs', 'middle');
+    const wt = 170, xl = cx - wt / 2 - run, xr = cx + wt / 2 + run;
+    s += DK.path('M30 ' + (yb - h) + 'H' + (cx - wt / 2) + 'L' + xl + ' ' + yb + 'H' + xr + 'L' + (cx + wt / 2) + ' ' + (yb - h) + 'H' + (W0 - 30) + 'V' + (yb + 22) + 'H30Z', 'hatch');
+    const cL = [xl + d * Math.cos(a / 2), yb - d * Math.sin(a / 2)], cR = [xr - d * Math.cos(a / 2), cL[1]];
+    s += DK.circle(cL[0], cL[1], r, 'tool') + DK.circle(cR[0], cR[1], r, 'tool') + DK.cl(cL[0], cL[1] - r - 6, cL[0], cL[1] + r + 6) + DK.cl(cR[0], cR[1] - r - 6, cR[0], cR[1] + r + 6);
+    s += DK.dimH(cL[0] + r, cR[0] - r, cL[1] - 34, 'M between the pins', {});
+    s += DK.dimH(xl, xr, yb + 40, 'W', { from: yb + 22, below: true, hot: true });
+    s += DK.angle(xl, yb, 46, 0, a * 180 / Math.PI, 'α', {});
+    s += DK.cl(cx, yb - h - 12, cx, yb + 30);
   }
-  return gsvg(420, 245, s, male ? 'Male dovetail over pins' : 'Female dovetail between pins');
+  s += DK.text(12, H0 - 6, (male ? 'Male' : 'Female') + ' dovetail, section: W at the ' + (male ? 'root' : 'bottom') + ' corners; pins touch face and flank.', { cls: 'mut', anchor: 'start' });
+  return '<div class="gdk">' + DK.svg(W0, H0, s, male ? 'Male dovetail over pins' : 'Female dovetail between pins') + '</div>';
 }
 function vgrooveDiagram() {
   const s = '<path class="gp gfill" d="M20 80H120L210 200L300 80H400V220H20Z"/><circle class="gp" cx="210" cy="104" r="48"/><path class="gk" d="M300 56H360M300 80H360"/>' + gtxt([366, 72], 'pin height', 'gs');
@@ -382,7 +407,7 @@ function renderDovetail(el) {
     const v = s.mode === 'vg';
     el.innerHTML = '<div class="mfilter"><span>Feature:</span>' + gseg('dvmode', [['male', 'Male dovetail'], ['female', 'Female dovetail'], ['vg', 'V-groove']], s.mode) + '</div>' +
       (v ? vgrooveDiagram() + '<div class="grid">' + sfield('Width of the V at the top face (sharp edges)', sinp('vw', s.vw), u) + sfield('Included angle of the V', sinp('beta', s.beta), 'deg') + sfield('Pin (roll) diameter', sinp('d', s.d), u) + '</div>'
-        : dovetailDiagram(s.mode === 'male') + '<div class="grid">' + sfield('Width given', gsel('wmode', [['corner', s.mode === 'male' ? 'at the root corners (narrow side)' : 'at the bottom corners (wide side)'], ['top', 'at the top face, plus depth']], s.wmode), '') +
+        : dovetailDiagram(s.mode === 'male', +s.alpha) + '<div class="grid">' + sfield('Width given', gsel('wmode', [['corner', s.mode === 'male' ? 'at the root corners (narrow side)' : 'at the bottom corners (wide side)'], ['top', 'at the top face, plus depth']], s.wmode), '') +
           sfield('Width', sinp('w', s.w), u) + (s.wmode === 'top' ? sfield('Depth of the dovetail', sinp('h', s.h), u) : '') + sfield('Dovetail angle (between base and flank)', sinp('alpha', s.alpha), 'deg') + sfield('Pin diameter', sinp('d', s.d), u) + '</div>') +
       '<div class="res" id="dvres"></div>';
     el.querySelectorAll('#dvmode button').forEach(b => b.onclick = () => { s.mode = b.dataset.v; draw(); });
