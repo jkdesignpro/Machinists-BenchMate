@@ -194,8 +194,16 @@ function initSearch() {
       : '<div class="shn">No tool matches' + (state.mode === 'simple' ? ' in Simple mode. Switch to Advanced to search every tool.' : '.') + '</div>';
   };
   const pick = i => { const h = hits[i]; if (!h) return; inp.value = ''; close(); inp.blur(); openTool(h.id); };
-  inp.oninput = () => { sel = 0; paint(); };
-  inp.onfocus = paint;
+  // On the Mac the app runs at tauri://localhost, and the system AutoFill offers any password saved for
+  // "localhost" (another app's, for one) in the first text box it finds, as a chip over the box that cannot be removed.
+  // The box stays read-only until it is clicked or focused, so AutoFill does not take it for a login box,
+  // and anything AutoFill put in before the first keystroke is cleared.
+  let typed = false;
+  const wake = () => { inp.readOnly = false; if (!typed && inp.value) inp.value = ''; };
+  inp.addEventListener('pointerdown', wake);
+  if (inp.value) inp.value = '';
+  inp.oninput = () => { typed = true; sel = 0; paint(); };
+  inp.onfocus = () => { wake(); paint(); };
   inp.onkeydown = e => {
     if (e.key === 'ArrowDown') { sel = Math.min(sel + 1, hits.length - 1); paint(); e.preventDefault(); }
     else if (e.key === 'ArrowUp') { sel = Math.max(sel - 1, 0); paint(); e.preventDefault(); }
@@ -203,7 +211,7 @@ function initSearch() {
     else if (e.key === 'Escape') { inp.value = ''; close(); inp.blur(); }
   };
   pop.onmousedown = e => { const b = e.target.closest('.sh'); if (b) { e.preventDefault(); pick(+b.dataset.i); } };
-  inp.onblur = () => setTimeout(close, 120);
+  inp.onblur = () => { inp.readOnly = true; setTimeout(close, 120); };
 }
 
 // ---- Main area ----

@@ -4,7 +4,13 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
-## [0.7.0] - in progress
+## [0.8.0] - in progress
+Work on the feedback after using 0.7.0.
+
+### Fixed
+- Search box on the Mac: the system AutoFill could put a saved "localhost" login (another app's) in the search box as a chip that hid the typed text and could not be removed. The app runs at tauri://localhost on the Mac, so any password saved for localhost was offered. The box now stays read-only until it is clicked or focused, so AutoFill does not take it for a login box, and anything AutoFill puts in before the first keystroke is cleared.
+
+## [0.7.0] - 2026-11-13
 Stage 4 of the plan, part 2: tables of dimensions and calculations for the book rows that 0.6.0 left partial. Built on top of 0.6.0.
 
 ### Added (thread engagement)

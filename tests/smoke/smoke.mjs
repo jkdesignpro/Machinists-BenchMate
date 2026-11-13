@@ -160,6 +160,7 @@ await page.waitForTimeout(80);
 
 // Search, theme and the linked pair on Spindle speed.
 where = 'search';
+await page.click('#search');
 await page.fill('#search', 'thread');
 await page.waitForSelector('#searchpop .sh');
 await page.keyboard.press('Enter');
