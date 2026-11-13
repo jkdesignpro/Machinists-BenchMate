@@ -26,7 +26,13 @@ Work on the feedback after using 0.7.0.
 - **What is this for?** A folded plain explanation at the top of eleven less familiar tools: preferred numbers, tolerance stack, process capability, control charts, gauge R&R, sampling plans, chatter finder, balancing, temperature compensation, runout and tool life. Preferred numbers explains where Renard's series came from and where they are used, from Kverneland (Machine Design, 1998) and Wikipedia, with one-publisher statements marked (see `docs/inspection.md`).
 
 ### Added (common profiles and sizes)
-- **Common profiles and sizes** (Stock and sheet metal; Mechanics > Engineering): box tube (metric), square tube (inch), equal angle (metric and inch) in the sizes two publishers list, each size marked when only one lists it, and the T-slot aluminium framing series as Wikipedia and MISUMI name them, side by side. Picking a size draws the section and gives its area, stiffness and weight from the core, and sends it to Section properties or Beam deflection. See `docs/stock-sizes.md`.
+- **Common profiles and sizes** (Stock and sheet metal; Mechanics > Engineering): steel square and rectangular box tube, round tube, equal angle, IPE beams and parallel flange channels (metric), square tube, rectangular tube and equal angle (inch), and aluminium equal angle (inch), in the sizes two publishers list, each size marked when only one lists it; a flat bar of any typed width and thickness; and the T-slot aluminium framing series as Wikipedia and MISUMI name them, side by side. Picking a size draws the section and gives its area, stiffness and weight from the core, and sends it to Section properties or Beam deflection. See `docs/stock-sizes.md`.
+
+### Changed (found in the review of the feedback)
+- **Advisors in inch mode**: the machine limit boxes (top feed, spindle power and torque) are in in/min, hp and lbf·ft, and the cards give the top feed and the power in the page's units.
+- **Thread type list**: BSW, BSF and BA, and BSP and NPT pipe threads, are in the list of thread types; picking one offers its own page (their form and tables differ from ISO metric and Unified).
+- **Search** finds a tool when a word is misspelt ("threding", "trocoidal"): when nothing matches as typed, each word is matched to the nearest word in the tool names and everyday words, and the list says what it searched for.
+- **Work volume**: the bolt circle is checked against the X and Y travel of the active machine, and the bar stock planner against its bar capacity.
 
 ### Added (formula fact check)
 - **Fact check of the core formulas**: 23 functions (speeds and feeds, chip thickness, cusp height, helix pitch, bolt circle, surface finish, drilling, tailstock taper, sine bar, thread diameters, wires and tap drills) compared with values worked by hand or printed in ISO 724. All agree. Kept as a test, `core/tests/factcheck.rs`, with every expected value written as a number; see `docs/factcheck.md`.

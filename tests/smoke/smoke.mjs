@@ -2927,12 +2927,34 @@ where = 'toolpaths';
     const top = await page.evaluate(() => { const e = document.getElementById('t-sig'); return e ? e.getBoundingClientRect().top : null; });
     if (top === null || top < 0 || top > 400) problems.push(`[${where}] picking a section should scroll to it: ${top}`);
   }
+  where = 'review-080';
+  {
+    // A misspelt word finds the tool and says what it searched for.
+    await page.click('#search'); await page.fill('#search', 'trocoidal'); await page.waitForTimeout(250);
+    let t = await page.$eval('#searchpop', e => e.innerText).catch(() => '');
+    if (!/showing trochoidal/i.test(t) || !/Milling strategy/.test(t)) problems.push(`[${where}] "trocoidal" should find the milling strategy page: ${t.slice(0, 160)}`);
+    await page.fill('#search', ''); await page.keyboard.press('Escape');
+    // Whitworth and pipe threads are in the type list and point to their own pages.
+    await units('mm'); await open('threaddata', 200);
+    const ty = '#main select[aria-label="Thread type"]';
+    const types = await page.$$eval(ty + ' option', a => a.map(o => o.value));
+    if (!types.includes('_whit') || !types.includes('_pipe')) problems.push(`[${where}] thread types should list Whitworth and pipe threads: ${types.join(',')}`);
+    await page.selectOption(ty, '_whit'); await page.waitForTimeout(80);
+    t = await page.$eval('#main', e => e.innerText).catch(() => '');
+    if (!/Open Whitworth and BA threads/i.test(t)) problems.push(`[${where}] picking Whitworth should offer its page`);
+    await page.selectOption(ty, 'mc'); await page.waitForTimeout(80);
+    // Machine limit boxes in the page's units.
+    await units('inch'); await open('advmill', 200);
+    const u = await page.$$eval('#main [data-id="vfmax"], #main [data-id="pmax"], #main [data-id="tmax"]', a => a.map(x => (x.closest('label') || x.parentElement).innerText.replace(/\s+/g, ' ')).join(' | ')).catch(() => '');
+    if (!/in\/min/.test(u) || !/hp/.test(u) || !/lbf·ft/.test(u)) problems.push(`[${where}] inch mode machine limits should be in/min, hp, lbf·ft: ${u.slice(0, 200)}`);
+    await units('mm');
+  }
   where = 'thread-080';
   {
     await open('threaddata', 400);
     const ty = '#main select[aria-label="Thread type"]', sz = '#main select[aria-label="Size"]';
     const types = await page.$$eval(ty + ' option', a => a.map(o => o.value));
-    if (types.join(',') !== 'mc,mf,UNC,UNF,UNEF,custom') problems.push(`[${where}] thread types: ${types}`);
+    if (types.join(',') !== 'mc,mf,UNC,UNF,UNEF,_whit,_pipe,custom') problems.push(`[${where}] thread types: ${types}`);
     await page.selectOption(ty, 'UNC'); await page.waitForTimeout(150);
     const n = await page.$$eval(sz + ' option', a => a.length), first = await page.$eval(sz, e => e.options[0].textContent);
     if (n < 10 || n > 40 || /UNF/.test(first)) problems.push(`[${where}] UNC sizes only: ${n}, ${first}`);
@@ -3001,16 +3023,32 @@ where = 'toolpaths';
   where = 'stocksizes-080';
   {
     await units('mm'); await open('stocksizes', 150);
-    await page.click('#main .sschip[data-s="50"][data-w="3"]'); await page.waitForTimeout(80);
-    let t = await page.$eval('#ssres', e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
-    // 50 x 50 x 3 box, sharp corners: 2500 - 44 x 44 = 564 mm2.
+    const pick = async (fam, name, w) => {
+      if (fam !== await page.inputValue('#ssf')) { await page.selectOption('#ssf', fam); await page.waitForTimeout(80); }
+      const i = await page.evaluate(([f, n]) => STOCK_SIZES[f].findIndex(r => r[0] === n), [fam, name]);
+      await page.click(`#main .sschip[data-i="${i}"][data-w="${w}"]`); await page.waitForTimeout(80);
+      return page.$eval('#ssres', e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
+    };
+    // Sharp corners: 50 x 50 x 3 box = 2500 - 44 x 44 = 564 mm2; 100 x 50 x 4 box = 5000 - 92 x 42 = 1136 mm2.
+    let t = await pick('shs', '50 x 50', 3);
     if (!/50 x 50 x 3 mm/.test(t) || !/564\.0 mm²/.test(t)) problems.push(`[${where}] 50 x 50 x 3 box should be 564 mm2: ${t.slice(0, 200)}`);
     if (!(await page.$('#ssdia svg'))) problems.push(`[${where}] no drawing of the section`);
-    await page.selectOption('#ssf', 'angm'); await page.waitForTimeout(80);
-    await page.click('#main .sschip[data-s="40"][data-w="4"]'); await page.waitForTimeout(80);
-    t = await page.$eval('#ssres', e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
-    // 40 x 40 x 4 angle, sharp corners: 2 x 40 x 4 - 16 = 304 mm2.
+    t = await pick('rhs', '100 x 50', 4);
+    if (!/1,?136\.0 mm²/.test(t)) problems.push(`[${where}] 100 x 50 x 4 box should be 1136 mm2: ${t.slice(0, 200)}`);
+    // 40 x 40 x 4 angle: 2 x 40 x 4 - 16 = 304 mm2.
+    t = await pick('angm', '40 x 40', 4);
     if (!/304\.0 mm²/.test(t)) problems.push(`[${where}] 40 x 40 x 4 angle should be 304 mm2: ${t.slice(0, 200)}`);
+    // IPE 100 sharp corners: 2 x 55 x 5.7 + (100 - 11.4) x 4.1 = 990.26 mm2.
+    t = await pick('ipe', 'IPE 100', '');
+    if (!/990\.3 mm²/.test(t)) problems.push(`[${where}] IPE 100 without fillets should be 990.3 mm2: ${t.slice(0, 200)}`);
+    // 60.3 x 4 round tube: pi/4 (60.3^2 - 52.3^2) = 707.5 mm2.
+    t = await pick('chs', 'Ø 60.3', 4);
+    if (!/707\.5 mm²/.test(t)) problems.push(`[${where}] 60.3 x 4 tube should be 707.5 mm2: ${t.slice(0, 200)}`);
+    // Flat bar 60 x 8: A = 480 mm2; lying flat Ix = 60 x 8^3 / 12 = 2560 mm4.
+    await page.selectOption('#ssf', 'flat'); await page.waitForTimeout(80);
+    await page.fill('#ssfb', '60'); await page.dispatchEvent('#ssfb', 'input'); await page.fill('#ssft', '8'); await page.dispatchEvent('#ssft', 'input'); await page.waitForTimeout(80);
+    t = await page.$eval('#ssres', e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
+    if (!/60 x 8 mm/.test(t) || !/480\.0 mm²/.test(t) || !/2,560 mm⁴/.test(t) || !(await page.$('#ssdia svg'))) problems.push(`[${where}] flat bar 60 x 8: ${t.slice(0, 200)}`);
     await page.selectOption('#ssf', 'tslot'); await page.waitForTimeout(80);
     t = await page.$eval('#main', e => e.innerText).catch(() => '');
     if (!/8-45 series/.test(t)) problems.push(`[${where}] T-slot series table missing`);

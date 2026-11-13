@@ -128,6 +128,15 @@ function checkRow(r, sys, W) {
     const mm = sys === 'inch' ? r.value * 25.4 : r.value;
     if (mm > n(m.feed_max)) return 'Above ' + m.name + ' max feed ' + (sys === 'inch' ? +(n(m.feed_max) / 25.4).toFixed(1) + ' in/min' : n(m.feed_max) + ' mm/min');
   }
+  // 0.8.0: the work volume. 'span_r' is a radius whose whole span (2 r) must fit inside the X and Y travel.
+  if (r.chk === 'span_r' && (n(m.tx) > 0 || n(m.ty) > 0)) {
+    const mm = 2 * r.value * (sys === 'inch' ? 25.4 : 1), lim = Math.min(n(m.tx) > 0 ? n(m.tx) : Infinity, n(m.ty) > 0 ? n(m.ty) : Infinity);
+    if (mm > lim) return 'Wider than the ' + (sys === 'inch' ? +(lim / 25.4).toFixed(2) + ' in' : lim + ' mm') + ' travel of ' + m.name;
+  }
+  if (r.chk === 'bar_d' && n(m.bar_d) > 0) {
+    const mm = r.value * (sys === 'inch' ? 25.4 : 1);
+    if (mm > n(m.bar_d)) return 'Larger than the ' + (sys === 'inch' ? +(n(m.bar_d) / 25.4).toFixed(3) + ' in' : n(m.bar_d) + ' mm') + ' bar capacity of ' + m.name;
+  }
   if (r.chk === 'power_kw' && n(m.power_kw) > 0) {
     const avail = r.rpm > 0 && W ? W.spindle_power_available_kw(r.rpm, n(m.power_kw), n(m.torque_nm) || 0) : n(m.power_kw);
     if (r.value > avail) return 'Needs more than ' + m.name + ' has (' + avail.toFixed(2) + ' kW' + (r.rpm > 0 ? ' at ' + Math.round(r.rpm) + ' RPM' : '') + ')';

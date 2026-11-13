@@ -380,8 +380,8 @@ const TOOLS = [
     if (!(vc > 0)) return [];
     const m = typeof Profiles !== 'undefined' ? Profiles.active() : null;
     const mnum = x => (x === '' || x == null) ? 0 : (Number(x) > 0 ? Number(x) : 0);
-    const pmax = v.pmax > 0 ? v.pmax : (m ? mnum(m.power_kw) : 0);
-    const tmax = v.tmax > 0 ? v.tmax : (m ? mnum(m.torque_nm) : 0);
+    const pmax = v.pmax > 0 ? (s === 'inch' ? v.pmax / KW_HP : v.pmax) : (m ? mnum(m.power_kw) : 0);
+    const tmax = v.tmax > 0 ? (s === 'inch' ? v.tmax * LBF_N * FT_M : v.tmax) : (m ? mnum(m.torque_nm) : 0);
     const pSrc = v.pmax > 0 ? 'entered' : (m && pmax > 0 ? m.name : '');
     const z0 = x => x > 0 ? x : 0;
     const args = ap => [g.d, g.dsh, z0(g.L), g.lf, g.kf, z0(g.e), v.z, v.ae * k, ap, v.fz * k, vc, z0(v.kc), z0(v.eta), z0(v.ratio), z0(v.F) * fk, z0(v.lim) * k, pmax, tmax, advHolderK(v)[0]];
@@ -748,6 +748,8 @@ const TOOLS = [
       R('Scrap per bar', scrap, lenU(s), 3),
       R('Scrap per bar', 100 * scrap / v.bar, '%', 1),
     ];
+    // 0.8.0: checked against the bar capacity of the active machine (its largest bar, from the machine profile).
+    if (v.size > 0) rows.push(R(v.shape === 1 ? 'Bar diameter' : 'Bar across corners', v.shape === 1 ? v.size : W.polygon_dims(v.shape === 2 ? 6 : 4, v.size, 0, 0), lenU(s), s === 'inch' ? 4 : 3, 'bar_d'));
     if (v.size > 0 && v.rho > 0) {
       // inch: in2 x in x lb/in3 = lb. metric: mm2 x mm = mm3; x 1e-3 = cm3; x g/cm3 = g; / 1000 = kg.
       const a = W.bar_section_area(v.shape, v.size), k = s === 'inch' ? 1 : 1e-6, wu = s === 'inch' ? 'lb' : 'kg';
@@ -1955,7 +1957,7 @@ const TOOLS = [
     if (!(v.dia > 0 && Number.isInteger(v.n) && v.n >= 1 && v.n <= 360)) return [];
     const rows = [R('Angle between holes', 360 / v.n, 'deg', 3)];
     if (v.n >= 2) rows.push(R('Centre to centre of neighbouring holes (chord)', W.arc_solve(1, v.dia / 2, 360 / v.n, 2), lenU(s), s === 'inch' ? 4 : 3));
-    rows.push(R('Bolt circle radius', v.dia / 2, lenU(s), s === 'inch' ? 4 : 3));
+    rows.push(R('Bolt circle radius', v.dia / 2, lenU(s), s === 'inch' ? 4 : 3, 'span_r'));
     return rows;
   },
   // Every hole: angle and X, Y, with copies for a spreadsheet and for a program.
@@ -2610,10 +2612,10 @@ const TOOLS = [
 },
 {
   id: 'stocksizes', level: 'simple', group: 'Stock and sheet metal', title: 'Common profiles and sizes',
-  desc: 'Box tube, square tube and equal angle in the sizes stockists list, metric and inch, with each size\'s area, stiffness and weight, and T-slot aluminium framing series. Hands the section to Section properties or Beam deflection.',
+  desc: 'Box tube, round tube, angle, IPE beams and channels in the sizes stockists list, metric and inch, aluminium angle and any flat bar, with each section\'s area, stiffness and weight, and the T-slot aluminium framing series. Hands the section to Section properties or Beam deflection.',
   render: el => renderStockSizes(el),
   working: 'Sizes are as two publishers list them; a size only one lists is marked. Area, second moment, section modulus and radius of gyration from the section built up from rectangles (sharp corners), as in Section properties. Weight = area x length x density.',
-  source: 'Box tube: AmesWeb (EN 10210-2 table) and Project Materials. Square tube, inch: Metals Depot and Speedy Metals. Equal angle, metric: Wermac and Kerschgens (DIN EN 10056). Equal angle, inch: The Engineering ToolBox and Speedy Metals. T-slot: Wikipedia and MISUMI USA. All read 2026-11-13; see docs/stock-sizes.md.',
+  source: 'Box tube, metric: AmesWeb (EN 10210-2 table) and Project Materials. Round tube: AmesWeb and Wermac. Equal angle, metric: Wermac and Kerschgens (DIN EN 10056). IPE: Wermac and Project Materials. Parallel flange channel: British Steel (BS EN 10365) and Kocaer Steel (BS 4-1). Square and rectangular tube, inch: Metals Depot and Speedy Metals. Equal angle, inch: The Engineering ToolBox and Speedy Metals. Aluminium angle: Speedy Metals and Russel Metals. T-slot: Wikipedia and MISUMI USA. All read 2026-11-13; see docs/stock-sizes.md.',
 },
 {
   id: 'gauges', level: 'advanced', group: 'Stock and sheet metal', title: 'Sheet metal and wire gauges',

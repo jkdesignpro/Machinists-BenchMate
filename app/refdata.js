@@ -100,19 +100,25 @@ function threadType(o) {
   if (/^M/.test(o.value)) return /\(coarse\)/.test(o.textContent) ? 'mc' : 'mf';
   const m = o.value.match(/ (\S+)$/); return m ? m[1] : 'other';
 }
-const THREAD_TYPE_NAMES = { mc: 'ISO metric, coarse', mf: 'ISO metric, fine', UNC: 'UNC (Unified coarse)', UNF: 'UNF (Unified fine)', UNEF: 'UNEF (Unified extra fine)', custom: 'Other size: type the diameter and pitch' };
+const THREAD_TYPE_NAMES = { mc: 'ISO metric, coarse', mf: 'ISO metric, fine', UNC: 'UNC (Unified coarse)', UNF: 'UNF (Unified fine)', UNEF: 'UNEF (Unified extra fine)', custom: 'Other size: type the diameter and pitch', _whit: 'BSW, BSF and BA (Whitworth 55°, BA 47.5°): own page', _pipe: 'BSP and NPT pipe threads: own page' };
+// Thread types that have their own page (other angle or a taper): picking one offers the page.
+const THREAD_TYPE_PAGES = { _whit: ['whitworth', 'Whitworth and BA threads'], _pipe: ['pipethreads', 'Pipe threads (BSP and NPT)'] };
 function enhanceThreadSelect(sel) {
   if (!sel || sel.dataset.tp) return; sel.dataset.tp = '1';
   const all = [...sel.querySelectorAll('option')].map(o => ({ value: o.value, text: o.textContent, type: threadType(o) }));
   const ORD = ['mc', 'mf', 'UNC', 'UNF', 'UNEF'], rank = t => t === 'custom' ? 99 : ORD.includes(t) ? ORD.indexOf(t) : 50;
   const types = [...new Set(all.map(o => o.type))].sort((a, b) => rank(a) - rank(b));
+  types.splice(types.indexOf('custom') >= 0 ? types.indexOf('custom') : types.length, 0, '_whit', '_pipe');
   const lab = sel.closest('label'), ty = document.createElement('select'), sz = document.createElement('select');
   ty.innerHTML = types.map(t => '<option value="' + rEsc(t) + '">' + rEsc(THREAD_TYPE_NAMES[t] || t) + '</option>').join('');
   ty.setAttribute('aria-label', 'Thread type'); sz.setAttribute('aria-label', 'Size');
   const tlab = document.createElement('label'); tlab.className = 'f'; tlab.innerHTML = '<span>Thread type</span><div class="row"></div>'; $('.row', tlab).appendChild(ty);
   lab.parentNode.insertBefore(tlab, lab);
   $('span', lab).textContent = 'Size'; sel.hidden = true; sel.before(sz);
+  const go = document.createElement('p'); go.className = 'desc'; go.hidden = true; go.style.gridColumn = '1/-1'; tlab.after(go);
   const fill = t => {
+    const pg = THREAD_TYPE_PAGES[t]; go.hidden = !pg;
+    if (pg) { go.innerHTML = 'These threads have their own form and tables. <button class="btn" type="button">Open ' + rEsc(pg[1]) + '</button>'; $('button', go).onclick = () => openTool(pg[0]); }
     const list = all.filter(o => o.type === t);
     sz.innerHTML = list.map(o => '<option value="' + rEsc(o.value) + '">' + rEsc(t === 'custom' ? 'Type it in the boxes below' : o.text.replace(/ \((coarse|fine)\)$/, '').replace(/ (UNC|UNF|UNEF)$/, '')) + '</option>').join('');
     sz.disabled = t === 'custom'; lab.classList.toggle('na', t === 'custom');
@@ -120,6 +126,7 @@ function enhanceThreadSelect(sel) {
   const sync = () => { const o = all.find(x => x.value === sel.value) || all[0]; if (!o) return; if (ty.value !== o.type) { ty.value = o.type; fill(o.type); } sz.value = o.value; };
   const pick = v => { desc.set.call(sel, v); sel.dispatchEvent(new Event('change')); };
   ty.onchange = () => {
+    if (THREAD_TYPE_PAGES[ty.value]) { fill(ty.value); sz.innerHTML = '<option>See its own page</option>'; sz.disabled = true; return; }
     // Keep near the size already shown: the first size of the new type at or above its diameter.
     const was = all.find(x => x.value === sel.value), dia = was ? parseFloat(String(was.text).replace(/^M/, '')) : NaN;
     fill(ty.value);

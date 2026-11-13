@@ -187,11 +187,38 @@ const SEARCH_KEYS = {
   advplunge: 'plunge milling z axis roughing', rpm: 'rpm sfm surface speed spindle speed', feeds: 'ipm ipr ipt feed rate conversion',
   threaddata: 'thread sizes pitch diameter tap size major minor unc unf metric', drills: 'drill sizes number letter fractional tap drill chart',
   chipthinning: 'radial chip thinning rcte hsm adaptive', helix: 'helical interpolation ramping', deflection: 'end mill deflection stick-out',
-  chatter: 'stability lobes vibration', surfacefin: 'ra finish nose radius cusp scallop', bandsaw: 'band saw cut time', weight: 'stock weight mass', stocksizes: 'profile extrusion box section shs rhs hss square tube angle iron l bar t-slot 8020 aluminium aluminum extrusion steel sizes',
+  chatter: 'stability lobes vibration', surfacefin: 'ra finish nose radius cusp scallop', bandsaw: 'band saw cut time', weight: 'stock weight mass', stocksizes: 'profile extrusion box section shs rhs chs hss square rectangular round tube pipe angle iron l bar ipe i-beam beam channel pfc flat bar t-slot 8020 aluminium aluminum extrusion steel sizes',
   fitlookup: 'iso fits h7 g6 tolerance hole shaft', prefnum: 'renard r5 r10 r20 r40 r80 preferred numbers', backlash: 'lost motion play reversal backlash compensation worm gear', millstrat: 'trochoidal adaptive hem hsm high efficiency dynamic milling toolpath strategy plunge high feed', gmcodes: 'g codes m codes g-code',
 };
-function searchHits(q) {
+// 0.8.0: a misspelt word ("threding", "trocoidal") is matched to the nearest word in the tool titles and
+// everyday words when nothing matches as typed: one letter off for short words, two for words of seven or more.
+function editDist(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]; let lo = i;
+    for (let j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); lo = Math.min(lo, cur[j]); }
+    if (lo > max) return max + 1; prev = cur;
+  }
+  return prev[b.length];
+}
+let searchVocab = null;
+function fixSearchWords(q) {
+  if (!searchVocab) {
+    const v = new Set(); const add = t => String(t || '').toLowerCase().split(/[^a-z0-9]+/).forEach(w => { if (w.length >= 3) v.add(w); });
+    Object.values(PAGES).forEach(p => { add(p.title); add(p.desc); }); TOOLS.forEach(t => add(t.title)); Object.values(SEARCH_KEYS).forEach(add);
+    searchVocab = [...v];
+  }
+  return q.split(/\s+/).map(w => {
+    if (w.length < 4 || searchVocab.includes(w)) return w;
+    const max = w.length >= 7 ? 2 : 1; let best = w, bd = max + 1;
+    searchVocab.forEach(c => { const d = editDist(w, c, max); if (d < bd || (d === bd && c.length < best.length)) { bd = d; best = c; } });
+    return bd <= max ? best : w;
+  }).join(' ');
+}
+function searchHits(q, fixed) {
   q = q.trim().toLowerCase(); if (!q) return [];
+  if (!fixed) { const hits = searchHits(q, true); if (hits.length) return hits; const f = fixSearchWords(q); return f !== q ? searchHits(f, true).map(h => Object.assign({ fixed: f }, h)) : []; }
   loadSearchIdx();
   const words = q.split(/\s+/), out = [];
   // Whole-word start counts for more than a match inside a word ("tap" finds "Tapping" before "Spline taper").
@@ -231,8 +258,8 @@ function initSearch() {
     if (!q.trim()) { close(); return; }
     pop.hidden = false;
     if (/#\/t\/\S+/.test(q)) { pop.innerHTML = '<div class="shn">Press Enter to open this link.</div>'; return; }
-    pop.innerHTML = hits.length ? hits.map((h, i) => '<button class="sh' + (h.child ? ' kid' : '') + (i === sel ? ' on' : '') + '" data-i="' + i + '">' + (h.child ? '<span class="shk">§</span>' : icon(h.icon)) + '<span><b>' + hesc(h.title) + '</b><small>' + hesc(h.sub || '') + '</small></span></button>').join('')
-      : '<div class="shn">No tool matches' + (state.mode === 'simple' ? ' in Simple mode. Switch to Advanced to search every tool.' : '.') + '</div>';
+    pop.innerHTML = (hits.length && hits[0].fixed ? '<div class="shn">Nothing for "' + hesc(q.trim()) + '"; showing <b>' + hesc(hits[0].fixed) + '</b></div>' : '') + (hits.length ? hits.map((h, i) => '<button class="sh' + (h.child ? ' kid' : '') + (i === sel ? ' on' : '') + '" data-i="' + i + '">' + (h.child ? '<span class="shk">§</span>' : icon(h.icon)) + '<span><b>' + hesc(h.title) + '</b><small>' + hesc(h.sub || '') + '</small></span></button>').join('')
+      : '<div class="shn">No tool matches' + (state.mode === 'simple' ? ' in Simple mode. Switch to Advanced to search every tool.' : '.') + '</div>');
   };
   const pick = i => { const h = hits[i]; if (!h) return; inp.value = ''; close(); inp.blur(); if (h.thread) { window.PENDING_THREAD = h.thread; openTool(h.id); } else if (h.anchor) openAnchor(h.id, h.anchor); else openTool(h.id); };
   // On the Mac the app runs at tauri://localhost, and the system AutoFill offers any password saved for
