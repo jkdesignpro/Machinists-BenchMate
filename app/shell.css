@@ -458,3 +458,9 @@ details.msec>summary{cursor:pointer;padding:8px 0;font-weight:600}
 .mscard ul{margin:6px 0 0;padding-left:0;list-style:none}
 .mscard li{margin:0 0 5px;padding-left:22px;position:relative}
 .msm{position:absolute;left:0;width:16px;text-align:center;font-weight:700}
+/* Common profiles and sizes (0.8.0) */
+.sstab td:last-child{display:flex;flex-wrap:wrap;gap:4px}
+.sschip{font:inherit;font-family:var(--mono);font-size:12.5px;padding:2px 7px;border:1px solid var(--line);background:var(--panel2,var(--panel));color:var(--ink);cursor:pointer;border-radius:2px}
+.sschip.one{border-style:dashed;color:var(--muted)}
+.sschip sup{font-size:9px;margin-left:1px}
+.sschip.on{background:var(--accent);color:var(--accent-ink,#000);border-color:var(--accent)}

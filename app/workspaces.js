@@ -90,8 +90,8 @@ const WORKSPACES = [
   { id: 'maths', name: 'Shop maths', icon: 'triangle', blurb: 'Calculator, conversions, geometry, stock and engineering sums.', sections: [
     ['Calculator and conversion', ['calc', 'interp', 'convert', 'formulas'], 'calc'],
     ['Geometry', ['triangle', 'squaring', 'arc', 'fillet', 'linecirc', 'conics', 'compound', 'figures', 'prismoid', 'irregular', 'tankvol', 'holepattern'], 'angle'],
-    ['Stock and sheet metal', ['weight', 'bar', 'bend', 'gauges'], 'material'],
-    ['Engineering', ['section', 'beam', 'torsion', 'column', 'stressconc', 'fatigue', 'balance', 'critspeed', 'bearinglife'], 'beam'],
+    ['Stock and sheet metal', ['weight', 'stocksizes', 'bar', 'bend', 'gauges'], 'material'],
+    ['Engineering', ['section', 'stocksizes', 'beam', 'torsion', 'column', 'stressconc', 'fatigue', 'balance', 'critspeed', 'bearinglife'], 'beam'],
   ] },
   { id: 'program', name: 'Programming', icon: 'programming', blurb: 'G and M codes, macros, cycle generators, backplot and DXF.', sections: [
     ['Codes', ['gmcodes', 'macroref'], 'code'],

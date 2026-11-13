@@ -25,6 +25,9 @@ Work on the feedback after using 0.7.0.
 - **Backlash: linear and rotary axes, gears** (Measure and inspect, Programming > Rotary axis, Gears): the lost motion of an axis from the indicator test (Tormach, MachMotion), the play of a rotary axis turned into an angle or an angle into play at the part, and the backlash a gear pair gains when its centres open (KHK, one publisher). Formulas in `core/src/rotary.rs`; see `docs/backlash.md`.
 - **What is this for?** A folded plain explanation at the top of eleven less familiar tools: preferred numbers, tolerance stack, process capability, control charts, gauge R&R, sampling plans, chatter finder, balancing, temperature compensation, runout and tool life. Preferred numbers explains where Renard's series came from and where they are used, from Kverneland (Machine Design, 1998) and Wikipedia, with one-publisher statements marked (see `docs/inspection.md`).
 
+### Added (common profiles and sizes)
+- **Common profiles and sizes** (Stock and sheet metal; Mechanics > Engineering): box tube (metric), square tube (inch), equal angle (metric and inch) in the sizes two publishers list, each size marked when only one lists it, and the T-slot aluminium framing series as Wikipedia and MISUMI name them, side by side. Picking a size draws the section and gives its area, stiffness and weight from the core, and sends it to Section properties or Beam deflection. See `docs/stock-sizes.md`.
+
 ### Added (formula fact check)
 - **Fact check of the core formulas**: 23 functions (speeds and feeds, chip thickness, cusp height, helix pitch, bolt circle, surface finish, drilling, tailstock taper, sine bar, thread diameters, wires and tap drills) compared with values worked by hand or printed in ISO 724. All agree. Kept as a test, `core/tests/factcheck.rs`, with every expected value written as a number; see `docs/factcheck.md`.
 

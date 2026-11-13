@@ -187,7 +187,7 @@ const SEARCH_KEYS = {
   advplunge: 'plunge milling z axis roughing', rpm: 'rpm sfm surface speed spindle speed', feeds: 'ipm ipr ipt feed rate conversion',
   threaddata: 'thread sizes pitch diameter tap size major minor unc unf metric', drills: 'drill sizes number letter fractional tap drill chart',
   chipthinning: 'radial chip thinning rcte hsm adaptive', helix: 'helical interpolation ramping', deflection: 'end mill deflection stick-out',
-  chatter: 'stability lobes vibration', surfacefin: 'ra finish nose radius cusp scallop', bandsaw: 'band saw cut time', weight: 'stock weight mass',
+  chatter: 'stability lobes vibration', surfacefin: 'ra finish nose radius cusp scallop', bandsaw: 'band saw cut time', weight: 'stock weight mass', stocksizes: 'profile extrusion box section shs rhs hss square tube angle iron l bar t-slot 8020 aluminium aluminum extrusion steel sizes',
   fitlookup: 'iso fits h7 g6 tolerance hole shaft', prefnum: 'renard r5 r10 r20 r40 r80 preferred numbers', backlash: 'lost motion play reversal backlash compensation worm gear', millstrat: 'trochoidal adaptive hem hsm high efficiency dynamic milling toolpath strategy plunge high feed', gmcodes: 'g codes m codes g-code',
 };
 function searchHits(q) {

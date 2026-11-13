@@ -2998,6 +2998,24 @@ where = 'toolpaths';
     t = await v(); if (!/0\.0728 mm/.test(t) || !/0\.0684 mm/.test(t) || !/8\.342 arcmin/.test(t)) problems.push(`[${where}] KHK centre distance 0.1 at 20 deg: ${t.slice(0, 260)}`);
     await page.click('#main .tpa button[title^="Reset"]').catch(() => {});
   }
+  where = 'stocksizes-080';
+  {
+    await units('mm'); await open('stocksizes', 150);
+    await page.click('#main .sschip[data-s="50"][data-w="3"]'); await page.waitForTimeout(80);
+    let t = await page.$eval('#ssres', e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
+    // 50 x 50 x 3 box, sharp corners: 2500 - 44 x 44 = 564 mm2.
+    if (!/50 x 50 x 3 mm/.test(t) || !/564\.0 mm²/.test(t)) problems.push(`[${where}] 50 x 50 x 3 box should be 564 mm2: ${t.slice(0, 200)}`);
+    if (!(await page.$('#ssdia svg'))) problems.push(`[${where}] no drawing of the section`);
+    await page.selectOption('#ssf', 'angm'); await page.waitForTimeout(80);
+    await page.click('#main .sschip[data-s="40"][data-w="4"]'); await page.waitForTimeout(80);
+    t = await page.$eval('#ssres', e => e.innerText.replace(/\s+/g, ' ')).catch(() => '');
+    // 40 x 40 x 4 angle, sharp corners: 2 x 40 x 4 - 16 = 304 mm2.
+    if (!/304\.0 mm²/.test(t)) problems.push(`[${where}] 40 x 40 x 4 angle should be 304 mm2: ${t.slice(0, 200)}`);
+    await page.selectOption('#ssf', 'tslot'); await page.waitForTimeout(80);
+    t = await page.$eval('#main', e => e.innerText).catch(() => '');
+    if (!/8-45 series/.test(t)) problems.push(`[${where}] T-slot series table missing`);
+    await page.selectOption('#ssf', 'shs');
+  }
   where = 'machines-080';
   {
     await units('mm'); await open('machines', 200);

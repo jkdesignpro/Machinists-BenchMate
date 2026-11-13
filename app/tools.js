@@ -2609,6 +2609,13 @@ const TOOLS = [
   source: 'Areas of plane figures; densities from the material data where Confirmed, else from your data sheet. See docs/geometry.md.',
 },
 {
+  id: 'stocksizes', level: 'simple', group: 'Stock and sheet metal', title: 'Common profiles and sizes',
+  desc: 'Box tube, square tube and equal angle in the sizes stockists list, metric and inch, with each size\'s area, stiffness and weight, and T-slot aluminium framing series. Hands the section to Section properties or Beam deflection.',
+  render: el => renderStockSizes(el),
+  working: 'Sizes are as two publishers list them; a size only one lists is marked. Area, second moment, section modulus and radius of gyration from the section built up from rectangles (sharp corners), as in Section properties. Weight = area x length x density.',
+  source: 'Box tube: AmesWeb (EN 10210-2 table) and Project Materials. Square tube, inch: Metals Depot and Speedy Metals. Equal angle, metric: Wermac and Kerschgens (DIN EN 10056). Equal angle, inch: The Engineering ToolBox and Speedy Metals. T-slot: Wikipedia and MISUMI USA. All read 2026-11-13; see docs/stock-sizes.md.',
+},
+{
   id: 'gauges', level: 'advanced', group: 'Stock and sheet metal', title: 'Sheet metal and wire gauges',
   desc: 'What a gauge number means in inches and mm: steel, galvanized, stainless and aluminium sheet, and the American (AWG), British (SWG) and tube wall wire gauges side by side.',
   render: el => renderGauges(el),
