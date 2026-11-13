@@ -165,7 +165,7 @@ function renderDrawGuide(el) {
     rows.map(r => '<tr><td><b>' + gesc(r[0]) + '</b></td><td>' + gesc(r[1]) + '</td><td>' + dgTags(r[2]) + '</td></tr>').join('') + '</table></div>';
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">How to read a drawing, in our own words: the kinds of drawing, sheet sizes and the title block, line types, first and third angle views, sections and hatching, welding symbols, the CAD file formats and the 3D model that replaces the drawing, and the standards behind it all. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
+    '<p class="desc">How to read a drawing, in our own words: the kinds of drawing, sheet sizes and the title block, line types, first and third angle views, sections and hatching, welding symbols, the CAD file formats and the 3D model that replaces the drawing, and the standards behind it all. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
 
     '<h2 id="dg-set">Kinds of drawing</h2>' +
     dgP('<b>Working drawings.</b> The whole set needed to make a product and put it together: a detail drawing for each part that is made, the assembly drawings, and a parts list.', ['MCG']) +

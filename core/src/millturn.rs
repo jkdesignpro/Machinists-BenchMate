@@ -286,6 +286,31 @@ pub fn saw_section(shape: f64, a: f64, b: f64, nx: f64, ny: f64, which: f64) -> 
     match which as i32 { 0 => area * nx * ny, 1 => h * ny, 2 => w * nx, 3 => nx * ny, _ => f64::NAN }
 }
 
+/// 0.8.0: more sections for the bandsaw. `shape`: 1 round bar (diameter a), 2 rectangle or flat
+/// (width a across the blade, height c), 3 round tube (outside diameter a, wall t), 4 square bar (side a),
+/// 5 hexagon bar lying on a flat (across flats a: the blade feeds through a and crosses the corners,
+/// 2a/sqrt 3), 6 square tube (side a, wall t), 7 rectangular tube (width a, height c, wall t),
+/// 8 angle (leg a across the blade, leg c in the feed direction, thickness t). Tubes and angles are
+/// taken with sharp corners (no corner radii), so the area is a little over the real one.
+/// `which` as for saw_section. NaN for impossible input.
+pub fn saw_section_ext(shape: f64, a: f64, t: f64, c: f64, nx: f64, ny: f64, which: f64) -> f64 {
+    let (nx, ny) = (nx.max(1.0).floor(), ny.max(1.0).floor());
+    if !(a > 0.0) { return f64::NAN; }
+    let s3 = 3f64.sqrt();
+    let (area, w, h) = match shape as i32 {
+        1 => (PI / 4.0 * a * a, a, a),
+        2 if c > 0.0 => (a * c, a, c),
+        3 if t > 0.0 && t < a / 2.0 => (PI / 4.0 * (a * a - (a - 2.0 * t).powi(2)), a, a),
+        4 => (a * a, a, a),
+        5 => (s3 / 2.0 * a * a, 2.0 * a / s3, a),
+        6 if t > 0.0 && t < a / 2.0 => (a * a - (a - 2.0 * t).powi(2), a, a),
+        7 if c > 0.0 && t > 0.0 && t < a.min(c) / 2.0 => (a * c - (a - 2.0 * t) * (c - 2.0 * t), a, c),
+        8 if c > 0.0 && t > 0.0 && t < a.min(c) => (t * (a + c - t), a, c),
+        _ => return f64::NAN,
+    };
+    match which as i32 { 0 => area * nx * ny, 1 => h * ny, 2 => w * nx, 3 => nx * ny, _ => f64::NAN }
+}
+
 /// Bandsaw cut time (min) from the metal area cut and a cutting rate in area
 /// per minute (in^2/min or cm^2/min, the figure saw and blade makers quote):
 /// t = area / rate. [Starrett Bulletin 193; Machinery's Handbook, band saw blades]
@@ -454,6 +479,27 @@ mod tests {
             assert!(best >= runout_chip_max(fz, 2.0 * rho, z as f64) - 1e-6);
         }
         assert!(close(runout_fz_for_max(0.07, 0.02, 2.0), 0.05, 1e-12));
+    }
+
+    #[test]
+    fn saw_sections_ext() {
+        // Square 50: 2500; hexagon 50 across flats: sqrt3/2 x 2500 = 2165.06, width across corners 57.735
+        assert!(close(saw_section_ext(4.0, 50.0, 0.0, 0.0, 1.0, 1.0, 0.0), 2500.0, 1e-12));
+        assert!(close(saw_section_ext(5.0, 50.0, 0.0, 0.0, 1.0, 1.0, 0.0), 2165.0635094610966, 1e-9));
+        assert!(close(saw_section_ext(5.0, 50.0, 0.0, 0.0, 1.0, 1.0, 2.0), 57.73502691896258, 1e-9));
+        assert!(close(saw_section_ext(5.0, 50.0, 0.0, 0.0, 1.0, 1.0, 1.0), 50.0, 1e-12));
+        // Square tube 50 x 3: 2500 - 44^2 = 564; rectangular tube 60 x 40 x 3: 2400 - 54 x 34 = 564
+        assert!(close(saw_section_ext(6.0, 50.0, 3.0, 0.0, 1.0, 1.0, 0.0), 564.0, 1e-12));
+        assert!(close(saw_section_ext(7.0, 60.0, 3.0, 40.0, 1.0, 1.0, 0.0), 564.0, 1e-12));
+        // Angle 50 x 50 x 5: 5 x (50 + 50 - 5) = 475
+        assert!(close(saw_section_ext(8.0, 50.0, 5.0, 50.0, 1.0, 1.0, 0.0), 475.0, 1e-12));
+        // The old shapes agree with saw_section; a rectangle's height is c here.
+        assert!(close(saw_section_ext(1.0, 40.0, 0.0, 0.0, 3.0, 2.0, 0.0), saw_section(1.0, 40.0, 0.0, 3.0, 2.0, 0.0), 1e-12));
+        assert!(close(saw_section_ext(2.0, 2.75, 0.0, 2.0, 1.0, 1.0, 0.0), 5.5, 1e-12));
+        assert!(close(saw_section_ext(3.0, 40.0, 4.0, 0.0, 1.0, 1.0, 0.0), saw_section(3.0, 40.0, 4.0, 1.0, 1.0, 0.0), 1e-12));
+        // impossible walls
+        assert!(saw_section_ext(6.0, 50.0, 25.0, 0.0, 1.0, 1.0, 0.0).is_nan());
+        assert!(saw_section_ext(8.0, 50.0, 60.0, 50.0, 1.0, 1.0, 0.0).is_nan());
     }
 
     #[test]

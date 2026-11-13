@@ -56,18 +56,44 @@ Balax, a forming tap maker, prints miniature hole sizes 0 to 0.0016 in larger th
 
 | Coating | Values (publishers) | Status |
 |---|---|---|
-| TiN | 600 (Oerlikon Balzers, Hartner, Brycoat); 500 (GWS, Jozef Stefan Institute) | differ |
-| TiCN | 400 (Balzers, Brycoat); 450 (Hartner) | one differs |
-| TiAlN | 800 (Hartner, Brycoat); 1100 (Balzers, a TiAlN-based brand); 900 (JSI) | differ |
+| TiN | 600 (Oerlikon Balzers, Hartner, Brycoat, AIMS); 500 (GWS, Jozef Stefan Institute) | differ |
+| TiCN | 400 (Balzers, Brycoat, AIMS); 450 (Hartner) | one differs |
+| TiAlN | 800 (Hartner, Brycoat); 1100 (Balzers, a TiAlN-based brand); 900 (JSI, AIMS) | differ |
 | AlTiN | 800 (GWS, Brycoat); 1000 (Balzers); 900 (Hartner); 1100 (JSI, AlTiN/TiN nano-layer) | differ |
-| AlCrN | 1100 (Balzers) | needs 2nd source |
+| AlCrN | 1100 (Balzers, AIMS) | confirmed |
 | DLC | 500 (Hartner) | needs 2nd source |
-| CVD diamond | 600 (Balzers, Hartner) | confirmed |
+| CVD diamond | 600 (Balzers, Hartner, AIMS) | confirmed |
 | ZrN | 700 (Hartner); 600 (Brycoat) | differ |
-| CrN | 700 (Brycoat); 750 (JSI) | differ |
+| CrN | 700 (Brycoat, AIMS); 750 (JSI) | differ |
 | CVD Al2O3 | none printed by the sources compared | not given |
 
 Some publishers call the figure an oxidation temperature (GWS); brand coatings are their own recipes. The guide says so and shows every value.
+
+Production Machining (PMPA, 2024) prints °F: TiN about 1000, AlTiN about 1400, TiB2 about 900, DLC about 750. The advisors show these as printed and do not convert them.
+
+### Tool materials and coatings in the advisors (0.8.0)
+
+app/coatings.js holds the list and the fit statements the milling, drilling and turning advisors show. Each statement carries its keys; one with a single publisher is marked "to be verified".
+
+| Statement | Sources | Status |
+|---|---|---|
+| Cermet: steels and stainless, semi-finishing and finishing at higher speed | Kennametal, AIMS | confirmed |
+| Cermet: less suited than carbide to heavy roughing | Kennametal, AIMS | confirmed |
+| Ceramics: cast iron, heat-resistant nickel alloys, hardened steel, at high speed | NTK, Kennametal | confirmed |
+| CBN: hardened steel and cast iron | NTK, Kennametal, AIMS | confirmed |
+| CBN gains nothing on non-ferrous | AIMS | to be verified |
+| PCD: not for steel or cast iron (reacts with iron) | Kennametal, AIMS, Mitsubishi Materials | confirmed |
+| PCD: non-ferrous, plastics, composites | NTK, Kennametal, AIMS | confirmed |
+| PCD needs a rigid machine and workholding | Kennametal | to be verified |
+| TiAlN and AlTiN not for aluminium | Productivity, Hartner, PMPA | confirmed |
+| AlCrN on aluminium | Productivity (avoid aluminium-bearing coatings) against AIMS (lists aluminium) | differ, both shown |
+| DLC for aluminium and non-ferrous | Hartner, PMPA, Balzers | confirmed |
+| Diamond never on ferrous | Hartner, Balzers, AIMS | confirmed |
+| CVD multilayer on inserts for steel and cast iron | Kennametal, WIDIA | confirmed |
+| TiB2 for non-ferrous | PMPA | to be verified |
+| MoS2 lubricating layer, steam oxide | Hartner; AIMS | to be verified |
+
+Not used: tool life multipliers from a seller's page ("3 to 10 times"), each maker's cutting speeds for its own grades, and an end mill coatings page that gave headings only (Advanced Tool). The Kennametal blog on end mill coatings could not be read (page script only).
 
 ### Saw blade pitch
 

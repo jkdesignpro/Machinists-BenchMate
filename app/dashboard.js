@@ -15,7 +15,9 @@ const Dash = (() => {
     toollib: { title: 'Tool library', icon: 'toollib', size: 's' },
     news: { title: 'What\'s new', icon: 'book', size: 's' },
   };
-  const SIZES = ['s', 'm', 'w', 'x'], SIZE_NAME = { s: 'small', m: 'medium', w: 'wide', x: 'full width' };
+  const SIZES = ['s', 'm', 'w', 'l', 'x'], SIZE_NAME = { s: 'small', m: 'medium', w: 'wide', l: 'large', x: 'full width' };
+  // Columns of the 12-column grid each size takes (shell.css), for snapping a drag to the nearest size.
+  const SPAN = { s: 3, m: 4, w: 6, l: 8, x: 12 }, SIZE_KEY = { s: 'S', m: 'M', w: 'W', l: 'L', x: 'F' };
   const T = id => ({ k: 'tool', id, size: 'm' });
   const K = (k, size) => ({ k, size: size || KINDS[k].size });
   const PRESETS = {
@@ -95,20 +97,49 @@ const Dash = (() => {
     if (adding) grid.appendChild(addPanel(main));
     if (!L.items.length && !adding) { const e = document.createElement('div'); e.className = 'wadd'; e.innerHTML = '<div class="wempty">Your Home page is empty. Use Add widget to put tools here.</div>'; grid.appendChild(e); }
     L.items.forEach((w, i) => {
-      const d = document.createElement('section'); d.className = 'wd ' + (w.size || 'm'); d.dataset.i = i;
+      const d = document.createElement('section'); d.className = 'wd ' + (w.size || 'm') + (w.h ? ' hset' : ''); d.dataset.i = i;
+      if (w.h) d.style.height = w.h + 'px';
       const pageId = w.k === 'tool' ? w.id : null;
       d.innerHTML = '<div class="wdh">' + icon(iconOf(w)) + '<b></b>' + (pageId ? '<a href="#" title="Open the full tool">Open' + icon('right') + '</a>' : '') + '</div><div class="wdb"></div>' +
         '<div class="wded"><button class="ib" data-a="l" title="Move earlier" aria-label="Move earlier">' + icon('left') + '</button><button class="ib" data-a="r" title="Move later" aria-label="Move later">' + icon('right') + '</button>' +
-        '<button class="ib" data-a="s" title="Change size (now ' + SIZE_NAME[w.size || 'm'] + ')" aria-label="Change size">' + icon('wide') + '</button><button class="ib" data-a="x" title="Remove" aria-label="Remove">' + icon('trash') + '</button></div>';
+        '<span class="wsizes">' + SIZES.map(z => '<button type="button" data-z="' + z + '" class="' + ((w.size || 'm') === z ? 'on' : '') + '" title="' + SIZE_NAME[z] + '" aria-label="Size ' + SIZE_NAME[z] + '">' + SIZE_KEY[z] + '</button>').join('') + '</span>' +
+        '<button class="ib" data-a="x" title="Remove" aria-label="Remove">' + icon('trash') + '</button></div>' +
+        '<div class="wrsz" title="Drag to resize; double-click to fit the height to the contents" aria-hidden="true"></div>';
       $('b', d).textContent = titleOf(w);
       const a = $('.wdh a', d); if (a) a.onclick = e => { e.preventDefault(); openTool(pageId); };
-      $$('.wded button', d).forEach(b => b.onclick = () => {
+      $$('.wsizes button', d).forEach(b => b.onclick = () => { w.size = b.dataset.z; save(); render(main); });
+      $$('.wded button[data-a]', d).forEach(b => b.onclick = () => {
         const k = b.dataset.a;
         if (k === 'x') L.items.splice(i, 1);
-        else if (k === 's') w.size = SIZES[(SIZES.indexOf(w.size || 'm') + 1) % SIZES.length];
         else { const j = i + (k === 'l' ? -1 : 1); if (j < 0 || j >= L.items.length) return; L.items.splice(j, 0, L.items.splice(i, 1)[0]); }
         save(); render(main);
       });
+      // Resize by dragging the corner: the width snaps to the nearest size, the height is free (at least 90 px).
+      const rz = $('.wrsz', d);
+      rz.ondblclick = () => { w.h = 0; save(); render(main); };
+      rz.onpointerdown = e => {
+        e.preventDefault(); e.stopPropagation(); if (rz.setPointerCapture) rz.setPointerCapture(e.pointerId);
+        const r0 = d.getBoundingClientRect(), col = grid.getBoundingClientRect().width / 12, x0 = e.clientX, y0 = e.clientY;
+        d.draggable = false; d.classList.add('sizing');
+        let size = w.size || 'm', h = r0.height;
+        rz.onpointermove = ev => {
+          const want = (r0.width + ev.clientX - x0) / col;
+          size = SIZES.reduce((a, z) => Math.abs(SPAN[z] - want) < Math.abs(SPAN[a] - want) ? z : a, SIZES[0]);
+          h = Math.max(90, Math.round(r0.height + ev.clientY - y0));
+          SIZES.forEach(z => d.classList.toggle(z, z === size)); d.style.height = h + 'px'; d.classList.add('hset');
+        };
+        let moved = false;
+        const mv0 = rz.onpointermove;
+        rz.onpointermove = ev => { if (Math.abs(ev.clientX - x0) + Math.abs(ev.clientY - y0) > 3) moved = true; mv0(ev); };
+        rz.onpointerup = () => {
+          rz.onpointermove = rz.onpointerup = null; d.classList.remove('sizing');
+          // A click without a drag changes nothing (and leaves the handle in place for a double-click).
+          if (!moved) { d.draggable = editing; return; }
+          w.size = size;
+          if (Math.abs(h - r0.height) > 4) w.h = h;
+          save(); render(main);
+        };
+      };
       if (editing) {
         d.draggable = true;
         d.ondragstart = e => { e.dataTransfer.setData('text/plain', String(i)); e.dataTransfer.effectAllowed = 'move'; d.classList.add('drag'); };

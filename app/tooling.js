@@ -15,6 +15,11 @@ const TG_EXTRA = {
 };
 // USCTI's tapping tips are GWS Tool Group's text: one publisher family.
 const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS', MSC_TM: 'MSC', REGAL_TG: 'REGAL', AIMS_CF: 'AIMS_BT', MMC_TH: 'MMC', PT_TH: 'PROTOOL_TM' };
+// Sources added with the coatings advisor (0.8.0): the same keys as in coatings.js.
+['HARVEY', 'UNIMERCO', 'PLATIT', 'MMC_EM', 'PAULIMOT', 'CUTWEL_AL', 'KYO_TP', 'KYO_CP', 'TUNG_HT', 'CTE_HT', 'SME_CER', 'MMC_PCD', 'CUTWEL_CM', 'KYO_TN60'].forEach(k => {
+  if (typeof TC_SOURCES === 'object' && TC_SOURCES[k]) TG_EXTRA[k] = { publisher: TC_SOURCES[k], title: '', url: TC_URLS[k] };
+});
+Object.assign(TG_FAMILY, { MMC_EM: 'MMC', MMC_PCD: 'MMC', KYO_TP: 'KYO', KYO_CP: 'KYO', KYO_TN60: 'KYO', CUTWEL_AL: 'CUTWEL', CUTWEL_CM: 'CUTWEL' });
 let TG_SRC = TG_EXTRA;
 function tgTags(keys) {
   const ks = keys || [];
@@ -74,15 +79,17 @@ async function renderToolGuide(el) {
   const toc = [['t-geo', 'Tool geometry'], ['t-mat', 'Tool materials'], ['t-coat', 'Coatings'], ['t-em', 'End mills'], ['t-dr', 'Drills'], ['t-rm', 'Reamers'], ['t-tap', 'Taps'],
     ['t-lim', 'Tap limits'], ['t-tm', 'Thread mills'], ['t-hold', 'Turning holders'], ['t-saw', 'Saw blades'], ['t-brk', 'Broken taps'], ['t-src', 'Sources']];
   const coatRows = [
-    ['TiN', 'Titanium nitride. Gold. The general purpose coating for HSS and carbide drills, taps and end mills.', ['HARTNER', 'GWS']],
+    ['TiN', 'Titanium nitride. The general purpose coating for HSS and carbide drills, taps and end mills.', ['HARTNER', 'GWS']],
     ['TiCN', 'Titanium carbonitride. Harder than TiN, for edges under high mechanical load or impact, such as taps and interrupted cuts; lower heat limit.', ['HARTNER', 'PRODINC']],
     ['TiAlN', 'Titanium aluminium nitride. Forms an aluminium oxide skin when hot, so it suits high speed and dry or near-dry cutting of steels and cast iron.', ['HARTNER', 'PRODINC']],
     ['AlTiN', 'Aluminium-rich TiAlN. More heat and oxidation resistance; hardened steel, stainless, titanium and nickel alloys, high speed. Not for aluminium (aluminium in the coating sticks to aluminium work).', ['HARTNER', 'PRODINC']],
     ['AlCrN', 'Aluminium chromium nitride. For very hot cutting: steels, hardened steels, gear cutting.', ['BALZERS', 'PRODINC']],
     ['DLC', 'Diamond-like carbon (amorphous carbon). Low friction against aluminium and other non-ferrous metals, against built-up edge.', ['HARTNER', 'PRODINC']],
     ['Diamond', 'CVD diamond film on carbide. Graphite, fibre-reinforced plastics and high-silicon aluminium. Never for steel or cast iron: carbon dissolves into iron when hot.', ['HARTNER', 'BALZERS']],
-    ['ZrN', 'Zirconium nitride. Pale gold. Aluminium and other non-ferrous metals.', ['HARTNER', 'PRODINC']],
-    ['CrN', 'Chromium nitride. Silver grey. Non-ferrous metals, and forming and moulding tools.', ['BRYCOAT', 'IJS']],
+    ['ZrN', 'Zirconium nitride. Aluminium and other non-ferrous metals, including abrasive ones such as brass, bronze and high-silicon aluminium.', ['HARTNER', 'PRODINC', 'HARVEY']],
+    ['CrN', 'Chromium nitride. Non-ferrous metals, and forming and moulding tools.', ['BRYCOAT', 'IJS']],
+    ['AlCrSiN', 'Aluminium chromium silicon nitride. The sources name it for different work: one tool maker for hardened steel (with AlTiSiN layers), one coating maker for abrasive aluminium alloys over 12 % silicon, titanium alloys and wood.', ['MMC_EM', 'PLATIT']],
+    ['Polished', 'Polished or lapped flutes and sharp edges, uncoated. For aluminium: the smooth flute holds back built-up edge and lets the chip slide out, and leaves a bright finish.', ['PAULIMOT', 'CUTWEL_AL']],
     ['CVD Al2O3', 'Aluminium oxide, applied by chemical vapour deposition, usually in a thick multilayer with TiCN on turning and milling inserts. It shields the carbide from heat and resists crater wear in steel and cast iron. No maximum temperature is given here: the sources compared print none.', ['MMC', 'SECO']],
   ];
   el.innerHTML =
@@ -105,6 +112,11 @@ async function renderToolGuide(el) {
     '<h2 id="t-mat">Tool materials, substrates and grades</h2>' +
     tp('<b>HSS and cobalt HSS</b> are tough and cheap, can be ground sharp, and are used for taps, drills, reamers and form tools, at lower speeds. <b>Cemented carbide</b> is hard tungsten carbide grains held in a cobalt binder; less cobalt and finer grains make it harder and more wear resistant, more cobalt makes it tougher. <b>Cermet</b> (titanium carbonitride based) gives good finish in steel at high speed. <b>Ceramics</b> (alumina, silicon nitride, whisker reinforced) run very fast in cast iron and nickel alloys. <b>CBN</b> cuts hardened steel and cast iron; <b>PCD</b> cuts aluminium, copper, composites and wood, never steel.', []) +
     tp('<b>Grades and groups.</b> A maker\'s grade is a substrate plus coating tuned for a work material. ISO 513 sorts them into the P, M, K, N, S and H groups with a number for the application range: see ' + tgLink('iso513', 'Cutting material groups (ISO 513)') + '. Grade names are not comparable across makers by number alone: compare the group and the application range.', []) +
+    '<h3 class="gcat" id="t-spd">Starting speeds for cermet, ceramic, CBN and PCD</h3>' +
+    '<p class="desc">The advisors\' speed tables are for carbide and HSS. For the other tool materials these are the makers\' ranges as each prints them, in the units printed, side by side and not averaged. Each range spans that maker\'s own grades, mostly for turning; use the chart for the grade in your hand.</p>' +
+    '<div class="res cntab" style="max-width:none"><table class="gtab"><tr><th>Tool material</th><th>Work</th><th>As printed</th></tr>' +
+    [[3, 'Cermet'], [4, 'Ceramic'], [5, 'CBN'], [6, 'PCD']].map(([tm, name]) => (TM_SPEEDS[tm] || []).map(([, what, rows]) => '<tr><td><b>' + name + '</b></td><td>' + rEsc(what) + '</td><td>' + rows.map(([t, k]) => rEsc(t) + ' ' + tgTags([k]).replace(/<span class="gtbv"[^>]*>[^<]*<\/span>/, '')).join('<br>') + (rows.length < 2 ? ' <span class="gtbv">needs 2nd source</span>' : '') + '</td></tr>').join('')).join('') +
+    '</table></div>' +
 
     '<h2 id="t-coat">Common coatings</h2>' +
     '<p class="desc">Maximum temperatures are the makers\' and coaters\' "maximum service" or "maximum application" figures; some call it an oxidation temperature. They differ a lot because each brand is its own recipe, so read them as an order of magnitude. A value is <b>confirmed</b> only where two independent publishers print the same figure.</p>' +
@@ -113,6 +125,7 @@ async function renderToolGuide(el) {
       const c = T.coating_max_c[k === 'CVD Al2O3' ? '' : k];
       return '<tr><td><b>' + rEsc(k) + '</b></td><td>' + rEsc(use) + ' ' + tgTags(keys) + '</td><td>' + (c ? tgGroups(S, c, ' °C') : '<span class="ms">not printed by the sources compared</span>') + '</td><td>' + (c ? badge(c.groups.length > 2 ? 'differs' : c.status) : '') + '</td></tr>';
     }).join('') + '</table></div>' +
+    tp('<b>Colour.</b> ' + TC_COLOUR[1], TC_COLOUR[2]) +
     tp('<b>Choosing.</b> For steels use the aluminium-bearing nitrides (TiAlN, AlTiN, AlCrN); for aluminium and other non-ferrous metals use a non-sticking coating (ZrN, DLC) or polished uncoated carbide and avoid aluminium-bearing coatings; for graphite and composites use diamond.', ['PRODINC', 'HARTNER']) +
 
     '<h2 id="t-em">End mills</h2>' +
@@ -224,7 +237,7 @@ async function renderToolGuide(el) {
     tp('<b>Weld a nut on</b> a protruding stub and turn it out with a wrench (the heat also helps break it loose); hard on small parts. AIMS wants 3 mm or more of the tap standing proud and warns that thin aluminium warps.', ['RAPID', 'AIMS_BT', 'MFGSHOP_BT']) +
     tp('<b>Prevention</b>: the right tap drill (see ' + tgLink('tapdrill', 'Tap drill size') + '), the right tap type for the hole, square alignment, good lubrication and chip removal, deep enough blind holes, sound taps replaced when worn, and no forcing. AIMS: drill a blind hole at least 3 pitches deeper than the thread, and back the tap off every one or two turns to break the chips.', ['RAPID', 'AIMS_BT', 'MFGSHOP_BT']) +
 
-    '<h2 id="t-src">Sources</h2><ul class="gsl">' + Object.entries(TG_SRC).map(([k, v]) => '<li><b>' + k + '</b> ' + rEsc(v.publisher) + ', ' + rEsc(v.title) + (v.url ? ' (' + rEsc(v.url) + ')' : '') + (v.accessed ? ', accessed ' + rEsc(v.accessed) : '') + '</li>').join('') + '</ul>' +
+    '<h2 id="t-src">Sources</h2><ul class="gsl">' + Object.entries(TG_SRC).map(([k, v]) => '<li><b>' + k + '</b> ' + rEsc(v.publisher) + (v.title ? ', ' + rEsc(v.title) : '') + (v.url ? ' (' + rEsc(v.url) + ')' : '') + (v.accessed ? ', accessed ' + rEsc(v.accessed) : '') + '</li>').join('') + '</ul>' +
     '<p class="desc">Full notes are in data/refdata/tooling-evidence.json and docs/tooling.md. No text, figures or tables were copied from handbooks, standards or maker catalogues.</p>';
   el.querySelectorAll('.gtoc a').forEach(a => a.onclick = e => { e.preventDefault(); const t = el.querySelector(a.getAttribute('href')); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   tgWireLinks(el);

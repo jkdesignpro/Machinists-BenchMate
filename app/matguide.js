@@ -68,6 +68,19 @@ const MG_SOURCES = {
   CTE_PH: 'B. Taylor, Cutting Tool Engineering, "Machining phenolic: dust, wear, and tooling guide", 2023-09-15',
   XOM_G10: 'G. Paulsen and J. Schadegg, Xometry, "Garolite machining", 2020-10-07, updated 2024-09-10',
   HAS_EB: 'P. N. Hasluck, Cassell\'s Cyclopaedia of Mechanics, "Turning and polishing ebonite and vulcanite" (early 1900s; chestofbooks.com)',
+  ERP3: 'R. Ye, 3ERP blog, "CNC machining magnesium: benefits and safety tips", 2020-05-29, modified 2025-07-11',
+  WAYKEN: 'WayKen blog, "Machining magnesium safely guide: risks and tips", 2023-08-04',
+  LUX_MM: 'Luxfer MEL Technologies, knowledge hub, "Machining magnesium" (a magnesium alloy maker)',
+  HUD_M2: 'Hudson Tool Steel, technical data "M2 high speed steel" (heat treating instructions)',
+  SBSM_M2: 'SB Specialty Metals, data sheet "M2" (2022; the PDF layout is jumbled, read line by line)',
+  TM_HSS: 'Total Materia, article "Heat treatment of high-speed steels", 2001, reviewed 2026',
+  MF_SZ: 'P. Ulintz, "Sub-zero treatment of tool steels", MetalForming, March 2012, p. 50',
+  ENC_DCT: 'P. Jovicevic-Klug and B. Podgornik, "Deep cryogenic treatment", Encyclopedia.pub (MDPI) entry 512',
+  WP_HT: 'Wikipedia, "Heat treating" (CC BY-SA)',
+  IITK: 'IIT Kanpur Virtual Labs, "Tailoring microstructure with various heat treatments (annealing, normalizing and quenching)", theory page',
+  MHCC_F: 'L. Hillyard, Metallurgy, ch. 22 "Brittle" and ch. 25 "Fatigue resistance" (MHCC Library Press, CC BY 4.0, 2024)',
+  ELEM_F: 'J. Dahman, Element Materials Technology, "Fatigue failure: how can you tell?", 2024-05-01',
+  IMT_F: 'P. Lours and F. Baillon, IMT Mines Albi, SciMat course, "Crack initiation, propagation and failure analysis", 2024-03-19',
   OWN: 'BenchMate reading of the rule in the sources beside it',
 };
 // Several pages of one publisher count once.
@@ -75,7 +88,7 @@ const MG_FAMILY = {
   TM_TS: 'TOTALMAT', TM_AL: 'TOTALMAT', TM_CU: 'TOTALMAT', TM_TI: 'TOTALMAT', TM_MG: 'TOTALMAT',
   MM_CS: 'MATMATCH', MM_H: 'MATMATCH', XOM_AL: 'XOMETRY', XOM_NI: 'XOMETRY', EF_TS: 'EFUNDA', EF_MG: 'EFUNDA', WP_SAE: 'WIKI', WP_CI: 'WIKI',
   WP_HARD: 'WIKI', WP_CN: 'WIKI', WP_MACH: 'WIKI', TM_HT: 'TOTALMAT', TM_SH: 'TOTALMAT', OU_PNC: 'OU', OU_IFH: 'OU',
-  WP_SS: 'WIKI', TWI_TT: 'TWI', TM_TEMP: 'TOTALMAT', XOM_G10: 'XOMETRY', NORP_FG: 'NORPLEX', PS_TS: 'NORPLEX',
+  WP_SS: 'WIKI', TWI_TT: 'TWI', TM_TEMP: 'TOTALMAT', TM_HSS: 'TOTALMAT', WP_HT: 'WIKI', MHCC_F: 'MHCC', XOM_G10: 'XOMETRY', NORP_FG: 'NORPLEX', PS_TS: 'NORPLEX',
 };
 const mgTags = keys => guideTags(keys, MG_SOURCES, MG_FAMILY);
 const mgP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + mgTags(keys)) + '</p>';
@@ -279,11 +292,39 @@ const MG_CASE = [
   ['Flame hardening', 'Oxy-fuel burners heat the surface, which is then quenched', 'no figure in the sources read', 'Open University: 0.1 to 10 mm for induction and flame together', ['OU_IFH', 'TM_SH']],
 ];
 
+// ---------- 0.8.0: high speed steel, terms ----------
+// M2 as two makers print it; side by side, never merged. Fahrenheit as printed, Celsius converted.
+const MG_M2 = [
+  ['Anneal', '829 to 843 C (1525 to 1550 F), 1 h per inch (2 h least); furnace cool at most 50 F per hour to 538 C (1000 F); 248 HBW or less', '871 C (1600 F) for 2 h; cool 25 F per hour to 538 C (1000 F); 215 to 255 HB', ['HUD_M2', 'SBSM_M2']],
+  ['Preheat', '788 to 843 C (1450 to 1550 F); large or complex tools first equalised at 593 C (1100 F)', '816 to 843 C (1500 to 1550 F), equalise', ['HUD_M2', 'SBSM_M2']],
+  ['Harden (austenitize)', 'Cutting tools, furnace: 1204 to 1232 C (2200 to 2250 F); salt 1191 to 1218 C. For toughness without hot hardness: 1175 to 1191 C', '1149 to 1218 C (2100 to 2225 F), soak 5 to 10 min; high side and longer soak in vacuum', ['HUD_M2', 'SBSM_M2']],
+  ['Quench', 'Pressurized gas, fast to below 538 C; or warm oil until black (about 482 C), then still air; or salt at 538 to 593 C, then air to 51 to 66 C', 'Vacuum, at least 50 F per minute to below 538 C; or salt at 538 to 593 C, then air to 66 C', ['HUD_M2', 'SBSM_M2']],
+  ['Temper', 'Straight after the quench; 552 to 566 C (1025 to 1050 F), 2 h, air cool. Double temper required, triple for large sections and wire EDM blanks', 'Straight after the quench; at least 538 C (1000 F); cool to room temperature between tempers. Double required, triple recommended', ['HUD_M2', 'SBSM_M2']],
+];
+const MG_TERMS = [
+  ['Austenite', 'The form of steel above its upper critical temperature. Every hardening treatment starts from it.', ['WP_HT', 'IITK']],
+  ['Ferrite', 'Soft, ductile iron; more of it makes a steel more ductile.', ['WP_HT']],
+  ['Cementite', 'Hard iron carbide. It is the hard part of pearlite and forms a network at the grain boundaries of high carbon steel if cooled wrongly.', ['WP_HT', 'IITK']],
+  ['Pearlite', 'Thin alternate layers of ferrite and cementite, formed from austenite on slow cooling. Slow cooling gives coarse, softer pearlite; faster cooling fine, harder pearlite.', ['WP_HT', 'IITK']],
+  ['Bainite', 'Forms between the speeds (or temperatures) that give pearlite and those that give martensite.', ['WP_HT', 'IITK']],
+  ['Martensite', 'The hard, brittle structure made when austenite is cooled fast (quenched). Brittle and prone to cracking until it is tempered.', ['WP_HT', 'IITK', 'MF_SZ']],
+  ['Retained austenite', 'Austenite left over after the quench. High carbon, high alloy steels keep a lot of it: 20 to 40 % in high speed steel by one source. Tempering or cold treatment turns it to martensite.', ['TM_HSS', 'MF_SZ']],
+  ['Annealing (full)', 'Heat above the upper critical temperature and cool very slowly in the furnace: soft, coarse pearlite that cold works and machines easily.', ['WP_HT', 'IITK']],
+  ['Normalizing', 'Heat above the upper critical temperature and cool in still air: finer, more even grain, harder and stronger than annealed but less ductile.', ['WP_HT', 'IITK']],
+  ['Spheroidizing', 'A long soak just below the lower critical temperature that turns the cementite plates into small balls. Makes high carbon steel more ductile before it is hardened.', ['IITK', 'WP_HT']],
+  ['Stress relieving', 'Heat below the lower critical temperature and cool evenly to take out stress from welding, cold work or rough machining.', ['WP_HT', 'SBSM_M2']],
+  ['Quenching', 'Fast cooling from above the critical temperature in water, brine, oil, polymer or gas. Hardens steel (martensite); most non-ferrous alloys are softened by it instead.', ['WP_HT', 'IITK']],
+  ['Tempering', 'Reheating hardened steel below the lower critical temperature to trade some hardness for toughness. The hotter, the tougher and softer.', ['WP_HT', 'IITK']],
+  ['Solution treatment and ageing', 'Dissolve the alloying elements by heating, quench to keep them dissolved, then age at room temperature (natural) or in an oven (artificial) so fine particles form and strengthen it: 2xxx, 6xxx and 7xxx aluminium (T4, T6), maraging steel.', ['WP_HT', 'HYDRO']],
+  ['Case hardening', 'Carbon or nitrogen diffused into the surface: a hard, wear resistant skin on a tough core. See Case hardening above.', ['WP_HT']],
+  ['Decarburization', 'Loss of carbon from the surface of hot steel in an oxidising atmosphere: a soft skin that will not harden.', ['WP_HT']],
+];
+
 function renderMatGuide(el) {
-  const toc = [['mg-steel', 'Steel numbers'], ['mg-tool', 'Tool steels'], ['mg-stain', 'Stainless'], ['mg-iron', 'Cast iron'], ['mg-alu', 'Aluminium'], ['mg-cu', 'Copper tempers'], ['mg-other', 'Titanium, magnesium, nickel, zinc'], ['mg-hard', 'Hardness tests'], ['mg-harden', 'Hardenability'], ['mg-case', 'Case hardening'], ['mg-mach', 'Machinability'], ['mg-tens', 'Tensile test'], ['mg-temp', 'Heat and cold'], ['mg-use', 'Steels by use'], ['mg-lam', 'Laminates and hard rubber'], ['mg-corr', 'Corrosion'], ['mg-cert', 'Mill certificates']];
+  const toc = [['mg-steel', 'Steel numbers'], ['mg-tool', 'Tool steels'], ['mg-stain', 'Stainless'], ['mg-iron', 'Cast iron'], ['mg-alu', 'Aluminium'], ['mg-cu', 'Copper tempers'], ['mg-other', 'Titanium, magnesium, nickel, zinc'], ['mg-hard', 'Hardness tests'], ['mg-harden', 'Hardenability'], ['mg-case', 'Case hardening'], ['mg-mach', 'Machinability'], ['mg-tens', 'Tensile test'], ['mg-temp', 'Heat and cold'], ['mg-use', 'Steels by use'], ['mg-lam', 'Laminates and hard rubber'], ['mg-corr', 'Corrosion'], ['mg-cert', 'Mill certificates'], ['mg-nonfe', 'Machining magnesium'], ['mg-hss', 'High speed steel heat treatment'], ['mg-terms', 'Metallurgy terms'], ['mg-fail', 'How metals fail']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">How to read what is stamped on the bar and printed on the certificate: steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, the names of titanium, magnesium, nickel and zinc alloys, how each hardness test works, the forms of corrosion, and the mill certificate, in our own words. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
+    '<p class="desc">How to read what is stamped on the bar and printed on the certificate: steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, the names of titanium, magnesium, nickel and zinc alloys, how each hardness test works, the forms of corrosion, and the mill certificate, in our own words. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
 
     '<h2 id="mg-steel">Carbon and alloy steel numbers (SAE and AISI)</h2>' + mgNumber() +
     mgP('<b>Four digits.</b> The first two name the family of steel and the last two give the carbon content in hundredths of a per cent.', ['ET', 'MD', 'WP_SAE']) +
@@ -496,6 +537,45 @@ function renderMatGuide(el) {
     mgP('<b>What is on it.</b> The maker, the product, the grade and specification, the heat number, the chemical analysis, the mechanical test results, and a signature or stamp.', ['PM', 'WIP']) +
     mgP('<b>Check the heat number first.</b> The number marked on the material must be the one on the certificate: the analysis and the test results belong to that number.', ['WIP', 'PM']) +
     mgP('<b>Then compare with the order:</b> grade, specification, delivery condition and dimensions.', ['WIP']) +
+
+    '<h2 id="mg-nonfe">Machining magnesium</h2>' +
+    '<p class="desc">Speeds and feeds for aluminium, copper alloys and titanium are in the speeds and feeds tools; this section is about handling magnesium, whose chips can burn.</p>' +
+    mgP('<b>The bar is safe, the chips are not.</b> A solid magnesium part is hard to set alight; fine chips and dust catch fire easily, from heat or a spark.', ['ERP3', 'WAYKEN']) +
+    mgP('<b>Sharp tools.</b> A dull tool heats the cut and can light the chips.', ['ERP3', 'WAYKEN']) +
+    mgP('<b>Clearance.</b> Avoid small clearance angles: they rub, heat up and make long chips. Tools with large relief are used.', ['ERP3', 'WAYKEN']) +
+    mgP('<b>Broken chips</b> rather than long ribbons: ribbons light more easily and wrap the cutter.', ['ERP3', 'WAYKEN']) +
+    mgP('<b>Coolant.</b> Cut dry or with mineral oil. Water-based coolant is advised against: water with magnesium can give off hydrogen, which burns.', ['ERP3', 'WAYKEN']) +
+    mgP('<b>If it burns: never water.</b> Use a class D (metal fire) extinguisher; dry sand smothers a small fire.', ['ERP3', 'WAYKEN']) +
+    mgP('<b>Where to keep them.</b> Sand in a bucket by the machine, the extinguisher a little further off so a fire does not cut you off from it.', ['ERP3']) +
+    mgP('<b>Carbon dioxide and nitrogen</b> do not put a magnesium fire out either.', ['ERP3']) +
+    mgP('<b>Chips and dust.</b> Extract with an explosion-proof vacuum. Keep chips dry, in closed steel bins away from other waste; move wet chips somewhere remote.', ['ERP3', 'WAYKEN']) +
+    mgP('<b>How it cuts.</b> One magnesium maker gives about 55 % of the power aluminium needs, with well broken chips and a fine finish.', ['LUX_MM']) +
+    mgP('<b>Titanium chips</b> call for the same care.', ['ERP3']) +
+
+    '<h2 id="mg-hss">High speed steel: hardening, tempering and cold treatment</h2>' +
+    mgP('<b>The sequence</b> is anneal (as delivered), preheat, harden at a high temperature, quench, then temper at least twice. M2 as two makers print it, side by side:', ['HUD_M2', 'SBSM_M2']) +
+    guideTable(['Step', 'Hudson Tool Steel', 'SB Specialty Metals'], MG_M2, mgTags) +
+    mgP('<b>Why twice.</b> Fresh from the quench, high speed steel holds 20 to 40 % retained austenite. The first temper (about 575 C in one source) turns it to new martensite, which the next temper must temper in its turn.', ['TM_HSS']) +
+    mgP('<b>Double tempering is required</b> by both makers; triple is recommended for large sections.', ['HUD_M2', 'SBSM_M2']) +
+    mgP('<b>Hardening temperature.</b> The low end of the range for the most toughness, the high end for the most hot hardness.', ['HUD_M2']) +
+    mgP('<b>Upper limit.</b> 1200 to 1220 C for M2, M7 and M42, never over 1230 C, in one source.', ['TM_HSS']) +
+    mgP('<b>Example hardness.</b> Hardened from 1204 C (2200 F) and tempered at 552 C (1025 F): 65 HRC in one maker\'s table.', ['SBSM_M2']) +
+    mgP('<b>Cold (sub-zero) treatment.</b> Taking a high carbon or high alloy steel below room temperature after the quench carries on the change of retained austenite to martensite: harder, more wear resistant and more stable in size.', ['MF_SZ', 'ENC_DCT']) +
+    mgP('<b>How cold, as printed.</b> Cold treatment about -70 to -120 C, held about 1 hour per 3 cm of section (MetalForming). Shallow cryogenic -80 to -160 C, deep cryogenic below -160 C (or -153 C), often in liquid nitrogen at -196 C (Encyclopedia.pub).', ['MF_SZ', 'ENC_DCT']) +
+    mgP('<b>Temper afterwards.</b> The new martensite is brittle and must be tempered like the rest.', ['MF_SZ', 'WP_HT']) +
+    mgP('<b>Deep cryogenic results vary</b> between studies; some found no gain or a loss of toughness.', ['ENC_DCT']) +
+
+    '<h2 id="mg-terms">Metallurgy terms</h2>' +
+    guideTable(['Term', 'Meaning'], MG_TERMS, mgTags) +
+
+    '<h2 id="mg-fail">How metals fail</h2>' +
+    mgP('<b>Ductile overload.</b> The part stretches, bends or necks before it breaks, which gives warning.', ['ELEM_F', 'MHCC_F']) +
+    mgP('<b>Brittle fracture.</b> Little or no deformation, little energy absorbed, often with a crack of sound; the halves fit back together. Wrongly heat treated steel can break this way.', ['MHCC_F']) +
+    mgP('<b>Fatigue.</b> Repeated or changing load starts a crack and grows it a little with every cycle, at stresses well below what would break the part in one pull.', ['MHCC_F', 'ELEM_F', 'IMT_F']) +
+    mgP('<b>Three stages.</b> The crack starts; it grows slowly; when it reaches a critical size the rest breaks suddenly.', ['MHCC_F', 'IMT_F', 'ELEM_F']) +
+    mgP('<b>Reading the break.</b> The slow growth zone is flat and fairly smooth, with curved beach (clamshell) marks where the growth paused; trace them back to find where it started. The last part to break is rough.', ['IMT_F', 'ELEM_F']) +
+    mgP('<b>Striations</b>, seen only under a microscope, are one per load cycle.', ['IMT_F', 'MHCC_F']) +
+    mgP('<b>Where cracks start.</b> At the surface and at stress raisers: sharp corners, tool marks, inclusions. A radius in every corner and a good finish lengthen fatigue life.', ['ELEM_F', 'IMT_F']) +
 
     '<h2 id="mg-src">Sources</h2><ul class="gsl">' + Object.entries(MG_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
     '<p class="desc">Full URLs and access dates are in docs/sources.md, "Materials guide". No text, figures or tables were copied from the sources.</p>';

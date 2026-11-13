@@ -107,8 +107,73 @@ pub fn rotary_rate(surface_feed: f64, length: f64, deg: f64) -> f64 {
     deg.abs() * surface_feed / length
 }
 
+// ---- Backlash (0.8.0, docs/backlash.md) ----
+
+/// Lost motion read on an indicator: the reading after the axis has gone out
+/// and come back to the start, less the reading at the start (Tormach, MachMotion).
+/// Returned as a positive amount.
+pub fn lost_motion(start: f64, back: f64) -> f64 {
+    if !start.is_finite() || !back.is_finite() { return f64::NAN; }
+    (back - start).abs()
+}
+
+/// Angular play of a rotary axis in arc seconds from the play measured round
+/// the axis at a radius (an indicator on a bar or a part at that radius).
+pub fn play_to_arcsec(radius: f64, play: f64) -> f64 {
+    let d = angle_for_length(radius, play.abs());
+    if d.is_finite() { d * 3600.0 } else { f64::NAN }
+}
+
+/// Play round the axis at a radius for an angular play in arc seconds.
+pub fn arcsec_to_play(radius: f64, arcsec: f64) -> f64 {
+    if !arcsec.is_finite() { return f64::NAN; }
+    arc_length(radius, arcsec.abs() / 3600.0)
+}
+
+/// Arc seconds in arc minutes (unit 1) or degrees (unit 2).
+pub fn arcsec_to(arcsec: f64, unit: f64) -> f64 {
+    if !arcsec.is_finite() { return f64::NAN; }
+    if unit == 1.0 { arcsec / 60.0 } else if unit == 2.0 { arcsec / 3600.0 } else { f64::NAN }
+}
+
+/// Change of the backlash of a gear pair when the centre distance opens by
+/// `da` (KHK-USA, Dengel): circular j = 2 da tan(alpha) (normal = 0), or in
+/// the normal direction jn = 2 da sin(alpha) (normal = 1). alpha in degrees.
+pub fn gear_backlash_centre(da: f64, alpha_deg: f64, normal: f64) -> f64 {
+    if !da.is_finite() || !(alpha_deg > 0.0 && alpha_deg < 90.0) { return f64::NAN; }
+    let a = alpha_deg * PI / 180.0;
+    2.0 * da * if normal == 1.0 { a.sin() } else { a.tan() }
+}
+
+/// Angular backlash of one gear in arc minutes from the circular backlash on
+/// its pitch circle of diameter `d`: the arc j at radius d / 2.
+pub fn gear_angular_arcmin(j: f64, d: f64) -> f64 {
+    if !(d > 0.0) { return f64::NAN; }
+    let deg = angle_for_length(d / 2.0, j.abs());
+    if deg.is_finite() { deg * 60.0 } else { f64::NAN }
+}
+
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn backlash_helpers() {
+        // Indicator back at 0.0012 after starting at 0: lost motion 0.0012.
+        assert!((super::lost_motion(0.0, 0.0012) - 0.0012).abs() < 1e-12);
+        assert!((super::lost_motion(0.003, -0.002) - 0.005).abs() < 1e-12);
+        // 0.01 mm at 100 mm radius = 1e-4 rad = 20.6265 arc seconds.
+        assert!((super::play_to_arcsec(100.0, 0.01) - 20.626_480_6).abs() < 1e-6);
+        assert!((super::arcsec_to_play(100.0, 20.626_480_6) - 0.01).abs() < 1e-9);
+        assert!((super::arcsec_to(90.0, 1.0) - 1.5).abs() < 1e-12 && (super::arcsec_to(5400.0, 2.0) - 1.5).abs() < 1e-12);
+        // KHK: 0.1 mm wider centres at 20 degrees: j = 0.2 tan 20 = 0.072794; jn = 0.2 sin 20 = 0.068404.
+        assert!((super::gear_backlash_centre(0.1, 20.0, 0.0) - 0.072_794_0).abs() < 1e-6);
+        assert!((super::gear_backlash_centre(0.1, 20.0, 1.0) - 0.068_404_0).abs() < 1e-6);
+        // KHK: a 20 degree gear gains 41 % more than a 14.5 degree gear for the same movement.
+        let r = super::gear_backlash_centre(1.0, 20.0, 0.0) / super::gear_backlash_centre(1.0, 14.5, 0.0);
+        assert!((r - 1.41).abs() < 0.005);
+        // 0.1 mm on a 60 mm pitch circle: 0.1 / 30 rad = 11.459 arc minutes.
+        assert!((super::gear_angular_arcmin(0.1, 60.0) - 11.459_156).abs() < 1e-5);
+    }
+
     use super::*;
     fn close(a: f64, b: f64, tol: f64) { assert!((a - b).abs() <= tol, "{a} vs {b}"); }
     const O: [f64; 3] = [0.0; 3];

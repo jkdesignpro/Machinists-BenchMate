@@ -77,6 +77,20 @@
    "accessed": "2026-11-11",
    "note": "Insert maker. States that a 60 degree thread's pitch diameter changes by four times the coating thickness, and that a plated helical insert counts twice (8 x thickness) because it carries both threads."
   },
+  "PEM_TI": {
+   "publisher": "PEM (PennEngineering)",
+   "title": "PEM REF / Thread inspection, July 2019",
+   "url": "https://www.pemnet.com/wp-content/uploads/sites/2/2022/06/Thread_Inspection.pdf",
+   "accessed": "2026-11-13",
+   "note": "Fastener maker. Class 2A and 6g limits apply before coating; the external thread allowance may be used for the coating, which must be no more than one quarter of the allowance; after coating the thread is checked with a basic class 3A (or 6h) GO gauge and the class 2A (or 6g) NOT GO gauge."
+  },
+  "IFI_F1941": {
+   "publisher": "Industrial Fasteners Institute",
+   "title": "ASTM publishes electroplating standards specifically for threaded fasteners (technical bulletin), March 2001",
+   "url": "https://www-eng.lbl.gov/~shuman/NEXT/MATERIALS&COMPONENTS/Pressure_vessels/thread_plate_spec_overview.pdf",
+   "accessed": "2026-11-13",
+   "note": "Trade association bulletin on ASTM F1941 and F1941M. Plated external inch threads must pass a class 3A GO gauge (2A NOT GO); metric 6g threads a 6h GO gauge (6g NOT GO); internal threads their class GO gauge. The standard's annex tabulates the largest plating thickness for 1A and 2A (6g) threads (not reproduced)."
+  },
   "AMES_UN": {
    "publisher": "AMESweb",
    "title": "Thread pitch chart (UNC / UNF / UNEF / UN), constant-pitch columns 4-UN to 32-UN",

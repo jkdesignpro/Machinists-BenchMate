@@ -94,6 +94,38 @@
 
   const V60 = { a1: 30, a2: 30, h: 0.541266, fc: 0.125 }; // ISO 68-1 / ASME B1.1 basic profile: depth 5/8 H, crest P/8, root P/4
 
+  // 0.8.0: the basic 60 degree profile as the standards draw it: the nut above and the screw below sharing one
+  // outline, the fundamental triangle of height H dashed through one tooth, its truncations H/8 at the crest and
+  // H/4 at the root, the flats P/8 and P/4, and the diameters named for the nut (capital) and the screw.
+  function basic60() {
+    const W = 520, H = 300, P = 92, x0 = 104, yc = 96, top = 54, yb = 214, axis = 244, Ht = 0.866025 * P;
+    const F = form(Object.assign({ P, n: 3, x0, yc }, V60));
+    let s = DK.path(F.d + 'L' + f(F.xe) + ' ' + f(top) + 'L' + f(F.xs) + ' ' + f(top) + 'Z', 'part');   // nut
+    s += body(F, yb) + DK.line(F.xs, yb, F.xe, yb, 'ghost') + DK.line(F.xs, top, F.xe, top, 'ghost'); // screw, break lines
+    s += DK.text(F.xs + 6, top + 14, 'nut (internal)', { cls: 'mut', anchor: 'start' }) + DK.text(F.xs + 6, yb - 6, 'screw (external)', { cls: 'mut', anchor: 'start' });
+    // Fundamental triangle through the middle tooth: crest apex H/8 above the major line, root apexes H/4 below the minor line.
+    const xc = F.crest[1][0], ya = yc - Ht / 8, yz = F.yr + Ht / 4, xl = xc - P / 2, xr = xc + P / 2;
+    s += DK.line(xl, yz, xc, ya, 'cons') + DK.line(xc, ya, xr, yz, 'cons') + DK.line(xl - P / 2, ya, xl, yz, 'cons') + DK.line(xr, yz, xr + P / 2, ya, 'cons');
+    s += DK.angle(xr, yz, 34, 60, 120, '60°', { hot: true });
+    // H and 5/8 H at the left, from the apex levels.
+    s += DK.line(18, ya, xl - P / 2 - 4, ya, 'thin') + DK.line(18, yz, xl - 4, yz, 'thin');
+    s += DK.dim(26, yz, 26, ya, 'H', { off: 0 }) + DK.dim(F.xs - 6, F.yr, F.xs - 6, yc, '5/8 H', { off: 22 });
+    // Truncations and flats, named where they are.
+    s += DK.text(xc + 12, ya + 6, 'H/8', { cls: 'dimt', anchor: 'start' }) + DK.text(xr + 8, yz + 14, 'H/4', { cls: 'dimt', anchor: 'start' });
+    s += DK.dim(F.crest[2][0] - F.fc / 2, yc, F.crest[2][0] + F.fc / 2, yc, 'P/8', { off: 26 });
+    s += DK.dim(xl - F.fr / 2, F.yr, xl + F.fr / 2, F.yr, 'P/4', { off: -30, below: true });
+    // Pitch between crests, at the top; the pitch line with tooth and gap both P/2.
+    s += DK.dim(F.crest[0][0], yc, F.crest[1][0], yc, 'P', { off: 62 });
+    s += DK.cl(F.xs - 4, F.yp, F.xe + 18, F.yp);
+    // The three diameters at the right, nut and screw names.
+    const lx = F.xe + 26;
+    [[yc, 'D, d  major Ø'], [F.yp, 'D2, d2  pitch Ø'], [F.yr, 'D1, d1  minor Ø']].forEach(([y, t]) => { s += DK.line(F.xe + 4, y, lx - 4, y, 'dim ext') + DK.text(lx, y + 4, t, { cls: 'dimt', anchor: 'start' }); });
+    s += DK.text(lx, F.yr + 26, 'D for the nut,', { cls: 'mut', anchor: 'start' }) + DK.text(lx, F.yr + 40, 'd for the screw;', { cls: 'mut', anchor: 'start' }) + DK.text(lx, F.yr + 54, 'measured across', { cls: 'mut', anchor: 'start' }) + DK.text(lx, F.yr + 68, 'the axis', { cls: 'mut', anchor: 'start' });
+    s += DK.cl(18, axis, F.xe + 18, axis) + DK.text(20, axis - 6, 'axis', { cls: 'mut', anchor: 'start' });
+    s += notes('Basic profile of ISO metric and Unified threads (ISO 68-1, ASME B1.1). H = 0.866 P, depth 5/8 H. On the pitch line the tooth and the gap are each P/2. Real threads sit inside this outline by the tolerance class.', 18, 266, 96);
+    return DK.svg(W, H, s, 'Basic 60 degree thread profile: nut and screw, fundamental triangle H, truncations H/8 and H/4, flats P/8 and P/4, pitch and the three diameters');
+  }
+
   // Thread identifier: where to measure. A screw in side view with its outside diameter and pitch, and a nut
   // in section with its bore. A key to the three readings; no live values.
   function identify() {
@@ -126,11 +158,7 @@
 
   Object.assign(DIAGRAMS, {
     threadid: identify,
-    threaddata: () => profile({
-      form: V60, ang: [[60, 120, '60°']], names: ['major Ø  d', 'pitch Ø  d2', 'minor Ø  d1'],
-      label: 'Basic 60 degree thread profile: pitch, depth and the major, pitch and minor diameters',
-      notes: 'Screw shown. Crest flat P/8, root flat P/4. On the pitch line the tooth and the gap are both P/2 wide.',
-    }),
+    threaddata: basic60,
     unm: () => profile({
       form: V60, ang: [[60, 120, '60°']], names: ['major Ø', 'pitch Ø', 'minor Ø'],
       label: 'Unified miniature thread: 60 degree profile with the pitch and the three diameters',

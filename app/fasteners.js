@@ -235,17 +235,37 @@ async function renderBoltTorque(el) {
 
 // ------------------------------------------------------------------ socket head cap screws
 function shcsSvg(dk, k, d, cb, depth) {
-  // Section of a socket head cap screw in a counterbore. Proportional to the numbers given (mm).
-  const W0 = 220, H0 = 170, sc = Math.min(120 / Math.max(cb || dk, dk), 110 / (k + 1.6 * d)), cx = 110, top = 22;
-  const X = v => (cx + v * sc).toFixed(1), Y = v => (top + v * sc).toFixed(1);
-  const cbw = (cb || dk * 1.1) / 2, dep = depth || k * 1.05, hole = d * 0.55;
-  const part = 'M' + X(-W0 / sc / 2 + 4 / sc) + ' ' + Y(0) + 'H' + X(-cbw) + 'V' + Y(dep) + 'H' + X(-hole) + 'V' + Y(dep + 1.6 * d) + 'M' + X(hole) + ' ' + Y(dep + 1.6 * d) + 'V' + Y(dep) + 'H' + X(cbw) + 'V' + Y(0) + 'H' + X(W0 / sc / 2 - 4 / sc);
-  const head = 'M' + X(-dk / 2) + ' ' + Y(dep - k) + 'h' + (dk * sc).toFixed(1) + 'v' + (k * sc).toFixed(1) + 'h' + (-dk * sc).toFixed(1) + 'z';
-  const shank = 'M' + X(-d / 2) + ' ' + Y(dep) + 'V' + Y(dep + 1.5 * d) + 'H' + X(d / 2) + 'V' + Y(dep);
-  const key = 'M' + X(-d * 0.3) + ' ' + Y(dep - k) + 'v' + (k * 0.5 * sc).toFixed(1) + 'h' + (d * 0.6 * sc).toFixed(1) + 'v' + (-k * 0.5 * sc).toFixed(1);
-  return '<svg class="gdia big" viewBox="0 0 ' + W0 + ' ' + H0 + '" role="img" aria-label="socket head cap screw in a counterbore"><path class="gb" d="' + part + '"/><path class="gp" d="' + head + '"/><path class="gp" d="' + shank + '"/><path class="gm" d="' + key + '"/>' +
-    '<path class="gm" style="stroke-dasharray:2 3" d="M' + X(0) + ' ' + Y(-1) + 'V' + Y(dep + 1.6 * d + 1) + '"/>' +
-    '<text class="gl" x="' + X(cbw + 1) + '" y="' + Y(dep / 2) + '">counterbore</text><text class="gl" x="' + X(d / 2 + 1) + '" y="' + Y(dep + d) + '">clearance hole</text><text class="gl" x="6" y="' + (H0 - 6) + '">schematic</text></svg>';
+  // Section of a socket head cap screw in a counterbored plate, in proportion to the sizes given (mm).
+  // The plate is cut (hatched); the screw is not, as on a drawing. Proportions only: no scale is claimed.
+  const cbd = cb || dk * 1.1, dep = depth || k * 1.05, hole = d * 1.1, T = dep + 1.6 * d, below = 1.4 * d;
+  const W0 = 440, H0 = 250, sc = Math.min(200 / (cbd * 1.9), 196 / (T + below)), cx = 170, top = 26;
+  const X = v => cx + v * sc, Y = v => top + v * sc, pw = cbd * 0.95;
+  let s = '';
+  // Plate, each side of the hole: hatched sections.
+  [-1, 1].forEach(g => {
+    const o = x => X(g * x);
+    s += DK.poly([[o(cbd / 2), Y(0)], [o(cbd / 2 + pw), Y(0)], [o(cbd / 2 + pw), Y(T)], [o(hole / 2), Y(T)], [o(hole / 2), Y(dep)], [o(cbd / 2), Y(dep)]], 'hatch');
+  });
+  // Screw: head with chamfered top edge and the hex socket (hidden), shank, thread below the plate.
+  const ch = Math.min(k, dk) * 0.08, hy = dep - k;
+  s += DK.poly([[X(-dk / 2 + ch), Y(hy)], [X(dk / 2 - ch), Y(hy)], [X(dk / 2), Y(hy + ch)], [X(dk / 2), Y(dep)], [X(-dk / 2), Y(dep)], [X(-dk / 2), Y(hy + ch)]], 'part');
+  const sk = d * 0.45, sd = k * 0.55;
+  s += DK.path('M' + X(-sk) + ' ' + Y(hy) + 'V' + Y(hy + sd) + 'L' + X(0) + ' ' + Y(hy + sd + sk * 0.5) + 'L' + X(sk) + ' ' + Y(hy + sd) + 'V' + Y(hy), 'hid');
+  s += DK.poly([[X(-d / 2), Y(dep)], [X(d / 2), Y(dep)], [X(d / 2), Y(T + below - d * 0.1)], [X(d / 2 - d * 0.1), Y(T + below)], [X(-d / 2 + d * 0.1), Y(T + below)], [X(-d / 2), Y(T + below - d * 0.1)]], 'part');
+  // Thread: minor diameter as thin lines over the threaded length (ISO 6410 convention).
+  const tStart = T - 0.4 * d;
+  s += DK.line(X(-d * 0.42), Y(tStart), X(-d * 0.42), Y(T + below - d * 0.1), 'thin') + DK.line(X(d * 0.42), Y(tStart), X(d * 0.42), Y(T + below - d * 0.1), 'thin') +
+    DK.line(X(-d / 2), Y(tStart), X(d / 2), Y(tStart), 'thin');
+  s += DK.cl(X(0), Y(hy) - 14, X(0), Y(T + below) + 12);
+  // Sizes.
+  s += DK.dimH(X(-cbd / 2), X(cbd / 2), Y(hy) - 16, 'counterbore Ø', { from: Y(0) });
+  s += DK.dimV(Y(dep), Y(0), X(-cbd / 2 - pw) - 18, 'depth', { from: X(-cbd / 2 - pw) });
+  s += DK.dimV(Y(dep), Y(hy), X(cbd / 2 + pw) + 22, 'k', { from: X(cbd / 2 + pw) });
+  s += DK.dimH(X(-hole / 2), X(hole / 2), Y(T) + 20, 'clearance Ø', { from: Y(T), below: true });
+  s += DK.leader(X(dk / 2) - 4, Y(hy + k * 0.4), 350, 30, 'head Ø dk', { anchor: 'start' });
+  s += DK.leader(X(sk) - 2, Y(hy + sd * 0.5), 350, 120, 'hex socket', { anchor: 'start' });
+  s += DK.text(12, H0 - 8, 'Plate cut (hatched), screw not cut. In proportion, not to scale.', { cls: 'mut', anchor: 'start' });
+  return '<div class="gdk">' + DK.svg(W0, H0, s, 'Socket head cap screw in a counterbore') + '</div>';
 }
 
 async function renderShcs(el) {
@@ -345,13 +365,18 @@ async function renderSpanner(el) {
 
 // ------------------------------------------------------------------ T-slots
 function tslotSvg(a, b, c, h) {
-  const sc = 150 / Math.max(b * 1.6, h * 1.6), W0 = 240, H0 = 180, cx = 120, top = 30;
-  const X = v => (cx + v * sc).toFixed(1), Y = v => (top + v * sc).toFixed(1);
-  const p = 'M' + X(-b * 0.8) + ' ' + Y(0) + 'H' + X(-a / 2) + 'V' + Y(h - c) + 'H' + X(-b / 2) + 'V' + Y(h) + 'H' + X(b / 2) + 'V' + Y(h - c) + 'H' + X(a / 2) + 'V' + Y(0) + 'H' + X(b * 0.8);
-  const dim = (x1, y1, x2, y2, t, tx, ty) => '<path class="gm" d="M' + x1 + ' ' + y1 + 'L' + x2 + ' ' + y2 + '"/><text class="gl" x="' + tx + '" y="' + ty + '" text-anchor="middle" style="fill:var(--ink)">' + t + '</text>';
-  return '<svg class="gdia big" viewBox="0 0 ' + W0 + ' ' + H0 + '" role="img" aria-label="T-slot section"><path class="gp" d="' + p + '"/>' +
-    dim(X(-a / 2), Y(-6 / sc), X(a / 2), Y(-6 / sc), 'a', X(0), Y(-9 / sc)) + dim(X(-b / 2), Y(h + 8 / sc), X(b / 2), Y(h + 8 / sc), 'b', X(0), Y(h + 20 / sc)) +
-    dim(X(b / 2 + 8 / sc), Y(h - c), X(b / 2 + 8 / sc), Y(h), 'c', X(b / 2 + 16 / sc), Y(h - c / 2 + 4 / sc)) + dim(X(-b / 2 - 10 / sc), Y(0), X(-b / 2 - 10 / sc), Y(h), 'h', X(-b / 2 - 18 / sc), Y(h / 2)) + '</svg>';
+  // Section across a T-slot in a machine table, in proportion to the sizes given: the table is cut (hatched).
+  const W0 = 440, H0 = 230, sc = Math.min(260 / (b * 2.2), 150 / (h * 1.3)), cx = 200, top = 40, side = b * 0.6, base = h * 0.3;
+  const X = v => cx + v * sc, Y = v => top + v * sc;
+  let s = DK.path('M' + X(-b / 2 - side) + ' ' + Y(0) + 'H' + X(-a / 2) + 'V' + Y(h - c) + 'H' + X(-b / 2) + 'V' + Y(h) + 'H' + X(b / 2) + 'V' + Y(h - c) + 'H' + X(a / 2) + 'V' + Y(0) +
+    'H' + X(b / 2 + side) + 'V' + Y(h + base) + 'H' + X(-b / 2 - side) + 'Z', 'hatch');
+  s += DK.cl(X(0), Y(0) - 22, X(0), Y(h) + 14) + DK.text(X(-b / 2 - side) + 4, Y(h + base) + 16, 'table, cut', { cls: 'mut', anchor: 'start' });
+  s += DK.dimH(X(-a / 2), X(a / 2), Y(0) - 14, 'a', { from: Y(0) });
+  s += DK.dimH(X(-b / 2), X(b / 2), Y(h) + 22, 'b', { from: Y(h), below: true });
+  s += DK.dimV(Y(h), Y(h - c), X(b / 2 + side) + 22, 'c', { from: X(b / 2) });
+  s += DK.dimV(Y(h), Y(0), X(-b / 2 - side) - 22, 'h', { from: X(-b / 2 - side) });
+  s += DK.text(W0 - 12, H0 - 26, 'a: slot width (the size named)', { cls: 'mut', anchor: 'end' }) + DK.text(W0 - 12, H0 - 10, 'b, c: head space; h: depth', { cls: 'mut', anchor: 'end' });
+  return '<div class="gdk">' + DK.svg(W0, H0, s, 'T-slot section') + '</div>';
 }
 async function renderTslots(el) {
   const R = await loadFast(el); if (!R) return;
@@ -519,12 +544,23 @@ async function renderKeys(el) {
 
 // ------------------------------------------------------------------ O-ring glands
 function glandSvg(kind) {
-  // Schematic of the three gland types with the dimensions the calculator asks for.
-  const t = (x, y, s) => '<text class="gl" x="' + x + '" y="' + y + '">' + s + '</text>';
-  let p = '';
-  if (kind === 'face') p = '<path class="gp" d="M20 40H70V90H130V40H200"/><path class="gb" d="M20 38H200"/><circle class="gz" style="stroke-dasharray:none" cx="100" cy="66" r="20"/>' + t(70, 104, 'groove width') + t(136, 70, 'depth');
-  else p = '<path class="gb" d="M20 40H200"/><path class="gp" d="M20 52H70V100H130V52H200"/><circle class="gz" style="stroke-dasharray:none" cx="100" cy="74" r="22"/>' + t(70, 116, 'groove width') + t(136, 80, 'gland depth') + t(24, 34, kind === 'piston' ? 'bore' : 'rod') + t(24, 120, kind === 'piston' ? 'groove bottom (in the piston)' : 'groove bottom (in the housing)');
-  return '<svg class="gdia" style="width:220px" viewBox="0 0 220 130" role="img" aria-label="O-ring gland">' + p + '</svg>';
+  // Section through an O-ring gland: the grooved part and the mating part cut (hatched), the ring squeezed in
+  // the groove, with the sizes the calculator asks for. A sketch of the arrangement, not to scale.
+  const W0 = 440, H0 = 230, gx0 = 160, gx1 = 260, face = kind === 'face';
+  // y of the sealing face (the bore, rod or flange face) and of the groove bottom.
+  const ys = 70, yb = 138, r = 30, cy = yb - r * 0.9;
+  let s = DK.poly([[40, 40], [400, 40], [400, ys - 2], [40, ys - 2]], 'hatch');
+  s += DK.path('M40 ' + ys + 'H' + gx0 + 'V' + yb + 'H' + gx1 + 'V' + ys + 'H400V' + (yb + 14) + 'H40Z', 'hatch');
+  // The ring, squeezed: wider than tall.
+  s += '<ellipse class="tool" cx="' + (gx0 + gx1) / 2 + '" cy="' + (cy + 2) + '" rx="' + (r * 1.12) + '" ry="' + ((yb - ys + 2) / 2) + '"/>';
+  s += DK.dimH(gx0, gx1, yb + 36, 'groove width', { from: yb + 14, below: true }) + DK.line(gx0, yb, gx0, yb + 14, 'thin') + DK.line(gx1, yb, gx1, yb + 14, 'thin');
+  s += DK.dimV(yb, ys, gx1 + 40, face ? 'groove depth' : 'gland depth', { from: gx1 });
+  const mate = face ? 'cover (flat face)' : kind === 'piston' ? 'cylinder bore' : 'rod';
+  const grooved = face ? 'flange with the groove' : kind === 'piston' ? 'piston (groove)' : 'housing (groove)';
+  s += DK.text(48, 34, mate, { cls: 'mut', anchor: 'start' }) + DK.text(48, yb + 30, grooved, { cls: 'mut', anchor: 'start' });
+  s += DK.leader((gx0 + gx1) / 2 + 20, cy + 14, 300, 196, 'O-ring, squeezed', { anchor: 'start' });
+  s += DK.text(W0 - 12, H0 - 8, 'Section, not to scale', { cls: 'mut', anchor: 'end' });
+  return '<div class="gdk">' + DK.svg(W0, H0, s, 'O-ring gland') + '</div>';
 }
 async function renderOring(el) {
   const R = await loadFast(el); if (!R) return;

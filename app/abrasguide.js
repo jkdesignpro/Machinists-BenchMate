@@ -148,7 +148,7 @@ function renderAbrasGuide(el) {
   const toc = [['ag-fig', 'Grinding in figures'], ['ag-surf', 'Surface grinding'], ['ag-fault', 'Faults in cylindrical grinding'], ['ag-cless', 'Centerless grinding'], ['ag-hone', 'Honing'], ['ag-lap', 'Lapping'], ['ag-super', 'Diamond and CBN wheels'], ['ag-belt', 'Belts and cut-off wheels'], ['ag-point', 'Mounted points'], ['ag-sieve', 'Sieves and mesh']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">The abrasive processes beyond the plain grinding wheel, in our own words: the grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding and cut-off wheels, mounted points, and sieves and mesh numbers. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
+    '<p class="desc">The abrasive processes beyond the plain grinding wheel, in our own words: the grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding and cut-off wheels, mounted points, and sieves and mesh numbers. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
 
     '<h2 id="ag-fig">Grinding in figures</h2>' +
     agP('<b>Grinding ratio (G ratio).</b> The volume of metal ground off divided by the volume of wheel worn away in doing it.', ['OU_G', 'CTE_W']) +

@@ -4,7 +4,100 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
-## [0.7.0] - in progress
+## [0.8.0] - 2026-11-13
+Work on the feedback after using 0.7.0.
+
+### Added (second feedback round, 2026-11-13)
+- **Coated threads** (Threads > Coated threads) now starts from the thread itself: pick Unified or ISO metric, type the size and pitch, the class (1A to 3B, or a grade and position such as 6g or 6H) and the coating thickness, and choose a plan. *Allowance* (external threads with an allowance) shows the allowance, the thickest coating it takes (allowance / 4 on a 60 degree thread), the limits before and after coating and the check against basic size. *Meet the limits after coating* gives the before-coating limits of pitch, major and minor diameter for external and internal threads. Checked against Thread Check's 1/2-20 example. The old typed-in mode is kept.
+- **Thread data**: the flats of the basic profile (P/8 at the major, P/4 at the minor diameter), the lead (helix) angle at the pitch diameter, and the best, largest and smallest measuring wire (0.57735 P, 1.010363 P, 0.505182 P; Thread Check prints the largest as 1.010362 P).
+- **Micro drills #98 to #107** in the drill chart: #98 to #104 from four trade charts, #105 to #107 from two. They are beyond ASME B94.11M, which stops at #97; the tool says so.
+- **Grinding** (Wheel and work speed): aggressiveness, 10^6 (vw / vs) sqrt(ae / de), with where it sits against the printed typical ranges (3 to 60, CTE; 5 to 200, Procedia CIRP), and the grit penetration depth (maximum undeformed chip thickness) when you enter the cutting point density and chip ratio.
+- **Magnesium** in Material equivalents: AZ31B, AZ80A and ZK60A with ASTM, UNS, W.-Nr., ISO and other specifications, composition limits and properties as Aircraft Materials, Smiths High Performance and MakeItFrom print them.
+- **Coatings**: AlCrSiN and polished (lapped) flutes added; colours taken out of the names, with a note that colour is no guide (makers dye coatings); each coating's tips now say what it is recommended for and what to avoid, from the makers, with disagreements side by side.
+- **Starting speeds for cermet, ceramic, CBN and PCD** by work group, as the makers print them (tooling guide and the advisors' tool material card), with sourced tips (ceramics run dry, CBN mostly for finishing and needs rigidity).
+- **Guide sections**: machining magnesium (chips, coolant, fire), high speed steel hardening and tempering with M2 from two makers side by side and cold treatment, metallurgy terms, how metals fail, micromachining, 3D tool compensation, threading insert shims and lead angle, straight pipe threads (NPSC, NPSL, NPSM, NPSF).
+- **Calculator basic view**: a Basic / Full switch; Basic shows the digits and the four functions on bigger keys only.
+- **Dashboard widgets**: size buttons S, M, W, L (new, two thirds) and F replace the cycling button, and a corner handle resizes by dragging: the width snaps to the nearest size and the height is free; double-click the handle to fit the height again.
+- **Arcs in G71** (Turning > G71 / G70 cycle): a profile line can end in `G02 R2` or `G03 R2`, so corner radii and fillets go into the program as arcs. The arc is checked point by point (every 3 degrees) for the rise toward the chuck that Type I G71 needs, so a radius too small for its two points or an arc that turns back is refused with the line number. A note asks you to check G02 and G03 against your lathe's manual, as the view flips between front and rear tool posts.
+- **Lines to arcs in the sketcher**: one button turns imported polylines (a DXF made of short lines) back into arcs and lines within a tolerance you set (default 0.01 mm, 0.0005 in), and reports how many segments it took out. Undo brings the lines back.
+- **Settings to a file**: in the menu, *Save to file* writes every setting, favourite, dashboard, tool library entry, machine profile, saved input and sketch into one JSON file; *Load file* reads one back after asking, so you can move BenchMate to another computer or keep a backup. Files that are not BenchMate settings are refused.
+- **Arrange the side panel**: an *Arrange* button on the Favourites and Workspaces headings shows up and down arrows to put them in your own order; the order is kept.
+- **Offline web version**: the web version now stores itself on the first visit (a service worker) and opens without a network after that; a web app manifest is included. There is no app icon yet, so browsers may not offer to install it as an app. The desktop app does not need this and does not use it.
+
+### Changed (second feedback round)
+- The side panel: clicking the open workspace (Milling, Turning...) closes it; clicking again opens it.
+- The assistant and the thread callout scan are parked for later on the roadmap (docs/feature-ideas.md).
+
+### Fixed (second feedback round)
+- Thread data and the other thread pickers: the size list was empty on opening and did not follow a change of thread type.
+- Dashboard: a single click on a widget's resize handle no longer redraws the dashboard, so double-click to fit the height works.
+
+### Not done, searched for
+- UNR external minor diameter limits and involute spline fit class tolerances (ANSI B92.1, ISO 4156): no public source prints them outside the standards themselves; the pages read are listed in docs/sources.md.
+- A vibration check from a phone's motion sensor: left for the phone version, as a desktop has no such sensor. The chatter listener (microphone) is already in Milling.
+
+### Added (tool materials and coatings in the advisors)
+- Milling and turning advisors: the tool material can now also be cermet, ceramic, CBN or PCD. No speed table for these is built in, so the advisor asks for the maker's cutting speed for the grade (and, for milling, its chip load) and then checks the cut as before.
+- Milling, drilling and turning advisors: a new **Coating** box with 15 choices, the common ones first (uncoated, TiN, TiCN, TiAlN, AlTiN, AlCrN, ZrN, DLC, CVD diamond) and the rest under "More" (CVD multilayer on inserts, TiSiN and AlTiSiN nanocomposites, TiB2, CrN, MoS2, steam oxide). A find button beside the box narrows the list as you type.
+- A **Tool material and coating** card under the result says what the choice suits and what it should not be used on for the chosen work material, worst first: for example PCD or diamond on steel or cast iron, or TiAlN and AlTiN on aluminium. Where the sources disagree (AlCrN on aluminium) both are shown. It lists each source's highest working temperature for the coating as printed, °F where the source prints °F, without converting. A coating never changes the speed or feed worked out: the maker's chart for the coated tool comes first.
+- Seven new sources read on 2026-11-13: Production Machining (PMPA), AIMS Industrial Supplies (coatings and tool materials, counted as one publisher), NTK Cutting Tools, Kennametal, Mitsubishi Materials and WIDIA in Modern Machine Shop. AlCrN's 1100 °C is now printed by two publishers (Oerlikon Balzers and AIMS).
+
+### Added (search, thread sizes, bandsaw sections)
+- **Search** finds what is inside a page as well as the tools: a section heading of a guide or reference page is listed under its page, indented (at most three per page), and picking it opens the page at that section. Only headings are searched, never body text, so a common word such as "speed" gives a short list. The headings are gathered when the app is built (`scripts/build_search.py`, 197 headings in 19 pages). Tools are also found by the everyday words for them (for example "sfm", "chip load", "h7", "r10"), and a word that starts a word in the title counts for more than one inside a word.
+- Typing a thread size in the search (M12, M10 x 1.25, 1/4-20) offers Thread data opened at that size; a metric size with no pitch opens the coarse pitch.
+- **Thread lists in two steps**: Thread data, Tap drill, Bolt torque and Tap pitch diameter limits first ask the thread type (ISO metric coarse, ISO metric fine, UNC, UNF, UNEF, Other) and then list only the standard sizes of that type, instead of one long list. Changing between metric coarse and fine stays near the same diameter.
+- **Other thread sizes in their own units**: a size that is not in the list is typed in the units of its thread system, whatever the units of the app: ISO metric as diameter and pitch in mm (M50 x 0.4), Unified as diameter in inches, a fraction such as 1/4 or 1-1/4 allowed, and threads per inch (1/4 x 10 TPI). A metric diameter with an inch pitch can no longer be typed. Recent sizes are named the same way.
+- **Bandsaw**: more sections: square bar, hexagon bar lying on a flat, rectangle or flat bar, round tube, square and rectangular box section, and angle, each with its drawing. The sizes are named A (diameter, side, width or across flats), C (height the blade cuts down through) and t (wall or thickness). Area formulas in `core/src/millturn.rs` (`saw_section_ext`); tubes and angles are taken with sharp corners, so the area is a little over the real one.
+
+### Added (milling strategy, backlash, what each tool is for)
+- **Milling strategy: which roughing toolpath** (Milling > Engagement): for a slot, pocket, face, 3D surface or thin wall, the tool reach and your machine, it marks adaptive or trochoidal milling (high-efficiency milling), traditional roughing, plunge roughing and high-feed milling as a good fit, possible, less suited or not suited, with every reason and its source. A control that stutters on many short moves rules trochoidal out; where the sources disagree (how rigid a machine high-efficiency milling needs) both are shown; statements from one publisher are marked. The machine answers come from the active machine profile. Seven publishers read on 2026-11-13; see `docs/strategy.md`.
+- **Backlash: linear and rotary axes, gears** (Measure and inspect, Programming > Rotary axis, Gears): the lost motion of an axis from the indicator test (Tormach, MachMotion), the play of a rotary axis turned into an angle or an angle into play at the part, and the backlash a gear pair gains when its centres open (KHK, one publisher). Formulas in `core/src/rotary.rs`; see `docs/backlash.md`.
+- **What is this for?** A folded plain explanation at the top of eleven less familiar tools: preferred numbers, tolerance stack, process capability, control charts, gauge R&R, sampling plans, chatter finder, balancing, temperature compensation, runout and tool life. Preferred numbers explains where Renard's series came from and where they are used, from Kverneland (Machine Design, 1998) and Wikipedia, with one-publisher statements marked (see `docs/inspection.md`).
+
+### Added (common profiles and sizes)
+- **Common profiles and sizes** (Stock and sheet metal; Mechanics > Engineering): steel square and rectangular box tube, round tube, equal angle, IPE beams and parallel flange channels (metric), square tube, rectangular tube and equal angle (inch), and aluminium equal angle (inch), in the sizes two publishers list, each size marked when only one lists it; a flat bar of any typed width and thickness; and the T-slot aluminium framing series as Wikipedia and MISUMI name them, side by side. Picking a size draws the section and gives its area, stiffness and weight from the core, and sends it to Section properties or Beam deflection. See `docs/stock-sizes.md`.
+
+### Changed (found in the review of the feedback)
+- **Advisors in inch mode**: the machine limit boxes (top feed, spindle power and torque) are in in/min, hp and lbf·ft, and the cards give the top feed and the power in the page's units.
+- **Thread type list**: BSW, BSF and BA, and BSP and NPT pipe threads, are in the list of thread types; picking one offers its own page (their form and tables differ from ISO metric and Unified).
+- **Search** finds a tool when a word is misspelt ("threding", "trocoidal"): when nothing matches as typed, each word is matched to the nearest word in the tool names and everyday words, and the list says what it searched for.
+- **Work volume**: the bolt circle is checked against the X and Y travel of the active machine, and the bar stock planner against its bar capacity.
+
+### Added (formula fact check)
+- **Fact check of the core formulas**: 23 functions (speeds and feeds, chip thickness, cusp height, helix pitch, bolt circle, surface finish, drilling, tailstock taper, sine bar, thread diameters, wires and tap drills) compared with values worked by hand or printed in ISO 724. All agree. Kept as a test, `core/tests/factcheck.rs`, with every expected value written as a number; see `docs/factcheck.md`.
+
+### Added (engraving arcs)
+- **Engraving**: a new box **Curves as arcs (G02, G03) within**. The Hershey letters are drawn with straight lines (the O of the plain letters is 20 lines at any size) and the program used to follow them line for line, which it still does by default. With a distance given, each run of three or more lines that lies within it of one circle (every point, and the bulge of every line) becomes one G02 or G03 with I and J: the O at 5 mm with 0.05 mm becomes four arcs and four lines instead of 20 lines. Arc fitting in `core/src/gcode.rs` (`fit_arcs`), with tests.
+
+### Changed (machine profiles)
+- **Machine builder by machine type**: pick mill, 5-axis mill, lathe, Swiss-type lathe, mill-turn, router or other, and the form asks only what that machine has: fourth axis, the layout of the rotary axes and tool centre point control on a 5-axis, C and Y axes, turret, sub spindle and tailstock on a lathe, guide bushing, gang, radial, axial and back-working tools on a Swiss-type, B-axis head on a mill-turn. New: work volume (travels, table, largest part, swing, turning diameter and length, bar capacity), sub spindle and live tool power, guideways per axis, linear scales, thermal compensation, measured backlash per axis, the maker's accuracy figures, how the control copes with many short moves, look-ahead and high-speed mode, probing, coolant through the spindle. Boxes the results are checked against are marked; lengths, feeds and masses show in the units of the top bar. Profiles saved by earlier versions open as before.
+- A feed above the machine's top feed now names the limit in in/min in inch mode.
+
+### Changed (drawings)
+- **Thread data**: the drawing is now the basic 60° profile as the standards draw it: the nut above and the screw below sharing one outline, the fundamental triangle H dashed through one tooth with its truncations H/8 and H/4, the flats P/8 and P/4, 60°, the pitch, 5/8 H, and the diameters named for the nut and the screw (D, D2, D1 and d, d2, d1).
+
+- **All drawings**: line weights in the 2:1 ratio of ISO 128 (thick outlines, thin dimension, hatching and centre lines), finer closed arrowheads, lighter dimension text and a lighter part tint, so parts read as outlines rather than blocks. The lathe chuck is drawn as a body in section with stepped jaws, and turning inserts show their clamping hole.
+- **Every drawing reviewed** (all 293, page by page) and the crude ones redrawn as proper sections with dimensions:
+  the **toolholder** approach angle (the holder at the work from above, the insert of the code's shape, kr from the feed, the lead angle when kr is 90° or less); the **insert section** (hatched, d, s, d1 and the flank angle); **nose radius compensation** (the part hatched, the nose at each end, the imaginary tip and the tip path, Z and X); the **GD&T tolerance zones** (13 characteristics, the datum reference frame, Rule #1 against independency, datum shift at MMB) with standard datum feature symbols and the part in section; the **cap screw in a counterbore**, the **T-slot** and the **O-ring gland** as sections; the **backlash** test (nut in section on the screw thread with the flank clearance, a dial indicator on the slide); the **dovetail** (pins drawn touching face and flank at the angle entered); the **compression spring** (near side of each coil as the wire, far side hidden, wire sections); the **Vickers** indenter (136° pyramid in its holder); the **sine bar** (rolls, bar, gauge block stack, L, H and the angle); and the **ball bearing** (rings in section with their raceway grooves, the shaft).
+- **Dimensions**: a short upright dimension now writes its figure level beside the line instead of over the arrows.
+- **Sampling plan**: the guide lines on the OC curve were filled black by mistake; they are thin dashed lines again.
+
+### Changed (sources)
+- Sources sit under their own folded **Sources** heading on every page. In the guides the source list at the bottom is folded, and the source keys after each statement and the Sources columns of the tables are hidden until you tick "Show the source keys" in any Sources fold (one setting for all pages). "to be verified" always stays in view; in tables it sits under a "Status" heading while the keys are hidden. Notes that end with a "Sources" heading fold the same way, and the advisors' tables of what each publisher prints are folded (open or shut is remembered).
+
+### Changed (advisors)
+- The inputs of the milling, drilling and turning advisors are grouped under headings: the job, the tool, the cut, with your own figures, the insert and chip breaker, the machine limits and the expert inputs folded away. Each heading remembers whether you left it open.
+- Advisors (milling, plunge roughing, drilling, reaming, tapping, turning): the feed is now shown as large as the spindle speed at the top of the result, with a short note on where it came from, instead of only in the list below. The tiles under it no longer repeat the spindle speed and feed; they say only whether they are inside the machine's top speed and top feed.
+- Any tool can now put more than one figure in the headline: a result row marked `big` sits beside the first one.
+- The calculator button in a number box is now its own small key between the box and the unit, always there and dim until the pointer is over the box. It used to sit over the box's up and down arrows.
+- A box that does not apply to the choices made (for example the second size of a round bar on the Bandsaw page) now stays where it is, greyed out and locked, instead of disappearing, so the other boxes no longer move about.
+- Slitting saw speeds and feeds is now filed under Milling, and is listed in Milling > Speeds and feeds as well as in Sawing.
+- Status line at the foot of the window: the sentence about Rust is gone; the warning to check results before cutting stays.
+
+### Fixed
+- Search box on the Mac: the system AutoFill could put a saved "localhost" login (another app's) in the search box as a chip that hid the typed text and could not be removed. The app runs at tauri://localhost on the Mac, so any password saved for localhost was offered. The box now stays read-only until it is clicked or focused, so AutoFill does not take it for a login box, and anything AutoFill puts in before the first keystroke is cleared.
+
+## [0.7.0] - 2026-11-13
 Stage 4 of the plan, part 2: tables of dimensions and calculations for the book rows that 0.6.0 left partial. Built on top of 0.6.0.
 
 ### Added (thread engagement)

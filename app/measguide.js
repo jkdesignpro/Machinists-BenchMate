@@ -111,7 +111,7 @@ function renderMeasGuide(el) {
   const toc = [['mz-tol', 'Writing a tolerance'], ['mz-fit', 'Preferred fits'], ['mz-plate', 'Surface plates'], ['mz-vb', 'V-blocks'], ['mz-mic', 'Checking micrometers and calipers'], ['mz-thr', 'Thread and ball micrometers'], ['mz-shaft', 'Shaft runout'], ['mz-surf', 'Surface texture symbols']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">Inspection practice in our own words: the ways a tolerance is written, the ten preferred metric fits, surface plates and their care, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout, and the surface texture symbols on a drawing. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
+    '<p class="desc">Inspection practice in our own words: the ways a tolerance is written, the ten preferred metric fits, surface plates and their care, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout, and the surface texture symbols on a drawing. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
 
     '<h2 id="mz-tol">Ways to write a tolerance</h2>' + mzTol() +
     guideTable(['Kind', 'Written', 'Allows'], MZ_TOL, mzTags) +

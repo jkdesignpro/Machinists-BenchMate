@@ -427,6 +427,41 @@ impl Sketch {
         Ok(out)
     }
 
+    /// Replace runs of short straight segments in polylines (curves a CAD or CAM program has cut
+    /// into lines) by arcs, where every vertex lies within `tol` of the arc (gcode::fit_arcs, the
+    /// same fit as the engraving). Only polylines with no arcs in them are touched. Returns the
+    /// polylines changed and the segment counts before and after; undo puts the old ones back.
+    pub fn fit_arcs(&mut self, tol: f64) -> (usize, usize, usize) {
+        if !(tol > 0.0) { return (0, 0, 0); }
+        let mut todo = vec![];
+        for (k, it) in self.doc.items.iter().enumerate() {
+            if let Geo::Poly { v, closed } = &it.geo {
+                if v.len() < 3 || v.iter().any(|p| p.2 != 0.0) { continue; }
+                let mut pts: Vec<(f64, f64)> = v.iter().map(|p| (p.0, p.1)).collect();
+                if *closed { pts.push(pts[0]); }
+                let pcs = crate::gcode::fit_arcs(&pts, tol);
+                if pcs.iter().all(|p| p.arc.is_none()) { continue; }
+                let mut nv: Vec<(f64, f64, f64)> = vec![(pts[0].0, pts[0].1, 0.0)];
+                for pc in &pcs {
+                    let b = match pc.arc { Some((_, cw, sw)) => (sw / 4.0).tan() * if cw { -1.0 } else { 1.0 }, None => 0.0 };
+                    nv.last_mut().unwrap().2 = b;
+                    nv.push((pc.end.0, pc.end.1, 0.0));
+                }
+                // A closed polyline ends where it started: drop the repeated last vertex.
+                if *closed { nv.pop(); }
+                todo.push((k, nv, pts.len() - 1, pcs.len()));
+            }
+        }
+        if todo.is_empty() { return (0, 0, 0); }
+        self.mark();
+        let (mut a, mut b) = (0, 0);
+        for (k, nv, before, after) in todo.iter() {
+            if let Geo::Poly { v, .. } = &mut self.doc.items[*k].geo { *v = nv.clone(); }
+            a += before; b += after;
+        }
+        (todo.len(), a, b)
+    }
+
     /// The sketch as a DXF file. With `explode` polylines are written as separate lines and arcs.
     pub fn export_dxf(&self, r12: bool, explode: bool) -> String {
         let (u, v) = (if self.inch { Units::Inch } else { Units::Mm }, if r12 { Version::R12 } else { Version::R2000 });
@@ -952,6 +987,29 @@ mod tests {
             }
         }
         std::fs::write(format!("{dir}/expected-sketch.tsv"), expected).unwrap();
+    }
+
+    #[test]
+    fn fit_arcs_in_polylines() {
+        // A slot outline from a CAM program: two half circles of radius 5, each cut into 12 lines, joined by straights.
+        let pi = std::f64::consts::PI;
+        let mut v = vec![];
+        for k in 0..=12 { let a = -pi / 2.0 + k as f64 * pi / 12.0; v.push((20.0 + 5.0 * a.cos(), 5.0 * a.sin(), 0.0)); }
+        for k in 0..=12 { let a = pi / 2.0 + k as f64 * pi / 12.0; v.push((5.0 * a.cos(), 5.0 * a.sin(), 0.0)); }
+        let mut s = Sketch::new(false);
+        s.add(0, Geo::Poly { v: v.clone(), closed: true }).unwrap();
+        let area0 = s.info(0).iter().find(|r| r.0 == "Area").unwrap().1;
+        let (n, before, after) = s.fit_arcs(0.06);
+        assert_eq!((n, before), (1, 26));
+        assert_eq!(after, 4, "two arcs and two straights");
+        // The fitted outline is the true slot: 20 x 10 plus a circle of radius 5.
+        let area1 = s.info(0).iter().find(|r| r.0 == "Area").unwrap().1;
+        assert!((area1 - (200.0 + pi * 25.0)).abs() < 1e-6, "{area1}");
+        assert!(area1 > area0);
+        // Too tight a tolerance leaves it alone; undo gives the lines back.
+        assert!(s.undo());
+        assert_eq!(s.fit_arcs(0.001).0, 0);
+        if let Geo::Poly { v: w, .. } = &s.doc.items[0].geo { assert_eq!(w.len(), v.len()); } else { panic!(); }
     }
 
     #[test]

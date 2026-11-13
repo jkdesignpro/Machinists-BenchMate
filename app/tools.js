@@ -233,6 +233,51 @@ const TOOLS = [
   source: "Sandvik Coromant milling formulas (circular and helical interpolation); Machinery's Handbook",
 },
 {
+  id: 'millstrat', level: 'advanced', group: 'Milling', title: 'Milling strategy: which roughing toolpath',
+  desc: 'Adaptive or trochoidal (high-efficiency milling), traditional roughing, plunge roughing or high-feed milling: which suits the feature, the tool reach and your machine (how its control copes with many short moves, its rigidity and guideways), with the reasons the sources give.',
+  render: el => renderMillStrategy(el),
+  working: 'No calculation: each strategy is marked from published advice. A reason that rules a strategy out marks it Not suited; otherwise two or more reasons for, beyond those against, mark it a Good fit (BenchMate\'s own weighting). A reach or depth over 3 x the tool diameter counts as long (BenchMate\'s own line; no source sets one).',
+  source: 'J. Ball, MoldMaking Technology 2018; D. Grandt and S. Tiehen, Productivity Inc. 2020; W. Leventon, Cutting Tool Engineering 2025; SolidCAM blog 2026; B. Kennedy, Cutting Tool Engineering 2012; American Machinist 2010; Tungaloy (high-feed milling). Statements from one publisher are marked. See docs/strategy.md.',
+},
+{
+  id: 'backlash', level: 'advanced', group: 'Machine checks', title: 'Backlash: linear and rotary axes, gears',
+  desc: 'Read the backlash (lost motion) of a machine axis from an indicator test, turn the play of a rotary axis into an angle or an angle into play at the part, and see how much backlash a gear pair gains when its centres move apart.',
+  fields: s => [
+    { id: 'mode', label: 'What to work out', unit: '', def: 1, options: [[1, 'Linear axis: lost motion from an indicator'], [2, 'Rotary axis: play and angle'], [3, 'Gear pair: backlash from the centre distance']], wide: true },
+    { id: 'r0', label: 'Indicator at the start (after coming in from one side)', unit: lenU(s), def: 0, when: v => v.mode === 1 },
+    { id: 'r1', label: 'Indicator after going out and back to the start', unit: lenU(s), def: '', when: v => v.mode === 1 },
+    { id: 'rk', label: 'You know', unit: '', def: 1, options: [[1, 'The play at a radius (measured)'], [2, 'The angle (maker\'s figure)']], when: v => v.mode === 2 },
+    { id: 'rad', label: 'Radius from the rotary axis', unit: lenU(s), def: s === 'inch' ? 4 : 100, when: v => v.mode === 2 },
+    { id: 'play', label: 'Play measured round the axis at that radius', unit: lenU(s), def: '', when: v => v.mode === 2 && v.rk === 1 },
+    { id: 'asec', label: 'Angular play', unit: 'arcsec', def: '', when: v => v.mode === 2 && v.rk === 2 },
+    { id: 'da', label: 'Centres moved apart by', unit: lenU(s), def: '', when: v => v.mode === 3 },
+    { id: 'alpha', label: 'Pressure angle', unit: 'deg', def: 20, when: v => v.mode === 3 },
+    { id: 'pd', label: 'Pitch diameter of one gear (for its angular backlash)', unit: lenU(s), def: '', when: v => v.mode === 3 },
+  ],
+  calc: (v, W, s) => {
+    const dp = s === 'inch' ? 5 : 4, u = lenU(s);
+    if (v.mode === 1) {
+      if (!isFinite(v.r1)) return [];
+      const lm = W.bl_lost_motion(v.r0 || 0, v.r1);
+      return [R('Lost motion (backlash and the rest)', lm, u, dp),
+        R('Note', 'Lost motion is the commanded move less the move seen: mostly backlash (gib clearance, the screw support bearings), plus bearing give, friction and heat (Tormach). Adjust or repair the mechanics before entering a backlash compensation (Tormach, MachMotion); the control then adds the lost travel at each reversal (Wikipedia). Machine profiles keep a measured figure per axis.', '', 0)];
+    }
+    if (v.mode === 2) {
+      if (!(v.rad > 0)) return [];
+      if (v.rk === 1) { if (!isFinite(v.play)) return []; const a = W.bl_play_to_arcsec(v.rad, v.play); return [R('Angular play', a, 'arcsec', 2), R('In arc minutes', W.bl_arcsec_to(a, 1), 'arcmin', 3), R('In degrees', W.bl_arcsec_to(a, 2), 'deg', 5)]; }
+      if (!isFinite(v.asec)) return [];
+      return [R('Play round the axis at that radius', W.bl_arcsec_to_play(v.rad, v.asec), u, dp), R('Note', 'The same angle gives more play the further out the work is: a part at twice the radius moves twice as far.', '', 0)];
+    }
+    if (!isFinite(v.da)) return [];
+    const j = W.bl_gear_centre(v.da, v.alpha, 0), rows = [R('Circular backlash gained (on the pitch circle)', j, u, dp), R('Normal backlash gained (square to the teeth)', W.bl_gear_centre(v.da, v.alpha, 1), u, dp)];
+    if (v.pd > 0) rows.push(R('Angular backlash of that gear', W.bl_gear_arcmin(j, v.pd), 'arcmin', 3));
+    rows.push(R('Note', 'KHK: do not close the centres to take backlash out; it removes the room for lubricant. Angular backlash depends on each gear\'s own radius, so give it for each gear.', '', 0));
+    return rows;
+  },
+  working: 'Lost motion = |indicator after out and back - indicator at the start| (Tormach lost motion test; MachMotion backlash test). Rotary: angle (rad) = play / radius, 1 rad = 206 264.8 arcsec; play = radius x angle. Gear pair: circular backlash j = 2 da tan(alpha), normal jn = 2 da sin(alpha) (KHK-USA); angular backlash of a gear = j / (d / 2) rad.',
+  source: 'Tormach knowledge base, Lost motion testing and gib/ACB adjustment (PCNC 440); MachMotion support, How to test for backlash; KHK-USA, B. Dengel, A primer on backlash (one publisher for the centre distance formulas); Wikipedia, Backlash (engineering). See docs/backlash.md.',
+},
+{
   id: 'helix', level: 'advanced', group: 'Milling', title: 'Helical interpolation and ramping',
   pick: { map: { d: 'dia' } },
   desc: 'Helix pitch per turn from a ramp angle, or the ramp angle from a pitch, and the axial (Z) feed. Angles are at the tool-centre path.',
@@ -335,8 +380,8 @@ const TOOLS = [
     if (!(vc > 0)) return [];
     const m = typeof Profiles !== 'undefined' ? Profiles.active() : null;
     const mnum = x => (x === '' || x == null) ? 0 : (Number(x) > 0 ? Number(x) : 0);
-    const pmax = v.pmax > 0 ? v.pmax : (m ? mnum(m.power_kw) : 0);
-    const tmax = v.tmax > 0 ? v.tmax : (m ? mnum(m.torque_nm) : 0);
+    const pmax = v.pmax > 0 ? (s === 'inch' ? v.pmax / KW_HP : v.pmax) : (m ? mnum(m.power_kw) : 0);
+    const tmax = v.tmax > 0 ? (s === 'inch' ? v.tmax * LBF_N * FT_M : v.tmax) : (m ? mnum(m.torque_nm) : 0);
     const pSrc = v.pmax > 0 ? 'entered' : (m && pmax > 0 ? m.name : '');
     const z0 = x => x > 0 ? x : 0;
     const args = ap => [g.d, g.dsh, z0(g.L), g.lf, g.kf, z0(g.e), v.z, v.ae * k, ap, v.fz * k, vc, z0(v.kc), z0(v.eta), z0(v.ratio), z0(v.F) * fk, z0(v.lim) * k, pmax, tmax, advHolderK(v)[0]];
@@ -703,6 +748,8 @@ const TOOLS = [
       R('Scrap per bar', scrap, lenU(s), 3),
       R('Scrap per bar', 100 * scrap / v.bar, '%', 1),
     ];
+    // 0.8.0: checked against the bar capacity of the active machine (its largest bar, from the machine profile).
+    if (v.size > 0) rows.push(R(v.shape === 1 ? 'Bar diameter' : 'Bar across corners', v.shape === 1 ? v.size : W.polygon_dims(v.shape === 2 ? 6 : 4, v.size, 0, 0), lenU(s), s === 'inch' ? 4 : 3, 'bar_d'));
     if (v.size > 0 && v.rho > 0) {
       // inch: in2 x in x lb/in3 = lb. metric: mm2 x mm = mm3; x 1e-3 = cm3; x g/cm3 = g; / 1000 = kg.
       const a = W.bar_section_area(v.shape, v.size), k = s === 'inch' ? 1 : 1e-6, wu = s === 'inch' ? 'lb' : 'kg';
@@ -940,7 +987,7 @@ const TOOLS = [
   source: "Gear-train ratio arithmetic; Machinery's Handbook 'Lathe change gears' (by name). 127 = 5 x 25.4 (inch defined as 25.4 mm, NIST SP 811). See docs/sources.md.",
 },
 {
-  id: 'slitsaw', level: 'advanced', group: 'Sawing', title: 'Slitting saw speeds and feeds',
+  id: 'slitsaw', level: 'advanced', group: 'Milling', title: 'Slitting saw speeds and feeds',
   pick: { map: { D: 'dia', z: 'flutes' } },
   desc: 'Spindle speed, table feed, chip thickness and cut time for a slitting or slotting saw. Pick the work material and the saw material for a starting speed and feed per tooth from a saw maker\'s sheet, or type your saw maker\'s own figures: a typed value is locked. A slot shallower than half the saw diameter thins the chip; the screen shows how much.',
   fields: s => [
@@ -996,11 +1043,12 @@ const TOOLS = [
 },
 {
   id: 'bandsaw', level: 'advanced', group: 'Sawing', title: 'Bandsaw cut time',
-  desc: 'Time to cut through a round, rectangular or tube section, one piece or a bundle (pieces across and layers high), from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
+  desc: 'Time to cut through a round, square, hexagon, rectangular or flat bar, a round, square or rectangular tube, or an angle, one piece or a bundle (pieces across and layers high), from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
   fields: s => [
-    { id: 'shape', label: 'Section', unit: '', def: 1, options: [[1, 'Round bar'], [2, 'Rectangle (cut through the height)'], [3, 'Tube']] },
-    { id: 'a', label: 'Diameter, or width of the rectangle', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
-    { id: 'b', label: 'Rectangle height, or tube wall', unit: lenU(s), def: '', when: v => v.shape !== 1 },
+    { id: 'shape', label: 'Section', unit: '', def: 1, options: [[1, 'Round bar'], [4, 'Square bar'], [5, 'Hexagon bar (lying on a flat)'], [2, 'Rectangle or flat bar'], [3, 'Round tube'], [6, 'Square tube (box section)'], [7, 'Rectangular tube (box section)'], [8, 'Angle']] },
+    { id: 'a', label: 'A: diameter, side, width or across flats', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
+    { id: 'c', label: 'C: height the blade cuts down through', unit: lenU(s), def: '', when: v => [2, 7, 8].includes(v.shape) },
+    { id: 'b', label: 'Wall or thickness t', unit: lenU(s), def: '', when: v => [3, 6, 7, 8].includes(v.shape) },
     { id: 'bundle', label: 'Cut', unit: '', def: 0, options: [[0, 'Single piece'], [1, 'Bundle']] },
     { id: 'nx', label: 'Pieces across (side by side, across the blade)', unit: '', def: 3, when: v => v.bundle === 1 },
     { id: 'ny', label: 'Layers high (stacked in the feed direction)', unit: '', def: 2, when: v => v.bundle === 1 },
@@ -1014,24 +1062,24 @@ const TOOLS = [
     const bun = v.bundle === 1, nx = bun ? v.nx : 1, ny = bun ? v.ny : 1;
     if (bun && !(nx >= 1 && ny >= 1)) return [R('Bundle', 'Enter at least 1 piece across and 1 layer', '', 0)];
     if (bun && (nx % 1 || ny % 1)) return [R('Bundle', 'Pieces and layers are whole numbers', '', 0)];
-    const S = k => W.saw_section(v.shape, v.a, v.b > 0 ? v.b : 0, nx, ny, k);
+    const S = k => W.saw_section_ext(v.shape, v.a, v.b > 0 ? v.b : 0, v.c > 0 ? v.c : 0, nx, ny, k);
     const area = S(0), h = S(1), wid = S(2);
-    if (!isFinite(area)) return [R('Section', v.shape === 3 ? 'Enter a wall thinner than half the diameter' : 'Enter the height', '', 0)];
+    if (!isFinite(area)) return [R('Section', ({ 2: 'Enter the height C', 3: 'Enter a wall t thinner than half the diameter', 6: 'Enter a wall t thinner than half the side', 7: 'Enter the height C and a wall t thinner than half the smaller side', 8: 'Enter the height C and a thickness t smaller than both legs' })[v.shape] || 'Check the sizes', '', 0)];
     const au = s === 'inch' ? 'in2' : 'cm2', ak = s === 'inch' ? 1 : 0.01;
     const rows = [R(bun ? 'Metal area cut (' + S(3) + ' pieces)' : 'Area cut', area * ak, au, 2), R('Height the blade feeds through', h, lenU(s), 2), R('Effective width (longest path of the blade in the work)', wid, lenU(s), 2)];
     if (v.vf > 0) rows.push(R('Cut time from the down-feed', h / v.vf, 'min', 2));
     if (v.rate > 0) { const t = W.saw_cut_time(area * ak, v.rate); rows.push(R('Cut time from the cutting rate', t, 'min', 2)); rows.push(R('Average down-feed at that rate', h / t, feedMinU(s), 2)); if (bun) rows.push(R('Cut time per piece', t / S(3), 'min', 3)); }
     if (bun && v.vf > 0) rows.push(R('Cut time per piece (down-feed)', h / v.vf / S(3), 'min', 3));
-    if (bun && v.shape !== 2) rows.push(R('Note', 'Rounds and tubes leave gaps: the blade cuts metal only part of the way down, so the down-feed time and the cutting-rate time differ. Makers quote rates for solid sections; a bundle usually cuts slower than the rate suggests.', '', 0));
+    if (bun && ![2, 4, 6, 7].includes(v.shape)) rows.push(R('Note', 'Rounds, hexagons, tubes and angles leave gaps: the blade cuts metal only part of the way down, so the down-feed time and the cutting-rate time differ. Makers quote rates for solid sections; a bundle usually cuts slower than the rate suggests.', '', 0));
     if (v.vf > 0 && v.vb > 0 && v.tpi > 0) {
       const c = s === 'inch' ? W.bandsaw_chip_per_tooth(v.vf * IN_MM, v.vb * FT_M, v.tpi) / IN_MM : W.bandsaw_chip_per_tooth(v.vf, v.vb, v.tpi);
       rows.push(R('Feed per tooth (depth each tooth takes)', c, lenU(s), s === 'inch' ? 6 : 5));
     }
     return rows;
   },
-  working: 'Time = height / down-feed rate, or metal area / cutting rate (the square inches or cm2 per minute figure saw makers quote: the cut area divided by the minutes per cut). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle W x H. Bundle of n across and m high, packed square: metal area = n m x piece area, height = m x piece height (D for rounds and tubes), effective width = n x piece width. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker. For a bundle the makers base the blade pitch on the average section (Fabricating and Metalworking, 2020) and keep at least three teeth in the work (The Tube and Pipe Journal, 2007).',
+  working: 'Time = height / down-feed rate, or metal area / cutting rate (the square inches or cm2 per minute figure saw makers quote: the cut area divided by the minutes per cut). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle A x C, square A^2, hexagon (sqrt 3 / 2) A^2 with A across flats (lying on a flat, the blade crosses the corners, 2A / sqrt 3), square tube A^2 - (A - 2t)^2, rectangular tube A C - (A - 2t)(C - 2t), angle t (A + C - t); tubes and angles with sharp corners, so a little over the real area. Bundle of n across and m high, packed square: metal area = n m x piece area, height = m x piece height (D for rounds and tubes), effective width = n x piece width. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker. For a bundle the makers base the blade pitch on the average section (Fabricating and Metalworking, 2020) and keep at least three teeth in the work (The Tube and Pipe Journal, 2007).',
   source: "Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut for each bar area); Machinery's Handbook 31st ed., band saw blades, p. 1245 (cutting time = area / cutting rate, by name); KASCO (teeth per minute = teeth per foot x blade speed); bundles: A. Popson, 'Bundles of joy', The Tube and Pipe Journal, 2007; 'How to optimize sawing operations', Fabricating and Metalworking, 2020. See docs/sources.md.",
-  proof: [{ name: 'A 5.5 in2 section at 4 in2 per minute', sys: 'inch', vals: { shape: 2, a: 2.75, b: 2, rate: 4 }, expect: [['Cut time from the cutting rate', 'min', 1.375, 1e-9]],
+  proof: [{ name: 'A 5.5 in2 section at 4 in2 per minute', sys: 'inch', vals: { shape: 2, a: 2.75, c: 2, rate: 4 }, expect: [['Cut time from the cutting rate', 'min', 1.375, 1e-9]],
     source: "Machinery's Handbook, 31st ed., band saw blades (by name): cutting time = area / cutting rate, 5.5 in2 at 4 in2 per minute is 1.375 minutes.", note: 'The 2.75 x 2 in rectangle is only a way to enter 5.5 in2.' }],
 },
 {
@@ -1179,8 +1227,8 @@ const TOOLS = [
   id: 'drillchart', level: 'simple', group: 'Drilling and tapping', title: 'Drill size chart',
   desc: 'Fractional, number, letter and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Number and letter sizes show how many independent publishers print each value.',
   render: el => renderDrillChart(el),
-  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them; they are not given by a formula), so each value is what the publishers listed under the table print. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder takes a diameter in inch or mm (whatever the unit setting) and lists, for each series (number, letter, fractional, metric), the nearest drill at or below and the nearest above, with the difference (drill minus your size) in inch and mm.',
-  source: 'Wikipedia "Drill bit sizes"; Stoody Industrial & Welding Supply decimal equivalents chart; P. Lobben, Machinists\' and Draftsmen\'s Handbook (1910, public domain). Standards cited, not read: ASME B94.11M-1993 (twist drills, current per ASME catalogue), ISO 235:2016 (metric jobber drill sizes).',
+  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them to #97; they are not given by a formula), so each value is what the publishers listed under the table print. Micro sizes #98 to #107 are beyond the standard: they come from trade charts (#98 to #104 from four publishers, #105 to #107 from two) and are worth checking against the drill maker\'s catalogue. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder takes a diameter in inch or mm (whatever the unit setting) and lists, for each series (number, letter, fractional, metric), the nearest drill at or below and the nearest above, with the difference (drill minus your size) in inch and mm.',
+  source: 'Wikipedia "Drill bit sizes"; Stoody Industrial & Welding Supply decimal equivalents chart; P. Lobben, Machinists\' and Draftsmen\'s Handbook (1910, public domain); micro sizes: The Engineering ToolBox, Mechanical-Engineering.com, Size-Charts.com, ElectronicsHub. Standards cited, not read: ASME B94.11M-1993 (twist drills, current per ASME catalogue), ISO 235:2016 (metric jobber drill sizes).',
 },
 {
   id: 'tapdrill', level: 'simple', group: 'Drilling and tapping', title: 'Tap drill size',
@@ -1205,7 +1253,7 @@ const TOOLS = [
 },
 {
   id: 'grindspeed', level: 'advanced', group: 'Grinding', title: 'Wheel and work speed, equivalent diameter',
-  desc: 'Wheel surface speed or rpm, work speed and the speed ratio, equivalent wheel diameter for external, internal and surface grinding, contact length, specific removal rate and equivalent chip thickness. Always obey the maximum operating speed marked on the wheel; BenchMate never assumes one.',
+  desc: 'Wheel surface speed or rpm, work speed and the speed ratio, equivalent wheel diameter for external, internal and surface grinding, contact length, specific removal rate, equivalent chip thickness, aggressiveness and grit penetration. Always obey the maximum operating speed marked on the wheel; BenchMate never assumes one.',
   fields: s => [
     { id: 'mode', label: 'Operation', unit: '', def: 0, options: [[0, 'External cylindrical'], [1, 'Internal'], [2, 'Surface']] },
     { id: 'ds', label: 'Wheel diameter', unit: lenU(s), def: s === 'inch' ? 14 : 350 },
@@ -1217,6 +1265,8 @@ const TOOLS = [
     { id: 'nw', label: 'Work speed (cylindrical)', unit: 'RPM', def: '' },
     { id: 'vt', label: 'Or table speed (surface)', unit: s === 'inch' ? 'ft/min' : 'm/min', def: '' },
     { id: 'ae', label: 'Depth of cut per pass', unit: lenU(s), def: '' },
+    { id: 'cc', label: 'Cutting points per mm2 C (for grit penetration; blank = not shown)', unit: '1/mm2', def: '' },
+    { id: 'cr', label: 'Chip width to thickness ratio r', unit: '', def: '' },
   ],
   calc: (v, W, s) => {
     if (!(v.ds > 0)) return [];
@@ -1241,11 +1291,17 @@ const TOOLS = [
     if (v.ae > 0 && isFinite(de)) {
       rows.push(R('Contact length sqrt(ae de)', W.contact_length(v.ae * k, de) / k, lenU(s), inch ? 4 : 3));
       if (vw > 0) { const q = W.specific_mrr(v.ae * k, vw); rows.push(R("Specific removal rate Q'w", inch ? q * 60 / 645.16 : q, inch ? 'in3/min per in' : 'mm3/mm/s', 3)); if (vs > 0) rows.push(R('Equivalent chip thickness heq', W.equiv_chip_um(v.ae * k, vw, vs) * (inch ? 1000 / IN_MM : 1), inch ? 'uin' : 'um', 4)); }
+      if (vw > 0 && vs > 0) {
+        const ag = W.grind_aggr(vw, vs, v.ae * k, de);
+        rows.push(R('Aggressiveness 10^6 (vw / vs) sqrt(ae / de)', ag, '', 2));
+        rows.push(R('Aggressiveness, where it sits', ag < 3 ? 'Below the usual 3 to 60: likely rubbing and burn rather than cutting' : ag > 200 ? 'Above the 5 to 200 the CIRP paper gives for grinding' : ag > 60 ? 'Above the usual 3 to 60 (CTE): heavy roughing, watch wheel wear' : 'Within the usual 3 to 60 (CTE): low for finishing, high for roughing', '', 0));
+        if (v.cc > 0 && v.cr > 0) rows.push(R('Grit penetration (max undeformed chip thickness) hm', W.grind_max_chip_um(ag, v.cc, v.cr) * (inch ? 1000 / IN_MM : 1), inch ? 'uin' : 'um', 3));
+      }
     }
     return rows;
   },
-  working: 'Wheel speed vs = pi ds ns / 60 000 m/s (ds in mm), SFPM = pi ds(in) ns / 12. Work speed vw = pi dw nw / 1000 m/min. Speed ratio q = vs x 60 / vw. Equivalent diameter de = dw ds / (dw + ds) external, dw ds / (dw - ds) internal, ds surface. Contact length lg = sqrt(ae de). Specific removal rate Q\'w = ae vw (mm3/mm/s with vw in mm/s); equivalent chip thickness heq = ae vw / vs. The maximum operating speed is marked on every wheel larger than 80 mm (or on its label or a notice) and must not be exceeded; it depends on the wheel, not on anything BenchMate can work out.',
-  source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
+  working: 'Wheel speed vs = pi ds ns / 60 000 m/s (ds in mm), SFPM = pi ds(in) ns / 12. Work speed vw = pi dw nw / 1000 m/min. Speed ratio q = vs x 60 / vw. Equivalent diameter de = dw ds / (dw + ds) external, dw ds / (dw - ds) internal, ds surface. Contact length lg = sqrt(ae de). Specific removal rate Q\'w = ae vw (mm3/mm/s with vw in mm/s); equivalent chip thickness heq = ae vw / vs. Aggressiveness = 10^6 (vw / vs) sqrt(ae / de), dimensionless, the same at any units; each wheel, work and coolant has a best value, found by trial (Badger). Typical ranges, as printed and not merged: 3 to 60, lower for finishing and higher for roughing (Badger, CTE 2012); 5 to 200 for grinding, thousands for dressing (Badger, Drazumeric and Krajnik, Procedia CIRP 2021). Grit penetration (maximum undeformed chip thickness) hm = sqrt(4 Aggr / (10^6 C r)) (Backer et al. 1952, as given by Krajnik, Drazumeric and Badger 2024); C and r describe the wheel surface and are hard to measure, so they are left for you to enter. The maximum operating speed is marked on every wheel larger than 80 mm (or on its label or a notice) and must not be exceeded; it depends on the wheel, not on anything BenchMate can work out.',
+  source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Aggressiveness: J. Badger, R. Drazumeric and P. Krajnik, Procedia CIRP 102 (2021) 361-368, doi 10.1016/j.procir.2021.09.062 (Elsevier); P. Krajnik, R. Drazumeric and J. Badger, Optimization of industrial grinding processes using the theory of aggressiveness, IntechOpen 2024 (https://research.chalmers.se/publication/543954); J. Badger, The great grinding divide, Cutting Tool Engineering, 15 Jan 2012 (typical range). One group of authors in two publishers: to be verified against a second group. Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
 },
 {
   id: 'gundrill', level: 'advanced', group: 'Drilling and tapping', title: 'Gun drilling: speed, feed, coolant pressure and flow',
@@ -1429,7 +1485,7 @@ const TOOLS = [
   desc: 'Basic dimensions of ISO metric (coarse and fine) and Unified (UNC, UNF, UNEF) threads from the basic profile, with ISO 6g/6H and Unified 2A/3A/2B/3B limits computed from the standards\' formulas and checked against published tables.',
   render: el => renderThreadData(el),
   working: 'See the note under the tool.',
-  source: 'ISO 68-1:2023, ISO 261:1998, ISO 262:2023, ISO 965-1:2013 (revised 2026), ASME B1.1-2024; series and published limits from the publishers listed under the tool.',
+  source: 'ISO 68-1:2023, ISO 261:1998, ISO 262:2023, ISO 965-1:2013 (revised 2026), ASME B1.1-2024; series and published limits from the publishers listed under the tool. Wire sizes: NBS Letter Circular 23 (1923, table 1, https://nvlpubs.nist.gov/nistpubs/Legacy/LC/nbslettercircular23r1923.pdf) and Thread Check, "Alternate size thread measuring wires" (https://www.threadcheck.com/blog/alternate-size-thread-measuring-wires/), both read 2026-11-13.',
 },
 {
   id: 'threadid', level: 'advanced', group: 'Threads', title: 'Thread identifier',
@@ -1893,7 +1949,7 @@ const TOOLS = [
   desc: 'List the ISO 3 preferred numbers of a Renard series between two values, with the theoretical value, the step and the rounding, or find the preferred number nearest to yours.',
   render: el => renderPrefNum(el),
   working: 'Term i = 10^(i/R) (theoretical); rounded values from the published series; nearest term i = round(R log10 x).',
-  source: 'ISO 3:1973 (by name); values from the iTeh Standards preview of ISO 3:1973 and Wikipedia (Renard series). See docs/inspection.md.',
+  source: 'ISO 3:1973 (by name); values from the iTeh Standards preview of ISO 3:1973 and Wikipedia (Renard series). Use and history (What is this for?): K. O. Kverneland, Machine Design, 5 Nov. 1998, and Wikipedia (Renard series). See docs/inspection.md.',
 },
 {
   id: 'bolt', level: 'simple', group: 'Geometry', title: 'Bolt circle',
@@ -1909,7 +1965,7 @@ const TOOLS = [
     if (!(v.dia > 0 && Number.isInteger(v.n) && v.n >= 1 && v.n <= 360)) return [];
     const rows = [R('Angle between holes', 360 / v.n, 'deg', 3)];
     if (v.n >= 2) rows.push(R('Centre to centre of neighbouring holes (chord)', W.arc_solve(1, v.dia / 2, 360 / v.n, 2), lenU(s), s === 'inch' ? 4 : 3));
-    rows.push(R('Bolt circle radius', v.dia / 2, lenU(s), s === 'inch' ? 4 : 3));
+    rows.push(R('Bolt circle radius', v.dia / 2, lenU(s), s === 'inch' ? 4 : 3, 'span_r'));
     return rows;
   },
   // Every hole: angle and X, Y, with copies for a spreadsheet and for a program.
@@ -2305,9 +2361,9 @@ const TOOLS = [
 },
 {
   id: 'cycg71', level: 'advanced', group: 'G-code cycles', title: 'G71 / G70 rough and finish',
-  desc: 'G71 roughing and G70 finishing from a simple profile of points (straight lines, no undercuts), outside or inside, Fanuc-style two-block or Haas one-block format.',
+  desc: 'G71 roughing and G70 finishing from a simple profile of points (straight lines and G02 or G03 arcs, no undercuts), outside or inside, Fanuc-style two-block or Haas one-block format.',
   render: el => renderG71Cycle(el),
-  working: 'Fanuc-style: G71 U(depth) R(retract); G71 P Q U(X allowance on diameter) W F. Haas: G71 P Q U W D(depth) F. The profile blocks carry the finish feed for G70. Type I needs a profile that only grows (outside) or shrinks (inside) toward the chuck. The backplot and time use BenchMate\'s model of the roughing passes.',
+  working: 'Fanuc-style: G71 U(depth) R(retract); G71 P Q U(X allowance on diameter) W F. Haas: G71 P Q U W D(depth) F. The profile blocks carry the finish feed for G70. Type I needs a profile that only grows (outside) or shrinks (inside) toward the chuck. A point can be reached by an arc: add G02 or G03 and R to its line; the arc is checked point by point along the curve, and G02 and G03 are taken as the simulator reads G18 (G03 counter-clockwise with Z across and X up). The backplot and time use BenchMate\'s model of the roughing passes.',
   source: 'NPTEL Module 7 CNC programming (G71/G70 parameters); industrialmonitordirect Fanuc G71 parameter reference; Haas Factory Outlet lathe programming (one-block G71 D, G70). See docs/cycles.md.',
 },
 {
@@ -2561,6 +2617,13 @@ const TOOLS = [
   render: el => renderWeight(el),
   working: 'Weight = section area x length x density. Round πd²/4; hex (√3/2)s² across flats s; square s²; tube π/4 (D² - (D - 2t)²); flat, plate or sheet width x thickness. Sharp corners assumed (no corner radii on hex, square or flat).',
   source: 'Areas of plane figures; densities from the material data where Confirmed, else from your data sheet. See docs/geometry.md.',
+},
+{
+  id: 'stocksizes', level: 'simple', group: 'Stock and sheet metal', title: 'Common profiles and sizes',
+  desc: 'Box tube, round tube, angle, IPE beams and channels in the sizes stockists list, metric and inch, aluminium angle and any flat bar, with each section\'s area, stiffness and weight, and the T-slot aluminium framing series. Hands the section to Section properties or Beam deflection.',
+  render: el => renderStockSizes(el),
+  working: 'Sizes are as two publishers list them; a size only one lists is marked. Area, second moment, section modulus and radius of gyration from the section built up from rectangles (sharp corners), as in Section properties. Weight = area x length x density.',
+  source: 'Box tube, metric: AmesWeb (EN 10210-2 table) and Project Materials. Round tube: AmesWeb and Wermac. Equal angle, metric: Wermac and Kerschgens (DIN EN 10056). IPE: Wermac and Project Materials. Parallel flange channel: British Steel (BS EN 10365) and Kocaer Steel (BS 4-1). Square and rectangular tube, inch: Metals Depot and Speedy Metals. Equal angle, inch: The Engineering ToolBox and Speedy Metals. Aluminium angle: Speedy Metals and Russel Metals. T-slot: Wikipedia and MISUMI USA. All read 2026-11-13; see docs/stock-sizes.md.',
 },
 {
   id: 'gauges', level: 'advanced', group: 'Stock and sheet metal', title: 'Sheet metal and wire gauges',
@@ -2986,7 +3049,7 @@ const TOOLS = [
 },
 {
   id: 'machines', level: 'simple', group: 'Setup', title: 'Machine profiles',
-  desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
+  desc: 'Add your machines once: pick the kind of machine (mill, 5-axis, lathe, Swiss-type, mill-turn, router) and fill in what it has. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and top feed. The rest (work volume, axes, guideways, thermal compensation, backlash, how the control copes with many short moves) describes the machine for you and for the pages that ask about it.',
   render: el => renderMachines(el),
   working: 'Power available at speed n: P(n) = min(P_max, T_max x 2 pi n / 60 000). Constant torque below base speed, constant power above it.',
   source: 'Standard spindle power/torque characteristic [SAN]. Machine limits come from the builder\'s spec sheet or manual.',

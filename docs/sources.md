@@ -1801,3 +1801,48 @@ All wording is BenchMate's own. A statement with fewer than two independent publ
 - **[VIK_TS]** Vikram University, course notes by S. Sharma, "Concept of rake and clearance angles and tool signature", https://vikramuniv.ac.in/files/wp-content/uploads/BE_ME_6th_sem_Concept-of-Rake__Clearance-angles_and_Tool-Signature_Shivam_Sharma.pdf : the order of the seven figures, degrees and mm, the example 0-7-6-8-15-16-0.8.
 - **[TB_TS]** Testbook, "ASA tool signature: objective questions with answers", https://testbook.com/objective-questions/mcq-on-asa-tool-signature--5eea6a0d39140f30f369e2c9 : the same order; the nose radius in inches in one answer and in mm in another, so the unit is shown as differing.
 - **Read, not used:** mfgrobots.com, an article on single-point tool geometry with no author or date that appears to repeat other pages.
+
+## Additions in 0.8.0 (owner feedback round), accessed 2026-11-13
+
+All wording is BenchMate's own. A statement with fewer than two independent publishers is marked on the page. Where sources print different figures each is shown with its source.
+
+### Micro drills #98 to #107 (`data/refdata/drills-evidence.json`)
+- **[ETB]** The Engineering ToolBox, "Drill bits: conversion chart", https://engineeringtoolbox.com/drill-bit-numer-gauge-inches-mm-d_2046.html : #98 to #104.
+- **[MECHENG]** Mechanical-Engineering.com (formerly EngineeringClicks), "Drill size chart", https://mechanical-engineering.com/drill-size-chart/ : #98 to #104 (stops at #104).
+- **[SIZECH]** Size-Charts.com, "Drill bit size chart and different types", https://size-charts.com/topics/house-size-chart/drill-bit-size-chart-and-different-types/ : #98 to #107.
+- **[EHUB]** ElectronicsHub, "Drill bit size chart", https://www.electronicshub.org/drill-bit-size-chart/ : #98 to #107.
+- Sizes beyond #97 are not in ASME B94.11M (per Wikipedia, already listed). **Read, not used:** Sinodrills (no number chart).
+
+### Thread data: flats, lead angle, wire sizes (`app/refdata.js`, `core/src/power_threads.rs`)
+- **[NBS LC23]** National Bureau of Standards, Letter Circular 23 (1923), table 1, https://nvlpubs.nist.gov/nistpubs/Legacy/LC/nbslettercircular23r1923.pdf : best 0.577350 P, largest 1.010363 P, smallest 0.505182 P for 60 degree threads.
+- **[Thread Check]** "Alternate size thread measuring wires", https://www.threadcheck.com/blog/alternate-size-thread-measuring-wires/ : 1.010362 P, 0.57735 P, 0.505182 P (largest printed one digit lower; shown beside it).
+- Flats P/8 and P/4 of the basic profile and the lead angle are geometry (ISO 68-1, ASME B1.1, already listed).
+
+### Grinding aggressiveness and grit penetration (`app/tools.js` grindspeed, `core/src/grinding.rs`)
+- **[BADGER_CIRP]** J. Badger, R. Drazumeric, P. Krajnik, "Application of the dimensionless Aggressiveness number in abrasive processes", Procedia CIRP 102 (2021) 361-368, doi 10.1016/j.procir.2021.09.062 (full text https://research.chalmers.se/publication/526634).
+- **[KRAJNIK_INTECH]** P. Krajnik, R. Drazumeric, J. Badger, "Optimization of industrial grinding processes using the theory of aggressiveness", IntechOpen 2024, https://research.chalmers.se/publication/543954 : Aggr with the equivalent diameter, hm (Backer et al. 1952).
+- **[CTE]** J. Badger, "The great grinding divide", Cutting Tool Engineering, 2012-01-15, https://ctemag.com/articles/great-grinding-divide/ : typical 3 to 60.
+- One group of authors: marked to be verified by a second group. **Read, not used:** ANCA E-Sharp News, December 2011 (its aggressiveness factor formula is an image and may be defined differently).
+
+### Magnesium (`data/evidence/magnesium.json`)
+- **[Aircraft Materials]** AZ31B, AZ80A and ZK60A data pages, https://aircraftmaterials.com/data/magnesium/
+- **[Smiths High Performance]** AZ31B datasheet (11.02.2025), https://www.smithshp.com/assets/pdf/magnesium/az31b-magnesium-english.pdf
+- **[MakeItFrom]** AZ31B, AZ80A and ZK60A pages, https://www.makeitfrom.com/
+- **Read, not used:** Smiths Elektron 43 datasheet (its composition columns do not line up), Luxfer MEL datasheet links (redirect to the home page).
+
+### Coated threads (`app/threads3.js`)
+- **[PEM_TI]** PennEngineering, "Thread inspection" (July 2019); **[IFI_F1941]** Industrial Fasteners Institute bulletin on ASTM F1941 (March 2001); with TC_PLATE and KATO_PLATE (already listed). See `data/refdata/threads-power-evidence.json`.
+
+### Guide sections
+- Machining magnesium (`app/matguide.js`): **[ERP3]** R. Ye, 3ERP, https://www.3erp.com/blog/safety-tips-for-cnc-machining-magnesium-other-flammable-metals/ ; **[WAYKEN]** WayKen, https://waykenrm.com/blogs/machining-magnesium-safely/ ; **[LUX_MM]** Luxfer MEL, https://www.luxfermeltechnologies.com/knowledge-hub/machining-magnesium/
+- High speed steel heat treatment (`app/matguide.js`): **[HUD_M2]** https://hudsontoolsteel.com/technical-data/steelM2 ; **[SBSM_M2]** https://sb-specialty-metals.com/wp-content/uploads/2022/06/Data-Sheet-M2-SBSM.pdf ; **[TM_HSS]** https://www.totalmateria.com/articles/heat-treatment-of-high-speed-steels/ ; **[MF_SZ]** https://metalformingmagazine.com/public/images/2012/03/digital/files/basic-html/page50.html ; **[ENC_DCT]** https://encyclopedia.pub/entry/download_pdf/13f34cf7e40833633f285e74c5c9e59f
+- Metallurgy terms (`app/matguide.js`): **[WP_HT]** https://en.wikipedia.org/wiki/Heat_treating ; **[IITK]** https://spm-iitk.vlabs.ac.in/exp/tailoring-microstructure/theory.html ; with HYDRO, TM_HSS, MF_SZ, SBSM_M2.
+- How metals fail (`app/matguide.js`): **[MHCC_F]** https://mhcc.pressbooks.pub/metallurgy/chapter/fatigue-resistance/ and https://mhcc.pressbooks.pub/metallurgy/?p=131 ; **[ELEM_F]** https://www.element.com/resources/articles/fatigue-failure-how-can-you-tell ; **[IMT_F]** https://nte.mines-albi.fr/SciMat/en/co/SM6uc3-3.html
+- Micromachining (`app/cutguide.js`): **[CCB_MICRO]** https://www.cnccookbook.com/CCCNCMillFeedsSpeedsMicroMachining.htm ; **[BIG_MICRO]** https://www.bigdaishowa.com/en/node/1249
+- 3D tool compensation (`app/cncguide.js`): **[HAAS_G141]** https://www.haascnc.com/service/codes-settings.type=gcode.machine=mill.value=G141.html ; **[ICAM_3D]** https://www.icam.com/?p=18181 ; **[CIMCO_3D]** https://www.cimco.com/documentation/online/cncbook/en/Ch09_3DCutterCompensation.html
+- Insert shims and straight pipe threads (`app/threadguide.js`): **[MMC_SHIM]** https://www.mmc-carbide.com/us/technical_information/tec_turning_tools/tec_threading/guide/tec_threading_select_mmt ; **[ISCAR_TH]** https://iscar.com/Catalogs/flipview/reference-user-guides/Threading_Handbook/files/basic-html/page36.html ; **[CPC_PIPE]** https://www.cpcworldwide.com/Portals/0/Downloadable-Content/COR/Literature/White-Papers/CPC-Pipe-Thread-Types-and-Designations-White-Paper.pdf
+
+### Searched, nothing usable found
+- UNR external minor diameter limits: no public formula or table beyond ASME B1.1 itself (engineersedge forum, AMESweb read).
+- Involute spline fit class tolerances (ANSI B92.1, ISO 4156): only the standards and Machinery's Handbook print them; Kroczak and Dudziak, WCE 2011 (https://www.iaeng.org/publication/WCE2011/WCE2011_pp2361-2363.pdf) names the fit classes but gives no deviations.
+- MJ thread profile: only the paywalled SAE MA1370 / ISO 5855.

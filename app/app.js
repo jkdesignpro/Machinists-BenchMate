@@ -66,8 +66,22 @@ const Favs = (() => {
     has: id => ids.includes(id),
     toggle: id => { ids = ids.includes(id) ? ids.filter(x => x !== id) : ids.concat(id); save(); },
     pages: () => ids.map(id => PAGES[id]).filter(Boolean),
+    // Move a favourite one place up (d = -1) or down (d = 1).
+    move: (id, d) => { const i = ids.indexOf(id), j = i + d; if (i < 0 || j < 0 || j >= ids.length) return; [ids[i], ids[j]] = [ids[j], ids[i]]; save(); },
   };
 })();
+// The order of the workspaces in the side panel, as the user arranged it (bm.wsorder); new ones go last.
+function wsOrdered() {
+  let o = lsJson('bm.wsorder', []); if (!Array.isArray(o)) o = [];
+  const known = WORKSPACES.map(w => w.id), seq = o.filter(id => known.includes(id)).concat(known.filter(id => !o.includes(id)));
+  return seq.map(id => WORKSPACES.find(w => w.id === id));
+}
+function wsMove(id, d) {
+  const seq = wsOrdered().map(w => w.id), i = seq.indexOf(id), j = i + d;
+  if (i < 0 || j < 0 || j >= seq.length) return;
+  [seq[i], seq[j]] = [seq[j], seq[i]]; lsPut('bm.wsorder', seq);
+}
+let RAIL_ARRANGE = false;
 const Recents = (() => {
   let ids = lsJson('bm.recent', []); if (!Array.isArray(ids)) ids = [];
   return {
@@ -130,8 +144,12 @@ function wsOfPage(id) {
   if (cur && lists(cur)) return cur.id;
   const h = PAGE_HOME[id]; return h ? h.ws : '';
 }
+// Workspaces the user closed by clicking their open heading. Cleared when the page changes, so opening a
+// tool (from search, a link or the home page) shows its workspace again.
+const RAIL_SHUT = new Set(); let RAIL_LAST = '';
 function renderRail() {
   const list = $('#list'); const r = state.route; list.innerHTML = '';
+  const rk = r.kind + ':' + (r.id || ''); if (rk !== RAIL_LAST) { RAIL_SHUT.clear(); RAIL_LAST = rk; }
   const add = el => { list.appendChild(el); return el; };
   const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; };
   const pageBtn = p => {
@@ -142,21 +160,54 @@ function renderRail() {
   };
   const home = add(mk('button', 'rw' + (r.kind === 'home' ? ' on' : ''), icon('home') + '<span>Home</span>'));
   home.dataset.ws = 'home'; home.onclick = () => go('#/home');
+  // Arrange: arrows move a favourite or a workspace up or down; the order is kept.
+  const arrows = (up, down, name) => {
+    const box = mk('span', 'rmv');
+    [['up', -1, up], ['down', 1, down]].forEach(([ic, d, ok]) => {
+      const b = mk('button', 'ib', icon(ic)); b.title = 'Move ' + name + (d < 0 ? ' up' : ' down'); b.setAttribute('aria-label', b.title); b.disabled = !ok; b.dataset.d = d; box.appendChild(b);
+    });
+    return box;
+  };
+  const head = (txt, arr) => {
+    const h = add(mk('h3', arr ? 'rhd' : '', '<span>' + txt + '</span>'));
+    if (arr) {
+      const b = mk('button', 'rarr', RAIL_ARRANGE ? 'Done' : 'Arrange'); b.title = RAIL_ARRANGE ? 'Stop arranging' : 'Change the order of the favourites and the workspaces';
+      b.onclick = () => { RAIL_ARRANGE = !RAIL_ARRANGE; renderRail(); }; h.appendChild(b);
+    }
+    return h;
+  };
   const favs = Favs.pages().filter(pageShown);
-  if (favs.length) { add(mk('h3', '', 'Favourites')); favs.forEach(p => add(pageBtn(p))); }
+  if (favs.length) {
+    head('Favourites', state.mode === 'simple');
+    favs.forEach((p, i) => {
+      const row = add(pageBtn(p));
+      if (RAIL_ARRANGE) { const a = arrows(i > 0, i < favs.length - 1, p.title); a.querySelectorAll('button').forEach(b => b.onclick = () => { Favs.move(p.id, +b.dataset.d); renderRail(); }); row.appendChild(a); }
+    });
+  }
   if (state.mode === 'simple') {
     add(mk('h3', '', 'Everyday tools'));
     SIMPLE_PAGES.map(id => PAGES[id]).filter(Boolean).forEach(p => add(pageBtn(p)));
     add(mk('p', 'railnote', 'Simple mode shows the everyday tools. Switch to Advanced for all ' + Object.keys(PAGES).length + '.'));
     return;
   }
-  add(mk('h3', '', 'Workspaces'));
+  head('Workspaces', true);
   const openWs = r.kind === 'ws' ? r.id : (r.kind === 'tool' ? wsOfPage(r.id) : '');
-  WORKSPACES.forEach(w => {
-    const open = w.id === openWs;
+  const wsList = wsOrdered();
+  wsList.forEach((w, wi) => {
+    if (RAIL_ARRANGE) {
+      const row = add(mk('div', 'li rwa', icon(w.icon) + '<span>' + hesc(w.name) + '</span>'));
+      const a = arrows(wi > 0, wi < wsList.length - 1, w.name); a.querySelectorAll('button').forEach(b => b.onclick = () => { wsMove(w.id, +b.dataset.d); renderRail(); }); row.appendChild(a);
+      return;
+    }
+    const open = w.id === openWs && !RAIL_SHUT.has(w.id);
     const b = add(mk('button', 'rw' + (r.kind === 'ws' && r.id === w.id ? ' on' : '') + (open ? ' open' : ''), icon(w.icon) + '<span>' + hesc(w.name) + '</span>' + icon(open ? 'down' : 'right', 'chev')));
     b.dataset.ws = w.id; b.setAttribute('aria-expanded', open ? 'true' : 'false');
-    b.onclick = () => go('#/w/' + w.id);
+    // A click on the open workspace closes it; a click on a closed one opens it (and its page).
+    b.onclick = () => {
+      if (open) { RAIL_SHUT.add(w.id); renderRail(); return; }
+      if (w.id === openWs) { RAIL_SHUT.delete(w.id); renderRail(); return; }
+      go('#/w/' + w.id);
+    };
     if (!open) return;
     const box = add(mk('div', 'rsec'));
     w.sections.forEach(([name, ids]) => {
@@ -170,17 +221,85 @@ function renderRail() {
 }
 
 // ---- Search (top bar) ----
-function searchHits(q) {
+// 0.8.0. A tool is found by its title first, then by the everyday words machinists use for it (SEARCH_KEYS),
+// then by its description. Under each tool come the sections inside it whose headings match (the index built
+// by scripts/build_search.py: headings only, never body text, so a common word does not flood the list).
+// A thread size (M12, M10 x 1.25, 1/4-20) goes straight to Thread data with that size.
+let SEARCH_IDX = null;
+function loadSearchIdx() { if (SEARCH_IDX) return; SEARCH_IDX = {}; fetch('data/searchindex.json').then(r => r.json()).then(j => {
+  SEARCH_IDX = j || {};
+  // The first search may have run before the index arrived: run it again so the sections show.
+  const inp = document.getElementById('search'); if (inp && inp.value.trim() && document.activeElement === inp) inp.dispatchEvent(new Event('input'));
+}).catch(() => {}); }
+const SEARCH_KEYS = {
+  advmill: 'feeds and speeds sfm surface speed chip load ipt ipm end mill feed rate cutting data',
+  advturn: 'feeds and speeds sfm surface speed css insert feed per rev ipr lathe cutting data',
+  advdrill: 'feeds and speeds sfm ipr drill feed cutting data', advream: 'reamer feeds and speeds', advtap: 'tapping speed tap feed rigid tapping',
+  advplunge: 'plunge milling z axis roughing', rpm: 'rpm sfm surface speed spindle speed', feeds: 'ipm ipr ipt feed rate conversion',
+  threaddata: 'thread sizes pitch diameter tap size major minor unc unf metric', drills: 'drill sizes number letter fractional tap drill chart',
+  chipthinning: 'radial chip thinning rcte hsm adaptive', helix: 'helical interpolation ramping', deflection: 'end mill deflection stick-out',
+  chatter: 'stability lobes vibration', surfacefin: 'ra finish nose radius cusp scallop', bandsaw: 'band saw cut time', weight: 'stock weight mass', stocksizes: 'profile extrusion box section shs rhs chs hss square rectangular round tube pipe angle iron l bar ipe i-beam beam channel pfc flat bar t-slot 8020 aluminium aluminum extrusion steel sizes',
+  fitlookup: 'iso fits h7 g6 tolerance hole shaft', prefnum: 'renard r5 r10 r20 r40 r80 preferred numbers', backlash: 'lost motion play reversal backlash compensation worm gear', millstrat: 'trochoidal adaptive hem hsm high efficiency dynamic milling toolpath strategy plunge high feed', gmcodes: 'g codes m codes g-code',
+};
+// 0.8.0: a misspelt word ("threding", "trocoidal") is matched to the nearest word in the tool titles and
+// everyday words when nothing matches as typed: one letter off for short words, two for words of seven or more.
+function editDist(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]; let lo = i;
+    for (let j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); lo = Math.min(lo, cur[j]); }
+    if (lo > max) return max + 1; prev = cur;
+  }
+  return prev[b.length];
+}
+let searchVocab = null;
+function fixSearchWords(q) {
+  if (!searchVocab) {
+    const v = new Set(); const add = t => String(t || '').toLowerCase().split(/[^a-z0-9]+/).forEach(w => { if (w.length >= 3) v.add(w); });
+    Object.values(PAGES).forEach(p => { add(p.title); add(p.desc); }); TOOLS.forEach(t => add(t.title)); Object.values(SEARCH_KEYS).forEach(add);
+    searchVocab = [...v];
+  }
+  return q.split(/\s+/).map(w => {
+    if (w.length < 4 || searchVocab.includes(w)) return w;
+    const max = w.length >= 7 ? 2 : 1; let best = w, bd = max + 1;
+    searchVocab.forEach(c => { const d = editDist(w, c, max); if (d < bd || (d === bd && c.length < best.length)) { bd = d; best = c; } });
+    return bd <= max ? best : w;
+  }).join(' ');
+}
+function searchHits(q, fixed) {
   q = q.trim().toLowerCase(); if (!q) return [];
+  if (!fixed) { const hits = searchHits(q, true); if (hits.length) return hits; const f = fixSearchWords(q); return f !== q ? searchHits(f, true).map(h => Object.assign({ fixed: f }, h)) : []; }
+  loadSearchIdx();
   const words = q.split(/\s+/), out = [];
-  const score = (title, rest) => { const t = title.toLowerCase(), all = t + ' ' + rest.toLowerCase(); if (!words.every(w => all.includes(w))) return 0; return (t.startsWith(q) ? 4 : 0) + (t.includes(q) ? 3 : 0) + (words.every(w => t.includes(w)) ? 2 : 0) + 1; };
+  // Whole-word start counts for more than a match inside a word ("tap" finds "Tapping" before "Spline taper").
+  const starts = (t, w) => new RegExp('(^|[^a-z0-9])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(t);
+  const score = (title, keys, rest) => {
+    const t = title.toLowerCase(), k = (keys || '').toLowerCase(), all = t + ' ' + k + ' ' + rest.toLowerCase();
+    if (!words.every(w => all.includes(w))) return 0;
+    return (t.startsWith(q) ? 6 : 0) + (t.includes(q) ? 3 : 0) + words.filter(w => starts(t, w)).length * 2 + (words.every(w => t.includes(w)) ? 2 : 0) + (words.every(w => starts(k, w)) ? 3 : 0) + 1;
+  };
+  const inside = (id, title) => ((SEARCH_IDX || {})[id] || []).filter(h => { const t = h[1].toLowerCase(); return words.every(w => t.includes(w)); }).slice(0, 3)
+    .map(h => ({ id, anchor: h[0], title: h[1], sub: 'In ' + title, child: true }));
+  // A thread size typed straight in.
+  const th = q.match(/^m\s?(\d+(?:\.\d+)?)(?:\s*x\s*(\d+(?:\.\d+)?))?$/) || q.match(/^(#?\d+(?:\/\d+)?(?:-\d+\/\d+)?)\s*-\s*(\d+)(?:\s*(unc|unf|unef))?$/);
+  if (th && PAGES.threaddata && pageShown(PAGES.threaddata)) out.push({ s: 50, id: 'threaddata', thread: q, title: 'Thread data and limits: ' + q.toUpperCase(), sub: 'Open this size', icon: PAGES.threaddata.icon });
   Object.values(PAGES).forEach(p => {
     if (!pageShown(p)) return;
-    const s = score(p.title, p.desc || ''); if (s) out.push({ s: s + 0.5, id: p.id, title: p.title, sub: p.desc, icon: p.icon });
-    pageTabs(p).forEach(tb => { const st = score(tb.tool.title, (tb.tool.desc || '') + ' ' + tb.label + ' ' + (tb.tool.group || '')); if (st) out.push({ s: st, id: tb.id, title: tb.tool.title, sub: 'In ' + p.title, icon: p.icon }); });
-    if (!p.tabs && p.tool && !s) { const sg = score('', p.tool.group || ''); if (sg) out.push({ s: 0.5, id: p.id, title: p.title, sub: p.desc, icon: p.icon }); }
+    const s = score(p.title, SEARCH_KEYS[p.id], p.desc || ''), kids = inside(p.id, p.title);
+    if (s || kids.length) out.push({ s: (s ? s + 0.5 : 0.4) + kids.length * 0.3, id: p.id, title: p.title, sub: p.desc, icon: p.icon, kids });
+    pageTabs(p).forEach(tb => { const st = score(tb.tool.title, SEARCH_KEYS[tb.tool.id], (tb.tool.desc || '') + ' ' + tb.label + ' ' + (tb.tool.group || '')); if (st) out.push({ s: st, id: tb.id, title: tb.tool.title, sub: 'In ' + p.title, icon: p.icon }); });
+    if (!p.tabs && p.tool && !s && !kids.length) { const sg = score('', '', p.tool.group || ''); if (sg) out.push({ s: 0.5, id: p.id, title: p.title, sub: p.desc, icon: p.icon }); }
   });
-  return out.sort((a, b) => b.s - a.s || a.title.localeCompare(b.title)).slice(0, 14);
+  // Tools in order, each followed by the sections inside it that match; at most 12 tools.
+  const tools = out.sort((a, b) => b.s - a.s || a.title.localeCompare(b.title)).slice(0, 12), flat = [];
+  tools.forEach(h => { flat.push(h); (h.kids || []).forEach(k => flat.push(Object.assign({ icon: h.icon }, k))); });
+  return flat;
+}
+// Open a section inside a page: open the page, then scroll to the heading once it is drawn.
+function openAnchor(id, anchor) {
+  openTool(id);
+  let n = 0; const t = setInterval(() => { const e = document.getElementById(anchor); if (e || ++n > 40) { clearInterval(t); if (e) e.scrollIntoView({ block: 'start', behavior: 'smooth' }); } }, 75);
 }
 function initSearch() {
   const inp = $('#search'), pop = $('#searchpop'); let hits = [], sel = 0;
@@ -190,12 +309,20 @@ function initSearch() {
     if (!q.trim()) { close(); return; }
     pop.hidden = false;
     if (/#\/t\/\S+/.test(q)) { pop.innerHTML = '<div class="shn">Press Enter to open this link.</div>'; return; }
-    pop.innerHTML = hits.length ? hits.map((h, i) => '<button class="sh' + (i === sel ? ' on' : '') + '" data-i="' + i + '">' + icon(h.icon) + '<span><b>' + hesc(h.title) + '</b><small>' + hesc(h.sub || '') + '</small></span></button>').join('')
-      : '<div class="shn">No tool matches' + (state.mode === 'simple' ? ' in Simple mode. Switch to Advanced to search every tool.' : '.') + '</div>';
+    pop.innerHTML = (hits.length && hits[0].fixed ? '<div class="shn">Nothing for "' + hesc(q.trim()) + '"; showing <b>' + hesc(hits[0].fixed) + '</b></div>' : '') + (hits.length ? hits.map((h, i) => '<button class="sh' + (h.child ? ' kid' : '') + (i === sel ? ' on' : '') + '" data-i="' + i + '">' + (h.child ? '<span class="shk">§</span>' : icon(h.icon)) + '<span><b>' + hesc(h.title) + '</b><small>' + hesc(h.sub || '') + '</small></span></button>').join('')
+      : '<div class="shn">No tool matches' + (state.mode === 'simple' ? ' in Simple mode. Switch to Advanced to search every tool.' : '.') + '</div>');
   };
-  const pick = i => { const h = hits[i]; if (!h) return; inp.value = ''; close(); inp.blur(); openTool(h.id); };
-  inp.oninput = () => { sel = 0; paint(); };
-  inp.onfocus = paint;
+  const pick = i => { const h = hits[i]; if (!h) return; inp.value = ''; close(); inp.blur(); if (h.thread) { window.PENDING_THREAD = h.thread; openTool(h.id); } else if (h.anchor) openAnchor(h.id, h.anchor); else openTool(h.id); };
+  // On the Mac the app runs at tauri://localhost, and the system AutoFill offers any password saved for
+  // "localhost" (another app's, for one) in the first text box it finds, as a chip over the box that cannot be removed.
+  // The box stays read-only until it is clicked or focused, so AutoFill does not take it for a login box,
+  // and anything AutoFill put in before the first keystroke is cleared.
+  let typed = false;
+  const wake = () => { inp.readOnly = false; if (!typed && inp.value) inp.value = ''; };
+  inp.addEventListener('pointerdown', wake);
+  if (inp.value) inp.value = '';
+  inp.oninput = () => { typed = true; sel = 0; paint(); };
+  inp.onfocus = () => { wake(); paint(); };
   inp.onkeydown = e => {
     if (e.key === 'ArrowDown') { sel = Math.min(sel + 1, hits.length - 1); paint(); e.preventDefault(); }
     else if (e.key === 'ArrowUp') { sel = Math.max(sel - 1, 0); paint(); e.preventDefault(); }
@@ -203,7 +330,7 @@ function initSearch() {
     else if (e.key === 'Escape') { inp.value = ''; close(); inp.blur(); }
   };
   pop.onmousedown = e => { const b = e.target.closest('.sh'); if (b) { e.preventDefault(); pick(+b.dataset.i); } };
-  inp.onblur = () => setTimeout(close, 120);
+  inp.onblur = () => { inp.readOnly = true; setTimeout(close, 120); };
 }
 
 // ---- Main area ----
@@ -273,6 +400,14 @@ function renderPage(main, page, tabId) {
   $$('.tabs button', wrap).forEach(b => b.onclick = () => go('#/t/' + page.id + '/' + b.dataset.tab));
   main.appendChild(wrap);
   const acts = $('.tpa', wrap), body = $('.tpb', wrap);
+  // What is this for? (0.8.0): a folded plain explanation on the less familiar tools; open or shut is remembered per tool.
+  const ab = typeof ABOUT !== 'undefined' && ABOUT[t.id];
+  if (ab) {
+    const d = document.createElement('details'); d.className = 'about'; d.dataset.kept = '1'; d.open = lsGet('bm.about.' + t.id) === '1';
+    d.innerHTML = '<summary>What is this for?</summary><div class="aboutb">' + ab.use + '</div>';
+    $('summary', d).addEventListener('click', () => setTimeout(() => lsSet('bm.about.' + t.id, d.open ? '1' : '0')));
+    body.appendChild(d);
+  }
   const act = (name, title, fn, cls) => { const b = document.createElement('button'); b.className = 'ib ' + (cls || ''); b.innerHTML = icon(name); b.title = title; b.setAttribute('aria-label', title); b.onclick = fn; acts.appendChild(b); return b; };
   const why = document.createElement('details'); why.className = 'why';
   why.innerHTML = '<summary>Formula and sources</summary><div class="whyb"><p><b>' + (t.render ? 'Note' : 'Working') + ':</b> <span class="w"></span></p><p><b>Sources:</b> <span class="s"></span></p></div>';
@@ -319,6 +454,75 @@ function renderPage(main, page, tabId) {
   if (state.mode === 'expert') openDetails(main);
 }
 // Expert mode opens every evidence table a tool keeps folded. Tools that redraw are caught by the observer.
+// Sources sit under their own folded "Sources" header on every page, so the pages read cleanly.
+// The pass runs after every redraw: a guide's source list, a "Sources" note, a table's Sources column
+// and the source keys after each statement. The keys and columns show again when the reader ticks the
+// box in any Sources fold (one setting for every page). "to be verified" always stays in view.
+// Find box for a long list: type to narrow it, click or Enter to pick. The list itself stays a normal drop-down.
+function listFind(sel, options, anchor) {
+  $$('.lfind').forEach(x => x.remove());
+  const box = document.createElement('div'); box.className = 'lfind';
+  box.innerHTML = '<input type="text" placeholder="Type to find" aria-label="Find in the list" autocomplete="off" spellcheck="false"><div class="lfl"></div>';
+  const q = $('input', box), list = $('.lfl', box); let hits = [], at = 0;
+  const pick = o => { sel.value = o[0]; sel.dispatchEvent(new Event('change')); box.remove(); sel.focus(); };
+  const draw = () => {
+    const w = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    hits = options.filter(o => w.every(x => String(o[1]).toLowerCase().includes(x))); at = Math.min(at, Math.max(0, hits.length - 1));
+    list.innerHTML = hits.length ? hits.map((o, i) => '<button type="button" data-i="' + i + '"' + (i === at ? ' class="on"' : '') + '>' + hesc(o[1]) + '</button>').join('') : '<div class="shn">Nothing in this list matches.</div>';
+    $$('button', list).forEach(b => b.onmousedown = e => { e.preventDefault(); pick(hits[+b.dataset.i]); });
+  };
+  q.oninput = () => { at = 0; draw(); };
+  q.onkeydown = e => {
+    if (e.key === 'ArrowDown') { at = Math.min(at + 1, hits.length - 1); draw(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { at = Math.max(at - 1, 0); draw(); e.preventDefault(); }
+    else if (e.key === 'Enter') { if (hits[at]) pick(hits[at]); e.preventDefault(); }
+    else if (e.key === 'Escape') { box.remove(); sel.focus(); }
+  };
+  q.onblur = () => setTimeout(() => box.remove(), 150);
+  anchor.after(box); draw(); q.focus();
+}
+function srcFold(title) {
+  const d = document.createElement('details'); d.className = 'srcfold';
+  const sm = document.createElement('summary'); sm.textContent = title || 'Sources'; d.appendChild(sm);
+  const lab = document.createElement('label'); lab.className = 'srcshow';
+  lab.innerHTML = '<input type="checkbox"> Show the source keys beside each statement and in the tables';
+  const cb = lab.firstChild; cb.checked = document.body.classList.contains('showsrc');
+  cb.onchange = () => { setShowSrc(cb.checked); };
+  d.appendChild(lab); return d;
+}
+function setShowSrc(on) {
+  document.body.classList.toggle('showsrc', on); lsSet('bm.showsrc', on ? '1' : '0');
+  $$('.srcshow input').forEach(i => { i.checked = on; });
+}
+function foldSources(root) {
+  if (!root) return;
+  // A guide's list at the bottom: <h2>Sources</h2><ul class="gsl">.
+  $$('h2', root).forEach(h => {
+    if (h.textContent.trim() !== 'Sources' || h.closest('details')) return;
+    const ul = h.nextElementSibling; if (!ul || !ul.matches('ul.gsl')) return;
+    const d = srcFold(); if (h.id) d.id = h.id; h.replaceWith(d); d.appendChild(ul);
+  });
+  // A note with a bold "Sources" heading: the heading and all that follows it fold away.
+  $$('b', root).forEach(b => {
+    if (!/^Sources\b/.test(b.textContent.trim()) || b.closest('details, table, summary')) return;
+    const box = b.parentElement; if (!box || !(box.classList.contains('note') || box.id)) return;
+    const d = srcFold(b.textContent.replace(/:\s*$/, '').trim());
+    const prev = b.previousSibling; if (prev && prev.nodeName === 'BR') box.removeChild(prev);
+    let n = b.nextSibling; if (n && n.nodeName === 'BR') { const x = n; n = n.nextSibling; box.removeChild(x); }
+    const body = document.createElement('div'); body.className = 'srcbody';
+    while (n) { const x = n.nextSibling; body.appendChild(n); n = x; }
+    d.appendChild(body); b.replaceWith(d);
+  });
+  // A table column headed "Sources": hidden with the keys, unless it holds a "to be verified" mark.
+  $$('table', root).forEach(t => {
+    if (t.dataset.sf) return; t.dataset.sf = '1';
+    const hr = t.rows[0]; if (!hr) return;
+    const i = [...hr.cells].findIndex(c => c.textContent.trim() === 'Sources'); if (i < 0) return;
+    const cells = [...t.rows].map(r => r.cells[i]).filter(Boolean);
+    if (cells.some(c => c.querySelector('.gtbv'))) { hr.cells[i].innerHTML = '<span class="sk">Sources</span><span class="nk">Status</span>'; return; }
+    cells.forEach(c => c.classList.add('scol'));
+  });
+}
 function openDetails(root) { $$('details:not([data-kept])', root).forEach(d => { d.open = true; d.dataset.kept = '1'; }); }
 
 // ---- Links with numbers, printing and worked examples ----
@@ -429,7 +633,15 @@ function mountTool(host, t, opts) {
     const row = document.createElement('div'); row.className = 'row';
     let inp;
     // A field with `options: [[value, label], ...]` renders as a drop-down; the value is still a number.
-    if (f.options) { inp = document.createElement('select'); f.options.forEach(([val, txt]) => { const o = document.createElement('option'); o.value = val; o.textContent = txt; inp.appendChild(o); }); }
+    if (f.options) {
+      inp = document.createElement('select');
+      const opt = ([val, txt]) => { const o = document.createElement('option'); o.value = val; o.textContent = txt; return o; };
+      // `common: [values]`: those options first, under "Common", the rest under "More".
+      if (f.common) {
+        const g1 = document.createElement('optgroup'), g2 = document.createElement('optgroup'); g1.label = 'Common'; g2.label = 'More';
+        f.options.forEach(o => (f.common.includes(o[0]) ? g1 : g2).appendChild(opt(o))); inp.append(g1, g2);
+      } else f.options.forEach(o => inp.appendChild(opt(o)));
+    }
     // A field with `slider: { min, max, step, labels }` renders as a slider; the words under it come from `labels`.
     else if (f.slider) { inp = document.createElement('input'); inp.type = 'range'; inp.min = f.slider.min; inp.max = f.slider.max; inp.step = f.slider.step || 1; lab.classList.add('sl'); }
     else { inp = document.createElement('input'); inp.type = 'number'; inp.step = 'any'; inp.inputMode = 'decimal'; }
@@ -437,6 +649,12 @@ function mountTool(host, t, opts) {
     inp.oninput = inp.onchange = () => { saved[f.id] = inp.value; const p = pairOf(f.id); if (p) { src[p.a + p.b] = f.id; saved['_src_' + p.a] = f.id; } saveVals(); update(); };
     const u = document.createElement('span'); u.className = 'u'; u.textContent = f.unit;
     row.append(inp, u);
+    // `search: true` on a list: a find box that narrows a long list as you type.
+    if (f.options && f.search && !mini) {
+      const sb = document.createElement('button'); sb.type = 'button'; sb.className = 'fx fsrch'; sb.innerHTML = icon('search'); sb.title = 'Find in this list'; sb.setAttribute('aria-label', sb.title);
+      sb.onclick = e => { e.preventDefault(); listFind(inp, f.options, row); };
+      row.insertBefore(sb, u);
+    }
     if (f.slider) { const say = () => { u.textContent = sliderWord(f.slider, inp.value); }; inp.addEventListener('input', say); say(); }
     // A field with `lock: true` is one the tool can suggest (t.suggest): blank shows the suggestion, a typed value is locked.
     let lock = null;
@@ -445,7 +663,7 @@ function mountTool(host, t, opts) {
       lock.onclick = e => { e.preventDefault(); inp.value = inp.value !== '' ? '' : (inp.placeholder || ''); saved[f.id] = inp.value; saveVals(); update(); };
       row.appendChild(lock);
     }
-    if (!f.options && !f.slider && !mini && window.BenchCalc) { const cb = document.createElement('button'); cb.type = 'button'; cb.className = 'fx'; cb.innerHTML = icon('calc'); cb.title = 'Work this value out in the calculator'; cb.setAttribute('aria-label', cb.title); cb.tabIndex = -1; cb.onclick = e => { e.preventDefault(); BenchCalc.open(inp); }; row.appendChild(cb); }
+    if (!f.options && !f.slider && !mini && window.BenchCalc) { const cb = document.createElement('button'); cb.type = 'button'; cb.className = 'fx'; cb.innerHTML = icon('calc'); cb.title = 'Work this value out in the calculator'; cb.setAttribute('aria-label', cb.title); cb.tabIndex = -1; cb.onclick = e => { e.preventDefault(); BenchCalc.open(inp); }; row.insertBefore(cb, u); }
     lab.append(span, row);
     // `when(v)`: show the field only when it applies (e.g. to the chosen shape).
     if (f.when) lab.dataset.when = f.id;
@@ -454,16 +672,27 @@ function mountTool(host, t, opts) {
     if (hide) { lab.classList.add('lvhide'); if (saved[f.id] === undefined) inp.dataset.def = f.def; } else shownCount++;
     els[f.id] = { lab, inp, f, lock, u }; return lab;
   };
+  let into = grid;
   fields.forEach(f => {
+    if (f.sec && !mini) {
+      const d = document.createElement('details'); d.className = 'fsec'; d.dataset.kept = '1';
+      const key = 'bm.fsec.' + t.id + '.' + f.sec[0], pref = lsGet(key);
+      d.open = pref ? pref === '1' : !f.sec[1];
+      d.innerHTML = '<summary>' + hesc(f.sec[0]) + '</summary><div class="grid"></div>';
+      d.addEventListener('toggle', () => lsSet(key, d.open ? '1' : '0'));
+      grid.appendChild(d); into = $('.grid', d);
+    }
     const p = pairOf(f.id);
     if (p && f.id === p.b) return;
     if (p && f.id === p.a) {
       const fb = fields.find(x => x.id === p.b), box = document.createElement('div'); box.className = 'pair';
       const sw = document.createElement('span'); sw.className = 'swap'; sw.innerHTML = icon('units'); sw.title = 'Type in either box; the other is worked out';
-      box.append(makeField(f), sw, makeField(fb)); grid.appendChild(box); return;
+      box.append(makeField(f), sw, makeField(fb)); into.appendChild(box); return;
     }
-    grid.appendChild(makeField(f));
+    into.appendChild(makeField(f));
   });
+  // A section with nothing to show in this mode is left out.
+  $$('details.fsec', grid).forEach(d => { d.hidden = !$$('label.f:not(.lvhide)', d).length; });
   const read = () => { const v = {}; fields.forEach(f => { const e = els[f.id].inp; const x = e.dataset.def !== undefined ? e.dataset.def : e.value; v[f.id] = x === '' ? NaN : parseFloat(x); }); return v; };
   let last = [];
   function update() {
@@ -478,7 +707,8 @@ function mountTool(host, t, opts) {
       // A slider that is the worked-out half of a pair shows the true figure beside it (the handle stops at the ends of its track).
       if (els[to].f.slider) els[to].u.textContent = isFinite(out) ? sliderWord(els[to].f.slider, +out.toPrecision(3)) : '';
     });
-    fields.forEach(f => { if (f.when) { let on = true; try { on = !!f.when(v); } catch (e) {} els[f.id].lab.hidden = !on; } });
+    // A field that does not apply stays where it is, greyed out and locked, so the other boxes never move.
+    fields.forEach(f => { if (f.when) { let on = true; try { on = !!f.when(v); } catch (e) {} const e = els[f.id]; e.lab.classList.toggle('na', !on); e.inp.disabled = !on; e.lab.title = on ? '' : 'Not used with the choices made above'; } });
     // Required boxes: a box with a starting value must hold a number.
     fields.forEach(f => { const need = f.def !== '' && !f.options && !pairOf(f.id); els[f.id].lab.classList.toggle('bad', need && !isFinite(v[f.id])); });
     let rows = [];
@@ -489,9 +719,13 @@ function mountTool(host, t, opts) {
     const warn = r => checkRow(r, sys, state.W);
     if (!rows.length) { res.innerHTML = '<div class="rempty">' + icon('info') + '<span>Enter the values ' + (mini ? '' : 'on the left ') + 'to see the result.</span></div>'; }
     else {
-      const hero = rows[0], w0 = warn(hero), rest = rows.slice(1, mini ? 3 : rows.length);
-      const longTxt = typeof hero.value === 'string' && hero.value.length > 24;
-      res.innerHTML = '<div class="hero rrow' + (w0 ? ' over' : '') + (longTxt ? ' txt' : '') + '"><div class="hl">' + hero.label + '</div><div class="hv"><b>' + fmt(hero.value, dp(hero)) + '</b><span>' + hero.unit + '</span></div>' + (w0 ? '<div class="wmsg">' + icon('info') + w0 + '</div>' : '') + '</div>' +
+      // The headline: the first row, and beside it any row marked `big` (feed as plain to see as speed).
+      // A big row may carry a short headline label `hl` and a note `hsub` (where the figure came from).
+      const heroes = [rows[0]].concat(mini ? [] : rows.slice(1).filter(r => r.big));
+      const rest = rows.slice(1).filter(r => mini || !r.big).slice(0, mini ? 2 : rows.length);
+      const w0 = warn(rows[0]), longTxt = typeof rows[0].value === 'string' && rows[0].value.length > 24;
+      const heroItem = (r, i) => { const w = i ? warn(r) : w0; return '<div class="hi' + (i ? ' h2' : '') + (w && heroes.length > 1 ? ' over' : '') + '"><div class="hl">' + (r.hl || r.label) + '</div><div class="hv"><b>' + fmt(r.value, dp(r)) + '</b><span>' + r.unit + '</span></div>' + (r.hsub ? '<div class="hsub">' + r.hsub + '</div>' : '') + (w ? '<div class="wmsg">' + icon('info') + w + '</div>' : '') + '</div>'; };
+      res.innerHTML = '<div class="hero rrow' + (w0 && heroes.length < 2 ? ' over' : '') + (longTxt ? ' txt' : '') + (heroes.length > 1 ? ' multi' : '') + '">' + heroes.map(heroItem).join('') + '</div>' +
         (rest.length ? '<table>' + rest.map(r => { const w = warn(r); return '<tr class="rrow' + (w ? ' over' : '') + '"><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v' + (typeof r.value === 'string' && r.value.length > 24 ? ' txt' : '') + (r.value === 'PASS' || r.value === 'OK' ? ' good' : r.value === 'FAIL' ? ' fail' : '') + '">' + fmt(r.value, dp(r)) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>' : '');
     }
     // Suggested values for the lock fields: shown in the empty box; a typed value is the user's and is kept.
@@ -534,8 +768,9 @@ function mountTool(host, t, opts) {
     if (!mini && t.table) {
       let tb = null; try { tb = rows.length ? t.table(v, state.W, sys, dpAdj) : null; } catch (e) { tb = null; }
       if (tb && tb.rows.length) {
-        const box = document.createElement('div'); box.className = 'rtab' + (tb.text ? ' text' : '');
-        box.innerHTML = '<div class="rtabh"><span>' + hesc(tb.title || '') + '</span></div><div class="rtabs"><table><thead><tr>' + tb.head.map(h => '<th>' + hesc(h) + '</th>').join('') + '</tr></thead><tbody>' +
+        const box = document.createElement(tb.fold ? 'details' : 'div'); box.className = 'rtab' + (tb.text ? ' text' : '') + (tb.fold ? ' fold' : '');
+        if (tb.fold) { box.open = lsGet('bm.rtabfold') === '1'; box.dataset.kept = '1'; box.addEventListener('toggle', () => lsSet('bm.rtabfold', box.open ? '1' : '0')); }
+        box.innerHTML = '<' + (tb.fold ? 'summary' : 'div') + ' class="rtabh"><span>' + hesc(tb.title || '') + '</span></' + (tb.fold ? 'summary' : 'div') + '><div class="rtabs"><table><thead><tr>' + tb.head.map(h => '<th>' + hesc(h) + '</th>').join('') + '</tr></thead><tbody>' +
           tb.rows.map(r => '<tr>' + r.map((c, i) => '<td' + (i ? ' class="v"' : '') + '>' + hesc(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
         (tb.copies || []).forEach(([label, text]) => { const b = document.createElement('button'); b.className = 'btn sm'; b.type = 'button'; b.innerHTML = icon('copy') + '<span>' + hesc(label) + '</span>'; b.onclick = () => copyText(text); $('.rtabh', box).appendChild(b); });
         res.appendChild(box);
@@ -633,6 +868,35 @@ if (['on', 'off', 'auto'].includes(lsGet('bm.compact'))) state.compactPref = lsG
 function dpAllPref() { const n = +lsGet('bm.dpall'); return [-1, 0, 1, 2].includes(n) ? n : 0; }
 function dpTotal(own) { return Math.max(-3, Math.min(4, (own || 0) + dpAllPref())); }
 
+// Settings export and import: every bm.* key of this browser (units, mode, theme, favourites, dashboard,
+// tool library, machine profiles, saved inputs, sketches...) in one JSON file.
+function settingsData() {
+  const data = {};
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('bm.')) data[k] = localStorage.getItem(k); } } catch (e) {}
+  return data;
+}
+function exportSettings() {
+  const data = settingsData(), day = new Date().toISOString().slice(0, 10);
+  saveFile('benchmate-settings-' + day + '.json', JSON.stringify({ app: 'Machinists BenchMate', kind: 'settings', version: $('#ver').textContent, saved: new Date().toISOString(), data }, null, 1), 'application/json');
+  toast(Object.keys(data).length + ' settings saved to a file');
+}
+// Read a settings file; returns { data, n } or throws with a plain reason.
+function readSettingsFile(text) {
+  let j; try { j = JSON.parse(text); } catch (e) { throw new Error('This is not a BenchMate settings file (not JSON).'); }
+  if (!j || j.app !== 'Machinists BenchMate' || j.kind !== 'settings' || !j.data || typeof j.data !== 'object') throw new Error('This is not a BenchMate settings file.');
+  const data = {};
+  Object.entries(j.data).forEach(([k, v]) => { if (k.startsWith('bm.') && typeof v === 'string') data[k] = v; });
+  return { data, n: Object.keys(data).length, version: String(j.version || ''), saved: String(j.saved || '').slice(0, 10) };
+}
+// Replace this browser's settings with the file's, then start again.
+function applySettings(data) {
+  try {
+    Object.keys(settingsData()).forEach(k => localStorage.removeItem(k));
+    Object.entries(data).forEach(([k, v]) => localStorage.setItem(k, v));
+  } catch (e) { toast('Could not write the settings: ' + e.message); return false; }
+  location.reload(); return true;
+}
+
 function initMenu() {
   const btn = $('#menubtn'), pop = $('#menupop');
   const seg = (id, opts, cur) => '<div class="seg" id="' + id + '">' + opts.map(([v, l]) => '<button data-v="' + v + '"' + (v === cur ? ' class="on"' : '') + '>' + l + '</button>').join('') + '</div>';
@@ -648,6 +912,8 @@ function initMenu() {
       '<button class="mlink" data-go="#/news">' + icon('book') + 'What\'s new</button>' +
       '<button class="mlink" data-go="#/t/machines">' + icon('machine') + 'Machine profiles</button>' +
       '<button class="mlink" data-go="#/t/toollib">' + icon('toollib') + 'Tool library</button>' +
+      '<div class="mrow msets"><span>Settings</span><div class="seg"><button id="msetexp" title="Save every setting, favourite, dashboard, tool, machine and saved input to a file">Save to file</button><button id="msetimp" title="Replace the settings here with those in a saved file">Load file</button></div><input type="file" id="msetfile" accept=".json,application/json" hidden></div>' +
+      '<div id="msetask"></div>' +
       '<div class="mabout">Machinists BenchMate ' + hesc($('#ver').textContent) + '. Open source, AGPL-3.0. Results are a guide: check them before you cut.</div>';
     $$('#mtheme button', pop).forEach(b => b.onclick = () => { lsSet('bm.theme', b.dataset.v); setTheme(b.dataset.v); paint(); if (state.route.kind !== 'home') renderMain(); });
     const accent = c => { lsSet('bm.accent', c); setAccent(c); };
@@ -659,6 +925,24 @@ function initMenu() {
     $$('#mmode button', pop).forEach(b => b.onclick = () => { setMode(b.dataset.v); paint(); });
     $$('#munits button', pop).forEach(b => b.onclick = () => { setUnits(b.dataset.v); paint(); });
     $$('.mlink', pop).forEach(b => b.onclick = () => { pop.hidden = true; go(b.dataset.go); });
+    $('#msetexp', pop).onclick = exportSettings;
+    $('#msetimp', pop).onclick = () => $('#msetfile', pop).click();
+    $('#msetfile', pop).onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        const box = $('#msetask', pop);
+        try {
+          const r = readSettingsFile(String(rd.result));
+          box.innerHTML = '<div class="mask">Replace the settings here with the ' + r.n + ' in ' + hesc(f.name) + (r.saved ? ' (saved ' + hesc(r.saved) + (r.version ? ', ' + hesc(r.version) : '') + ')' : '') + '? What is here now is lost; save it to a file first if you want it.' +
+            '<div class="seg"><button id="msetyes">Replace</button><button id="msetno">Cancel</button></div></div>';
+          $('#msetyes', box).onclick = () => applySettings(r.data);
+          $('#msetno', box).onclick = () => { box.innerHTML = ''; };
+        } catch (x) { box.innerHTML = '<div class="mask warn">' + hesc(x.message) + '</div>'; }
+        e.target.value = '';
+      };
+      rd.readAsText(f);
+    };
   };
   btn.onclick = e => { e.stopPropagation(); pop.hidden = !pop.hidden; if (!pop.hidden) paint(); };
   pop.addEventListener('click', e => e.stopPropagation());
@@ -670,7 +954,7 @@ async function boot() {
   const resp = await fetch('benchmate.wasm');
   const { instance } = await WebAssembly.instantiate(await resp.arrayBuffer(), {});
   state.W = instance.exports;
-  $('#ver').textContent = 'v0.7.0';
+  $('#ver').textContent = 'v0.8.0';
   refreshMachineSelect();
   $('#machine').onchange = e => { Profiles.setActive(e.target.value); renderMain(); };
   $$('#mode button').forEach(b => b.onclick = () => setMode(b.dataset.m));
@@ -678,8 +962,13 @@ async function boot() {
   $$('#units button').forEach(b => { const on = b.dataset.u === state.sys; b.classList.toggle('on', on); });
   document.documentElement.dataset.mode = state.mode;
   $$('#mode button').forEach(b => { const on = b.dataset.m === state.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
-  new MutationObserver(() => { if (state.mode === 'expert' && state.route.kind === 'tool') openDetails($('#main')); }).observe($('#main'), { childList: true, subtree: true });
+  document.body.classList.toggle('showsrc', lsGet('bm.showsrc') === '1');
+  new MutationObserver(() => { foldSources($('#main')); if (typeof enhanceThreadSelect === 'function') document.querySelectorAll('#main select#hk, #main select#tk, #main select#qk, #main select#lk').forEach(enhanceThreadSelect); if (state.mode === 'expert' && state.route.kind === 'tool') openDetails($('#main')); }).observe($('#main'), { childList: true, subtree: true });
   initSearch(); initMenu(); applyCompact();
+  // Offline use of the web version (app/sw.js). Not in the desktop app, whose files are local anyway,
+  // and not under automated testing, so a test always sees the files on disk.
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.__TAURI_INTERNALS__ && location.hostname !== 'tauri.localhost' && !navigator.webdriver)
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   addEventListener('resize', applyCompact);
   $('#calcbtn').onclick = () => { if (BenchCalc.isOpen) BenchCalc.close(); else BenchCalc.open(); };
   $('#railbtn').onclick = () => document.body.classList.toggle('railopen');

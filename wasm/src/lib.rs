@@ -415,10 +415,10 @@ pub extern "C" fn engrave_layout(len: f64, cap_h: f64, spacing: f64, line: f64, 
 /// bytes goes in the header. Read it with the `cyc_*` calls. Returns 1 if a
 /// program was made, 0 on error.
 #[no_mangle] #[allow(clippy::too_many_arguments)]
-pub extern "C" fn engrave_program(len: f64, metric: f64, ctrl: f64, prog: f64, tool: f64, wcs: f64, rpm: f64, feed: f64, plunge: f64, z_safe: f64, depth: f64, coolant: f64) -> f64 {
+pub extern "C" fn engrave_program(len: f64, metric: f64, ctrl: f64, prog: f64, tool: f64, wcs: f64, rpm: f64, feed: f64, plunge: f64, z_safe: f64, depth: f64, coolant: f64, arc_tol: f64) -> f64 {
     let u = |v: f64| if v.is_finite() && v > 0.0 { v.round() as u32 } else { 0 };
     let p = c::gcode::gen_engrave(&c::gcode::EngraveJob { metric: metric != 0.0, ctrl: c::gcode::Ctrl::from_f(ctrl), prog: u(prog), tool: u(tool).max(1), wcs: u(wcs).clamp(54, 59),
-        rpm, feed, plunge, z_safe, depth, coolant: coolant != 0.0, text: eng_in(len), strokes: eng_laid().map(|l| l.strokes.clone()).unwrap_or_default() });
+        rpm, feed, plunge, z_safe, depth, coolant: coolant != 0.0, text: eng_in(len), strokes: eng_laid().map(|l| l.strokes.clone()).unwrap_or_default(), arc_tol: if arc_tol.is_finite() && arc_tol > 0.0 { arc_tol } else { 0.0 } });
     let ok = p.error.is_none();
     unsafe { *core::ptr::addr_of_mut!(PROG) = Some(p); }
     if ok { 1.0 } else { 0.0 } }
@@ -434,6 +434,12 @@ f1!(rot_arc_length, c::rotary::arc_length, radius, deg);
 f1!(rot_angle_for_length, c::rotary::angle_for_length, radius, length);
 f1!(rot_deg_per_min, c::rotary::deg_per_min, surface_feed, radius);
 f1!(rot_surface_feed, c::rotary::surface_feed, deg_per_min, radius);
+f1!(bl_lost_motion, c::rotary::lost_motion, start, back);
+f1!(bl_play_to_arcsec, c::rotary::play_to_arcsec, radius, play);
+f1!(bl_arcsec_to_play, c::rotary::arcsec_to_play, radius, arcsec);
+f1!(bl_arcsec_to, c::rotary::arcsec_to, arcsec, unit);
+f1!(bl_gear_centre, c::rotary::gear_backlash_centre, da, alpha_deg, normal);
+f1!(bl_gear_arcmin, c::rotary::gear_angular_arcmin, j, d);
 f1!(rot_move_length, c::rotary::move_length, radius, deg, linear);
 f1!(rot_move_time_s, c::rotary::move_time_s, surface_feed, length);
 f1!(rot_inverse_time_f, c::rotary::inverse_time_f, surface_feed, length);
@@ -521,6 +527,7 @@ f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
 f1!(spot_chamfer_dia, c::spot_chamfer_dia, z, angle);
 f1!(chamfer_mill, c::chamfer_mill, w, angle, tip, clear, dia, which);
 f1!(saw_section, c::saw_section, shape, a, b, nx, ny, which);
+f1!(saw_section_ext, c::saw_section_ext, shape, a, t, hc, nx, ny, which);
 f1!(saw_cut_time, c::saw_cut_time, area, rate);
 f1!(edm_kerf, c::edm_kerf, d, gap);
 f1!(edm_offset, c::edm_offset, d, gap, stock);
@@ -607,6 +614,8 @@ f1!(equiv_dia, c::equiv_dia_f, dw, ds, mode);
 f1!(contact_length, c::contact_length, ae, de);
 f1!(specific_mrr, c::specific_mrr, ae, vw);
 f1!(equiv_chip_um, c::equiv_chip_um, ae, vw, vs);
+f1!(grind_aggr, c::aggressiveness, vw, vs, ae, de);
+f1!(grind_max_chip_um, c::max_chip_um, aggr, cc, r);
 f1!(traverse_speed, c::traverse_speed, fa, nw);
 f1!(overlap_ratio, c::overlap_ratio, bs, fa);
 f1!(traverse_time, c::traverse_time, len, fa, nw, passes);
@@ -941,6 +950,13 @@ fn sk_li(layer: f64) -> usize { if layer >= 0.0 { layer as usize } else { 0 } }
 #[no_mangle] pub extern "C" fn sk_inch() -> f64 { if sk().inch { 1.0 } else { 0.0 } }
 /// The last error or report (lines separated by new lines).
 #[no_mangle] pub extern "C" fn sk_msg() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(SK_MSG)).clone() }) }
+/// Fit arcs to the straight runs of the polylines within `tol`; returns the number of polylines
+/// changed, the report (segments before and after) in `sk_msg`.
+#[no_mangle] pub extern "C" fn sk_fit_arcs(tol: f64) -> f64 {
+    let (n, a, b) = sk().fit_arcs(tol);
+    sk_say(if n == 0 { "No run of straight segments fits an arc within that tolerance.".to_string() } else { format!("{} polyline{} changed: {} segments became {}.", n, if n == 1 { "" } else { "s" }, a, b) });
+    n as f64
+}
 #[no_mangle] pub extern "C" fn sk_set_units(inch: f64, convert: f64) -> f64 { if sk().set_units(inch != 0.0, convert != 0.0) { 1.0 } else { 0.0 } }
 /// Replace the sketch with a DXF file; returns the entity count or -1 (reason in `sk_msg`).
 #[no_mangle] pub extern "C" fn sk_import(len: f64, default_inch: f64) -> f64 {

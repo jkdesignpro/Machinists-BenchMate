@@ -150,16 +150,26 @@ function insDrawing(W, g) {
   }
   let out = '<figure class="insfig"><svg id="itop" viewBox="0 0 ' + TW + ' ' + TH + '" width="' + TW + '" height="' + TH + '" role="img" aria-label="insert ' + g.shape + ' seen from above, to scale">' + top + '</svg><figcaption>Top view, to scale</figcaption></figure>';
   if (g.s > 0) {
+    // Section across the inscribed circle, same scale as the top view: hatched as cut, flanks at the clearance angle,
+    // the fixing hole dashed, the thickness and the inscribed circle dimensioned.
     const base = g.clr >= 0 ? W.insert_base_ic(g.d, g.s, g.clr) : NaN, bw = isFinite(base) ? base : g.d;
-    const SW = 300, SH = Math.max(120, g.s * k + 84), xl = (SW - g.d * k) / 2 - 20, yt = 34, yb = yt + g.s * k, xc = xl + g.d * k / 2;
-    let sec = '<path id="isec" d="M' + f([xl, yt]) + 'L' + f([xl + g.d * k, yt]) + 'L' + f([xc + bw * k / 2, yb]) + 'L' + f([xc - bw * k / 2, yb]) + 'Z" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="2"/>';
-    if (g.hole) sec += '<path d="M' + f([xc - hr * k, yt]) + 'V' + yb.toFixed(1) + 'M' + f([xc + hr * k, yt]) + 'V' + yb.toFixed(1) + '" stroke="currentColor" stroke-dasharray="2 3" opacity=".7"/>' +
-      (g.d1 > 0 ? T(xc, (yt + yb) / 2 + 4, 'd1 ' + fLen(g.d1)) : '');
-    const xr = xl + g.d * k + 16;
-    sec += '<path d="M' + f([xl + g.d * k + 3, yt]) + 'H' + (xr + 4) + 'M' + f([xc + bw * k / 2 + 3, yb]) + 'H' + (xr + 4) + 'M' + xr + ' ' + yt + 'V' + yb.toFixed(1) + '" stroke="currentColor" opacity=".75" fill="none"/>' +
-      T(xr + 6, (yt + yb) / 2 + 4, 's ' + fLen(g.s), 'start') + T(xc, yt - 10, (g.shape === 'R' ? 'Ø ' : 'd ') + fLen(g.d)) +
-      T(xc, yb + 16, g.clr > 0 && isFinite(base) ? 'bottom face ' + fLen(base) + ', flanks ' + g.clr + '°' : g.clr === 0 ? 'flanks square to the face (0°)' : '');
-    out += '<figure class="insfig"><svg id="iside" viewBox="0 0 ' + SW + ' ' + SH.toFixed(0) + '" width="' + SW + '" height="' + SH.toFixed(0) + '" role="img" aria-label="section of the insert, to scale">' + sec + '</svg><figcaption>Section across the inscribed circle, same scale</figcaption></figure>';
+    const SW = 340, SH = Math.round(Math.max(130, g.s * k + 96)), xl = (SW - g.d * k) / 2 - 24, yt = 40, yb = yt + g.s * k, xc = xl + g.d * k / 2;
+    const pts = [[xl, yt], [xl + g.d * k, yt], [xc + bw * k / 2, yb], [xc - bw * k / 2, yb]];
+    let sec = '';
+    if (g.hole && hr > 0) {
+      // Cut on each side of the hole: two hatched pieces, the hole left open.
+      const hx = hr * k, inner = y => [xc - hx, xc + hx];
+      sec += DK.poly([pts[0], [xc - hx, yt], [xc - hx, yb], pts[3]], 'hatch') + DK.poly([[xc + hx, yt], pts[1], pts[2], [xc + hx, yb]], 'hatch');
+      sec += DK.line(xc - hx, yt, xc - hx, yb, 'part') + DK.line(xc + hx, yt, xc + hx, yb, 'part');
+      if (g.d1 > 0) sec += DK.dimH(xc - hx, xc + hx, yb + 22, 'd1 ' + fLen(g.d1), { from: yb, below: true });
+    } else sec += DK.poly(pts, 'hatch');
+    sec += DK.cl(xc, yt - 14, xc, yb + 12);
+    sec += DK.dimH(xl, xl + g.d * k, yt - 18, (g.shape === 'R' ? 'Ø ' : 'd ') + fLen(g.d), { from: yt });
+    sec += DK.dimV(yb, yt, xl + g.d * k + 30, 's ' + fLen(g.s), { from: xl + g.d * k });
+    if (g.clr > 0) sec += DK.line(pts[1][0], pts[1][1], pts[1][0], yb + 6, 'cons') +
+      DK.text(pts[1][0] + 6, yb + 18, 'flanks ' + g.clr + '°', { cls: 'dimt', anchor: 'start' });
+    sec += DK.text(12, SH - 8, g.clr > 0 && isFinite(base) ? 'Bottom face ' + fLen(base) + ' across' : g.clr === 0 ? 'Flanks square to the face (0°)' : '', { cls: 'mut', anchor: 'start' });
+    out += '<figure class="insfig"><div id="iside" style="width:' + SW + 'px;max-width:100%">' + DK.svg(SW, SH, '<g id="isec">' + sec + '</g>', 'Section of the insert, to scale') + '</div><figcaption>Section across the inscribed circle, same scale</figcaption></figure>';
   }
   return '<div class="insdraw">' + out + '</div>';
 }
@@ -325,12 +335,35 @@ async function renderHolderCode(el) {
     'The approach angle here is the ISO convention kr, measured from the work axis (feed direction) to the cutting edge: 90 deg and above is a square shoulder. North American catalogues often give a lead angle instead, measured from the square-on position, so a 15 deg lead is about kr 75. Boring bars (ISO 6261) use another layout and are not decoded here.' +
     '<br><b>Standard:</b> ISO 5608:2012, Turning and copying tool holders and cartridges for indexable inserts: designation (current per iso.org).</div><div class="note" id="hsrc"></div>';
   const hc = $('#hc', el);
-  function kSvg(kr) {
+  // Top view of the holder at the work: the edge at kr to the feed, the insert of the code's shape (nose angle eps),
+  // the cut stock (depth exaggerated) and the shank behind. Shape and angles from the code; sizes are not to scale.
+  function kSvg(kr, eps) {
     if (!isFinite(kr)) return '';
-    const a = kr * Math.PI / 180, cx = 90, cy = 70, L = 55;
-    const ex = cx - L * Math.cos(a), ey = cy - L * Math.sin(a);
-    return '<svg viewBox="0 0 180 120" width="180" height="120" role="img" aria-label="approach angle"><line x1="10" y1="70" x2="170" y2="70" stroke="currentColor" stroke-dasharray="4 3" opacity=".6"/><text x="168" y="64" font-size="9" text-anchor="end" fill="currentColor">work axis, feed</text>' +
-      '<line x1="' + cx + '" y1="' + cy + '" x2="' + ex.toFixed(1) + '" y2="' + ey.toFixed(1) + '" stroke="currentColor" stroke-width="3"/><text x="' + (cx + 6) + '" y="' + (cy + 16) + '" font-size="10" fill="currentColor">kr ' + kr + ' deg</text></svg>';
+    const W0 = 460, H0 = 250, tx = 250, ty = 92, ap = 26, rad = d => d * Math.PI / 180;
+    const e1 = [-Math.cos(rad(kr)), Math.sin(rad(kr))], round = !isFinite(eps);
+    const e = round ? 0 : eps, kr2 = 180 - kr - e, e2 = [Math.cos(rad(kr2)), Math.sin(rad(kr2))], L = 46;
+    const P = (a, k1, b, k2) => [tx + a[0] * k1 + (b ? b[0] * k2 : 0), ty + a[1] * k1 + (b ? b[1] * k2 : 0)];
+    // Uncut stock ahead of the tool (left) stands proud of the finished diameter by ap.
+    const xe = kr >= 90 ? tx : tx + e1[0] * (ap / Math.max(0.2, e1[1]));
+    let h = DK.poly([[30, 26], [430, 26], [430, ty], [tx, ty], [xe, ty + ap], [30, ty + ap]], 'part');
+    h += DK.cl(18, 26, 442, 26) + DK.text(436, 20, 'work axis', { cls: 'mut', anchor: 'end' });
+    h += DK.text(36, 44, 'work, seen from above', { cls: 'mut', anchor: 'start' });
+    let ins, cen;
+    if (round) { const r = 26; cen = [tx, ty + r]; ins = DK.circle(cen[0], cen[1], r, 'tool'); }
+    else if (Math.abs(e - 60) < 1) { const a = P(e1, L), b = P(e2, L); cen = [(tx + a[0] + b[0]) / 3, (ty + a[1] + b[1]) / 3]; ins = DK.poly([[tx, ty], a, b], 'tool'); }
+    else { const a = P(e1, L), c = P(e1, L, e2, L), b = P(e2, L); cen = [(tx + c[0]) / 2, (ty + c[1]) / 2]; ins = DK.poly([[tx, ty], a, c, b], 'tool'); }
+    // Shank: square to the work axis, behind the insert.
+    const sw = 70, sx = Math.max(tx + 6, cen[0] - 30), sy = ty + ap + 4;
+    h += DK.poly([[sx, sy], [sx + sw, sy], [sx + sw, H0 - 26], [sx, H0 - 26]], 'part') + DK.cl(sx + sw / 2, sy + 10, sx + sw / 2, H0 - 20);
+    h += ins + DK.circle(cen[0], cen[1], 4, 'thin') + DK.text(sx + sw + 8, H0 - 40, 'shank', { cls: 'mut', anchor: 'start' });
+    // Feed direction and the angle kr from it to the main edge.
+    h += DK.arrow(tx - 120, ty + ap + 26, tx - 190, ty + ap + 26, 'hot') + DK.text(tx - 196, ty + ap + 30, 'feed', { cls: 'hott', anchor: 'end' });
+    h += DK.line(tx, ty, tx - 70, ty, 'cons') + DK.line(tx, ty, tx + e1[0] * 70, ty + e1[1] * 70, 'thin');
+    h += DK.angle(tx, ty, 36, 180, 180 + kr, '', {}) + DK.text(tx - 44 * Math.cos(rad(kr / 2)) - 4, ty + 44 * Math.sin(rad(kr / 2)) + 12, 'kr ' + kr + '°', { cls: 'dimt', anchor: 'end' });
+    if (!round) h += DK.text(Math.max(cen[0], tx) + 48, ty + 16, 'insert, nose ' + e + '°', { cls: 'mut', anchor: 'start' });
+    h += DK.leader(Math.min(xe, tx) - 110, ty + ap * 0.6, 60, ty + ap + 62, 'stock being cut (depth not to scale)', { anchor: 'start' });
+    h += DK.text(16, H0 - 12, kr <= 90 ? 'Lead angle (North American) = 90 - kr = ' + (90 - kr) + '°' : 'kr above 90°: the edge clears a square shoulder', { cls: 'mut', anchor: 'start' });
+    return DK.svg(W0, H0, h, 'Toolholder seen from above at the work, approach angle kr ' + kr + ' degrees');
   }
   function upd() {
     m.code = hc.value;
@@ -351,7 +384,7 @@ async function renderHolderCode(el) {
       ['8 Tool length <b>' + len + '</b>', '<td class="v">' + (H.length[len] ? fBoth(+H.length[len].value) : '-') + '</td>' + evCell(X.sources, H.length[len])],
       ['9 Insert size <b>' + sz + '</b>', calcCell('<span class="mv">' + (+sz) + ' mm</span> <span class="ms">insert cutting edge length, whole mm</span>', 'matches the insert size code')],
     ];
-    out.innerHTML = '<div class="res"><div class="h">' + rEsc(s) + '</div><div style="padding:8px 12px">' + kSvg(kr) + '</div><table class="codes">' + rowsHtml(rows) + '</table>' +
+    out.innerHTML = '<div class="res"><div class="h">' + rEsc(s) + '</div><div class="tdia" style="padding:8px 12px;max-width:560px">' + kSvg(kr, I.shape[sh] && I.shape[sh].value !== 'round' ? +I.shape[sh].value : NaN) + '</div><table class="codes">' + rowsHtml(rows) + '</table>' +
       '<p class="desc">Insert that fits: ' + rEsc(sh + cr) + '.. ' + rEsc(sz) + ' (shape ' + rEsc(sh) + ', clearance ' + rEsc(cr) + ', size ' + rEsc(sz) + '); the type and thickness depend on the clamping system and the maker.</p></div>';
   }
   hc.oninput = upd;

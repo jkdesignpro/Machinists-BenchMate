@@ -22,7 +22,7 @@ const DK = (() => {
   const f = v => (Math.round(v * 100) / 100).toString();
   const esc = t => String(t).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
   const head = (x, y, ang, cls) => { // arrowhead with its tip at (x, y), pointing along ang (radians)
-    const L = 8, W = 2.6, c = Math.cos(ang), s = Math.sin(ang);
+    const L = 9, W = 2.3, c = Math.cos(ang), s = Math.sin(ang);   // closed filled head, about 15 degrees (ISO 129)
     const bx = x - L * c, by = y - L * s;
     return '<path class="' + cls + '" d="M' + f(x) + ' ' + f(y) + 'L' + f(bx - W * s) + ' ' + f(by + W * c) + 'L' + f(bx + W * s) + ' ' + f(by - W * c) + 'Z"/>';
   };
@@ -69,7 +69,14 @@ const DK = (() => {
       else { h += K.line(ax - ux * 16, ay - uy * 16, bx + ux * 16, by + uy * 16, d) + head(ax, ay, ang, d + 'f') + head(bx, by, ang + Math.PI, d + 'f'); }
       let rot = ang * 180 / Math.PI; if (rot > 90 || rot <= -90) rot += 180;
       // Text sits just off the line on its upper side (or lower with o.below).
-      const tx = (ax + bx) / 2 + Math.sin(rot * Math.PI / 180) * (o.below ? -13 : 5), ty = (ay + by) / 2 - Math.cos(rot * Math.PI / 180) * (o.below ? -13 : 5);
+      let tx = (ax + bx) / 2 + Math.sin(rot * Math.PI / 180) * (o.below ? -13 : 5), ty = (ay + by) / 2 - Math.cos(rot * Math.PI / 180) * (o.below ? -13 : 5);
+      const est = String(text === undefined ? '' : text).length * 7;
+      // A short upright dimension takes its text level, beside the middle of the line, on the side away from the part.
+      if (est > len - 8 && Math.abs(uy) > 0.7) {
+        const side = nx * off > 0.5 ? 1 : nx * off < -0.5 ? -1 : 1;
+        if (text !== undefined && text !== '') h += K.text((ax + bx) / 2 + side * 6, (ay + by) / 2 + 4, text, { cls: d + 't', anchor: side > 0 ? 'start' : 'end' });
+        return h;
+      }
       if (text !== undefined && text !== '') h += K.text(tx, ty, text, { cls: d + 't', rot });
       return h;
     },

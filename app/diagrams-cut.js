@@ -23,7 +23,7 @@ const dcRow = (rows, label, unit) => {
 };
 const dcStr = (rows, label) => { const r = (rows || []).find(x => x.label.indexOf(label) === 0 && typeof x.value === 'string'); return r ? r.value : ''; };
 const dcHead = (x, y, ang, cls) => {
-  const L = 8, W = 2.6, c = Math.cos(ang), s = Math.sin(ang), bx = x - L * c, by = y - L * s;
+  const L = 9, W = 2.3, c = Math.cos(ang), s = Math.sin(ang), bx = x - L * c, by = y - L * s;
   return DK.poly([[x, y], [bx - W * s, by + W * c], [bx + W * s, by - W * c]], cls);
 };
 // Rotation arrow: elliptical arc from a0 to a1 (degrees, anticlockwise on screen), head at a1. cls: dim | hot.
@@ -476,7 +476,13 @@ Object.assign(DIAGRAMS, {
 
 // ---- lathe helpers ----
 // Chuck jaws gripping a part of radius R whose face is at x (part to the right).
-const dcChuck = (x, cy, R) => DK.rect(x - 36, cy - R - 34, 22, 2 * R + 68, 'hatch') + DK.rect(x - 14, cy - R - 18, 24, 18, 'hatch') + DK.rect(x - 14, cy + R, 24, 18, 'hatch');
+const dcChuck = (x, cy, R) => {
+  const t = cy - R - 34, b = cy + R + 34, c = 5;
+  const body = DK.poly([[x - 36, t + c], [x - 36 + c, t], [x - 14, t], [x - 14, b], [x - 36 + c, b], [x - 36, b - c]], 'hatch');
+  // Each jaw steps down to the part: the outer step against the body, the inner step on the part.
+  const jaw = sg => DK.poly([[x - 14, cy - sg * (R + 22)], [x - 2, cy - sg * (R + 22)], [x - 2, cy - sg * (R + 11)], [x + 10, cy - sg * (R + 11)], [x + 10, cy - sg * R], [x - 14, cy - sg * R]], 'hatch');
+  return body + jaw(1) + jaw(-1);
+};
 // Turning tool in plan view: a triangular insert with its tip at (tx, ty) and a holder shank.
 // dir +1: body to the right of the tip (turning towards the chuck on the left), -1 mirrored.
 // rot (degrees, clockwise on screen) turns the whole tool about its tip: 0 = shank straight up.
@@ -486,7 +492,9 @@ function dcInsert(tx, ty, s, dir, holder, cls, rot) {
   const P = (x, y) => [tx + (d * x) * ca - y * sa, ty + (d * x) * sa + y * ca];
   let h = '';
   if (holder !== false) { const hl = holder || 2.4 * s; h += DK.poly([P(0.22 * s, -0.42 * s), P(1.1 * s, -0.42 * s), P(1.1 * s, -0.42 * s - hl), P(0.22 * s, -0.42 * s - hl)], 'part'); }
-  return h + DK.poly([P(0, 0), P(0.98 * s, -0.17 * s), P(0.34 * s, -0.94 * s)], cls || 'tool');
+  // The insert with its clamping hole at the centre of the triangle.
+  const c = P(0.44 * s, -0.37 * s);
+  return h + DK.poly([P(0, 0), P(0.98 * s, -0.17 * s), P(0.34 * s, -0.94 * s)], cls || 'tool') + DK.circle(c[0], c[1], Math.max(1.5, 0.11 * s), cls === 'ghost' ? 'ghost' : 'ln');
 }
 // Rotation of a turning part seen from the side: arrow round a narrow ellipse at x.
 const dcTurnSpin = (x, cy, R, cls) => dcSpin(x, cy, 9, R + 10, 115, 245, cls || 'dim');
@@ -822,11 +830,24 @@ Object.assign(DIAGRAMS, {
 
   // Bandsaw: the section being cut (to scale), the blade part way through, the down-feed and the time.
   bandsaw(v, sys, rows) {
-    const W = 520, H = 280, u = dcU(sys), shape = v.shape === 2 ? 2 : v.shape === 3 ? 3 : 1, a = v.a, b = v.b;
-    const ok = dcOk(a) && (shape === 1 || dcOk(b)), cx = 150, cy = 150;
-    const ww = shape === 2 ? a : a, hh = shape === 2 ? b : a, s = ok ? Math.min(220 / ww, 170 / hh) : 1, Wp = ok ? ww * s : 160, Hp = ok ? hh * s : 160;
+    const W = 520, H = 280, u = dcU(sys), shape = [1, 2, 3, 4, 5, 6, 7, 8].includes(v.shape) ? v.shape : 1, a = v.a, b = v.b, c = v.c;
+    const needC = [2, 7, 8].includes(shape), needT = [3, 6, 7, 8].includes(shape), cx = 150, cy = 150;
+    const ok = dcOk(a) && (!needC || dcOk(c)) && (!needT || dcOk(b)), wid = dcRow(rows, 'Effective width (longest path of the blade in the work)'), hgt = dcRow(rows, 'Height the blade feeds through');
+    // Width across the blade and height in the feed direction, from the tool's rows (one piece), else from the inputs.
+    const bx = v.bundle === 1 && v.nx >= 1 ? Math.floor(v.nx) : 1, by = v.bundle === 1 && v.ny >= 1 ? Math.floor(v.ny) : 1;
+    const ww = dcOk(wid) ? wid / bx : a, hh = dcOk(hgt) ? hgt / by : needC ? c : a;
+    const s = ok ? Math.min(220 / ww, 170 / hh) : 1, Wp = ok ? ww * s : 160, Hp = ok ? hh * s : 160, tp = ok && needT ? Math.max(2, b * s) : 14;
     let h = '';
-    const sec = cls => shape === 2 ? DK.rect(cx - Wp / 2, cy - Hp / 2, Wp, Hp, cls) : shape === 3 ? dcRing(cx, cy, Math.max(1, Wp / 2 - (ok ? b * s : 18)), Wp / 2, cls) : DK.circle(cx, cy, Wp / 2, cls);
+    const x0 = cx - Wp / 2, x1 = cx + Wp / 2, y0 = cy - Hp / 2, y1 = cy + Hp / 2, P = pts => 'M' + pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('L') + 'Z';
+    const box = (i, j, k, l) => [[i, j], [k, j], [k, l], [i, l]], hole = (i, j, k, l) => [[i, j], [i, l], [k, l], [k, j]];
+    const sec = cls => {
+      if (shape === 1) return DK.circle(cx, cy, Wp / 2, cls);
+      if (shape === 3) return dcRing(cx, cy, Math.max(1, Wp / 2 - tp), Wp / 2, cls);
+      if (shape === 5) return DK.path(P([[x0 + Wp / 4, y0], [x1 - Wp / 4, y0], [x1, cy], [x1 - Wp / 4, y1], [x0 + Wp / 4, y1], [x0, cy]]), cls);
+      if (shape === 6 || shape === 7) return DK.path(P(box(x0, y0, x1, y1)) + P(hole(x0 + tp, y0 + tp, x1 - tp, y1 - tp)), cls);
+      if (shape === 8) return DK.path(P([[x0, y1], [x1, y1], [x1, y1 - tp], [x0 + tp, y1 - tp], [x0 + tp, y0], [x0, y0]]), cls);
+      return DK.rect(x0, y0, Wp, Hp, cls);
+    };
     const yb = cy - Hp / 2 + Hp * 0.36;
     h += sec('hatch') + '<clipPath id="dcbsc"><rect x="0" y="0" width="' + W + '" height="' + yb.toFixed(1) + '"/></clipPath><g clip-path="url(#dcbsc)">' + sec('part') + '</g>';
     h += DK.cl(cx - Wp / 2 - 12, cy, cx + Wp / 2 + 12, cy) + DK.cl(cx, cy - Hp / 2 - 12, cx, cy + Hp / 2 + 12);
@@ -838,12 +859,14 @@ Object.assign(DIAGRAMS, {
     const t1 = dcRow(rows, 'Cut time from the down-feed'), t2 = dcRow(rows, 'Cut time from the cutting rate'), area = (rows.find(r => r.label === 'Area cut') || {});
     h += DK.arrow(34, yb + 4, 34, yb + 50, 'hot') + DK.text(40, yb + 64, 'down-feed', { cls: 'mut', anchor: 'middle' });
     h += DK.text(cx, cy - Hp / 2 - 8, 'cut', { cls: 'mut' });
-    h += dcDimV(cy - Hp / 2, cy + Hp / 2, cx + Wp / 2 + 74, 'h ' + dcL(shape === 2 ? b : a, u, 'h'), { from: cx + (shape === 2 ? Wp / 2 : 0) + 2 });
-    if (shape !== 2) h += DK.dimH(cx - Wp / 2, cx + Wp / 2, cy + Hp / 2 + 22, 'Ø ' + dcL(a, u, 'D'), { from: cy, below: true });
-    else h += DK.dimH(cx - Wp / 2, cx + Wp / 2, cy + Hp / 2 + 22, 'width ' + dcL(a, u, 'W'), { from: cy + Hp / 2 + 2, below: true });
+    const round = shape === 1 || shape === 3, flatSide = !round && shape !== 5;
+    h += dcDimV(y0, y1, cx + Wp / 2 + 74, (shape === 5 ? 'A ' : needC ? 'C ' : round ? 'h ' : 'A ') + dcL(needC ? c : a, u, 'h'), { from: cx + (flatSide ? Wp / 2 : 0) + 2 });
+    if (round) h += DK.dimH(x0, x1, y1 + 22, 'Ø ' + dcL(a, u, 'D'), { from: cy, below: true });
+    else if (shape === 5) h += DK.dimH(x0, x1, y1 + 22, 'across corners', { from: cy, below: true });
+    else h += DK.dimH(x0, x1, y1 + 22, 'A ' + dcL(a, u, 'W'), { from: y1 + 2, below: true });
     const x = 360, cpt = dcRow(rows, 'Feed per tooth');
     h += DK.text(x, 40, dcOk(t1) ? 'time ' + dcN(t1) + ' min' : dcOk(t2) ? 'time ' + dcN(t2) + ' min' : 'time: enter a rate', { cls: 'hott', anchor: 'start' });
-    h += dcLines(x, 58, [shape === 3 && dcOk(b) ? 'tube wall ' + dcN(b) + ' ' + u : '', dcOk(t1) && dcOk(t2) ? '(' + dcN(t2) + ' min from the rate)' : '', isFinite(area.value) ? 'area ' + dcN(area.value) + ' ' + dcUnit(area.unit) : '', dcOk(v.vf) ? 'down-feed ' + dcN(v.vf) + ' ' + dcFU(sys) : '', dcOk(cpt) ? 'chip per tooth ' + dcN(cpt) : '']);
+    h += dcLines(x, 58, [needT && dcOk(b) ? (shape === 8 ? 'thickness t ' : 'wall t ') + dcN(b) + ' ' + u : '', dcOk(t1) && dcOk(t2) ? '(' + dcN(t2) + ' min from the rate)' : '', isFinite(area.value) ? 'area ' + dcN(area.value) + ' ' + dcUnit(area.unit) : '', dcOk(v.vf) ? 'down-feed ' + dcN(v.vf) + ' ' + dcFU(sys) : '', dcOk(cpt) ? 'chip per tooth ' + dcN(cpt) : '']);
     return DK.svg(W, H, h, 'Bandsaw cut through a section');
   },
 
@@ -949,10 +972,19 @@ Object.assign(DIAGRAMS, {
     if (!dcOk(d) || !dcOk(od) || !dcOk(nt) || !dcOk(ls) || !(od > 2 * d)) return '';
     const lf = dcOk(v.lf) && v.lf > ls ? v.lf : ls * 1.6, known = dcOk(v.lf) && v.lf > ls;
     const sc = Math.min(330 / lf, 130 / od), x0 = 40, cy = 118, L = lf * sc, r = od / 2 * sc, w = Math.max(1.5, d * sc);
-    // One zig-zag per coil: the wire seen from the side crosses from top to bottom and back.
-    const n = Math.max(2, Math.round(nt)), step = (L - w) / n; let p = 'M' + (x0 + w / 2).toFixed(1) + ' ' + (cy + r - w / 2).toFixed(1);
-    for (let i = 0; i < n; i++) p += 'L' + (x0 + w / 2 + step * (i + 0.5)).toFixed(1) + ' ' + (cy - r + w / 2).toFixed(1) + 'L' + (x0 + w / 2 + step * (i + 1)).toFixed(1) + ' ' + (cy + r - w / 2).toFixed(1);
-    let h = '<path d="' + p + '" fill="none" stroke="currentColor" stroke-width="' + w.toFixed(1) + '" stroke-linejoin="round" stroke-linecap="round" class="part" style="fill:none"/>';
+    // Side view as drawn on a drawing: the near half of each coil as the wire (two edges, filled), the far half
+    // as thin hidden lines, the wire cut where it meets the top and bottom of the coil (small sections).
+    const n = Math.max(2, Math.round(nt)), step = (L - w) / n, yt = cy - r + w / 2, yb2 = cy + r - w / 2;
+    const bx = i => x0 + w / 2 + step * i, tx = i => x0 + w / 2 + step * (i + 0.5);
+    let h = '';
+    for (let i = 0; i < n; i++) h += DK.line(tx(i), yt, bx(i + 1), yb2, 'hid');
+    for (let i = 0; i < n; i++) {
+      // Near side: from the bottom at coil i to the top at i + 1/2, as a band the width of the wire.
+      const ax = bx(i), ay = yb2, cx2 = tx(i), cy2 = yt, len = Math.hypot(cx2 - ax, cy2 - ay), nx = -(cy2 - ay) / len * w / 2, ny = (cx2 - ax) / len * w / 2;
+      h += DK.poly([[ax + nx, ay + ny], [cx2 + nx, cy2 + ny], [cx2 - nx, cy2 - ny], [ax - nx, ay - ny]], 'part');
+    }
+    for (let i = 0; i <= n; i++) h += DK.circle(bx(i), yb2, w / 2, 'hatch');
+    for (let i = 0; i < n; i++) h += DK.circle(tx(i), yt, w / 2, 'hatch');
     h += DK.line(x0 - 6, cy - r - 8, x0 - 6, cy + r + 8, 'tool') + DK.line(x0 + L + 6, cy - r - 8, x0 + L + 6, cy + r + 8, 'tool');
     h += DK.cl(x0 - 14, cy, x0 + L + 14, cy);
     h += DK.dimH(x0, x0 + L, cy + r + 34, (known ? 'free length ' + dcN(lf, dp) + ' ' + u : 'free length not entered'), { from: cy + r });

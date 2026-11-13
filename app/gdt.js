@@ -168,89 +168,138 @@ const CHARS = [
 ];
 const CHAR = Object.fromEntries(CHARS.map(c => [c.id, c]));
 
-// ---------- Diagrams for each characteristic (own drawings, theme-aware) ----------
-// Part = solid ink stroke; tolerance zone = accent dashed; datum = muted with triangle.
+// ---------- Diagrams for each characteristic (own drawings, theme-aware, in the DK drawing style) ----------
+// Part: shaded section with an ink outline; actual surface: ink line; tolerance zone: accent dashed;
+// datum: filled triangle on the datum surface, with the letter in a square frame; t: the zone width.
+const GD = {
+  // Datum feature symbol: triangle on the surface at (x, y), stem and framed letter on the side dir (+1 below, -1 above).
+  datum(x, y, letter, dir) {
+    const d = dir || 1, by = y + d * 22;
+    return DK.poly([[x - 8, y], [x + 8, y], [x, y + d * 11]], 'inkf') + DK.line(x, y + d * 11, x, by, 'ln') +
+      DK.rect(x - 11, d > 0 ? by : by - 21, 22, 21, 'ln') + DK.text(x, (d > 0 ? by : by - 21) + 15, letter, { cls: 'txt' });
+  },
+  t(y1, y2, x, from) { return DK.dimV(y2, y1, x, 't', { from }); },
+  // Caption at the foot, wrapped at about 64 characters.
+  cap(t) {
+    const lines = []; let cur = '';
+    t.split(' ').forEach(w => { if ((cur + ' ' + w).trim().length > 70) { lines.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); });
+    lines.push(cur);
+    return lines.map((l, i) => DK.text(12, 248 - (lines.length - 1 - i) * 15, l, { cls: 'mut', anchor: 'start' })).join('');
+  },
+  svg(h, label) { return '<div class="gdk">' + DK.svg(440, 256, h, label) + '</div>'; },
+};
 function zoneDiagram(id) {
-  const W = 220, H = 120;
-  const zone = (d) => '<path class="gz" d="' + d + '"/>';
-  const part = (d) => '<path class="gp" d="' + d + '"/>';
-  const dat = (x, y, letter) => '<g class="gd"><path d="M' + (x - 6) + ' ' + y + 'H' + (x + 6) + 'L' + x + ' ' + (y + 8) + 'Z"/><path d="M' + x + ' ' + (y + 8) + 'V' + (y + 16) + '"/><rect x="' + (x - 8) + '" y="' + (y + 16) + '" width="16" height="15"/><text x="' + x + '" y="' + (y + 27.5) + '" text-anchor="middle">' + letter + '</text></g>';
-  const lab = (x, y, t, a) => '<text class="gl" x="' + x + '" y="' + y + '"' + (a ? ' text-anchor="' + a + '"' : '') + '>' + t + '</text>';
-  const dim = (x, y1, y2, t) => '<path class="gm" d="M' + x + ' ' + y1 + 'V' + y2 + 'M' + (x - 3) + ' ' + y1 + 'H' + (x + 3) + 'M' + (x - 3) + ' ' + y2 + 'H' + (x + 3) + '"/>' + lab(x + 5, (y1 + y2) / 2 + 4, t);
-  let b = '';
+  const z = d => DK.path(d, 'cons'), part = d => DK.path(d, 'part'), ln = d => DK.path(d, 'ln');
+  let b = '', cap = '';
   switch (id) {
     case 'straightness':
-      b = zone('M20 40H180M20 54H180') + part('M20 47Q60 42 100 49T180 46') + dim(190, 40, 54, 't') + lab(20, 80, 'line element between lines t apart');
+      b = part('M40 92Q120 80 200 96T360 90V160H40Z') + z('M40 76H372M40 106H372') + GD.t(76, 106, 400, 372) + DK.cl(24, 186, 380, 186);
+      cap = 'Each line element along the surface lies between two straight lines t apart.';
       break;
     case 'flatness':
-      b = zone('M20 50L60 30H200L160 50ZM20 66L60 46H200L160 66Z') + part('M22 58Q70 46 110 52T196 46') + dim(206, 46, 62, 't') + lab(20, 92, 'surface between planes t apart');
+      b = part('M40 112Q120 104 180 114T320 110L400 72L120 72Z') + part('M40 112Q120 104 180 114T320 110V150H40Z') + part('M320 110L400 72V112L320 150Z') +
+        z('M40 98L120 58H400L320 98ZM40 126L120 86H400L320 126Z') + GD.t(58, 86, 424, 400);
+      cap = 'The whole surface lies between two parallel planes t apart.';
       break;
-    case 'circularity':
-      b = zone('M110 20A40 40 0 1 1 109.9 20ZM110 30A30 30 0 1 1 109.9 30Z') + part('M110 24Q146 24 145 60Q148 96 110 95Q74 98 75 60Q72 26 110 24Z') + dim(160, 20, 30, 't (radial)') + lab(14, 112, 'each section: two circles');
+    case 'circularity': {
+      const c = [220, 102], lobe = Array.from({ length: 73 }, (_, i) => { const a = i * 5 * Math.PI / 180, r = 66 + 5 * Math.cos(3 * a) + 2 * Math.sin(5 * a); return [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)]; });
+      b = DK.poly(lobe, 'part') + DK.circle(c[0], c[1], 76, 'cons') + DK.circle(c[0], c[1], 57, 'cons') + DK.cl(c[0] - 92, c[1], c[0] + 92, c[1]) + DK.cl(c[0], c[1] - 92, c[0], c[1] + 92) +
+        DK.dimH(c[0] + 57, c[0] + 76, c[1] - 6, 't', { from: c[1] }) + DK.text(330, 70, 'cross-section', { cls: 'mut', anchor: 'start' });
+      cap = 'Each cross-section lies between two concentric circles t apart (radially).';
       break;
+    }
     case 'cylindricity':
-      b = zone('M40 30H180M40 46H180M40 74H180M40 90H180') + '<path class="gz" d="M40 30A8 30 0 0 0 40 90M180 30A8 30 0 0 1 180 90M40 46A4 14 0 0 0 40 74"/>' + part('M40 36Q110 32 180 40M40 84Q110 86 180 80') + dim(195, 30, 46, 't') + lab(14, 112, 'between two coaxial cylinders');
+      b = part('M80 64Q220 58 360 66V174Q220 180 80 172Z') + DK.cl(56, 120, 390, 120) +
+        z('M80 54H360M80 186H360M80 72H360M80 168H360') + DK.path('M360 54A14 66 0 0 1 360 186M360 72A10 48 0 0 1 360 168M80 54A14 66 0 0 0 80 186', 'cons') + GD.t(54, 72, 404, 374);
+      cap = 'The whole surface lies between two coaxial cylinders t apart (radially).';
       break;
     case 'profile_line': case 'profile_surface':
-      b = '<path class="gb" d="M20 70Q70 70 90 45T160 40H200"/>' + zone('M20 62Q70 62 88 37T160 32H200M20 78Q70 78 92 53T160 48H200') + part('M20 72Q68 66 90 44T160 42Q180 38 200 41') + dim(208, 32, 48, 't') + lab(14, 104, 'zone t, centred on true profile');
+      b = part('M40 146Q130 146 172 98T310 82H400V180H40Z') + DK.path('M40 132Q130 132 166 86T310 68H400M40 160Q130 160 178 110T310 96H400', 'cons') +
+        DK.path('M40 146Q130 146 172 98T310 82H400', 'ghost') + GD.t(68, 96, 424, 400) + DK.leader(230, 84, 250, 34, 'true profile (basic)', { anchor: 'start' });
+      cap = 'The surface lies in a zone t wide, centred on the true profile.';
       break;
     case 'perpendicularity':
-      b = '<path class="gb" d="M20 92H200"/>' + zone('M96 20V92M110 20V92') + part('M100 92Q104 60 106 22') + dat(150, 92, 'A') + '<path class="gm" d="M96 14H110"/>' + lab(112, 16, 't') + lab(20, 114, '90 deg to datum A');
+      b = part('M40 150H400V172H40Z') + part('M140 150L206 150Q214 100 212 34L140 34Z') + z('M196 24V150M226 24V150') + DK.cl(211, 16, 211, 158) +
+        DK.dimH(196, 226, 14, 't', { from: 24 }) + GD.datum(320, 172, 'A', 1) + DK.text(240, 70, 'zone square to datum A', { cls: 'mut', anchor: 'start' });
+      cap = 'The surface lies between two planes t apart, at 90° to datum A.';
       break;
     case 'parallelism':
-      b = '<path class="gb" d="M20 92H200"/>' + zone('M20 34H200M20 48H200') + part('M20 44Q80 37 140 42T200 40') + dat(110, 92, 'A') + dim(208, 34, 48, 't') + lab(14, 70, 'parallel to datum A');
+      b = part('M40 86Q120 76 220 88T400 82V170H40Z') + z('M40 70H400M40 100H400') + GD.t(70, 100, 424, 400) + GD.datum(220, 170, 'A', 1);
+      cap = 'The surface lies between two planes t apart, parallel to datum A.';
       break;
-    case 'angularity':
-      b = '<path class="gb" d="M20 92H200"/>' + zone('M30 92L130 20M44 92L144 20') + part('M37 90Q90 52 136 22') + dat(170, 92, 'A') + lab(60, 84, 'basic angle') + '<path class="gm" d="M70 92A40 40 0 0 0 62 69"/>';
+    case 'angularity': {
+      const P1 = [118, 150], u = [0.809, -0.588], n = [0.588, 0.809], L = 172, at = (p, k, s) => [p[0] + u[0] * k + n[0] * s, p[1] + u[1] * k + n[1] * s];
+      const q = at(P1, L, 0);
+      b = part('M40 150H' + P1[0] + 'Q160 120 ' + q[0].toFixed(1) + ' ' + q[1].toFixed(1) + 'H400V172H40Z') +
+        [-13, 13].map(s => { const a = at(P1, -14, s), c = at(P1, L + 14, s); return DK.line(a[0], a[1], c[0], c[1], 'cons'); }).join('') +
+        DK.line(P1[0], P1[1], P1[0] + 90, P1[1], 'thin') + DK.angle(P1[0], P1[1], 62, 0, 36, '') + DK.text(190, 144, 'basic angle', { cls: 'dimt', anchor: 'start' }) + GD.datum(320, 172, 'A', 1);
+      cap = 'The surface lies between two planes t apart, at the basic angle to datum A.';
       break;
-    case 'position':
-      b = '<path class="gb" d="M20 100H200M20 100V10"/>' + '<path class="gm" d="M110 100V20M20 55H180"/>' + zone('M110 41A14 14 0 1 1 109.9 41Z') + part('M114 51l4 4M118 51l-4 4') + '<circle class="gdot" cx="116" cy="53" r="1.6"/>' + lab(128, 40, 'zone dia t') + lab(24, 52, 'basic') + lab(114, 96, 'basic') + lab(128, 74, 'axis inside');
+    }
+    case 'position': {
+      const hx = 250, hy = 92;
+      b = part('M60 40H380V172H60Z') + DK.circle(hx, hy, 26, 'ln') + DK.cl(hx - 40, hy, hx + 40, hy) + DK.cl(hx, hy - 40, hx, hy + 40) +
+        DK.circle(hx, hy, 11, 'cons') + DK.circle(hx + 4, hy + 4, 3, 'hotf') +
+        DK.dimH(60, hx, 22, 'basic', { from: 40 }) + DK.dimV(172, hy, 400, 'basic', { from: 380 }) +
+        GD.datum(130, 172, 'A', 1) + DK.leader(hx + 6, hy + 6, 262, 150, 'axis, inside Ø t', { anchor: 'start', hot: true }) +
+        // Datum B on the left edge: the frame to the left.
+        DK.poly([[60, 52], [60, 68], [49, 60]], 'inkf') + DK.line(49, 60, 34, 60, 'ln') + DK.rect(12, 50, 22, 21, 'ln') + DK.text(23, 65, 'B', { cls: 'txt' });
+      cap = 'The axis lies in a cylinder Ø t at the true position, located by basic dimensions from the datums.';
       break;
-    case 'circular_runout': case 'total_runout':
-      b = '<path class="gb" d="M10 60H210"/>' + part('M40 34H180V86H40Z') + (id === 'total_runout' ? '<path class="gm" d="M50 20H170"/>' + lab(52, 14, 'indicator over whole surface') : lab(70, 14, 'each circle on its own')) + '<path class="gm" d="M110 22V32"/><circle class="gm" cx="110" cy="18" r="4"/>' + dat(25, 64, 'A') + lab(70, 112, 'part turns about axis A');
+    }
+    case 'circular_runout': case 'total_runout': {
+      const tot = id === 'total_runout';
+      b = part('M40 96H120V144H40Z') + part('M120 70H360V170H120Z') + DK.cl(20, 120, 384, 120) + GD.datum(80, 144, 'A', 1) +
+        DK.circle(200, 30, 9, 'ln') + DK.line(200, 39, 200, 70, 'ln') + DK.text(186, 34, 'indicator', { cls: 'mut', anchor: 'end' }) +
+        DK.path('M372 92A10 28 0 1 1 372 148', 'hot') + DK.arrow(374, 147, 368, 150, 'hot') +
+        (tot ? DK.arrow(218, 30, 350, 30, 'hot') + DK.text(218, 22, 'moved along', { cls: 'hott', anchor: 'start' }) : '');
+      cap = tot ? 'Part turns about axis A; the full reading over the whole surface is at most t.' : 'Part turns about axis A; the reading at each section is at most t.';
       break;
+    }
     case 'concentricity':
-      b = '<path class="gb" d="M10 60H210"/>' + part('M30 40H90V80H30ZM90 30H190V90H90Z') + zone('M90 53H190M90 67H190') + lab(100, 112, 'axis in dia t about A') + dat(55, 80, 'A');
+      b = part('M40 88H140V152H40Z') + part('M140 60H380V180H140Z') + DK.cl(20, 120, 400, 120) + z('M140 106H380M140 134H380') + GD.t(106, 134, 404, 380) + GD.datum(90, 152, 'A', 1);
+      cap = 'The axis lies in a cylinder Ø t about datum axis A.';
       break;
     case 'symmetry':
-      b = '<path class="gb" d="M10 60H210"/>' + part('M40 30H180M40 90H180') + zone('M40 54H180M40 66H180') + lab(14, 112, 'median plane in zone t, centred');
+      b = part('M60 40H380V84H60Z') + part('M60 156H380V200H60Z') + DK.cl(40, 120, 400, 120) + z('M60 108H380M60 132H380') + ln('M60 116Q150 124 220 118T380 122') + GD.t(108, 132, 404, 380) +
+        DK.text(70, 104, 'slot', { cls: 'mut', anchor: 'start' });
+      cap = 'The median plane of the slot lies between two planes t apart, centred on the datum plane.';
       break;
   }
-  return '<svg class="gdia" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Tolerance zone sketch">' + b + '</svg>';
+  return GD.svg(b + GD.cap(cap), 'Tolerance zone sketch');
 }
 
 function drfDiagram() {
   // 3-2-1: three mutually perpendicular planes with contact points.
-  const p = (pts, cls) => '<path class="' + cls + '" d="M' + pts.map(q => q.join(' ')).join('L') + 'Z"/>';
-  const dot = (x, y) => '<circle class="gdot" cx="' + x + '" cy="' + y + '" r="3"/>';
-  return '<svg class="gdia big" viewBox="0 -22 320 222" role="img" aria-label="Three-plane datum reference frame with 3-2-1 contact points">' +
-    p([[40, 150], [160, 190], [300, 140], [180, 100]], 'gplane') +
-    p([[40, 150], [40, 40], [180, -10], [180, 100]], 'gplane') +
-    p([[180, 100], [180, -10], [300, 30], [300, 140]], 'gplane') +
-    dot(110, 160) + dot(200, 158) + dot(170, 125) +
-    dot(80, 90) + dot(140, 70) +
-    dot(240, 70) +
-    '<text class="gl" x="120" y="196">A primary: 3 points</text><text class="gl" x="6" y="30">B secondary: 2 points</text><text class="gl" x="222" y="-8">C tertiary: 1 point</text>' +
-    '</svg>';
+  const dot = (x, y) => DK.circle(x, y, 4, 'hotf');
+  return GD.svg(
+    DK.poly([[40, 150], [160, 190], [300, 140], [180, 100]], 'part') +
+    DK.poly([[40, 150], [40, 40], [180, 0], [180, 100]], 'part') +
+    DK.poly([[180, 100], [180, 0], [300, 40], [300, 140]], 'part') +
+    dot(110, 160) + dot(200, 158) + dot(170, 125) + dot(80, 90) + dot(140, 70) + dot(240, 70) +
+    DK.leader(170, 150, 296, 196, 'A primary: 3 points', { anchor: 'start' }) + DK.leader(60, 100, 16, 20, 'B secondary: 2 points', { anchor: 'start' }) +
+    DK.leader(258, 84, 296, 20, 'C tertiary: 1 point', { anchor: 'start' }), 'Three-plane datum reference frame with 3-2-1 contact points');
 }
 
 function envelopeDiagram() {
-  return '<svg class="gdia big" viewBox="0 0 320 130" role="img" aria-label="Rule 1 envelope versus independency">' +
-    '<text class="gl" x="10" y="14">Rule #1 (ASME): perfect form at MMC</text>' +
-    '<path class="gz" d="M20 30H140V80H20Z"/><path class="gp" d="M20 36Q80 30 140 42M20 74Q80 80 140 70"/>' +
-    '<text class="gl" x="10" y="100">bent pin must still fit the MMC envelope</text>' +
-    '<text class="gl" x="170" y="14">Independency (ISO 8015)</text>' +
-    '<path class="gm" d="M180 42H300M180 70H300"/><path class="gp" d="M180 46Q240 26 300 50M180 74Q240 54 300 78"/>' +
-    '<text class="gl" x="170" y="100">size checked by two-point sizes only;</text><text class="gl" x="170" y="114">form needs its own tolerance</text>' +
-    '</svg>';
+  return GD.svg(
+    DK.text(12, 18, 'Rule #1 (ASME): perfect form at MMC', { cls: 'txt', anchor: 'start' }) +
+    DK.rect(24, 50, 170, 70, 'cons') + DK.path('M24 58Q110 48 194 64V108Q110 124 24 114Z', 'part') +
+    DK.text(12, 148, 'A bent pin must still fit', { cls: 'mut', anchor: 'start' }) + DK.text(12, 164, 'inside the MMC envelope.', { cls: 'mut', anchor: 'start' }) +
+    DK.text(232, 18, 'Independency (ISO 8015)', { cls: 'txt', anchor: 'start' }) +
+    DK.path('M240 64Q320 36 420 70V112Q320 80 240 108Z', 'part') +
+    DK.dimV(108, 64, 236, 'size', { from: 240 }) +
+    DK.text(232, 148, 'Size is checked by two-point', { cls: 'mut', anchor: 'start' }) + DK.text(232, 164, 'sizes only; form needs its own', { cls: 'mut', anchor: 'start' }) + DK.text(232, 180, 'tolerance.', { cls: 'mut', anchor: 'start' }),
+    'Rule 1 envelope versus independency');
 }
 
 function mmbDiagram() {
-  return '<svg class="gdia big" viewBox="0 0 320 120" role="img" aria-label="Datum feature of size at MMB with shift">' +
-    '<path class="gp" d="M30 20H150V100H30Z"/><circle class="gp" cx="90" cy="60" r="24"/><circle class="gz" cx="90" cy="60" r="18"/>' +
-    '<path class="gm" d="M60 60H120M90 30V90"/>' +
-    '<text class="gl" x="170" y="40">simulator pin at MMB size;</text><text class="gl" x="170" y="58">hole larger than MMB:</text><text class="gl" x="170" y="76">part may shift on the pin</text><text class="gl" x="170" y="94">(datum feature shift)</text>' +
-    '</svg>';
+  return GD.svg(
+    DK.path('M40 40H220V180H40ZM158 110A28 28 0 1 0 102 110A28 28 0 1 0 158 110Z', 'part" fill-rule="evenodd') +
+    DK.circle(124, 114, 21, 'tool') + DK.cl(130 - 46, 110, 130 + 46, 110) + DK.cl(130, 64, 130, 156) +
+    DK.leader(118, 104, 250, 60, 'simulator pin at MMB size', { anchor: 'start' }) + DK.leader(154, 96, 250, 90, 'hole larger than MMB', { anchor: 'start' }) +
+    DK.text(250, 130, 'The part may shift on the pin', { cls: 'mut', anchor: 'start' }) + DK.text(250, 146, '(datum feature shift).', { cls: 'mut', anchor: 'start' }),
+    'Datum feature of size at MMB with shift');
 }
 
 // ---------- Modifiers ----------

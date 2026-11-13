@@ -21,6 +21,8 @@ const CG_SOURCES = {
   TEP: 'The Engineers Post, "Twist drill nomenclature"',
   USFS: 'USDA Forest Service, ax manual (publication 1823-2812P), part 7 on files and filing',
   NICH: 'Crescent Nicholson, "Guide to files and filing"',
+  CCB_MICRO: 'CNC Cookbook, "Feeds and speeds for micromachining" (cnccookbook.com; quotes Makino, Big Kaiser and AMT)',
+  BIG_MICRO: 'BIG DAISHOWA, "Enhancing productivity using micro cutting tools" (first in Metalworking Canada; page updated 2025-11-21)',
 };
 // Several pages of one publisher count once. The Engineers Edge page on broaching follows the Wikipedia text.
 const CG_FAMILY = { CTE_M: 'CTE', CTE_G: 'CTE', CTE_B: 'CTE', AM12: 'AMACH', AM10: 'AMACH', AM14: 'AMACH', WP_MC: 'WIKI', WP_BR: 'WIKI', EE_BR: 'WIKI' };
@@ -188,10 +190,10 @@ const CG_BORE = [
 ];
 
 function renderCutGuide(el) {
-  const toc = [['cg-mill', 'Milling cutters'], ['cg-mat', 'Tool materials'], ['cg-drill', 'Twist drill terms'], ['cg-file', 'Files'], ['cg-broach', 'Broaching'], ['cg-bore', 'Boring tools']];
+  const toc = [['cg-mill', 'Milling cutters'], ['cg-mat', 'Tool materials'], ['cg-drill', 'Twist drill terms'], ['cg-file', 'Files'], ['cg-broach', 'Broaching'], ['cg-bore', 'Boring tools'], ['cg-micro', 'Micromachining']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">What the cutting tools are called and what each is for, in our own words: the kinds of milling cutter, the tool materials from high speed steel to diamond, the parts of a twist drill, files and filing, broaches, and boring tools. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
+    '<p class="desc">What the cutting tools are called and what each is for, in our own words: the kinds of milling cutter, the tool materials from high speed steel to diamond, the parts of a twist drill, files and filing, broaches, and boring tools. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
 
     '<h2 id="cg-mill">Kinds of milling cutter</h2>' + cgCutters() +
     cgP('<b>Arbor or shank.</b> Plain, side and the other disc-shaped cutters are usually mounted on an arbor. End mills, T-slot, Woodruff and dovetail cutters are held by a shank and work in vertical and horizontal machines alike.', ['CTE_G', 'AM12']) +
@@ -294,6 +296,20 @@ function renderCutGuide(el) {
     cgP('<b>Then speed and feed.</b> More feed, less speed, or both, change the pressure on the tool and can stop the chatter; so can a different depth of cut.', ['CTE_B']) +
     cgP('<b>Coolant</b> through the bar is recommended.', ['AM10']) +
     cgP('How far a bar bends under the cut, with the overhang figures of the bar makers, is worked out in <a href="#/t/boringbar">boring bar deflection</a>.', null) +
+
+    '<h2 id="cg-micro">Micromachining</h2>' +
+    cgP('<b>When it is micro.</b> Big Kaiser puts the change in cutting behaviour at tools of about 0.100 in (2.5 mm) and under; others use under 0.015 in.', ['CCB_MICRO']) +
+    cgP('<b>Runout comes first.</b> The edge that runs out most does most of the cutting, so its chip load goes up by the runout and the tool breaks early.', ['CCB_MICRO', 'BIG_MICRO']) +
+    cgP('<b>An example as printed.</b> A 0.118 in carbide drill, 0.590 in deep in steel: 2,300 holes in a holder with 0.00008 in runout, 800 in one with 0.0006 in.', ['BIG_MICRO']) +
+    cgP('<b>A rule of thumb:</b> total runout under 10 % of the cutter diameter (under 0.001 in on a 0.010 in cutter). A dial indicator is not fine enough to see it; laser or capacitive gauges are used.', ['CCB_MICRO']) +
+    cgP('<b>Do not feed too light.</b> When the feed per tooth is about the radius of the cutting edge, the edge stops cutting and rubs (ploughs). Keep to the maker\'s chip load.', ['CCB_MICRO', 'BIG_MICRO']) +
+    cgP('<b>Speed.</b> Small tools need high rpm to reach a sensible feed at their tiny chip load: over 60,000 rpm in one source; an auxiliary high speed spindle is one answer.', ['BIG_MICRO', 'CCB_MICRO']) +
+    cgP('<b>Forces are higher than the usual sums predict:</b> 2 to 20 times (CNC Cookbook, from several sources); energy 2 to 10 times (BIG DAISHOWA).', ['CCB_MICRO', 'BIG_MICRO']) +
+    cgP('<b>Shortest tool that reaches.</b> Deflection acts like runout; a dull edge or built-up edge raises the force and bends the tool more.', ['CCB_MICRO', 'BIG_MICRO']) +
+    cgP('<b>Balance.</b> The force from a given imbalance rises steeply with speed, so the small, fast tools need balanced, accurate holders.', ['BIG_MICRO']) +
+    cgP('<b>Coolant.</b> Mist is often preferred: a flood can push small tools and parts aside, and chips must not be recut.', ['CCB_MICRO']) +
+    cgP('<b>Measuring.</b> A toolmaker\'s microscope or a vision system; a micrometer is impractical on tiny parts.', ['CCB_MICRO']) +
+    cgP('Micro drill sizes #98 to #107 are in the <a href="#/t/drillchart">drill chart</a>.', null) +
 
     '<h2 id="cg-src">Sources</h2><ul class="gsl">' + Object.entries(CG_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
     '<p class="desc">Full URLs and access dates are in docs/sources.md, "Cutting tools guide". No text, figures or tables were copied from the sources.</p>';

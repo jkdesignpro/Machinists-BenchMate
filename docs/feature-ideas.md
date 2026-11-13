@@ -85,3 +85,43 @@ State of the tier list above, with the stage for what is still to build.
 | 18 Phone or tablet build | not planned for now | | |
 
 Also built in 0.2.0 after the review: milling surface finish and the RMS (Rq) conversion, which closed Ultra row U66.
+
+## 0.8.0 review: issues close to the owner's feedback, and ideas (2026-11-13)
+
+Found while working through the 24 points of the 0.8.0 feedback. None is built yet unless marked.
+
+1. **Machine limit boxes in the advisors are metric in inch mode.** Top feed rate (mm/min), power (kW) and
+   torque (N·m) in the milling, reaming and tapping advisors are labelled and used as metric even when the
+   page is in inch. Correct as labelled, but an inch user has to convert. Show them in the page's units.
+2. **The thread picker has no Whitworth or BSP.** They have their own pages, but the picker in Thread data
+   and the cycles lists metric and Unified only. Add BSW, BSF and BSP (G and R) to the type list.
+3. **Search has no typo tolerance.** "threding" or "trocoidal" finds nothing. A small edit-distance match
+   on titles and the everyday words would fix most misses.
+4. **The machine profile's work volume is not used yet.** It could warn when a part, a bolt circle or an
+   engraving is larger than the travel, and the Swiss bar capacity could check the bar planner.
+5. **More stock sizes.** Rectangular tube, channel, I-beam, flat bar and round tube, each with two publishers.
+6. **Arc fitting elsewhere.** Done in 0.8.0: *Lines to arcs* in the sketcher (DXF imports) and G02/G03
+   arcs in the G71 profile.
+7. **Still open from the plan:** done in 0.8.0: offline web version (service worker; an app icon is
+   still needed for browsers to offer an install), settings save and load, arranging the side panel.
+   The chatter listener was already in. Still open: vibration check (phone sensor), the assistant,
+   a proper phone layout and translations.
+8. **Later (owner, 2026-11-13): the assistant and the thread callout scan.** Both are parked on the roadmap.
+   Open question when they are picked up: run them on the owner's own Claude API key (optional, online only
+   when used), offline only (search of BenchMate's pages, on-device text reading), or both.
+
+### Idea: BenchMate as an MCP server (point 23)
+
+An MCP (Model Context Protocol) server would let Claude, or another assistant, call BenchMate instead of
+searching the web each time: the same Rust core and the same sourced tables, so an answer comes with the
+formula, the inputs and the publisher behind every number.
+
+- **Tools**: one per calculator family, for example `speeds_feeds`, `thread_data`, `tap_drill`,
+  `section_properties`, `fits_lookup`, `hardness_convert`, `stock_sizes`, each returning the result, the
+  working and the sources, and saying "one publisher" or "publishers differ" where the page does.
+- **Resources**: the data files (threads, fits, materials, gauges, G and M codes) read-only, with their
+  source lists.
+- **How**: a small Rust binary over stdio that links `benchmate-core` directly (no web page), shipped
+  beside the desktop app; nothing leaves the computer, so it also works on an air-gapped PC.
+- **Rules carried over**: no numbers without a source, disagreements shown side by side, no catalogue data
+  that is not ours to share.

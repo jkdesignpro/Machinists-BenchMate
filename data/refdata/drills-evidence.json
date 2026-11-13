@@ -27,6 +27,34 @@
    "url": "https://blog.misumiusa.com/drill-bit-size-chart/",
    "accessed": "2026-11-10",
    "note": "Metric table printed in 0.5 mm steps from 0.5 to 20.0 mm with inch decimals to 4 places (e.g. 8.5 mm .3346). Only the metric sizes are used here."
+  },
+  "ETB": {
+   "publisher": "The Engineering ToolBox",
+   "title": "Drill bits: conversion chart (number gauge, inches, mm)",
+   "url": "https://engineeringtoolbox.com/drill-bit-numer-gauge-inches-mm-d_2046.html",
+   "accessed": "2026-11-13",
+   "note": "Number sizes read #98 to #104 only. Beyond #97 the sizes are not in ASME B94.11M (per Wikipedia); these are trade chart values."
+  },
+  "MECHENG": {
+   "publisher": "Mechanical-Engineering.com (formerly EngineeringClicks)",
+   "title": "Drill size chart",
+   "url": "https://mechanical-engineering.com/drill-size-chart/",
+   "accessed": "2026-11-13",
+   "note": "Number sizes read #98 to #104 only; the chart stops at #104. Beyond #97 the sizes are not in ASME B94.11M (per Wikipedia); these are trade chart values."
+  },
+  "SIZECH": {
+   "publisher": "Size-Charts.com",
+   "title": "Drill bit size chart and different types",
+   "url": "https://size-charts.com/topics/house-size-chart/drill-bit-size-chart-and-different-types/",
+   "accessed": "2026-11-13",
+   "note": "Number sizes read #98 to #107 only. Beyond #97 the sizes are not in ASME B94.11M (per Wikipedia); these are trade chart values."
+  },
+  "EHUB": {
+   "publisher": "ElectronicsHub",
+   "title": "Drill bit size chart (wire gauge and letter)",
+   "url": "https://www.electronicshub.org/drill-bit-size-chart/",
+   "accessed": "2026-11-13",
+   "note": "Number sizes read #98 to #107 only. Beyond #97 the sizes are not in ASME B94.11M (per Wikipedia); these are trade chart values."
   }
  },
  "number": {
@@ -309,6 +337,48 @@
    "78": ".0160",
    "79": ".0145",
    "80": ".0135"
+  },
+  "ETB": {
+   "98": "0.0055",
+   "99": "0.0051",
+   "100": "0.0047",
+   "101": "0.0043",
+   "102": "0.0039",
+   "103": "0.0035",
+   "104": "0.0031"
+  },
+  "MECHENG": {
+   "98": "0.0055",
+   "99": "0.0051",
+   "100": "0.0047",
+   "101": "0.0043",
+   "102": "0.0039",
+   "103": "0.0035",
+   "104": "0.0031"
+  },
+  "SIZECH": {
+   "98": "0.0055",
+   "99": "0.0051",
+   "100": "0.0047",
+   "101": "0.0043",
+   "102": "0.0039",
+   "103": "0.0035",
+   "104": "0.0031",
+   "105": "0.0027",
+   "106": "0.0023",
+   "107": "0.0019"
+  },
+  "EHUB": {
+   "98": "0.0055",
+   "99": "0.0051",
+   "100": "0.0047",
+   "101": "0.0043",
+   "102": "0.0039",
+   "103": "0.0035",
+   "104": "0.0031",
+   "105": "0.0027",
+   "106": "0.0023",
+   "107": "0.0019"
   }
  },
  "letter": {

@@ -17,11 +17,11 @@
 // assembling text.
 (() => {
   const KEY = 'bm.calc';
-  const S = { deg: 1, ans: 0, mem: 0, hist: [], fn: 'bolt', f: {} };
+  const S = { deg: 1, ans: 0, mem: 0, hist: [], fn: 'bolt', f: {}, basic: 0 };
   try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
   if (!Array.isArray(S.hist)) S.hist = [];
   if (!S.f || typeof S.f !== 'object') S.f = {};
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ deg: S.deg, ans: S.ans, mem: S.mem, hist: S.hist.slice(0, 50), fn: S.fn, f: S.f })); } catch (e) {} };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify({ deg: S.deg, ans: S.ans, mem: S.mem, hist: S.hist.slice(0, 50), fn: S.fn, f: S.f, basic: S.basic })); } catch (e) {} };
   const live = new Set();
   const W = () => (typeof state !== 'undefined' && state.W) || null;
   const sys = () => (typeof state !== 'undefined' && state.sys) || 'inch';
@@ -75,6 +75,17 @@
     ['0', 'i:0', '', 'num'], ['.', 'i:.', 'Decimal point', 'num'], ['in\u2192mm', 'x:tomm', 'Inch to millimetre (\u00D7 25.4)', 'fnk'], ['+', 'o:+', 'Add', 'op'], ['=', 'x:eq', 'Evaluate (Enter)', 'eq'], ['mm\u2192in', 'x:toin', 'Millimetre to inch (\u00F7 25.4)', 'fnk'],
   ];
 
+  // Basic view (0.8.0): the four functions and the digits only, on bigger keys; the scientific keys, the
+  // memory keys and the Functions panel are hidden. The same actions as above.
+  const BASIC_KEYS = [
+    ['AC', 'x:ac', 'Clear the expression', 'ctl'], ['\u232B', 'x:bs', 'Backspace', 'ctl'], ['%', 'x:pct', 'Percent (divide by 100)', 'fnk'], ['\u00F7', 'o:/', 'Divide', 'op'],
+    ['7', 'i:7', '', 'num'], ['8', 'i:8', '', 'num'], ['9', 'i:9', '', 'num'], ['\u00D7', 'o:*', 'Multiply', 'op'],
+    ['4', 'i:4', '', 'num'], ['5', 'i:5', '', 'num'], ['6', 'i:6', '', 'num'], ['\u2212', 'o:-', 'Subtract', 'op'],
+    ['1', 'i:1', '', 'num'], ['2', 'i:2', '', 'num'], ['3', 'i:3', '', 'num'], ['+', 'o:+', 'Add', 'op'],
+    ['\u00B1', 'x:neg', 'Change sign', 'fnk'], ['0', 'i:0', '', 'num'], ['.', 'i:.', 'Decimal point', 'num'], ['=', 'x:eq', 'Evaluate (Enter)', 'eq'],
+  ];
+  const keysHtml = () => (S.basic ? BASIC_KEYS : KEYS).map(k => '<button type="button" class="' + k[3] + '" data-a="' + esc(k[1]) + '"' + (k[2] ? ' title="' + esc(k[2]) + '"' : '') + '>' + esc(k[0]) + '</button>').join('');
+
   const FN = {
     bolt: ['Bolt circle', [['n', 'Holes', 6], ['pcd', 'Circle dia (PCD)', 4], ['a0', 'Start angle \u00B0', 0], ['cx', 'Centre X', 0], ['cy', 'Centre Y', 0]]],
     chord: ['Chord', [['d', 'Circle dia', 4], ['th', 'Included angle \u00B0', 60], ['n', 'or equal spaces', '']]],
@@ -90,12 +101,13 @@
     root.classList.add('bcalc');
     root.innerHTML =
       '<div class="bc-head"' + (inline ? '' : ' title="Drag to move"') + '><b>Calculator</b><span class="bc-tgt"></span><span class="sp"></span>' +
+      '<div class="seg bc-view" role="group" aria-label="Calculator view"><button type="button" data-v="1" title="Digits and the four functions only">Basic</button><button type="button" data-v="0" title="Scientific keys, memory, history and functions">Full</button></div>' +
       '<div class="seg bc-deg" role="group" aria-label="Angle unit"><button type="button" data-d="1">DEG</button><button type="button" data-d="0">RAD</button></div>' +
       (inline ? '' : '<button type="button" class="bc-x" aria-label="Close calculator" title="Close (Esc)"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>') + '</div>' +
       '<div class="bc-main"><div class="bc-left">' +
       '<div class="bc-disp"><input class="bc-expr" type="text" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Expression" placeholder="e.g. 3-7/16 * 2  or  12.7mm + 1/2 in">' +
       '<div class="bc-res" aria-live="polite"></div><div class="bc-alt"></div><div class="bc-mem"></div></div>' +
-      '<div class="bc-keys">' + KEYS.map(k => '<button type="button" class="' + k[3] + '" data-a="' + esc(k[1]) + '"' + (k[2] ? ' title="' + esc(k[2]) + '"' : '') + '>' + esc(k[0]) + '</button>').join('') + '</div>' +
+      '<div class="bc-keys">' + keysHtml() + '</div>' +
       '<div class="bc-use"><button type="button" class="btn bc-usebtn"></button></div>' +
       '</div><div class="bc-right">' +
       '<div class="bc-sec"><div class="bc-sh"><span>History</span><button type="button" class="bc-link bc-clr">Clear</button></div><div class="bc-tape"></div></div>' +
@@ -128,6 +140,9 @@
       }
       q('.bc-mem').textContent = S.mem ? 'M = ' + fmt(S.mem) : '';
       root.querySelectorAll('.bc-deg button').forEach(b => b.classList.toggle('on', +b.dataset.d === S.deg));
+      root.querySelectorAll('.bc-view button').forEach(b => b.classList.toggle('on', +b.dataset.v === (S.basic ? 1 : 0)));
+      root.classList.toggle('bc-basic', !!S.basic);
+      const kb = root.querySelector('.bc-keys'); if (kb.dataset.basic !== String(S.basic ? 1 : 0)) { kb.innerHTML = keysHtml(); kb.dataset.basic = S.basic ? '1' : '0'; }
       const ub = q('.bc-usebtn');
       q('.bc-use').hidden = !target;
       if (target) ub.textContent = 'Use ' + (last !== null ? fmt(last) : '') + ' in ' + targetName(target);
@@ -221,6 +236,7 @@
       if (done && (e.key === 'Backspace' || e.key === 'Delete' || e.key.startsWith('Arrow'))) done = false;
     });
     inp.addEventListener('input', () => { done = false; show(); });
+    root.querySelector('.bc-view').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.basic = +b.dataset.v; save(); refreshAll(); focus(); });
     root.querySelector('.bc-deg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; S.deg = +b.dataset.d; save(); refreshAll(); focus(); });
     root.querySelector('.bc-tape').addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
