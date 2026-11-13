@@ -12,6 +12,13 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (guide sections: threads, subprograms, drives)
+- Measurement guide: **Thread and ball micrometers** (what a thread micrometer reads, its anvils and how they go with the pitch, setting zero, why it does not agree with wires; ball, tube and blade micrometers).
+- Tooling guide: **Thread mills** (kinds of cutter, what thread milling does better than tapping and where tapping wins, the direction for climb milling an internal thread, several radial passes).
+- CNC lathe guide: **Threading** (G32 against G92 and G76, why the speed must stay fixed, tapered threads with G32 and in a cycle, more than one start, the start angle on a Haas).
+- CNC knowledge guide: **Subprograms** (M98 and M99, repeats, Haas M97, nesting, what carries over, G65) with three worked examples of our own.
+- Drives and maintenance guide: **Belt, chain or gears**, compared point by point; where the sources differ both views are shown.
+
 ### Added (units, signs and symbols; algebra; decimal places)
 - **Units, signs, symbols and Greek letters** (was "SI prefixes, constants and Greek letters"): how the SI and inch-pound units are tied together (the yard and pound of 1959, the inch of exactly 25.4 mm), the seven SI base units, the 22 derived units with a name of their own, 26 mathematical signs and the letters used for 37 quantities. Where publishers print different letters (torque, pressure, density) all are shown.
 - Formula library: six **algebra** entries (quadratic formula, powers, logarithms, change of base, factoring); two rest on one source and are marked.
@@ -75,7 +82,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (seventh batch)
 - MH300 (mathematical signs and letter symbols), ED3 (units systems), ED7 (essential mathematics), U105 (decimal precision), BB13 and MH252 (broken taps) from partial to done; ED10 (engineering abbreviations) done on re-audit.
-- 396 done, 152 partial, 48 missing of 596 in-scope rows, 66 %; 141 more rows to done for the 90 % target.
+- Counted after the seventh batch: 396 done, 152 partial, 48 missing.
+
+### Book audit (eighth batch)
+- MH245 (thread and ball micrometers), MH260 (thread milling methods), MH181 (thread cutting on CNC lathes), MH182 (subprograms) and ED76 (drive types) from partial to done.
+- 401 done, 147 partial, 48 missing of 596 in-scope rows, 67 %; 136 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.

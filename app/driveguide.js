@@ -5,6 +5,9 @@
 'use strict';
 
 const DV_SOURCES = {
+  LM_DRV: 'LearnMech, S. Thorat, "Mechanical drives: belt, chain, gear. Advantages and disadvantages", 2016-06-23, modified 2020-05-10',
+  UNCC_BC: 'University of North Carolina at Charlotte, engineering toolkit, "Belts & chains" (no author or date shown; its statements on service life contradict each other and are not used)',
+  DE_DRV: 'Design Engineering, L. Burgess, "Which is better: gear drive or belt and pulley drive system?", 2022-03-01',
   MD_NP: 'Machine Design, D. Basso, "Basics of motor nameplates", 2000-05-01',
   AD_AC: 'AutomationDirect library, C. McDaniel, "How do AC motors work?", 2018-01-02',
   CE_AC: 'Control Engineering, F. J. Bartos, "Anatomy of an AC induction motor"',
@@ -167,6 +170,18 @@ const DV_LIM = [
   ['Group 2, rigid support', '1.4', '2.8', '4.5', ['FAB_VIB', 'VIBRO']],
   ['Group 2, flexible support', '2.3', '4.5', '7.1', ['FAB_VIB', 'VIBRO']],
 ];
+// Belt, chain and gear drives side by side. A cell that rests on one of the three publishers names it.
+const DV_CMP = [
+  ['Slip', 'A flat belt or V-belt slips a little, so the speed ratio is not exact.', 'No slip: the ratio stays constant.', 'No slip: the ratio stays constant.', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Efficiency', 'Lower than that of a chain or of gears.', 'Higher than a belt; up to 98 % (UNC Charlotte).', 'High.', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Lubrication', 'None.', 'Regular lubrication (UNC Charlotte).', 'Regular lubrication.', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Noise', 'Quiet; damps noise and vibration.', 'Noisier than a belt.', 'Noisy when not lubricated (LearnMech).', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['First cost', 'Low.', 'Higher than a belt.', 'Small drives: cheaper than a belt drive. Large drives: a timing belt is cheaper (Design Engineering).', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Space', 'Not compact (Design Engineering); for shafts far apart (UNC Charlotte).', 'Takes less room than a belt (LearnMech); shafts closer together than with a belt (UNC Charlotte).', 'The most compact; not for shafts far apart (Design Engineering).', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Overload and shock', 'Slips or breaks when overloaded, which protects the machine (LearnMech); takes up swings in the load (Design Engineering).', 'Not stated in the sources read.', 'Can lock up if the tooth form is not kept (LearnMech).', ['LM_DRV', 'DE_DRV']],
+  ['Wear and upkeep', 'Wears and stretches; the tension has to be set again from time to time (LearnMech).', 'The sources differ: upkeep costs more than a belt (LearnMech); low upkeep cost, as for a belt (UNC Charlotte).', 'The longest life of the three (LearnMech).', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Oil and wet', 'Not for oily, greasy or wet places.', 'Works dry or wet.', 'Not stated in the sources read.', ['UNCC_BC']],
+];
 const DV_SIG = [
   ['Unbalance', 'Vibration mostly at once the running speed.', ['VIBRO']],
   ['Misalignment', 'Vibromera: at two and three times the running speed, with axial vibration more than half the radial. Fabrico and Tractian: at once and twice the running speed; Fabrico adds raised axial vibration.', ['VIBRO', 'FAB_AL', 'TRAC']],
@@ -174,12 +189,20 @@ const DV_SIG = [
   ['Rolling bearing damage', 'High-frequency noise.', ['VIBRO']],
 ];
 function renderDriveGuide(el) {
-  const toc = [['dv-mot', 'Electric motors'], ['dv-al', 'Shaft alignment'], ['dv-fp', 'Fluid power'], ['dv-vib', 'Machine vibration']];
+  const toc = [['dv-cmp', 'Belt, chain or gears'], ['dv-mot', 'Electric motors'], ['dv-al', 'Shaft alignment'], ['dv-fp', 'Fluid power'], ['dv-vib', 'Machine vibration']];
   const two = (head, rows) => '<div class="res cntab" style="max-width:none"><table class="gtab"><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '<th>Sources</th></tr>' +
     rows.map(r => '<tr><td><b>' + gesc(r[0]) + '</b></td><td>' + gesc(r[1]) + '</td><td>' + dvTags(r[2]) + '</td></tr>').join('') + '</table></div>';
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">What drives a machine and what keeps it running, in our own words: induction motors and their nameplate, lining up two coupled shafts with dial indicators, hydraulics and pneumatics with their fittings, and how machine vibration is judged. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
+
+    '<h2 id="dv-cmp">Belt, chain or gears</h2>' +
+    '<div id="dvcmp">' + guideTable(['', 'Belt', 'Chain', 'Gears'], DV_CMP, dvTags) + '</div>' +
+    dvP('<b>Timing belts</b> have teeth that keep the two shafts in step.', ['UNCC_BC', 'DE_DRV']) +
+    dvP('Design Engineering prefers a timing belt for high torque and a V-belt for high speed.', ['DE_DRV']) +
+    dvP('UNC Charlotte gives about 35 m/s as the limit of belt speed and a ratio of up to 8 : 1 for a chain.', ['UNCC_BC']) +
+    dvP('Neither a belt nor a chain is the better one in general: it depends on the job.', ['UNCC_BC']) +
+    dvP('Each drive has its calculator: <a href="#/t/beltdrive">belt drive</a>, <a href="#/t/chaindrive">chain drive</a> and <a href="#/t/geartrain">gear train</a>.', null) +
 
     '<h2 id="dv-mot">Electric motors</h2>' + dvMotor() +
     dvP('<b>Stator and rotor.</b> The stator is the fixed outer part of an AC motor. The rotor is the inner part that turns with the shaft.', ['AD_AC', 'CE_AC']) +

@@ -3739,7 +3739,7 @@ const TOOLS = [
 },
 {
   id: 'cncguide', level: 'advanced', group: 'Guides', title: 'CNC knowledge guide',
-  desc: 'Machine axes and the right-hand rule, machine, work and tool coordinates, work, length, radius and wear offsets, program structure, climb and conventional milling, chip formation, tool wear with causes and remedies, turning and milling troubleshooting, workholding and shop safety.',
+  desc: 'Machine axes and the right-hand rule, machine, work and tool coordinates, work, length, radius and wear offsets, program structure, subprograms with three worked examples, climb and conventional milling, chip formation, tool wear with causes and remedies, turning and milling troubleshooting, workholding and shop safety.',
   render: el => renderCncGuide(el),
   working: 'Reference only. Your machine and control manuals govern. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
   source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
@@ -3767,10 +3767,10 @@ const TOOLS = [
 },
 {
   id: 'latheguide', level: 'advanced', group: 'Guides', title: 'CNC lathe guide',
-  desc: 'Turning on a CNC lathe: the machine, chucks, soft jaws and collets, bar work with a puller or feeder, the common tools and insert shapes, speeds and feeds, the toolpaths in the order they are run with the Haas cycles, parting off, and live tools with the C axis.',
+  desc: 'Turning on a CNC lathe: the machine, chucks, soft jaws and collets, bar work with a puller or feeder, the common tools and insert shapes, speeds and feeds, the toolpaths in the order they are run with the Haas cycles, threading with G32, G92 and G76 (tapered and multi-start threads included), parting off, and live tools with the C axis.',
   render: el => renderLatheGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Cycle numbers are those of the Haas lathe manual read for this page.',
-  source: 'CIMCO CNC programming book, chapter 8; Haas Factory Outlet lathe programming manual (12/2024); Haas cut-off tool sheet; Production Machining and Modern Machine Shop (one publisher); CNC Cookbook; CNC Training Centre; Mitsubishi Materials. See docs/sources.md, "CNC lathe guide".',
+  source: 'CIMCO CNC programming book, chapter 8; Haas Factory Outlet lathe programming manual (12/2024); Haas cut-off tool sheet; Production Machining and Modern Machine Shop (one publisher); CNC Cookbook; CNC Training Centre; Mitsubishi Materials; Haas G32 and G76 pages, Cutting Tool Engineering, Modern Machine Shop and Industrial Monitor Direct (threading). See docs/sources.md, "CNC lathe guide".',
 },
 {
   id: 'shoptools', level: 'advanced', group: 'Guides', title: 'Shop tools guide',
@@ -3788,10 +3788,10 @@ const TOOLS = [
 },
 {
   id: 'measguide', level: 'advanced', group: 'Guides', title: 'Measurement guide',
-  desc: 'Inspection practice: the ways a tolerance is written, the ten preferred metric fits and what each is for, surface plate grades and care, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout with V-blocks and a dial indicator, and the surface texture and lay symbols on a drawing.',
+  desc: 'Inspection practice: the ways a tolerance is written, the ten preferred metric fits and what each is for, surface plate grades and care, checking a micrometer and a caliper against gauge blocks, thread, ball, tube and blade micrometers, checking a shaft for runout with V-blocks and a dial indicator, and the surface texture and lay symbols on a drawing.',
   render: el => renderMeasGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
-  source: 'WisTech Open Blueprint Reading (CC BY) and Machinist Guides (tolerances); Amesweb, Engineers Edge and Fractory (fits); Starrett, Quality Magazine, Mitutoyo and Travers (surface plates and blocks); Quality Magazine, Mitutoyo and Machinist Guides (micrometers and calipers); Fabrico, Acoem and the Machining FAQ (runout); GD&T Basics, Wevolver and Digital Surf (surface texture). Full list in docs/sources.md, "Measurement guide".',
+  source: 'WisTech Open Blueprint Reading (CC BY) and Machinist Guides (tolerances); Amesweb, Engineers Edge and Fractory (fits); Starrett, Quality Magazine, Mitutoyo and Travers (surface plates and blocks); Quality Magazine, Mitutoyo and Machinist Guides (micrometers and calipers); Quality Magazine, Haas, RS Components and Penn Tool (thread and ball micrometers); Fabrico, Acoem and the Machining FAQ (runout); GD&T Basics, Wevolver and Digital Surf (surface texture). Full list in docs/sources.md, "Measurement guide".',
 },
 {
   id: 'cutguide', level: 'advanced', group: 'Guides', title: 'Cutting tools guide',
@@ -3837,10 +3837,10 @@ const TOOLS = [
 },
 {
   id: 'driveguide', level: 'advanced', group: 'Guides', title: 'Drives and maintenance guide',
-  desc: 'Electric motors (stator and rotor, synchronous speed and slip, reading the nameplate field by field), shaft alignment with dial indicators (offset and angle, soft foot, rim and face against reverse dial, bracket sag, thermal growth), fluid power (force of a cylinder, the parts of a hydraulic circuit, pumps, hydraulics against pneumatics, air preparation, tube and hose fittings), and machine vibration (severity zones A to D with their limits, and what a vibration points to). Four drawings.',
+  desc: 'Belt, chain and gear drives compared point by point, electric motors (stator and rotor, synchronous speed and slip, reading the nameplate field by field), shaft alignment with dial indicators (offset and angle, soft foot, rim and face against reverse dial, bracket sag, thermal growth), fluid power (force of a cylinder, the parts of a hydraulic circuit, pumps, hydraulics against pneumatics, air preparation, tube and hose fittings), and machine vibration (severity zones A to D with their limits, and what a vibration points to). Four drawings.',
   render: el => renderDriveGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source. The vibration limits were read from two web pages about the ISO standards, not from the standards.',
-  source: 'Machine Design, AutomationDirect and Control Engineering (motors); Fabrico, OpenExamPrep and Tractian (alignment); course slides after Cundiff, OpenExamPrep, Wikipedia, Power & Motion and AutomationPrimer (fluid power); Brennan and MISUMI (fittings); Fabrico, Vibromera and Industrial Monitor Direct (vibration). Full list with URLs in docs/sources.md.',
+  source: 'LearnMech, UNC Charlotte and Design Engineering (belt, chain or gears); Machine Design, AutomationDirect and Control Engineering (motors); Fabrico, OpenExamPrep and Tractian (alignment); course slides after Cundiff, OpenExamPrep, Wikipedia, Power & Motion and AutomationPrimer (fluid power); Brennan and MISUMI (fittings); Fabrico, Vibromera and Industrial Monitor Direct (vibration). Full list with URLs in docs/sources.md.',
 },
 {
   id: 'fastguide', level: 'advanced', group: 'Guides', title: 'Fasteners guide',
@@ -3872,7 +3872,7 @@ const TOOLS = [
 },
 {
   id: 'toolguide', level: 'advanced', group: 'Guides', title: 'Tooling guide',
-  desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps and tap limits, saw blade pitch and broken tap removal.',
+  desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps and tap limits, thread mills and how they compare with tapping, saw blade pitch and broken tap removal.',
   render: el => renderToolGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements without two independent public sources are marked "needs 2nd source". Coating temperatures show every value printed.',
   source: 'Tool and coating makers and distributors listed under the guide and in docs/tooling.md (data/refdata/tooling-evidence.json).',

@@ -24,10 +24,14 @@ const MZ_SOURCES = {
   GDTB: 'GD&T Basics, article on surface finish (text only; its symbol charts are images)',
   WEV_SF: 'Wevolver, "Surface finish symbols: how to read a drawing callout"',
   DS: 'Digital Surf, Surface metrology guide, "Indication of surface texture"',
+  QMAG_PM: 'Quality Magazine, H. Cox, "The pitch mike problem", 2017-06-01',
+  HAAS_STM: 'Haas Automation, "Screw thread micrometers", instruction manual 09-0274 (text only; its table of pitch ranges could not be read)',
+  RS_MIC: 'RS Components, "A complete guide to micrometers", 2023-03-07, modified 2024-05-14',
+  PENN_MIC: 'Penn Tool Co., M. Elson, "Micrometer: its working principle, parts, use and precautions", 2017-04-13',
   OWN: 'BenchMate reading of the rule in the sources beside it',
 };
 // Several pages of one publisher count once. The Quality Magazine article on surface plates repeats Starrett's text.
-const MZ_FAMILY = { QM_SP: 'STARRETT', STAR: 'STARRETT', MITU_SP: 'MITUTOYO', MITU_MIC: 'MITUTOYO', MITU_CAL: 'MITUTOYO', MGT: 'MACHG', MGC: 'MACHG' };
+const MZ_FAMILY = { QM_SP: 'STARRETT', STAR: 'STARRETT', MITU_SP: 'MITUTOYO', MITU_MIC: 'MITUTOYO', MITU_CAL: 'MITUTOYO', MGT: 'MACHG', MGC: 'MACHG', QM_MIC: 'QMAG', QMAG_PM: 'QMAG' };
 const mzTags = keys => guideTags(keys, MZ_SOURCES, MZ_FAMILY);
 const mzP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + mzTags(keys)) + '</p>';
 
@@ -101,7 +105,7 @@ const MZ_LAY = [
 ];
 
 function renderMeasGuide(el) {
-  const toc = [['mz-tol', 'Writing a tolerance'], ['mz-fit', 'Preferred fits'], ['mz-plate', 'Surface plates'], ['mz-mic', 'Checking micrometers and calipers'], ['mz-shaft', 'Shaft runout'], ['mz-surf', 'Surface texture symbols']];
+  const toc = [['mz-tol', 'Writing a tolerance'], ['mz-fit', 'Preferred fits'], ['mz-plate', 'Surface plates'], ['mz-mic', 'Checking micrometers and calipers'], ['mz-thr', 'Thread and ball micrometers'], ['mz-shaft', 'Shaft runout'], ['mz-surf', 'Surface texture symbols']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Inspection practice in our own words: the ways a tolerance is written, the ten preferred metric fits, surface plates and their care, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout, and the surface texture symbols on a drawing. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
@@ -156,6 +160,19 @@ function renderMeasGuide(el) {
     mzP('<b>Dial calipers.</b> Choose sizes that bring the pointer to different places round the dial.', ['MITU_CAL']) +
     mzP('<b>How often.</b> Every three to four months for a tool in critical, daily use; once a year for one seldom used.', ['MGC']) +
     mzP('Reading a vernier and a micrometer thimble is practised in <a href="#/t/scales">reading scales</a>; what a temperature difference does to a measurement is in <a href="#/t/tempcomp">temperature compensation</a>.', null) +
+
+    '<h2 id="mz-thr">Thread and ball micrometers</h2>' +
+    mzP('<b>Thread micrometer.</b> Also called a pitch micrometer, which misleads: it does not measure the pitch. It reads the pitch diameter of a screw thread.', ['QMAG_PM', 'PENN_MIC']) +
+    mzP('<b>Its anvils.</b> One contact is a V that sits over a thread; the other is a cone that goes into the groove on the opposite side.', ['QMAG_PM', 'HAAS_STM']) +
+    mzP('<b>Anvils go with the pitch.</b> One pair of contacts covers only a range of pitches: Quality Magazine gives 14 to 18 and 32 to 40 threads per inch as examples; on the Haas micrometer the anvils are changed to suit the pitch, and the range is marked on them.', ['QMAG_PM', 'HAAS_STM']) +
+    mzP('<b>Setting zero.</b> Set it again whenever the anvils are changed. Haas: bring the anvils together, or close them on the setting standard, with the thimble at zero. Quality Magazine: set on a thread plug gauge of known pitch diameter, with the same pitch as the part and about the same diameter.', ['HAAS_STM', 'QMAG_PM']) +
+    mzP('<b>It will not agree with wires.</b> The anvils touch the flanks, and wires sit in the groove, so the two readings never agree exactly. Errors in the thread form and in the pitch change the reading, and it will not always agree with fixed limit gauges either.', ['QMAG_PM']) +
+    mzP('<b>What it is good for.</b> Setting up and watching the size during a run. The same article accepts the product with thread ring gauges and does not use a thread micrometer to calibrate thread plug gauges.', ['QMAG_PM']) +
+    mzP('<b>Ball micrometer.</b> A rounded anvil for the wall of a tube, where one contact has to sit on a curved surface.', ['RS_MIC', 'PENN_MIC']) +
+    mzP('RS Components adds the distance from a hole to an edge as a use.', ['RS_MIC']) +
+    mzP('<b>Tube micrometer.</b> Made for the wall thickness of tubes. RS Components describes its anvil as a cylinder set at right angles to the spindle.', ['RS_MIC', 'PENN_MIC']) +
+    mzP('<b>Blade micrometer.</b> Narrow blades that reach into a narrow groove, such as the groove for an O-ring.', ['RS_MIC', 'PENN_MIC']) +
+    mzP('The pitch diameter over wires is worked out in <a href="#/t/wires">thread measurement over wires</a>, gauge sizes in <a href="#/t/threadgauge">thread gauge limits</a>, and an unknown thread is named from its diameter and pitch in the <a href="#/t/threadid">thread identifier</a>.', null) +
 
     '<h2 id="mz-shaft">Checking a shaft for runout</h2>' + mzRunout() +
     mzP('<b>Runout</b> is how far a surface moves against a fixed point while the shaft is turned once.', ['FAB', 'ACOEM']) +

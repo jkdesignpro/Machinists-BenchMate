@@ -98,6 +98,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, seventh batch, 2026-11-13):** units, signs and letters for quantities on the symbols page, algebra in the formula library, a decimal places setting for all calculators, second and third sources for broken tap removal. MH300, ED3, ED7, U105, BB13 and MH252 from partial to done; ED10 done on re-audit (its section belongs to the drawing chapter, and the app lists 65 drawing abbreviations). Counted from the tables below: 396 done, 152 partial, 48 missing of 596 in-scope rows, 66 %; 141 more rows to done for the 90 % target.
 
+**Update (0.7.0, eighth batch, 2026-11-13):** five guide sections: thread and ball micrometers, thread mills, threading on a CNC lathe (G32, tapered and multi-start threads), subprograms with worked examples, and belt against chain against gears. MH245, MH260, MH181, MH182 and ED76 from partial to done. Counted from the tables below: 401 done, 147 partial, 48 missing of 596 in-scope rows, 67 %; 136 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -554,8 +556,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH178 | Work offsets, tool length offsets, cutter radius offsets | done | `cncguide` | Work offsets (G54-G59 and extended), tool length, cutter radius and wear offsets explained (`claude/cnc-guide`) |
 | MH179 | Fixed (canned) cycles for holes | done | `toolpaths`, `cycdrill` | Re-audit: G81, G82, G83, the R plane with G98 and G99, and G84 explained in the milling toolpath guide (0.6.0); generator for the blocks |
 | MH180 | Contouring, turning and boring on CNC | done | `toolpaths`, `latheguide` | Re-audit: contouring with cutter compensation in the milling toolpath guide; turning and boring in the CNC lathe guide (0.6.0) |
-| MH181 | Thread cutting on CNC lathes: depth, infeed, G32, G76, multi-start | partial | `cycthread` | Depth, infeed, G76 and G92; no G32, no multi-start, no tapered threads |
-| MH182 | Subprograms, macros and parametric programming | partial | `macroref` | Macro variables, system variables and statements per control; no worked subprogram examples |
+| MH181 | Thread cutting on CNC lathes: depth, infeed, G32, G76, multi-start | done | `cycthread`, `latheguide`, `multistart` | Depth, infeed, G76 and G92 for straight single-start threads in the program writer; 0.7.0: G32, tapered threads and more than one start explained in the CNC lathe guide, the shift between starts in `multistart`. The program writer does not write G32, tapered or multi-start programs |
+| MH182 | Subprograms, macros and parametric programming | done | `macroref`, `cncguide` | Macro variables, system variables and statements per control; 0.7.0: subprograms in the CNC knowledge guide (M98, M99, M97, repeats, nesting, G65) with three worked examples of our own |
 | MH183 | Axis nomenclature | done | `cncguide` | ISO 841 right-hand rule, mill and lathe axes, rotary axes (`claude/cnc-guide`) |
 | MH184 | Total indicator reading | done | `runout`, `gdtguide`, `measguide` | Runout and total runout in the GD&T guide, runout against chip load; 0.6.0: the measuring procedure |
 | MH185 | CAD/CAM: drawing types, projections, exchange standards | done | `drawguide` | 0.6.0: kinds of drawing, first and third angle with the symbols, sections, CAD exchange formats (STEP, IGES, Parasolid, STL, DXF, DWG) |
@@ -633,7 +635,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH242 | Spark plug, lamp base and electrical fixture threads | out of scope? | | |
 | MH243 | Instrument threads; British Association (BA) | partial | `whitworth` | BA done; instrument and microscope threads missing |
 | MH244 | Historical and miscellaneous threads | out of scope? | | |
-| MH245 | Measuring threads: pitch, lead, thread and ball micrometers | partial | `wires`, `threadid` | Measurement over wires and identifying a thread from diameter and pitch; no thread or ball micrometer guidance |
+| MH245 | Measuring threads: pitch, lead, thread and ball micrometers | done | `wires`, `threadid`, `measguide` | Measurement over wires and identifying a thread from diameter and pitch; 0.7.0: thread, ball, tube and blade micrometers in the measurement guide (four publishers) |
 | MH246 | Three-wire method, best wire sizes, formulas | partial | `wires` | 60, 55, 30, 29 degree; no lead-angle correction (`claude/threads-3`) |
 | MH247 | Wire measurement of Whitworth, ACME, stub ACME, taper and buttress threads | partial | `wires`, `acme`, `trapezoidal` | Whitworth, ACME, Stub ACME and trapezoidal; no taper or buttress wires (`claude/threads-3`) |
 | MH248 | Thread gauges, gauge tolerances | partial | `threadgauge` | 0.5.0: GO and NOT GO plug and ring pitch diameter limits for Unified 2A, 2B, 3A, 3B with the X tolerance; no metric (ISO 1502), no setting plugs |
@@ -648,7 +650,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH257 | Relieving helical-fluted hobs | out of scope? | | |
 | MH258 | Thread rolling: machines, blank diameter, roll diameter, speeds | partial | `rollblank` | 0.5.0: blank diameter by a maker's rule with the handbook's amounts beside it, correction after a trial; no machines, roll diameters or speeds |
 | MH259 | Thread grinding | missing | | |
-| MH260 | Thread milling: methods, helix angles | partial | `cyctmill` | Program, helix angle, feed; no method guide |
+| MH260 | Thread milling: methods, helix angles | done | `cyctmill`, `toolguide` | Program, helix angle, feed; 0.7.0: thread mills in the tooling guide (kinds of cutter, against tapping, climb milling direction, radial passes; four publishers) |
 
 ### Gears, splines and cams
 
@@ -790,7 +792,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED73 | 13.9 Cam mechanisms | done | `elemguide` | 0.6.0: as MH280: kinds of cam and follower, terms, displacement diagram, follower motions named (one source, marked) |
 | ED74 | 13.10 Clutches | out of scope? | | |
 | ED75 | 13.11 Pulley mechanisms | done | `beltdrive`, `tackle` | 0.6.0: belt length, ratio and wrap for two pulleys; 0.7.0: block and tackle, ideal pull, pull at your own efficiency and rope hauled in (the last two from one source each, marked) |
-| ED76 | 13.12 Drive types | partial | `beltdrive`, `chaindrive`, `geartrain` | 0.6.0: belt, chain and gear drives each have a calculator; no comparison of drive types |
+| ED76 | 13.12 Drive types | done | `beltdrive`, `chaindrive`, `geartrain`, `driveguide` | 0.6.0: belt, chain and gear drives each have a calculator; 0.7.0: the three compared point by point in the drives guide (three publishers) |
 | ED77 | 14.1-14.3 ISO 9001 quality systems and certification | out of scope? | | Management system |
 | ED78 | 14.4 Taguchi methods | missing | | Low priority |
 | ED79 | 14.5 Statistical process control | done | `capability`, `ctrlchart` | Cp/Cpk; X-bar/R and individuals/MR charts; run rules not applied (`claude/inspection-2`) |

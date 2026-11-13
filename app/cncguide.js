@@ -39,6 +39,9 @@ const CNC_SOURCES = {
   CADEM: 'Cadem, "Constant surface speed: why does it always go with a limiting spindle speed?" (cadem.com)',
   CTE: 'C. Tate, "Understanding cutting equations", Cutting Tool Engineering, 2014-07-01 (ctemag.com)',
   WOODWEB: 'WOODWEB knowledge base, "Understanding chip load", 2005-06-19 (woodweb.com)',
+  CCB_SUB: 'CNC Cookbook, "M98 & M99 G-code: CNC subprograms", last modified 2024-04-30 (cnccookbook.com)',
+  MG_SUB: 'B. Fowler, Machinist Guides, "Quick guide to CNC subprograms", 2024-09-08 (machinistguides.com; its example program is not used)',
+  IMD_SUB: 'Industrial Monitor Direct, "Fanuc subprogramming: M98, M99, GOTO macro reference", 2026-09-13 (its combined form of the P word is described two ways and is not used)',
   OWN: 'BenchMate derivation (geometry), with tests in core/src/tnrc.rs',
 };
 const CNC_INDEPENDENT = { HFO_OP: 'HAAS', HFO_L: 'HAAS', HFO_MP: 'HAAS', LCNC_G: 'LCNC', FMC_D: 'FMC', FMC_T: 'FMC' }; // same publisher family counts once
@@ -387,7 +390,7 @@ function cnGeoExamples() {
 }
 
 function renderCncGuide(el) {
-  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-geo', 'Working out coordinates'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
+  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-geo', 'Working out coordinates'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-sub', 'Subprograms'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
     ['c-wear', 'Tool wear'], ['c-trt', 'Turning troubles'], ['c-trm', 'Milling troubles'], ['c-trd', 'Drilling troubles'], ['c-trtap', 'Tapping troubles'], ['c-trg', 'Grinding troubles'], ['c-hold', 'Workholding'], ['c-safe', 'Safety'], ['c-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
@@ -432,6 +435,28 @@ function renderCncGuide(el) {
     '<h3>Special characters in a program</h3>' + cnTable(['Character', 'Meaning', 'Notes'], PROG_CHARS) +
     cp('<b>Subprograms.</b> Repeated work goes in a subprogram: M98 P(number) calls it and M99 returns (Fanuc, Haas); Haas M97 calls a block inside the same program; LinuxCNC uses O-word subroutines; G65 calls a macro with arguments. See the G and M codes and Macro reference screens for each control.', []) +
     cp('<b>Typical order of one tool:</b> safe start line, tool change and offsets, spindle speed and direction, coolant, rapid to a clear start point, cut, retract to a safe height or position, coolant and spindle off, next tool; finally return to the change position and M30.', ['OWN']) +
+
+    '<h2 id="c-sub">Subprograms</h2>' +
+    cp('<b>Call and return.</b> M98 with P runs the program that has that O number. M99 ends the subprogram and goes back to the block after the call.', ['CCB_SUB', 'MG_SUB', 'IMD_SUB']) +
+    cp('<b>Repeats.</b> L is the number of times it is run. Left out, it runs once.', ['CCB_SUB', 'MG_SUB', 'IMD_SUB']) +
+    cp('Some controls write the number of repeats another way, with K for example.', ['MG_SUB']) +
+    cp('<b>Inside the same program (Haas M97).</b> M97 with P runs the blocks that begin at that N number of the same program. They are put after the M30.', ['CCB_SUB', 'MG_SUB', 'IMD_SUB']) +
+    cp('<b>Nesting.</b> A subprogram can call another one, down to a limit set by the control. Machinist Guides gives four levels for most controls and finds one enough for most work.', ['CCB_SUB', 'MG_SUB']) +
+    cp('<b>Modes carry over.</b> What is modal at the call is still on inside the subprogram, and what the subprogram turns on is still on after the return.', ['MG_SUB']) +
+    cp('<b>Same shape in several places.</b> Write the shape once in incremental moves, go to each start point in the main program and call it there.', ['CCB_SUB', 'MG_SUB']) +
+    cp('<b>Several depths.</b> Write one pass once and call it again for each deeper level.', ['CCB_SUB']) +
+    cp('<b>Macro call.</b> G65 with P also runs another program, and hands the values written in the block to its local variables. M98 hands over nothing.', ['CCB_SUB', 'IMD_SUB']) +
+    cp('<b>M99 with P</b> returns to that N number of the calling program, not to the block after the call. CNC Cookbook finds it confusing and advises against it.', ['CCB_SUB', 'IMD_SUB']) +
+    cp('<b>M99 in the main program</b> starts the program again from the top.', ['IMD_SUB']) +
+    '<h3 class="gcat">Worked examples</h3>' +
+    '<p class="desc">The three examples are our own, in the Fanuc and Haas style that the sources describe, with mm values. They show how the blocks hang together and are not cut-ready programs: prove any program on your own control first.</p>' +
+    cp('<b>1. One shape at three places.</b> The subprogram is written in G91, so it starts from wherever the tool stands, and it goes back to G90 before it returns.', null) +
+    '<pre class="gcode" id="csub1">O1000 (MAIN PROGRAM)\nT1 M06\nG90 G54 G00 X10. Y10.    (first start point)\nG43 H01 Z5. M03 S2000\nM98 P2000                (cut the shape here)\nG00 X60. Y10.            (second start point)\nM98 P2000\nG00 X110. Y10.           (third start point)\nM98 P2000\nG00 Z50. M05\nM30\n\nO2000 (THE SHAPE, FROM WHERE THE TOOL STANDS)\nG91 G01 Z-7. F100.       (down)\nX30. F250.\nY20.\nX-30.\nY-20.\nG00 Z7.                  (up by the same amount)\nG90                      (absolute again)\nM99                      (back to the main program)</pre>' +
+    cp('<b>2. One pass, four depths.</b> Each call goes 1.5 mm deeper than the one before, because the Z move is incremental.', null) +
+    '<pre class="gcode" id="csub2">G90 G00 X0. Y0.\nZ2.\nG01 Z0. F100.            (down to the top of the part)\nM98 P3000 L4             (four passes)\nG90 G00 Z50.\n\nO3000 (ONE PASS)\nG91 G01 Z-1.5 F100.\nX40. F250.\nY25.\nX-40.\nY-25.\nG90\nM99</pre>' +
+    cp('<b>3. Haas M97.</b> The same pass kept in the main program, after the M30.', null) +
+    '<pre class="gcode" id="csub3">G90 G00 X0. Y0.\nZ2.\nG01 Z0. F100.\nM97 P500 L4              (run the blocks from N500 four times)\nG90 G00 Z50.\nM30\nN500 G91 G01 Z-1.5 F100.\nX40. F250.\nY25.\nX-40.\nY-25.\nG90\nM99</pre>' +
+    cp('The codes of each control are in <a href="#/t/gmcodes">G and M codes</a>, and variables, arguments and loops in the <a href="#/t/macroref">macro reference</a>.', null) +
 
     '<h2 id="c-spin">Spindle direction and constant surface speed</h2>' + cnSpin() +
     cp('<b>M03, M04, M05.</b> M03 starts the spindle clockwise at the S speed, M04 starts it counterclockwise and M05 stops it.', ['LCNC_G', 'HURCO_PF', 'HFO_MP']) +

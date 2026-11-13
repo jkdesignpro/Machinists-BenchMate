@@ -1926,7 +1926,7 @@ where = 'toolpaths';
   // CNC lathe guide: the two trade magazines have one publisher and the two Haas documents count once.
   where = 'latheguide';
   g = await guide('latheguide');
-  if (g.h2 !== 9 || g.svgs !== 4 || g.tabs !== '9,8,8' || g.srcs !== 10) problems.push(`[${where}] 9 sections, 4 drawings, tables of 8, 7 and 7 rows, 10 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 10 || g.svgs !== 4 || g.tabs !== '9,8,8' || g.srcs !== 17) problems.push(`[${where}] 10 sections, 4 drawings, tables of 8, 7 and 7 rows, 17 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 38) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Spindle and chuck', 'Chuck or collet', 'Through the spindle', 'On centre', 'Slow the feed near the centre', 'Coolant: the sources differ', 'Axial and radial', 'Milling a shape on the face', 'Feed per minute'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -1974,7 +1974,7 @@ where = 'toolpaths';
   if (!/under 0\.25 % in one, 0\.05 to 0\.30 % in the other/.test(g.all) || !/0\.0005 to 0\.003 %/.test(g.all) || !/OS025 is 0\.025 mm/.test(g.all) || !/apex angle of 120 degrees/.test(g.all) || !/about 6 % aluminium and 4 % vanadium/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   where = 'measguide';
   g = await guide('measguide');
-  if (g.h2 !== 7 || g.svgs !== 3 || g.tabs !== '5,11,4,8' || g.srcs !== 20) problems.push(`[${where}] 7 sections, 3 drawings, tables of 4, 10, 3 and 7 rows, 20 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '5,11,4,8' || g.srcs !== 24) problems.push(`[${where}] 8 sections, 3 drawings, tables of 4, 10, 3 and 7 rows, 24 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 54) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Limit dimensions', 'A unilateral tolerance', 'Three kinds of fit', 'Three grades', 'Overall flatness', 'Repeat reading', 'The standard', 'Micrometer, five points', 'Caliper, outside jaws', 'Total indicator reading', 'Indicator. Fix it', 'How much is too much', 'Lay is the direction'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2165,7 +2165,7 @@ where = 'toolpaths';
   }
   where = 'driveguide';
   g = await guide('driveguide');
-  if (g.h2 !== 5 || g.svgs !== 4 || g.tabs !== '15,5,6,10,4,8,10,5,5,5' || g.srcs !== 16) problems.push(`[${where}] 5 sections, 4 drawings, tables of 14, 4, 5, 9, 3, 7, 9, 4, 4 and 4 rows, 16 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 6 || g.svgs !== 4 || g.tabs !== '10,15,5,6,10,4,8,10,5,5,5' || g.srcs !== 19) problems.push(`[${where}] 6 sections, 4 drawings, tables of 9, 14, 4, 5, 9, 3, 7, 9, 4, 4 and 4 rows, 19 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 52) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Stator and rotor', 'Rotating field', 'Induction', 'Synchronous speed is', 'Slip. An induction motor', 'How much slip', 'Offset and angle', 'What misalignment does', 'Soft foot first', 'Bracket sag', 'Thermal growth', 'The limits of the maker', 'Small piston, big load', 'Force of a cylinder', 'The pump makes flow', 'Air preparation', 'What is measured', 'Frequency range', 'Where. At each bearing', 'Two groups of machines', 'Rigid or flexible', 'Standard numbers'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2185,7 +2185,7 @@ where = 'toolpaths';
     if (!/^Group 1, rigid support 2\.3 4\.5 7\.1/.test(row('Group 1, rigid')) || !/^Group 1, flexible support 3\.5 7\.1 11\.0/.test(row('Group 1, flexible')) || !/^Group 2, rigid support 1\.4 2\.8 4\.5/.test(row('Group 2, rigid')) || !/^Group 2, flexible support 2\.3 4\.5 7\.1/.test(row('Group 2, flexible'))) problems.push(`[${where}] zone boundaries: ${row('Group 1, rigid')} | ${row('Group 1, flexible')} | ${row('Group 2, rigid')} | ${row('Group 2, flexible')}`);
     if (!/Vibromera: at two and three times the running speed, with axial vibration more than half the radial\. Fabrico and Tractian: at once and twice the running speed/.test(row('Misalignment')) || !/mostly at once the running speed/.test(row('Unbalance'))) problems.push(`[${where}] fault rows: ${row('Misalignment')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ').slice(0, 2).join(' ')).join(', ');
-    if (fl !== 'Voltage The, Frequency and, Full-load amps, Power The, Code letter, Service factor, Efficiency The, Duty Usually, Insulation class, Ambient The, Frame The, Straightedge and, Up to, 1000 to, 2000 to, 3000 to, Above 4000, Reservoir Holds, Check valve, Accumulator Stores, Flow control, 45 degree, Parallel pipe, Push-to-connect A, Unbalance Vibration, Looseness At, Rolling bearing') problems.push(`[${where}] the rows with one publisher: ${fl}`);
+    if (fl !== 'Oil and, Voltage The, Frequency and, Full-load amps, Power The, Code letter, Service factor, Efficiency The, Duty Usually, Insulation class, Ambient The, Frame The, Straightedge and, Up to, 1000 to, 2000 to, 3000 to, Above 4000, Reservoir Holds, Check valve, Accumulator Stores, Flow control, 45 degree, Parallel pipe, Push-to-connect A, Unbalance Vibration, Looseness At, Rolling bearing') problems.push(`[${where}] the rows with one publisher: ${fl}`);
   }
   if (!/1760 rpm \(AutomationDirect\), 1748 rpm \(Machine Design\) and 1746 rpm \(Control Engineering, at 3 % slip\)/.test(g.all) || !/120 times the frequency, divided by the number of poles/.test(g.all) || !/synchronous speed of 1800 rpm/.test(g.all) || !/2 to 5 % as the usual slip/.test(g.all) || !/within 15 degrees of the vertical/.test(g.all) || !/more than 0\.001 in \(0\.025 mm\), look for loose hardware/.test(g.all) || !/no more than 0\.001 in \(0\.025 mm\) runout/.test(g.all) || !/more than 0\.002 in \(0\.05 mm\) as a flange is loosened/.test(g.all) || !/API 686 as 0\.02 mm offset and 0\.03 degrees/.test(g.all) || !/divided by 1714; kilowatts are bar times litres a minute divided by 600/.test(g.all) || !/5 to 10 times that of a hydraulic one/.test(g.all) || !/about 1 hp for every 4 cubic feet a minute/.test(g.all) || !/above 6000 psi \(41 MPa\)/.test(g.all) || !/every five to seven years/.test(g.all) || !/covers 10 to 1000 Hz/.test(g.all) || !/above 300 kW, Group 2 machines from 15 to 300 kW/.test(g.all) || !/at least 25 % above/.test(g.all) || !/above 15 kW running at 120 to 30 000 rpm/.test(g.all) || !/315 mm and more for Group 1, 160 to 315 mm for Group 2/.test(g.all) || !/not from the standards themselves/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   {
@@ -2197,7 +2197,7 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
-    if (links !== 'bearguide,torsion,measguide,pipethreads,oring,chatter') problems.push(`[${where}] links to other pages: ${links}`);
+    if (links !== 'beltdrive,chaindrive,geartrain,bearguide,torsion,measguide,pipethreads,oring,chatter') problems.push(`[${where}] links to other pages: ${links}`);
   }
   where = 'fastguide';
   g = await guide('fastguide');
@@ -2579,6 +2579,35 @@ where = 'toolpaths';
     await open('formulas', 200);
     const fq3 = await page.$('#main input[type="search"]');
     if (fq3) { await fq3.fill('Algebra'); await fq3.dispatchEvent('input'); await page.waitForTimeout(150); const ft = (await page.$eval('#main', e => e.innerText)).replace(/\s+/g, ' '); if (!/6 of \d+ formulas/.test(ft) || !/x = \(−b ± √\(b² − 4ac\)\) \/ \(2a\)/.test(ft) || !/log_b x = ln x \/ ln b/.test(ft) || !/single source/i.test(ft)) problems.push(`[${where}] algebra in the formula library: ${ft.slice(0, 500)}`); await fq3.fill(''); await fq3.dispatchEvent('input'); }
+    await mode('advanced');
+  }
+
+  // Eighth batch of 0.7.0: thread and ball micrometers, thread mills, threading on a CNC lathe, subprograms with worked
+  // examples, and belt against chain against gears. Each section is read back with its source tags.
+  where = 'guides-8';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id) => { await open(tool, 300); return page.evaluate(i => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && n.tagName !== 'H2') { out.push({ t: n.innerText.replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv'), tag: n.tagName }); n = n.nextElementSibling; } return out; }, id); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const linksOk = async id => page.evaluate(i => { const h = document.querySelector('#main #' + i); let n = h && h.nextElementSibling, ok = !!h; while (n && n.tagName !== 'H2') { n.querySelectorAll('a[href^="#/t/"]').forEach(a => { if (!TOOLS.some(t => t.id === a.getAttribute('href').slice(4))) ok = false; }); n = n.nextElementSibling; } return ok; }, id);
+
+    let s = await sect('measguide', 'mz-thr');
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^Thread micrometer\..*reads the pitch diameter/, 2, false) || !has(s, /^It will not agree with wires/, 1, true) || !has(s, /^Ball micrometer/, 2, false) || !(await linksOk('mz-thr'))) problems.push(`[${where}] thread and ball micrometers: ${s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 30)).join(' ; ')}`);
+
+    s = await sect('toolguide', 't-tm');
+    if (s.filter(x => x.k > 0).length !== 18 || !has(s, /^Climb milling a right-hand internal thread: start at the bottom and go round counter-clockwise/, 3, false) || !has(s, /^Partial-profile cutters/, 1, true) || !has(s, /^Blind holes\..*within half a pitch/, 2, false) || !(await page.$('#main button.tglink[data-id="cyctmill"]'))) problems.push(`[${where}] thread mills: ${s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 30)).join(' ; ')}`);
+
+    s = await sect('latheguide', 'l-thread');
+    if (s.filter(x => x.k > 0).length !== 18 || !has(s, /^G32, one move per block/, 2, false) || !has(s, /^More than one start\. The lead is the pitch times the number of starts/, 3, false) || !has(s, /Q180000 is 180°/, 1, true) || !has(s, /^An ordinary outside taper thread, small at the front, takes a negative value/, 2, false) || !(await linksOk('l-thread'))) problems.push(`[${where}] lathe threading: ${s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 30)).join(' ; ')}`);
+
+    s = await sect('cncguide', 'c-sub');
+    const pre = await page.$$eval('#main pre.gcode', a => a.filter(e => /^csub/.test(e.id)).map(e => e.textContent));
+    if (s.filter(x => x.k > 0).length !== 11 || !has(s, /^Call and return\. M98 with P/, 3, false) || !has(s, /^M99 in the main program/, 1, true) || pre.length !== 3 || !/M98 P2000[\s\S]*O2000[\s\S]*G91 G01 Z-7\. F100\.[\s\S]*G90[\s\S]*M99/.test(pre[0]) || !/M98 P3000 L4/.test(pre[1]) || !/M97 P500 L4[\s\S]*M30\nN500 G91/.test(pre[2]) || !(await linksOk('c-sub'))) problems.push(`[${where}] subprograms: ${s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 30)).join(' ; ')} | ${pre.length} examples`);
+
+    s = await sect('driveguide', 'dv-cmp');
+    const cmp = await page.$$eval('#main #dvcmp tr', r => r.map(t => Array.from(t.children).map(c => c.innerText.replace(/\s+/g, ' ').trim())));
+    if (cmp.length !== 10 || cmp[0].join('|') !== '|Belt|Chain|Gears|Sources' || !/^Slip$/.test(cmp[1][0]) || !/No slip/.test(cmp[1][2]) || !/up to 98 % \(UNC Charlotte\)/.test(cmp[2][2]) || !/The sources differ/.test(cmp[8][2]) || !/to be verified/.test(cmp[9][4]) || /to be verified/.test(cmp[1][4]) || !(await linksOk('dv-cmp'))) problems.push(`[${where}] belt, chain or gears: ${cmp.map(r => r.join(' / ').slice(0, 80)).join(' ; ')}`);
+    if (await page.evaluate(() => { const e = document.querySelector('#main #dvcmp .cntab'); return e.scrollWidth > e.clientWidth + 1; })) problems.push(`[${where}] the drives table is wider than its frame`);
     await mode('advanced');
   }
 

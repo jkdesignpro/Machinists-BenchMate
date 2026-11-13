@@ -14,7 +14,7 @@ const TG_EXTRA = {
   OWN: { publisher: 'BenchMate', title: 'Own derivation (geometry), with tests in core/src/tooling.rs' },
 };
 // USCTI's tapping tips are GWS Tool Group's text: one publisher family.
-const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS' };
+const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS', MSC_TM: 'MSC' };
 let TG_SRC = TG_EXTRA;
 function tgTags(keys) {
   const ks = keys || [];
@@ -72,7 +72,7 @@ async function renderToolGuide(el) {
   TG_SRC = Object.assign({}, TG_EXTRA, T.sources);
   const S = T.sources;
   const toc = [['t-geo', 'Tool geometry'], ['t-mat', 'Tool materials'], ['t-coat', 'Coatings'], ['t-em', 'End mills'], ['t-dr', 'Drills'], ['t-rm', 'Reamers'], ['t-tap', 'Taps'],
-    ['t-lim', 'Tap limits'], ['t-saw', 'Saw blades'], ['t-brk', 'Broken taps'], ['t-src', 'Sources']];
+    ['t-lim', 'Tap limits'], ['t-tm', 'Thread mills'], ['t-saw', 'Saw blades'], ['t-brk', 'Broken taps'], ['t-src', 'Sources']];
   const coatRows = [
     ['TiN', 'Titanium nitride. Gold. The general purpose coating for HSS and carbide drills, taps and end mills.', ['HARTNER', 'GWS']],
     ['TiCN', 'Titanium carbonitride. Harder than TiN, for edges under high mechanical load or impact, such as taps and interrupted cuts; lower heat limit.', ['HARTNER', 'PRODINC']],
@@ -151,6 +151,27 @@ async function renderToolGuide(el) {
     tp('<b>D numbers (metric)</b> step the same way above the basic pitch diameter: OSG gives them as multiples of 0.0005 in (D3 to + 0.0015 in, D9 to + 0.0045 in), USCTI as multiples of 0.013 mm. The two steps differ by 0.0003 mm per number, so D9 is 0.114 mm (OSG, 0.0045 in) or 0.117 mm (USCTI). DU numbers are undersize.', ['OSG', 'USCTI']) +
     tp('<b>Choosing.</b> The tap must cut inside the internal thread\'s pitch diameter tolerance, allowing for the hole cutting a little larger than the tap. MSC says to choose the largest H number that still gives the class of fit, for tap life; Cutting Tool Supply gives a "40 % rule" (tap about 40 % of the tolerance above the minimum). OSG prints a recommended number per size and class. Forming taps are made to their own limits, often higher: use the maker\'s chart.', ['MSC', 'CTS']) +
     '<p>The ' + tgLink('taplimits', 'Tap pitch diameter limits') + ' tool works these out for any thread and class.</p>' +
+
+    '<h2 id="t-tm">Thread mills</h2>' +
+    '<p class="desc">A thread mill cuts a thread by going round the hole or the boss while it moves along the axis. Our own summary of what the sources below say; the program is written by the ' + tgLink('cyctmill', 'Thread milling program') + ' tool.</p>' +
+    tp('<b>The machine</b> has to move X, Y and Z at the same time.', ['HARVEY_TM']) +
+    tp('Most modern controls have a cycle for it.', ['PROTOOL_TM']) +
+    tp('<b>Single-profile (single-form) cutters</b> have one cutting tooth and make the thread one turn at a time. Protool calls them the slower kind.', ['HARVEY_TM', 'MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Full-profile (multi-form) cutters</b> carry the whole thread form on several teeth and finish the thread in one orbit, for one pitch only. Harvey lists a tri-form cutter as well.', ['PROTOOL_TM', 'HARVEY_TM']) +
+    tp('<b>Partial-profile cutters</b>, with a 60° or 55° point, cover a range of pitches.', ['PROTOOL_TM']) +
+    tp('<b>One tool, many threads.</b> A thread mill cuts any diameter that has its pitch.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('The same tool cuts right-hand and left-hand threads, inside and outside.', ['MSC_TM', 'HARVEY_TM']) +
+    tp('<b>Against tapping: no tap to break.</b> Thread milling suits materials and parts where a broken tap is the worry.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Blind holes.</b> The thread can run close to the bottom of the hole: MSC says within half a pitch.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Hard and tough materials</b> are easier to thread mill than to tap. Protool names titanium, Inconel, hardened steel and stainless.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Power.</b> Thread milling takes less power than tapping; a large tap needs a lot of torque and a rigid spindle.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Size.</b> A tight thread is put right with the cutter radius offset.', ['PROTOOL_TM']) +
+    tp('<b>Where tapping wins.</b> Tapping is quicker on small holes made in large numbers in free-cutting material.', ['PROTOOL_TM']) +
+    tp('<b>Climb milling a right-hand internal thread:</b> start at the bottom and go round counter-clockwise on the way up, with the spindle turning clockwise.', ['HARVEY_TM', 'IMD_TM', 'PROTOOL_TM']) +
+    tp('<b>A left-hand internal thread</b> is climb milled from the top down, also counter-clockwise.', ['HARVEY_TM', 'IMD_TM']) +
+    tp('<b>Several radial passes.</b> In tough material, or with a long tool, step out to size over two or three orbits. It spares the tool, bends it less and gives a better thread.', ['HARVEY_TM', 'PROTOOL_TM']) +
+    tp('<b>Chips.</b> Clear them with coolant: chips that are cut a second time push the thread out of tolerance.', ['HARVEY_TM']) +
+    tp('<b>Cutter diameter.</b> Harvey: no larger than the job needs.', ['HARVEY_TM']) +
 
     '<h2 id="t-saw">Saw blades and tooth pitch</h2>' +
     tp('<b>At least three teeth in the cut.</b> Choose a pitch that keeps at least three teeth in the thinnest section the blade crosses (the wall of a tube or the leg of an angle); with fewer, teeth snag and strip.', ['STARRETT', 'RMT']) +
