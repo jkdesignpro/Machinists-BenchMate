@@ -8,6 +8,11 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 Work on the feedback after using 0.7.0.
 
 ### Changed
+- Advisors (milling, plunge roughing, drilling, reaming, tapping, turning): the feed is now shown as large as the spindle speed at the top of the result, with a short note on where it came from, instead of only in the list below. The tiles under it no longer repeat the spindle speed and feed; they say only whether they are inside the machine's top speed and top feed.
+- Any tool can now put more than one figure in the headline: a result row marked `big` sits beside the first one.
+- The calculator button in a number box is now its own small key between the box and the unit, always there and dim until the pointer is over the box. It used to sit over the box's up and down arrows.
+- A box that does not apply to the choices made (for example the second size of a round bar on the Bandsaw page) now stays where it is, greyed out and locked, instead of disappearing, so the other boxes no longer move about.
+- Slitting saw speeds and feeds is now filed under Milling, and is listed in Milling > Speeds and feeds as well as in Sawing.
 - Status line at the foot of the window: the sentence about Rust is gone; the warning to check results before cutting stays.
 
 ### Fixed

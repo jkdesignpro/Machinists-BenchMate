@@ -146,9 +146,13 @@ label.f .row{position:relative}
 label.f input,label.f select{height:32px;font-size:13.5px}
 label.f.bad input{border-color:var(--err);background:var(--err2)}
 label.f.calcd input{color:var(--digit);background:var(--screen);border-color:var(--screen-line);font-weight:600}
-label.f .fx{position:absolute;right:42px;top:4px;width:24px;height:24px;display:none;place-items:center;border:0;border-radius:2px;background:var(--field);color:var(--muted);cursor:pointer;padding:0}
+label.f .fx{flex:none;width:22px;height:28px;display:grid;place-items:center;border:0;border-radius:2px;background:none;color:var(--muted);opacity:.4;cursor:pointer;padding:0;margin:0 -4px 0 -2px}
 label.f .fx .ic{width:15px;height:15px}
-label.f .row:hover .fx,label.f .row:focus-within .fx{display:grid}
+label.f .row:hover .fx,label.f .row:focus-within .fx{opacity:1}
+label.f .fx:focus-visible{opacity:1}
+label.f.na{opacity:.38}
+label.f.na input,label.f.na select{cursor:not-allowed;background:none;border-style:dashed}
+label.f.na .fx,label.f.na .flock{visibility:hidden}
 label.f .fx:hover{color:var(--accent)}
 .lvhide{display:none !important}
 .pair{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:end}
@@ -165,6 +169,12 @@ label.f .row input,label.f .row select{min-width:0;width:100%}
 .hero.over{background:var(--warn2)}
 .hero.over .hv b,.hero.over .hv span{color:var(--warn);text-shadow:none}
 .hero .wmsg{display:flex;gap:6px;align-items:center;margin-top:6px;font-weight:600}
+.hero.multi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 24px;align-items:start}
+.hero .hi{min-width:0}
+.hero .hi.h2 .hv b{font-size:28px}
+.hero .hsub{font-size:11px;color:var(--muted);margin-top:2px;max-width:260px}
+.hero .hi.over{background:var(--warn2);margin:-4px -8px;padding:4px 8px}
+.hero .hi.over .hv b,.hero .hi.over .hv span{color:var(--warn);text-shadow:none}
 .tg .res table{margin:4px 0}
 .tg .res td{padding:6px 16px;border-bottom:1px solid var(--soft)}
 .tg .res td.v{font-size:14px}

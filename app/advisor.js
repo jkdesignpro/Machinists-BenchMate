@@ -323,8 +323,8 @@ TOOLS.push(
     const limName = (ADV_LIMITS[r.limit] || '').toLowerCase();
     const rows = [
       R('Spindle speed', r.rpm, 'RPM', 0),
-      R('Table feed', r.vf / k, feedMinU(s), inch ? 2 : 0),
-      R('Feed per tooth', r.fz / k, lu, dpF),
+      R('Table feed', r.vf / k, feedMinU(s), inch ? 2 : 0, undefined, { big: true, hl: 'Table feed' }),
+      R('Feed per tooth', r.fz / k, lu, dpF, undefined, { big: true, hl: 'Feed per tooth' }),
       r.ball ? R('Cutting speed at the largest diameter in the cut', inch ? r.vcDe / FT_M : r.vcDe, spdU(s), 0) : R('Cutting speed at the tool', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0),
       R('Width of cut ae (' + how(r.aeL, r.ae0, r.ae, limName, ADV_ENG_SRC[r.srcAe]) + ')', r.ae / k, lu, dpL),
       R('Depth of cut ap (' + how(r.apL, r.ap0, r.ap, limName, ADV_ENG_SRC[r.srcAp]) + ')', r.ap / k, lu, dpL),
@@ -361,7 +361,7 @@ TOOLS.push(
     const r = advMillRun(v, W, s);
     if (!r || r.none) return '';
     const inch = r.inch, k = r.k, lu = lenU(s), f = (x, dp) => fmt(x, dp);
-    let tiles = advTile('Spindle speed', f(r.rpm, 0) + ' RPM', r.rpmCap ? 'held to the top speed ' + advOf(r.mach.nSrc) : r.mach.n > 0 ? 'inside the top speed ' + advOf(r.mach.nSrc) : 'no machine picked', r.rpmCap ? 'caution' : 'good');
+    let tiles = advTile('Top speed', r.rpmCap ? 'Held to it' : r.mach.n > 0 ? 'Inside' : 'Not checked', r.rpmCap ? 'held to the top speed ' + advOf(r.mach.nSrc) : r.mach.n > 0 ? 'inside the top speed ' + advOf(r.mach.nSrc) : 'no machine picked', r.rpmCap ? 'caution' : 'good');
     if (isFinite(r.useP)) tiles += advTile(r.limit === 3 ? 'Torque' : 'Power', advPct(r.useP), 'of ' + f(r.pAv, 2) + ' kW at this speed', advBand(r.useP));
     else tiles += advTile('Power', isFinite(r.pSp) ? f(r.pSp, 2) + ' kW' : 'not worked out', r.mach.live ? 'driven tool: type its power to check it' : 'pick a machine to check it', '');
     if (isFinite(r.useD)) tiles += advTile('Deflection', f(r.defl / k, inch ? 5 : 3) + ' ' + lu, advPct(r.useD) + ' of ' + f(r.lim / k, inch ? 4 : 2) + ' ' + lu + (r.limOwn ? '' : ' (starting figure)'), advBand(r.useD));
@@ -446,7 +446,7 @@ function advHoleCard(r, s, what) {
 }
 function advHoleTiles(r, s) {
   const f = (x, dp) => fmt(x, dp);
-  let t = advTile('Spindle speed', f(r.rpm, 0) + ' RPM', r.limit === 7 || r.rpmCap ? 'held to the top speed ' + advOf(r.mach.nSrc) : r.mach.n > 0 ? 'inside the top speed ' + advOf(r.mach.nSrc) : 'no machine picked', r.limit === 7 || r.rpmCap ? 'caution' : 'good');
+  let t = advTile('Top speed', r.limit === 7 || r.rpmCap ? 'Held to it' : r.mach.n > 0 ? 'Inside' : 'Not checked', r.limit === 7 || r.rpmCap ? 'held to the top speed ' + advOf(r.mach.nSrc) : r.mach.n > 0 ? 'inside the top speed ' + advOf(r.mach.nSrc) : 'no machine picked', r.limit === 7 || r.rpmCap ? 'caution' : 'good');
   if (isFinite(r.useP)) t += advTile(r.limit === 3 ? 'Torque' : 'Power', advPct(r.useP), 'of ' + f(r.pAv, 2) + ' kW at this speed', advBand(r.useP));
   else if (r.hasForce) t += advTile('Power', isFinite(r.pSp) ? f(r.pSp, 2) + ' kW' : 'not worked out', r.mach.live ? 'driven tool: type its power to check it' : 'pick a machine to check it', '');
   return t;
@@ -659,8 +659,8 @@ TOOLS.push(
     const fHow = r.fL ? (r.f < r.f0 * (1 - 1e-9) ? 'yours, reduced to the top feed of the machine' : 'yours, locked') : r.f < r.f0 * (1 - 1e-9) ? 'reduced from ' + fmt(r.f0 / k, dpF) + ' to fit ' + (ADV_LIMITS[r.limit] || 'the machine').toLowerCase() : 'suggested: University of Florida table for this diameter';
     const rows = [
       R('Spindle speed', r.rpm, 'RPM', 0),
-      R('Feed per revolution (' + fHow + ')', r.f / k, feedRevU(s), dpF),
-      R('Feed rate', r.vf / k, feedMinU(s), inch ? 2 : 0),
+      R('Feed per revolution (' + fHow + ')', r.f / k, feedRevU(s), dpF, undefined, { big: true, hl: 'Feed per rev', hsub: fHow }),
+      R('Feed rate', r.vf / k, feedMinU(s), inch ? 2 : 0, undefined, { big: true, hl: 'Feed rate' }),
       R('Cutting speed at the drill', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0),
     ];
     const pl = W.drill_point_length(r.dmm, r.pt), q = W.mrr_drilling_cm3_min(r.dmm, r.vf);
@@ -729,8 +729,8 @@ TOOLS.push(
     if (r.none) rows.push(R('Speed and feed', 'No publisher in the table lists a reaming speed for this material: type your own cutting speed and feed', '', 0));
     else {
       rows.push(R('Spindle speed', r.rpm, 'RPM', 0),
-        R('Feed per revolution (' + (r.fL ? 'yours, locked' : 'suggested: ' + r.e.pub + (r.e.fnote ? '; ' + r.e.fnote : '')) + ')', r.f / k, feedRevU(s), dpF),
-        R('Feed rate', r.vf / k, feedMinU(s), inch ? 2 : 0),
+        R('Feed per revolution (' + (r.fL ? 'yours, locked' : 'suggested: ' + r.e.pub + (r.e.fnote ? '; ' + r.e.fnote : '')) + ')', r.f / k, feedRevU(s), dpF, undefined, { big: true, hl: 'Feed per rev', hsub: r.fL ? 'yours, locked' : 'suggested: ' + r.e.pub }),
+        R('Feed rate', r.vf / k, feedMinU(s), inch ? 2 : 0, undefined, { big: true, hl: 'Feed rate' }),
         R('Cutting speed at the reamer', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0));
     }
     // Stock to leave, each publisher on its own line.
@@ -782,8 +782,8 @@ TOOLS.push(
     if (r.none) return [R('Tapping speed', 'The table lists no tapping speed for this material: type your own cutting speed (Advanced)', '', 0)];
     const inch = r.inch, k = r.k, rows = [
       R('Spindle speed', r.rpm, 'RPM', 0),
-      R('Feed rate (pitch x spindle speed)', r.vf / k, feedMinU(s), inch ? 4 : 2),
-      R('Feed per revolution (the pitch)', r.p / k, feedRevU(s), inch ? 5 : 3),
+      R('Feed rate (pitch x spindle speed)', r.vf / k, feedMinU(s), inch ? 4 : 2, undefined, { big: true, hl: 'Feed rate', hsub: 'pitch x spindle speed' }),
+      R('Feed per revolution (the pitch)', r.p / k, feedRevU(s), inch ? 5 : 3, undefined, { big: true, hl: 'Feed per rev', hsub: 'the pitch' }),
       R('Cutting speed at the thread diameter', inch ? r.vcA / FT_M : r.vcA, spdU(s), 1),
     ];
     if (v.depth > 0) rows.push(R('Time in and out (the stop and reversal at the bottom not counted)', W.tap_time_min(v.depth * k, r.p, r.rpm) * 60, 's', 1));
@@ -797,7 +797,7 @@ TOOLS.push(
   panel: (v, W, s) => {
     const r = advTapRun(v, W, s);
     if (!r || r.none) return '';
-    const feed = advTile('Feed rate', fmt(r.vf / r.k, r.inch ? 4 : 1) + ' ' + feedMinU(s), r.limit === 8 ? 'held to the top feed ' + advOf(r.mach.vfSrc) : r.mach.vf > 0 ? 'inside the top feed ' + advOf(r.mach.vfSrc) : 'no machine picked', r.limit === 8 ? 'caution' : 'good');
+    const feed = advTile('Top feed', r.limit === 8 ? 'Held to it' : r.mach.vf > 0 ? 'Inside' : 'Not checked', r.limit === 8 ? 'held to the top feed ' + advOf(r.mach.vfSrc) : r.mach.vf > 0 ? 'inside the top feed ' + advOf(r.mach.vfSrc) : 'no machine picked', r.limit === 8 ? 'caution' : 'good');
     return '<div class="tiles">' + advHoleTiles(r, s) + feed + '</div>' + advTapCard(r, s);
   },
   table: (v, W, s) => {
@@ -849,8 +849,8 @@ TOOLS.push(
     const fHow = r.fL ? (r.fz < r.f0 * (1 - 1e-9) ? 'yours, reduced to the top feed of the machine' : 'yours, locked') : r.fz < r.f0 * (1 - 1e-9) ? 'reduced from ' + fmt(r.f0 / k, dpF) + ' to fit ' + (ADV_LIMITS[r.limit] || 'the machine').toLowerCase() : 'suggested: ' + r.rule.pub;
     const rows = [
       R('Spindle speed', r.rpm, 'RPM', 0),
-      R('Feed rate straight down', r.vf / k, feedMinU(s), inch ? 2 : 1),
-      R('Feed per tooth down (' + fHow + ')', r.fz / k, lu, dpF),
+      R('Feed rate straight down', r.vf / k, feedMinU(s), inch ? 2 : 1, undefined, { big: true, hl: 'Feed rate down' }),
+      R('Feed per tooth down (' + fHow + ')', r.fz / k, lu, dpF, undefined, { big: true, hl: 'Feed per tooth', hsub: fHow }),
       R('Cutting speed at the rim', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0),
     ];
     if (r.step > 0) {
@@ -929,7 +929,7 @@ TOOLS.push(
     const lim = (ADV_LIMITS[r.limit] || '').toLowerCase();
     const rows = [
       R('Spindle speed', r.rpm, 'RPM', 0),
-      R('Feed per revolution (' + (r.fL ? 'yours, locked' : r.reduced === 3 ? 'reduced to fit ' + lim : r.fHow) + ')', r.f / k, feedRevU(s), dpF),
+      R('Feed per revolution (' + (r.fL ? 'yours, locked' : r.reduced === 3 ? 'reduced to fit ' + lim : r.fHow) + ')', r.f / k, feedRevU(s), dpF, undefined, { big: true, hl: 'Feed per rev', hsub: r.fL ? 'yours, locked' : r.reduced === 3 ? 'reduced to fit ' + lim : r.fHow }),
       R('Depth of cut (' + (r.apL ? 'yours, locked' : r.reduced === 1 ? 'reduced from ' + fmt(r.ap0 / k, dpF) + ' to fit ' + lim : r.apHow) + ')', r.ap / k, lu, dpF),
       R('Cutting speed at the diameter', inch ? r.vcA / FT_M : r.vcA, spdU(s), 0),
       R('Removal rate', inch ? r.q / IN3_CM3 : r.q, inch ? 'in3/min' : 'cm3/min', 2),

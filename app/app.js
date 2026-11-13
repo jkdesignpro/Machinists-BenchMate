@@ -453,7 +453,7 @@ function mountTool(host, t, opts) {
       lock.onclick = e => { e.preventDefault(); inp.value = inp.value !== '' ? '' : (inp.placeholder || ''); saved[f.id] = inp.value; saveVals(); update(); };
       row.appendChild(lock);
     }
-    if (!f.options && !f.slider && !mini && window.BenchCalc) { const cb = document.createElement('button'); cb.type = 'button'; cb.className = 'fx'; cb.innerHTML = icon('calc'); cb.title = 'Work this value out in the calculator'; cb.setAttribute('aria-label', cb.title); cb.tabIndex = -1; cb.onclick = e => { e.preventDefault(); BenchCalc.open(inp); }; row.appendChild(cb); }
+    if (!f.options && !f.slider && !mini && window.BenchCalc) { const cb = document.createElement('button'); cb.type = 'button'; cb.className = 'fx'; cb.innerHTML = icon('calc'); cb.title = 'Work this value out in the calculator'; cb.setAttribute('aria-label', cb.title); cb.tabIndex = -1; cb.onclick = e => { e.preventDefault(); BenchCalc.open(inp); }; row.insertBefore(cb, u); }
     lab.append(span, row);
     // `when(v)`: show the field only when it applies (e.g. to the chosen shape).
     if (f.when) lab.dataset.when = f.id;
@@ -486,7 +486,8 @@ function mountTool(host, t, opts) {
       // A slider that is the worked-out half of a pair shows the true figure beside it (the handle stops at the ends of its track).
       if (els[to].f.slider) els[to].u.textContent = isFinite(out) ? sliderWord(els[to].f.slider, +out.toPrecision(3)) : '';
     });
-    fields.forEach(f => { if (f.when) { let on = true; try { on = !!f.when(v); } catch (e) {} els[f.id].lab.hidden = !on; } });
+    // A field that does not apply stays where it is, greyed out and locked, so the other boxes never move.
+    fields.forEach(f => { if (f.when) { let on = true; try { on = !!f.when(v); } catch (e) {} const e = els[f.id]; e.lab.classList.toggle('na', !on); e.inp.disabled = !on; e.lab.title = on ? '' : 'Not used with the choices made above'; } });
     // Required boxes: a box with a starting value must hold a number.
     fields.forEach(f => { const need = f.def !== '' && !f.options && !pairOf(f.id); els[f.id].lab.classList.toggle('bad', need && !isFinite(v[f.id])); });
     let rows = [];
@@ -497,9 +498,13 @@ function mountTool(host, t, opts) {
     const warn = r => checkRow(r, sys, state.W);
     if (!rows.length) { res.innerHTML = '<div class="rempty">' + icon('info') + '<span>Enter the values ' + (mini ? '' : 'on the left ') + 'to see the result.</span></div>'; }
     else {
-      const hero = rows[0], w0 = warn(hero), rest = rows.slice(1, mini ? 3 : rows.length);
-      const longTxt = typeof hero.value === 'string' && hero.value.length > 24;
-      res.innerHTML = '<div class="hero rrow' + (w0 ? ' over' : '') + (longTxt ? ' txt' : '') + '"><div class="hl">' + hero.label + '</div><div class="hv"><b>' + fmt(hero.value, dp(hero)) + '</b><span>' + hero.unit + '</span></div>' + (w0 ? '<div class="wmsg">' + icon('info') + w0 + '</div>' : '') + '</div>' +
+      // The headline: the first row, and beside it any row marked `big` (feed as plain to see as speed).
+      // A big row may carry a short headline label `hl` and a note `hsub` (where the figure came from).
+      const heroes = [rows[0]].concat(mini ? [] : rows.slice(1).filter(r => r.big));
+      const rest = rows.slice(1).filter(r => mini || !r.big).slice(0, mini ? 2 : rows.length);
+      const w0 = warn(rows[0]), longTxt = typeof rows[0].value === 'string' && rows[0].value.length > 24;
+      const heroItem = (r, i) => { const w = i ? warn(r) : w0; return '<div class="hi' + (i ? ' h2' : '') + (w && heroes.length > 1 ? ' over' : '') + '"><div class="hl">' + (r.hl || r.label) + '</div><div class="hv"><b>' + fmt(r.value, dp(r)) + '</b><span>' + r.unit + '</span></div>' + (r.hsub ? '<div class="hsub">' + r.hsub + '</div>' : '') + (w ? '<div class="wmsg">' + icon('info') + w + '</div>' : '') + '</div>'; };
+      res.innerHTML = '<div class="hero rrow' + (w0 && heroes.length < 2 ? ' over' : '') + (longTxt ? ' txt' : '') + (heroes.length > 1 ? ' multi' : '') + '">' + heroes.map(heroItem).join('') + '</div>' +
         (rest.length ? '<table>' + rest.map(r => { const w = warn(r); return '<tr class="rrow' + (w ? ' over' : '') + '"><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v' + (typeof r.value === 'string' && r.value.length > 24 ? ' txt' : '') + (r.value === 'PASS' || r.value === 'OK' ? ' good' : r.value === 'FAIL' ? ' fail' : '') + '">' + fmt(r.value, dp(r)) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>' : '');
     }
     // Suggested values for the lock fields: shown in the empty box; a typed value is the user's and is kept.

@@ -62,11 +62,11 @@ const WORKSPACES = [
     ['Stock and workholding', ['bar', 'chuckforce', 'slender', 'changegears'], 'material'],
   ] },
   { id: 'milling', name: 'Milling', icon: 'milling', blurb: 'Speeds and feeds, engagement, deflection and chatter for mills.', sections: [
-    ['Speeds and feeds', ['advmill', 'advplunge', 'rpm', 'feeds', 'mrr', 'kcforce', 'cutopt', 'toollife'], 'gauge'],
+    ['Speeds and feeds', ['advmill', 'advplunge', 'rpm', 'feeds', 'slitsaw', 'mrr', 'kcforce', 'cutopt', 'toollife'], 'gauge'],
     ['Engagement', ['chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
     ['Tool behaviour', ['deflection', 'runout', 'chatter'], 'wave'],
     ['Tool holding', ['holdertorque', 'machinetapers'], 'nut'],
-    ['Other milling', ['surfacefin', 'chamfermill', 'slitsaw', 'indexing'], 'saw'],
+    ['Other milling', ['surfacefin', 'chamfermill', 'indexing'], 'saw'],
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
     ['Drilling', ['advdrill', 'advream', 'advtap', 'gundrill', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],

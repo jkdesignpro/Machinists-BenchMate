@@ -940,7 +940,7 @@ const TOOLS = [
   source: "Gear-train ratio arithmetic; Machinery's Handbook 'Lathe change gears' (by name). 127 = 5 x 25.4 (inch defined as 25.4 mm, NIST SP 811). See docs/sources.md.",
 },
 {
-  id: 'slitsaw', level: 'advanced', group: 'Sawing', title: 'Slitting saw speeds and feeds',
+  id: 'slitsaw', level: 'advanced', group: 'Milling', title: 'Slitting saw speeds and feeds',
   pick: { map: { D: 'dia', z: 'flutes' } },
   desc: 'Spindle speed, table feed, chip thickness and cut time for a slitting or slotting saw. Pick the work material and the saw material for a starting speed and feed per tooth from a saw maker\'s sheet, or type your saw maker\'s own figures: a typed value is locked. A slot shallower than half the saw diameter thins the chip; the screen shows how much.',
   fields: s => [
