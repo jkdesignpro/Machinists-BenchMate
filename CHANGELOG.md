@@ -25,6 +25,9 @@ Work on the feedback after using 0.7.0.
 - **Backlash: linear and rotary axes, gears** (Measure and inspect, Programming > Rotary axis, Gears): the lost motion of an axis from the indicator test (Tormach, MachMotion), the play of a rotary axis turned into an angle or an angle into play at the part, and the backlash a gear pair gains when its centres open (KHK, one publisher). Formulas in `core/src/rotary.rs`; see `docs/backlash.md`.
 - **What is this for?** A folded plain explanation at the top of eleven less familiar tools: preferred numbers, tolerance stack, process capability, control charts, gauge R&R, sampling plans, chatter finder, balancing, temperature compensation, runout and tool life. Preferred numbers explains where Renard's series came from and where they are used, from Kverneland (Machine Design, 1998) and Wikipedia, with one-publisher statements marked (see `docs/inspection.md`).
 
+### Added (formula fact check)
+- **Fact check of the core formulas**: 23 functions (speeds and feeds, chip thickness, cusp height, helix pitch, bolt circle, surface finish, drilling, tailstock taper, sine bar, thread diameters, wires and tap drills) compared with values worked by hand or printed in ISO 724. All agree. Kept as a test, `core/tests/factcheck.rs`, with every expected value written as a number; see `docs/factcheck.md`.
+
 ### Added (engraving arcs)
 - **Engraving**: a new box **Curves as arcs (G02, G03) within**. The Hershey letters are drawn with straight lines (the O of the plain letters is 20 lines at any size) and the program used to follow them line for line, which it still does by default. With a distance given, each run of three or more lines that lies within it of one circle (every point, and the bulge of every line) becomes one G02 or G03 with I and J: the O at 5 mm with 0.05 mm becomes four arcs and four lines instead of 20 lines. Arc fitting in `core/src/gcode.rs` (`fit_arcs`), with tests.
 
