@@ -59,6 +59,20 @@ pub fn specific_mrr(ae: f64, vw_m_min: f64) -> f64 { ae * vw_m_min * 1000.0 / 60
 /// Equivalent chip thickness heq (um) = ae vw / vs = Q'w / vs, ae mm, vw m/min, vs m/s. [MALKIN]
 pub fn equiv_chip_um(ae: f64, vw_m_min: f64, vs_ms: f64) -> f64 { ae * 1000.0 * vw_m_min / 60.0 / vs_ms }
 
+/// Aggressiveness (dimensionless) = 10^6 x (vw / vs) x sqrt(ae / de), vw m/min, vs m/s,
+/// ae and de in mm. [BADGER_CIRP 2021, KRAJNIK_INTECH 2024]
+pub fn aggressiveness(vw_m_min: f64, vs_ms: f64, ae: f64, de: f64) -> f64 {
+    1.0e6 * (vw_m_min / 60.0) / vs_ms * (ae / de).sqrt()
+}
+
+/// Maximum undeformed chip thickness (grit penetration) hm (um) =
+/// sqrt(4 / (C r) x Aggr / 10^6) mm, C cutting points per mm^2, r chip width-to-thickness
+/// ratio (Backer et al. 1952, as given in KRAJNIK_INTECH 2024).
+pub fn max_chip_um(aggr: f64, c_per_mm2: f64, r: f64) -> f64 {
+    if !(c_per_mm2 > 0.0 && r > 0.0 && aggr >= 0.0) { return f64::NAN; }
+    (4.0 / (c_per_mm2 * r) * aggr / 1.0e6).sqrt() * 1000.0
+}
+
 /// Traverse speed (mm/min) = traverse per work revolution fa (mm) x work rpm.
 pub fn traverse_speed(fa: f64, nw: f64) -> f64 { fa * nw }
 
@@ -163,6 +177,17 @@ pub fn marks_vs_ratio_pct(marks_per_rev: f64, ratio: f64) -> f64 { (marks_per_re
 mod tests {
     use super::*;
     fn close(a: f64, b: f64, tol: f64) -> bool { (a - b).abs() <= tol }
+
+    #[test]
+    fn aggressiveness_number() {
+        // vw 1.2 m/min (20 mm/s), vs 35 m/s, ae 5 um, de 100 mm: 10^6 x 0.02/35 x sqrt(0.005/100).
+        let a = aggressiveness(1.2, 35.0, 0.005, 100.0);
+        assert!(close(a, 1.0e6 * (0.02 / 35.0) * (0.00005f64).sqrt(), 1e-9));
+        assert!(close(a, 4.04061, 1e-4));
+        // hm grows with the square root of Aggr; C = 1 per mm^2, r = 10: sqrt(0.4 x Aggr / 10^6) mm.
+        assert!(close(max_chip_um(a, 1.0, 10.0), (0.4 * a / 1.0e6).sqrt() * 1000.0, 1e-9));
+        assert!(max_chip_um(a, 0.0, 10.0).is_nan());
+    }
 
     /// [BADGER10]: 40 m/s on a wheel worn from 500 to 350 mm is 1,528 to 2,182 rpm;
     /// with the work at 200 rpm the ratio goes from 7.63 to 10.91 (1528 / 200 is

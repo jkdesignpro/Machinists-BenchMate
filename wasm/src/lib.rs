@@ -614,6 +614,8 @@ f1!(equiv_dia, c::equiv_dia_f, dw, ds, mode);
 f1!(contact_length, c::contact_length, ae, de);
 f1!(specific_mrr, c::specific_mrr, ae, vw);
 f1!(equiv_chip_um, c::equiv_chip_um, ae, vw, vs);
+f1!(grind_aggr, c::aggressiveness, vw, vs, ae, de);
+f1!(grind_max_chip_um, c::max_chip_um, aggr, cc, r);
 f1!(traverse_speed, c::traverse_speed, fa, nw);
 f1!(overlap_ratio, c::overlap_ratio, bs, fa);
 f1!(traverse_time, c::traverse_time, len, fa, nw, passes);

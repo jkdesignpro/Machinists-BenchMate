@@ -1253,7 +1253,7 @@ const TOOLS = [
 },
 {
   id: 'grindspeed', level: 'advanced', group: 'Grinding', title: 'Wheel and work speed, equivalent diameter',
-  desc: 'Wheel surface speed or rpm, work speed and the speed ratio, equivalent wheel diameter for external, internal and surface grinding, contact length, specific removal rate and equivalent chip thickness. Always obey the maximum operating speed marked on the wheel; BenchMate never assumes one.',
+  desc: 'Wheel surface speed or rpm, work speed and the speed ratio, equivalent wheel diameter for external, internal and surface grinding, contact length, specific removal rate, equivalent chip thickness, aggressiveness and grit penetration. Always obey the maximum operating speed marked on the wheel; BenchMate never assumes one.',
   fields: s => [
     { id: 'mode', label: 'Operation', unit: '', def: 0, options: [[0, 'External cylindrical'], [1, 'Internal'], [2, 'Surface']] },
     { id: 'ds', label: 'Wheel diameter', unit: lenU(s), def: s === 'inch' ? 14 : 350 },
@@ -1265,6 +1265,8 @@ const TOOLS = [
     { id: 'nw', label: 'Work speed (cylindrical)', unit: 'RPM', def: '' },
     { id: 'vt', label: 'Or table speed (surface)', unit: s === 'inch' ? 'ft/min' : 'm/min', def: '' },
     { id: 'ae', label: 'Depth of cut per pass', unit: lenU(s), def: '' },
+    { id: 'cc', label: 'Cutting points per mm2 C (for grit penetration; blank = not shown)', unit: '1/mm2', def: '' },
+    { id: 'cr', label: 'Chip width to thickness ratio r', unit: '', def: '' },
   ],
   calc: (v, W, s) => {
     if (!(v.ds > 0)) return [];
@@ -1289,11 +1291,17 @@ const TOOLS = [
     if (v.ae > 0 && isFinite(de)) {
       rows.push(R('Contact length sqrt(ae de)', W.contact_length(v.ae * k, de) / k, lenU(s), inch ? 4 : 3));
       if (vw > 0) { const q = W.specific_mrr(v.ae * k, vw); rows.push(R("Specific removal rate Q'w", inch ? q * 60 / 645.16 : q, inch ? 'in3/min per in' : 'mm3/mm/s', 3)); if (vs > 0) rows.push(R('Equivalent chip thickness heq', W.equiv_chip_um(v.ae * k, vw, vs) * (inch ? 1000 / IN_MM : 1), inch ? 'uin' : 'um', 4)); }
+      if (vw > 0 && vs > 0) {
+        const ag = W.grind_aggr(vw, vs, v.ae * k, de);
+        rows.push(R('Aggressiveness 10^6 (vw / vs) sqrt(ae / de)', ag, '', 2));
+        rows.push(R('Aggressiveness, where it sits', ag < 3 ? 'Below the usual 3 to 60: likely rubbing and burn rather than cutting' : ag > 200 ? 'Above the 5 to 200 the CIRP paper gives for grinding' : ag > 60 ? 'Above the usual 3 to 60 (CTE): heavy roughing, watch wheel wear' : 'Within the usual 3 to 60 (CTE): low for finishing, high for roughing', '', 0));
+        if (v.cc > 0 && v.cr > 0) rows.push(R('Grit penetration (max undeformed chip thickness) hm', W.grind_max_chip_um(ag, v.cc, v.cr) * (inch ? 1000 / IN_MM : 1), inch ? 'uin' : 'um', 3));
+      }
     }
     return rows;
   },
-  working: 'Wheel speed vs = pi ds ns / 60 000 m/s (ds in mm), SFPM = pi ds(in) ns / 12. Work speed vw = pi dw nw / 1000 m/min. Speed ratio q = vs x 60 / vw. Equivalent diameter de = dw ds / (dw + ds) external, dw ds / (dw - ds) internal, ds surface. Contact length lg = sqrt(ae de). Specific removal rate Q\'w = ae vw (mm3/mm/s with vw in mm/s); equivalent chip thickness heq = ae vw / vs. The maximum operating speed is marked on every wheel larger than 80 mm (or on its label or a notice) and must not be exceeded; it depends on the wheel, not on anything BenchMate can work out.',
-  source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
+  working: 'Wheel speed vs = pi ds ns / 60 000 m/s (ds in mm), SFPM = pi ds(in) ns / 12. Work speed vw = pi dw nw / 1000 m/min. Speed ratio q = vs x 60 / vw. Equivalent diameter de = dw ds / (dw + ds) external, dw ds / (dw - ds) internal, ds surface. Contact length lg = sqrt(ae de). Specific removal rate Q\'w = ae vw (mm3/mm/s with vw in mm/s); equivalent chip thickness heq = ae vw / vs. Aggressiveness = 10^6 (vw / vs) sqrt(ae / de), dimensionless, the same at any units; each wheel, work and coolant has a best value, found by trial (Badger). Typical ranges, as printed and not merged: 3 to 60, lower for finishing and higher for roughing (Badger, CTE 2012); 5 to 200 for grinding, thousands for dressing (Badger, Drazumeric and Krajnik, Procedia CIRP 2021). Grit penetration (maximum undeformed chip thickness) hm = sqrt(4 Aggr / (10^6 C r)) (Backer et al. 1952, as given by Krajnik, Drazumeric and Badger 2024); C and r describe the wheel surface and are hard to measure, so they are left for you to enter. The maximum operating speed is marked on every wheel larger than 80 mm (or on its label or a notice) and must not be exceeded; it depends on the wheel, not on anything BenchMate can work out.',
+  source: 'D. S. Goetz, Cutting Tool Engineering, 24 Oct 2017 (sfpm, de external, contact length); S. Malkin and C. Guo, Grinding Technology, 2nd ed., 2008 (de internal and surface, Q\'w, heq); W. B. Rowe, Principles of Modern Grinding Technology, 2nd ed., 2014 (speed ratio). Aggressiveness: J. Badger, R. Drazumeric and P. Krajnik, Procedia CIRP 102 (2021) 361-368, doi 10.1016/j.procir.2021.09.062 (Elsevier); P. Krajnik, R. Drazumeric and J. Badger, Optimization of industrial grinding processes using the theory of aggressiveness, IntechOpen 2024 (https://research.chalmers.se/publication/543954); J. Badger, The great grinding divide, Cutting Tool Engineering, 15 Jan 2012 (typical range). One group of authors in two publishers: to be verified against a second group. Wheel marking: ISO 525:2020, EN 12413, ANSI B7.1 (cited by name). See docs/sources.md.',
 },
 {
   id: 'gundrill', level: 'advanced', group: 'Drilling and tapping', title: 'Gun drilling: speed, feed, coolant pressure and flow',
