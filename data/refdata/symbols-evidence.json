@@ -1,0 +1,45 @@
+{
+  "_about": "SI prefixes, the seven SI defining constants and the Greek alphabet. Each section records what each publisher prints; an entry counts as confirmed when two independent publishers print the same. The 'used' text beside a Greek letter is BenchMate's own: what the letter stands for in BenchMate's formula library.",
+  "sources": {
+    "BIPM_PREFIX": {"publisher": "BIPM", "title": "SI prefixes", "url": "https://www.bipm.org/en/measurement-units/si-prefixes", "accessed": "2026-11-12", "note": "24 prefixes from quetta (10^30) to quecto (10^-30); cites CGPM Resolution 3 (2022), On the extension of the range of SI prefixes."},
+    "NIST_PREFIX": {"publisher": "NIST", "title": "Metric (SI) prefixes", "url": "https://www.nist.gov/node/428761", "accessed": "2026-11-12", "note": "Same 24 prefixes; spells 10^1 as deka (US spelling) where BIPM prints deca."},
+    "BIPM_CONST": {"publisher": "BIPM", "title": "The International System of Units (SI): defining constants", "url": "https://bipm.org/measurement-units/si-defining-constants", "accessed": "2026-11-12"},
+    "NIST_SP330": {"publisher": "NIST", "title": "Special Publication 330, section 2, Table 1 (the defining constants of the SI)", "url": "https://www.nist.gov/node/1578986", "accessed": "2026-11-12"},
+    "WARWICK": {"publisher": "University of Warwick", "title": "Mathematics undergraduate handbook: the Greek alphabet", "url": "https://warwick.ac.uk/fac/sci/maths/ughandbook2022/general/greek/", "accessed": "2026-11-12", "note": "24 letters with variant lower-case forms of epsilon, theta, pi, rho and phi."},
+    "ETB": {"publisher": "The Engineering ToolBox", "title": "Greek alphabet", "url": "https://www.engineeringtoolbox.com/greek-alphabet-d_5.html", "accessed": "2026-11-12", "note": "24 letters; also the final sigma used at the end of a word."}
+  },
+  "prefixes": {
+    "BIPM_PREFIX": [["quetta", "Q", 30], ["ronna", "R", 27], ["yotta", "Y", 24], ["zetta", "Z", 21], ["exa", "E", 18], ["peta", "P", 15], ["tera", "T", 12], ["giga", "G", 9], ["mega", "M", 6], ["kilo", "k", 3], ["hecto", "h", 2], ["deca", "da", 1],
+      ["deci", "d", -1], ["centi", "c", -2], ["milli", "m", -3], ["micro", "µ", -6], ["nano", "n", -9], ["pico", "p", -12], ["femto", "f", -15], ["atto", "a", -18], ["zepto", "z", -21], ["yocto", "y", -24], ["ronto", "r", -27], ["quecto", "q", -30]],
+    "NIST_PREFIX": [["quetta", "Q", 30], ["ronna", "R", 27], ["yotta", "Y", 24], ["zetta", "Z", 21], ["exa", "E", 18], ["peta", "P", 15], ["tera", "T", 12], ["giga", "G", 9], ["mega", "M", 6], ["kilo", "k", 3], ["hecto", "h", 2], ["deka", "da", 1],
+      ["deci", "d", -1], ["centi", "c", -2], ["milli", "m", -3], ["micro", "µ", -6], ["nano", "n", -9], ["pico", "p", -12], ["femto", "f", -15], ["atto", "a", -18], ["zepto", "z", -21], ["yocto", "y", -24], ["ronto", "r", -27], ["quecto", "q", -30]]
+  },
+  "prefix_alias": {"deka": "deca"},
+  "constants": {
+    "BIPM_CONST": [["Caesium hyperfine transition frequency", "ΔνCs", "9 192 631 770", "Hz"], ["Speed of light in vacuum", "c", "299 792 458", "m/s"], ["Planck constant", "h", "6.626 070 15 × 10^-34", "J s"],
+      ["Elementary charge", "e", "1.602 176 634 × 10^-19", "C"], ["Boltzmann constant", "k", "1.380 649 × 10^-23", "J/K"], ["Avogadro constant", "NA", "6.022 140 76 × 10^23", "1/mol"], ["Luminous efficacy of a defined visible radiation", "Kcd", "683", "lm/W"]],
+    "NIST_SP330": [["Caesium hyperfine transition frequency", "ΔνCs", "9 192 631 770", "Hz"], ["Speed of light in vacuum", "c", "299 792 458", "m/s"], ["Planck constant", "h", "6.626 070 15 × 10^-34", "J s"],
+      ["Elementary charge", "e", "1.602 176 634 × 10^-19", "C"], ["Boltzmann constant", "k", "1.380 649 × 10^-23", "J/K"], ["Avogadro constant", "NA", "6.022 140 76 × 10^23", "1/mol"], ["Luminous efficacy of a defined visible radiation", "Kcd", "683", "lm/W"]]
+  },
+  "greek": {
+    "WARWICK": ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu", "nu", "xi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega"],
+    "ETB": ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu", "nu", "xi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega"]
+  },
+  "greek_letters": [["alpha", "Α", "α"], ["beta", "Β", "β"], ["gamma", "Γ", "γ"], ["delta", "Δ", "δ"], ["epsilon", "Ε", "ε"], ["zeta", "Ζ", "ζ"], ["eta", "Η", "η"], ["theta", "Θ", "θ"], ["iota", "Ι", "ι"], ["kappa", "Κ", "κ"], ["lambda", "Λ", "λ"], ["mu", "Μ", "μ"],
+    ["nu", "Ν", "ν"], ["xi", "Ξ", "ξ"], ["omicron", "Ο", "ο"], ["pi", "Π", "π"], ["rho", "Ρ", "ρ"], ["sigma", "Σ", "σ"], ["tau", "Τ", "τ"], ["upsilon", "Υ", "υ"], ["phi", "Φ", "φ"], ["chi", "Χ", "χ"], ["psi", "Ψ", "ψ"], ["omega", "Ω", "ω"]],
+  "greek_used": {
+    "alpha": "α: pressure angle of a gear, an included angle, thermal expansion coefficient",
+    "beta": "β: helix angle",
+    "delta": "δ: deflection, interference of a fit; Δ: a difference",
+    "eta": "η: efficiency",
+    "theta": "θ: an angle (point angle, chamfer angle)",
+    "kappa": "κ: entering angle of a cutting edge",
+    "mu": "μ: friction coefficient; µ as the prefix micro",
+    "nu": "ν: Poisson's ratio",
+    "pi": "π: circumference divided by diameter",
+    "rho": "ρ: density",
+    "sigma": "σ: standard deviation; Σ: a sum",
+    "phi": "φ: engagement angle of a milling cutter",
+    "psi": "ψ: half angle of a gear tooth at a radius"
+  }
+}

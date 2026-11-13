@@ -451,6 +451,38 @@ const TOOLS = [
   source: 'Engagement and chip thickness: Altintas, Manufacturing Automation, Ch. 2; arc feed: Sandvik Coromant milling formulas (circular interpolation). The arc engagement is derived here by the law of cosines and checked in the core tests against a brute-force sample of the tool circle.',
 },
 {
+  id: 'chamfermill', level: 'advanced', group: 'Milling', title: 'Chamfer mill: depth and offset',
+  desc: 'Where to put a chamfer mill to cut a chamfer of a given width on an outside edge: the depth of the tip below the top face and the distance of the tool centre from the wall, keeping the tip clear of the cut, with the cutting diameter for the speed and the widest chamfer the tool can reach.',
+  fields: s => [
+    { id: 'w', label: 'Chamfer width (along the top face)', unit: lenU(s), def: s === 'inch' ? 0.03 : 1 },
+    { id: 'ang', label: 'Tool included angle', unit: 'deg', def: 90, options: [[60, '60 deg'], [82, '82 deg'], [90, '90 deg (45 deg chamfer)'], [100, '100 deg'], [120, '120 deg']] },
+    { id: 'tip', label: 'Tip flat diameter (0 for a sharp point)', unit: lenU(s), def: 0 },
+    { id: 'c', label: 'Clearance past the tip', unit: lenU(s), def: s === 'inch' ? 0.02 : 0.5 },
+    { id: 'd', label: 'Cutter diameter (optional)', unit: lenU(s), def: '', level: 'advanced' },
+  ],
+  calc: (v, W, s) => {
+    const c = v.c > 0 ? v.c : 0, tip = v.tip > 0 ? v.tip : 0, d = v.d > 0 ? v.d : 0;
+    const z = W.chamfer_mill(v.w, v.ang, tip, c, d, 0);
+    if (!isFinite(z)) return [];
+    const rows = [R('Tip below the top face (Z depth)', z, lenU(s), 4), R('Tool centre out from the wall', W.chamfer_mill(v.w, v.ang, tip, c, d, 1), lenU(s), 4),
+      R('Chamfer depth down the wall', W.chamfer_mill(v.w, v.ang, tip, c, d, 4), lenU(s), 4), R('Cutting diameter at the top of the chamfer', W.chamfer_mill(v.w, v.ang, tip, c, d, 3), lenU(s), 4)];
+    if (d > 0) {
+      const max = W.chamfer_mill(v.w, v.ang, tip, c, d, 2);
+      if (isFinite(max)) {
+        rows.push(R('Widest chamfer this cutter reaches', max, lenU(s), 4));
+        if (v.w > max) rows.push(R('Note', 'The chamfer is wider than this cutter can reach with that clearance: use a larger cutter or less clearance', '', 0));
+      } else rows.push(R('Note', 'The cutter diameter must be larger than the tip flat', '', 0));
+    }
+    rows.push(R('Note', 'Work out the speed from the cutting diameter shown, not the cutter diameter. With cutter compensation, program the wall and put the centre distance in as the tool radius', '', 0));
+    return rows;
+  },
+  working: 'A chamfer mill is a cone. Its radius at a height z above the tip is tip/2 + z tan(angle/2). Put the bottom of the chamfer on the cone a clearance c out from the edge of the tip flat, so the tip itself does not cut: the tool centre is then tip/2 + c out from the wall, and the tip is (w + c) / tan(angle/2) below the top face. The chamfer runs w / tan(angle/2) down the wall; the cone is tip + 2 (w + c) across where it meets the top face.',
+  source: 'BenchMate geometry of a cone, with tests in core/src/millturn.rs. The limit radius - tip radius - clearance for the chamfer width matches the depth rule printed in M. Deans, "10 milling toolpaths for your first 2D CNC machining project", Autodesk Fusion blog, 2018.',
+  proof: [{ name: '1.5 mm chamfer, 90 degree tool with a 2 mm tip flat, 0.5 mm clearance, 10 mm cutter', sys: 'mm', vals: { w: 1.5, ang: 90, tip: 2, c: 0.5, d: 10 },
+    expect: [['Tip below the top face (Z depth)', 'mm', 2, 1e-9], ['Tool centre out from the wall', 'mm', 1.5, 1e-9], ['Cutting diameter at the top of the chamfer', 'mm', 6, 1e-9], ['Widest chamfer this cutter reaches', 'mm', 3.5, 1e-9]],
+    source: 'Cone geometry: at 45 degrees a side the tool is as wide as it is deep.', note: 'Radius at the bottom of the chamfer 1 + 0.5 = 1.5 mm (the centre distance); at the top 1.5 + 1.5 = 3 mm, so 6 mm across; depth (1.5 + 0.5) / tan 45 = 2 mm; reach 5 - 1 - 0.5 = 3.5 mm.' }],
+},
+{
   id: 'ballcusp', level: 'advanced', group: 'Milling', title: 'Ball-nose cusp height and stepover',
   pick: { map: { d: 'dia' }, types: ['Ball end mill', 'Other'] },
   desc: 'Scallop (cusp) height left between passes of a ball-nose tool on a flat or gently curved surface, or the stepover for the cusp you want.',
@@ -624,14 +656,23 @@ const TOOLS = [
     { id: 'D', label: 'Large diameter', unit: lenU(s), def: s === 'inch' ? 1 : 25 },
     { id: 'd', label: 'Small diameter', unit: lenU(s), def: s === 'inch' ? 0.5 : 12 },
     { id: 'L', label: 'Length', unit: lenU(s), def: s === 'inch' ? 2.5 : 60 },
+    { id: 'Lw', label: 'Whole length of the work between centres (optional, for tailstock set-over)', unit: lenU(s), def: '', level: 'advanced' },
   ],
-  calc: (v, W, s) => (v.L > 0 && v.D > v.d) ? [
-    R('Included angle', W.taper_included_angle_deg(v.D, v.d, v.L), 'deg', 4),
-    R('Half angle (slide setting)', W.taper_included_angle_deg(v.D, v.d, v.L) / 2, 'deg', 4),
-    R('Taper per unit length (diameter)', W.taper_per_length(v.D, v.d, v.L), s === 'inch' ? 'in/in' : 'mm/mm', 5),
-  ] : [],
-  working: 'tan(half angle) = (D - d) / (2 L).',
-  source: "Machinery's Handbook (tapers)",
+  calc: (v, W, s) => {
+    if (!(v.L > 0 && v.D > v.d)) return [];
+    const rows = [
+      R('Included angle', W.taper_included_angle_deg(v.D, v.d, v.L), 'deg', 4),
+      R('Half angle (slide setting)', W.taper_half_angle_deg(v.D, v.d, v.L), 'deg', 4),
+      R('Taper per unit length (diameter)', W.taper_per_length(v.D, v.d, v.L), s === 'inch' ? 'in/in' : 'mm/mm', 5),
+    ];
+    if (v.Lw > 0) {
+      const so = W.taper_tailstock_setover(v.D, v.d, v.L, v.Lw);
+      rows.push(isFinite(so) ? R('Tailstock set-over', so, lenU(s), s === 'inch' ? 4 : 3) : R('Tailstock set-over', 'the work cannot be shorter than the taper', '', 0));
+    }
+    return rows;
+  },
+  working: 'tan(half angle) = (D - d) / (2 L). Turning with the compound slide: swivel it to the half angle. Turning between centres with the tailstock set over: set-over = whole length of the work × (D - d) / (2 × length of the taper); only for slow tapers, since the centres no longer sit square in their holes.',
+  source: "Machinery's Handbook (tapers); tailstock set-over and compound slide angle as printed in two sets of lathe notes (see docs/sources.md, Taper turning).",
   proof: [{ name: 'The NPT pipe taper, 3/4 in per foot on the diameter', sys: 'inch', vals: { D: 1.75, d: 1, L: 12 }, expect: [['Half angle', 'deg', 1.79, 0.0002]],
     source: 'Wikipedia, "National pipe thread": the taper of 3/4 in per foot is printed with its half angle, 1° 47′ 24″, which is 1.7900°. ASME B1.20.1 by name.', note: 'Any two diameters 0.75 in apart over a length of 12 in have this taper.' }],
 },
@@ -1520,6 +1561,8 @@ const TOOLS = [
         R(n + ': tooth thickness at the tip (arc)', gi(13), u, dp + 1));
       const xm = gi(12);
       rows.push(R(n + ': smallest profile shift without undercut', xm, 'x m', 3));
+      const cn = W.involute_cutter_no(z, s === 'inch' ? 0 : 1);
+      if (isFinite(cn)) rows.push(R(n + ': involute form cutter number (' + (s === 'inch' ? 'diametral pitch' : 'module') + ' set of eight)', cn, '', 0));
     };
     one('Gear 1', g, v.z1);
     rows.push(R('Fewest teeth without undercut (x = 0)', g(11), '', 2));
@@ -1539,8 +1582,8 @@ const TOOLS = [
     }
     return rows;
   },
-  working: 'm = 1 / P in inch mode. d = z m; db = d cos α; p = π m; pb = p cos α; ha = (ha* + x) m; hf = (hf* − x) m; da = d + 2 ha; df = d − 2 hf; s = m (π/2 + 2 x tan α); thickness at diameter dy: sy = dy (s/d + inv α − inv αy), cos αy = db/dy. Undercut: z_min = 2 ha*/sin²α, x_min = ha* − z sin²α / 2. Pair: inv αw = 2 tan α (x1 + x2)/(z1 + z2) + inv α; y = (z1 + z2)/2 · (cos α / cos αw − 1); a = ((z1 + z2)/2 + y) m; dw = db / cos αw; tips for standard clearance: ha1 = (ha* + y − x2) m, ha2 = (ha* + y − x1) m. Contact ratio εα = [√(ra1² − rb1²) + √(ra2² − rb2²) − a sin αw] / pb. inv α = tan α − α (radians). The drawing below the root circle uses a radial flank instead of the real fillet, which depends on the cutter.',
-  source: 'Basic rack: ISO 53:1998 and AGMA full-depth system (cited by name: addendum 1 m, dedendum 1.25 m). Formulas and the worked example in the tests (m 3, z 12 and 24, x 0.6 and 0.36: a = 56.4999, αw = 26.0886°) from the KHK Gear Technical Reference, calculation of gear dimensions; SDP/SI Elements of Metric Gear Technology; MESYS AG online helical gear calculation. See docs/gears.md.',
+  working: 'm = 1 / P in inch mode. d = z m; db = d cos α; p = π m; pb = p cos α; ha = (ha* + x) m; hf = (hf* − x) m; da = d + 2 ha; df = d − 2 hf; s = m (π/2 + 2 x tan α); thickness at diameter dy: sy = dy (s/d + inv α − inv αy), cos αy = db/dy. Undercut: z_min = 2 ha*/sin²α, x_min = ha* − z sin²α / 2. Pair: inv αw = 2 tan α (x1 + x2)/(z1 + z2) + inv α; y = (z1 + z2)/2 · (cos α / cos αw − 1); a = ((z1 + z2)/2 + y) m; dw = db / cos αw; tips for standard clearance: ha1 = (ha* + y − x2) m, ha2 = (ha* + y − x1) m. Contact ratio εα = [√(ra1² − rb1²) + √(ra2² − rb2²) − a sin αw] / pb. inv α = tan α − α (radians). The drawing below the root circle uses a radial flank instead of the real fillet, which depends on the cutter. Form milling cutter for a gear cut one tooth space at a time: diametral pitch cutters are No. 1 (135 teeth to a rack), 2 (55 to 134), 3 (35 to 54), 4 (26 to 34), 5 (21 to 25), 6 (17 to 20), 7 (14 to 16), 8 (12 and 13); module cutters are numbered the other way round (No. 1 cuts 12 and 13 teeth). Check the range marked on the cutter: one brand marks its module cutters in the diametral pitch order, and half-number cutters split these ranges.',
+  source: 'Basic rack: ISO 53:1998 and AGMA full-depth system (cited by name: addendum 1 m, dedendum 1.25 m). Formulas and the worked example in the tests (m 3, z 12 and 24, x 0.6 and 0.36: a = 56.4999, αw = 26.0886°) from the KHK Gear Technical Reference, calculation of gear dimensions; SDP/SI Elements of Metric Gear Technology; MESYS AG online helical gear calculation. See docs/gears.md. Cutter numbers: Victor Machinery Exchange, the All Industrial Tool Supply catalogue (TTC brand) and Evolvent Design print the same ranges; see docs/sources.md.',
 },
 {
   id: 'gearmeasure', level: 'expert', group: 'Gears and splines', title: 'Gear measurement: span, pins, chordal',
@@ -1798,7 +1841,7 @@ const TOOLS = [
 },
 {
   id: 'machinetapers', level: 'simple', group: 'Setup', title: 'Machine tapers',
-  desc: 'Morse, Jacobs, 7:24 steep tapers (ISO 7388-1 / SK, BT, CAT), HSK-A and R8: gauge diameters, lengths, taper per foot and angle, with pull stud (retention knob) references.',
+  desc: 'Morse, Jacobs, Jarno, Brown & Sharpe, 7:24 steep tapers (ISO 7388-1 / SK, BT, CAT), HSK-A and R8: gauge diameters, lengths, taper per foot and angle, with pull stud (retention knob) references.',
   render: el => renderMachineTapers(el),
   working: 'Included angle = 2 atan(taper per unit length / 2). Values come from published tables, each with its publisher count.',
   source: 'ISO 296:1991 (Morse), ISO 7388-1:2007 and ISO 7388-2:2007 (7/24 shanks), ISO 7388-3:2016 (retention knobs), ISO 12164-1:2023 (HSK), ASME B5.50-2015 (R2025) (CAT), JIS B 6339 (BT, edition not confirmed); publishers listed under the tool.',
@@ -1962,6 +2005,52 @@ const TOOLS = [
   render: el => renderFigures(el),
   working: 'Standard mensuration formulas (listed in docs/sources.md). Polygon: side = AF tan(180°/n), AC = AF / cos(180°/n), area = n side AF / 4. Ellipse perimeter: Ramanujan II approximation.',
   source: "Machinery's Handbook 'areas and volumes' (by name); see docs/sources.md.",
+},
+{
+  id: 'prismoid', level: 'advanced', group: 'Geometry', title: 'Prismoidal formula: volume from three sections',
+  desc: 'Volume of a tapering solid (a hopper, a tapered block, a casting) from the areas of its two parallel end faces and of the section halfway between them.',
+  fields: s => [
+    { id: 'a1', label: 'Area of one end face A1', unit: lenU(s) + '²', def: s === 'inch' ? 56 : 5600 },
+    { id: 'am', label: 'Area of the section halfway Am', unit: lenU(s) + '²', def: s === 'inch' ? 99 : 9900 },
+    { id: 'a2', label: 'Area of the other end face A2', unit: lenU(s) + '²', def: s === 'inch' ? 154 : 15400 },
+    { id: 'h', label: 'Distance between the end faces h', unit: lenU(s), def: s === 'inch' ? 12 : 120 },
+  ],
+  calc: (v, W, s) => {
+    const V = W.prismoid_volume(v.a1, v.am, v.a2, v.h);
+    if (!isFinite(V)) return [];
+    const inch = s === 'inch';
+    return [R('Volume', V, lenU(s) + '³', inch ? 3 : 1), R('Volume', W.unit_convert(2, inch ? 4 : 3, 1, V), 'L', 4),
+      R('Note', 'The halfway section is measured, not averaged: for a tapering solid its area is not the mean of the two ends. For a rectangular hopper each of its sides is the mean of the matching sides of the two ends.', '', 0)];
+  },
+  working: 'V = h (A1 + 4 Am + A2) / 6. Exact for prisms, pyramids, cones, frustums, wedges and spheres (any solid whose section area is at most a cubic in the height); elsewhere an approximation, the same as Simpson\'s rule with two strips.',
+  source: 'Wolfram MathWorld, Prismatoid (the prismoidal formula); MATHalino, solid mensuration: prismatoid. See docs/sources.md, Areas and volumes by rule.',
+},
+{
+  id: 'tankvol', level: 'advanced', group: 'Geometry', title: 'Tank contents: cylinder lying or standing',
+  desc: 'How much liquid is in a cylindrical tank with flat ends (a coolant or oil drum, a sump made from pipe) from the depth on a dipstick, lying on its side or standing on end.',
+  fields: s => [
+    { id: 'orient', label: 'Tank', unit: '', def: 0, options: [[0, 'Lying on its side'], [1, 'Standing on end']] },
+    { id: 'd', label: 'Inside diameter', unit: lenU(s), def: s === 'inch' ? 22.5 : 570 },
+    { id: 'l', label: 'Inside length (height when standing)', unit: lenU(s), def: s === 'inch' ? 33.5 : 850 },
+    { id: 'h', label: 'Depth of liquid', unit: lenU(s), def: s === 'inch' ? 8 : 200 },
+  ],
+  calc: (v, W, s) => {
+    const T = k => W.tank_contents(v.orient, v.d, v.l, v.h, k), inch = s === 'inch', from = inch ? 4 : 3;
+    if (!(v.d > 0 && v.l > 0 && v.h >= 0)) return [];
+    if (!isFinite(T(0))) return [R('Depth of liquid', v.orient === 1 ? 'is more than the height of the tank' : 'is more than the diameter of the tank', '', 0)];
+    const vol = (n, x) => [R(n, W.unit_convert(2, from, 1, x), 'L', 2), R(n, W.unit_convert(2, from, 6, x), 'gal (US)', 2), R(n, W.unit_convert(2, from, 9, x), 'gal (UK)', 2)];
+    return [...vol('Liquid in the tank', T(0)), R('Full', 100 * T(2), '%', 1), ...vol('Tank when full', T(1)),
+      R('Note', 'Flat ends only: dished or domed ends hold more. A drum with ribs or a tank that is not level reads differently.', '', 0)];
+  },
+  working: 'Lying down: V = L [R² acos((R − h) / R) − (R − h) √(2 R h − h²)], the area of the circular segment times the length. Standing: V = π R² h.',
+  source: 'Wolfram MathWorld, Horizontal cylindrical segment; Math is Fun, Volume of a horizontal cylinder. Litres and gallons from the unit converter (NIST SP 811). See docs/sources.md, Areas and volumes by rule.',
+},
+{
+  id: 'irregular', level: 'advanced', group: 'Geometry', title: 'Irregular area from equally spaced widths',
+  desc: 'Area of an irregular outline (a gasket, a cam plate, a casting section) from widths measured at equal steps across it, by the trapezoidal rule and by Simpson\'s rule.',
+  render: el => renderIrregular(el),
+  working: 'Trapezoidal rule: A = d [(first + last) / 2 + all the widths between]. Simpson\'s rule: A = d/3 [first + last + 4 (2nd, 4th, …) + 2 (3rd, 5th, …)], which needs an odd number of widths (an even number of strips).',
+  source: 'Geosurab surveying notes, calculation of area of irregular figures (worked example 843.33 m²); Maths at Home, Simpson\'s 1/3 rule (worked example 4053 m²); Class Mathematics, the trapezoidal rule (worked example 760 m²). See docs/sources.md, Areas and volumes by rule.',
 },
 {
   id: 'compound', level: 'advanced', group: 'Geometry', title: 'Compound angles',
@@ -2355,6 +2444,13 @@ const TOOLS = [
   source: 'Areas of plane figures; densities from the material data where Confirmed, else from your data sheet. See docs/geometry.md.',
 },
 {
+  id: 'gauges', level: 'advanced', group: 'Stock and sheet metal', title: 'Sheet metal and wire gauges',
+  desc: 'What a gauge number means in inches and mm: steel, galvanized, stainless and aluminium sheet, and the American (AWG), British (SWG) and tube wall wire gauges side by side.',
+  render: el => renderGauges(el),
+  working: 'Sheet gauges and the SWG are tables, each value as two publishers print it. AWG diameter = 0.005 in × 92^((36 − n) / 39); 0, 2/0, 3/0 and 4/0 are n = 0, −1, −2 and −3.',
+  source: 'Wikipedia, Sheet metal and Standard wire gauge; The Engineering ToolBox, gauge and weight chart and SWG table. AWG rule: Wikipedia, American wire gauge (after ASTM B258), RapidTables and Omni Calculator. See docs/sources.md, Wire and sheet metal gauges.',
+},
+{
   id: 'bend', level: 'advanced', group: 'Stock and sheet metal', title: 'Sheet-metal bend allowance',
   desc: 'Bend allowance, outside setback and bend deduction for a bend, flat length of a two-flange part, and the K-factor from a test bend.',
   fields: s => [
@@ -2556,17 +2652,24 @@ const TOOLS = [
   source: 'NIST SP 811, appendix B: inch = 0.0254 m exactly (1959 definition). See docs/shop-helpers.md.',
 },
 {
+  id: 'symbols', level: 'advanced', group: 'Shop helpers', title: 'SI prefixes, constants and Greek letters',
+  desc: 'The 24 SI prefixes from quecto to quetta, the seven constants that define the SI, and the Greek alphabet with what each letter stands for in BenchMate\'s formulas.',
+  render: el => renderSymbols(el),
+  working: 'No calculation: the values are shown as the publishers print them.',
+  source: 'BIPM, SI prefixes and SI defining constants; NIST, Metric (SI) prefixes and SP 330 Table 1; University of Warwick and The Engineering ToolBox (Greek alphabet). See docs/sources.md, Units and symbols.',
+},
+{
   id: 'units', level: 'simple', group: 'Shop helpers', title: 'Unit converter',
-  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow and angle. Every unit of the quantity at once. Angles also convert to and from degrees-minutes-seconds, % slope, slope 1 in n, taper per foot, taper ratio 1:x and rate of taper.',
+  desc: 'Length, area, volume, mass, force, torque, pressure and stress, power, energy, speed, feed rate, feed per rev, temperature, temperature difference, density, flow, angle, acceleration, rotational speed and viscosity (dynamic and kinematic). Every unit of the quantity at once. Angles also convert to and from degrees-minutes-seconds, % slope, slope 1 in n, taper per foot, taper ratio 1:x and rate of taper.',
   render: el => renderUnits(el),
   working: 'value_SI = (value + offset) x factor; then divided by the target factor. Offsets only for temperature (°C +273.15, °F +459.67 then x 5/9). Angle forms: % slope = 100 tan a, 1 in n = 1 / tan a (a from the horizontal); taper C = 2 tan(a/2) = 1 : x, taper per foot = 12 C (a the included angle).',
   source: 'NIST SP 811 (2008), Appendix B.8 and B.9: exact definitions (bold factors) and printed values checked in tests. Slope: Wikipedia "Grade (slope)". Taper: ISO/R 1119 (public preview), Omni Calculator taper. See docs/sources.md.',
 },
 {
   id: 'calc', level: 'simple', group: 'Shop helpers', title: 'Calculator',
-  desc: 'Type an expression with brackets, powers, trig (degrees or radians), roots, logs and factorials. Also degrees-minutes-seconds, prime factors and linear interpolation.',
+  desc: 'Type an expression with brackets, powers, trig (degrees or radians, with secant, cosecant, cotangent, versed sine and exsecant), roots, logs and factorials. Also degrees-minutes-seconds, prime factors and linear interpolation.',
   render: el => renderCalc(el),
-  working: "BenchMate's own recursive-descent parser in the Rust core (no eval): + - * / % ^ ! and functions. Powers bind right to left and above unary minus. Involute inv a = tan a - a.",
+  working: "BenchMate's own recursive-descent parser in the Rust core (no eval): + - * / % ^ ! and functions. Powers bind right to left and above unary minus. Involute inv a = tan a - a; versed sine versin a = 1 - cos a; coversed sine 1 - sin a; exsecant sec a - 1.",
   source: 'Operator precedence as in common mathematical convention; functions from the Rust standard library (IEEE 754 double precision). See docs/sources.md.',
 },
 {
@@ -2694,6 +2797,175 @@ const TOOLS = [
   render: el => renderTslots(el),
   working: 'No calculation: values as printed (min to max).',
   source: 'ISO 299:1987, DIN 650 (by name only); Engineers Edge (ASME B5.1M mm columns), iTeh preview of ISO 299.',
+},
+{
+  id: 'spring', level: 'advanced', group: 'Machine elements', title: 'Compression spring: rate, load and stress',
+  desc: 'A helical compression spring of round wire from what you can measure: wire diameter, outside diameter, coils and the kind of ends. Gives the spring rate, the solid length, the pitch, and the load and shear stress at a length or for a load, with the spring drawn to scale.',
+  fields: s => [
+    { id: 'd', label: 'Wire diameter d', unit: lenU(s), def: s === 'inch' ? 0.08 : 2 },
+    { id: 'od', label: 'Outside diameter of the coil', unit: lenU(s), def: s === 'inch' ? 0.625 : 16 },
+    { id: 'na', label: 'Active coils Na', unit: '', def: s === 'inch' ? 22 : 10 },
+    { id: 'end', label: 'Ends', unit: '', def: 3, options: [[0, 'Plain (open)'], [1, 'Plain and ground'], [2, 'Closed (squared)'], [3, 'Closed and ground']] },
+    { id: 'mat', label: 'Material', unit: '', def: 1, options: [[1, 'Carbon and alloy spring steel (music wire, hard drawn, oil tempered, CrV, CrSi)'], [2, 'Stainless steel 302, 304, 316'], [3, 'Stainless steel 17-7 PH'], [4, 'Phosphor bronze (one maker)'], [5, 'Beryllium copper (one maker)'], [0, 'Own modulus of rigidity']] },
+    { id: 'g', label: 'Modulus of rigidity G', unit: s === 'inch' ? 'psi' : 'MPa', def: '', when: v => v.mat === 0 },
+    { id: 'lf', label: 'Free length (optional)', unit: lenU(s), def: s === 'inch' ? 4 : '' },
+    { id: 'f', label: 'Load (optional)', unit: s === 'inch' ? 'lbf' : 'N', def: '' },
+    { id: 'lw', label: 'Length under load (optional, needs the free length)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d > 0 && v.od > 0 && v.na > 0)) return [];
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 3 : 2, fu = inch ? 'lbf' : 'N', ku = inch ? 'lbf/in' : 'N/mm', su = inch ? 'psi' : 'MPa';
+    const D = W.spring_mean_dia(v.od, v.d);
+    if (!isFinite(D)) return [R('Outside diameter', 'must be more than twice the wire diameter', '', 0)];
+    // Modulus: the core holds the makers' figures in psi; MPa is a unit conversion.
+    const G = v.mat === 0 ? v.g : (inch ? W.spring_g_psi(v.mat) : W.unit_convert(6, 6, 2, W.spring_g_psi(v.mat)));
+    const C = W.spring_index(D, v.d), E = k => W.spring_ends(v.end, v.na, v.d, v.lf, k), Ls = E(1);
+    const rows = [], ok = G > 0, St = (x, k) => W.spring_state(v.d, D, v.na, G, v.end, v.lf, x, k);
+    rows.push(ok ? R('Spring rate k', W.spring_rate(v.d, D, v.na, G), ku, inch ? 2 : 3) : R('Spring rate k', 'enter the modulus of rigidity', '', 0));
+    rows.push(R('Mean diameter D', D, u, dp), R('Spring index C = D / d', C, '', 2), R('Stress factor (Wahl) Kw', W.spring_wahl(C), '', 3));
+    if (v.mat !== 0) rows.push(R('Modulus of rigidity G used', G, su, 0));
+    rows.push(R('Total coils', E(0), '', 1), R('Solid length', Ls, u, dp));
+    const at = (name, F) => { rows.push(R('Load ' + name, F, fu, inch ? 2 : 1), R('Shear stress ' + name + ' (with Kw)', W.spring_stress(F, D, v.d), su, 0)); };
+    const free = v.lf > Ls;
+    if (v.lf > 0) {
+      if (!free) rows.push(R('Free length', 'is not longer than the solid length: check the coils and the ends', '', 0));
+      else {
+        rows.push(R('Pitch of the coils', E(2), u, dp), R('Travel from free to solid', St(0, 0), u, dp));
+        if (ok) at('at solid', St(0, 1));
+      }
+    }
+    if (v.f > 0 && ok) {
+      rows.push(R('Deflection for the load', St(v.f, 2), u, dp));
+      if (free) rows.push(isFinite(St(v.f, 3)) ? R('Length under the load', St(v.f, 3), u, dp) : R('Length under the load', 'the spring goes solid before it carries this load', '', 0));
+      rows.push(R('Shear stress at the load (with Kw)', W.spring_stress(v.f, D, v.d), su, 0));
+    }
+    if (v.lw > 0 && free && ok) {
+      if (v.lw >= v.lf) rows.push(R('Length under load', 'is not shorter than the free length', '', 0));
+      else if (!isFinite(St(v.lw, 4))) rows.push(R('Length under load', 'is shorter than the solid length', '', 0));
+      else at('at the length under load', St(v.lw, 4));
+    }
+    if (C < 3 || C > 12) rows.push(R('Note', 'Spring index ' + (C < 3 ? 'below 3' : 'above 12') + ': one source gives 3 to 12 as the range of most helical springs. ' + (C < 3 ? 'A tight coil is hard to wind and highly stressed on the inside.' : 'A loose coil tangles and buckles easily.'), '', 0));
+    return rows;
+  },
+  working: 'Mean diameter D = outside diameter − d. Spring index C = D / d. Rate k = G d⁴ / (8 D³ Na). Load F = k × deflection. Shear stress τ = Kw × 8 F D / (π d³), with the Wahl factor Kw = (4C − 1) / (4C − 4) + 0.615 / C for the curvature of the wire and the direct shear. ' +
+    'Total coils and solid length by the ends: plain Na and d (Nt + 1); plain and ground Na + 1 and d Nt; closed Na + 2 and d (Nt + 1); closed and ground Na + 2 and d Nt. Pitch from the free length Lf: plain (Lf − d) / Na; plain and ground Lf / (Na + 1); closed (Lf − 3d) / Na; closed and ground (Lf − 2d) / Na (one source for the pitch). ' +
+    'Modulus of rigidity as two spring makers print it: carbon and alloy spring steels 11.5 × 10⁶ psi, stainless 302, 304 and 316 10 × 10⁶ psi, 17-7 PH 11 × 10⁶ psi; phosphor bronze 6.25 and beryllium copper 7 × 10⁶ psi from one maker. The allowable stress is not given here: it depends on the wire size, the material and whether the load is steady or repeated, so compare the stress with the wire maker\'s figures. Buckling and surge are not checked.',
+  source: 'AMES (amesweb.info), Compression spring formulas; MechRef (University of Illinois), Springs; RoyMech, Helical springs (rate, Wahl factor, coils and solid length by end type). Modulus of rigidity: Lee Spring and Acxess Spring. See docs/sources.md, Springs.',
+  proof: [{ name: 'Music wire spring, 0.080 in wire, 0.625 in outside, 22 active coils, closed and ground, 4 in free, 7 lbf', sys: 'inch', vals: { d: 0.08, od: 0.625, na: 22, end: 3, mat: 0, g: 11750000, lf: 4, f: 7 },
+    expect: [['Spring rate k', 'lbf/in', 16.89, 0.005], ['Spring index C = D / d', '', 6.81, 0.005], ['Stress factor (Wahl) Kw', '', 1.22, 0.005], ['Solid length', 'in', 1.92, 0.0005], ['Travel from free to solid', 'in', 2.08, 0.0005], ['Shear stress at the load (with Kw)', 'psi', 23140, 6]],
+    source: 'AMES, Compression spring fatigue design example: k 16.89 lbf/in, C 6.81, Kw 1.22, solid height 1.92, maximum deflection 2.08, stress amplitude 23.14 ksi for loads of 22 and 8 lbf (an amplitude of 7 lbf).', note: 'The page does not print its shear modulus; 11.75 × 10⁶ psi reproduces its rate, where the two spring makers print 11.5 × 10⁶ psi for music wire.' }],
+},
+{
+  id: 'beltdrive', level: 'advanced', group: 'Machine elements', title: 'Belt drive: length, ratio and wrap',
+  desc: 'An open belt round two pulleys: the belt length for a centre distance, or the centre distance a belt of a known length gives, with the speed ratio, the driven speed, the belt speed and the angle of wrap on each pulley, drawn to scale.',
+  fields: s => [
+    { id: 'd1', label: 'Driving pulley diameter', unit: lenU(s), def: s === 'inch' ? 6 : 150 },
+    { id: 'd2', label: 'Driven pulley diameter', unit: lenU(s), def: s === 'inch' ? 20 : 300 },
+    { id: 'find', label: 'Find', unit: '', def: 0, options: [[0, 'Belt length from the centre distance'], [1, 'Centre distance from the belt length']] },
+    { id: 'c', label: 'Centre distance', unit: lenU(s), def: s === 'inch' ? 56 : 1500, when: v => v.find === 0 },
+    { id: 'len', label: 'Belt length', unit: lenU(s), def: s === 'inch' ? 153.72 : 3710, when: v => v.find === 1 },
+    { id: 'n', label: 'Driving speed (optional)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.d1 > 0 && v.d2 > 0)) return [];
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 2 : 1, rows = [];
+    let c = v.c;
+    if (v.find === 1) {
+      if (!(v.len > 0)) return [];
+      c = W.belt_centre(v.d1, v.d2, v.len);
+      if (!isFinite(c)) return [R('Belt length', 'is too short to go round both pulleys with a gap between them', '', 0)];
+      rows.push(R('Centre distance', c, u, dp));
+    } else {
+      if (!(c > 0)) return [];
+      const L = W.belt_length(v.d1, v.d2, c);
+      if (!isFinite(L)) return [R('Centre distance', 'the pulleys would touch: it must be more than half the sum of the diameters', '', 0)];
+      rows.push(R('Belt length', L, u, dp), R('By the short formula', W.belt_length_approx(v.d1, v.d2, c), u, dp));
+    }
+    const small = W.belt_wrap_deg(v.d1, v.d2, c, 0);
+    rows.push(R('Speed ratio (driving speed / driven speed)', W.drive_driven_rpm(1, v.d2, v.d1), ': 1', 3),
+      R('Wrap on the small pulley', small, '°', 1), R('Wrap on the large pulley', W.belt_wrap_deg(v.d1, v.d2, c, 1), '°', 1));
+    if (v.n > 0) {
+      rows.push(R('Driven speed', W.drive_driven_rpm(v.n, v.d1, v.d2), 'RPM', 0));
+      // Belt speed is the surface speed of the driving pulley: the same core function as cutting speed.
+      rows.push(inch ? R('Belt speed', W.sfm_from_rpm(v.n, v.d1), 'ft/min', 0) : R('Belt speed', W.unit_convert(9, 1, 0, W.vc_from_rpm(v.n, v.d1)), 'm/s', 1));
+    }
+    if (v.d1 !== v.d2) rows.push(R('Note', 'Use the pitch (datum) diameters of V-belt and timing pulleys and the pitch length of the belt, not the outside sizes. Slip and belt thickness are not included.', '', 0));
+    return rows;
+  },
+  working: 'Belt length, exact: L = (D + d) π/2 + (D − d) asin((D − d) / 2C) + 2 √(C² − (D − d)² / 4), with D the large and d the small pulley diameter and C the centre distance. Short formula: L ≈ 2C + π/2 (D + d) + (D − d)² / (4C). ' +
+    'Wrap on the small pulley = 180° − 2 asin((D − d) / 2C); the large pulley has the rest of the full turn. Centre distance from a belt length: the exact length formula solved for C. Speed ratio = driven diameter / driving diameter; driven speed = driving speed × driving diameter / driven diameter; belt speed = π × driving diameter × speed.',
+  source: 'tec-science, Calculation of the belt length for belt drives (exact and short formulas, wrap angle); Omni Calculator, Belt length (the same two formulas, worked examples). See docs/sources.md, Belts and chains.',
+  proof: [{ name: 'Pulleys of 300 and 150 mm, 1500 mm apart', sys: 'mm', vals: { d1: 150, d2: 300, find: 0, c: 1500 }, expect: [['Belt length', 'mm', 3710, 5]],
+    source: 'Omni Calculator, Belt length: pulleys of 30 cm and 15 cm, 1.5 m apart, belt length 3.71 m.' },
+  { name: 'Pulleys of 6 and 20 in, 56 in apart, by the short formula', sys: 'inch', vals: { d1: 6, d2: 20, find: 0, c: 56 }, expect: [['By the short formula', 'in', 153.72, 0.005]],
+    source: 'Omni Calculator, Belt length: 6 and 20 in pulleys, 56 in apart, 153.72 in by the approximate formula.' }],
+},
+{
+  id: 'chaindrive', level: 'advanced', group: 'Machine elements', title: 'Roller chain drive: length and sprockets',
+  desc: 'A roller chain round two sprockets: the chain length in pitches for a centre distance, rounded up to an even number of pitches, the centre distance that length then needs, the sprocket pitch diameters, the ratio and the wrap on the small sprocket.',
+  fields: s => [
+    { id: 'no', label: 'Chain', unit: '', def: 40, options: [[25, 'No. 25 (1/4 in pitch)'], [35, 'No. 35 (3/8 in)'], [40, 'No. 40 (1/2 in)'], [41, 'No. 41 (1/2 in, light)'], [50, 'No. 50 (5/8 in)'], [60, 'No. 60 (3/4 in)'], [80, 'No. 80 (1 in)'], [100, 'No. 100 (1 1/4 in)'], [120, 'No. 120 (1 1/2 in)'], [140, 'No. 140 (1 3/4 in)'], [160, 'No. 160 (2 in)'], [180, 'No. 180 (2 1/4 in)'], [200, 'No. 200 (2 1/2 in)'], [240, 'No. 240 (3 in)'], [0, 'Own pitch']] },
+    { id: 'p', label: 'Chain pitch', unit: lenU(s), def: s === 'inch' ? 0.5 : 12.7, when: v => v.no === 0 },
+    { id: 'n1', label: 'Teeth on the driving sprocket', unit: '', def: 17 },
+    { id: 'n2', label: 'Teeth on the driven sprocket', unit: '', def: 51 },
+    { id: 'c', label: 'Centre distance wanted', unit: lenU(s), def: s === 'inch' ? 20 : 500 },
+    { id: 'n', label: 'Driving speed (optional)', unit: 'RPM', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.n1 >= 3 && v.n2 >= 3 && v.c > 0)) return [];
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 3 : 2;
+    // Chain pitch: the core gives inches from the chain number; mm is a unit conversion. Lengths in pitches are the length divided by the pitch.
+    const p = v.no === 0 ? v.p : (inch ? W.chain_pitch_in(v.no) : W.unit_convert(0, 5, 1, W.chain_pitch_in(v.no)));
+    if (!(p > 0)) return [];
+    const cp = v.c / p, L = W.chain_length_pitches(v.n1, v.n2, cp), Le = W.chain_even_links(L), ce = W.chain_centre_pitches(v.n1, v.n2, Le);
+    const d1 = W.sprocket_pitch_dia(p, v.n1), d2 = W.sprocket_pitch_dia(p, v.n2), rows = [];
+    if (!(v.c > (d1 + d2) / 2)) return [R('Centre distance', 'the sprockets would touch: it must be more than half the sum of the pitch diameters, ' + fmt((d1 + d2) / 2, dp) + ' ' + u, '', 0)];
+    rows.push(R('Chain length, even number of pitches', Le, 'pitches', 0), R('Chain length as calculated', L, 'pitches', 2), R('Chain pitch', p, u, inch ? 3 : 3),
+      R('Centre distance for the even length', ce * p, u, dp), R('Centre distance wanted, in pitches', cp, 'pitches', 1),
+      R('Pitch diameter, driving sprocket', d1, u, dp), R('Pitch diameter, driven sprocket', d2, u, dp),
+      R('Speed ratio (driving speed / driven speed)', W.drive_driven_rpm(1, v.n2, v.n1), ': 1', 3));
+    const wrap = W.belt_wrap_deg(d1, d2, ce * p, 0);
+    rows.push(R('Wrap on the small sprocket', wrap, '°', 1));
+    if (v.n > 0) rows.push(R('Driven speed', W.drive_driven_rpm(v.n, v.n1, v.n2), 'RPM', 0));
+    const notes = [];
+    if (cp < 30 || cp > 50) notes.push('The centre distance is ' + fmt(cp, 1) + ' pitches: two sources recommend 30 to 50 pitches for ordinary drives' + (cp >= 80 ? ', and guides or an idler at 80 pitches or more' : '') + '.');
+    if (wrap < 120) notes.push('The wrap on the small sprocket is under 120°: two sources ask for at least 120° so that enough teeth share the load.');
+    if (Math.min(v.n1, v.n2) < 15) notes.push('One chain maker suggests more than 15 teeth on the small sprocket.');
+    if (notes.length) rows.push(R('Note', notes.join(' '), '', 0));
+    return rows;
+  },
+  working: 'Chain pitch from the ANSI chain number: the digits before the last are eighths of an inch (No. 40 = 4/8 in, No. 100 = 10/8 in); the last digit is 0 for standard chain, 1 for light chain, 5 for bushed chain without rollers. Chain length in pitches: L = 2C + (N1 + N2)/2 + (N2 − N1)² / (4π² C), with C the centre distance in pitches. ' +
+    'The length is rounded up to an even number of pitches, because an odd number needs an offset link. Centre distance for a length: C = 1/8 [2L − (N1 + N2) + √((2L − (N1 + N2))² − (8/π²)(N2 − N1)²)] pitches. Sprocket pitch diameter = pitch / sin(180° / N). Wrap on the small sprocket = 180° − 2 asin((D2 − D1) / 2C), the geometry of a belt on the pitch circles. Chain sag, wear elongation and the load rating are not covered.',
+  source: 'Martin Sprocket & Gear, Sprocket engineering data (chain length with the constant 0.1013, pitch diameter, pitches by chain number, 30 to 50 pitches, 120° wrap); U.S. Tsubaki, RS chain drive selection (length and centre distance, small sprocket teeth); a summary of Mott, Machine Elements in Mechanical Design (the same formulas, even number of pitches); Wikipedia, Roller chain (the chain number rule). See docs/sources.md, Belts and chains.',
+},
+{
+  id: 'taperpin', level: 'advanced', group: 'Machine elements', title: 'Taper pins (inch series)',
+  desc: 'Standard inch taper pins No. 7/0 to No. 14 (taper 1/4 in per foot): large end diameter with its limits, and the small end diameter for the length of pin, which is the size of the hole before reaming.',
+  fields: s => [
+    { id: 'no', label: 'Pin number', unit: '', def: 4, options: [[-6, '7/0'], [-5, '6/0'], [-4, '5/0'], [-3, '4/0'], [-2, '3/0'], [-1, '2/0'], [0, '0'], [1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6'], [7, '7'], [8, '8'], [9, '9'], [10, '10'], [11, '11'], [12, '12'], [13, '13'], [14, '14']] },
+    { id: 'l', label: 'Length of the pin', unit: lenU(s), def: s === 'inch' ? 2 : 50 },
+  ],
+  calc: (v, W, s) => {
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 4 : 3, k = inch ? 1 : 25.4;   // the table is in inches; mm is a unit conversion
+    const D = i => W.taper_pin_dia_in(v.no, i) * k;
+    if (!isFinite(D(0))) return [];
+    const rows = [];
+    if (v.l > 0) {
+      const sm = W.taper_pin_small(D(0), v.l, 0.25);
+      rows.push(isFinite(sm) ? R('Small end diameter at this length', sm, u, dp) : R('Small end diameter', 'the pin is too long for this size: it would taper to nothing', '', 0));
+    }
+    rows.push(R('Large end diameter (basic)', D(0), u, dp), R('Large end, commercial class, largest', D(1), u, dp), R('Large end, commercial class, smallest', D(2), u, dp));
+    if (isFinite(D(3))) rows.push(R('Large end, precision class, largest', D(3), u, dp), R('Large end, precision class, smallest', D(4), u, dp));
+    else rows.push(R('Precision class', 'listed up to No. 10 only', '', 0));
+    rows.push(R('Taper on the diameter', 0.25, 'in/ft', 3), R('Included angle', W.taper_included_angle_deg(0.25, 0, 12), 'deg', 4));
+    if (!inch) rows.push(R('Note', 'This is the inch series shown in mm. Metric taper pins (ISO 2339, taper 1:50) are a different series and are not included.', '', 0));
+    return rows;
+  },
+  working: 'Small end = large end − length × 0.25 / 12 (0.02083 per unit of length). Commercial class: +0.0013 / −0.0007 in on the large end; precision class: +0.0010 / −0 in, up to No. 10. Included angle = 2 atan(0.25 / 24).',
+  source: 'Large end diameters, limits and the small end rule: a supplier\'s cut sheet of ASME B18.8.2-2000 (hbbolt.com), the only full table found, so the sizes rest on one publisher; two other suppliers print the same large end for No. 7/0, 7, 9 and 14. See docs/sources.md, Pins.',
+  proof: [{ name: 'No. 3/0 taper pin, 1 in long', sys: 'inch', vals: { no: -2, l: 1 },
+    expect: [['Small end diameter at this length', 'in', 0.1042, 0.00005], ['Large end diameter (basic)', 'in', 0.125, 0.00005]],
+    source: 'Albany County Fasteners, pin size chart: No. 3/0 taper pin, large end 0.1250 in, small end at 1 in of length 0.1042 in.', note: 'Only the rows of that chart that match the standard\'s cut sheet are used; its sizes from 2/0 up do not.' }],
 },
 {
   id: 'keys', level: 'advanced', group: 'Machine elements', title: 'Keys and keyways',
@@ -3089,6 +3361,118 @@ const TOOLS = [
   render: el => renderCncGuide(el),
   working: 'Reference only. Your machine and control manuals govern. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
   source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'millsetup', level: 'advanced', group: 'Guides', title: 'CNC mill setup guide',
+  desc: 'From a cold machine to a proven first part: start and home, the control panel, loading tools, four ways to measure tool lengths (paper, 1-2-3 block, probe, true length), work offsets with an edge finder or indicator, loading the program, the first run, adjusting for size and shutting down.',
+  render: el => renderMillSetup(el),
+  working: 'Reference only, in our own words. Key names are those of the Haas control, which the public guides read for this page describe. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Your machine manual governs.',
+  source: 'Haas Factory Outlet mill operator and programming manuals; Worcester Polytechnic Institute Haas quick guide; Virasak, Manufacturing Processes 4-5; camInstructor; Hurco WinMax help; Travers Tool and Protool on edge finders; LinuxCNC documentation; CIMCO CNC programming book. Listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'toolpaths', level: 'advanced', group: 'Guides', title: 'Milling toolpath guide',
+  desc: 'What each milling toolpath is for and how to set it up: from model to part, 2D and 3D, stepover and stepdown, facing, contours with cutter compensation, pockets and slots and how to enter them, chamfer and radius milling, spot, drill and tap, 3D roughing and finishing, rest machining, pencil passes and tolerances.',
+  render: el => renderToolpaths(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. The G-code example is one to adapt, not a proven program.',
+  source: 'Autodesk Fusion blog and Inventor CAM help; MIT Center for Bits and Atoms class page; Helical Solutions Machining Guidebook (2016); MecSoft, Best practices in 3 axis machining; LinuxCNC documentation; Haas Factory Outlet mill programming manual. Listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'workholding', level: 'advanced', group: 'Guides', title: 'Workholding guide',
+  desc: 'Holding work on a mill: the rules, the vise and its accessories, aligning a vise, hard, step and soft jaws, making soft jaws, squaring a block, clamps and fixture plates, thin parts, tape and glue, round parts and several parts at once.',
+  render: el => renderWorkholding(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers.',
+  source: 'CNC Cookbook and Tormach (one author); CIMCO CNC programming book; J. A. Nilsson, Machine Shop Tutorials; M. R. Jennings, Introduction to Machining (CC BY); Autodesk Fusion blog; Helical Solutions Machining Guidebook; WPI Haas quick guide. Listed under the guide and in docs/sources.md.',
+},
+{
+  id: 'latheguide', level: 'advanced', group: 'Guides', title: 'CNC lathe guide',
+  desc: 'Turning on a CNC lathe: the machine, chucks, soft jaws and collets, bar work with a puller or feeder, the common tools and insert shapes, speeds and feeds, the toolpaths in the order they are run with the Haas cycles, parting off, and live tools with the C axis.',
+  render: el => renderLatheGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Cycle numbers are those of the Haas lathe manual read for this page.',
+  source: 'CIMCO CNC programming book, chapter 8; Haas Factory Outlet lathe programming manual (12/2024); Haas cut-off tool sheet; Production Machining and Modern Machine Shop (one publisher); CNC Cookbook; CNC Training Centre; Mitsubishi Materials. See docs/sources.md, "CNC lathe guide".',
+},
+{
+  id: 'shoptools', level: 'advanced', group: 'Guides', title: 'Shop tools guide',
+  desc: 'Bench and toolroom practice: sharpening twist drills and what a badly ground point does, grinding lathe tool bits, hacksaw and band saw blades and breaking a blade in, hole saw speeds from two charts, carbide burr speeds, choosing a cutting fluid, grinding wheel shapes, dressing and truing.',
+  render: el => renderShopTools(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Speeds are printed as the two charts give them, side by side; the cutting speed for hole saws in mild steel is our arithmetic from both charts.',
+  source: 'TTE work instruction and the Machinery Repairman manual (drills); J. A. Nilsson and mini-lathe.com (tool bits); Introduction to Machining (CC BY), Tameson, Fastenal, Sawblade.com, Modern Machine Shop (saws); RUKO chart at AutomationDirect and Remora Electrical (hole saws); Klingspor and Amana Tool (burrs); American Machinist and FUCHS (fluids); Palmgren and Norton in Modern Machine Shop (dressing). See docs/sources.md, "Shop tools guide".',
+},
+{
+  id: 'matguide', level: 'advanced', group: 'Guides', title: 'Materials guide',
+  desc: 'How to read what is stamped on the bar and printed on the certificate: SAE and AISI steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, titanium, magnesium, nickel and zinc alloy names, how each hardness test works, the forms of corrosion, and the mill certificate.',
+  render: el => renderMatGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'Engineering ToolBox, Machine Design and Wikipedia (steel numbers); Matmatch and Tata Steel (carbon classes); eFunda, Total Materia and the open textbook Metallurgy, CC BY (tool steels); Outokumpu and Aalco (stainless); Acme Foundry and Wikipedia (cast iron); ESAB, Hydro, AlCircle, Xometry, Total Materia and Righton Blackburns (aluminium); Total Materia and National Bronze (copper tempers); Online Metals, eFunda, White Industries, Dynacast and Aludiecasting (other metals); Matmatch, Wevolver, UNSW, Missouri S&T and Welding Advisers (hardness tests); AMPP and TWI (corrosion); Projectmaterials and What Is Piping (certificates). Full list in docs/sources.md, "Materials guide".',
+},
+{
+  id: 'measguide', level: 'advanced', group: 'Guides', title: 'Measurement guide',
+  desc: 'Inspection practice: the ways a tolerance is written, the ten preferred metric fits and what each is for, surface plate grades and care, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout with V-blocks and a dial indicator, and the surface texture and lay symbols on a drawing.',
+  render: el => renderMeasGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'WisTech Open Blueprint Reading (CC BY) and Machinist Guides (tolerances); Amesweb, Engineers Edge and Fractory (fits); Starrett, Quality Magazine, Mitutoyo and Travers (surface plates and blocks); Quality Magazine, Mitutoyo and Machinist Guides (micrometers and calipers); Fabrico, Acoem and the Machining FAQ (runout); GD&T Basics, Wevolver and Digital Surf (surface texture). Full list in docs/sources.md, "Measurement guide".',
+},
+{
+  id: 'cutguide', level: 'advanced', group: 'Guides', title: 'Cutting tools guide',
+  desc: 'What the cutting tools are called and what each is for: sixteen kinds of milling cutter, the tool materials from high speed steel to diamond with what each must not cut, the parts of a twist drill, files and filing, broaches with pitch and rise per tooth, and boring tools with their overhang limits.',
+  render: el => renderCutGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'Cutting Tool Engineering, American Machinist, MachineMfg and Wikipedia (milling cutters); CNCCookbook and AIMS Industrial (tool materials); TTE and The Engineers Post (twist drills); USDA Forest Service and Crescent Nicholson (files); American Machinist, Wikipedia and Engineers Edge (broaching); American Machinist and Cutting Tool Engineering (boring). Full list in docs/sources.md, "Cutting tools guide".',
+},
+{
+  id: 'bearguide', level: 'advanced', group: 'Guides', title: 'Bearings and seals guide',
+  desc: 'Rolling bearings for the person who fits them: what each type carries, how to read a bearing number and its suffixes (2RS, ZZ, C3), tolerance classes (P0 to P2, ABEC), which ring gets the tight fit, mounting cold and with heat, what a radial shaft seal asks of the shaft, and the threadlocker colours.',
+  render: el => renderBearGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'Reliability Solutions, RapidDirect and NSK (types); JTEKT Koyo, NSK, a college hand-out and Southern Cross Bearings (numbers); Wikipedia and NSK (tolerance classes); NHBB, NRB, MinebeaMitsumi and TFL (fits); Processing Magazine, Fabrico and Schaeffler (mounting); Seals-Shop and the University of Stuttgart (shaft seals); Permabond and Fastener Engineering (threadlockers). Full list in docs/sources.md, "Bearings and seals guide".',
+},
+{
+  id: 'abrasguide', level: 'advanced', group: 'Guides', title: 'Abrasive processes guide',
+  desc: 'The abrasive processes beyond the plain grinding wheel: the grinding ratio and spark-out, centerless grinding (why the work sits above centre, through-feed and infeed, lobing), honing and the crosshatch, lapping and light bands, diamond and CBN wheels (concentration, shape code), belt grinding, cut-off wheels and mounted points.',
+  render: el => renderAbrasGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
+  source: 'The Open University (grinding, centreless grinding); Cutting Tool Engineering, Modern Machine Shop and Production Machining (wheel wear, centerless grinding, honing); American Machinist and Wikipedia (honing, lapping); Kemet (lapping); MISUMI, UKAM and 3M (diamond and CBN wheels); EMI Supply and Xometry (belts); Weiler (cut-off wheels); Norton and PFERD (mounted points). Full list in docs/sources.md, "Abrasive processes guide".',
+},
+{
+  id: 'drawguide', level: 'advanced', group: 'Guides', title: 'Drawings and weld symbols guide',
+  desc: 'How to read a drawing: detail and assembly drawings, sheet sizes (A0 to A4, ANSI A to E), the title block, scales, line types, first and third angle projection and its symbol, sections and hatching, welding symbols (AWS A2.4 and ISO 2553), CAD file formats (STEP, IGES, STL, DXF), model-based definition and the drawing standards.',
+  render: el => renderDrawGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources put a thing differently both are shown.',
+  source: 'McGill University and DraftAid (kinds of drawing, sections); Wikipedia and a Washington State open textbook (sheet sizes); Werk24 (title block); What Is Piping and a university lecture (lines); Xometry Pro and GD&T Basics (projection); TU Darmstadt (views, sections, scales); Miller Electric, WeldGuru, Clause5, Material Welding and STRUCTURE Magazine (welding symbols); Get It Made, GibbsCAM and Industrial Monitor Direct (CAD files); Sigmetrix and ETMM (model-based definition); DEVELOP3D (BS 8888). Full list in docs/sources.md, "Drawings and weld symbols guide".',
+},
+{
+  id: 'procguide', level: 'advanced', group: 'Guides', title: 'Special processes and finishing guide',
+  desc: 'The processes a shop sends out or meets on a drawing: water jet, laser, plasma and flame cutting of plate (what each cuts, heat-affected zone, thickness), sinker, wire and hole drilling EDM, ultrasonic, abrasive flow, electron beam and photochemical machining, polishing, buffing compounds and wire brushes, black oxide, phosphate and chromate conversion coatings, anodising Types I to III and how much the part grows, decorative and hard chrome, zinc, cadmium, nickel and electroless nickel plating, hydrogen embrittlement, thermal spraying. Three drawings.',
+  render: el => renderProcGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
+  source: 'The Open University (OpenLearn Manupedia), Hypertherm, Fractory, The Fabricator, Techni Waterjet and Wikipedia (cutting plate); Modern Machine Shop and Xometry (EDM); Wikipedia, Artizono, Extrude Hone AFM and E-Fab (other processes); Products Finishing, Empire Abrasives, Wikipedia, United Abrasives and Weiler Abrasives (polishing, buffing, brushing); PCI Magazine, eFunda, Gleco Plating and Finishing.com (conversion coatings, anodising); Wikipedia and Richconn (chrome plating); Protolabs and EPI (other plating); TWI and WeldGuru (thermal spraying). Full list with URLs in docs/sources.md.',
+},
+{
+  id: 'elemguide', level: 'advanced', group: 'Guides', title: 'Machine elements guide',
+  desc: 'Friction (the laws, static and kinetic, a table of coefficients quoted source by source), backlash in gears and screws (why it is needed, how it is made, anti-backlash gears, compensation), gear materials and their heat treatment, cams and followers (kinds, base circle, pitch curve, pressure angle, rise, dwell and return), plain bearings (forms, materials, PV limits, shaft and clearance), leadscrews against ball screws (efficiency, self-locking, back-driving, preload). Three drawings.',
+  render: el => renderElemGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
+  source: 'Wikipedia, MISUMI and G.U.N.T. (friction); Wikipedia and KHK (backlash); KHK and MachineMfg (gear materials); Wikipedia, a course text and i GET IT (cams); Wikipedia, GlobalSpec and Armoloy (plain bearings); Wikipedia, Machine Design and Roton (leadscrews and ball screws). Full list with URLs in docs/sources.md.',
+},
+{
+  id: 'driveguide', level: 'advanced', group: 'Guides', title: 'Drives and maintenance guide',
+  desc: 'Electric motors (stator and rotor, synchronous speed and slip, reading the nameplate field by field), shaft alignment with dial indicators (offset and angle, soft foot, rim and face against reverse dial, bracket sag, thermal growth), fluid power (force of a cylinder, the parts of a hydraulic circuit, pumps, hydraulics against pneumatics, air preparation, tube and hose fittings), and machine vibration (severity zones A to D with their limits, and what a vibration points to). Four drawings.',
+  render: el => renderDriveGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source. The vibration limits were read from two web pages about the ISO standards, not from the standards.',
+  source: 'Machine Design, AutomationDirect and Control Engineering (motors); Fabrico, OpenExamPrep and Tractian (alignment); course slides after Cundiff, OpenExamPrep, Wikipedia, Power & Motion and AutomationPrimer (fluid power); Brennan and MISUMI (fittings); Fabrico, Vibromera and Industrial Monitor Direct (vibration). Full list with URLs in docs/sources.md.',
+},
+{
+  id: 'fastguide', level: 'advanced', group: 'Guides', title: 'Fasteners guide',
+  desc: 'How much thread to engage, why fasteners come loose and ten ways of locking them, safety wire (lock wire), set screw points, screw heads and drives, self-tapping screws (thread-forming against thread-cutting, the common types), pins (dowel, taper, spring, grooved, split), retaining rings, and British fasteners (Whitworth, BSF, BA, BSP and how the spanners are marked). Four drawings.',
+  render: el => renderFastGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
+  source: 'Nord-Lock and a university shop (engagement); Machine Design, Fastener Engineering and Essentra (locking); Wikipedia and the FAA (safety wire); Wikipedia, Tameson and bolts.co.uk (set screws); Accu and Essentra (heads and drives); Machine Design, Essentra and Specialty Bolt (tapping screws); Machine Design and Fastener Engineering (pins); Wikipedia and Rotor Clip (retaining rings); the Aircraft Engine Historical Society and Wikipedia (British fasteners). Full list with URLs in docs/sources.md.',
+},
+{
+  id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
+  desc: 'Over a hundred shop and CNC words in plain language, from 1-2-3 block to work offset, each with a link to the page that explains it. Type to search.',
+  render: el => renderGlossary(el),
+  working: 'No calculation: BenchMate\'s own wording. Where a term is explained on another page, the link opens that page and its sources.',
+  source: 'Own definitions. The choice of headwords was compared with the glossary of the CIMCO CNC programming book (appendix E, headwords only). See docs/sources.md, "Glossary".',
 },
 {
   id: 'toolwear', level: 'advanced', group: 'Guides', title: 'Tool wear guide',

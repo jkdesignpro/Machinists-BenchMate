@@ -24,6 +24,8 @@ f1!(feed_for_ra, c::feed_for_ra, ra, r);
 f1!(pass_time_min, c::pass_time_min, length, feed, rpm);
 f1!(taper_included_angle_deg, c::taper_included_angle_deg, large, small, length);
 f1!(taper_per_length, c::taper_per_length, large, small, length);
+f1!(taper_half_angle_deg, c::taper_half_angle_deg, large, small, length);
+f1!(taper_tailstock_setover, c::taper_tailstock_setover, large, small, length, work_len);
 f1!(taper_small_dia, c::taper_small_dia, large, length, deg);
 f1!(drill_point_length, c::drill_point_length, dia, angle);
 f1!(drill_tip_depth, c::drill_tip_depth, depth, dia, angle);
@@ -513,6 +515,7 @@ f1!(spot_depth, c::spot_depth, dc, angle);
 f1!(centre_drill_depth, c::centre_drill_depth, dc, dp, l, angle);
 f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
 f1!(spot_chamfer_dia, c::spot_chamfer_dia, z, angle);
+f1!(chamfer_mill, c::chamfer_mill, w, angle, tip, clear, dia, which);
 f1!(saw_section, c::saw_section, shape, a, b, nx, ny, which);
 f1!(saw_cut_time, c::saw_cut_time, area, rate);
 f1!(edm_kerf, c::edm_kerf, d, gap);
@@ -673,6 +676,11 @@ f1!(npv, c::npv, investment, saving, n, i, resale);
 #[no_mangle] pub extern "C" fn plane_figure(kind: f64, a: f64, b: f64, cc: f64, which: f64) -> f64 { pick(c::plane_figure(kind as u32, a, b, cc), which) }
 /// Solid `kind`: which 0 volume, 1 total surface, 2 lateral surface, 3 extra.
 #[no_mangle] pub extern "C" fn solid_figure(kind: f64, a: f64, b: f64, cc: f64, which: f64) -> f64 { pick(c::solid_figure(kind as u32, a, b, cc), which) }
+f1!(prismoid_volume, c::measure::prismoid_volume, a1, am, a2, h);
+f1!(tank_contents, c::measure::tank_contents, orient, d, l, h, which);
+/// Area under the first `n` buffer values spaced `d` apart: `which` 0 trapezoidal rule, 1 Simpson's rule.
+#[no_mangle] pub extern "C" fn area_from_buf(n: f64, d: f64, which: f64) -> f64 {
+    if which as i32 == 1 { c::measure::simpson_area(buf(n), d) } else { c::measure::trapezoid_area(buf(n), d) } }
 #[no_mangle] pub extern "C" fn scale_spec(kind: f64, which: f64) -> f64 { pick(c::scale_spec(kind as u32), which) }
 #[no_mangle] pub extern "C" fn scale_reading(kind: f64, value: f64, which: f64) -> f64 { pick(c::scale_reading(kind as u32, value), which) }
 
@@ -719,8 +727,30 @@ f1!(interpolate, c::expr::interpolate, x1, y1, x2, y2, x);
 
 // Gears and splines (core/src/gears.rs). Lengths in any one unit (module or 1/P).
 f1!(gear_involute, c::gears::involute, deg);
+f1!(involute_cutter_no, c::gears::involute_cutter_no, z, series);
 f1!(gear_inv_angle, c::gears::inv_angle_deg, inv);
 f1!(sae_spline, c::gears::sae_spline, n, fit, d_nom, which);
+f1!(spring_mean_dia, c::springs::spring_mean_dia, od, d);
+f1!(spring_index, c::springs::spring_index, dm, d);
+f1!(spring_rate, c::springs::spring_rate, d, dm, na, g);
+f1!(spring_wahl, c::springs::spring_wahl, c);
+f1!(spring_stress, c::springs::spring_stress, f, dm, d);
+f1!(spring_ends, c::springs::spring_ends, end, na, d, lf, which);
+f1!(spring_g_psi, c::springs::spring_g_psi, mat);
+f1!(spring_state, c::springs::spring_state, d, dm, na, g, end, lf, x, which);
+f1!(belt_length, c::drives::belt_length, d1, d2, cd);
+f1!(belt_length_approx, c::drives::belt_length_approx, d1, d2, cd);
+f1!(belt_wrap_deg, c::drives::belt_wrap_deg, d1, d2, cd, which);
+f1!(belt_centre, c::drives::belt_centre, d1, d2, len);
+f1!(drive_driven_rpm, c::drives::drive_driven_rpm, n, driver, driven);
+f1!(chain_pitch_in, c::drives::chain_pitch_in, number);
+f1!(chain_length_pitches, c::drives::chain_length_pitches, n1, n2, cd);
+f1!(chain_even_links, c::drives::chain_even_links, l);
+f1!(chain_centre_pitches, c::drives::chain_centre_pitches, n1, n2, l);
+f1!(sprocket_pitch_dia, c::drives::sprocket_pitch_dia, p, n);
+f1!(awg_dia_in, c::gauges::awg_dia_in, n);
+f1!(taper_pin_dia_in, c::pins::taper_pin_dia_in, no, which);
+f1!(taper_pin_small, c::pins::taper_pin_small, d, l, tpf);
 /// Spur gear: which 0 d, 1 db, 2 da, 3 df, 4 ha, 5 hf, 6 h, 7 p, 8 pb, 9 s, 10 e, 11 z_min, 12 x_min, 13 s at tip.
 #[no_mangle] pub extern "C" fn gear_spur(m: f64, z: f64, alpha: f64, x: f64, ha: f64, hf: f64, which: f64) -> f64 { c::gears::spur_flat(m, z, alpha, x, ha, hf, which as u32) }
 /// Spur pair: which 0 inv aw, 1 aw, 2 y, 3 a0, 4 a, 5 dw1, 6 dw2, 7 ha1, 8 ha2, 9 h, 10 da1, 11 da2, 12 df1, 13 df2, 14 contact ratio.

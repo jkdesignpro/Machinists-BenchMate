@@ -31,9 +31,17 @@ const CNC_SOURCES = {
   MACH: 'MachMotion, Lathe tool tip types (support.machmotion.com)',
   KENTECH: 'Kentech Inc., "Stop scratching your head and make some chips", TWI Press 2000, reprinted on a Florida International University course page',
   IA: 'Industry Arena (CNCzone mirror) forum thread "Manual tool comp partial radius lathe", 2005-2009',
+  LCNC_G: 'LinuxCNC documentation: G-code overview (format of a line), G codes, M codes (linuxcnc.org)',
+  HFO_MP: 'Haas Factory Outlet (Productivity Inc.), Haas Mill Programming manual, revised 06/26',
+  HURCO_PF: 'Hurco Companies, WinMax Mill help, NC programming, "Program functions" (support.hurco.com)',
+  MASSO: 'MASSO documentation, "G96: turn on constant surface speed (CSS)" (docs.masso.com.au)',
+  MDOC: 'Machining Doctor, "G96 / G97 G-code: constant SFM vs. constant RPM" (machiningdoctor.com)',
+  CADEM: 'Cadem, "Constant surface speed: why does it always go with a limiting spindle speed?" (cadem.com)',
+  CTE: 'C. Tate, "Understanding cutting equations", Cutting Tool Engineering, 2014-07-01 (ctemag.com)',
+  WOODWEB: 'WOODWEB knowledge base, "Understanding chip load", 2005-06-19 (woodweb.com)',
   OWN: 'BenchMate derivation (geometry), with tests in core/src/tnrc.rs',
 };
-const CNC_INDEPENDENT = { HFO_OP: 'HAAS', HFO_L: 'HAAS', FMC_D: 'FMC', FMC_T: 'FMC' }; // same publisher family counts once
+const CNC_INDEPENDENT = { HFO_OP: 'HAAS', HFO_L: 'HAAS', HFO_MP: 'HAAS', LCNC_G: 'LCNC', FMC_D: 'FMC', FMC_T: 'FMC' }; // same publisher family counts once
 // mode 'cat': a standard's own edition and status, confirmed on the standards body's catalogue.
 function cnTags(keys, mode) {
   const ks = keys || [];
@@ -342,12 +350,29 @@ const TROUBLE_GRIND = [
   ['Long, even waves', 'A wheel out of balance: often one that was stopped with the coolant running, so one side is soaked, or one stored where it took up moisture or oil.', 'Balance the wheel; shut the coolant off and let the wheel spin dry before stopping it; store wheels in racks off the floor.', ['RADIAC']],
   ['Short, close waves', 'Vibration from belts, motors, the hydraulic system or other machines nearby.', 'Find the source and repair or replace the part that causes it.', ['RADIAC']],
 ];
+// Spindle direction seen from above a vertical mill: M03 clockwise, M04 counterclockwise.
+function cnSpin() {
+  const arc = (cx, cw) => '<circle class="gm" cx="' + cx + '" cy="78" r="46"/><path class="gc" d="M' + (cx - 46) + ' 78A46 46 0 0 ' + (cw ? 1 : 0) + ' ' + cx + ' ' + (cw ? 32 : 124) + '"/>' +
+    (cw ? '<path class="gc" d="M' + (cx - 9) + ' 26L' + cx + ' 32L' + (cx - 8) + ' 39"/>' : '<path class="gc" d="M' + (cx - 9) + ' 118L' + cx + ' 124L' + (cx - 8) + ' 131"/>') +
+    '<circle class="gp" cx="' + cx + '" cy="78" r="14"/><path class="gm" d="M' + (cx - 5) + ' 78H' + (cx + 5) + 'M' + cx + ' 73V83"/>';
+  return cnSvg(440, 170, arc(120, true) + cnT(120, 150, 'M03 clockwise', 'gv', 'middle') + arc(320, false) + cnT(320, 150, 'M04 counterclockwise', 'gv', 'middle') +
+    cnT(220, 166, 'seen from above, looking down the spindle of a vertical mill', 'gs', 'middle'), 'Spindle direction: M03 clockwise and M04 counterclockwise, seen from above');
+}
+const PROG_CHARS = [
+  ['%', 'Start and end of the program file', 'On LinuxCNC the pair may be left out when the file ends with M2 or M30; a % at the start with none at the end is an error.', ['LCNC_G', 'HFO_MP']],
+  ['O and a number', 'Program number', 'On the Haas control the letter O and five digits name the program. LinuxCNC uses O words for subroutines and flow control instead.', ['HFO_MP', 'LCNC_G']],
+  ['N and a number', 'Block (line) number', 'Optional. It is a label, not a word that does anything.', ['LCNC_G', 'NIST']],
+  ['( )', 'Comment', 'Text in round brackets is for the reader and is not carried out.', ['LCNC_G', 'HFO_MP', 'NIST']],
+  [';', 'End of block, or a comment', 'Haas listings show a semicolon at the end of each block. On LinuxCNC a semicolon starts a comment that runs to the end of the line.', ['HFO_MP', 'LCNC_G']],
+  ['/', 'Block delete', 'First on a line: the line is skipped when the block delete switch is on.', ['LCNC_G', 'NIST']],
+  ['Spaces, capitals', 'No meaning', 'On LinuxCNC spaces and tabs change nothing outside comments, and letters may be upper or lower case.', ['LCNC_G']],
+];
 function cnTable(head, rows) {
   return '<div class="res cntab" style="max-width:none"><table class="gtab"><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '<th>Sources</th></tr>' +
     rows.map(r => '<tr>' + r.slice(0, 3).map((c, i) => '<td>' + (i ? '' : '<b>') + gesc(c) + (i ? '' : '</b>') + '</td>').join('') + '<td>' + cnTags(r[3]) + '</td></tr>').join('') + '</table></div>';
 }
 function renderCncGuide(el) {
-  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
+  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
     ['c-wear', 'Tool wear'], ['c-trt', 'Turning troubles'], ['c-trm', 'Milling troubles'], ['c-trd', 'Drilling troubles'], ['c-trtap', 'Tapping troubles'], ['c-trg', 'Grinding troubles'], ['c-hold', 'Workholding'], ['c-safe', 'Safety'], ['c-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
@@ -379,9 +404,22 @@ function renderCncGuide(el) {
     cp('<b>Modal and one-shot codes.</b> Most G codes stay in force until another code of the same group replaces them (modal): motion G00/G01/G02/G03, plane G17/G18/G19, units G20/G21, distance mode G90/G91, compensation and canned cycles. Two codes from the same modal group may not share a block. One-shot (non-modal) codes such as dwell G04 or G53 act in their own block only and must be repeated where needed.', ['NIST', 'MIT_EM', 'LCNC']) +
     cp('<b>Safe start line.</b> Start every program and every tool with a block that puts the modal state where you expect it, whatever ran before: plane, units, absolute mode, compensation off, tool length off (mill), canned cycle off. For example a mill: G17 G21 G40 G49 G80 G90; a lathe: G18 G21 G40 G80 G99. Check each code against your control: not every control has every one.', ['OWN']) +
     cp('<b>Comments</b> go in round brackets on Fanuc-style, Mitsubishi and RS274NGC controls. M30 (or M02) ends the program.', ['NIST', 'MIT_EM']) +
-    cp('A block starting with / is skipped when the block delete switch is on.', ['NIST']) +
+    cp('A block starting with / is skipped when the block delete switch is on.', ['NIST', 'LCNC_G']) +
+    cp('<b>Inch or millimetre.</b> G20 sets the program to inches and G21 to millimetres. Put one of them in the start-up block of every program, so that the numbers are never read in the wrong unit.', ['LCNC_G', 'HFO_MP']) +
+    cp('The <a href="#/t/gsim">G-code simulator</a> can convert a program between inch and millimetre. Offsets and settings stored in the control are not part of the program and have to be right at the machine.', null) +
+    '<h3>Special characters in a program</h3>' + cnTable(['Character', 'Meaning', 'Notes'], PROG_CHARS) +
     cp('<b>Subprograms.</b> Repeated work goes in a subprogram: M98 P(number) calls it and M99 returns (Fanuc, Haas); Haas M97 calls a block inside the same program; LinuxCNC uses O-word subroutines; G65 calls a macro with arguments. See the G and M codes and Macro reference screens for each control.', []) +
     cp('<b>Typical order of one tool:</b> safe start line, tool change and offsets, spindle speed and direction, coolant, rapid to a clear start point, cut, retract to a safe height or position, coolant and spindle off, next tool; finally return to the change position and M30.', ['OWN']) +
+
+    '<h2 id="c-spin">Spindle direction and constant surface speed</h2>' + cnSpin() +
+    cp('<b>M03, M04, M05.</b> M03 starts the spindle clockwise at the S speed, M04 starts it counterclockwise and M05 stops it.', ['LCNC_G', 'HURCO_PF', 'HFO_MP']) +
+    cp('<b>Seen from where.</b> Clockwise is judged from the headstock, looking along the spindle toward the work: on a vertical mill that is looking down from above.', ['HURCO_PF']) +
+    cp('<b>Constant surface speed (lathe).</b> At a fixed rpm the cutting speed falls as the tool moves toward the centre. G96 with an S word in surface speed (m/min in millimetre mode, ft/min in inch mode) makes the control change the rpm with the diameter so that the cutting speed stays the same. G97 goes back to a fixed speed, with S in rev/min.', ['MASSO', 'MDOC', 'CADEM']) +
+    cp('<b>Why the rpm climbs.</b> rpm = 1000 x cutting speed / (pi x diameter) in metric units, or 12 x cutting speed / (pi x diameter) with ft/min and inches: halve the diameter and the rpm doubles. At the centre line no spindle could keep up.', ['MDOC', 'CADEM']) +
+    cp('<b>Always with a speed limit.</b> Give the control a top speed for G96, and when the rpm reaches it the spindle stays there for the rest of the cut. The word differs by control: G50 S on Haas and Fanuc-style lathes, G92 S in one Fanuc example read, a D word in the G96 block on LinuxCNC-style controls.', ['HFO_L', 'MDOC', 'CADEM', 'MASSO']) +
+    cp('For a round part held rigidly the limit can be the top speed of the machine; for a part that is not round, or a fixture that is out of balance, set it lower.', ['CADEM']) +
+    cp('<b>When fixed rpm is better.</b> Facing to the centre or parting off, where G96 simply runs up to the limit; and when one particular speed has been found to stop vibration.', ['MDOC']) +
+    cp('See <a href="#/t/rpm">speed from cutting speed</a> and <a href="#/t/partofftime">part-off time</a>, which allows for the speed limit.', null) +
 
     '<h2 id="c-climb">Climb and conventional milling</h2>' + cnClimb() +
     cp('<b>Climb (down) milling:</b> the cutter turns "with" the feed, so each tooth enters the chip at its thickest and leaves thin. With the spindle turning clockwise (M03, seen from above) that means the material is on the right of the tool path. It rubs less, more of the heat goes away with the chip, chips are left behind the cutter instead of being recut, and edges usually last longer with a better finish.', ['HARV']) +
@@ -391,6 +429,9 @@ function renderCncGuide(el) {
     '<h2 id="c-chip">Chip formation</h2>' + cnChip() +
     cp('<b>Shearing, not splitting.</b> The edge pushes the material ahead of it until it shears along a narrow shear zone running from the edge up to the surface; the sheared layer slides up the rake face as a chip. Most of the cutting heat is made in this zone and at the rake face.', []) +
     cp('<b>Chip types.</b> Ductile materials give continuous ribbons (which need a chip breaker); brittle materials such as cast iron give small discontinuous pieces; hard or heat-resistant alloys give segmented, saw-tooth chips. Material that welds to the edge gives a built-up edge.', []) +
+    cp('<b>Chip load</b> (feed per tooth) is how much each cutting edge takes as it passes: feed rate = rpm x number of teeth x chip load. In turning, the matching figure is the feed per revolution.', ['CTE', 'WOODWEB']) +
+    cp('Chip load is not always the chip thickness: a small radial depth of cut or a lead angle makes the chip thinner than the feed per tooth. See the <a href="#/t/chipthin">chip thinning</a> tool.', ['CTE']) +
+    cp('Too little chip load makes heat and wears the tool out early; too much overloads the tool and the spindle and spoils the cut.', ['WOODWEB']) +
     cp('<b>Chip thickness</b> is set by the feed (and the entering angle in turning, the radial engagement in milling). Each chip breaker and edge works in a range of chip thickness: too thin and the edge rubs, too thick and it breaks. See the chip thinning tool for milling.', []) +
 
     '<h2 id="c-wear">Tool wear: types, causes and remedies</h2>' +

@@ -20,7 +20,7 @@ const HUBS = {
   drilldepth: { title: 'Drill point and spot depth', icon: 'drill', desc: 'Point length to add to a drilled depth, spot and centre drill depths.',
     tabs: [['drillpoint', 'Point length'], ['spotdepth', 'Spot and centre drill']] },
   convert: { title: 'Unit and fraction conversion', icon: 'units', desc: 'Convert units, and fractions to decimals and millimetres.',
-    tabs: [['units', 'Units', 1], ['fraction', 'Fractions', 1]] },
+    tabs: [['units', 'Units', 1], ['fraction', 'Fractions', 1], ['symbols', 'Prefixes and symbols']] },
   fitlookup: { title: 'Limits and fits', icon: 'fit', desc: 'ISO 286 and ANSI inch fits, with general tolerances.',
     tabs: [['fits', 'ISO fits', 1], ['ansifits', 'ANSI inch fits', 1], ['gentol', 'General tolerances']] },
   surfacefin: { title: 'Surface finish', icon: 'surface', desc: 'Roughness conversions and symbols, and the finish a turning tool or a milling cutter will leave.',
@@ -66,7 +66,7 @@ const WORKSPACES = [
     ['Engagement', ['chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
     ['Tool behaviour', ['deflection', 'runout', 'chatter'], 'wave'],
     ['Tool holding', ['holdertorque', 'machinetapers'], 'nut'],
-    ['Other milling', ['surfacefin', 'slitsaw', 'indexing'], 'saw'],
+    ['Other milling', ['surfacefin', 'chamfermill', 'slitsaw', 'indexing'], 'saw'],
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
     ['Drilling', ['advdrill', 'advream', 'advtap', 'gundrill', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
@@ -89,8 +89,8 @@ const WORKSPACES = [
   ] },
   { id: 'maths', name: 'Shop maths', icon: 'triangle', blurb: 'Calculator, conversions, geometry, stock and engineering sums.', sections: [
     ['Calculator and conversion', ['calc', 'convert', 'formulas'], 'calc'],
-    ['Geometry', ['triangle', 'arc', 'fillet', 'compound', 'figures', 'holepattern'], 'angle'],
-    ['Stock and sheet metal', ['weight', 'bar', 'bend'], 'material'],
+    ['Geometry', ['triangle', 'arc', 'fillet', 'compound', 'figures', 'prismoid', 'irregular', 'tankvol', 'holepattern'], 'angle'],
+    ['Stock and sheet metal', ['weight', 'bar', 'bend', 'gauges'], 'material'],
     ['Engineering', ['section', 'beam', 'torsion', 'column', 'stressconc', 'fatigue', 'balance', 'critspeed', 'bearinglife'], 'beam'],
   ] },
   { id: 'program', name: 'Programming', icon: 'programming', blurb: 'G and M codes, macros, cycle generators, backplot and DXF.', sections: [
@@ -103,9 +103,9 @@ const WORKSPACES = [
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
     ['Materials', ['materials', 'hardness', 'heattreat', 'tempercolours', 'galvanic', 'plastics', 'metalid'], 'material'],
     ['Fasteners', ['boltgrade', 'bolttorque', 'shcs', 'clearance', 'spanner', 'tslots'], 'nut'],
-    ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife'], 'bearing'],
+    ['Machine elements', ['machinetapers', 'keys', 'oring', 'bearinglife', 'spring', 'beltdrive', 'chaindrive', 'taperpin'], 'bearing'],
     ['Shop', ['coolant', 'economics', 'abbrev'], 'drop'],
-    ['Guides', ['cncguide', 'toolwear', 'toolguide'], 'book'],
+    ['Guides', ['cncguide', 'millsetup', 'toolpaths', 'workholding', 'latheguide', 'shoptools', 'matguide', 'measguide', 'cutguide', 'bearguide', 'abrasguide', 'drawguide', 'procguide', 'elemguide', 'driveguide', 'fastguide', 'toolwear', 'toolguide', 'glossary'], 'book'],
   ] },
 ];
 // Listed on the Home rail rather than in a workspace.

@@ -111,6 +111,20 @@ pub fn taper_included_angle_deg(large: f64, small: f64, length: f64) -> f64 {
     2.0 * ((large - small) / (2.0 * length)).atan().to_degrees()
 }
 
+/// Half of the included taper angle: the setting of the compound (top) slide.
+/// `tan(half) = (D - d) / (2 L)`.
+pub fn taper_half_angle_deg(large: f64, small: f64, length: f64) -> f64 {
+    ((large - small) / (2.0 * length)).atan().to_degrees()
+}
+
+/// Tailstock set-over for turning a taper between centres: the taper is
+/// `length` long on a piece `work_len` long overall,
+/// `set-over = work_len (D - d) / (2 length)`. NaN when the work is shorter than the taper.
+pub fn taper_tailstock_setover(large: f64, small: f64, length: f64, work_len: f64) -> f64 {
+    if !(large > small && small >= 0.0 && length > 0.0 && work_len >= length) { return f64::NAN; }
+    work_len * (large - small) / (2.0 * length)
+}
+
 /// Taper per unit length (dia change over length): `(D - d) / L` [MH]
 pub fn taper_per_length(large: f64, small: f64, length: f64) -> f64 {
     (large - small) / length
@@ -641,6 +655,10 @@ pub mod mechanics;
 pub mod inspect;
 pub use inspect::*;
 pub mod matref;
+pub mod springs;
+pub mod drives;
+pub mod gauges;
+pub mod pins;
 pub mod cutforce;
 pub mod advisor;
 pub mod lobes;
@@ -671,6 +689,14 @@ mod tests {
     #[test] fn taper() {
         // 1:20-ish check: D=1.0, d=0.5, L=2.5 -> half angle atan(0.1)=5.7106 deg
         close(taper_included_angle_deg(1.0, 0.5, 2.5), 11.4212, 1e-3);
+        // Lathe notes (engineering1995 blog, Taper turning): D 80, d 50 over 80 mm: compound slide at 10.62 deg.
+        // Tailstock set-over = L (D - d) / (2 l): a 1:50 taper 250 mm long (30 to 25 mm) on a 500 mm bar needs 5 mm
+        // (own arithmetic from the formula both sets of notes print); a taper over the whole length needs (D - d) / 2.
+        close(taper_half_angle_deg(80.0, 50.0, 80.0), 10.62, 5e-3);
+        close(taper_half_angle_deg(1.0, 0.5, 2.5) * 2.0, taper_included_angle_deg(1.0, 0.5, 2.5), 1e-12);
+        close(taper_tailstock_setover(30.0, 25.0, 250.0, 500.0), 5.0, 1e-12);
+        close(taper_tailstock_setover(30.0, 25.0, 250.0, 250.0), 2.5, 1e-12);
+        assert!(taper_tailstock_setover(30.0, 25.0, 250.0, 200.0).is_nan());
         close(taper_per_length(1.0, 0.5, 2.5), 0.2, 1e-12);
         close(taper_small_dia(1.0, 2.5, 11.4212), 0.5, 1e-4);
     }

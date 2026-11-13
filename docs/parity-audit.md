@@ -37,6 +37,53 @@ features are names only.
 | CNC Machining handbook | 83 | 13 | 17 | 49 (0) | 0 | 4 | 16 % |
 | **All** | **676** | **177** | **184** | **236 (22)** | **21** | **58** | **30 %** |
 
+**Recount (2026-11-12, after 0.5.0, branch `claude/books`):** 76 rows that were still marked missing from the first audit (written before the geometry, reference data, gears, advisor and guide work was merged) were checked against the app and corrected; when in doubt the lower status was kept. Counted from the tables below, this recount replaces the table above:
+
+| Checklist | Done | Partial | Missing | Out of scope | Out of scope? | Done, of in-scope rows |
+|---|---|---|---|---|---|---|
+| CNC Machinist Calculator Ultra | 89 | 16 | 5 | 2 | 0 | 81 % |
+| Machinery's Handbook 31 | 63 | 131 | 78 | 6 | 28 | 23 % |
+| Engineers' Data Book | 11 | 31 | 14 | 12 | 26 | 20 % |
+| Engineers Black Book | 31 | 33 | 15 | 1 | 0 | 39 % |
+| CNC Machining handbook | 13 | 25 | 41 | 0 | 4 | 16 % |
+| **All** | **207** | **236** | **153** | **21** | **58** | **35 %** |
+
+Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more rows to done.
+
+**Update (0.6.0, first batch, branch `claude/books`, 2026-11-12):** springs, belt and chain drives, units and symbols, Jarno and Brown & Sharpe tapers. MH118, MH301, MH306, ED2, BB4 and BB46 done; MH40, MH289, MH290, MH300, ED75 and ED76 partial. Counted from the tables below: 213 done, 239 partial, 144 missing of 596 in-scope rows, 36 %; 324 more rows to done for 90 %.
+
+**Update (0.6.0, second batch, 2026-11-12):** sheet metal and wire gauges, inch taper pins, involute cutter numbers. MH296 and BB55 done; MH214 and MH264 partial. Counted from the tables below: 215 done, 240 partial, 141 missing of 596 in-scope rows, 36 %; 322 more rows to done for 90 %.
+
+**Update (0.6.0, third batch, 2026-11-12):** shop maths (old trig functions, prismoidal formula, irregular areas, tank contents, equal-area circle and square, tailstock set-over), and nine rows that the app already covered but were still marked partial or missing from before the unit converter, the surface texture page, the stock weight tool and the j and J fits existed. MH3, MH9, MH11, MH16, ED4, ED16, ED17, BB1, BB36, BB39, BB50, BB74 and BB75 done. Counted from the tables below: 228 done, 228 partial, 140 missing of 596 in-scope rows, 38 %; 309 more rows to done for 90 %.
+
+**Update (0.6.0, fourth batch, 2026-11-12):** CNC mill setup guide (`millsetup`: start-up, control keys, loading tools, four tool length methods, work offsets, first run, adjusting, shut-down), and in the CNC guide: units, program characters, spindle direction, constant surface speed, chip load. CN5, CN7, CN9, CN17, CN18, CN19, CN23, CN25, CN27 to CN34, CN52 and CN77 to CN79 done; CN26 partial. Counted from the tables below: 248 done, 223 partial, 125 missing of 596 in-scope rows, 42 %; 289 more rows to done for 90 %.
+
+**Update (0.6.0, fifth batch, 2026-11-12):** milling toolpath guide (`toolpaths`: from model to part, 2D and 3D, which toolpath for which feature, contour with cutter compensation and a worked example, pockets and slots, chamfer and radius milling, holes, 3D toolpaths, rest machining, tolerances), workholding guide (`workholding`: rules, vise and accessories, aligning a vise, jaws and soft jaws, squaring a block, clamps and fixture plates, thin parts, round parts and many parts) and the chamfer mill calculator (`chamfermill`). CN3, CN37 to CN47, CN56 to CN69, CN71 to CN73 and CN76 done; CN35, CN70 and CN75 partial; CN55 (3D tool compensation) and CN74 (angle plates) stay missing because no source for them was read. Counted from the tables below: 278 done, 215 partial, 103 missing of 596 in-scope rows, 47 %; 259 more rows to done for 90 %. The CNC machining handbook checklist is at 63 of 79, 80 %.
+
+**Update (0.6.0, sixth batch, 2026-11-12):** CNC lathe guide (`latheguide`: the machine, holding the part, bar work, common tools, speeds and feeds, toolpaths in order with the Haas cycles, parting off, live tools), glossary (`glossary`, 108 terms), and in the workholding guide a section on flanges, angle plates, dowels and shoulder bolts for two-sided parts and several parts from one bar. CN49, CN50, CN51, CN53, CN54, CN70, CN74, CN75 and CN82 done; CN70, CN74 and CN75 rest on one source each and are marked so in the app. Counted from the tables below: 287 done, 209 partial, 100 missing of 596 in-scope rows, 48 %; 250 more rows to done for 90 %. The CNC machining handbook checklist is at 72 of 79, 91 %; still open there: CN4, CN6, CN11, CN26, CN35, CN80 (partial) and CN55 (missing).
+
+**Update (0.6.0, seventh batch, 2026-11-12):** shop tools guide (`shoptools`: sharpening twist drills, grinding lathe tool bits, hacksaw and band saw blades, hole saw speeds, carbide burrs, choosing a cutting fluid, grinding wheel shapes, dressing and truing). BB18, BB24, BB25, BB27, BB28, BB60, BB62, BB80, MH157 and MH163 done; MH129 and MH164 from missing to partial; notes brought up to date on BB26, MH132, MH156 and MH158. Re-audit: MH179 and MH180 are done by the milling toolpath guide and the CNC lathe guide. Counted from the tables below: 299 done, 204 partial, 93 missing of 596 in-scope rows, 50 %; 238 more rows to done for 90 %.
+
+**Update (0.6.0, eighth batch, 2026-11-12):** materials guide (`matguide`: steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, titanium, magnesium, nickel and zinc alloy names, how the hardness tests work, forms of corrosion, mill certificates). MH50, MH60, MH62, MH63, MH64, MH65, ED51 to ED61, ED63, ED64 and BB56 done (ED58 and ED63 were missing); notes brought up to date on MH53 and MH54, which stay partial. Counted from the tables below: 319 done, 186 partial, 91 missing of 596 in-scope rows, 54 %. For 90 %, 218 more rows have to reach done.
+
+**Update (0.6.0, ninth batch, 2026-11-12):** measurement guide (`measguide`: ways to write a tolerance, the ten preferred fits, surface plates, checking micrometers and calipers, shaft runout, surface texture and lay symbols). MH75, MH78, MH87, MH92, MH94, MH184, ED12 and BB38 done (MH87 was missing); MH90 from missing to partial; notes brought up to date on MH93 and MH95. Counted from the tables below: 327 done, 180 partial, 89 missing of 596 in-scope rows, 55 %. For 90 %, 210 more rows have to reach done.
+
+**Update (0.6.0, tenth batch, 2026-11-12):** cutting tools guide (`cutguide`: kinds of milling cutter, tool materials ranked, twist drill terms, files and filing, broaches, boring tools). MH101, MH103, MH109, MH113, MH129 and BB64 done; MH105 and MH128 from missing to partial. Counted from the tables below: 333 done, 176 partial, 87 missing of 596 in-scope rows, 56 %. For 90 %, 204 more rows have to reach done.
+
+**Update (0.6.0, eleventh batch, 2026-11-12):** bearings and seals guide (`bearguide`: bearing types, bearing numbers, tolerance classes, shaft and housing fits, mounting, radial shaft seals, threadlocker colours). MH283, MH284, ED66, ED67 and ED71 done (MH283 and MH284 were missing); MH293 and BB59 from missing to partial. Counted from the tables below: 338 done, 175 partial, 83 missing of 596 in-scope rows, 57 %. For 90 %, 199 more rows have to reach done.
+
+**Update (0.6.0, twelfth batch, 2026-11-12):** abrasive processes guide (`abrasguide`: grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding, cut-off wheels, mounted points). MH127, MH168, MH170, MH171, MH172 and BB61 from missing to done; MH161 and MH165 from missing to partial. Counted from the tables below: 344 done, 177 partial, 75 missing of 596 in-scope rows, 58 %. For 90 %, 193 more rows have to reach done.
+
+**Update (0.6.0, thirteenth batch, 2026-11-12):** drawings and weld symbols guide (`drawguide`: kinds of drawing, sheets and title block, lines, views, sections, welding symbols, CAD files and model-based definition, standards). MH69, MH73, MH185, MH194, ED86 and BB71 from missing to done. Counted from the tables below: 350 done, 177 partial, 69 missing of 596 in-scope rows, 59 %. For 90 %, 187 more rows have to reach done.
+
+**Update (0.6.0, fourteenth batch, 2026-11-12):** special processes and finishing guide (`procguide`: cutting plate, EDM, other special processes, polishing, buffing and brushing, conversion coatings, anodising, plating and thermal spraying). MH173, MH196 and ED92 from missing to done; MH189 and MH197 from partial to done. Counted from the tables below: 355 done, 175 partial, 66 missing of 596 in-scope rows, 60 %. For 90 %, 182 more rows have to reach done.
+
+**Update (0.6.0, fifteenth batch, 2026-11-12):** machine elements guide (`elemguide`: friction, backlash, gear materials, cams, plain bearings, leadscrews and ball screws). MH26, ED69, MH266, MH275, ED73 and MH291 from missing to done; MH280 and MH282 from missing to partial. Counted from the tables below: 361 done, 177 partial, 58 missing of 596 in-scope rows, 61 %. For 90 %, 176 more rows have to reach done.
+
+**Update (0.6.0, sixteenth batch, 2026-11-12):** drives and maintenance guide (`driveguide`: electric motors, shaft alignment, fluid power, machine vibration). MH292, MH298, MH299 and ED25 from missing to done. Counted from the tables below: 365 done, 177 partial, 54 missing of 596 in-scope rows, 61 %; 172 more rows to done for the 90 % target.
+
+**Update (0.6.0, seventeenth batch, 2026-11-12):** fasteners guide (`fastguide`). MH208 from missing to done and MH214 from partial to done; MH201, MH209, MH211, MH215 and MH216 from missing to partial (the tables of dimensions and hole sizes are still to come); MH210 stays partial with set screw points added. Counted from the tables below: 367 done, 181 partial, 48 missing of 596 in-scope rows, 62 %; 170 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -290,20 +337,20 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | MH1 | Real numbers, fractions, decimals, ratio, percentage | done | `calc`, `fraction` | Expression calculator and fraction converter (`claude/measure-maths`) |
 | MH2 | Powers, roots, scientific notation, factorials, combinations | done | `calc` | Powers, roots, logs, factorials, nCr, nPr; numbers in e notation (`claude/measure-maths`) |
-| MH3 | Prime factorization and prime/factor tables | partial | `calc` | Prime factors of any whole number to 10^12; no printed factor tables (`claude/measure-maths`) |
+| MH3 | Prime factorization and prime/factor tables | done | `calc` | Prime factors of any whole number to 10^12, worked out, so no printed tables are needed |
 | MH4 | Algebra: expressions, equations, rearranging formulas, polynomials, quadratic/cubic | out of scope? | | Maths teaching, not a machining tool |
 | MH5 | Functions, logarithms, sequences | out of scope? | | |
-| MH6 | Analytic geometry: lines, slopes, circle, ellipse, sphere, parabola, hyperbola | missing | | Line/circle intersections, ellipse points. Partly in progress (`claude/geometry`) |
+| MH6 | Analytic geometry: lines, slopes, circle, ellipse, sphere, parabola, hyperbola | partial | `arc`, `fillet` | Circle through three points, chord and sagitta, fillet and tangent points; no line and circle intersections, ellipse, parabola or hyperbola |
 | MH7 | Complex numbers | out of scope? | | |
 | MH8 | Pure geometry propositions and geometric constructions | missing | | |
-| MH9 | Area and volume rules (prismoidal, Pappus, irregular areas, tank contents) | partial | `figures` | Torus (Pappus), frustum, cap; no prismoidal formula, irregular areas or tank contents (`claude/measure-maths`) |
+| MH9 | Area and volume rules (prismoidal, Pappus, irregular areas, tank contents) | done | `figures`, `prismoid`, `irregular`, `tankvol` | 0.6.0: prismoidal formula, irregular areas by the trapezoidal and Simpson's rules, contents of a lying or standing cylindrical tank; torus (Pappus), frustum and cap in `figures` |
 | MH10 | Dimensions of plane figures, polygons, segments of a circle | done | `figures`, `arc` | Squares, rectangles, parallelograms, trapezoids, circles, rings, ellipses, regular polygons, sectors; segments in `arc` (`claude/measure-maths`) |
-| MH11 | Circles and squares of equal area; diagonals of squares and hexagons | partial | `figures` | Across corners and flats of any regular polygon; no equal-area circle/square table (`claude/measure-maths`) |
+| MH11 | Circles and squares of equal area; diagonals of squares and hexagons | done | `figures` | 0.6.0: side of the square and diameter of the circle of equal area; across corners and flats of any regular polygon |
 | MH12 | Volumes of solids | done | `figures` | Cube, box, cylinder, tube, cone, frustum, sphere, cap, pyramid, torus, hex bar (`claude/measure-maths`) |
-| MH13 | Trigonometry: angle measure, ratios, laws of sines and cosines, identities | missing | | In progress (`claude/geometry`) |
-| MH14 | Solution of right and oblique triangles | missing | | In progress (`claude/geometry`, `triangle`) |
+| MH13 | Trigonometry: angle measure, ratios, laws of sines and cosines, identities | partial | `triangle`, `calc` | Laws of sines and cosines in the triangle solver, any trig value in the calculator, degrees, minutes and seconds; no list of identities |
+| MH14 | Solution of right and oblique triangles | done | `triangle` |  |
 | MH15 | Angular measure conversion (degrees-minutes-seconds, radians) | done | `calc`, `units` | Decimal degrees, DMS, radians, gon, revolutions (`claude/measure-maths`) |
-| MH16 | Trig function values, versed sine, involute functions | partial | `calc` | Any trig value and the involute function; no versed sine, no printed tables (`claude/measure-maths`) |
+| MH16 | Trig function values, versed sine, involute functions | done | `calc` | 0.6.0: versed sine, coversed sine, exsecant, secant, cosecant and cotangent added; any value is worked out, so no printed tables are needed |
 | MH17 | Spherical trigonometry | out of scope? | | |
 | MH18 | Compound angles | done | `compound` | True angle from apparent angles or two tilts; swivel-and-tilt and compound sine plate settings (`claude/measure-maths`) |
 | MH19 | Interpolation | partial | `calc` | Linear interpolation only (`claude/measure-maths`) |
@@ -318,7 +365,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | MH25 | Mechanics terms, units, force systems, couples | out of scope? | | |
-| MH26 | Friction laws and coefficients | missing | | Clamping and workholding friction |
+| MH26 | Friction laws and coefficients | done | `elemguide` | 0.6.0: the laws of dry friction, static and kinetic, angle of friction, table of ten pairs with the coefficients of each source (three rows one source, marked); bolt friction in `bolttorque` |
 | MH27 | Simple mechanisms: levers, wedge, pulleys, screw, Geneva, toggle | out of scope? | | Toggle/screw clamps could matter for fixtures |
 | MH28 | Pendulums | out of scope? | | |
 | MH29 | Velocity, acceleration, work, energy, momentum, power | out of scope? | | |
@@ -332,7 +379,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH37 | Columns | done | `column` | Euler and Johnson, end-condition K (`claude/mechanics`) |
 | MH38 | Plates, shells and cylinders | out of scope | | Pressure vessels |
 | MH39 | Shafts: torsion, deflection, design, keyway effect | partial | `torsion`, `critspeed` | Torsion, power, twist, critical speed; no keyway effect or combined bending and torsion design (`claude/mechanics`) |
-| MH40 | Springs: materials, stresses, compression/extension/torsion design | missing | | |
+| MH40 | Springs: materials, stresses, compression/extension/torsion design | partial | `spring` | 0.6.0: compression springs of round wire: rate, Wahl stress, coils, solid length and pitch by end type, modulus of rigidity from two makers; no allowable stresses, extension or torsion springs |
 | MH41 | Disc springs | missing | | |
 
 ### Properties, treatment and testing of materials
@@ -347,22 +394,22 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH47 | Properties of wood | out of scope? | | |
 | MH48 | Tabulated properties of ceramics, plastics, investment-casting and powder metal alloys | partial | `materials` | 5 plastics; no ceramics, casting or PM alloys |
 | MH49 | Elastic properties; effect of temperature on strength | partial | `materials` | E for 27 entries; no temperature effect |
-| MH50 | Standard steels: classification, AISI/SAE/UNS numbering | partial | `materials` | Equivalents only; no numbering-system explainer |
+| MH50 | Standard steels: classification, AISI/SAE/UNS numbering | done | `materials`, `matguide` | 0.6.0: numbering explained in the materials guide (digits, 17 series, letters L, B, H); equivalents in `materials`. UNS numbers are not explained |
 | MH51 | Identifying metals | partial | `metalid` | Spark, magnet and chip tests (one source); no chemical spot tests |
 | MH52 | Compositions of carbon, alloy and stainless steels | partial | `materials` | 0.5.0: 37 grades, limits from two public sources each where found (see docs/material-equivalents.md) |
-| MH53 | Applications and mechanical properties of steels | partial | `materials` | Properties for some grades; no applications |
-| MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials` | 10 tool-steel grades as equivalents; no selection guide, faults or heat treatment |
+| MH53 | Applications and mechanical properties of steels | partial | `materials`, `matguide` | Properties for some grades; uses by carbon class in the materials guide; no applications by grade |
+| MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials`, `matguide` | 10 tool-steel grades as equivalents; 0.6.0: the letter groups with an example grade, quench, hardness and machinability rating (one source for the figures); no selection guide by job, faults or heat treatment |
 | MH55 | Tool steel mill forms, machining allowances, decarburization limits | missing | | |
 | MH56 | Heat treatment: definitions, hardness and hardenability | partial | `heattreat` | Terms in our words (7 of 12 used by two publishers); no hardness and hardenability theory |
 | MH57 | Hardening, quenching, tempering temperatures, annealing, normalising | partial | `heattreat`, `tempercolours` | 12 steels side by side (2 confirmed, 16 differ); no tempering-hardness tables (no two sources agree) |
 | MH58 | Case hardening: carburising, nitriding, flame and induction hardening | partial | `heattreat` | Terms and 4340 nitriding only; no case depth or process data |
 | MH59 | Heat treating high-speed steels; subzero treatment | missing | | |
-| MH60 | Hardness tests: Brinell, Rockwell, Vickers, Knoop, Shore, Mohs, durometer | missing | | In progress (`claude/ref-data-3`) |
-| MH61 | Comparison of hardness scales | missing | | In progress (`claude/ref-data-3`) |
-| MH62 | Nonferrous: copper alloys | partial | `materials` | 12 copper alloys; no temper explainer |
-| MH63 | Aluminium: temper designations, alloy designations, heat-treatability | partial | `materials` | Grades only; no temper (T6, H32...) explainer |
-| MH64 | Magnesium, nickel, titanium alloys | partial | `materials` | Ni and Ti present; no magnesium |
-| MH65 | Corrosion types and galvanic corrosion | partial | `galvanic` | Galvanic series and two-metal check; no other corrosion types |
+| MH60 | Hardness tests: Brinell, Rockwell, Vickers, Knoop, Shore, Mohs, durometer | done | `hardness`, `matguide` | 0.6.0: how Brinell, Rockwell, Vickers, Knoop, Leeb, Shore and Mohs work (indenter, load, what is measured); conversion in `hardness` |
+| MH61 | Comparison of hardness scales | done | `hardness` | Steel, approximate |
+| MH62 | Nonferrous: copper alloys | done | `materials`, `matguide` | 12 copper alloys; 0.6.0: temper classes, H00 to H10, annealed, grain size and as-manufactured tempers |
+| MH63 | Aluminium: temper designations, alloy designations, heat-treatability | done | `materials`, `matguide` | 0.6.0: series, heat-treatability, F O H W T, H digits, T1 to T10, T651 and the stress-relief codes |
+| MH64 | Magnesium, nickel, titanium alloys | done | `materials`, `matguide` | Ni and Ti grades in `materials`; 0.6.0: titanium grades, nickel families and the magnesium naming rule with tempers. No magnesium grades in the materials table |
+| MH65 | Corrosion types and galvanic corrosion | done | `galvanic`, `matguide` | Galvanic series and two-metal check; 0.6.0: eight forms of corrosion (two of them one source, marked) |
 | MH66 | Plastics: families, properties, design analysis | partial | `materials`, `plastics` | 12 plastics with service temperature and expansion; no design data |
 | MH67 | Plastics processing (thermoforming, moulding) and additive manufacturing | out of scope? | | |
 | MH68 | Machining plastics | done | `plastics` | Makers' turning data side by side, annealing, notes (`claude/materials-ref`) |
@@ -371,33 +418,33 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH69 | Drafting practices: sheet sizes, line types, section lining | missing | | |
+| MH69 | Drafting practices: sheet sizes, line types, section lining | done | `drawguide` | 0.6.0: ISO and ANSI sheet sizes, borders, title block, scales, nine line types with a drawing, hatching rules; line widths and borders one source, marked |
 | MH70 | ASME and ISO geometric symbols | done | `gdtguide` | |
-| MH71 | Surface texture symbols | missing | | In progress (`claude/ref-data-3`) |
+| MH71 | Surface texture symbols | done | `surface` |  |
 | MH72 | GD&T, datum referencing, positional tolerance | done | `gdtguide`, `gdtdof`, `gdttp`, `gdtfcf` | |
-| MH73 | GD&T and CAD models, digital product definition | missing | | |
+| MH73 | GD&T and CAD models, digital product definition | done | `drawguide`, `gdtguide` | 0.6.0: model-based definition, PMI, ASME Y14.41 and ISO 16792, STEP AP242, what happens to the drawing; GD&T itself in `gdtguide` |
 | MH74 | Checking designs and drawings, arrangement of views | out of scope? | | Design office work |
-| MH75 | Limits and fits basics: unilateral/bilateral tolerances | partial | `fits` | Only via ISO classes |
+| MH75 | Limits and fits basics: unilateral/bilateral tolerances | done | `fits`, `measguide` | 0.6.0: limits, unilateral and bilateral tolerances with a drawing; ISO classes in `fits` |
 | MH76 | Force, expansion and shrink fits; temperatures for shrinkage fits | done | `shrinkfit` | Shrink-fit temperatures (hub heated, shaft cooled, both) and Lame press-fit pressure, stress, torque; inputs are yours (`claude/measure-maths`) |
 | MH77 | ANSI/ASME standard fits (RC, LC, LT, LN, FN) | partial | `ansifits` | All 34 classes 0 to 19.69 in, but only one full table read: 491 of 492 rows need a 2nd source; above 19.69 in not covered (`claude/inspection-2`) |
-| MH78 | ANSI preferred metric limits and fits | partial | `fits` | Any class works; preferred fits not listed |
+| MH78 | ANSI preferred metric limits and fits | done | `fits`, `measguide` | 0.6.0: the ten preferred fits, hole and shaft basis, with what each is for; limits of any class in `fits` |
 | MH79 | ISO metric limits and fits | done | `fits` | j/J and up to 3150 mm added (`claude/inspection-2`) |
 | MH80 | Tolerance stack-up chain, analysis and assignment | partial | `gdtstack` | 1D worst case and RSS; no tolerance assignment |
 | MH81 | Preferred numbers and sizes | partial | `prefnum` | Renard R5 to R80 (R40-only and R80 values single-source); no more-rounded R' and R'' series, no preferred metric sizes (`claude/inspection-2`) |
 | MH82 | Reading verniers and micrometers | done | `scales` | Reading aid for micrometers (0.01, 0.001 mm; 0.001, 0.0001 in) and vernier calipers (0.02, 0.05 mm; 0.001 in) (`claude/measure-maths`) |
-| MH83 | Sine bar use and constants | missing | | In progress (`claude/geometry`, `sinebar`) |
+| MH83 | Sine bar use and constants | done | `sinebar` |  |
 | MH84 | Measuring tapers with V-block; dimensioning tapers; taper per foot | partial | `taper`, `machinetapers`, `taperrolls` | Taper per foot, angle, over-rolls measurement; no V-block method (`claude/measure-maths`) |
-| MH85 | Measuring angles and dovetail slides | missing | | In progress (`claude/geometry`, `dovetail`) |
+| MH85 | Measuring angles and dovetail slides | done | `dovetail`, `sinebar`, `taperrolls` |  |
 | MH86 | Measurement over pins and rolls; V-groove; radius of arc | partial | `dovetail`, `taperrolls`, `ballcone` | Dovetails, V-grooves, tapers over rolls, balls in bores; no radius-of-arc over rolls (`claude/measure-maths`) |
-| MH87 | Checking shaft conditions | missing | | |
+| MH87 | Checking shaft conditions | done | `measguide` | 0.6.0: runout of a shaft in V-blocks or between centres with a dial indicator, TIR, bent shaft against off-centre hub (several statements one source, marked) |
 | MH88 | Coordinates for hole circles; chord lengths; hole coordinate tables | done | `bolt` | |
-| MH89 | Gauge blocks and gauge block sets | missing | | In progress (`claude/geometry`, `sinebar`) |
-| MH90 | Surface plates, V-blocks, parallels, angle plates and their calibration | missing | | |
+| MH89 | Gauge blocks and gauge block sets | done | `sinebar` | Gauge-block stack from the sets you own |
+| MH90 | Surface plates, V-blocks, parallels, angle plates and their calibration | partial | `measguide` | 0.6.0: surface plate grades, flatness, care, support and calibration interval (care and intervals from one maker, marked), 1-2-3 blocks; parallels and angle plates in `workholding`; no V-blocks, no calibration method |
 | MH91 | Measurements using light, interferometer | out of scope? | | |
-| MH92 | Micrometers, verniers, dial and digital calipers; their calibration | partial | `scales` | Reading only; no calibration (`claude/measure-maths`) |
-| MH93 | Surface texture: terms, sampling lengths, roughness and waviness parameters | missing | | In progress (`claude/ref-data-3`) |
-| MH94 | Roughness average values, lay symbols, castings | partial | `finish` | Theoretical Ra/Rt from feed and nose radius only |
-| MH95 | ISO surface finish standards and profiles | missing | | In progress (`claude/ref-data-3`) |
+| MH92 | Micrometers, verniers, dial and digital calipers; their calibration | done | `scales`, `measguide` | Reading in `scales`; 0.6.0: checking a micrometer and a caliper against gauge blocks |
+| MH93 | Surface texture: terms, sampling lengths, roughness and waviness parameters | partial | `surface`, `measguide` | Ra, Rz, Rq ratios, N grades and symbols; 0.6.0: roughness, waviness and lay in words, P, R and W profiles, default filters (one source, marked); no waviness parameters or full list of parameters |
+| MH94 | Roughness average values, lay symbols, castings | done | `finish`, `surface`, `measguide` | Typical Ra by process from two publishers in `surface`; 0.6.0: lay symbols; theoretical Ra from feed and nose radius in `finish`. Nothing on castings |
+| MH95 | ISO surface finish standards and profiles | partial | `surface`, `measguide` | ISO 21920-1 against ISO 1302 symbols noted; 0.6.0: where things go in the new symbol and the acceptance rule (one source each, marked); no profile definitions |
 
 ### Tooling and toolmaking
 
@@ -408,24 +455,24 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH98 | Indexable insert holder identification and selection | partial | `holdercode` | ISO 5608 external holder codes decoded; no selection guide (status corrected on `claude/tooling-ref`) |
 | MH99 | Carbide blanks and carbide-tipped tool styles | missing | | |
 | MH100 | Insert radius compensation (NC); threading insert radius | partial | `tnrc` | Nose radius shifts for chamfers, tapers and arcs, any tip 0-9, G41/G42 explained; no threading insert radius (`claude/cnc-guide`) |
-| MH101 | Cemented carbides, ceramics, superhard materials | partial | `toolguide` | One-paragraph summary of HSS, carbide, cermet, ceramic, CBN, PCD (needs 2nd source); no property data (`claude/tooling-ref`) |
+| MH101 | Cemented carbides, ceramics, superhard materials | done | `toolguide`, `cutguide` | Summary of HSS, carbide, cermet, ceramic, CBN and PCD in `toolguide`; 0.6.0: ranking drawing, hardness at 20 and 600 °C, top temperature and toughness (one source, marked), what each is used for and kept off, two differing temperature figures shown |
 | MH102 | ISO classification of hardmetals (P/M/K/N/S/H) | partial | `materials` (ISO group) | Groups shown on work materials; no grade chart |
-| MH103 | Milling cutters: selection, number of teeth, plain/side/T-slot/angle/shell/end mills | partial | `toolguide` | End mill flutes, end shapes, roughers, variable helix, high-feed; no plain, side, T-slot, angle or shell cutters (`claude/tooling-ref`) |
-| MH104 | Metal slitting saws | missing | | |
-| MH105 | Keyseat and Woodruff cutters, spline-shaft cutters | missing | | |
+| MH103 | Milling cutters: selection, number of teeth, plain/side/T-slot/angle/shell/end mills | done | `toolguide`, `cutguide` | End mill flutes, end shapes, roughers, variable helix and high-feed in `toolguide`; 0.6.0: sixteen cutter kinds (plain, side, staggered, half side, saw, angle, form, face, shell, end, ball, T-slot, Woodruff, dovetail, fly, hollow) with teeth and use, arbor against shank, plunging |
+| MH104 | Metal slitting saws | partial | `slitsaw` | Speeds and feeds; no saw dimensions |
+| MH105 | Keyseat and Woodruff cutters, spline-shaft cutters | partial | `cutguide` | 0.6.0: Woodruff keyseat cutter described (what it is and what it cuts); no cutter dimensions, no spline-shaft cutters |
 | MH106 | Cutter grinding: wheel speeds, clearance angles, indicator drop method | missing | | |
 | MH107 | Reamers: types, sizes, difficulties | partial | `toolguide` | Reamer types, flute direction by hole, stock allowance and speed (two sources shown); no reamer sizes or tolerances (`claude/tooling-ref`) |
-| MH108 | Dimensions of centres; countersink and spot drill depths | missing | | |
-| MH109 | Twist drill terms and types | partial | `toolguide` | Drill types and point angles 118/135/140, split point, spot drill angle; no terms drawing (`claude/tooling-ref`) |
+| MH108 | Dimensions of centres; countersink and spot drill depths | done | `spotdepth` | Centre drills by type and size (inch plain and bell, ISO 866, ISO 2540, ISO 2541), spot and countersink depths |
+| MH109 | Twist drill terms and types | done | `toolguide`, `cutguide` | Drill types and point angles 118/135/140, split point, spot drill angle in `toolguide`; 0.6.0: fourteen terms with a drawing, point, helix and lip clearance angles (the last two one source, marked) |
 | MH110 | Drill sizes: fractional, gauge, letter, metric | done | `drillchart` | |
 | MH111 | Taper-shank drills; tolerance on diameter; accuracy of drilled holes | missing | | |
 | MH112 | Counterboring, counterbore sizes for bolts | partial | `shcs` | Counterbore sizes for socket head cap screws only (two makers, shown side by side); no counterboring practice or other head types |
-| MH113 | Boring tools | missing | | |
+| MH113 | Boring tools | done | `boringbar`, `cutguide` | Overhang and deflection by bar material in `boringbar`; 0.6.0: boring tool types, why holes are bored, overhang limits, insert and cutting data against chatter |
 | MH114 | Taps: forms, marking, series designations, tap terms and dimensions | partial | `toolguide` | Tap types (spiral point, spiral flute, straight, forming) and chamfer lengths; no marking, series or tap dimensions (`claude/tooling-ref`) |
 | MH115 | Tap thread limits (H and D limits), pipe and insert taps | partial | `taplimits` | Inch H and L, metric D numbers computed and checked against 1B/2B/3B and 6H/5H/7H/6G; no pipe or STI tap limits; D minimums only where OSG prints them (`claude/tooling-ref`) |
 | MH116 | Acme and square-threaded taps | missing | | |
 | MH117 | Morse tapers | done | `machinetapers` | |
-| MH118 | Brown & Sharpe and Jarno tapers | missing | | |
+| MH118 | Brown & Sharpe and Jarno tapers | done | `machinetapers` | 0.6.0: Jarno No. 2 to 20 confirmed; Brown & Sharpe No. 1 to 18, the two publishers' plug lengths differ for six sizes and both are shown |
 | MH119 | ANSI machine tapers and 7/24 tool shanks | done | `machinetapers` | |
 | MH120 | British standard tapers | missing | | |
 | MH121 | Jacobs tapers and threads | partial | `machinetapers` | Tapers only; no Jacobs threaded mounts |
@@ -434,33 +481,33 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH124 | R8 collet | done | `machinetapers` | |
 | MH125 | ER and other collets | partial | `holdertorque` | 0.5.0: ER collet nut torque by size, bore and nut (REGO-FIX, with Techniks beside it). No collet dimensions or clamping ranges |
 | MH126 | Portable tool spindles, square drives, hex chucks | out of scope? | | Portable power tools |
-| MH127 | Mounted wheels and points | missing | | |
-| MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | missing | | |
-| MH129 | Files and burs; speeds of rotary burs | missing | | |
-| MH130 | Knurls and knurling: sizes, formulas for knurled work, tolerances | missing | | |
+| MH127 | Mounted wheels and points | done | `abrasguide` | 0.6.0: what sets the top speed (shape, size, shank, overhang), grip length, shape groups, grit (mostly one source each, marked); no table of shapes, sizes and speeds |
+| MH128 | Broaches and broaching: tooth pitch, depth per tooth, broach design | partial | `cutguide` | 0.6.0: runs of teeth, rise per tooth with figures (one source, marked), the two-teeth rule for pitch, tooth proportions, chip breakers, push and pull, rotary broaching; no pitch formula (not readable in the sources), no broach design calculation |
+| MH129 | Files and burs; speeds of rotary burs | done | `shoptools`, `cutguide` | Carbide burr cuts and speeds from two makers in `shoptools`; 0.6.0: files (parts, cuts, grades, shapes, filing practice, care) |
+| MH130 | Knurls and knurling: sizes, formulas for knurled work, tolerances | partial | `knurl` | Blank diameter by four methods with a trial procedure; no tolerances on knurled work |
 | MH131 | Tool wear: flank wear, cratering, chipping, deformation | done | `cncguide` | See U91 (`claude/cnc-guide`) |
-| MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | missing | | |
-| MH133 | Sieves, mesh and abrasive grit numbers | missing | | |
+| MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | partial | `shoptools`, `toolguide` | Drill sharpening by hand, faults and web thinning; no carbide tool grinding or diamond wheels |
+| MH133 | Sieves, mesh and abrasive grit numbers | partial | `gritconv` | Grit size conversion per publisher; no sieve and mesh table |
 
 ### Machining operations
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH134 | Work materials and cutting tool materials | missing | | |
+| MH134 | Work materials and cutting tool materials | partial | `iso513`, `toolguide`, `materials` | Work material groups (ISO 513) and tool materials in our own words; no machinability theory |
 | MH135 | Cutting speed, feed, depth of cut, tool wear and tool life | partial | `toollife` | Taylor life only |
-| MH136 | Selecting cutting conditions | missing | | |
+| MH136 | Selecting cutting conditions | partial | `advmill`, `advturn`, `advdrill` | The advisors suggest speed, feed, width and depth and hold them to the machine; no general method text |
 | MH137 | Tool troubleshooting | partial | `cncguide` | Turning and milling troubleshooting tables (chatter, finish, tool life, burrs); drilling, tapping and grinding tables added in 0.5.0; not a full maker guide |
 | MH138 | Cutting speed formulas; RPM for drills and diameters | done | `rpm` | |
-| MH139 | Speeds and feeds tables for turning (by material) | missing | | Starting data from tool makers |
-| MH140 | Speeds and feeds tables for milling (by material), slit milling | missing | | |
+| MH139 | Speeds and feeds tables for turning (by material) | partial | `advturn` | Starting speeds for common materials (one publisher), feed from the nose radius; not the full range of materials |
+| MH140 | Speeds and feeds tables for milling (by material), slit milling | partial | `advmill`, `slitsaw` | Starting speed and chip load by material and cutter size; not the full range of materials |
 | MH141 | Speed, radial depth of cut and tool life adjustment factors | partial | `cutopt`, `toollife` | Chip thickness and Taylor only; no feed/speed adjustment factors |
-| MH142 | Speeds and feeds for drilling, reaming and threading (by material) | missing | | |
+| MH142 | Speeds and feeds for drilling, reaming and threading (by material) | partial | `advdrill`, `advream`, `advtap` | Starting data for drilling, reaming and tapping; carbide and tapping speeds from one publisher each |
 | MH143 | Cutting speed for broaching | missing | | |
 | MH144 | Planing and shaping speeds and times | out of scope? | | Planers and shapers rare now |
 | MH145 | Cutting time for turning, boring and facing | partial | `passtime` | One pass at fixed RPM; no facing with CSS |
 | MH146 | Speeds for metal-cutting saws | missing | | |
 | MH147 | Estimating machining power: power constants, feed and wear factors | partial | `mrr`, `cutopt` | kc entered by user; no constants |
-| MH148 | Drilling thrust, torque and power | missing | | |
+| MH148 | Drilling thrust, torque and power | done | `holeforce` | Drilling torque, thrust and power, tapping torque |
 | MH149 | Boring: cutting force and boring bar deflection | done | `boringbar` | See U9 (`claude/calcs-3`) |
 | MH150 | Micromachining: tools, stiffness, offsets, fluids, micromilling/drilling/turning | missing | | |
 | MH151 | Tool wear and tool life: ECT, Taylor, G and H curves | partial | `toollife` | Taylor only; no ECT or extended Taylor |
@@ -468,53 +515,53 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH153 | Machine settings and calculation of costs (all operations incl. grinding) | partial | `toollife` | Single tool only |
 | MH154 | High-speed machining econometrics, chip geometry in milling, mean chip thickness | partial | `cutopt` | Mean chip thickness only |
 | MH155 | Automatic screw machines: knurling, cams, speeds, stock | partial | `bar` | Bar stock per part only; cam work missing |
-| MH156 | Band saw blade selection, speeds, feeds, break-in | partial | `sawtpi`, `bandsaw` | 3-teeth-in-cut pitch rule (two sources) and cut time; no speeds or break-in (`claude/tooling-ref`) |
-| MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | missing | | |
-| MH158 | Metalworking fluids: classes, maintenance, exposure | partial | `coolconc`, `coolmix` | Concentration and mix only |
+| MH156 | Band saw blade selection, speeds, feeds, break-in | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch rule, blade types, break-in, fault table and cut time; no band speeds by material |
+| MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | done | `shoptools`, `coolconc`, `coolmix` | Neat oil, emulsion, semi-synthetic and synthetic compared; which for slow heavy work and which for fast cutting; by material |
+| MH158 | Metalworking fluids: classes, maintenance, exposure | partial | `shoptools`, `coolconc`, `coolmix` | Classes, concentration and mixing, care of mixed fluids; no exposure limits or sump maintenance schedule |
 | MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | missing | | |
-| MH160 | Machining non-metals (hard rubber, laminates) | missing | | |
-| MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | missing | | |
+| MH160 | Machining non-metals (hard rubber, laminates) | partial | `plastics` | Machining plastics; no hard rubber or laminates |
+| MH161 | Grinding feeds and speeds: wheel life, grinding ratio, optimum data, spark-out, forces | partial | `abrasguide` | 0.6.0: grinding ratio with its range and an example, what lowers wheel wear, wheel speeds, spark-out (mostly one source each, marked); no optimum data, no forces |
 | MH162 | Grinding data selection and grindability groups | missing | | |
-| MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | partial | `wheelcode`, `gritconv` | Abrasives, bonds, grade, structure and markings decoded with sources; no wheel shapes or selection guide (`claude/calcs-3`) |
-| MH164 | Dressing and truing; diamond sizes | missing | | |
-| MH165 | Diamond wheels: shapes, designations, selection | missing | | |
+| MH163 | Grinding wheels: abrasives, bonds, structure, ANSI markings, shapes, selection | done | `shoptools`, `wheelcode`, `gritconv` | Markings decoded; shapes by type number, choice of abrasive, grit and grade (the choice rests on one source, marked) |
+| MH164 | Dressing and truing; diamond sizes | partial | `shoptools` | Dressing against truing, when to dress, open and closed dressing, the tools; no diamond sizes |
+| MH165 | Diamond wheels: shapes, designations, selection | partial | `abrasguide` | 0.6.0: what diamond and CBN grind, concentration table, bond, how the shape code is built, wheel speeds (shape code and speeds one source, marked); no list of body shapes, no selection table |
 | MH166 | Grinding wheel safety and safe operating speeds | partial | `grindspeed`, `wheelcode` | Speed check against the marked max speed and the rule to obey it; no full safety code (`claude/calcs-3`) |
 | MH167 | Cylindrical grinding (traverse, plunge, high speed, troubles) | partial | `grindtime`, `grindspeed` | Traverse and plunge time, speed ratio, equivalent diameter; no high-speed grinding or troubleshooting (`claude/calcs-3`) |
-| MH168 | Centerless grinding | missing | | |
+| MH168 | Centerless grinding | done | `abrasguide` | 0.6.0: arrangement with drawing, regulating wheel, work above centre, through-feed, infeed and end-feed, lobing, what it holds (figures from one source, marked) |
 | MH169 | Surface grinding | partial | `grindsurf` | Cycle time only; no wheel or feed recommendations (`claude/calcs-3`) |
-| MH170 | Offhand, belt grinding and abrasive cutting | missing | | |
-| MH171 | Honing | missing | | |
-| MH172 | Laps and lapping | missing | | |
-| MH173 | Nontraditional: water jet, ultrasonic, abrasive flow, laser, plasma, electron beam | missing | | Low priority |
+| MH170 | Offhand, belt grinding and abrasive cutting | done | `abrasguide`, `shoptools` | 0.6.0: belt grinding (contact wheel, platen, slack belt, speed, wheel hardness, grit, backing) and cut-off wheels (one source, marked); offhand sharpening of drills and tool bits in `shoptools` |
+| MH171 | Honing | done | `abrasguide` | 0.6.0: motions and crosshatch with drawing, speed, stock, what it holds, abrasives, oil, single-pass and plateau honing; two points where the sources differ show both |
+| MH172 | Laps and lapping | done | `abrasguide` | 0.6.0: principle with drawing, lap softer than the work, abrasives, stock, pressure, speed, grit, conditioning rings, flatness in light bands |
+| MH173 | Nontraditional: water jet, ultrasonic, abrasive flow, laser, plasma, electron beam | done | `procguide` | 0.6.0: water jet, abrasive water jet, laser, plasma and oxyfuel (what each cuts, heat-affected zone, thickness source by source), ultrasonic, abrasive flow and photochemical machining; electron beam from one source, marked; two drawings |
 | MH174 | CNC introduction, coordinate geometry, word address format, program structure | partial | `cncguide` | Axes, coordinate systems, block and word format, modal groups, program order; no coordinate geometry worked examples (`claude/cnc-guide`) |
-| MH175 | M-codes, G20/G21, G90/G91, S, F, inverse time feed, T | missing | | |
+| MH175 | M-codes, G20/G21, G90/G91, S, F, inverse time feed, T | done | `gmcodes`, `rotfeed` | G and M codes per control with modal groups; inverse time feed in the rotary feed tool |
 | MH176 | Tool nose radius compensation | done | `tnrc` | Hand compensation and G41/G42 with tip numbers (`claude/cnc-guide`) |
 | MH177 | Rapid, linear, circular and helical interpolation | partial | `helix`, `arcfeed` | Feed maths only; no G-code reference or output |
 | MH178 | Work offsets, tool length offsets, cutter radius offsets | done | `cncguide` | Work offsets (G54-G59 and extended), tool length, cutter radius and wear offsets explained (`claude/cnc-guide`) |
-| MH179 | Fixed (canned) cycles for holes | partial | `cycdrill` | Generator for G81/G82/G83/G73/G84; no reference text on the cycles |
-| MH180 | Contouring, turning and boring on CNC | missing | | |
+| MH179 | Fixed (canned) cycles for holes | done | `toolpaths`, `cycdrill` | Re-audit: G81, G82, G83, the R plane with G98 and G99, and G84 explained in the milling toolpath guide (0.6.0); generator for the blocks |
+| MH180 | Contouring, turning and boring on CNC | done | `toolpaths`, `latheguide` | Re-audit: contouring with cutter compensation in the milling toolpath guide; turning and boring in the CNC lathe guide (0.6.0) |
 | MH181 | Thread cutting on CNC lathes: depth, infeed, G32, G76, multi-start | partial | `cycthread` | Depth, infeed, G76 and G92; no G32, no multi-start, no tapered threads |
-| MH182 | Subprograms, macros and parametric programming | missing | | |
+| MH182 | Subprograms, macros and parametric programming | partial | `macroref` | Macro variables, system variables and statements per control; no worked subprogram examples |
 | MH183 | Axis nomenclature | done | `cncguide` | ISO 841 right-hand rule, mill and lathe axes, rotary axes (`claude/cnc-guide`) |
-| MH184 | Total indicator reading | missing | | |
-| MH185 | CAD/CAM: drawing types, projections, exchange standards | missing | | |
+| MH184 | Total indicator reading | done | `runout`, `gdtguide`, `measguide` | Runout and total runout in the GD&T guide, runout against chip load; 0.6.0: the measuring procedure |
+| MH185 | CAD/CAM: drawing types, projections, exchange standards | done | `drawguide` | 0.6.0: kinds of drawing, first and third angle with the symbols, sections, CAD exchange formats (STEP, IGES, Parasolid, STL, DXF, DWG) |
 
 ### Manufacturing processes
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | MH186 | Sheet metal: shearing, blanking force, stripper force | missing | | Low priority |
-| MH187 | Sheet metal bending (bend allowance) | missing | | In progress (`claude/geometry`, `bend`) |
+| MH187 | Sheet metal bending (bend allowance) | done | `bend` |  |
 | MH188 | Stretch forming, dies, presses, tube bending | out of scope? | | Press shop, not machining |
-| MH189 | EDM: terms, process, wire EDM | partial | `edmoffset`, `edmtaper`, `edmtime` | Wire EDM kerf, offset, corner radius, taper and cut time (0.5.0). Sinker EDM and rate tables not covered |
+| MH189 | EDM: terms, process, wire EDM | done | `edmoffset`, `edmtaper`, `edmtime`, `procguide` | Wire EDM kerf, offset, corner radius, taper and cut time (0.5.0); 0.6.0: how EDM cuts, sinker, wire and hole drilling EDM, electrodes, recast layer (wire and hole drilling rows one source, marked). No removal rate tables |
 | MH190 | Metal casting, moulding and extrusion | out of scope | | Casting process detail |
 | MH191 | Powder metallurgy and metal additive manufacturing | out of scope? | | |
 | MH192 | Soldering and brazing | out of scope? | | Joining, like welding |
 | MH193 | Welding processes | out of scope | | |
-| MH194 | Weld and welding symbols | missing | | Drawing reading; low priority |
+| MH194 | Weld and welding symbols | done | `drawguide` | 0.6.0: parts of the symbol, arrow side and other side, fillet and groove welds, supplementary symbols, what ISO 2553 does differently, with a drawing; no full chart of every symbol |
 | MH195 | Nondestructive testing | out of scope? | | |
-| MH196 | Finishing: brushing, polishing, buffing, etching | missing | | Low priority |
-| MH197 | Conversion coatings, anodising, plating, flame spraying | missing | | Plating/anodise allowance matters for threads and fits |
+| MH196 | Finishing: brushing, polishing, buffing, etching | done | `procguide` | 0.6.0: polishing and buffing (grit steps, cut and colour buff, table of compounds, wheels), wire brushes, photochemical etching; electropolishing named only |
+| MH197 | Conversion coatings, anodising, plating, flame spraying | done | `coating`, `procguide` | Coating allowance on threads in `coating`; 0.6.0: black oxide, phosphate and chromate, passivation, anodising Types I to III with growth and a drawing, chrome, zinc, cadmium, nickel and electroless nickel plating, hydrogen embrittlement, thermal spraying; thicknesses quoted source by source, many statements one source, marked |
 
 ### Fasteners
 
@@ -523,22 +570,22 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH198 | Torque and tension: tightening, wrench torque, preload, friction | partial | `bolttorque` | VDI 2230 torque from preload with your own friction (cited classes shown); no torque-angle or yield-controlled tightening, no tightening factor (scatter) |
 | MH199 | Thread tensile-stress area, torque-tension relationships | done | `bolttorque` | Stress area (ISO and Unified), torque-preload relation with the share of each term (`claude/fasteners`) |
 | MH200 | Grade marks, material properties, counterfeit detection | partial | `boltgrade` | ISO 898-1, SAE J429 and ASTM A574 minimums and head marks; no counterfeit detection |
-| MH201 | Working strength, engagement length, breaking force, lock wire | missing | | Thread engagement length is a common shop question |
+| MH201 | Working strength, engagement length, breaking force, lock wire | partial | `fastguide`, `boltgrade`, `bolttorque` | 0.6.0: engagement rule of thumb from two sources (differing figures shown) and lock wire in `fastguide`; strengths in `boltgrade`, preload in `bolttorque`; no breaking force by size and no calculated engagement length yet |
 | MH202 | Inch bolts, screws, nuts and washers (dimensions) | partial | `shcs`, `spanner` | Socket head cap screw heads and hex widths across flats only; no full bolt, nut and washer dimensions |
 | MH203 | Wrench clearances | missing | | |
 | MH204 | Metric hex screws, bolts, nuts and washers | partial | `spanner` | Widths across flats (ISO 272, old DIN, JIS) only; no head heights, nuts or washers |
 | MH205 | Socket head cap screws (inch and metric) | done | `shcs` | ISO 4762 and ASME B18.3 head diameter, height and key (`claude/fasteners`) |
 | MH206 | Clearance holes for bolts, screws and studs (inch and metric) | done | `clearance` | ISO 273 fine/medium/coarse and inch close/normal/free, with disagreements (`claude/fasteners`) |
 | MH207 | Helical coil screw thread inserts (STI) | partial | `sti` | Tapped-hole sizes; no insert lengths or installation data (`claude/threads-3`) |
-| MH208 | British fasteners | missing | | |
-| MH209 | Machine screws and nuts (inch, metric, British) | missing | | |
-| MH210 | Cap screws and set screws; drill and counterbore sizes; hex keys | partial | `shcs`, `clearance`, `spanner` | Cap screws, clearance and counterbore holes and hex keys; no set screws |
-| MH211 | Self-threading and thread-forming screws; hole sizes | missing | | |
+| MH208 | British fasteners | done | `fastguide`, `whitworth` | 0.6.0: Whitworth, BSF, BA, BSP and the cycle thread, the smaller hexagons and how spanners are marked, BSW against UNC; thread sizes in `whitworth` |
+| MH209 | Machine screws and nuts (inch, metric, British) | partial | `fastguide` | 0.6.0: eleven head shapes and six drives with what each is chosen for; no dimensions of machine screws and nuts |
+| MH210 | Cap screws and set screws; drill and counterbore sizes; hex keys | partial | `shcs`, `clearance`, `spanner`, `fastguide` | Cap screws, clearance and counterbore holes and hex keys; 0.6.0: set screw points and their use in `fastguide`; no set screw dimensions |
+| MH211 | Self-threading and thread-forming screws; hole sizes | partial | `fastguide` | 0.6.0: thread-forming against thread-cutting, types A, AB, B, 25 and U, thread-rolling and self-drilling screws; no hole sizes |
 | MH212 | T-slots, T-bolts and T-nuts | partial | `tslots` | ISO 299 T-slot dimensions and pitches; no T-bolt or T-nut dimensions |
 | MH213 | Rivets and riveted joints | out of scope? | | |
-| MH214 | Pins and studs: dowel pins, taper pins, spring pins, grooved pins, cotter pins | missing | | Dowel hole fits matter |
-| MH215 | Retaining rings | missing | | Groove dimensions |
-| MH216 | Wing nuts, wing screws and thumb screws | missing | | Low priority |
+| MH214 | Pins and studs: dowel pins, taper pins, spring pins, grooved pins, cotter pins | done | `taperpin`, `fastguide` | 0.6.0: inch taper pins (one publisher) in `taperpin`; dowel, slotted and coiled spring, grooved, split and clevis pins with how each holds in `fastguide` (sizes from one source, marked) |
+| MH215 | Retaining rings | partial | `fastguide` | 0.6.0: seven kinds of ring, how each is fitted and what load it suits, standards named; no groove dimensions |
+| MH216 | Wing nuts, wing screws and thumb screws | partial | `fastguide` | 0.6.0: thumb and wing heads named with their limits; no dimensions |
 | MH217 | Nails, spikes and wood screws | out of scope | | |
 
 ### Threads and threading
@@ -572,20 +619,20 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH242 | Spark plug, lamp base and electrical fixture threads | out of scope? | | |
 | MH243 | Instrument threads; British Association (BA) | partial | `whitworth` | BA done; instrument and microscope threads missing |
 | MH244 | Historical and miscellaneous threads | out of scope? | | |
-| MH245 | Measuring threads: pitch, lead, thread and ball micrometers | missing | | |
+| MH245 | Measuring threads: pitch, lead, thread and ball micrometers | partial | `wires`, `threadid` | Measurement over wires and identifying a thread from diameter and pitch; no thread or ball micrometer guidance |
 | MH246 | Three-wire method, best wire sizes, formulas | partial | `wires` | 60, 55, 30, 29 degree; no lead-angle correction (`claude/threads-3`) |
 | MH247 | Wire measurement of Whitworth, ACME, stub ACME, taper and buttress threads | partial | `wires`, `acme`, `trapezoidal` | Whitworth, ACME, Stub ACME and trapezoidal; no taper or buttress wires (`claude/threads-3`) |
 | MH248 | Thread gauges, gauge tolerances | partial | `threadgauge` | 0.5.0: GO and NOT GO plug and ring pitch diameter limits for Unified 2A, 2B, 3A, 3B with the X tolerance; no metric (ISO 1502), no setting plugs |
-| MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | missing | | |
+| MH249 | Tapping: selection of taps, rake angles, cutting speed, lubricants | partial | `advtap`, `toolguide` | Tap types and tapping speed (one publisher); no rake angles or lubricants |
 | MH250 | Tap drill diameter, percentage of thread, cold form tapping | done | `tapdrill` | |
 | MH251 | Tap and clearance drills; tolerances of tapped holes | done | `tapdrill`, `threaddata`, `clearance` | Clearance holes added in `clearance` (`claude/fasteners`) |
-| MH252 | Removing a broken tap | missing | | |
+| MH252 | Removing a broken tap | partial | `toolguide` | Summary only |
 | MH253 | Tap drills and power for pipe taps | missing | | |
 | MH254 | High-speed CNC tapping; combined drilling and tapping | missing | | |
 | MH255 | Relief angles for thread cutting tools | missing | | |
 | MH256 | Lathe change gears (inch, metric, fractional, quick-change gearbox) | partial | `changegears` | Simple and compound trains from your gears for TPI, mm, module and DP; no quick-change gearbox tables (`claude/measure-maths`) |
 | MH257 | Relieving helical-fluted hobs | out of scope? | | |
-| MH258 | Thread rolling: machines, blank diameter, roll diameter, speeds | missing | | |
+| MH258 | Thread rolling: machines, blank diameter, roll diameter, speeds | partial | `rollblank` | 0.5.0: blank diameter by a maker's rule with the handbook's amounts beside it, correction after a trial; no machines, roll diameters or speeds |
 | MH259 | Thread grinding | missing | | |
 | MH260 | Thread milling: methods, helix angles | partial | `cyctmill` | Program, helix angle, feed; no method guide |
 
@@ -593,92 +640,92 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH261 | Gear terms, involute, diametral and circular pitch | missing | | |
-| MH262 | Spur gear formulas, tooth proportions, outside and root diameters | missing | | |
-| MH263 | Centre distance, tooth thickness, chordal addendum and thickness | missing | | |
-| MH264 | Gear milling cutters (involute cutter numbers) | missing | | |
-| MH265 | Contact ratio, undercut, minimum teeth, enlarged pinions | missing | | |
-| MH266 | Backlash | missing | | |
-| MH267 | Internal gears | missing | | |
+| MH261 | Gear terms, involute, diametral and circular pitch | done | `spurgear` |  |
+| MH262 | Spur gear formulas, tooth proportions, outside and root diameters | done | `spurgear` |  |
+| MH263 | Centre distance, tooth thickness, chordal addendum and thickness | done | `spurgear`, `gearmeasure` |  |
+| MH264 | Gear milling cutters (involute cutter numbers) | partial | `spurgear` | 0.6.0: cutter number of the set of eight for each gear, diametral pitch and module series; no half-number cutters, no cutter dimensions |
+| MH265 | Contact ratio, undercut, minimum teeth, enlarged pinions | done | `spurgear` | Contact ratio, fewest teeth and smallest profile shift without undercut |
+| MH266 | Backlash | done | `elemguide` | 0.6.0: what backlash is, why gears need it, how it is made and shared, rule of thumb and centre distance (one source each, marked), gear trains, anti-backlash gears, leadscrews and CNC compensation |
+| MH267 | Internal gears | partial | `gearmeasure` | Measurement between pins for internal gears; no internal gear geometry or interference checks |
 | MH268 | British and ISO gear standards; addendum modification | missing | | |
 | MH269 | Hypoid and bevel gears | missing | | |
-| MH270 | Worm gearing | missing | | |
-| MH271 | Helical gearing; milling helical gears; hobbing change gears | missing | | |
-| MH272 | Elliptic, planetary and ratchet gearing | missing | | Low priority |
-| MH273 | Module system gear design | missing | | |
-| MH274 | Checking gear sizes: over wires/balls, chordal measurement | missing | | |
-| MH275 | Gear materials | missing | | |
-| MH276 | Involute splines (ANSI B92.1) | missing | | |
-| MH277 | Metric module splines (ISO 4156) | missing | | |
-| MH278 | Straight splines; polygon shaft connections | missing | | |
-| MH279 | Spline inspection with gauges and pins | missing | | |
-| MH280 | Cams and cam design; cam milling | missing | | |
+| MH270 | Worm gearing | partial | `worm` | Basics only |
+| MH271 | Helical gearing; milling helical gears; hobbing change gears | partial | `helicalgear` | Helical gear data; no milling of helical gears or hobbing change gears |
+| MH272 | Elliptic, planetary and ratchet gearing | partial | `planetary` | Planetary sets; no elliptic or ratchet gearing |
+| MH273 | Module system gear design | done | `spurgear` |  |
+| MH274 | Checking gear sizes: over wires/balls, chordal measurement | done | `gearmeasure` |  |
+| MH275 | Gear materials | done | `elemguide` | 0.6.0: seven materials with where each is used, worm and wheel pairing, plastics, heat treatment and hardness (details one source each, marked) |
+| MH276 | Involute splines (ANSI B92.1) | partial | `spline` | Basic (nominal) dimensions and pin measurement; fit class tolerances not shown |
+| MH277 | Metric module splines (ISO 4156) | partial | `spline` | Basic (nominal) dimensions and pin measurement; fit class tolerances not shown |
+| MH278 | Straight splines; polygon shaft connections | partial | `saespline` | 0.5.0: SAE parallel side splines (largest sizes, torque capacity; one publisher); no polygon connections |
+| MH279 | Spline inspection with gauges and pins | partial | `spline` | Pins only; no gauges |
+| MH280 | Cams and cam design; cam milling | partial | `elemguide` | 0.6.0: kinds of cam and follower, base circle, pitch curve, prime circle, pressure angle, rise, dwell and return, displacement diagram with a drawing; no cam design calculations, no cam milling |
 
 ### Machine elements
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | MH281 | Plain bearings: types, design, lubrication | out of scope? | | Design rather than machining |
-| MH282 | Plain bearings: machining bores, hardness and finish; bearing materials | missing | | |
-| MH283 | Rolling bearings: types, designation, tolerances | missing | | |
-| MH284 | Shaft and housing fits for bearings; mounting | missing | | |
+| MH282 | Plain bearings: machining bores, hardness and finish; bearing materials | partial | `elemguide` | 0.6.0: forms, materials, PV limits (one source, marked), shaft hardness and finish, clearance and press fit, lubrication, failures; no data for machining the bores |
+| MH283 | Rolling bearings: types, designation, tolerances | done | `bearguide` | 0.6.0: nine types with what each carries, bearing numbers (type code, series, bore number, suffixes), tolerance classes ISO, DIN and ABEC; no tolerance tables |
+| MH284 | Shaft and housing fits for bearings; mounting | done | `bearguide` | 0.6.0: which ring gets the tight fit, classes named by the sources for four cases, effects of loose and tight fits, C3, checking the seats; mounting cold and with heat, temperature limits; limits of each class in `fits` |
 | MH285 | Bearing load ratings and life (L10) | partial | `bearinglife` | ISO 281 basic rating life L10 and equivalent load with your X and Y; no modified life (aISO) or static safety factor |
 | MH286 | Lubrication theory, lubricants, contamination | out of scope? | | |
 | MH287 | Couplings, clutches, brakes | out of scope? | | Cutting clutch teeth is the only machining part |
 | MH288 | Keys and keyseats (metric, inch, Woodruff), keyseat depths | partial | `keys` | Metric (DIN 6885-1 / ISO 773) and inch (ASME B17.1) parallel keys and keyseat depths; no Woodruff (no second source) |
-| MH289 | Belts and pulleys (flat, V, synchronous) | missing | | |
-| MH290 | Transmission chains and sprockets | missing | | |
-| MH291 | Ball and ACME leadscrews | missing | | |
-| MH292 | Electric motors | missing | | |
-| MH293 | Adhesives and sealants, retaining compounds, threadlocking | missing | | |
+| MH289 | Belts and pulleys (flat, V, synchronous) | partial | `beltdrive` | 0.6.0: open belt length (exact and short formula), centre distance from a length, ratio, speeds, wrap; no V-belt sections, standard lengths or power ratings |
+| MH290 | Transmission chains and sprockets | partial | `chaindrive` | 0.6.0: chain length in pitches (even), centre distance, pitch by ANSI chain number, sprocket pitch diameters, wrap; no load ratings or tooth form |
+| MH291 | Ball and ACME leadscrews | done | `elemguide`, `acme`, `trapezoidal` | 0.6.0: leadscrew against ball screw (efficiency with both figures shown, self-locking, back-driving, backlash and preload, cost), thread forms, rolled and ground, critical speed rule (one source, marked); thread sizes in `acme` and `trapezoidal` |
+| MH292 | Electric motors | done | `driveguide` | 0.6.0: induction motor principle, synchronous speed and slip, single phase and variable frequency drive (one source each, marked), a NEMA nameplate field by field (mostly one source, marked), frame numbers; no motor selection tables |
+| MH293 | Adhesives and sealants, retaining compounds, threadlocking | partial | `bearguide` | 0.6.0: threadlocker colours, strength, fastener size, taking apart, cure and application (cure and application one source, marked); no retaining compound selection, no sealants or structural adhesives |
 | MH294 | O-rings and glands | partial | `oring` | AS568 sizes and a squeeze, stretch and fill check; no ISO 3601-1 G series, no -9xx sizes, no back-up rings |
 | MH295 | Rolled steel sections, aluminium structural shapes | missing | | |
-| MH296 | Wire and sheet metal gauges | missing | | |
+| MH296 | Wire and sheet metal gauges | done | `gauges` | 0.6.0: sheet gauges for steel, galvanized, stainless, aluminium and US Standard; AWG by its rule, SWG, tube wall series |
 | MH297 | Wire rope | out of scope | | |
-| MH298 | Shaft alignment with dial indicators | missing | | |
-| MH299 | Fluid power: circuits, pressure and flow, tube fittings, pneumatics | missing | | Low priority |
+| MH298 | Shaft alignment with dial indicators | done | `driveguide` | 0.6.0: offset and angle, soft foot, rim and face against reverse dial, total indicator reading, bracket sag, the validity check, thermal growth; tolerance table from one source, marked |
+| MH299 | Fluid power: circuits, pressure and flow, tube fittings, pneumatics | done | `driveguide`, `pipethreads` | 0.6.0: cylinder force and speed, the parts of a circuit with a block diagram, open and closed centre, pumps, hydraulics against pneumatics, air preparation, nine kinds of tube and hose fitting; thread sizes in `pipethreads` |
 
 ### Measuring units
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH300 | Greek alphabet, abbreviations, mathematical signs, letter symbols | missing | | |
-| MH301 | SI system, prefixes, US customary system, constants | partial | `units` | US customary and SI units; no prefix or constants table (`claude/measure-maths`) |
+| MH300 | Greek alphabet, abbreviations, mathematical signs, letter symbols | partial | `symbols`, `abbrev` | 0.6.0: Greek alphabet (two publishers) and drawing abbreviations; no mathematical signs or letter symbols for quantities |
+| MH301 | SI system, prefixes, US customary system, constants | done | `units`, `symbols` | 0.6.0: SI prefixes (BIPM and NIST) and the seven defining constants beside the unit converter |
 | MH302 | Length conversions (inches, fractions, mm, feet) | done | `fraction` | |
 | MH303 | Area, volume and flow conversions | done | `units` | Area, volume, flow (`claude/measure-maths`) |
 | MH304 | Mass, density, pressure, force and torque conversions | done | `units` | Mass, density, pressure, force, torque (`claude/measure-maths`) |
 | MH305 | Energy, power, heat and temperature conversions | done | `units` | Energy, power, temperature and temperature difference (`claude/measure-maths`) |
-| MH306 | Velocity, acceleration, viscosity and miscellaneous units | partial | `units` | Speed, feed and angle; no acceleration or viscosity (`claude/measure-maths`) |
+| MH306 | Velocity, acceleration, viscosity and miscellaneous units | done | `units` | 0.6.0: acceleration, rotational speed, dynamic and kinematic viscosity added |
 
 ## 3. Engineers' Data Book (Clifford Matthews)
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
 | ED1 | 1.1-1.7 Engineering careers (7 entries) | out of scope | | |
-| ED2 | 2.1 Greek alphabet | missing | | |
+| ED2 | 2.1 Greek alphabet | done | `symbols` | 0.6.0 |
 | ED3 | 2.2 Units systems | partial | `units` | SI and US customary conversions; no units-system explainer (`claude/measure-maths`) |
-| ED4 | 2.3 Units and conversions | partial | `fraction` | Length only |
+| ED4 | 2.3 Units and conversions | done | `units`, `fraction` | 21 quantities in the unit converter |
 | ED5 | 2.4 Consistency of units | out of scope? | | |
 | ED6 | 2.5 Dimensional analysis | out of scope? | | |
-| ED7 | 2.6 Essential engineering mathematics | missing | | Scientific calculator, trig (in progress) |
+| ED7 | 2.6 Essential engineering mathematics | partial | `calc`, `triangle` | Scientific calculator and triangle solver; no reference text |
 | ED8 | 2.7 Maths and the real world | out of scope? | | |
 | ED9 | 3.1-3.12 Engineering design process and principles (12 entries) | out of scope? | | Design methodology |
 | ED10 | 4.1 Engineering abbreviations | partial | `abbrev` | Drawing abbreviations only (`claude/measure-maths`) |
 | ED11 | 4.2 Datums and tolerances: principles | done | `gdtguide`, `gdtdof` | |
-| ED12 | 4.3 Toleranced dimensions | partial | `gdtguide`, `gdtstack` | No guide to plus/minus dimensioning |
+| ED12 | 4.3 Toleranced dimensions | done | `gdtguide`, `gdtstack`, `measguide` | 0.6.0: plus and minus dimensioning explained with examples |
 | ED13 | 4.4 General tolerances (ISO 2768) | done | `gentol` | ISO 2768-1 linear, broken edges and angles, five publishers; ISO 2768-2 is withdrawn (`claude/measure-maths`) |
 | ED14 | 4.5 Holes | partial | `fits` | |
 | ED15 | 4.6 Screw threads | done | `threaddata` | |
-| ED16 | 4.7 Limits and fits | partial | `fits` | No j/J |
-| ED17 | 4.8 Surface finish | partial | `finish` | Conversions and symbols in progress |
+| ED16 | 4.7 Limits and fits | done | `fits` | j5 to j7 and J6 to J8 included |
+| ED17 | 4.8 Surface finish | done | `surface`, `finish` | Ra in both units, N grades, drawing symbols, typical Ra by process |
 | ED18 | 5.1 Equilibrium | out of scope? | | |
 | ED19 | 5.2 Motion equations | out of scope? | | |
 | ED20 | 5.3 Newton's laws | out of scope? | | |
 | ED21 | 5.4 Simple harmonic motion | out of scope? | | |
 | ED22 | 5.5 Understanding acceleration | out of scope? | | |
 | ED23 | 5.6 Dynamic balancing | partial | `balance` | Permissible unbalance and two-plane split; no balancing procedure (`claude/mechanics`) |
-| ED24 | 5.7 Vibration | missing | | Basis for chatter tools |
-| ED25 | 5.8 Machine vibration | missing | | Severity limits |
+| ED24 | 5.7 Vibration | partial | `chatter`, `critspeed` | Natural frequency in the chatter finder and shaft critical speed; no general vibration theory |
+| ED25 | 5.8 Machine vibration | done | `driveguide` | 0.6.0: severity zones A to D, machine groups, rigid and flexible supports, zone boundaries as two web pages quote them from ISO 10816-3 (the standard itself was not read; the page says so), fault signatures (mostly one source, marked) |
 | ED26 | 5.9 Machinery noise | out of scope? | | |
 | ED27 | 6.1 Mechanical notation | out of scope? | | |
 | ED28 | 6.2 Engineering structures, pin joints | out of scope? | | |
@@ -704,32 +751,32 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED48 | 10 Fluid equipment: turbines, refrigeration, diesel engines, heat exchangers, pumps (6 entries) | out of scope | | |
 | ED49 | 11 Pressure vessels and flanges (7 entries) | out of scope | | |
 | ED50 | 12.1 Crystals: order and disorder | out of scope? | | |
-| ED51 | 12.2 Carbon steels | partial | `materials` | 0.5.0: compositions for nine carbon steels; no heat treatment per grade |
-| ED52 | 12.3 Low-alloy steels | partial | `materials` | |
-| ED53 | 12.4 Alloy steels | partial | `materials` | |
-| ED54 | 12.5 Cast iron | partial | `materials` | |
-| ED55 | 12.6 Stainless steels | partial | `materials` | |
-| ED56 | 12.7 Non-ferrous alloys | partial | `materials` | |
-| ED57 | 12.8 Nickel alloys | partial | `materials` | |
-| ED58 | 12.9 Zinc alloys | missing | | |
-| ED59 | 12.10 Copper alloys | partial | `materials` | |
-| ED60 | 12.11 Aluminium alloys | partial | `materials` | No temper explainer |
-| ED61 | 12.12 Titanium alloys | partial | `materials` | |
+| ED51 | 12.2 Carbon steels | done | `materials`, `matguide` | 0.5.0: compositions for nine carbon steels; 0.6.0: carbon classes with properties and uses, numbering; heat treatment of some grades in `heattreat` |
+| ED52 | 12.3 Low-alloy steels | done | `materials`, `matguide` | 0.6.0: the alloy series and what each number means |
+| ED53 | 12.4 Alloy steels | done | `materials`, `matguide` | 0.6.0: as ED52, with tool steel groups |
+| ED54 | 12.5 Cast iron | done | `materials`, `matguide` | 0.6.0: grey, ductile, white and malleable iron: form of the carbon, behaviour, uses |
+| ED55 | 12.6 Stainless steels | done | `materials`, `matguide` | 0.6.0: five families, magnetism, hardening, typical grades (grades one source, marked) |
+| ED56 | 12.7 Non-ferrous alloys | done | `materials`, `matguide` | 0.6.0: aluminium, copper, titanium, magnesium, nickel and zinc sections |
+| ED57 | 12.8 Nickel alloys | done | `materials`, `matguide` | 0.6.0: four families, what each resists, machining behaviour (one source, marked) |
+| ED58 | 12.9 Zinc alloys | done | `matguide` | 0.6.0: Zamak and ZA families and what the names mean; no property table |
+| ED59 | 12.10 Copper alloys | done | `materials`, `matguide` | 0.6.0: temper designations; 12 alloys in `materials` |
+| ED60 | 12.11 Aluminium alloys | done | `materials`, `matguide` | 0.6.0: series and tempers explained |
+| ED61 | 12.12 Titanium alloys | done | `materials`, `matguide` | 0.6.0: grades 1 to 5 and 23, structure classes (one source, marked) |
 | ED62 | 12.13 Engineering plastics | partial | `materials`, `plastics` | 12 plastics in `plastics` |
-| ED63 | 12.14 Material traceability and documentation (certificates) | missing | | Reading a mill cert |
-| ED64 | 12.15 Corrosion | partial | `galvanic` | Galvanic corrosion only |
+| ED63 | 12.14 Material traceability and documentation (certificates) | done | `matguide` | 0.6.0: EN 10204 types 2.1 to 3.2, what is on a certificate, checking the heat number |
+| ED64 | 12.15 Corrosion | done | `galvanic`, `matguide` | 0.6.0: eight forms of corrosion; galvanic check in `galvanic` |
 | ED65 | 13.1 Screw fasteners | partial | `bolttorque`, `boltgrade` | Torque, preload and grades; no joint stiffness or fatigue |
-| ED66 | 13.2 Bearings | missing | | |
-| ED67 | 13.3 Ball and roller bearings | missing | | |
+| ED66 | 13.2 Bearings | done | `bearinglife`, `bearguide` | Rating life in `bearinglife`; 0.6.0: types, fits and mounting |
+| ED67 | 13.3 Ball and roller bearings | done | `bearinglife`, `bearguide` | Rating life in `bearinglife`; 0.6.0: types, designations, tolerance classes and fits |
 | ED68 | 13.4 Bearing lifetime | done | `bearinglife` | Basic rating life L10 (`claude/fasteners`) |
-| ED69 | 13.5 Coefficient of friction | missing | | |
-| ED70 | 13.6 Gear trains | missing | | |
-| ED71 | 13.7 Seals | partial | `oring` | O-rings only |
+| ED69 | 13.5 Coefficient of friction | done | `elemguide` | 0.6.0: as MH26 |
+| ED70 | 13.6 Gear trains | done | `geartrain` |  |
+| ED71 | 13.7 Seals | done | `oring`, `bearguide` | O-ring glands in `oring`; 0.6.0: radial shaft seals (shaft roughness, lead, hardness, housing bore, fitting; mostly one source, marked). No mechanical face seals |
 | ED72 | 13.8 Shaft couplings | out of scope? | | |
-| ED73 | 13.9 Cam mechanisms | missing | | |
+| ED73 | 13.9 Cam mechanisms | done | `elemguide` | 0.6.0: as MH280: kinds of cam and follower, terms, displacement diagram, follower motions named (one source, marked) |
 | ED74 | 13.10 Clutches | out of scope? | | |
-| ED75 | 13.11 Pulley mechanisms | missing | | |
-| ED76 | 13.12 Drive types | missing | | |
+| ED75 | 13.11 Pulley mechanisms | partial | `beltdrive` | 0.6.0: belt length, ratio and wrap for two pulleys; no rope and block pulley systems |
+| ED76 | 13.12 Drive types | partial | `beltdrive`, `chaindrive`, `geartrain` | 0.6.0: belt, chain and gear drives each have a calculator; no comparison of drive types |
 | ED77 | 14.1-14.3 ISO 9001 quality systems and certification | out of scope? | | Management system |
 | ED78 | 14.4 Taguchi methods | missing | | Low priority |
 | ED79 | 14.5 Statistical process control | done | `capability`, `ctrlchart` | Cp/Cpk; X-bar/R and individuals/MR charts; run rules not applied (`claude/inspection-2`) |
@@ -739,13 +786,13 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED83 | 15.1-15.5 Project engineering (planning, CPA, Gantt, prototyping, value analysis) | out of scope? | | |
 | ED84 | 16.1 Welding processes | out of scope | | |
 | ED85 | 16.2 Weld types and orientation | out of scope | | |
-| ED86 | 16.3 Welding symbols | missing | | Drawing reading; low priority |
+| ED86 | 16.3 Welding symbols | done | `drawguide` | 0.6.0: as MH194 |
 | ED87 | 16.4 Welding defects | out of scope | | |
 | ED88 | 16.5 Welding documentation | out of scope | | |
 | ED89 | 17.1-17.6 Non-destructive testing | out of scope? | | |
 | ED90 | 18.1 Painting | out of scope? | | |
 | ED91 | 18.2 Galvanizing | out of scope? | | |
-| ED92 | 18.3 Chrome plating | missing | | Plating allowance; low priority |
+| ED92 | 18.3 Chrome plating | done | `procguide` | 0.6.0: decorative and hard chrome, thickness and hardness from two sources (they differ, both shown), grinding after plating and edge build-up (one source, marked); thread allowance in `coating` |
 | ED93 | 18.4 Rubber linings | out of scope? | | |
 | ED94 | 19 Metallurgical terms | missing | | Glossary |
 
@@ -753,10 +800,10 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| BB1 | Conversion factors inch/metric | partial | `fraction` | Length only |
+| BB1 | Conversion factors inch/metric | done | `units`, `fraction` | 21 quantities in the unit converter; inch fractions and decimals |
 | BB2 | Drill size and decimal equivalent chart | done | `drillchart` | |
 | BB3 | Spanner selection chart | done | `spanner` | (`claude/fasteners`) |
-| BB4 | Torque conversion chart | missing | | |
+| BB4 | Torque conversion chart | done | `units` | Torque units convert in the unit converter (N·m, lbf·ft, lbf·in, ozf·in, kgf·m, kgf·cm) |
 | BB5 | Socket size cross-reference inch/metric | partial | `spanner` | Lookup of a spanner size against metric and inch heads; no socket cross-reference chart |
 | BB6 | Abbreviations for standard threads | partial | `threaddata` | Series names only |
 | BB7 | Thread forms used in engineering | partial | `threaddata`, `pipethreads`, `whitworth`, `acme`, `trapezoidal`, `buttress` | ACME, trapezoidal and buttress added; no forms overview drawing (`claude/threads-3`) |
@@ -770,69 +817,69 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB15 | Drill sizes for screw extractors, self-tappers | missing | | |
 | BB16 | Drill sizes for socket head screws | done | `shcs`, `clearance` | (`claude/fasteners`) |
 | BB17 | Hole coordinates | done | `bolt` | |
-| BB18 | Drill point sharpening and effects of bad grinding | missing | | |
+| BB18 | Drill point sharpening and effects of bad grinding | done | `shoptools`, `toolguide` | Hand sharpening step by step, lip clearance, the chisel edge check, a table of five grinding faults and their effects, web thinning |
 | BB19 | Drill point geometry by material | partial | `toolguide` | Point angle by material (118 general, 135 harder, over 140 very hard); no full geometry table (`claude/tooling-ref`) |
-| BB20 | Speeds and feeds for HSS twist drills | missing | | |
-| BB21 | Speeds and feeds for solid carbide drills | missing | | |
+| BB20 | Speeds and feeds for HSS twist drills | partial | `advdrill` | Speed by material and feed by diameter; not a full table |
+| BB21 | Speeds and feeds for solid carbide drills | partial | `advdrill` | Carbide speeds from one publisher |
 | BB22 | End mills | partial | `toolguide` | Types, flutes by material, end shapes, roughers; no dimensions (`claude/tooling-ref`) |
 | BB23 | Cutting speed to RPM conversion | done | `rpm` | |
-| BB24 | Hole saws and recommended speeds | missing |  | Not built: no two independent hole saw speed charts compared (`claude/tooling-ref`) |
-| BB25 | Hacksaw and power saw blade selection | partial | `sawtpi` | Pitch from the 3-teeth rule; no hacksaw blade chart (`claude/tooling-ref`) |
-| BB26 | Bandsaw blade selection | partial | `sawtpi`, `bandsaw` | Pitch selection (min 3 teeth confirmed, upper rule shown from two makers) and cut time; no blade width or speed chart (`claude/tooling-ref`) |
-| BB27 | Sharpening HSS toolbits | missing | | |
-| BB28 | Lubricants and coolants for cutting tools | partial | `coolconc`, `coolmix` | No selection guide |
-| BB29 | Trigonometry, Pythagoras, rise per degree, 3-4-5 rule | missing | | In progress (`claude/geometry`) |
+| BB24 | Hole saws and recommended speeds | done | `shoptools`, `rpm` | Speeds for four diameters and five materials from two charts side by side; the cutting speed in mild steel worked out from both |
+| BB25 | Hacksaw and power saw blade selection | done | `shoptools`, `sawtpi` | Hacksaw blades of 18, 24 and 32 teeth per inch, the three-teeth rule, fitting and tension; pitch calculator |
+| BB26 | Bandsaw blade selection | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch selection, blade types, break-in (two suppliers, figures differ), fault table and cut time; no blade width or speed chart |
+| BB27 | Sharpening HSS toolbits | done | `shoptools` | Order of grinding, relief and rake by material, nose radius, cooling, wheel and finishing, with a drawing (two guides) |
+| BB28 | Lubricants and coolants for cutting tools | done | `shoptools`, `coolconc`, `coolmix` | Table of four kinds of fluid and where each suits, the rule by speed and by material, care of mixed fluids |
+| BB29 | Trigonometry, Pythagoras, rise per degree, 3-4-5 rule | partial | `triangle` | Triangle solver; no rise per degree or 3-4-5 rule |
 | BB30 | Geometrical construction | missing | | |
 | BB31 | Formulae for dimensions of plane figures | done | `figures` | (`claude/measure-maths`) |
 | BB32 | Area and measurement of plane figures | done | `figures` | (`claude/measure-maths`) |
 | BB33 | Distance across corners of squares and hexagons | done | `figures` | Any regular polygon, across flats to across corners (`claude/measure-maths`) |
 | BB34 | Area and volume of solid figures | done | `figures` | (`claude/measure-maths`) |
 | BB35 | Tapers | done | `taper`, `machinetapers` | |
-| BB36 | Taper turning and sine bar formulae | partial | `taper` | No tailstock set-over or compound setting; sine bar in progress |
-| BB37 | Dividing head / rotary table indexing | missing | | In progress (`claude/geometry`, `indexing`) |
-| BB38 | Tolerances and preferred fits | partial | `fits` | Preferred fits not listed |
-| BB39 | Fits for shafts and holes | partial | `fits` | No j/J |
+| BB36 | Taper turning and sine bar formulae | done | `taper`, `sinebar` | 0.6.0: compound slide setting and tailstock set-over added; sine bar and gauge block stack |
+| BB37 | Dividing head / rotary table indexing | done | `indexing` |  |
+| BB38 | Tolerances and preferred fits | done | `fits`, `measguide` | 0.6.0: preferred fits listed |
+| BB39 | Fits for shafts and holes | done | `fits` | j5 to j7 and J6 to J8 included |
 | BB40 | Morse, Jacobs and DIN tapers | partial | `machinetapers` | DIN metric tapers missing |
 | BB41 | Milling machine tapers | done | `machinetapers` | |
 | BB42 | Pull studs and retention knobs | partial | `machinetapers`, `holdertorque` | Standard references only, no dimensions. 0.5.0: tightening torque by taper from three makers, shown side by side |
 | BB43 | T-slots | done | `tslots` | (`claude/fasteners`) |
 | BB44 | Keys and keyways | partial | `keys` | Parallel keys metric and inch; no Woodruff |
-| BB45 | Spur gear calculations | missing | | |
-| BB46 | Belt and gear drive calculations | missing | | |
+| BB45 | Spur gear calculations | done | `spurgear` |  |
+| BB46 | Belt and gear drive calculations | done | `geartrain`, `beltdrive` | 0.6.0: belt drives added |
 | BB47 | V-belt cross sections | missing | | |
 | BB48 | Bolts and nuts identification and grades | done | `boltgrade` | (`claude/fasteners`) |
 | BB49 | Bolt and screw heads, types and drives | partial | `shcs` | Socket head cap screws only; no other head types or drives |
-| BB50 | Weights of round, square and hex bars | partial | `bar` | Density entered by hand; full tool in progress (`claude/geometry`, `weight`) |
-| BB51 | Weights of round tubes | missing | | In progress (`claude/geometry`, `weight`) |
-| BB52 | Weights of sheet metal | missing | | In progress (`claude/geometry`, `weight`) |
+| BB50 | Weights of round, square and hex bars | done | `weight`, `bar` | Round, hex, square, tube, flat, plate and sheet with material densities |
+| BB51 | Weights of round tubes | done | `weight` |  |
+| BB52 | Weights of sheet metal | done | `weight` |  |
 | BB53 | Symbols for elements; viscosity chart | missing | | Low priority |
 | BB54 | Physical properties of metals and compounds | partial | `materials` | |
-| BB55 | Sheet metal and wire gauges; bend allowance | missing | | In progress (`claude/geometry`, `bend`) |
-| BB56 | Workshop metals | partial | `materials` | |
+| BB55 | Sheet metal and wire gauges; bend allowance | done | `bend`, `gauges` | 0.6.0: gauge tables added |
+| BB56 | Workshop metals | done | `materials`, `matguide` | 0.6.0: families of steel, cast iron, stainless and non-ferrous metals in the materials guide |
 | BB57 | Workpiece material comparison table | done | `materials` | |
 | BB58 | Engineering plastics | partial | `materials` | 5 plastics |
-| BB59 | Engineering adhesives | missing | | |
-| BB60 | Grinding wheels: markings, specs, shapes, faces | partial | `wheelcode` | Markings and specs decoded; no shapes or faces (`claude/calcs-3`) |
-| BB61 | Mounted wheels and points | missing | | |
-| BB62 | Tungsten carbide burrs | missing | | |
+| BB59 | Engineering adhesives | partial | `bearguide` | 0.6.0: threadlocker colours, strength, removal, cure and application; no structural adhesives, retaining compound selection or sealants |
+| BB60 | Grinding wheels: markings, specs, shapes, faces | done | `shoptools`, `wheelcode` | Markings decoded; eight shapes by type number with a drawing of six, the face of the wheel, choice of abrasive, grit and grade |
+| BB61 | Mounted wheels and points | done | `abrasguide` | 0.6.0: as MH127; no table of shapes, sizes and speeds |
+| BB62 | Tungsten carbide burrs | done | `shoptools` | Cuts and what each is for; speeds by size from two makers, which differ and are both shown |
 | BB63 | Surface coatings (tool coatings) | done | `toolguide` | Ten coatings with use; max temperatures with every publisher value, confirmed only where two agree (`claude/tooling-ref`) |
-| BB64 | Relative position of cutting tool materials | partial | `toolguide` | Tool materials summary; no ranking chart (`claude/tooling-ref`) |
+| BB64 | Relative position of cutting tool materials | done | `toolguide`, `cutguide` | Tool materials summary in `toolguide`; 0.6.0: ranking drawing by hardness with the tough and brittle ends |
 | BB65 | Carbide grades and grade comparison chart | partial | `iso513`, `toolguide` | ISO 513 groups; no maker grade comparison chart (`claude/tooling-ref`) |
-| BB66 | Carbide insert identification | missing | | In progress (`claude/ref-data-3`) |
-| BB67 | Quick visual identification of insert shapes | missing | | In progress (`claude/ref-data-3`) |
-| BB68 | Carbide toolholder identification | missing | | |
-| BB69 | Carbide toolholder selection and application | missing | | |
+| BB66 | Carbide insert identification | done | `insertcode` |  |
+| BB67 | Quick visual identification of insert shapes | done | `insertcode` | Insert drawn to scale from the code |
+| BB68 | Carbide toolholder identification | done | `holdercode` |  |
+| BB69 | Carbide toolholder selection and application | partial | `holdercode` | Decoding only; no selection guide |
 | BB70 | Abbreviations used in drawings | done | `abbrev` | 65 abbreviations in our words, 34 listed by two publishers (`claude/measure-maths`) |
-| BB71 | Standards for engineering drawings | missing | | |
+| BB71 | Standards for engineering drawings | done | `drawguide` | 0.6.0: table of thirteen ISO, ASME, AWS and BS standards with what each covers (six rows one source, marked); BS 8888 |
 | BB72 | Human physical dimensions | out of scope | | |
 | BB73 | G-codes, letter addresses, miscellaneous function words | done | `gmcodes` | G and M words per control; letter-address table A-Z (NIST RS274NGC and Haas mill columns, each from its own document) under the code list (`claude/gdt-3`) |
-| BB74 | Surface roughness tables | partial | `finish` | Conversions in progress (`claude/ref-data-3`) |
-| BB75 | Surface finish expected from manufacturing processes | missing | | In progress (`claude/ref-data-3`) |
+| BB74 | Surface roughness tables | done | `surface` | Ra, N grades and typical Ra by process from two publishers |
+| BB75 | Surface finish expected from manufacturing processes | done | `surface` | Typical Ra by process from two publishers |
 | BB76 | Terms used in heat treatment of steel | done | `heattreat` | 12 terms in our words (`claude/materials-ref`) |
 | BB77 | Hardening and tempering temperatures by colour | done | `tempercolours`, `heattreat` | Temper colours with three publishers, hardening and tempering temperatures (`claude/materials-ref`) |
-| BB78 | Hardness comparison chart | missing | | In progress (`claude/ref-data-3`) |
+| BB78 | Hardness comparison chart | done | `hardness` |  |
 | BB79 | Natural sines and tangents table | done | `calc` | Any sine or tangent from the calculator instead of a table (`claude/measure-maths`) |
-| BB80 | Drill point sharpening gauge (back cover) | missing | | |
+| BB80 | Drill point sharpening gauge (back cover) | done | `shoptools` | How the drill point gauge is used to check the angle and the length of each lip (the gauge itself is a tool, not a page) |
 
 ## 5. CNC Machining for Engineers and Makers (course handbook)
 
@@ -842,13 +889,13 @@ One row per learning objective.
 |---|---|---|---|---|
 | CN1 | L1 Course goals, audience, tools, lessons, resources | out of scope? | | Course administration |
 | CN2 | L1 Subtractive vs additive rapid prototyping | out of scope? | | |
-| CN3 | L1 Overall CAD/CAM/CNC process | missing | | Explainer |
+| CN3 | L1 Overall CAD/CAM/CNC process | done | `toolpaths`, `millsetup` | "From model to part" in the milling toolpath guide (CAD, CAM setup, toolpaths, simulation, post-processor; one source, marked), with the machine side in the mill setup guide |
 | CN4 | L2 Shop safety awareness, rules, clothing, conduct | partial | `cncguide` | Short safety page (guards, dress, chips, coolant, lock-out); points to HSE/OSHA, not a full course (`claude/cnc-guide`) |
-| CN5 | L2 Safety precautions when running a new CNC program | partial | `cncguide` | Prove-out steps in the safety page (`claude/cnc-guide`) |
+| CN5 | L2 Safety precautions when running a new CNC program | done | `millsetup`, `cncguide` | 0.6.0: first-run steps with sources: plot, cut air, slow rapids, stop above the part and compare distance to go, single block |
 | CN6 | L3 Common CNC tools | partial | `toolguide` | End mills, drills, reamers, taps described; no course-specific tool list (`claude/tooling-ref`) |
-| CN7 | L3 Spindle rotation direction | missing | | |
+| CN7 | L3 Spindle rotation direction | done | `cncguide`, `gmcodes` | 0.6.0: M03/M04/M05 with a drawing seen from above (the viewpoint has one source, marked) |
 | CN8 | L3 Chip formation | done | `cncguide` | Shear zone, chip types, chip thickness (`claude/cnc-guide`) |
-| CN9 | L3 Chip load definition | partial | `feed`, `cutopt` | Used, not explained |
+| CN9 | L3 Chip load definition | done | `cncguide`, `feed`, `cutopt` | 0.6.0: chip load defined in the CNC guide (two publishers), with the feed formula and the link to chip thinning |
 | CN10 | L3 Climb vs conventional milling | done | `cncguide` | With drawing (`claude/cnc-guide`) |
 | CN11 | L3 Speeds and feeds from reference tables | partial | `rpm`, `feed` | Formulas only; no tables |
 | CN12 | L4 Cartesian coordinate system | done | `cncguide` | Right-handed axes (`claude/cnc-guide`) |
@@ -856,72 +903,72 @@ One row per learning objective.
 | CN14 | L4 Closed-loop servo control | out of scope? | | Machine design |
 | CN15 | L4 Machine coordinate system | done | `cncguide` | Machine coordinates, G53 (`claude/cnc-guide`) |
 | CN16 | L4 Fixture offset XY | done | `cncguide`, `setupsheet` | Explainer in the guide; offsets recorded on the setup sheet (`claude/cnc-guide`) |
-| CN17 | L4 Tool length offset with a 1-2-3 block | missing | | |
-| CN18 | L4 Fixture offset Z with 1-2-3 block and indicator | missing | | |
-| CN19 | L4 Inch and metric programming units | partial | `app.js` (unit toggle) | No G20/G21 explanation |
+| CN17 | L4 Tool length offset with a 1-2-3 block | done | `millsetup` | 0.6.0: tool lengths on a block of known height (method B), with the rule never to jog down onto the block |
+| CN18 | L4 Fixture offset Z with 1-2-3 block and indicator | done | `millsetup` | 0.6.0: work offset Z from the block or with a dial indicator (the measuring steps have one source, marked) |
+| CN19 | L4 Inch and metric programming units | done | `cncguide`, `gsim` | 0.6.0: G20/G21 in the start-up block (two publishers); the simulator converts a program between units |
 | CN20 | L5 What a CNC program is; sequence of operations | done | `cncguide` | Program as blocks, typical order of one tool (`claude/cnc-guide`) |
 | CN21 | L5 Common G-codes | done | `gmcodes` | |
 | CN22 | L5 Common M-codes | done | `gmcodes` | |
-| CN23 | L5 Special characters in a program | partial | `cncguide` | Comments and block delete; no full character list (`claude/cnc-guide`) |
+| CN23 | L5 Special characters in a program | done | `cncguide` | 0.6.0: table of program characters: %, O number, N number, brackets, semicolon, block delete, spaces and case |
 | CN24 | L5 Organisation of a simple program | done | `cncguide` | Safe start line, block anatomy, tool order (`claude/cnc-guide`) |
-| CN25 | L6 Steps to set up and run a CNC mill | missing | | |
-| CN26 | L6 Control panel layout (one control maker) | missing | | Per control profile |
-| CN27 | L6 Start and home the machine | missing | | |
-| CN28 | L6 Load tools | missing | | |
-| CN29 | L6 Set tool length offsets | missing | | |
-| CN30 | L6 Set fixture offsets | missing | | |
-| CN31 | L6 Load a program | missing | | |
-| CN32 | L6 Run a new program safely | missing | | |
-| CN33 | L6 Adjust offsets for wear and deflection | partial | `deflection` | Estimates deflection only |
-| CN34 | L6 Shut down | missing | | |
-| CN35 | L7 2.5D, 3D and 4-axis parts | missing | | |
+| CN25 | L6 Steps to set up and run a CNC mill | done | `millsetup` | 0.6.0: eleven steps in order with a drawing |
+| CN26 | L6 Control panel layout (one control maker) | partial | `millsetup` | 0.6.0: Haas key groups and what they do (two publishers); no picture of where the keys are, other controls not covered |
+| CN27 | L6 Start and home the machine | done | `millsetup` | 0.6.0: checks, power on, reset, home (Z first) |
+| CN28 | L6 Load tools | done | `millsetup` | 0.6.0: tools in program order, through the spindle, how to put one in and take one out |
+| CN29 | L6 Set tool length offsets | done | `millsetup` | 0.6.0: what the offset is, the steps on the control, four methods compared |
+| CN30 | L6 Set fixture offsets | done | `millsetup` | 0.6.0: PART ZERO SET, edge finder steps with a drawing, half the tip, centre of a feature, limits |
+| CN31 | L6 Load a program | done | `millsetup` | 0.6.0: copy to memory, then select the active program |
+| CN32 | L6 Run a new program safely | done | `millsetup` | 0.6.0: plot, cut air, rapids at 25 or 5 %, stop above the part, single block, every tool |
+| CN33 | L6 Adjust offsets for wear and deflection | done | `millsetup`, `deflection` | 0.6.0: sizes brought in with the diameter and length registers, wear column, which way to change; deflection note (own reasoning, marked) and the calculator |
+| CN34 | L6 Shut down | done | `millsetup` | 0.6.0: part and tool out, chips, wipe down, power off by the manual |
+| CN35 | L7 2.5D, 3D and 4-axis parts | partial | `toolpaths` | 2D (2.5D), 3D and 3+2 positioning explained; no continuous 4-axis work |
 | CN36 | L7 CAD/CAM graphics views | out of scope? | | CAM software usage |
-| CN37 | L7 Identifying 2D machining features | missing | | |
-| CN38 | L7 Machining parameters for 2D toolpaths (stepover, stepdown) | missing | | |
-| CN39 | L7 Facing toolpaths | missing | | |
-| CN40 | L7 2D contour toolpaths | missing | | |
-| CN41 | L7 Cutter diameter compensation rules | partial | `cncguide`, `tnrc` | G41/G42 sides and entry/exit rules; no mill contour worked example (`claude/cnc-guide`) |
-| CN42 | L7 Pocketing toolpaths | missing | | |
-| CN43 | L7 Slot milling | missing | | |
-| CN44 | L7 Chamfer milling | missing | | Chamfer mill depth for width |
-| CN45 | L7 Radius milling | missing | | |
-| CN46 | L7 Drilling and peck drilling | missing | | |
-| CN47 | L7 Tapping toolpaths | missing | | |
+| CN37 | L7 Identifying 2D machining features | done | `toolpaths` | Feature table and drawing: which toolpath for which feature |
+| CN38 | L7 Machining parameters for 2D toolpaths (stepover, stepdown) | done | `toolpaths`, `chipthin` | Stepover, stepdown, stock to leave, lead-in and lead-out |
+| CN39 | L7 Facing toolpaths | done | `toolpaths` | Facing: start off the part, cut a little below the face, roughing passes for uneven stock (one source, marked) |
+| CN40 | L7 2D contour toolpaths | done | `toolpaths` | Contour section with lead-in, lead-out and a worked G-code example |
+| CN41 | L7 Cutter diameter compensation rules | done | `toolpaths`, `cncguide`, `tnrc` | Rules for G41 and G42 plus an 8-line mill contour example for a 60 x 40 block |
+| CN42 | L7 Pocketing toolpaths | done | `toolpaths`, `helix` | Getting in (helix, ramp, plunge), clearing, inside corners, deep pockets |
+| CN43 | L7 Slot milling | done | `toolpaths` | Slots: cutter narrower than the slot, ramp in, finish each wall |
+| CN44 | L7 Chamfer milling | done | `toolpaths`, `chamfermill` | Guide paragraph and the chamfer mill calculator (tip depth, centre offset, cutting diameter) |
+| CN45 | L7 Radius milling | done | `toolpaths` | Radius milling paragraph (one source, marked) |
+| CN46 | L7 Drilling and peck drilling | done | `toolpaths`, `cycdrill`, `advdrill` | Spot, drill, peck and the R plane explained; cycle generator and advisor |
+| CN47 | L7 Tapping toolpaths | done | `toolpaths`, `cycdrill`, `advtap` | G84 tapping explained; cycle generator and advisor |
 | CN48 | L8 Lathe coordinate system | done | `cncguide`, `tnrc` | Lathe Z and X, diameter programming, imaginary tip (`claude/cnc-guide`) |
-| CN49 | L8 Lathe workholding | partial | `cncguide` | Chuck speed, stick-out, support; no collet or chuck selection (`claude/cnc-guide`) |
-| CN50 | L8 Common lathe tools | missing | | |
-| CN51 | L8 Lathe speeds and feeds | partial | `rpm`, `passtime` | No recommendations |
-| CN52 | L8 Constant surface speed | missing | | |
-| CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | partial | `cycg71`, `cycgroove`, `cycthread`, `cyctaper` | Turn, groove, cut-off, thread; no facing or drilling on the lathe |
-| CN54 | L8 Live tools | partial | `machines` | Live-tool speed limit check only |
+| CN49 | L8 Lathe workholding | done | `latheguide`, `cncguide`, `chuckforce` | Table of eight ways to hold work, chuck against collet, grip, speed and stick-out, bar work |
+| CN50 | L8 Common lathe tools | done | `latheguide`, `insertcode`, `holdercode` | Table of seven tool types, insert shapes with a drawing, nose radius, hand |
+| CN51 | L8 Lathe speeds and feeds | done | `latheguide`, `rpm`, `advturn` | Speed from the diameter, feed per revolution, when to use constant surface speed; starting values in the turning advisor (0.4.0) |
+| CN52 | L8 Constant surface speed | done | `cncguide`, `partofftime` | 0.6.0: G96 and G97, why the rpm climbs, the speed limit word by control (four sources), when fixed rpm is better |
+| CN53 | L8 Lathe toolpaths: face, turn, groove, cut-off, thread, drill | done | `latheguide`, `cycg71`, `cycgroove`, `cycthread`, `cyctaper` | Face, rough, finish, groove, thread, drill and cut off in order with the Haas cycles; parting off in its own section |
+| CN54 | L8 Live tools | done | `latheguide`, `machines` | What live tools are, axial and radial holders, C axis, polar interpolation, Y axis, feed per minute, limits |
 | CN55 | L9 3D tool compensation | missing | | |
-| CN56 | L9 3D cut tolerances | missing | | |
-| CN57 | L9 Geometric features in 3D toolpaths | missing | | |
-| CN58 | L9 3D roughing toolpaths | missing | | |
-| CN59 | L9 3D finishing toolpaths (and scallop height) | missing | | |
-| CN60 | L9 Rest milling | missing | | |
-| CN61 | L9 Pencil milling | missing | | |
-| CN62 | L10 CNC workholding components | partial | `cncguide` | Locate then clamp, vise on parallels; no fixture plate or clamp kit detail (`claude/cnc-guide`) |
-| CN63 | L10 CNC vise parts and accessories | partial | `cncguide` | Vise practice paragraph (`claude/cnc-guide`) |
-| CN64 | L10 Hard, step and soft jaws | partial | `cncguide` | Soft jaws mentioned only (`claude/cnc-guide`) |
-| CN65 | App A: align a vise | missing | | |
-| CN66 | App A: square a block | missing | | |
-| CN67 | App A: 2D contour with cutter compensation | missing | | |
-| CN68 | App A: vise jaw types; installing and aligning jaws | missing | | |
-| CN69 | App A: making and using soft jaws | missing | | |
-| CN70 | App A: multiple parts from one bar | missing | | |
-| CN71 | App A: fixture plates | missing | | |
-| CN72 | App A: clamps and bolts | missing | | |
-| CN73 | App A: thin-walled parts | missing | | |
-| CN74 | App A: angle plates for multi-sided parts | missing | | |
-| CN75 | App A: shoulder bolts and dowel pins for two-sided parts | missing | | |
-| CN76 | App A: double-sided tape | missing | | |
-| CN77 | App B: tool length offset with paper | missing | | |
-| CN78 | App B: tool length offset with a 1-2-3 block from a finished face | missing | | |
-| CN79 | App B: tool length offset with a tool probe | missing | | |
+| CN56 | L9 3D cut tolerances | done | `toolpaths` | "3D tolerances": the chain of tolerances and what a tighter one costs (one source, marked) |
+| CN57 | L9 Geometric features in 3D toolpaths | done | `toolpaths` | Steep or shallow decides the finishing pass, with a drawing |
+| CN58 | L9 3D roughing toolpaths | done | `toolpaths` | 3D roughing in the order of work and the 3D toolpath table |
+| CN59 | L9 3D finishing toolpaths (and scallop height) | done | `toolpaths`, `ballcusp` | Seven 3D toolpaths in a table; cusp (scallop) height tool |
+| CN60 | L9 Rest milling | done | `toolpaths` | Rest machining |
+| CN61 | L9 Pencil milling | done | `toolpaths` | Pencil passes (one source, marked) |
+| CN62 | L10 CNC workholding components | done | `workholding`, `cncguide` | Rules for every setup, vise, clamps, fixture plates |
+| CN63 | L10 CNC vise parts and accessories | done | `workholding` | Vise parts, parallels, vise stop, handle, with a drawing |
+| CN64 | L10 Hard, step and soft jaws | done | `workholding` | Table of five jaw types (hard, step, soft and others) |
+| CN65 | App A: align a vise | done | `workholding` | Three-step procedure with an indicator; two vises in line |
+| CN66 | App A: square a block | done | `workholding` | Six-step table (one source, marked) |
+| CN67 | App A: 2D contour with cutter compensation | done | `toolpaths` | Worked G41 contour example with lead-in and lead-out |
+| CN68 | App A: vise jaw types; installing and aligning jaws | done | `workholding` | Jaw types table; cutting soft jaws in place |
+| CN69 | App A: making and using soft jaws | done | `workholding` | Cut in place, clamp on a spacer, second operations, keeping parts alike |
+| CN70 | App A: multiple parts from one bar | done | `workholding` | Several parts cut side by side in one bar and freed by facing the back (one source, marked) |
+| CN71 | App A: fixture plates | done | `workholding` | Fixture plates: grid of tapped and dowel holes, plate material |
+| CN72 | App A: clamps and bolts | done | `workholding` | Step clamps with a drawing, heel height (sources differ, both shown), toe clamps |
+| CN73 | App A: thin-walled parts | done | `workholding` | Thin parts: why they are hard, vacuum, tape and glue, sacrificial plate, tabs, thin walls |
+| CN74 | App A: angle plates for multi-sided parts | done | `workholding` | Angle plate: what it is and how a part is set on it (one source, marked) |
+| CN75 | App A: shoulder bolts and dowel pins for two-sided parts | done | `workholding` | Dowel pins in a fixture plate for the second side, shoulder bolts while the flange is cut away (one source, marked) |
+| CN76 | App A: double-sided tape | done | `workholding` | Double-sided tape and superglue, with their limits |
+| CN77 | App B: tool length offset with paper | done | `millsetup` | 0.6.0: method A, on the part with paper or a feeler, with its drawbacks |
+| CN78 | App B: tool length offset with a 1-2-3 block from a finished face | done | `millsetup` | 0.6.0: method B with the block standing on a face milled flat |
+| CN79 | App B: tool length offset with a tool probe | done | `millsetup` | 0.6.0: method C, tool setting probe |
 | CN80 | App C: CNC process planning form | partial | `setupsheet` | Setup sheet, no operation-sequence plan |
 | CN81 | App D: G and M code reference | done | `gmcodes` | |
-| CN82 | App E: glossary | missing | | |
+| CN82 | App E: glossary | done | `glossary` | 108 terms in our own words with a search box; 97 link to the page that explains them |
 | CN83 | App F: drill chart and decimal equivalents | done | `drillchart` | |
 
 ## 6. Prioritised build list

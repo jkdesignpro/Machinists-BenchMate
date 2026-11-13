@@ -71,6 +71,24 @@ const dcPl = (pts, cls) => (pts.length > 1 ? '<path class="' + (cls || 'ln') + '
 // Vertical dimension from yTop down to yBot at x (extension lines from o.from). DK.dimV puts the
 // offset on the wrong side when y1 < y2, so it is always called bottom-to-top here.
 const dcDimV = (yTop, yBot, x, text, o) => DK.dimV(Math.max(yTop, yBot), Math.min(yTop, yBot), x, text, o);
+// Two wheels joined by a belt or chain, to scale. d1 is the driving wheel (left), d2 the driven wheel (right).
+function dcTwoWheels(d1, d2, c, sys, rows, kind, dp) {
+  const W = 520, H = 250, u = dcU(sys);
+  if (!dcOk(d1) || !dcOk(d2) || !dcOk(c) || !(c > (d1 + d2) / 2)) return '';
+  const sc = Math.min(400 / (c + (d1 + d2) / 2), 150 / Math.max(d1, d2)), r1 = d1 / 2 * sc, r2 = d2 / 2 * sc, cy = 112;
+  const x1 = 40 + r1, x2 = x1 + c * sc;
+  // The spans touch each circle where the radius makes the angle a with the vertical: sin a = (r2 - r1) / c.
+  const a = Math.asin((r2 - r1) / (c * sc)), sx = Math.sin(a), cx = Math.cos(a);
+  let h = DK.circle(x1, cy, r1, 'part') + DK.circle(x2, cy, r2, 'part');
+  h += DK.line(x1 - r1 * sx, cy - r1 * cx, x2 - r2 * sx, cy - r2 * cx, 'hot') + DK.line(x1 - r1 * sx, cy + r1 * cx, x2 - r2 * sx, cy + r2 * cx, 'hot');
+  h += DK.cl(x1 - r1 - 8, cy, x2 + r2 + 8, cy) + DK.cl(x1, cy - r1 - 8, x1, cy + r1 + 8) + DK.cl(x2, cy - r2 - 8, x2, cy + r2 + 8);
+  const yb = cy + Math.max(r1, r2) + 30;
+  h += DK.dimH(x1, x2, yb, 'centres ' + dcN(c, dp) + ' ' + u, { from: cy });
+  h += DK.text(x1, cy - r1 - 14, 'driving ' + dcN(d1, dp), { cls: 'dimt' }) + DK.text(x2, cy - r2 - 14, 'driven ' + dcN(d2, dp), { cls: 'dimt' });
+  const wrap = rows.find(q => q.label.indexOf('Wrap on the small') === 0), len = rows.find(q => q.label === 'Belt length' || q.label === 'Chain length, even number of pitches');
+  h += dcLines(12, H - 26, [(len && isFinite(len.value) ? kind + ' ' + dcN(len.value, len.unit === 'pitches' ? 0 : dp) + ' ' + len.unit + '   ' : '') + (wrap && isFinite(wrap.value) ? 'wrap on the small wheel ' + dcN(wrap.value, 1) + '°' : '')]);
+  return DK.svg(W, H, h, 'Two wheels joined by a ' + kind + ': diameters, centre distance and the straight spans');
+}
 // Split a sentence into lines of at most n characters.
 const dcWrap = (t, n) => { const out = []; let cur = ''; String(t || '').split(' ').forEach(w => { if (cur && (cur + ' ' + w).length > n) { out.push(cur); cur = w; } else cur = cur ? cur + ' ' + w : w; }); if (cur) out.push(cur); return out; };
 const dcLines = (x, y, lines, o) => lines.filter(Boolean).map((t, i) => DK.text(x, y + i * 16, t, Object.assign({ cls: 'mut', anchor: 'start' }, o || {}))).join('');
@@ -915,6 +933,108 @@ Object.assign(DIAGRAMS, {
     h += dcLines(x, 128, ['depth h ' + dcN(hh, dp) + ' ' + u, n + ' splines', T && isFinite(T.value) ? 'T ' + dcN(T.value, sys === 'inch' ? 0 : 1) + ' ' + T.unit : '', T && isFinite(T.value) ? 'per inch of length' : '', T && isFinite(T.value) ? 'at 1000 psi' : '']);
     h += DK.text(W - 6, H - 6, 'the splined hole, to scale', { cls: 'mut', anchor: 'end' });
     return DK.svg(W, H, h, 'Section of an SAE parallel side splined hole: large diameter, small diameter, width and depth of the splines');
+  },
+
+  // Belt or chain round two wheels, to scale: the two circles, the straight spans tangent to both, centre distance and wrap.
+  beltdrive(v, sys, rows) { return dcTwoWheels(v.d1, v.d2, v.find === 1 ? dcRow(rows, 'Centre distance') : v.c, sys, rows, 'belt', sys === 'inch' ? 2 : 1); },
+  chaindrive(v, sys, rows) {
+    const p = dcRow(rows, 'Chain pitch'), ce = dcRow(rows, 'Centre distance for the even length');
+    return dcTwoWheels(dcRow(rows, 'Pitch diameter, driving sprocket'), dcRow(rows, 'Pitch diameter, driven sprocket'), ce, sys, rows, 'chain', sys === 'inch' ? 3 : 2, p);
+  },
+
+  // Compression spring: side view to scale, the coils as a zig-zag of the wire, with the solid length marked.
+  spring(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys), dp = sys === 'inch' ? 3 : 2;
+    const d = v.d, od = v.od, nt = dcRow(rows, 'Total coils'), ls = dcRow(rows, 'Solid length');
+    if (!dcOk(d) || !dcOk(od) || !dcOk(nt) || !dcOk(ls) || !(od > 2 * d)) return '';
+    const lf = dcOk(v.lf) && v.lf > ls ? v.lf : ls * 1.6, known = dcOk(v.lf) && v.lf > ls;
+    const sc = Math.min(330 / lf, 130 / od), x0 = 40, cy = 118, L = lf * sc, r = od / 2 * sc, w = Math.max(1.5, d * sc);
+    // One zig-zag per coil: the wire seen from the side crosses from top to bottom and back.
+    const n = Math.max(2, Math.round(nt)), step = (L - w) / n; let p = 'M' + (x0 + w / 2).toFixed(1) + ' ' + (cy + r - w / 2).toFixed(1);
+    for (let i = 0; i < n; i++) p += 'L' + (x0 + w / 2 + step * (i + 0.5)).toFixed(1) + ' ' + (cy - r + w / 2).toFixed(1) + 'L' + (x0 + w / 2 + step * (i + 1)).toFixed(1) + ' ' + (cy + r - w / 2).toFixed(1);
+    let h = '<path d="' + p + '" fill="none" stroke="currentColor" stroke-width="' + w.toFixed(1) + '" stroke-linejoin="round" stroke-linecap="round" class="part" style="fill:none"/>';
+    h += DK.line(x0 - 6, cy - r - 8, x0 - 6, cy + r + 8, 'tool') + DK.line(x0 + L + 6, cy - r - 8, x0 + L + 6, cy + r + 8, 'tool');
+    h += DK.cl(x0 - 14, cy, x0 + L + 14, cy);
+    h += DK.dimH(x0, x0 + L, cy + r + 34, (known ? 'free length ' + dcN(lf, dp) + ' ' + u : 'free length not entered'), { from: cy + r });
+    h += DK.dimH(x0, x0 + ls * sc, cy + r + 62, 'solid ' + dcN(ls, dp) + ' ' + u, { from: cy + r });
+    h += dcDimV(cy - r, cy + r, x0 + L + 36, 'OD ' + dcN(od, dp), { from: x0 + L + 6 });
+    const k = rows.find(q => q.label === 'Spring rate k');
+    h += dcLines(x0 + L + 78, cy - 30, ['wire ' + dcN(d, dp) + ' ' + u, dcN(nt, 1) + ' coils in all', k && isFinite(k.value) ? 'rate ' + dcN(k.value, sys === 'inch' ? 2 : 3) + ' ' + k.unit : '']);
+    return DK.svg(W, H, h, 'Side view of a compression spring between two flat faces: free length, solid length, outside diameter');
+  },
+
+  // Prismoidal formula: a tapering solid in side view (not to scale) with the two end faces and the halfway section.
+  prismoid(v, sys, rows) {
+    const W = 520, H = 230, u = dcU(sys), V = dcRow(rows, 'Volume');
+    if (!dcOk(V) || !dcOk(v.h)) return '';
+    // Half-widths in proportion to the square roots of the areas (layout only), so the larger face is drawn wider.
+    const big = Math.max(v.a1, v.am, v.a2) || 1, hw = a => Math.max(12, 130 * Math.sqrt(Math.max(0, a) / big));
+    const cx = 200, yT = 40, yB = 170, yM = (yT + yB) / 2, wT = hw(v.a2), wB = hw(v.a1), wM = hw(v.am);
+    let h = DK.poly([[cx - wB, yB], [cx + wB, yB], [cx + wM, yM], [cx + wT, yT], [cx - wT, yT], [cx - wM, yM]], 'part');
+    h += DK.line(cx - wM, yM, cx + wM, yM, 'ghost');
+    h += DK.text(cx, yT - 8, 'A2 = ' + dcN(v.a2) + ' ' + u + '²', { cls: 'txt' }) + DK.text(cx, yM - 6, 'Am = ' + dcN(v.am) + ' ' + u + '²', { cls: 'txt' }) + DK.text(cx, yB + 18, 'A1 = ' + dcN(v.a1) + ' ' + u + '²', { cls: 'txt' });
+    h += dcDimV(yT, yB, cx + 170, 'h ' + dcN(v.h), { from: cx + Math.min(wT, wB) });
+    h += dcLines(cx + 216, yM - 8, ['halfway section', 'at h / 2', 'not to scale']);
+    return DK.svg(W, H, h, 'Side view of a tapering solid: end face A1, halfway section Am, end face A2, distance h between the end faces');
+  },
+
+  // Tank contents: end view of a lying cylinder with the liquid as a segment, or side view of a standing one. To scale.
+  tankvol(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys), pc = dcRow(rows, 'Full');
+    if (!dcOk(v.d) || !dcOk(v.l) || !(v.h >= 0) || !dcOk(pc + 1)) return '';
+    let h = '';
+    if (v.orient === 1) {
+      const sc = Math.min(150 / v.d, 170 / v.l), w = v.d * sc, ht = v.l * sc, x0 = 190 - w / 2, yB = 215, lev = v.h * sc;
+      if (lev > 0) h += DK.rect(x0, yB - lev, w, lev, 'hatch');
+      h += DK.rect(x0, yB - ht, w, ht, 'part') .replace('class="part"', 'class="part" style="fill:none"');
+      h += DK.dimH(x0, x0 + w, yB + 22, 'diameter ' + dcN(v.d) + ' ' + u, { from: yB });
+      h += dcDimV(yB - lev, yB, x0 + w + 34, 'depth ' + dcN(v.h), { from: x0 + w });
+      h += dcDimV(yB - ht, yB, x0 - 34, 'height ' + dcN(v.l), { from: x0 });
+    } else {
+      const r = Math.min(85, 85), sc = r / (v.d / 2), cx = 190, cy = 118, lev = v.h * sc, yL = cy + r - lev;
+      const half = Math.sqrt(Math.max(0, r * r - (yL - cy) * (yL - cy)));   // layout only: where the liquid surface meets the wall
+      if (lev > 0 && lev < 2 * r) h += DK.path('M' + (cx - half).toFixed(1) + ' ' + yL.toFixed(1) + 'A' + r + ' ' + r + ' 0 ' + (lev > r ? 1 : 0) + ' 0 ' + (cx + half).toFixed(1) + ' ' + yL.toFixed(1) + 'Z', 'hatch');
+      else if (lev >= 2 * r) h += DK.circle(cx, cy, r, 'hatch');
+      h += DK.circle(cx, cy, r, 'thin');
+      h += DK.dimH(cx - r, cx + r, cy + r + 26, 'diameter ' + dcN(v.d) + ' ' + u, { from: cy });
+      h += dcDimV(yL, cy + r, cx + r + 34, 'depth ' + dcN(v.h), { from: cx });
+      h += dcLines(cx + r + 90, cy - 30, ['end view', 'length ' + dcN(v.l) + ' ' + u]);
+    }
+    h += dcLines(380, 200, [dcN(pc, 1) + ' % full']);
+    return DK.svg(W, H, h, 'A cylindrical tank with flat ends and the liquid in it: diameter, depth of liquid, length');
+  },
+
+  // Chamfer mill on an outside edge, section view to scale: tip depth below the top face and centre distance from the wall.
+  chamfermill(v, sys, rows) {
+    const W = 520, H = 260, u = dcU(sys);
+    const z = dcRow(rows, 'Tip below the top face'), x0 = dcRow(rows, 'Tool centre out from the wall'), hh = dcRow(rows, 'Chamfer depth down the wall'), dt = dcRow(rows, 'Cutting diameter at the top');
+    if (!dcOk(z) || !dcOk(hh) || !dcOk(dt) || !dcOk(v.w) || !(x0 >= 0)) return '';
+    const tip = v.tip > 0 ? v.tip : 0, t = Math.tan(dcRad(v.ang / 2));
+    const rmax = v.d > dt ? v.d / 2 : dt / 2 * 1.25, hc = (rmax - tip / 2) / t, tot = Math.max(hc * 1.4, z * 1.25);
+    const sc = Math.min(165 / tot, 200 / (2 * rmax)), ax = 330, ty = 205, topY = ty - z * sc, wallX = ax - x0 * sc;
+    let h = DK.poly([[40, topY], [wallX - v.w * sc, topY], [wallX, topY + hh * sc], [wallX, 240], [40, 240]], 'part');
+    h += DK.poly([[ax - tip / 2 * sc, ty], [ax + tip / 2 * sc, ty], [ax + rmax * sc, ty - hc * sc], [ax + rmax * sc, ty - tot * sc], [ax - rmax * sc, ty - tot * sc], [ax - rmax * sc, ty - hc * sc]], 'tool');
+    h += DK.cl(ax, ty - tot * sc - 10, ax, ty + 12);
+    h += dcDimV(topY, ty, ax + rmax * sc + 34, 'Z ' + dcN(z), { from: ax });
+    h += DK.dimH(wallX, ax, ty + 30, dcN(x0), { from: ty });
+    h += DK.dimH(wallX - v.w * sc, wallX, topY - 16, 'w ' + dcN(v.w), { from: topY });
+    h += dcLines(44, topY + 26, ['part']) + dcLines(40, 22, ['section through the edge, to scale, ' + u, 'the cutting is done on the cone, clear of the tip']);
+    return DK.svg(W, H, h, 'Chamfer mill cutting a chamfer on an outside edge: depth of the tip below the top face and distance of the tool centre from the wall');
+  },
+
+  // Taper pin: side view to scale, large end on the left.
+  taperpin(v, sys, rows) {
+    const W = 520, H = 220, u = dcU(sys), dp = sys === 'inch' ? 4 : 3;
+    const D = dcRow(rows, 'Large end diameter (basic)'), d = dcRow(rows, 'Small end diameter at this length'), L = v.l;
+    if (!dcOk(D) || !dcOk(d) || !dcOk(L)) return '';
+    const sc = Math.min(330 / L, 80 / D), x0 = 80, cy = 96, len = L * sc, R = D / 2 * sc, r = d / 2 * sc;
+    let h = DK.poly([[x0, cy - R], [x0 + len, cy - r], [x0 + len, cy + r], [x0, cy + R]], 'part');
+    h += DK.cl(x0 - 16, cy, x0 + len + 16, cy);
+    h += dcDimV(cy - R, cy + R, x0 - 30, 'D ' + dcN(D, dp), { from: x0 });
+    h += dcDimV(cy - r, cy + r, x0 + len + 30, 'd ' + dcN(d, dp), { from: x0 + len });
+    h += DK.dimH(x0, x0 + len, cy + R + 34, 'length ' + dcN(L, sys === 'inch' ? 3 : 2) + ' ' + u, { from: cy + R });
+    h += dcLines(x0, cy + R + 70, ['taper 1/4 in per foot on the diameter, drawn to scale']);
+    return DK.svg(W, H, h, 'Side view of a taper pin: large end diameter D, small end diameter d, length');
   },
 
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).

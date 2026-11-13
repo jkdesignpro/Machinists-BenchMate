@@ -4,6 +4,91 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-12
+Stage 4 of the plan, part 1: book references, in seventeen batches. Built on top of 0.5.0. The book audit (docs/parity-audit.md) stands at 367 done, 181 partial and 48 missing of 596 in-scope rows, 62 %; the target of 90 % is carried on in 0.7.0 and 0.8.0.
+
+### Added (springs, belts and chains)
+- New tool **Compression spring: rate, load and stress** (Reference > Machine elements): from the wire diameter, outside diameter, active coils and the kind of ends it gives the spring rate, spring index, Wahl stress factor, total coils, solid length and pitch, and the load and shear stress at solid, for a load or at a length, with the spring drawn to scale. Modulus of rigidity from two spring makers (two materials from one maker, marked), or your own. Checked against a published worked example.
+- New tool **Belt drive: length, ratio and wrap**: the exact length of an open belt and the usual short formula, or the centre distance a belt of a known length gives, with the speed ratio, driven speed, belt speed and the wrap on each pulley, drawn to scale. Two published examples are reproduced.
+- New tool **Roller chain drive: length and sprockets**: ANSI chain No. 25 to No. 240 or your own pitch; chain length in pitches rounded up to an even number, the centre distance that length needs, sprocket pitch diameters, ratio, driven speed and wrap, with notes when the centre distance is outside 30 to 50 pitches, the wrap is under 120° or the small sprocket has few teeth.
+- Eight entries in the formula library.
+
+### Added (machine tapers)
+- **Machine tapers** has two more families: **Jarno** No. 2 to 20 (two publishers print the same table and a third the rule behind it: large end N/8 in, small end N/10 in, length N/2 in) and **Brown & Sharpe** No. 1 to 18. For Brown & Sharpe the two publishers print the same small ends but different plug lengths, and so different large ends, for No. 4, 5, 7, 9, 10 and 11: both are shown with "Sources differ". No. 16 to 18 and the taper per foot come from one publisher and say so.
+
+### Added (gauges, pins, gear cutters)
+- New page **Sheet metal and wire gauges** (Shop maths > Stock and sheet metal): what a gauge number is in inches and mm for steel (Manufacturers' Standard), galvanized, stainless and aluminium sheet and the US Standard gauge, and for wire the American wire gauge (worked out from its rule), the British Standard Wire Gauge and the tube wall and strip series. Each table value is shown as two publishers print it; the three places where they differ show both.
+- New tool **Taper pins (inch series)** (Reference > Machine elements): No. 7/0 to No. 14, large end with commercial and precision limits, and the small end diameter for the length of the pin, with a drawing. The sizes come from one supplier's sheet of the standard and say so.
+- **Spur gear data** shows the number of the involute form cutter (set of eight) for each gear: the diametral pitch series in inch mode, the module series, which is numbered the other way round, in mm mode.
+
+### Added (fasteners)
+- New page **Fasteners guide** (Reference > Guides): thread engagement (the rule of thumb from two sources, with a drawing), why fasteners come loose and ten ways of locking them, safety wire (drawing), set screw points (eight, with a drawing), screw heads (eleven) and drives (six), self-tapping screws (thread-forming against thread-cutting, seven kinds), pins (seven kinds, with a drawing), retaining rings (seven kinds), and British fasteners (Whitworth, BSF, BA, BSP, the cycle thread and how the spanners are marked). Eight sections, four drawings, 21 public sources from 13 publishers. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Pilot hole sizes for tapping screws, retaining ring grooves and head dimensions are not in yet.
+
+### Added (drives and maintenance)
+- New page **Drives and maintenance guide** (Reference > Guides): electric motors (stator and rotor, synchronous speed and slip with a drawing, a nameplate read field by field in fourteen rows), shaft alignment with dial indicators (offset and angle, soft foot, rim and face against reverse dial with a drawing, bracket sag, the check on the readings, thermal growth, one source's tolerance table), fluid power (force of a cylinder, the parts of a hydraulic circuit with a block diagram, pumps, hydraulics against pneumatics, air preparation, nine kinds of tube and hose fitting and how each seals), and machine vibration (severity zones A to D with a drawing, the zone boundaries for two machine groups, what a vibration points to). Four sections, four drawings, 16 public sources from 13 publishers. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". The vibration limits were read from two web pages about the ISO standards, not from the standards, and the page says so.
+
+### Added (machine elements)
+- New page **Machine elements guide** (Reference > Guides): friction (the laws, static and kinetic, a table of ten pairs with each source's coefficients; drawing), backlash in gears and screws (why it is needed, how it is made and shared, anti-backlash gears, compensation; drawing), gear materials with heat treatment and hardness, cams and followers (four kinds of cam, six terms, a drawing of a plate cam with its displacement diagram), plain bearings (forms, materials, PV limits, shaft, clearance and press fit), and leadscrews against ball screws (efficiency, self-locking, back-driving, preload, rolled and ground). Six sections, three drawings, 17 public sources from 11 publishers. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Where the friction tables and the leadscrew efficiencies differ, each figure is shown with its source.
+
+### Added (special processes and finishing)
+- New page **Special processes and finishing guide** (Reference > Guides): water jet, laser, plasma and flame cutting of plate (what each cuts, heat-affected zone, thickness quoted source by source; drawing of an abrasive water jet head), sinker, wire and hole drilling EDM, ultrasonic machining (drawing), abrasive flow, electron beam and photochemical machining, polishing and buffing with a table of compounds, wire brushes, black oxide, phosphate and chromate conversion coatings, anodising Types I to III and how much the part grows (drawing), decorative and hard chrome, zinc, cadmium, nickel and electroless nickel plating, hydrogen embrittlement, and thermal spraying. Eight sections, three drawings, 34 public sources from 24 publishers. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Seven points where the sources differ show each figure with its source.
+
+### Added (drawings and weld symbols)
+- New page **Drawings and weld symbols guide** (Reference > Guides): detail and assembly drawings and the parts list, ISO and ANSI sheet sizes, the title block, scales, nine line types (drawing of samples), first and third angle projection with the symbol of each (drawing), sections and hatching, welding symbols read the AWS A2.4 way and what ISO 2553 does differently (drawing of a symbol with its parts named), CAD file formats, model-based definition, and a table of thirteen drawing standards. Eight sections, three drawings, 26 public sources from 21 publishers. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Two points where the sources differ show both sides.
+
+### Added (abrasive processes)
+- New page **Abrasive processes guide** (Reference > Guides): the grinding ratio and spark-out, centerless grinding (why the work sits above centre, through-feed, infeed and end-feed, lobing; drawing of the wheels, blade and work), honing and its crosshatch (drawing), lapping with a lap softer than the work and flatness in light bands (drawing), diamond and CBN wheels (what each grinds, concentration, the shape code), belt grinding on a contact wheel, platen or slack belt, cut-off wheels, and mounted points. Seven sections, three drawings, 21 public sources from 14 publishers. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Five points where the sources differ show both sides.
+
+### Added (bearings and seals)
+- New page **Bearings and seals guide** (Reference > Guides): what each rolling bearing type carries, how to read a bearing number with its type code, series, bore number and suffixes (drawing of 6205-2RS C3 taken apart), tolerance classes (ISO, DIN and ABEC side by side), which ring gets the tight fit with the tolerance classes the sources name, mounting cold and with heat (drawing of the right and the wrong way to press), what a radial shaft seal asks of the shaft and the housing, and the threadlocker colours. Seven sections, three drawings, 20 public sources. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Four points where the sources differ show both figures.
+
+### Added (cutting tools)
+- New page **Cutting tools guide** (Reference > Guides): sixteen kinds of milling cutter with where the teeth are and what each is for, the tool materials from high speed steel to diamond with a ranking drawing, hardness and temperature figures and what each must not cut, the parts of a twist drill with a drawing, files (cuts, grades, shapes, filing practice and care), broaches (runs of teeth, rise per tooth, pitch, chip breakers, push and pull, rotary broaching) and boring tools with their overhang limits and what to do against chatter. Six sections, five drawings, 16 public sources. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Four points where the sources differ show both sides.
+
+### Added (measurement)
+- New page **Measurement guide** (Reference > Guides): the ways a tolerance is written (limits, unilateral, equal and unequal bilateral) with a drawing of the zones, the ten preferred metric fits on the hole and the shaft basis with what each is for, surface plate grades, flatness, care, support and calibration, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout with V-blocks and a dial indicator, and the surface texture and lay symbols on a drawing. Six sections, three drawings, 19 public sources. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Three points where the sources differ show both figures.
+
+### Added (materials)
+- New page **Materials guide** (Reference > Guides): how to read what is stamped on the bar and printed on the certificate. SAE and AISI steel numbers with a table of 17 common series, low, medium and high carbon steel, tool steel letters with an example grade for each group, the five stainless steel families, four cast irons, aluminium alloy series and tempers (F, O, H, W, T, the H digits, T1 to T10, T651 and the other stress-relief codes), copper alloy tempers (H00 to H10, annealed, grain size and as-manufactured tempers), titanium grades, magnesium alloy names, nickel alloy families, zinc die casting alloys, how the Brinell, Rockwell, Vickers, Knoop, Leeb, Shore and Mohs tests work, eight forms of corrosion, and the four EN 10204 certificate types with what to check on a mill certificate. Ten sections, three drawings, 37 public sources. Every statement shows its source keys, and one with fewer than two independent publishers is marked "to be verified". Six points where the sources differ show both figures, among them the carbon ranges and the angle of the Vickers pyramid.
+
+### Added (shop tools)
+- New page **Shop tools guide** (Reference > Guides): sharpening a twist drill by hand and what each grinding fault does to the hole, grinding a lathe tool bit, hacksaw and band saw blades with blade break-in and a fault table, hole saw speeds for four diameters from two charts side by side, carbide burr cuts and speeds, choosing between neat oil, emulsion, semi-synthetic and synthetic fluid, and grinding wheel shapes, dressing and truing. Eight sections, three drawings, 18 public sources. Where two charts or suppliers give different figures both are shown.
+
+### Added (CNC lathe and glossary)
+- New page **CNC lathe guide** (Reference > Guides): the machine, eight ways to hold the work and when a collet beats a chuck, bar work with a puller or a feeder, the common tools and insert shapes, speeds and feeds, the toolpaths in the order they are run with the Haas cycle for each, parting off (centre height, overhang, feed near the centre, coolant) and live tools with the C axis. Nine sections, four drawings, nine public sources. Four points where the sources give different figures show both.
+- New page **Glossary** (Reference > Guides): 108 shop and CNC words in plain language with a search box. 97 of them link to the page that explains the term.
+- **Workholding guide**: an eleventh section, from a tenth source, on a flange of spare stock for the clamps, angle plates, dowel pins and shoulder bolts for two-sided plate parts, and several parts from one bar. These come from one source and are marked "to be verified".
+
+### Added (milling toolpaths and workholding)
+- New page **Milling toolpath guide** (Reference > Guides): how a part gets from the model to G-code, what 2D, 3D and 3+2 mean, the words every toolpath uses (stepover, stepdown, stock to leave, lead-in), a drawing and table of which toolpath suits which feature, contours with cutter compensation and a worked G41 example, pockets and slots with the ways in (helix, ramp, plunge), chamfer and radius milling, spot, drill and tap, the 3D toolpaths and when each suits, rest machining, pencil passes and 3D tolerances. Twelve sections, three drawings, seven public sources; every statement shows its source keys, and one with a single publisher is marked "to be verified".
+- New page **Workholding guide** (Reference > Guides): rules that hold for every setup, the vise and its accessories, aligning a vise, jaw types, making and using soft jaws, squaring a block in six steps, step clamps and fixture plates, thin parts with vacuum, tape and glue, round parts and many parts. Ten sections, two drawings, nine public sources. Where two sources disagree (the heel height of a step clamp) both are shown.
+- New tool **Chamfer mill** (Milling > Other milling): from the chamfer width, the tool angle and the tip flat, the Z depth of the tip, how far the tool centre runs out from the wall, the cutting diameter to work the speed out from, and the widest chamfer the cutter reaches, with a drawing to scale.
+
+### Fixed
+- `docs/feature-parity.md` gave the size of the formula library as 177; the count had been carried forward from an old figure. The library holds 312 entries.
+
+### Added (CNC mill setup)
+- New page **CNC mill setup guide** (Reference > Guides): from a cold machine to a proven first part. The order of work, power on and homing, the keys of the control and what they do, loading tools, four ways to measure a tool length (on the part with paper or a feeler, on a 1-2-3 block, on a tool setting probe, true length from the spindle nose) and what each puts in the work offset Z, the work offset in X and Y with an edge finder or an indicator, loading the program, running it the first time, adjusting for size, shutting down. Three drawings. Written from 13 public sources; every statement shows its sources, and one that rests on a single publisher is marked "to be verified". Key names are those of the Haas control, which the public guides describe.
+- **CNC knowledge guide**: inch and millimetre (G20, G21), a table of the special characters in a program, spindle direction (M03, M04) with a drawing, constant surface speed (G96, G97) and its speed limit, and what chip load means.
+
+### Added (shop maths)
+- New tool **Prismoidal formula** (Shop maths > Geometry): volume of a tapering solid from its two end faces and the section halfway.
+- New tool **Tank contents**: litres and gallons in a cylindrical tank with flat ends, lying or standing, from the depth of liquid, with a drawing.
+- New page **Irregular area from equally spaced widths**: the trapezoidal rule and Simpson's rule, checked against three published examples.
+- **Areas and volumes**: a circle shows the side of the square of equal area, a square the diameter of the circle of equal area.
+- **Calculator**: sec, csc, cot, versin (versed sine), coversin and exsec.
+- **Taper** (from Advanced mode): tailstock set-over for a taper turned between centres.
+
+### Changed
+- **Taper**: the half angle is worked out in the core, as every other result is.
+
+### Added (units and symbols)
+- **Unit converter**: acceleration, rotational speed, dynamic viscosity and kinematic viscosity (factors from the exact definitions in NIST SP 811, checked against its printed values).
+- New tab **Prefixes and symbols** on the Unit and fraction conversion page: the 24 SI prefixes, the seven defining constants of the SI and the Greek alphabet with what each letter stands for in BenchMate's formulas. Every entry is printed the same by two publishers.
+
+### Changed
+- `docs/parity-audit.md` recounted against the app after 0.5.0: 76 rows that were still marked missing from the first audit are corrected. Nine more rows that the app already covered (unit converter, surface texture, stock weight, j and J fits) are corrected in the third batch.
+
 ## [0.5.0] - 2026-11-12
 Stage 3 of the plan: the extras. Built on top of 0.4.0.
 

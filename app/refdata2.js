@@ -123,6 +123,8 @@ async function renderWhitworth(el) {
 const TAPER_FAMILIES = {
   morse: { title: 'Morse tapers', fields: [['d_gauge_in', 'Gauge (large end) diameter', 'in'], ['small_in', 'Small end diameter', 'in'], ['length_in', 'Length', 'in'], ['tpf_in', 'Taper per foot', 'tpf']], prefix: 'MT' },
   jacobs: { title: 'Jacobs (drill chuck) tapers', fields: [['large_in', 'Large end diameter', 'in'], ['small_in', 'Small end diameter', 'in'], ['length_in', 'Length', 'in']], prefix: 'JT' },
+  jarno: { title: 'Jarno tapers', fields: [['large_in', 'Large end diameter', 'in'], ['small_in', 'Small end diameter', 'in'], ['length_in', 'Length', 'in'], ['tpf_in', 'Taper per foot', 'tpf']], prefix: 'No.' },
+  brownsharpe: { title: 'Brown & Sharpe tapers', fields: [['large_in', 'Large end diameter', 'in'], ['small_in', 'Small end diameter', 'in'], ['length_in', 'Length', 'in'], ['tpf_in', 'Taper per foot', 'tpf']], prefix: 'No.' },
   steep724: { title: '7:24 steep tapers (ISO 7388-1 / SK, BT, CAT)', fields: [], prefix: '' },
   hsk: { title: 'HSK hollow taper shanks (ISO 12164-1), form A', fields: [['d2_mm', 'Taper diameter d2', 'mm'], ['l1_mm', 'Shank length l1', 'mm']], prefix: 'HSK-A' },
   r8: { title: 'R8 collet', fields: [['angle', 'Included angle', 'deg'], ['body_in', 'Body (locating) diameter', 'in'], ['drawbar', 'Drawbar thread', 'text']], prefix: '' },
@@ -161,4 +163,40 @@ async function renderMachineTapers(el) {
   }
   $('#tsrc', el).innerHTML = '<b>Sources</b><br>' + sourceList(T.sources);
   tf.onchange = upd; upd();
+}
+
+// ------------------------------------------------------------------ sheet metal and wire gauges
+const GAUGE_FAMILIES = {
+  sheet: { title: 'Sheet metal gauges', fields: [['steel_in', 'Steel sheet (Manufacturers\' Standard)'], ['galv_in', 'Galvanized steel'], ['stainless_in', 'Stainless steel'], ['alu_in', 'Aluminium (Brown & Sharpe)'], ['usstd_in', 'US Standard gauge']] },
+  wire: { title: 'Wire gauges', fields: [['awg', 'AWG (American, Brown & Sharpe)'], ['swg_in', 'SWG (British Standard)'], ['tube_in', 'Steel tube wall and strip']] },
+};
+// Gauge label to the n of the AWG rule: 0 is 0, 2/0 is -1, 3/0 is -2, 4/0 is -3. The diameter itself comes from the core.
+const awgN = size => { const m = /^(\d)\/0$/.exec(size); return m ? 1 - Number(m[1]) : Number(size); };
+
+async function renderGauges(el) {
+  const R = await loadRef(el); if (!R) return;
+  const W = state.W, G = R.gauges; if (!G) { el.textContent = 'Gauge data not built.'; return; }
+  const m = RMEM.gauges || (RMEM.gauges = { fam: 'sheet' });
+  const fams = Object.keys(GAUGE_FAMILIES).filter(f => G.families[f] && G.families[f].length);
+  el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f"><span>Gauge system</span><div class="row"><select id="gf">' + fams.map(f => '<option value="' + f + '">' + rEsc(GAUGE_FAMILIES[f].title) + '</option>').join('') + '</select></div></label></div>' +
+    '<div id="gres"></div><div class="note" id="gnote"></div><div class="note" id="gsrc"></div>';
+  const gf = $('#gf', el); gf.value = fams.includes(m.fam) ? m.fam : fams[0];
+  function upd() {
+    m.fam = gf.value;
+    const F = GAUGE_FAMILIES[gf.value], rows = G.families[gf.value];
+    const cell = c => {
+      if (!c) return '<td class="v">-</td>';
+      const alt = c.groups.length > 1 ? '<br><span class="ms">also ' + c.groups.slice(1).map(g => rEsc(g.printed[0])).join(', ') + '</span>' : '';
+      return '<td class="v" title="' + rEsc(groupsTitle(G.sources, c.groups)) + '">' + fBoth(c.value * IN_MM) + '<br>' + badge(c.status) + alt + '</td>';
+    };
+    const awg = size => {
+      const d = W.awg_dia_in(awgN(size));
+      return Number.isFinite(d) && awgN(size) <= 40 ? '<td class="v">' + fBoth(d * IN_MM) + '<br><span class="ms">by the rule</span></td>' : '<td class="v">-</td>';
+    };
+    $('#gres', el).innerHTML = '<div class="res mtab"><table><tr><th>Gauge</th>' + F.fields.map(f => '<th>' + rEsc(f[1]) + '</th>').join('') + '</tr>' +
+      rows.map(r => '<tr><td style="white-space:nowrap"><b>' + rEsc(r.size) + '</b></td>' + F.fields.map(f => f[0] === 'awg' ? awg(r.size) : cell(r[f[0]])).join('') + '</tr>').join('') + '</table></div>';
+    $('#gnote', el).innerHTML = rEsc(G.notes[gf.value] || '');
+  }
+  $('#gsrc', el).innerHTML = '<b>Sources</b><br>' + sourceList(G.sources) + '<br>AWG rule: Wikipedia, American wire gauge (after ASTM B258); RapidTables, wire gauge chart; Omni Calculator, wire gauge.';
+  gf.onchange = upd; upd();
 }
