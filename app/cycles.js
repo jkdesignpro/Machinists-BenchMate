@@ -586,10 +586,20 @@ function renderG71Cycle(el) {
     { k: 'fr', label: 'Roughing feed', unit: () => feedRevU(state.sys) }, { k: 'ff', label: 'Finishing feed (G70)', unit: () => feedRevU(state.sys) },
     { k: 'cl', label: 'Clearance', unit: cyU }, { k: 'ns', label: 'First profile block number (N)', unit: '' },
     ...spindleFields, rapidField,
-    { k: 'prof', label: 'Profile points from the front: diameter and Z on each line (straight lines only; no undercuts)', area: 6 }];
+    { k: 'prof', label: 'Profile points from the front: diameter and Z on each line; add G02 R.. or G03 R.. to reach a point by an arc (no undercuts)', area: 6 }];
   cyScreen(el, 'g71', defs, fields, s => {
-    const v = numsFrom(s.prof);
-    if (v.length % 2 || v.length < 4) throw new Error('Profile: enter at least two points, a diameter and a Z on each line.');
-    return { cycle: CYC.G71, lathe: true, params: [...cyHead(s, !cyInch()), +s.internal, snum(s.stock), snum(s.doc), snum(s.ret) || 0, snum(s.u) || 0, snum(s.w) || 0, snum(s.fr), snum(s.ff), snum(s.cl), snum(s.ns), ...spParams(s), v.length / 2, ...v] };
+    // Each line: diameter, Z, and optionally G02 or G03 with R (the arc that reaches this point).
+    const v = [], seg = [];
+    String(s.prof || '').split(/\n/).map(l => l.trim()).filter(Boolean).forEach((l, i) => {
+      const g = l.match(/\bG0?([23])\b/i), r = l.match(/\bR\s*(-?\d*\.?\d+)/i);
+      const nums = l.replace(/\bG0?[0-9]+\b/ig, ' ').replace(/\bR\s*-?\d*\.?\d+/ig, ' ').match(/-?\d*\.?\d+(?:e-?\d+)?/ig) || [];
+      if (nums.length !== 2) throw new Error('Profile line ' + (i + 1) + ': a diameter and a Z (and, for an arc, G02 or G03 with R).');
+      if (!g !== !r) throw new Error('Profile line ' + (i + 1) + ': an arc needs both G02 or G03 and its radius R.');
+      if (r && !(+r[1] > 0)) throw new Error('Profile line ' + (i + 1) + ': the arc radius R must be more than 0.');
+      if (g && i === 0) throw new Error('Profile line 1 is the start point; an arc can only lead to a later point.');
+      v.push(+nums[0], +nums[1]); seg.push(g ? +g[1] : 0, r ? +r[1] : 0);
+    });
+    if (v.length < 4) throw new Error('Profile: enter at least two points, a diameter and a Z on each line.');
+    return { cycle: CYC.G71, lathe: true, params: [...cyHead(s, !cyInch()), +s.internal, snum(s.stock), snum(s.doc), snum(s.ret) || 0, snum(s.u) || 0, snum(s.w) || 0, snum(s.fr), snum(s.ff), snum(s.cl), snum(s.ns), ...spParams(s), v.length / 2, ...v, ...seg] };
   }, (s, res) => res.ok ? '<div class="res" style="margin-bottom:10px">' + stable('Roughing model', [['Roughing levels', String(res.table.length), '']]) + '</div>' : '');
 }

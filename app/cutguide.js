@@ -309,7 +309,7 @@ function renderCutGuide(el) {
     cgP('<b>Balance.</b> The force from a given imbalance rises steeply with speed, so the small, fast tools need balanced, accurate holders.', ['BIG_MICRO']) +
     cgP('<b>Coolant.</b> Mist is often preferred: a flood can push small tools and parts aside, and chips must not be recut.', ['CCB_MICRO']) +
     cgP('<b>Measuring.</b> A toolmaker\'s microscope or a vision system; a micrometer is impractical on tiny parts.', ['CCB_MICRO']) +
-    cgP('Micro drill sizes #98 to #107 are in the <a href="#/t/drills">drill chart</a>.', null) +
+    cgP('Micro drill sizes #98 to #107 are in the <a href="#/t/drillchart">drill chart</a>.', null) +
 
     '<h2 id="cg-src">Sources</h2><ul class="gsl">' + Object.entries(CG_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
     '<p class="desc">Full URLs and access dates are in docs/sources.md, "Cutting tools guide". No text, figures or tables were copied from the sources.</p>';

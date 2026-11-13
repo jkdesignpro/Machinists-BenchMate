@@ -274,7 +274,39 @@ fn sp_css(metric: bool) -> Spindle { Spindle { css: true, v: if metric { 180.0 }
 fn g71job(ctrl: Ctrl) -> G71Job {
     G71Job { metric: true, ctrl, prog: 7001, tool: 1, internal: false, stock_dia: 50.0,
         profile: vec![(20.0, 0.0), (24.0, -2.0), (24.0, -15.0), (36.0, -15.0), (40.0, -17.0), (40.0, -40.0)],
-        doc: 2.0, retract: 0.5, u: 0.4, w: 0.1, f_rough: 0.25, f_finish: 0.1, clear: 2.0, n_start: 100, sp: sp_css(true) }
+        segs: vec![], doc: 2.0, retract: 0.5, u: 0.4, w: 0.1, f_rough: 0.25, f_finish: 0.1, clear: 2.0, n_start: 100, sp: sp_css(true) }
+}
+#[test] fn g71_arcs() {
+    // A 2 mm corner radius from D24 Z-13 to D28 Z-15 (convex, G03 in the G18 view) and a 2 mm
+    // chamfer-like fillet (G02) into the D40 shoulder face.
+    let mut j = g71job(Ctrl::Generic);
+    j.profile = vec![(20.0, 0.0), (24.0, -2.0), (24.0, -13.0), (28.0, -15.0), (36.0, -15.0), (40.0, -17.0), (40.0, -40.0)];
+    j.segs = vec![(0, 0.0), (0, 0.0), (0, 0.0), (2, 2.0), (1, 0.0), (0, 0.0), (0, 0.0)];
+    let p = gen_g71(&j);
+    assert!(p.error.is_none(), "{:?}", p.error);
+    assert!(p.text.contains("G02 X28. Z-15. R2.") || p.text.contains("G02 X28.0 Z-15.0 R2.0") || p.text.contains("G02 X28 Z-15 R2"), "{}", p.text);
+    assert!(p.text.contains("G01 X36"), "{}", p.text);
+    // The fillet's centre is in the air at (r 14, z -13); a quarter circle.
+    let (c, sw) = lathe_arc_centre((12.0, -13.0), (14.0, -15.0), 2.0, false).unwrap();
+    assert!((c.0 - 14.0).abs() < 1e-9 && (c.1 + 13.0).abs() < 1e-9, "{:?}", c);
+    assert!((sw - std::f64::consts::FRAC_PI_2).abs() < 1e-9);
+    // Too small a radius is refused; an arc that bulges back toward the front is refused.
+    j.segs[3] = (2, 1.0);
+    assert!(gen_g71(&j).error.is_some());
+    j.segs[3] = (3, 2.0);
+    assert!(gen_g71(&j).error.is_none(), "a G03 quarter round here is a convex corner and still rises toward the chuck");
+    // A half circle from D24 Z-13 to D24 Z-17 rises and falls again: an undercut, refused.
+    let mut k = g71job(Ctrl::Generic);
+    k.profile = vec![(20.0, 0.0), (24.0, -2.0), (24.0, -13.0), (24.0, -17.0), (40.0, -17.0), (40.0, -40.0)];
+    k.segs = vec![(0, 0.0), (0, 0.0), (0, 0.0), (2, 2.0), (0, 0.0), (0, 0.0)];
+    assert!(gen_g71(&k).error.is_some());
+    // The flat form gives the same program as the struct.
+    j.segs[3] = (2, 2.0);
+    let mut v = vec![1.0, 0.0, 7001.0, 1.0, 0.0, 50.0, 2.0, 0.5, 0.4, 0.1, 0.25, 0.1, 2.0, 100.0, 1.0, 180.0, 3000.0, 1200.0, 7.0];
+    for p in &j.profile { v.push(p.0); v.push(p.1); }
+    for s in &j.segs { v.push(s.0 as f64); v.push(s.1); }
+    let f = run_flat(cyc::G71, &v);
+    assert_eq!(f.text, gen_g71(&j).text);
 }
 #[test] fn g71_generic_mm() { golden("g71_generic_mm", &gen_g71(&g71job(Ctrl::Generic))); }
 #[test] fn g71_haas_mm() { golden("g71_haas_mm", &gen_g71(&g71job(Ctrl::Haas))); }

@@ -1402,7 +1402,7 @@ where = 'material card';
   c = await card('6082');
   if (!/No source with a composition table/.test(c.none) || c.rings) problems.push(`[${where}] 6082 has no composition yet and should say so: ${c.none.slice(0, 120)}`);
   const nComp = await page.evaluate(async () => (await (await fetch('data/materials.json')).json()).materials.filter(m => m.composition).length);
-  if (nComp !== 37) problems.push(`[${where}] grades with a composition: ${nComp}`);
+  if (nComp !== 40) problems.push(`[${where}] grades with a composition: ${nComp}`);
   await page.fill('#msearch', ''); await page.dispatchEvent('#msearch', 'input');
 }
 // Collet nut and pull stud torque: the maker's table by size, bore and nut, the 25 % ceiling from the core,
@@ -1996,7 +1996,7 @@ where = 'toolpaths';
   if (!/8 to 12 degrees/.test(g.all) || !/6 to 9 degrees/.test(g.all) || !/20 to 50 %/.test(g.all) || !/first 100 square inches/.test(g.all) || !/about 27 to 30 m\/min/.test(g.all) || !/12 000 to 18 000 against 4 000 to 10 000/.test(g.all)) problems.push(`[${where}] drill clearance, break-in, hole saw or burr figures are missing`);
   where = 'matguide';
   g = await guide('matguide');
-  if (g.h2 !== 18 || g.svgs !== 4 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,11,9,5' || g.srcs !== 64) problems.push(`[${where}] 18 sections, 4 drawings, 15 tables, 64 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 22 || g.svgs !== 4 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,11,9,5,6,17' || g.srcs !== 77) problems.push(`[${where}] 22 sections, 4 drawings, 17 tables, 77 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 77) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four digits', 'First digit', 'A letter in the middle', 'Low, medium and high carbon', 'W, O and A name the quench', 'Austenitic grades are not hardened', 'Two ways to strength', 'H tempers, second digit', 'T651 is', 'On extrusions a fourth digit', 'Grain size tempers', 'Titanium grade 5', 'The letters', 'The number in a ZA name', 'Rockwell scales', 'Vickers angle, sources differ', 'Check the heat number first'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2029,7 +2029,7 @@ where = 'toolpaths';
   if (!/40 plus the square of the diagonal in inches divided by 25/.test(g.all) || !/0\.210, 0\.420, 0\.605, 0\.815 and 1\.000 in/.test(g.all) || !/0\.08 mm TIR is 0\.04 mm/.test(g.all) || !/0\.05 mm TIR at 1500 rpm/.test(g.all) || !/at least 90 % of the range/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   where = 'cutguide';
   g = await guide('cutguide');
-  if (g.h2 !== 7 || g.svgs !== 5 || g.tabs !== '17,8,15,5,8,6' || g.srcs !== 16) problems.push(`[${where}] 7 sections, 5 drawings, tables of 16, 7, 14, 4, 7 and 5 rows, 16 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 8 || g.svgs !== 5 || g.tabs !== '17,8,15,5,8,6' || g.srcs !== 18) problems.push(`[${where}] 8 sections, 5 drawings, tables of 16, 7, 14, 4, 7 and 5 rows, 18 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 77) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Arbor or shank', 'Shell mills', 'Slab mill', 'Plunging', 'The tough end', 'The hardest', 'High speed steel, how hot', 'Carbide, how hot', 'CBN is used on cast iron', 'Diamond is for', 'Point angle', 'Parts. A file', 'Grades', 'Length counts', 'The push stroke cuts', 'Draw filing', 'Pinning', 'What a broach is', 'Three runs of teeth', 'Pitch. The tooth spacing', 'One pitch or several', 'Push broaches are worked', 'Starting hole', 'Overhang of a steel bar', 'Against chatter, first'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2272,7 +2272,7 @@ where = 'toolpaths';
   }
   where = 'threadguide';
   g = await guide('threadguide');
-  if (g.h2 !== 6 || g.svgs !== 2 || g.tabs !== '11,25' || g.srcs !== 12) problems.push(`[${where}] 6 sections, 2 drawings, tables of 10 and 24 rows, 12 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 8 || g.svgs !== 2 || g.tabs !== '11,25' || g.srcs !== 15) problems.push(`[${where}] 8 sections, 2 drawings, tables of 10 and 24 rows, 15 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 24) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Major diameter. The largest', 'Minor diameter. The smallest', 'Pitch diameter. The diameter', 'Pitch. The distance along', 'Crest and root', 'Thread angle. The angle between', 'Depth of thread', 'Lead. The distance the nut', 'On a single-start thread', 'ACME against square'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2302,7 +2302,7 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
-    if (links !== 'threaddata,wires,threadid,multistart,whitworth,pipethreads,acme,trapezoidal,buttress,unseries,unjunr,fastguide') problems.push(`[${where}] links to other pages: ${links}`);
+    if (links !== 'threaddata,wires,threadid,multistart,whitworth,pipethreads,acme,trapezoidal,buttress,unseries,unjunr,fastguide,threaddata') problems.push(`[${where}] links to other pages: ${links}`);
   }
   // Hexagon screws, nuts and washers: the published rows, both disagreements shown, the drawing, inch nuts.
   where = 'hexhw';
@@ -3026,13 +3026,68 @@ where = 'toolpaths';
   await page.selectOption('#cc', '2'); await page.dispatchEvent('#cc', 'change'); await page.selectOption('#cpln', 'meet');
   await page.fill('#ct1', '0.0003'); await page.fill('#ct2', '0.0002'); await page.dispatchEvent('#ct2', 'input'); await page.waitForTimeout(100);
   let t = await page.$eval('#cres', e => e.innerText.replace(/\s+/g, ' '));
-  if (!/Before coating, pitch diameter max \/ min 0\.4650 in [^/]*\/ 0\.4611 in/.test(t)) problems.push(`[${where}] 1/2-20 2A before coating: ${t.slice(0, 300)}`);
+  if (!/Before coating, pitch diameter max \/ min [\d.]+ mm 0\.4650 in \/ [\d.]+ mm 0\.4611 in/.test(t)) problems.push(`[${where}] 1/2-20 2A before coating: ${t.slice(0, 300)}`);
   await page.selectOption('#cc', '12'); await page.dispatchEvent('#cc', 'change'); await page.waitForTimeout(100);
   t = await page.$eval('#cres', e => e.innerText.replace(/\s+/g, ' '));
-  if (!/0\.4687 in [^/]*\/ 0\.4739 in/.test(t)) problems.push(`[${where}] 1/2-20 2B before coating: ${t.slice(0, 300)}`);
+  if (!/Before coating, pitch diameter min \/ max [\d.]+ mm 0\.4687 in \/ [\d.]+ mm 0\.4739 in/.test(t)) problems.push(`[${where}] 1/2-20 2B before coating: ${t.slice(0, 300)}`);
   await page.selectOption('#cc', '2'); await page.dispatchEvent('#cc', 'change'); await page.selectOption('#cpln', 'allow'); await page.waitForTimeout(100);
   t = await page.$eval('#cres', e => e.innerText.replace(/\s+/g, ' '));
-  if (!/Allowance on the pitch diameter 0\.0013 in/.test(t) || !/Fits/.test(t)) problems.push(`[${where}] 2A coating in the allowance: ${t.slice(0, 300)}`);
+  if (!/Allowance on the pitch diameter [\d.]+ mm 0\.0013 in/.test(t) || !/Fits/.test(t)) problems.push(`[${where}] 2A coating in the allowance: ${t.slice(0, 300)}`);
+}
+where = 'second-round-080';
+{
+  // Thread data: flats, lead angle and wires for M10 x 1.5; micro drills; aggressiveness; magnesium; new guide sections.
+  await page.evaluate(() => { RMEM.thd = { key: 'M10x1.5', d: 10, p: 1.5, int: 0 }; });
+  await open('threaddata', 300);
+  let t = await page.$eval('#hres', e => e.innerText.replace(/\s+/g, ' '));
+  if (!/P\/8 .*0\.188 mm/.test(t) || !/P\/4 .*0\.375 mm/.test(t) || !/3\.028 deg/.test(t) || !/Largest wire 1\.010363 P/.test(t)) problems.push(`[${where}] thread data flats, lead angle, wires: ${t.slice(0, 300)}`);
+  await open('drillchart', 300);
+  t = await page.$eval('#main', e => e.innerText);
+  if (!/#107/.test(t) || !/#98/.test(t)) problems.push(`[${where}] micro drills #98 to #107 should be listed`);
+  await open('grindspeed', 300);
+  for (const [id, v] of [['ds', 350], ['ns', 1900], ['dw', 50], ['nw', 200], ['ae', 0.01]]) await page.fill(`#main [data-id="${id}"]`, String(v));
+  await page.dispatchEvent('#main [data-id="ae"]', 'input'); await page.waitForTimeout(150);
+  t = await page.$eval('#main', e => e.innerText.replace(/\s+/g, ' '));
+  if (!/Aggressiveness 10\^6/.test(t) || /Grit penetration/.test(t)) problems.push(`[${where}] grinding aggressiveness without grit penetration: ${t.slice(0, 200)}`);
+  await open('materials', 400);
+  if (!(await page.$$eval('#mfam option', a => a.some(o => o.textContent === 'Magnesium')))) problems.push(`[${where}] Magnesium family missing from material equivalents`);
+  for (const [id, anchors] of [['matguide', ['mg-nonfe', 'mg-hss', 'mg-terms', 'mg-fail']], ['cutguide', ['cg-micro']], ['cncguide', ['c-3dcomp']], ['threadguide', ['tf-shim', 'tf-nps']]]) {
+    await open(id, 300);
+    for (const a of anchors) if (!(await page.$('#' + a))) problems.push(`[${where}] ${id}: section ${a} missing`);
+  }
+}
+where = 'arrange-settings-arcs-080';
+{
+  // Side panel: arrange the workspaces; the order is kept.
+  const m0 = await page.evaluate(() => state.mode); await mode('advanced');
+  await page.click('#list .rarr'); await page.waitForTimeout(60);
+  const first = await page.$eval('#list .rwa', e => e.textContent.trim());
+  await page.click('#list .rwa .rmv button[data-d="1"]'); await page.waitForTimeout(60);
+  const second = await page.$$eval('#list .rwa', a => a[1].textContent.trim());
+  if (second !== first) problems.push(`[${where}] moving the first workspace down should make it second: ${first} / ${second}`);
+  await page.click('#list .rwa:nth-of-type(2) .rmv button[data-d="-1"]').catch(() => {});
+  await page.evaluate(() => localStorage.removeItem('bm.wsorder'));
+  await page.click('#list .rarr'); await page.waitForTimeout(60); await mode(m0);
+  if (await page.$('#list .rwa')) problems.push(`[${where}] Done should leave arranging`);
+  // Settings file: what is saved reads back; a stranger file is refused.
+  const rt = await page.evaluate(() => { const d = settingsData(); const r = readSettingsFile(JSON.stringify({ app: 'Machinists BenchMate', kind: 'settings', data: d })); return [Object.keys(d).length, r.n]; });
+  if (!(rt[0] > 0 && rt[0] === rt[1])) problems.push(`[${where}] settings round trip: ${rt}`);
+  const bad = await page.evaluate(() => { try { readSettingsFile('{"x":1}'); return 'accepted'; } catch (e) { return e.message; } });
+  if (!/not a BenchMate settings file/.test(bad)) problems.push(`[${where}] a stranger file should be refused: ${bad}`);
+  // G71 with a G02 fillet; a half circle that rises and falls is refused.
+  const u0 = await page.evaluate(() => state.sys); if (u0 !== 'mm') await page.click('#units button[data-u="mm"]');
+  await open('cycg71', 300);
+  const ta = await page.$('#main textarea');
+  await ta.fill('20 0\n24 -2\n24 -13\n28 -15 G02 R2\n36 -15\n40 -17\n40 -40'); await ta.dispatchEvent('input'); await page.waitForTimeout(300);
+  let t = await page.$eval('#main', e => e.innerText);
+  if (!/N104 G02 X28\.0 Z-15\.0 R2\.0/.test(t) || !/N105 G01 X36\.0/.test(t)) problems.push(`[${where}] G71 arc blocks: ${(t.match(/N10\d [^\n]*/g) || []).join(' | ')}`);
+  await ta.fill('20 0\n24 -2\n24 -13\n24 -17 G02 R2\n40 -17\n40 -40'); await ta.dispatchEvent('input'); await page.waitForTimeout(300);
+  t = await page.$eval('#main', e => e.innerText);
+  if (/N103 G02/.test(t)) problems.push(`[${where}] a half-circle undercut in G71 should be refused`);
+  if (u0 !== 'mm') await page.click(`#units button[data-u="${u0}"]`);
+  // Sketcher: the lines-to-arcs button is there and says when nothing fits.
+  await open('sketch', 300);
+  if (!(await page.$('#skarcfit')) || !(await page.$('#skarctol'))) problems.push(`[${where}] the sketcher should have Lines to arcs and its tolerance`);
 }
 where = 'bandsaw-080';
   {

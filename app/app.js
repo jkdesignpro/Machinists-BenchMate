@@ -66,8 +66,22 @@ const Favs = (() => {
     has: id => ids.includes(id),
     toggle: id => { ids = ids.includes(id) ? ids.filter(x => x !== id) : ids.concat(id); save(); },
     pages: () => ids.map(id => PAGES[id]).filter(Boolean),
+    // Move a favourite one place up (d = -1) or down (d = 1).
+    move: (id, d) => { const i = ids.indexOf(id), j = i + d; if (i < 0 || j < 0 || j >= ids.length) return; [ids[i], ids[j]] = [ids[j], ids[i]]; save(); },
   };
 })();
+// The order of the workspaces in the side panel, as the user arranged it (bm.wsorder); new ones go last.
+function wsOrdered() {
+  let o = lsJson('bm.wsorder', []); if (!Array.isArray(o)) o = [];
+  const known = WORKSPACES.map(w => w.id), seq = o.filter(id => known.includes(id)).concat(known.filter(id => !o.includes(id)));
+  return seq.map(id => WORKSPACES.find(w => w.id === id));
+}
+function wsMove(id, d) {
+  const seq = wsOrdered().map(w => w.id), i = seq.indexOf(id), j = i + d;
+  if (i < 0 || j < 0 || j >= seq.length) return;
+  [seq[i], seq[j]] = [seq[j], seq[i]]; lsPut('bm.wsorder', seq);
+}
+let RAIL_ARRANGE = false;
 const Recents = (() => {
   let ids = lsJson('bm.recent', []); if (!Array.isArray(ids)) ids = [];
   return {
@@ -146,17 +160,45 @@ function renderRail() {
   };
   const home = add(mk('button', 'rw' + (r.kind === 'home' ? ' on' : ''), icon('home') + '<span>Home</span>'));
   home.dataset.ws = 'home'; home.onclick = () => go('#/home');
+  // Arrange: arrows move a favourite or a workspace up or down; the order is kept.
+  const arrows = (up, down, name) => {
+    const box = mk('span', 'rmv');
+    [['up', -1, up], ['down', 1, down]].forEach(([ic, d, ok]) => {
+      const b = mk('button', 'ib', icon(ic)); b.title = 'Move ' + name + (d < 0 ? ' up' : ' down'); b.setAttribute('aria-label', b.title); b.disabled = !ok; b.dataset.d = d; box.appendChild(b);
+    });
+    return box;
+  };
+  const head = (txt, arr) => {
+    const h = add(mk('h3', arr ? 'rhd' : '', '<span>' + txt + '</span>'));
+    if (arr) {
+      const b = mk('button', 'rarr', RAIL_ARRANGE ? 'Done' : 'Arrange'); b.title = RAIL_ARRANGE ? 'Stop arranging' : 'Change the order of the favourites and the workspaces';
+      b.onclick = () => { RAIL_ARRANGE = !RAIL_ARRANGE; renderRail(); }; h.appendChild(b);
+    }
+    return h;
+  };
   const favs = Favs.pages().filter(pageShown);
-  if (favs.length) { add(mk('h3', '', 'Favourites')); favs.forEach(p => add(pageBtn(p))); }
+  if (favs.length) {
+    head('Favourites', state.mode === 'simple');
+    favs.forEach((p, i) => {
+      const row = add(pageBtn(p));
+      if (RAIL_ARRANGE) { const a = arrows(i > 0, i < favs.length - 1, p.title); a.querySelectorAll('button').forEach(b => b.onclick = () => { Favs.move(p.id, +b.dataset.d); renderRail(); }); row.appendChild(a); }
+    });
+  }
   if (state.mode === 'simple') {
     add(mk('h3', '', 'Everyday tools'));
     SIMPLE_PAGES.map(id => PAGES[id]).filter(Boolean).forEach(p => add(pageBtn(p)));
     add(mk('p', 'railnote', 'Simple mode shows the everyday tools. Switch to Advanced for all ' + Object.keys(PAGES).length + '.'));
     return;
   }
-  add(mk('h3', '', 'Workspaces'));
+  head('Workspaces', true);
   const openWs = r.kind === 'ws' ? r.id : (r.kind === 'tool' ? wsOfPage(r.id) : '');
-  WORKSPACES.forEach(w => {
+  const wsList = wsOrdered();
+  wsList.forEach((w, wi) => {
+    if (RAIL_ARRANGE) {
+      const row = add(mk('div', 'li rwa', icon(w.icon) + '<span>' + hesc(w.name) + '</span>'));
+      const a = arrows(wi > 0, wi < wsList.length - 1, w.name); a.querySelectorAll('button').forEach(b => b.onclick = () => { wsMove(w.id, +b.dataset.d); renderRail(); }); row.appendChild(a);
+      return;
+    }
     const open = w.id === openWs && !RAIL_SHUT.has(w.id);
     const b = add(mk('button', 'rw' + (r.kind === 'ws' && r.id === w.id ? ' on' : '') + (open ? ' open' : ''), icon(w.icon) + '<span>' + hesc(w.name) + '</span>' + icon(open ? 'down' : 'right', 'chev')));
     b.dataset.ws = w.id; b.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -826,6 +868,35 @@ if (['on', 'off', 'auto'].includes(lsGet('bm.compact'))) state.compactPref = lsG
 function dpAllPref() { const n = +lsGet('bm.dpall'); return [-1, 0, 1, 2].includes(n) ? n : 0; }
 function dpTotal(own) { return Math.max(-3, Math.min(4, (own || 0) + dpAllPref())); }
 
+// Settings export and import: every bm.* key of this browser (units, mode, theme, favourites, dashboard,
+// tool library, machine profiles, saved inputs, sketches...) in one JSON file.
+function settingsData() {
+  const data = {};
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('bm.')) data[k] = localStorage.getItem(k); } } catch (e) {}
+  return data;
+}
+function exportSettings() {
+  const data = settingsData(), day = new Date().toISOString().slice(0, 10);
+  saveFile('benchmate-settings-' + day + '.json', JSON.stringify({ app: 'Machinists BenchMate', kind: 'settings', version: $('#ver').textContent, saved: new Date().toISOString(), data }, null, 1), 'application/json');
+  toast(Object.keys(data).length + ' settings saved to a file');
+}
+// Read a settings file; returns { data, n } or throws with a plain reason.
+function readSettingsFile(text) {
+  let j; try { j = JSON.parse(text); } catch (e) { throw new Error('This is not a BenchMate settings file (not JSON).'); }
+  if (!j || j.app !== 'Machinists BenchMate' || j.kind !== 'settings' || !j.data || typeof j.data !== 'object') throw new Error('This is not a BenchMate settings file.');
+  const data = {};
+  Object.entries(j.data).forEach(([k, v]) => { if (k.startsWith('bm.') && typeof v === 'string') data[k] = v; });
+  return { data, n: Object.keys(data).length, version: String(j.version || ''), saved: String(j.saved || '').slice(0, 10) };
+}
+// Replace this browser's settings with the file's, then start again.
+function applySettings(data) {
+  try {
+    Object.keys(settingsData()).forEach(k => localStorage.removeItem(k));
+    Object.entries(data).forEach(([k, v]) => localStorage.setItem(k, v));
+  } catch (e) { toast('Could not write the settings: ' + e.message); return false; }
+  location.reload(); return true;
+}
+
 function initMenu() {
   const btn = $('#menubtn'), pop = $('#menupop');
   const seg = (id, opts, cur) => '<div class="seg" id="' + id + '">' + opts.map(([v, l]) => '<button data-v="' + v + '"' + (v === cur ? ' class="on"' : '') + '>' + l + '</button>').join('') + '</div>';
@@ -841,6 +912,8 @@ function initMenu() {
       '<button class="mlink" data-go="#/news">' + icon('book') + 'What\'s new</button>' +
       '<button class="mlink" data-go="#/t/machines">' + icon('machine') + 'Machine profiles</button>' +
       '<button class="mlink" data-go="#/t/toollib">' + icon('toollib') + 'Tool library</button>' +
+      '<div class="mrow msets"><span>Settings</span><div class="seg"><button id="msetexp" title="Save every setting, favourite, dashboard, tool, machine and saved input to a file">Save to file</button><button id="msetimp" title="Replace the settings here with those in a saved file">Load file</button></div><input type="file" id="msetfile" accept=".json,application/json" hidden></div>' +
+      '<div id="msetask"></div>' +
       '<div class="mabout">Machinists BenchMate ' + hesc($('#ver').textContent) + '. Open source, AGPL-3.0. Results are a guide: check them before you cut.</div>';
     $$('#mtheme button', pop).forEach(b => b.onclick = () => { lsSet('bm.theme', b.dataset.v); setTheme(b.dataset.v); paint(); if (state.route.kind !== 'home') renderMain(); });
     const accent = c => { lsSet('bm.accent', c); setAccent(c); };
@@ -852,6 +925,24 @@ function initMenu() {
     $$('#mmode button', pop).forEach(b => b.onclick = () => { setMode(b.dataset.v); paint(); });
     $$('#munits button', pop).forEach(b => b.onclick = () => { setUnits(b.dataset.v); paint(); });
     $$('.mlink', pop).forEach(b => b.onclick = () => { pop.hidden = true; go(b.dataset.go); });
+    $('#msetexp', pop).onclick = exportSettings;
+    $('#msetimp', pop).onclick = () => $('#msetfile', pop).click();
+    $('#msetfile', pop).onchange = e => {
+      const f = e.target.files[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        const box = $('#msetask', pop);
+        try {
+          const r = readSettingsFile(String(rd.result));
+          box.innerHTML = '<div class="mask">Replace the settings here with the ' + r.n + ' in ' + hesc(f.name) + (r.saved ? ' (saved ' + hesc(r.saved) + (r.version ? ', ' + hesc(r.version) : '') + ')' : '') + '? What is here now is lost; save it to a file first if you want it.' +
+            '<div class="seg"><button id="msetyes">Replace</button><button id="msetno">Cancel</button></div></div>';
+          $('#msetyes', box).onclick = () => applySettings(r.data);
+          $('#msetno', box).onclick = () => { box.innerHTML = ''; };
+        } catch (x) { box.innerHTML = '<div class="mask warn">' + hesc(x.message) + '</div>'; }
+        e.target.value = '';
+      };
+      rd.readAsText(f);
+    };
   };
   btn.onclick = e => { e.stopPropagation(); pop.hidden = !pop.hidden; if (!pop.hidden) paint(); };
   pop.addEventListener('click', e => e.stopPropagation());
@@ -874,6 +965,10 @@ async function boot() {
   document.body.classList.toggle('showsrc', lsGet('bm.showsrc') === '1');
   new MutationObserver(() => { foldSources($('#main')); if (typeof enhanceThreadSelect === 'function') document.querySelectorAll('#main select#hk, #main select#tk, #main select#qk, #main select#lk').forEach(enhanceThreadSelect); if (state.mode === 'expert' && state.route.kind === 'tool') openDetails($('#main')); }).observe($('#main'), { childList: true, subtree: true });
   initSearch(); initMenu(); applyCompact();
+  // Offline use of the web version (app/sw.js). Not in the desktop app, whose files are local anyway,
+  // and not under automated testing, so a test always sees the files on disk.
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.__TAURI_INTERNALS__ && location.hostname !== 'tauri.localhost' && !navigator.webdriver)
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   addEventListener('resize', applyCompact);
   $('#calcbtn').onclick = () => { if (BenchCalc.isOpen) BenchCalc.close(); else BenchCalc.open(); };
   $('#railbtn').onclick = () => document.body.classList.toggle('railopen');

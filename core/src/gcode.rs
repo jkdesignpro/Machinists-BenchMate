@@ -869,8 +869,13 @@ pub fn gen_broach(j: &BroachJob) -> Program {
 pub struct G71Job {
     pub metric: bool, pub ctrl: Ctrl, pub prog: u32, pub tool: u32,
     pub internal: bool, pub stock_dia: f64,
-    /// Profile points (diameter, z) from the front, straight lines only.
+    /// Profile points (diameter, z) from the front.
     pub profile: Vec<(f64, f64)>,
+    /// How each point is reached from the one before: (0, _) a straight line, (2, r) a G02 arc
+    /// and (3, r) a G03 arc of radius r. Empty, or shorter than the profile, means straight lines.
+    /// G02 and G03 as the simulator reads G18: in a view with Z to the right and X (radius) up,
+    /// G03 runs counter-clockwise.
+    pub segs: Vec<(u8, f64)>,
     pub doc: f64, pub retract: f64, pub u: f64, pub w: f64,
     pub f_rough: f64, pub f_finish: f64, pub clear: f64, pub n_start: u32,
     pub sp: Spindle,
@@ -892,6 +897,46 @@ fn profile_z_at(p: &[(f64, f64)], r: f64, od: bool) -> f64 {
     p[p.len() - 1].1
 }
 
+/// Centre (radius, z) of the arc of radius `r` from `a` to `b` (both (radius, z)), and its sweep
+/// (radians, positive), in the G18 view (Z across, radius up): G03 counter-clockwise. The shorter
+/// arc (at most a half circle). None when the radius is too small for the two points.
+pub fn lathe_arc_centre(a: (f64, f64), b: (f64, f64), r: f64, ccw: bool) -> Option<((f64, f64), f64)> {
+    // Plane coordinates: u = z (across), v = radius (up).
+    let (ua, va, ub, vb) = (a.1, a.0, b.1, b.0);
+    let d = ((ub - ua).powi(2) + (vb - va).powi(2)).sqrt();
+    if !(r > 0.0) || d < 1e-12 { return None; }
+    let h2 = r * r - (d / 2.0).powi(2);
+    if h2 < -1e-9 * r * r { return None; }
+    let h = h2.max(0.0).sqrt();
+    let (tu, tv) = ((ub - ua) / d, (vb - va) / d);
+    // The centre lies to the left of a to b for a counter-clockwise arc of at most 180 degrees.
+    let sgn = if ccw { 1.0 } else { -1.0 };
+    let (cu, cv) = ((ua + ub) / 2.0 - tv * h * sgn, (va + vb) / 2.0 + tu * h * sgn);
+    let a0 = (va - cv).atan2(ua - cu);
+    let a1 = (vb - cv).atan2(ub - cu);
+    let tau = 2.0 * std::f64::consts::PI;
+    let sweep = if ccw { (a1 - a0).rem_euclid(tau) } else { (a0 - a1).rem_euclid(tau) };
+    Some(((cv, cu), sweep))
+}
+
+/// Points along the profile (radius, z), with each arc cut into steps of at most 3 degrees.
+fn g71_dense(prof: &[(f64, f64)], segs: &[(u8, f64)]) -> Result<Vec<(f64, f64)>, String> {
+    let mut out = vec![prof[0]];
+    for i in 1..prof.len() {
+        let (a, b) = (prof[i - 1], prof[i]);
+        let (kind, r) = segs.get(i).copied().unwrap_or((0, 0.0));
+        if kind == 2 || kind == 3 {
+            let ((cr, cz), sw) = lathe_arc_centre(a, b, r, kind == 3).ok_or_else(|| format!("Profile point {}: the arc radius is smaller than half the distance from the point before.", i + 1))?;
+            let n = ((sw.to_degrees() / 3.0).ceil() as usize).max(1);
+            let a0 = (a.0 - cr).atan2(a.1 - cz);
+            let dir = if kind == 3 { 1.0 } else { -1.0 };
+            for k in 1..n { let t = a0 + dir * sw * k as f64 / n as f64; out.push((cr + r * t.sin(), cz + r * t.cos())); }
+        }
+        out.push(b);
+    }
+    Ok(out)
+}
+
 pub fn gen_g71(j: &G71Job) -> Program {
     if !supported(j.ctrl, cyc::G71) { return Program::err("This control is not yet supported for this cycle."); }
     if j.profile.len() < 2 { return Program::err("Enter at least two profile points."); }
@@ -899,7 +944,11 @@ pub fn gen_g71(j: &G71Job) -> Program {
     if !(j.stock_dia > 0.0 && j.doc > 0.0 && j.retract >= 0.0 && j.f_rough > 0.0 && j.f_finish > 0.0 && j.clear > 0.0) { return Program::err("Enter stock, depth of cut, retract, feeds and clearance."); }
     if let Some(e) = check_lathe_spindle(&j.sp) { return Program::err(e); }
     let od = !j.internal;
-    for w in j.profile.windows(2) {
+    let has_arc = j.segs.iter().skip(1).take(j.profile.len().saturating_sub(1)).any(|s| s.0 == 2 || s.0 == 3);
+    // Arcs are checked point by point along the curve, so a bulge that runs back is found too.
+    let dense_d = match g71_dense(&j.profile.iter().map(|(x, z)| (x / 2.0, *z)).collect::<Vec<_>>(), &j.segs) {
+        Ok(v) => v.iter().map(|(r, z)| (2.0 * r, *z)).collect::<Vec<_>>(), Err(e) => return Program::err(&e) };
+    for w in dense_d.windows(2) {
         let ((x0, z0), (x1, z1)) = (w[0], w[1]);
         if z1 > z0 + 1e-12 { return Program::err("Profile Z must not go back toward the front (G71 type I)."); }
         if od && x1 < x0 - 1e-12 { return Program::err("Outside profile: diameters must not get smaller toward the chuck (no undercuts in G71 type I)."); }
@@ -927,7 +976,17 @@ pub fn gen_g71(j: &G71Job) -> Program {
     let ns = j.n_start;
     // Profile blocks: N ns G00 X first; G01 Z first; then each point; then out to the stock.
     let mut blocks = vec![format!("G00 X{}", b.xd(first.0 / 2.0)), format!("G01 Z{} F{}", b.n(first.1), b.feed(j.f_finish))];
-    for p in j.profile.iter().skip(1) { blocks.push(format!("X{} Z{}", b.xd(p.0 / 2.0), b.n(p.1))); }
+    let mut modal = 1u8;
+    for (i, p) in j.profile.iter().enumerate().skip(1) {
+        let (kind, r) = j.segs.get(i).copied().unwrap_or((0, 0.0));
+        let g = if kind == 2 || kind == 3 { kind } else { 1 };
+        let lead = if g != modal { format!("G0{} ", g) } else { String::new() };
+        modal = g;
+        if g == 1 { blocks.push(format!("{}X{} Z{}", lead, b.xd(p.0 / 2.0), b.n(p.1))); }
+        else { blocks.push(format!("{}X{} Z{} R{}", lead, b.xd(p.0 / 2.0), b.n(p.1), b.n(r))); }
+    }
+    if modal != 1 && (last.0 - j.stock_dia).abs() > 1e-9 { blocks.push(format!("G01 X{}", b.xd(rs))); }
+    else
     if (last.0 - j.stock_dia).abs() > 1e-9 { blocks.push(format!("X{}", b.xd(rs))); }
     let nf = ns + blocks.len() as u32 - 1;
     let u_word = b.n(s * j.u.abs());
@@ -946,7 +1005,7 @@ pub fn gen_g71(j: &G71Job) -> Program {
     b.l("M05");
     b.footer();
     // Model: offset profile (radius + s u/2, z + w), roughing levels, semi-finish along the offset, finish.
-    let mut prof: Vec<(f64, f64)> = j.profile.iter().map(|(x, z)| (x / 2.0, *z)).collect();
+    let mut prof: Vec<(f64, f64)> = dense_d.iter().map(|(x, z)| (x / 2.0, *z)).collect();
     if (last.0 - j.stock_dia).abs() > 1e-9 { prof.push((rs, last.1)); }
     let off: Vec<(f64, f64)> = prof.iter().map(|(r, z)| (r + s * j.u.abs() / 2.0, z + j.w)).collect();
     let r_min = off[0].0;
@@ -979,6 +1038,7 @@ pub fn gen_g71(j: &G71Job) -> Program {
     b.rapid_to(rcl, 0.0, zc);
     b.warn.push("The roughing moves shown are BenchMate's model of G71; the control plans the real passes.".into());
     b.warn.push("F in the profile blocks (finish feed) is used by G70 only; G71 roughs at its own F.".into());
+    if has_arc { b.warn.push("Arcs: G02 and G03 as written; check the direction against your lathe's manual (the view flips between front and rear tool posts, the code does not). The model offsets the arc points by U/2 and W, as G71 does.".into()); }
     b.done(table)
 }
 
@@ -1235,7 +1295,8 @@ fn spindle(v: &[f64], i: usize) -> Spindle { Spindle { css: gb(v, i), v: g(v, i 
 ///   10 z end, 11 feed, 12 lift, 13 cx, 14 cy, 15 dir, 16 edge, 17 wcs.
 /// - G71: 4 internal, 5 stock dia, 6 doc, 7 retract, 8 u, 9 w, 10 f rough,
 ///   11 f finish, 12 clear, 13 n start, 14 css, 15 v, 16 max rpm, 17 rpm,
-///   18 point count n, 19.. diameter, z.
+///   18 point count n, 19.. diameter, z; then, optionally, n pairs (kind, radius):
+///   kind 0 straight, 2 G02, 3 G03 into that point.
 /// - WORDS: 4 lathe, 5 css, 6 v, 7 max rpm, 8 rpm, 9 feed per revolution
 ///   (lathe), 10 feed. Program number and tool are not used.
 pub fn run_flat(cycle: u32, v: &[f64]) -> Program {
@@ -1267,7 +1328,8 @@ pub fn run_flat(cycle: u32, v: &[f64]) -> Program {
         cyc::G71 => {
             let n = gu(v, 18) as usize;
             gen_g71(&G71Job { metric, ctrl, prog, tool, internal: gb(v, 4), stock_dia: g(v, 5), doc: g(v, 6), retract: g(v, 7), u: g(v, 8), w: g(v, 9),
-                f_rough: g(v, 10), f_finish: g(v, 11), clear: g(v, 12), n_start: gu(v, 13).max(1), sp: spindle(v, 14), profile: pairs(v, 19, n) })
+                f_rough: g(v, 10), f_finish: g(v, 11), clear: g(v, 12), n_start: gu(v, 13).max(1), sp: spindle(v, 14), profile: pairs(v, 19, n),
+                segs: if v.len() >= 19 + 4 * n { (0..n).map(|k| (g(v, 19 + 2 * n + 2 * k) as u8, g(v, 20 + 2 * n + 2 * k))).collect() } else { vec![] } })
         }
         cyc::WORDS => gen_words(&WordsJob { metric, ctrl, lathe: gb(v, 4), sp: spindle(v, 5), per_rev: gb(v, 9), feed: g(v, 10) }),
         _ => Program::err("Unknown cycle."),

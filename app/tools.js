@@ -2361,9 +2361,9 @@ const TOOLS = [
 },
 {
   id: 'cycg71', level: 'advanced', group: 'G-code cycles', title: 'G71 / G70 rough and finish',
-  desc: 'G71 roughing and G70 finishing from a simple profile of points (straight lines, no undercuts), outside or inside, Fanuc-style two-block or Haas one-block format.',
+  desc: 'G71 roughing and G70 finishing from a simple profile of points (straight lines and G02 or G03 arcs, no undercuts), outside or inside, Fanuc-style two-block or Haas one-block format.',
   render: el => renderG71Cycle(el),
-  working: 'Fanuc-style: G71 U(depth) R(retract); G71 P Q U(X allowance on diameter) W F. Haas: G71 P Q U W D(depth) F. The profile blocks carry the finish feed for G70. Type I needs a profile that only grows (outside) or shrinks (inside) toward the chuck. The backplot and time use BenchMate\'s model of the roughing passes.',
+  working: 'Fanuc-style: G71 U(depth) R(retract); G71 P Q U(X allowance on diameter) W F. Haas: G71 P Q U W D(depth) F. The profile blocks carry the finish feed for G70. Type I needs a profile that only grows (outside) or shrinks (inside) toward the chuck. A point can be reached by an arc: add G02 or G03 and R to its line; the arc is checked point by point along the curve, and G02 and G03 are taken as the simulator reads G18 (G03 counter-clockwise with Z across and X up). The backplot and time use BenchMate\'s model of the roughing passes.',
   source: 'NPTEL Module 7 CNC programming (G71/G70 parameters); industrialmonitordirect Fanuc G71 parameter reference; Haas Factory Outlet lathe programming (one-block G71 D, G70). See docs/cycles.md.',
 },
 {

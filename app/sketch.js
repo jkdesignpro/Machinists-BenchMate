@@ -78,6 +78,7 @@ function renderSketch(el) {
       '<button class="btn" id="skfit" title="Show the whole drawing">Fit</button>' +
       '<button class="btn" id="skopen">Open DXF</button><input type="file" id="skfile" accept=".dxf,application/dxf,text/plain" hidden>' +
       '<button class="btn" id="sksave">Save DXF</button>' +
+      '<span class="skarc" title="Polylines made of many short straight lines (curves cut up by another CAD or CAM program) become arcs where every point lies within the tolerance. Undo brings the lines back."><button class="btn" id="skarcfit">Lines to arcs</button> <input type="number" step="any" min="0" inputmode="decimal" id="skarctol" aria-label="Arc fit tolerance" style="width:74px;font-family:var(--mono)"> <span class="ms" id="skarcu"></span></span>' +
       '<select id="skver" aria-label="DXF version" title="DXF version"><option value="2000">R2000 (units stored)</option><option value="12">R12 (widest CAM support)</option></select>' +
       '<label class="chk" title="Write rectangles and other polylines as separate LINE and ARC entities, for programs that do not read polylines or their arcs"><input type="checkbox" id="skexpl"> Polylines as lines and arcs</label></div>' +
     '<div class="grid">' +
@@ -371,6 +372,15 @@ function renderSketch(el) {
   $q('#sksave').onclick = () => {
     let name = (SK.file || 'sketch').replace(/\.dxf$/i, '').replace(/[\\/:*?"<>|]+/g, '_') + '.dxf';
     saveFile(name, gsGet(W.sk_export(SK.ver === 12 ? 1 : 0, SK.explode ? 1 : 0)), 'application/dxf');
+  };
+  // Arc fitting of imported polylines, within a tolerance in the drawing's units (0.01 mm or 0.0005 in to start).
+  if (!(snum(SK.arctol) > 0)) SK.arctol = D.inch ? 0.0005 : 0.01;
+  $q('#skarctol').value = SK.arctol; $q('#skarcu').textContent = U();
+  $q('#skarctol').oninput = e => { SK.arctol = e.target.value; };
+  $q('#skarcfit').onclick = () => {
+    const t = snum(SK.arctol);
+    if (!(t > 0)) { SK.err = 'Enter a tolerance for the arc fit.'; panels(); return; }
+    W.sk_fit_arcs(t); SK.rep = gsGet(W.sk_msg()).split('\n').filter(Boolean); SK.err = ''; skSave(); sync(true);
   };
   $q('#skopen').onclick = () => $q('#skfile').click();
   $q('#skfile').onchange = e => {

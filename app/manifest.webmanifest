@@ -1,0 +1,10 @@
+{
+ "name": "Machinists BenchMate",
+ "short_name": "BenchMate",
+ "description": "A free, open-source machinist's calculator. Works offline.",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#1b1d1f",
+ "theme_color": "#1b1d1f"
+}

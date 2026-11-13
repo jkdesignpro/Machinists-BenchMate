@@ -950,6 +950,13 @@ fn sk_li(layer: f64) -> usize { if layer >= 0.0 { layer as usize } else { 0 } }
 #[no_mangle] pub extern "C" fn sk_inch() -> f64 { if sk().inch { 1.0 } else { 0.0 } }
 /// The last error or report (lines separated by new lines).
 #[no_mangle] pub extern "C" fn sk_msg() -> f64 { set_text(unsafe { (&*core::ptr::addr_of!(SK_MSG)).clone() }) }
+/// Fit arcs to the straight runs of the polylines within `tol`; returns the number of polylines
+/// changed, the report (segments before and after) in `sk_msg`.
+#[no_mangle] pub extern "C" fn sk_fit_arcs(tol: f64) -> f64 {
+    let (n, a, b) = sk().fit_arcs(tol);
+    sk_say(if n == 0 { "No run of straight segments fits an arc within that tolerance.".to_string() } else { format!("{} polyline{} changed: {} segments became {}.", n, if n == 1 { "" } else { "s" }, a, b) });
+    n as f64
+}
 #[no_mangle] pub extern "C" fn sk_set_units(inch: f64, convert: f64) -> f64 { if sk().set_units(inch != 0.0, convert != 0.0) { 1.0 } else { 0.0 } }
 /// Replace the sketch with a DXF file; returns the entity count or -1 (reason in `sk_msg`).
 #[no_mangle] pub extern "C" fn sk_import(len: f64, default_inch: f64) -> f64 {

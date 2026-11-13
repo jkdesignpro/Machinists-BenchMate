@@ -128,8 +128,14 @@ const Dash = (() => {
           h = Math.max(90, Math.round(r0.height + ev.clientY - y0));
           SIZES.forEach(z => d.classList.toggle(z, z === size)); d.style.height = h + 'px'; d.classList.add('hset');
         };
+        let moved = false;
+        const mv0 = rz.onpointermove;
+        rz.onpointermove = ev => { if (Math.abs(ev.clientX - x0) + Math.abs(ev.clientY - y0) > 3) moved = true; mv0(ev); };
         rz.onpointerup = () => {
-          rz.onpointermove = rz.onpointerup = null; w.size = size;
+          rz.onpointermove = rz.onpointerup = null; d.classList.remove('sizing');
+          // A click without a drag changes nothing (and leaves the handle in place for a double-click).
+          if (!moved) { d.draggable = editing; return; }
+          w.size = size;
           if (Math.abs(h - r0.height) > 4) w.h = h;
           save(); render(main);
         };

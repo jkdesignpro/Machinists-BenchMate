@@ -539,7 +539,7 @@ function renderMatGuide(el) {
     mgP('<b>Then compare with the order:</b> grade, specification, delivery condition and dimensions.', ['WIP']) +
 
     '<h2 id="mg-nonfe">Machining magnesium</h2>' +
-    mgP('<b>Speeds and feeds</b> for aluminium, copper alloys and titanium are in the speeds and feeds tools; this section is about handling magnesium, whose chips can burn.', null) +
+    '<p class="desc">Speeds and feeds for aluminium, copper alloys and titanium are in the speeds and feeds tools; this section is about handling magnesium, whose chips can burn.</p>' +
     mgP('<b>The bar is safe, the chips are not.</b> A solid magnesium part is hard to set alight; fine chips and dust catch fire easily, from heat or a spark.', ['ERP3', 'WAYKEN']) +
     mgP('<b>Sharp tools.</b> A dull tool heats the cut and can light the chips.', ['ERP3', 'WAYKEN']) +
     mgP('<b>Clearance.</b> Avoid small clearance angles: they rub, heat up and make long chips. Tools with large relief are used.', ['ERP3', 'WAYKEN']) +
