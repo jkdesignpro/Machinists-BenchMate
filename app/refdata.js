@@ -454,7 +454,11 @@ async function renderThreadData(el) {
     let h = '<div class="res"><div class="h">Basic dimensions' + (sel ? ' of ' + rEsc(sel.label) + ' ' + badge(sel.status) + ' <span class="ms">series printed by ' + sel.pubs.map(x => rEsc(pubName(T.sources, x))).join(', ') + '</span>' : '') + '</div><table>' +
       row('Major diameter D', d) + row('Pitch P' + (sys === 'unified' ? ' (' + fx(IN_MM / p, 2) + ' TPI)' : ''), p) + row('Fundamental triangle height H', W.thread_fundamental_h(p)) +
       row('Basic thread height H1 = 5/8 H', W.thread_basic_height(p)) + row('Pitch diameter d2', W.thread_basic_pitch_dia(d, p)) + row('Basic minor diameter D1 (internal)', W.thread_basic_minor_dia(d, p)) +
-      (sys === 'metric' ? row('Minor diameter d3 (external, ISO 965 rounded root)', W.thread_iso_d3(d, p)) : '') + '</table></div>';
+      (sys === 'metric' ? row('Minor diameter d3 (external, ISO 965 rounded root)', W.thread_iso_d3(d, p)) : '') +
+      row('Flat at the major diameter P/8 (external crest, basic profile)', W.thread_misc(p, 0, 5)) + row('Flat at the minor diameter P/4 (internal crest, basic profile)', W.thread_misc(p, 0, 6)) +
+      '<tr><td>Lead (helix) angle at d2, single start</td><td class="v">' + fx(W.thread_misc(p, W.thread_basic_pitch_dia(d, p), 2), 3) + ' deg' + cpy(fx(W.thread_misc(p, W.thread_basic_pitch_dia(d, p), 2), 3)) + '</td></tr>' +
+      row('Best wire 0.57735 P', W.thread_misc(p, 60, 1), ' <a href="#/t/wires" class="ms">measure over wires</a>') + row('Largest wire 1.010363 P', W.thread_misc(p, 0, 3), ' <span class="ms">(Thread Check prints 1.010362 P)</span>') + row('Smallest wire 0.505182 P', W.thread_misc(p, 0, 4)) +
+      '</table><p class="ms" style="margin:6px 0 0">Flats are those of the basic profile; a real external root is rounded (ISO 965 d3 above, UNR) or flat, and the limits of the class apply. Wire sizes as printed by NBS Letter Circular 23 (1923) and Thread Check; use a wire safely inside the limits, nearest the best size.</p></div>';
     if (sys === 'metric') {
       const key = 'M' + (+d.toFixed(3)) + 'x' + (+p.toFixed(3));
       const ext = ['Major max', 'Major min', 'Pitch max', 'Pitch min'], intl = ['Pitch min', 'Pitch max', 'Minor min', 'Minor max'];

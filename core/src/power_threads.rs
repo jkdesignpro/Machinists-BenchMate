@@ -354,13 +354,29 @@ pub fn lead_angle_deg(lead: f64, e: f64) -> f64 {
     (lead / (std::f64::consts::PI * e)).atan().to_degrees()
 }
 
+/// Largest and smallest wire for measuring a 60 degree thread, as printed
+/// (NBS Letter Circular 23, 1923, table 1; Thread Check prints the largest as
+/// 1.010362 P): 1.010363 P and 0.505182 P. Lead angle ignored.
+pub fn max_wire_60(p: f64) -> f64 { 1.010363 * p }
+pub fn min_wire_60(p: f64) -> f64 { 0.505182 * p }
+
+/// Flats of the basic 60 degree profile (ISO 68-1, ASME B1.1): P/8 at the
+/// major diameter, P/4 at the basic minor diameter.
+pub fn basic_flat_60(p: f64, at_minor: bool) -> f64 { if at_minor { p / 4.0 } else { p / 8.0 } }
+
 /// f64 interface: `what` 0 coating PD change (a = thickness, b = angle),
-/// 1 best wire (a = P, b = angle), 2 lead angle (a = lead, b = pitch dia).
+/// 1 best wire (a = P, b = angle), 2 lead angle (a = lead, b = pitch dia),
+/// 3 largest and 4 smallest wire for 60 degrees (a = P), 5 basic flat at the
+/// major and 6 at the minor diameter of the 60 degree profile (a = P).
 pub fn thread_misc_f(a: f64, b: f64, what: f64) -> f64 {
     match what as i32 {
         0 => coating_pd_change(a, b),
         1 => best_wire(a, b),
         2 => lead_angle_deg(a, b),
+        3 => max_wire_60(a),
+        4 => min_wire_60(a),
+        5 => basic_flat_60(a, false),
+        6 => basic_flat_60(a, true),
         _ => f64::NAN,
     }
 }
@@ -374,6 +390,19 @@ pub fn wire_measurement_f(x: f64, w: f64, p: f64, angle_deg: f64, inverse: f64) 
 mod tests {
     use super::*;
     fn close(a: f64, b: f64, tol: f64) { assert!((a - b).abs() <= tol, "{a} vs {b} (tol {tol})"); }
+
+    /// 1/4-20 (P = 0.05 in): the printed constants times P, flats P/8 and P/4.
+    #[test]
+    fn wire_limits_and_flats() {
+        let p = 1.0 / 20.0;
+        close(thread_misc_f(p, 0.0, 3.0), 0.0505, 1e-4);
+        close(thread_misc_f(p, 0.0, 4.0), 0.0253, 1e-4);
+        close(thread_misc_f(p, 60.0, 1.0), 0.0289, 1e-4);
+        close(thread_misc_f(p, 0.0, 5.0), 0.00625, 1e-9);
+        close(thread_misc_f(p, 0.0, 6.0), 0.0125, 1e-9);
+        // The largest wire touches the flank at the major-diameter flat: 7 P / (8 cos 30).
+        close(max_wire_60(1.0), 7.0 / (8.0 * 30f64.to_radians().cos()), 1e-6);
+    }
 
     /// 2-4 ACME as printed by MachiningDoctor (threadinfo-acme, tid 5014,
     /// accessed 2026-11-11). Class, external (major max, min, pitch max, min,

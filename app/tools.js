@@ -1227,8 +1227,8 @@ const TOOLS = [
   id: 'drillchart', level: 'simple', group: 'Drilling and tapping', title: 'Drill size chart',
   desc: 'Fractional, number, letter and metric drills in decimal inch and mm, searchable, with a nearest-drill finder. Number and letter sizes show how many independent publishers print each value.',
   render: el => renderDrillChart(el),
-  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them; they are not given by a formula), so each value is what the publishers listed under the table print. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder takes a diameter in inch or mm (whatever the unit setting) and lists, for each series (number, letter, fractional, metric), the nearest drill at or below and the nearest above, with the difference (drill minus your size) in inch and mm.',
-  source: 'Wikipedia "Drill bit sizes"; Stoody Industrial & Welding Supply decimal equivalents chart; P. Lobben, Machinists\' and Draftsmen\'s Handbook (1910, public domain). Standards cited, not read: ASME B94.11M-1993 (twist drills, current per ASME catalogue), ISO 235:2016 (metric jobber drill sizes).',
+  working: 'Number and letter drill sizes are a convention (ASME B94.11M-1993 lists them to #97; they are not given by a formula), so each value is what the publishers listed under the table print. Micro sizes #98 to #107 are beyond the standard: they come from trade charts (#98 to #104 from four publishers, #105 to #107 from two) and are worth checking against the drill maker\'s catalogue. Fractional sizes are n/64 in, exact. mm = inch x 25.4 (exact). The nearest-drill finder takes a diameter in inch or mm (whatever the unit setting) and lists, for each series (number, letter, fractional, metric), the nearest drill at or below and the nearest above, with the difference (drill minus your size) in inch and mm.',
+  source: 'Wikipedia "Drill bit sizes"; Stoody Industrial & Welding Supply decimal equivalents chart; P. Lobben, Machinists\' and Draftsmen\'s Handbook (1910, public domain); micro sizes: The Engineering ToolBox, Mechanical-Engineering.com, Size-Charts.com, ElectronicsHub. Standards cited, not read: ASME B94.11M-1993 (twist drills, current per ASME catalogue), ISO 235:2016 (metric jobber drill sizes).',
 },
 {
   id: 'tapdrill', level: 'simple', group: 'Drilling and tapping', title: 'Tap drill size',
@@ -1477,7 +1477,7 @@ const TOOLS = [
   desc: 'Basic dimensions of ISO metric (coarse and fine) and Unified (UNC, UNF, UNEF) threads from the basic profile, with ISO 6g/6H and Unified 2A/3A/2B/3B limits computed from the standards\' formulas and checked against published tables.',
   render: el => renderThreadData(el),
   working: 'See the note under the tool.',
-  source: 'ISO 68-1:2023, ISO 261:1998, ISO 262:2023, ISO 965-1:2013 (revised 2026), ASME B1.1-2024; series and published limits from the publishers listed under the tool.',
+  source: 'ISO 68-1:2023, ISO 261:1998, ISO 262:2023, ISO 965-1:2013 (revised 2026), ASME B1.1-2024; series and published limits from the publishers listed under the tool. Wire sizes: NBS Letter Circular 23 (1923, table 1, https://nvlpubs.nist.gov/nistpubs/Legacy/LC/nbslettercircular23r1923.pdf) and Thread Check, "Alternate size thread measuring wires" (https://www.threadcheck.com/blog/alternate-size-thread-measuring-wires/), both read 2026-11-13.',
 },
 {
   id: 'threadid', level: 'advanced', group: 'Threads', title: 'Thread identifier',
