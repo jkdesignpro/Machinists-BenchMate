@@ -2955,6 +2955,18 @@ where = 'toolpaths';
     const ty = '#main select[aria-label="Thread type"]', sz = '#main select[aria-label="Size"]';
     const types = await page.$$eval(ty + ' option', a => a.map(o => o.value));
     if (types.join(',') !== 'mc,mf,UNC,UNF,UNEF,_whit,_pipe,custom') problems.push(`[${where}] thread types: ${types}`);
+    // The size list is filled on opening, also when the thread shown is of the first type (it was empty).
+    for (const id of ['threaddata', 'tapdrill', 'taplimits', 'bolttorque']) {
+      if (id !== 'threaddata') await open(id, 300);
+      const s0 = await page.$eval(sz, e => e.options.length + ':' + e.value).catch(() => 'none');
+      if (!/^[1-9]\d*:.+/.test(s0)) problems.push(`[${where}] ${id}: the size list should be filled on opening: ${s0}`);
+    }
+    await open('threaddata', 300);
+    // Changing the type keeps near the size shown, and the size list shows the size picked.
+    await page.selectOption(ty, 'mc'); await page.waitForTimeout(150); await page.selectOption(sz, 'M10x1.5'); await page.waitForTimeout(150);
+    await page.selectOption(ty, 'mf'); await page.waitForTimeout(150);
+    if ((await page.inputValue(sz)) !== (await page.inputValue('#hk')) || !/^M1[02]x/.test(await page.inputValue('#hk'))) problems.push(`[${where}] coarse to fine near M10: ${await page.inputValue(sz)} / ${await page.inputValue('#hk')}`);
+    await page.selectOption(ty, 'mc'); await page.waitForTimeout(150);
     await page.selectOption(ty, 'UNC'); await page.waitForTimeout(150);
     const n = await page.$$eval(sz + ' option', a => a.length), first = await page.$eval(sz, e => e.options[0].textContent);
     if (n < 10 || n > 40 || /UNF/.test(first)) problems.push(`[${where}] UNC sizes only: ${n}, ${first}`);

@@ -123,15 +123,19 @@ function enhanceThreadSelect(sel) {
     sz.innerHTML = list.map(o => '<option value="' + rEsc(o.value) + '">' + rEsc(t === 'custom' ? 'Type it in the boxes below' : o.text.replace(/ \((coarse|fine)\)$/, '').replace(/ (UNC|UNF|UNEF)$/, '')) + '</option>').join('');
     sz.disabled = t === 'custom'; lab.classList.toggle('na', t === 'custom');
   };
-  const sync = () => { const o = all.find(x => x.value === sel.value) || all[0]; if (!o) return; if (ty.value !== o.type) { ty.value = o.type; fill(o.type); } sz.value = o.value; };
-  const pick = v => { desc.set.call(sel, v); sel.dispatchEvent(new Event('change')); };
+  // Fill the size list whenever the type changes, and also the first time (the type list starts on its first
+  // entry, so without the check the size list stayed empty when the thread shown was of the first type).
+  const sync = () => { const o = all.find(x => x.value === sel.value) || all[0]; if (!o) return; if (ty.value !== o.type || !sz.options.length) { ty.value = o.type; fill(o.type); } sz.value = o.value; };
+  const pick = v => { desc.set.call(sel, v); sz.value = v; sel.dispatchEvent(new Event('change')); };
   ty.onchange = () => {
     if (THREAD_TYPE_PAGES[ty.value]) { fill(ty.value); sz.innerHTML = '<option>See its own page</option>'; sz.disabled = true; return; }
     // Keep near the size already shown: the first size of the new type at or above its diameter.
-    const was = all.find(x => x.value === sel.value), dia = was ? parseFloat(String(was.text).replace(/^M/, '')) : NaN;
+    // From "Other", the typed diameter (mm) of the thread data page is used when there is one.
+    const was = all.find(x => x.value === sel.value), typed = sel.id === 'hk' && sel.value === 'custom' && RMEM.thd && RMEM.thd.sys !== 'unified' ? RMEM.thd.d : NaN;
+    const dia = isFinite(typed) ? typed : was ? parseFloat(String(was.text).replace(/^M/, '')) : NaN;
     fill(ty.value);
     const list = all.filter(o => o.type === ty.value);
-    const next = (ty.value === 'mc' || ty.value === 'mf') && (was && /^M/.test(was.value)) && isFinite(dia) ? (list.find(o => parseFloat(o.text.replace(/^M/, '')) >= dia - 1e-9) || list[0]) : list[0];
+    const next = (ty.value === 'mc' || ty.value === 'mf') && (isFinite(typed) || (was && /^M/.test(was.value))) && isFinite(dia) ?(list.find(o => parseFloat(o.text.replace(/^M/, '')) >= dia - 1e-9) || list[0]) : list[0];
     if (next) pick(next.value);
   };
   sz.onchange = () => pick(sz.value);
