@@ -106,6 +106,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, eleventh batch, 2026-11-13):** hardenability, case hardening and machinability in the materials guide; vibration in general and balancing a rotor in place in the drives and maintenance guide; tightening methods in the fasteners guide; speed, feed and depth of cut in the CNC knowledge guide. MH56, MH58, MH134, MH135, MH136, MH198, ED23 and ED24 from partial to done; MH31 gains the balancing procedure and stays partial. Counted from the tables below: 421 done, 127 partial, 48 missing of 596 in-scope rows, 71 %; 116 more rows to done for the 90 % target.
 
+**Update (0.7.0, twelfth batch, 2026-11-13):** the tensile test, heat and cold and steels by use in the materials guide; band speeds and grinding carbide tools in the shop tools guide; choosing a turning tool holder in the tooling guide. MH49, MH53, MH132, MH156, MH98 and BB69 from partial to done; MH33 and BB26 gain sections and stay partial. Counted from the tables below: 427 done, 121 partial, 48 missing of 596 in-scope rows, 72 %; 110 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -394,7 +396,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH30 | Centrifugal force | done | `chuckforce` | F = m r omega^2, jaw centrifugal force and grip left at speed, OD and ID gripping (`claude/mechanics`) |
 | MH31 | Balancing rotating parts, balancing lathe fixtures | partial | `balance`, `driveguide` | ISO 21940-11 permissible unbalance, two-plane split, correction mass; 0.7.0: trial-weight balancing procedure in the drives and maintenance guide; no lathe fixture counterweight layout (`claude/mechanics`) |
 | MH32 | Critical speeds | partial | `critspeed` | Uniform shaft with up to three discs, Rayleigh and Dunkerley; no stepped shafts or flexible bearings (`claude/mechanics`) |
-| MH33 | Mechanical properties, stress and strain, factor of safety, stress concentration | partial | `stressconc`, `fatigue` | Holes in plates, fatigue factors of safety; no stress-strain basics, no stepped-shaft or groove Kt (no free source) (`claude/mechanics`) |
+| MH33 | Mechanical properties, stress and strain, factor of safety, stress concentration | partial | `stressconc`, `fatigue`, `matguide` | Holes in plates, fatigue factors of safety; 0.7.0: the tensile test (stress and strain, modulus, limits, yield and proof stress, tensile strength, elongation, factor of safety) in the materials guide; no stepped-shaft or groove Kt (no free source) (`claude/mechanics`) |
 | MH34 | Combined and 3D stresses, loaded rings, strength of taper pins | missing | | |
 | MH35 | Centre of gravity, radius of gyration, moment of inertia, section modulus | done | `section` | Eight shapes built up from rectangles, principal axes, S, r, J (`claude/mechanics`) |
 | MH36 | Beams: stresses and deflections | done | `beam`, `deflection` | Cantilever, simply supported, fixed-fixed; point and uniform loads; no overhangs or partial loads (`claude/mechanics`) |
@@ -415,11 +417,11 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH46 | Weight of piles, molecular weight, mole, air, alligation, soil weight | out of scope? | | |
 | MH47 | Properties of wood | out of scope? | | |
 | MH48 | Tabulated properties of ceramics, plastics, investment-casting and powder metal alloys | partial | `materials` | 5 plastics; no ceramics, casting or PM alloys |
-| MH49 | Elastic properties; effect of temperature on strength | partial | `materials` | E for 27 entries; no temperature effect |
+| MH49 | Elastic properties; effect of temperature on strength | done | `materials`, `matguide` | E for 27 entries; 0.7.0: what heat and cold do to strength, the brittleness of ferritic steels in the cold, creep and stress relaxation in the materials guide. No strength-against-temperature figures (none printed for steel in the sources read) |
 | MH50 | Standard steels: classification, AISI/SAE/UNS numbering | done | `materials`, `matguide` | 0.6.0: numbering explained in the materials guide (digits, 17 series, letters L, B, H); equivalents in `materials`. UNS numbers are not explained |
 | MH51 | Identifying metals | done | `metalid` | Spark, magnet and chip tests (one source); 0.7.0: magnet on stainless with two sources, and three chemical spot tests (nitric acid, molybdenum, sulphur print) with their limits |
 | MH52 | Compositions of carbon, alloy and stainless steels | partial | `materials` | 0.5.0: 37 grades, limits from two public sources each where found (see docs/material-equivalents.md) |
-| MH53 | Applications and mechanical properties of steels | partial | `materials`, `matguide` | Properties for some grades; uses by carbon class in the materials guide; no applications by grade |
+| MH53 | Applications and mechanical properties of steels | done | `materials`, `matguide` | Properties for some grades; uses by carbon class in the materials guide; 0.7.0: a table of uses grade by grade from two suppliers side by side, plus tool steels and stainless |
 | MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials`, `matguide` | 10 tool-steel grades as equivalents; 0.6.0: the letter groups with an example grade, quench, hardness and machinability rating (one source for the figures); no selection guide by job, faults or heat treatment |
 | MH55 | Tool steel mill forms, machining allowances, decarburization limits | missing | | |
 | MH56 | Heat treatment: definitions, hardness and hardenability | done | `heattreat`, `matguide` | Terms in our words (7 of 12 used by two publishers); 0.7.0: hardness against hardenability, the Jominy end-quench test, what each depends on and the ideal critical diameter in the materials guide |
@@ -474,7 +476,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 |---|---|---|---|---|
 | MH96 | Single-point tool terms: contour, relief, rake, lead angles, nose radius, chipbreakers | partial | `toolguide` | Rake, clearance, entering/lead angle, helix, nose radius, chip breaker and edge hone in own words with drawings (mostly marked "needs 2nd source"); no tool signature or contour terms (`claude/tooling-ref`) |
 | MH97 | Indexable insert identification system | done | `insertcode` | Decode and build ISO 1832 codes with evidence (`claude/ref-data-3`); status corrected on `claude/tooling-ref` |
-| MH98 | Indexable insert holder identification and selection | partial | `holdercode` | ISO 5608 external holder codes decoded; no selection guide (status corrected on `claude/tooling-ref`) |
+| MH98 | Indexable insert holder identification and selection | done | `holdercode`, `toolguide` | ISO 5608 external holder codes decoded; 0.7.0: choosing a turning tool holder (shank, overhang, clamping, interrupted cuts, hand) in the tooling guide. No holder angles: the maker's tables are pictures |
 | MH99 | Carbide blanks and carbide-tipped tool styles | missing | | |
 | MH100 | Insert radius compensation (NC); threading insert radius | partial | `tnrc` | Nose radius shifts for chamfers, tapers and arcs, any tip 0-9, G41/G42 explained; no threading insert radius (`claude/cnc-guide`) |
 | MH101 | Cemented carbides, ceramics, superhard materials | done | `toolguide`, `cutguide` | Summary of HSS, carbide, cermet, ceramic, CBN and PCD in `toolguide`; 0.6.0: ranking drawing, hardness at 20 and 600 °C, top temperature and toughness (one source, marked), what each is used for and kept off, two differing temperature figures shown |
@@ -508,7 +510,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH129 | Files and burs; speeds of rotary burs | done | `shoptools`, `cutguide` | Carbide burr cuts and speeds from two makers in `shoptools`; 0.6.0: files (parts, cuts, grades, shapes, filing practice, care) |
 | MH130 | Knurls and knurling: sizes, formulas for knurled work, tolerances | partial | `knurl` | Blank diameter by four methods with a trial procedure; no tolerances on knurled work |
 | MH131 | Tool wear: flank wear, cratering, chipping, deformation | done | `cncguide` | See U91 (`claude/cnc-guide`) |
-| MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | partial | `shoptools`, `toolguide` | Drill sharpening by hand, faults and web thinning; no carbide tool grinding or diamond wheels |
+| MH132 | Sharpening twist drills, point thinning, carbide tool grinding, diamond wheels | done | `shoptools`, `toolguide` | Drill sharpening by hand, faults and web thinning; 0.7.0: grinding carbide tools (green silicon carbide and diamond wheels, bond, grit, pressure, coolant) in the shop tools guide |
 | MH133 | Sieves, mesh and abrasive grit numbers | done | `gritconv`, `abrasguide` | Grit size conversion per publisher; 0.7.0: sieve No. 4 to No. 635 openings as three sources print them, side by side, with what the mesh number means |
 
 ### Machining operations
@@ -537,7 +539,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH153 | Machine settings and calculation of costs (all operations incl. grinding) | partial | `toollife` | Single tool only |
 | MH154 | High-speed machining econometrics, chip geometry in milling, mean chip thickness | partial | `cutopt` | Mean chip thickness only |
 | MH155 | Automatic screw machines: knurling, cams, speeds, stock | partial | `bar` | Bar stock per part only; cam work missing |
-| MH156 | Band saw blade selection, speeds, feeds, break-in | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch rule, blade types, break-in, fault table and cut time; no band speeds by material |
+| MH156 | Band saw blade selection, speeds, feeds, break-in | done | `shoptools`, `sawtpi`, `bandsaw` | Pitch rule, blade types, break-in, fault table and cut time; 0.7.0: band speeds by material from three pages side by side, chips |
 | MH157 | Cutting fluids: selection, cutting oils, water-miscible fluids | done | `shoptools`, `coolconc`, `coolmix` | Neat oil, emulsion, semi-synthetic and synthetic compared; which for slow heavy work and which for fast cutting; by material |
 | MH158 | Metalworking fluids: classes, maintenance, exposure | done | `shoptools`, `coolconc`, `coolmix` | Classes, concentration and mixing, care of mixed fluids; 0.7.0: what to check on a sump and when, when to change the fluid, the mist limit NIOSH recommends and how to keep mist and skin contact down |
 | MH159 | Machining nonferrous metals (aluminium, magnesium, zinc, nickel, copper) | missing | | |
@@ -847,7 +849,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB23 | Cutting speed to RPM conversion | done | `rpm` | |
 | BB24 | Hole saws and recommended speeds | done | `shoptools`, `rpm` | Speeds for four diameters and five materials from two charts side by side; the cutting speed in mild steel worked out from both |
 | BB25 | Hacksaw and power saw blade selection | done | `shoptools`, `sawtpi` | Hacksaw blades of 18, 24 and 32 teeth per inch, the three-teeth rule, fitting and tension; pitch calculator |
-| BB26 | Bandsaw blade selection | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch selection, blade types, break-in (two suppliers, figures differ), fault table and cut time; no blade width or speed chart |
+| BB26 | Bandsaw blade selection | partial | `shoptools`, `sawtpi`, `bandsaw` | Pitch selection, blade types, break-in (two suppliers, figures differ), fault table and cut time; 0.7.0: band speed table from three pages; no blade widths |
 | BB27 | Sharpening HSS toolbits | done | `shoptools` | Order of grinding, relief and rake by material, nose radius, cooling, wheel and finishing, with a drawing (two guides) |
 | BB28 | Lubricants and coolants for cutting tools | done | `shoptools`, `coolconc`, `coolmix` | Table of four kinds of fluid and where each suits, the rule by speed and by material, care of mixed fluids |
 | BB29 | Trigonometry, Pythagoras, rise per degree, 3-4-5 rule | done | `triangle`, `squaring` | Triangle solver; 0.7.0: 3-4-5 rule for any two legs, corner angle from a measured diagonal, rise over a length for an angle |
@@ -890,7 +892,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB66 | Carbide insert identification | done | `insertcode` |  |
 | BB67 | Quick visual identification of insert shapes | done | `insertcode` | Insert drawn to scale from the code |
 | BB68 | Carbide toolholder identification | done | `holdercode` |  |
-| BB69 | Carbide toolholder selection and application | partial | `holdercode` | Decoding only; no selection guide |
+| BB69 | Carbide toolholder selection and application | done | `holdercode`, `toolguide` | Decoding in `holdercode`; 0.7.0: choosing and applying a turning tool holder in the tooling guide |
 | BB70 | Abbreviations used in drawings | done | `abbrev` | 65 abbreviations in our words, 34 listed by two publishers (`claude/measure-maths`) |
 | BB71 | Standards for engineering drawings | done | `drawguide` | 0.6.0: table of thirteen ISO, ASME, AWS and BS standards with what each covers (six rows one source, marked); BS 8888 |
 | BB72 | Human physical dimensions | out of scope | | |

@@ -1699,3 +1699,43 @@ All wording is BenchMate's own. A statement with fewer than two independent publ
 ### Speed, feed and depth of cut (`app/cncguide.js`, section in the CNC knowledge guide)
 - **[MMC_EFF]** Mitsubishi Materials, technical information for turning tools, "Effects of cutting conditions", https://www.mmc-carbide.com/us/technical_information/tec_turning_tools/technical/tec_turning_effects : speed against tool life (20 % more speed halves it, 50 % more leaves a fifth), chatter at 65 to 130 SFM, feed too small and too large, feed and finish, depth of cut and the hardened skin. Figures are for the maker's turning tools and are attributed.
 - **[SECO_PAR]** Seco Tools, "Tools and parameters still play a key role in machining success" (no author or date in the text read), https://www.secotools.com/article/tools_and_parameters_still_play_a_key_role_in_mach : depth of cut first, then feed, then speed; speed shortens tool life while feed and depth have little effect; lower speed with higher feed uses less energy.
+
+## Guide sections added in the twelfth batch of 0.7.0, accessed 2026-11-13
+
+All wording is BenchMate's own. A statement with fewer than two independent publishers is marked on the page. Where sources print different figures each is shown with its source.
+
+### The tensile test (`app/matguide.js`, section in the materials guide)
+- **[FRAC_SS]** A. Velling, Fractory, "Stress-strain curve", 2020-06-03, updated 2026-08-19, https://fractory.com/stress-strain-curve/ : stress and strain, Hooke's law, Young's modulus, proportional limit, yield, tensile strength, necking, cup and cone fracture.
+- **[WP_SS]** Wikipedia, "Stress-strain curve", https://en.wikipedia.org/wiki/True_stress (redirect to the article; CC BY-SA): how the curve is obtained, Hooke's law and the modulus, tensile strength, necking, ductile and brittle materials, engineering against true stress.
+- **[MATH_SS]** MATHalino, "Stress-strain diagram", https://mathalino.com/node/94 : proportional limit, elastic limit, ultimate strength, factor of safety as strength over allowable stress.
+- **[TWI_TT]** TWI, Job Knowledge 69, "Mechanical testing: tensile testing part 1", https://www.twi-global.com/technical-knowledge/job-knowledge/mechanical-testing-tensile-testing-part-1-069 : the test, yield, proof stress and Rp0.2, elongation, reduction of area, ductility, Young's modulus. Same publisher as [TWI] (corrosion). Its definition of tensile strength (load at failure over the original area) differs in wording from the others, so it is not cited for that statement.
+- None of the four prints the 0.2 % offset figure except TWI, so the proof stress statement is marked as one source. The drawing of the curve is BenchMate's own and is a schematic, not to scale.
+
+### Heat and cold (`app/matguide.js`, section in the materials guide)
+- **[TM_TEMP]** Total Materia, "Steel properties at low and high temperatures", updated August 2026, https://www.totalmateria.com/ru/articles/steel-properties-low-and-high-temperatures (article in English, site menus in Russian): strength in the cold, ferritic against austenitic steels, the brittle transition and what lowers it, creep and its stages, temperatures. Same publisher as the other Total Materia articles.
+- **[MAT_TEMP]** N. Lewis and Materion Customer Technical Services, "In our element: how does temperature affect material properties?", 2024-01-01, https://www.materion.com/insights/blog/in-our-element-temperature-affect-material-properties : strength and modulus against temperature, steel brittle and copper alloys tougher in the cold, creep and stress relaxation. Its measurements are of a copper beryllium alloy, and the page says so.
+- No figures for strength against temperature are given: neither source prints them for steel.
+
+### Steels by use (`app/matguide.js`, section in the materials guide)
+- **[AIMS_SG]** AIMS Industrial, "Steel grades comparison", 2026-09-29, https://aimsindustrial.com.au/blogs/product-guides/steel-grades-comparison : uses of 1020, 1045, 4140, 4340, 8620, the tool steels O1, A2, D2, M2 and H13, and 304 and 316. A supplier.
+- **[CS_SG]** Continental Steel & Tube, carbon and alloy steel grades page (no date), https://continentalsteel.com/carbon/grades/ : uses printed for groups of grades. A supplier.
+- **Read but not used:** Industrial Metal Supply, https://www.industrialmetalsupply.com/grades-of-steel , and Metallus, https://metallus.com/offerings/grades-of-steel/ : neither prints uses grade by grade.
+
+### Band speeds (`app/shoptools.js`, sub-section in the shop tools guide)
+- **[EXC_BS]** A. Grace, Excision, "What speed and feed should I run my bandsaw at?", 2024-10-03, https://excision.com.au/blogs/learning-centre/what-speed-and-feed-should-i-run-my-bandsaw-at : band speed in m/min by material for 10 to 100 mm sections, harder and bigger slower, chips. One row of its table (aluminium "without band twist", 2125 to 2875 m/min) is far outside the rest and is not used.
+- **[LFC_BS]** LFC, "Blade speed and feed settings for a metal bandsaw", 2025-07-08 (no author), https://www.lfc.com.sg/blog/detail/blade-speed-feed-settings-metal-bandsaw : band speeds in ft/min and m/min by material (the m/min figures are used), chips, more feed with fluid.
+- **[NILS_BS]** J. A. Nilsson, Machine shop tutorials, band saw, "Speeds and materials" (CC BY-SA 4.0), https://jonilsson.github.io/machine-shop-tutorials/band_saw/speeds_and_materials : band speeds in ft/min by material, hardened material with a carbide blade. Same author as [NILS_L].
+- None of the three says which kind of blade its figures are for. Nilsson's figures for steel, tool steel, stainless steel and cast iron are well below the other two; all three are shown side by side and nothing is averaged. Excision and LFC give opposite advice for short, hard chips, and the page says so.
+- **Not used:** the Sawblade.com bi-metal chart (https://www.sawblade.com/tech-tips/band-saw-blade-speed-and-feed-chart): the reader returned it flattened, with its columns placed by row order only. The Starrett cutting rate bulletin (no band speeds) and the MachineMFG sawing chart (seven unlabelled figures a row, no units). Little Machine Shop's band saw page prints no speeds.
+
+### Grinding carbide tools (`app/shoptools.js`, sub-section in the shop tools guide)
+- **[IMD_GW]** Industrial Monitor Direct, "Grinding wheels for lathe tools: selection guide", 2026-07-31, https://industrialmonitordirect.com/blogs/knowledgebase/grinding-wheels-for-lathe-tools-selection-guide : green silicon carbide for carbide, aluminium oxide hardly cuts it, light pressure, green wheels seldom dressed. Its grit figures for high speed steel and its grade of the white wheel disagree with each other inside the page and are not used.
+- **[AX_GW]** Axminster Tools, "Choosing a grinding wheel", 2016-05-19, https://www.axminstertools.com/ideas-advice/grinding-wheels/ : aluminium oxide wheels for steel, green silicon carbide for tungsten carbide, CBN for high speed steel.
+- **[UKAM_DW]** UKAM Industrial Superhard Tools, "How to select the best diamond grinding wheel for tungsten carbide", 2026-07-23, https://ukam.com/how-to-select-the-best-diamond-grinding-wheel-for-tungsten-carbide/ : diamond against carbide, bonds, grit, coolant, heat, conditioning. A maker of diamond wheels; its own figures are attributed.
+- Not found in the pages read: whether a diamond wheel may touch steel, and dust precautions for carbide. The page says so.
+
+### Choosing a turning tool holder (`app/tooling.js`, section in the tooling guide; `data/refdata/tooling-evidence.json`)
+- **[PT_TH]** C. Humphreys, Protool, "Lathe tool holders carbide: what to choose", 2026-06-14, https://www.protool-ltd.co.uk/blogs/blog/lathe-tool-holders-carbide-what-to-choose : shank, overhang, kinds of clamping, interrupted cuts, what to check before ordering. Same publisher as [PROTOOL_TM].
+- **[MMC_TH]** Mitsubishi Materials, course page "Tool holder selection for external turning", https://www.mmc-carbide.com/permanent/courses/75/tool-holder-selection-for-external-turning.html : the clamping methods P, S, C, D, M and E and where each is used, square inserts. Same publisher as [MMC]. Its tables of holders and lead angles are pictures and were not read.
+- **[OMT_TH]** Jiang.xu, OnMy Toolings, "CNC turning tool holder types: the ultimate selection guide", 2025-12-30, modified 2026-11-02, https://onmytoolings.com/?p=17548 : kinds of clamping, shank, overhang, positive inserts, hand. A seller. Its list of style letters and angles contradicts itself (style A and style E each given two angles) and is not used.
+- Mitsubishi and OnMy Toolings describe the clamping letter M differently (wedge lock against multi-lock); both are shown.

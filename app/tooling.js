@@ -14,7 +14,7 @@ const TG_EXTRA = {
   OWN: { publisher: 'BenchMate', title: 'Own derivation (geometry), with tests in core/src/tooling.rs' },
 };
 // USCTI's tapping tips are GWS Tool Group's text: one publisher family.
-const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS', MSC_TM: 'MSC', REGAL_TG: 'REGAL', AIMS_CF: 'AIMS_BT' };
+const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS', MSC_TM: 'MSC', REGAL_TG: 'REGAL', AIMS_CF: 'AIMS_BT', MMC_TH: 'MMC', PT_TH: 'PROTOOL_TM' };
 let TG_SRC = TG_EXTRA;
 function tgTags(keys) {
   const ks = keys || [];
@@ -72,7 +72,7 @@ async function renderToolGuide(el) {
   TG_SRC = Object.assign({}, TG_EXTRA, T.sources);
   const S = T.sources;
   const toc = [['t-geo', 'Tool geometry'], ['t-mat', 'Tool materials'], ['t-coat', 'Coatings'], ['t-em', 'End mills'], ['t-dr', 'Drills'], ['t-rm', 'Reamers'], ['t-tap', 'Taps'],
-    ['t-lim', 'Tap limits'], ['t-tm', 'Thread mills'], ['t-saw', 'Saw blades'], ['t-brk', 'Broken taps'], ['t-src', 'Sources']];
+    ['t-lim', 'Tap limits'], ['t-tm', 'Thread mills'], ['t-hold', 'Turning holders'], ['t-saw', 'Saw blades'], ['t-brk', 'Broken taps'], ['t-src', 'Sources']];
   const coatRows = [
     ['TiN', 'Titanium nitride. Gold. The general purpose coating for HSS and carbide drills, taps and end mills.', ['HARTNER', 'GWS']],
     ['TiCN', 'Titanium carbonitride. Harder than TiN, for edges under high mechanical load or impact, such as taps and interrupted cuts; lower heat limit.', ['HARTNER', 'PRODINC']],
@@ -188,6 +188,21 @@ async function renderToolGuide(el) {
     tp('<b>Several radial passes.</b> In tough material, or with a long tool, step out to size over two or three orbits. It spares the tool, bends it less and gives a better thread.', ['HARVEY_TM', 'PROTOOL_TM']) +
     tp('<b>Chips.</b> Clear them with coolant: chips that are cut a second time push the thread out of tolerance.', ['HARVEY_TM']) +
     tp('<b>Cutter diameter.</b> Harvey: no larger than the job needs.', ['HARVEY_TM']) +
+
+    '<h2 id="t-hold">Choosing a turning tool holder</h2>' +
+    tp('<b>Shank.</b> Take the largest shank the turret or tool post accepts: a larger shank makes a stiffer set-up.', ['PT_TH', 'OMT_TH']) +
+    tp('<b>Overhang.</b> Let the holder stick out only as far as the job needs. Boring bars suffer most: deflection from a long overhang is the main enemy of internal turning.', ['PT_TH', 'OMT_TH']) +
+    tp('<b>Lever lock (P)</b> is the commonest way of clamping the insert. Mitsubishi: it does not suit heavy interrupted cuts.', ['MMC_TH', 'OMT_TH']) +
+    tp('<b>Screw (S)</b> is the simplest and most compact: a screw through the tapered hole of the insert. It is used on small holders and boring bars and holds positive inserts.', ['MMC_TH', 'OMT_TH']) +
+    tp('<b>Top clamp (C)</b> presses the insert into its pocket from above, so it holds inserts that have no hole.', ['MMC_TH', 'OMT_TH']) +
+    tp('<b>Double clamp (D)</b> holds even in heavy interrupted cutting.', ['MMC_TH']) +
+    tp('<b>The letter M</b> is described in two ways: Mitsubishi calls it wedge lock and suggests it for copying; OnMy Toolings calls it multi-lock and rates it for the most secure hold.', ['MMC_TH', 'OMT_TH']) +
+    tp('<b>Interrupted cuts</b> want a stronger insert shape and a holder that clamps securely.', ['PT_TH', 'MMC_TH']) +
+    tp('<b>Insert shape.</b> Where no square shoulder has to be finished, a square insert gives four cutting edges a side.', ['MMC_TH']) +
+    tp('<b>Positive inserts</b> are sharper and cut with less force and heat.', ['OMT_TH']) +
+    tp('<b>Hand.</b> A right-hand holder, cutting towards the chuck, is the commonest.', ['OMT_TH']) +
+    tp('<b>Before ordering</b> check the insert designation, the hand, the shank size, the centre height and the approach angle.', ['PT_TH']) +
+    '<p class="desc">No angles are given here: Mitsubishi\'s tables of holders and lead angles are pictures and could not be read, and the other list of style letters does not agree with itself. The letters of a holder are decoded in ' + tgLink('holdercode', 'Toolholder designation (ISO 5608)') + '.</p>' +
 
     '<h2 id="t-saw">Saw blades and tooth pitch</h2>' +
     tp('<b>At least three teeth in the cut.</b> Choose a pitch that keeps at least three teeth in the thinnest section the blade crosses (the wall of a tube or the leg of an angle); with fewer, teeth snag and strip.', ['STARRETT', 'RMT']) +

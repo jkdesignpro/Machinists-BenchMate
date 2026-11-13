@@ -1943,7 +1943,7 @@ where = 'toolpaths';
   // hole saw table prints both charts' figures side by side.
   where = 'shoptools';
   g = await guide('shoptools');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,5,5' || g.srcs !== 26) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 4 and 4 rows, 26 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,8,5,5' || g.srcs !== 32) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 7, 4 and 4 rows, 32 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 46) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four things have to be right', 'Lip clearance', 'Drill point gauge', 'Order', 'Hacksaw blades', 'Break in a new band saw blade', 'Fluid and brush', 'Bigger saw, slower', 'Speed falls with size', 'The rule', 'Dressing and truing are two jobs'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -1958,7 +1958,7 @@ where = 'toolpaths';
   if (!/8 to 12 degrees/.test(g.all) || !/6 to 9 degrees/.test(g.all) || !/20 to 50 %/.test(g.all) || !/first 100 square inches/.test(g.all) || !/about 27 to 30 m\/min/.test(g.all) || !/12 000 to 18 000 against 4 000 to 10 000/.test(g.all)) problems.push(`[${where}] drill clearance, break-in, hole saw or burr figures are missing`);
   where = 'matguide';
   g = await guide('matguide');
-  if (g.h2 !== 14 || g.svgs !== 3 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,9,5' || g.srcs !== 49) problems.push(`[${where}] 14 sections, 3 drawings, 14 tables, 49 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 17 || g.svgs !== 4 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,11,9,5' || g.srcs !== 57) problems.push(`[${where}] 17 sections, 4 drawings, 15 tables, 57 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 77) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four digits', 'First digit', 'A letter in the middle', 'Low, medium and high carbon', 'W, O and A name the quench', 'Austenitic grades are not hardened', 'Two ways to strength', 'H tempers, second digit', 'T651 is', 'On extrusions a fourth digit', 'Grain size tempers', 'Titanium grade 5', 'The letters', 'The number in a ZA name', 'Rockwell scales', 'Vickers angle, sources differ', 'Check the heat number first'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2717,6 +2717,40 @@ where = 'toolpaths';
 
     s = await sect('cncguide', 'c-cond', ['H2']);
     if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^Speed wears the tool fastest\..*20 % more speed halves the tool life, 50 % more leaves a fifth/, 2, false) || !has(s, /^The order \(Seco\)\. Take the largest depth of cut/, 1, true) || !(await page.$('#main .gtoc a[href="#c-cond"]'))) problems.push(`[${where}] speed, feed and depth: ${brief(s)}`);
+    await mode('advanced');
+  }
+
+  // Twelfth batch of 0.7.0: the tensile test, heat and cold, steels by use, band speeds, grinding carbide and turning holders.
+  where = 'guides-12';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || '').replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+    const rowsOf = async sel => page.$$eval(sel, r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()));
+
+    let s = await sect('matguide', 'mg-tens', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 12 || !has(s, /^The straight part\..*Young's modulus/, 3, false) || !has(s, /^Proof stress\..*0\.2 %, written Rp0\.2/, 1, true) || !has(s, /^Tensile strength\. The highest stress on the curve/, 3, false) || !(await page.$('#main #mg-tens + svg.geo'))) problems.push(`[${where}] tensile test: ${brief(s)}`);
+    s = await sect('matguide', 'mg-temp', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^But steel turns brittle\./, 2, false) || !has(s, /^Which steels\..*around 0 °C.*Below -100 °C/, 1, true) || !has(s, /^Creep\..*450 to 550 °C/, 1, true)) problems.push(`[${where}] heat and cold: ${brief(s)}`);
+    {
+      const rows = await rowsOf('#main #mg-use + div table.gtab tr');
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 11 || !/^4340 Crankshafts, heavy-duty axles, aircraft parts 4330, 4340: aerospace, defence, high-stress parts AIMS_SG ?CS_SG$/.test(row('4340')) || !/to be verified/.test(row('52100')) || /to be verified/.test(row('8620'))) problems.push(`[${where}] steels by use: ${rows.join(' | ')}`);
+    }
+
+    s = await sect('shoptools', 'st-band', ['H2', 'H3']);
+    {
+      const rows = await rowsOf('#main #st-band + div table.gtab tr');
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 8 || !/^Cast iron 46 to 75 33 to 75 \(grey iron\) 80 to 100 EXC_BS ?LFC_BS ?NILS_BS$/.test(row('Cast iron')) || !/to be verified/.test(row('Alloy steel')) || /to be verified/.test(row('Tool steel'))) problems.push(`[${where}] band speeds: ${rows.join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 5 || !has(s, /^Short, hard chips: the sources differ\./, 2, false) || !has(s, /^With fluid LFC allows up to 15 % more feed/, 1, true) || !s.some(x => /None of them says which kind of blade/.test(x.t))) problems.push(`[${where}] band speed notes: ${brief(s)}`);
+    s = await sect('shoptools', 'st-carb', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^Green silicon carbide is the bench grinder wheel for tungsten carbide/, 3, false) || !has(s, /^Grit \(UKAM\)\. 80 to 120 .* 230 to 325/, 1, true) || !s.some(x => /Not found in the pages read/.test(x.t))) problems.push(`[${where}] grinding carbide: ${brief(s)}`);
+
+    s = await sect('toolguide', 't-hold', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 12 || !has(s, /^Shank\. Take the largest shank/, 2, false) || !has(s, /^The letter M is described in two ways/, 2, false) || !has(s, /^Hand\. A right-hand holder/, 1, true) || !(await page.$('#main button.tglink[data-id="holdercode"]'))) problems.push(`[${where}] turning holders: ${brief(s)}`);
     await mode('advanced');
   }
 

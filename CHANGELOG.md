@@ -12,6 +12,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (guide sections: tensile test, heat and cold, steels by use, band speeds, grinding carbide, turning holders)
+- Materials guide: **The tensile test** with our own drawing of the curve (stress and strain, Young's modulus, proportional and elastic limit, yield and proof stress, tensile strength, necking, elongation and reduction of area, true stress), **Heat and cold** (strength in the cold and the brittleness of ferritic steels, creep and its stages, stress relaxation) and **Steels by what they are used for** (a table from two suppliers side by side, tool steels and stainless).
+- Shop tools guide: **Band speed by material** (three pages side by side in their own units, chips, where the sources differ) and **Grinding carbide tools** (green silicon carbide and diamond wheels, bond, grit, pressure, coolant).
+- Tooling guide: **Choosing a turning tool holder** (shank, overhang, the kinds of clamping, interrupted cuts, hand, what to check before ordering).
+
 ### Added (guide sections: hardenability, case hardening, machinability, vibration, balancing, tightening, cutting conditions)
 - Materials guide: **Hardenability** (hardness against hardenability, the Jominy end-quench test, the ideal critical diameter), **Case hardening** (carburising, carbonitriding, nitriding, ferritic nitrocarburising, induction and flame hardening in a table of temperatures and case depths, each figure with the source that prints it; steels, quenching, distortion, case hardness) and **Machinability** (what it means, how it is judged, the rating against B1112, carbon, sulphur and lead, stainless steel).
 - Drives and maintenance guide: **Vibration in general** (free and forced vibration, resonance and its cure, damping, which quantity to measure) and **Balancing a rotor in place** (checking that it is unbalance, the reference, trial and trim runs, the size of the trial weight, one plane or two, safety).
@@ -117,7 +122,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 ### Book audit (eleventh batch)
 - MH56 (hardness and hardenability), MH58 (case hardening), MH134 (work materials: machinability), MH135 and MH136 (speed, feed and depth; selecting cutting conditions), MH198 (tightening methods), ED23 (dynamic balancing: the procedure) and ED24 (vibration) from partial to done. MH31 stays partial: the balancing procedure is added, the counterweight layout of lathe fixtures is not.
 - Not found in the sources read and therefore not given: the scatter of each tightening method, a temperature for induction or flame hardening, and how the correction weight is worked out from the trial run.
-- 421 done, 127 partial, 48 missing of 596 in-scope rows, 71 %; 116 more rows to done for the 90 % target.
+- Counted after the eleventh batch: 421 done, 127 partial, 48 missing.
+
+### Book audit (twelfth batch)
+- MH49 (effect of temperature on strength), MH53 (applications of steels), MH132 (carbide tool grinding and diamond wheels), MH156 (band speeds), MH98 and BB69 (choosing a holder) from partial to done. MH33 gains the tensile test and stays partial (no stress concentration for stepped shafts or grooves); BB26 gains the speed table and stays partial (no blade widths).
+- 427 done, 121 partial, 48 missing of 596 in-scope rows, 72 %; 110 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.
