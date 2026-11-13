@@ -104,6 +104,9 @@ Found while working through the 24 points of the 0.8.0 feedback. None is built y
    sketcher's output, and the G71 profile could take arcs.
 7. **Still open from the plan:** offline install (PWA), settings import and export, reordering lists,
    chatter listener and vibration check, the assistant, phone layout and translations.
+8. **Later (owner, 2026-11-13): the assistant and the thread callout scan.** Both are parked on the roadmap.
+   Open question when they are picked up: run them on the owner's own Claude API key (optional, online only
+   when used), offline only (search of BenchMate's pages, on-device text reading), or both.
 
 ### Idea: BenchMate as an MCP server (point 23)
 

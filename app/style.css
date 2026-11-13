@@ -344,6 +344,10 @@ svg.geo.cnw{width:150px;max-width:150px;flex:none;margin:0}
 .bcalc .bc-keys{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
 .bcalc .bc-keys button{height:34px;min-width:0;padding:0 2px;border:1px solid var(--keyedge);border-bottom-width:3px;border-radius:var(--r2);background:linear-gradient(var(--keytop),var(--keybot));color:var(--keyink);cursor:pointer;font:12px var(--sans);white-space:nowrap;overflow:hidden}
 .bcalc .bc-keys button:hover{filter:brightness(1.08)}
+/* Basic view: four columns of bigger keys; no angle unit, no memory line, no Functions panel. */
+.bcalc.bc-basic .bc-keys{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.bcalc.bc-basic .bc-keys button{height:46px;font-size:18px}
+.bcalc.bc-basic .bc-deg,.bcalc.bc-basic .bc-fns,.bcalc.bc-basic .bc-mem{display:none}
 .bcalc .bc-keys button:active{border-bottom-width:1px;transform:translateY(2px)}
 .bcalc .bc-keys .num{background:linear-gradient(color-mix(in srgb,var(--keytop) 70%,var(--panel)),color-mix(in srgb,var(--keybot) 70%,var(--panel)));font:600 15px var(--mono)}
 .bcalc .bc-keys .op{font:600 15px var(--mono)}

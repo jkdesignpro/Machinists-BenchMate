@@ -13,6 +13,8 @@
     "HARTNER": {"publisher": "Hartner GmbH", "title": "Coatings (HARTNER_Beschichtungen_EN)", "url": "https://www.hartner.de/wp-content/uploads/2017/08/HARTNER_Beschichtungen_EN.pdf", "accessed": "2026-11-11", "note": "Drill and tool maker. Max application temperature (printed as < value): TiN 600, TiAlN 800, AlTiN 900, TiCN 450, DLC 500, CVD diamond 600, ZrN 700 deg C."},
     "GWS": {"publisher": "GWS Tool Group", "title": "Tool coatings", "url": "https://www.gwstoolgroup.com/tool-coatings/", "accessed": "2026-11-11", "note": "Tool maker. TiN 500 deg C; AlTiN 800 deg C, printed as an oxidation temperature. No temperature for TiCN, TiAlN or DLC."},
     "BRYCOAT": {"publisher": "Brycoat", "title": "PVD coating properties", "url": "https://brycoat.com/surface-engineering/brycoat-pvd-coating-solutions/pvd-coating-properties/", "accessed": "2026-11-11", "note": "Coating service. Max service temperature: TiN 600, TiCN 400, TiAlN 800, AlTiN 800, CrN 700, ZrN 600 deg C."},
+    "UNIMERCO": {"publisher": "Kyocera Unimerco", "title": "Coating types, end mills (HPMT and Fraisa coatings)", "url": "https://imageservice.kyocera-unimerco.com/imageandfile/getpdf/coating_types_endmill.pdf", "accessed": "2026-11-13", "note": "Tool maker and seller. Max temperature per coating as printed, one grade each: AlTiN (B0819) up to 1000, AlCrN (G6110) up to 1100, TiAlN (T8090) up to 900, CVD diamond (DCT01) up to 600 deg C. The colours it prints for the same chemistries differ from other makers' (AlTiN blue-black; Fraisa's TiB2 gold)."},
+    "PLATIT": {"publisher": "PLATIT AG", "title": "nACRo coating sheet (Compendium p. 65)", "url": "https://www.platit.com/filer/sharing/1757056211/1308/", "accessed": "2026-11-13", "note": "Coating equipment maker. nACRo: CrN adhesion layer, AlCrN core, AlCrSiN top layer; colour grey; max service temperature 1100 deg C; for abrasive aluminium alloys over 12 % Si, titanium alloys (TiAl6V4) and wood; also forming and aluminium die casting."},
     "IJS": {"publisher": "Jozef Stefan Institute, Department F3 (thin films)", "title": "Coating types", "url": "https://www.ijs.si/ijs/dept/f3/TrdePrevleke_A.htm", "accessed": "2026-11-11", "note": "Research institute. Max temperature: TiN 500, CrN 750, TiAlN 900, AlTiN (nano-layer AlTiN/TiN) 1100 deg C."},
     "PRODINC": {"publisher": "Productivity Inc (S. Hudis)", "title": "Selecting the right end mill for your machining set up, 21 Apr 2026", "url": "https://productivity.com/blog/selecting-the-right-end-mill-for-your-machining-set-up/", "accessed": "2026-11-11", "note": "Distributor. Flutes by material, end shapes, roughers, variable pitch and helix, coatings by work material."},
     "BROTHER": {"publisher": "Brother Industries (machine tools)", "title": "What is an end mill? (Speedio navi article a0046), 11 Jun 2024", "url": "https://machinetool.global.brother/en-us/speedio-navi/articles/a0046", "accessed": "2026-11-11", "note": "Machine tool maker. Flute count trade-offs, square, ball and radius ends, roughing end mills."},
@@ -80,7 +82,9 @@
     "GWS": {"TiN": "500", "AlTiN": "800"},
     "BRYCOAT": {"TiN": "600", "TiCN": "400", "TiAlN": "800", "AlTiN": "800", "CrN": "700", "ZrN": "600"},
     "IJS": {"TiN": "500", "TiAlN": "900", "AlTiN": "1100", "CrN": "750"},
-    "AIMS_CT": {"TiN": "600", "TiCN": "400", "TiAlN": "900", "AlCrN": "1100", "Diamond": "600", "CrN": "700"}
+    "AIMS_CT": {"TiN": "600", "TiCN": "400", "TiAlN": "900", "AlCrN": "1100", "Diamond": "600", "CrN": "700"},
+    "UNIMERCO": {"TiAlN": "900", "AlTiN": "1000", "AlCrN": "1100", "Diamond": "600"},
+    "PLATIT": {"AlCrSiN": "1100"}
   },
   "saw_teeth": {
     "STARRETT": {"min_teeth": "3", "max_teeth": "10-14"},

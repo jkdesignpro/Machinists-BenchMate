@@ -130,8 +130,12 @@ function wsOfPage(id) {
   if (cur && lists(cur)) return cur.id;
   const h = PAGE_HOME[id]; return h ? h.ws : '';
 }
+// Workspaces the user closed by clicking their open heading. Cleared when the page changes, so opening a
+// tool (from search, a link or the home page) shows its workspace again.
+const RAIL_SHUT = new Set(); let RAIL_LAST = '';
 function renderRail() {
   const list = $('#list'); const r = state.route; list.innerHTML = '';
+  const rk = r.kind + ':' + (r.id || ''); if (rk !== RAIL_LAST) { RAIL_SHUT.clear(); RAIL_LAST = rk; }
   const add = el => { list.appendChild(el); return el; };
   const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; };
   const pageBtn = p => {
@@ -153,10 +157,15 @@ function renderRail() {
   add(mk('h3', '', 'Workspaces'));
   const openWs = r.kind === 'ws' ? r.id : (r.kind === 'tool' ? wsOfPage(r.id) : '');
   WORKSPACES.forEach(w => {
-    const open = w.id === openWs;
+    const open = w.id === openWs && !RAIL_SHUT.has(w.id);
     const b = add(mk('button', 'rw' + (r.kind === 'ws' && r.id === w.id ? ' on' : '') + (open ? ' open' : ''), icon(w.icon) + '<span>' + hesc(w.name) + '</span>' + icon(open ? 'down' : 'right', 'chev')));
     b.dataset.ws = w.id; b.setAttribute('aria-expanded', open ? 'true' : 'false');
-    b.onclick = () => go('#/w/' + w.id);
+    // A click on the open workspace closes it; a click on a closed one opens it (and its page).
+    b.onclick = () => {
+      if (open) { RAIL_SHUT.add(w.id); renderRail(); return; }
+      if (w.id === openWs) { RAIL_SHUT.delete(w.id); renderRail(); return; }
+      go('#/w/' + w.id);
+    };
     if (!open) return;
     const box = add(mk('div', 'rsec'));
     w.sections.forEach(([name, ids]) => {

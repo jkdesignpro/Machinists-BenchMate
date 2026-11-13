@@ -71,6 +71,20 @@ await page.fill('#wq', 'stock weight');
 await page.click('#wtools button');
 const w2 = await page.$$eval('#main .dgrid .wd', ws => ws.length);
 if (w2 !== w0) problems.push(`[${where}] add widget: expected ${w0} widgets, got ${w2}`);
+// Resizing: a size button sets the width; dragging the corner snaps the width and sets a height.
+if (!(await page.$('#main .dgrid.editing'))) await page.click('#dedit');
+await page.click('#main .dgrid .wd:first-child .wsizes button[data-z="l"]');
+if (!(await page.$('#main .dgrid .wd:first-child.l'))) problems.push(`[${where}] the L size button should make the widget large`);
+{
+  const h = await page.$eval('#main .dgrid .wd:first-child .wrsz', e => { const r = e.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; });
+  const gw = await page.$eval('#main .dgrid', e => e.getBoundingClientRect().width);
+  await page.mouse.move(h[0], h[1]); await page.mouse.down(); await page.mouse.move(h[0] - gw / 6, h[1] + 80, { steps: 5 }); await page.mouse.up(); await page.waitForTimeout(80);
+  const cls = await page.$eval('#main .dgrid .wd:first-child', e => e.className + ' ' + e.style.height);
+  if (!/\bw\b/.test(cls) || !/hset/.test(cls) || !/\d+px/.test(cls)) problems.push(`[${where}] dragging the corner two columns narrower than large should give the wide size and a height: ${cls}`);
+  await page.dblclick('#main .dgrid .wd:first-child .wrsz'); await page.waitForTimeout(60);
+  if (/hset/.test(await page.$eval('#main .dgrid .wd:first-child', e => e.className))) problems.push(`[${where}] a double-click on the corner should fit the height again`);
+}
+await page.click('#dedit');
 await page.reload({ waitUntil: 'load' });
 await page.waitForSelector('#main .dgrid .wd');
 const w3 = await page.$$eval('#main .dgrid .wd', ws => ws.length);
@@ -78,6 +92,20 @@ if (w3 !== w0) problems.push(`[${where}] layout not kept after a restart: ${w3} 
 
 // Grouping: every page is listed in a workspace; Simple mode lists exactly its 16 pages.
 where = 'grouping';
+{
+  // Clicking the open workspace in the side panel closes it; clicking again opens it.
+  const m0 = await page.evaluate(() => state.mode); await mode('advanced');
+  await page.evaluate(() => openTool('rpm')); await page.waitForTimeout(150);
+  const ws = await page.$eval('#list button.rw.open', e => e.dataset.ws).catch(() => '');
+  if (!ws) problems.push(`[${where}] the workspace of an open tool should be open in the side panel`);
+  else {
+    await page.click('#list button.rw.open'); await page.waitForTimeout(60);
+    if (await page.$('#list button.rw.open') || await page.$('#list .rsec')) problems.push(`[${where}] clicking the open workspace should close it`);
+    await page.click(`#list button.rw[data-ws="${ws}"]`); await page.waitForTimeout(60);
+    if (!(await page.$(`#list button.rw.open[data-ws="${ws}"]`))) problems.push(`[${where}] clicking it again should open it`);
+  }
+  await mode(m0);
+}
 const meta = await page.evaluate(() => ({ unlisted: UNLISTED_PAGES, simple: SIMPLE_PAGES, pages: Object.keys(PAGES), tools: TOOLS.map(t => t.id), ws: WORKSPACES.map(w => w.id),
   missing: WORKSPACES.flatMap(w => w.sections.flatMap(s => s[1])).concat(SIMPLE_PAGES).filter(id => !PAGES[id]) }));
 if (meta.unlisted.length) problems.push(`[${where}] pages in no workspace: ${meta.unlisted.join(', ')}`);
@@ -2883,13 +2911,23 @@ where = 'toolpaths';
     const secs = await page.$$eval('#main details.fsec', a => a.filter(d => !d.hidden).map(d => d.querySelector('summary').textContent + (d.open ? '+' : '-')));
     if (secs.slice(0, 3).join('|') !== 'The job+|The tool+|The cut+' || !secs.some(x => /^Your own figures/.test(x) && x.endsWith('-'))) problems.push(`[${where}] milling inputs under headings, the rest folded: ${secs.join('|')}`);
     const groups = await page.$$eval('#main [data-id="coat"] optgroup', a => a.map(g => g.label + ':' + g.children.length));
-    if (groups.join(',') !== 'Common:10,More:6') problems.push(`[${where}] coating list, common ones first: ${groups}`);
+    if (groups.join(',') !== 'Common:11,More:7') problems.push(`[${where}] coating list, common ones first: ${groups}`);
     const card = async () => page.$eval('#res', e => (e.querySelector('.tmcard') || {}).textContent || '');
     await page.selectOption('#main [data-id="mat"]', '15'); await page.selectOption('#main [data-id="coat"]', '5'); await page.waitForTimeout(80);
     let c = await card();
     if (!/not advised for aluminium/.test(c) || !/about 1400 °F/.test(c) || /760/.test(c)) problems.push(`[${where}] AlTiN on aluminium should be a caution with the temperatures as printed: ${c.slice(0, 300)}`);
     await page.selectOption('#main [data-id="coat"]', '6'); await page.waitForTimeout(80);
     if (!/The sources differ/.test(await card())) problems.push(`[${where}] AlCrN on aluminium: the sources differ`);
+    if (!/Colour is no guide to the coating/.test(await card())) problems.push(`[${where}] a coated tool should say colour is no guide`);
+    await page.selectOption('#main [data-id="coat"]', '17'); await page.waitForTimeout(80);
+    c = await card();
+    if (!/Polished or lapped flutes and sharp edges/.test(c) || /Colour is no guide/.test(c)) problems.push(`[${where}] polished flutes on aluminium: ${c.slice(0, 200)}`);
+    await page.selectOption('#main [data-id="coat"]', '16'); await page.waitForTimeout(80);
+    if (!/The sources name AlCrSiN for different work/.test(await card())) problems.push(`[${where}] AlCrSiN: the uses named differ`);
+    await page.selectOption('#main [data-id="mat"]', '6'); await page.selectOption('#main [data-id="tm"]', '5'); await page.waitForTimeout(80);
+    c = await card();
+    if (!/Makers' starting speeds on hardened steel/.test(c) || !/200 to 660 sfm/.test(c) || !/50 to 350 m\/min/.test(c)) problems.push(`[${where}] CBN on hardened steel should show the makers' ranges: ${c.slice(0, 300)}`);
+    await page.selectOption('#main [data-id="tm"]', '1'); await page.selectOption('#main [data-id="coat"]', '0'); await page.waitForTimeout(80);
     await page.selectOption('#main [data-id="mat"]', '3'); await page.selectOption('#main [data-id="tm"]', '6'); await page.waitForTimeout(80);
     c = await card();
     const t0 = await page.$eval('#res', e => e.innerText);
@@ -3187,6 +3225,18 @@ where = 'calc keypad';
 for (const a of ['x:ac', 'i:2', 'o:+', 'i:3', 'o:*', 'i:4', 'x:eq']) await page.click(`#main .bcalc .bc-keys button[data-a="${a}"]`);
 const kres = (await page.textContent('#main .bcalc .bc-res')) || '';
 if (kres.trim() !== '= 14') problems.push(`[${where}] 2 + 3 * 4: expected "= 14", got "${kres}"`);
+// Basic view: digits and the four functions only, and the Functions panel hidden; Full brings them back.
+await page.click('#main .bcalc .bc-view button[data-v="1"]');
+{
+  const nk = await page.$$eval('#main .bcalc .bc-keys button', a => a.length);
+  const fnsShown = await page.$eval('#main .bcalc .bc-fns', e => getComputedStyle(e).display !== 'none');
+  if (nk !== 20 || fnsShown || await page.$('#main .bcalc .bc-keys button[data-a="f:sin"]')) problems.push(`[${where}] basic view: ${nk} keys, functions shown ${fnsShown}`);
+  for (const a of ['x:ac', 'i:7', 'o:*', 'i:8', 'x:eq']) await page.click(`#main .bcalc .bc-keys button[data-a="${a}"]`);
+  const br = (await page.textContent('#main .bcalc .bc-res')) || '';
+  if (br.trim() !== '= 56') problems.push(`[${where}] basic view 7 x 8: "${br}"`);
+}
+await page.click('#main .bcalc .bc-view button[data-v="0"]');
+if ((await page.$$eval('#main .bcalc .bc-keys button', a => a.length)) !== 42) problems.push(`[${where}] full view should have the 42 keys back`);
 where = 'calc units';
 // Lengths with units mix freely and come back in the app's unit; feet and
 // inches, degrees-minutes-seconds and curly quotes are read as typed.
