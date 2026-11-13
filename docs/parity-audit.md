@@ -104,6 +104,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, tenth batch, 2026-11-13):** retaining compounds, thread and flange sealants and structural adhesives in the bearings and seals guide; ratchets, elliptical gears and factors of safety in the machine elements guide; a fourth axis in the milling toolpath guide; more kinds of tap in the tooling guide. MH293, BB59, ED43, MH272 and CN35 from partial to done; BB8 done with the added kinds of tap; CN6 done on re-audit. Counted from the tables below: 413 done, 135 partial, 48 missing of 596 in-scope rows, 69 %; 124 more rows to done for the 90 % target.
 
+**Update (0.7.0, eleventh batch, 2026-11-13):** hardenability, case hardening and machinability in the materials guide; vibration in general and balancing a rotor in place in the drives and maintenance guide; tightening methods in the fasteners guide; speed, feed and depth of cut in the CNC knowledge guide. MH56, MH58, MH134, MH135, MH136, MH198, ED23 and ED24 from partial to done; MH31 gains the balancing procedure and stays partial. Counted from the tables below: 421 done, 127 partial, 48 missing of 596 in-scope rows, 71 %; 116 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -390,7 +392,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH28 | Pendulums | out of scope? | | |
 | MH29 | Velocity, acceleration, work, energy, momentum, power | out of scope? | | |
 | MH30 | Centrifugal force | done | `chuckforce` | F = m r omega^2, jaw centrifugal force and grip left at speed, OD and ID gripping (`claude/mechanics`) |
-| MH31 | Balancing rotating parts, balancing lathe fixtures | partial | `balance` | ISO 21940-11 permissible unbalance, two-plane split, correction mass; no trial-weight balancing procedure or lathe fixture counterweight layout (`claude/mechanics`) |
+| MH31 | Balancing rotating parts, balancing lathe fixtures | partial | `balance`, `driveguide` | ISO 21940-11 permissible unbalance, two-plane split, correction mass; 0.7.0: trial-weight balancing procedure in the drives and maintenance guide; no lathe fixture counterweight layout (`claude/mechanics`) |
 | MH32 | Critical speeds | partial | `critspeed` | Uniform shaft with up to three discs, Rayleigh and Dunkerley; no stepped shafts or flexible bearings (`claude/mechanics`) |
 | MH33 | Mechanical properties, stress and strain, factor of safety, stress concentration | partial | `stressconc`, `fatigue` | Holes in plates, fatigue factors of safety; no stress-strain basics, no stepped-shaft or groove Kt (no free source) (`claude/mechanics`) |
 | MH34 | Combined and 3D stresses, loaded rings, strength of taper pins | missing | | |
@@ -420,9 +422,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH53 | Applications and mechanical properties of steels | partial | `materials`, `matguide` | Properties for some grades; uses by carbon class in the materials guide; no applications by grade |
 | MH54 | Tool steels: properties, faults, classification, selection, HSS, hot/cold work, mould steels | partial | `materials`, `matguide` | 10 tool-steel grades as equivalents; 0.6.0: the letter groups with an example grade, quench, hardness and machinability rating (one source for the figures); no selection guide by job, faults or heat treatment |
 | MH55 | Tool steel mill forms, machining allowances, decarburization limits | missing | | |
-| MH56 | Heat treatment: definitions, hardness and hardenability | partial | `heattreat` | Terms in our words (7 of 12 used by two publishers); no hardness and hardenability theory |
+| MH56 | Heat treatment: definitions, hardness and hardenability | done | `heattreat`, `matguide` | Terms in our words (7 of 12 used by two publishers); 0.7.0: hardness against hardenability, the Jominy end-quench test, what each depends on and the ideal critical diameter in the materials guide |
 | MH57 | Hardening, quenching, tempering temperatures, annealing, normalising | partial | `heattreat`, `tempercolours` | 12 steels side by side (2 confirmed, 16 differ); no tempering-hardness tables (no two sources agree) |
-| MH58 | Case hardening: carburising, nitriding, flame and induction hardening | partial | `heattreat` | Terms and 4340 nitriding only; no case depth or process data |
+| MH58 | Case hardening: carburising, nitriding, flame and induction hardening | done | `heattreat`, `matguide` | Terms and 4340 nitriding in the reference; 0.7.0: carburising, carbonitriding, nitriding, ferritic nitrocarburising, induction and flame hardening in the materials guide, with a table of temperatures and case depths attributed cell by cell. No temperature for induction or flame hardening in the sources read |
 | MH59 | Heat treating high-speed steels; subzero treatment | missing | | |
 | MH60 | Hardness tests: Brinell, Rockwell, Vickers, Knoop, Shore, Mohs, durometer | done | `hardness`, `matguide` | 0.6.0: how Brinell, Rockwell, Vickers, Knoop, Leeb, Shore and Mohs work (indenter, load, what is measured); conversion in `hardness` |
 | MH61 | Comparison of hardness scales | done | `hardness` | Steel, approximate |
@@ -513,9 +515,9 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH134 | Work materials and cutting tool materials | partial | `iso513`, `toolguide`, `materials` | Work material groups (ISO 513) and tool materials in our own words; no machinability theory |
-| MH135 | Cutting speed, feed, depth of cut, tool wear and tool life | partial | `toollife` | Taylor life only |
-| MH136 | Selecting cutting conditions | partial | `advmill`, `advturn`, `advdrill` | The advisors suggest speed, feed, width and depth and hold them to the machine; no general method text |
+| MH134 | Work materials and cutting tool materials | done | `iso513`, `toolguide`, `materials`, `matguide` | Work material groups (ISO 513) and tool materials in our own words; 0.7.0: machinability (meaning, how it is judged, the rating against B1112, carbon, sulphur and lead, stainless steel) in the materials guide |
+| MH135 | Cutting speed, feed, depth of cut, tool wear and tool life | done | `toollife`, `cncguide` | Taylor life in the calculator; tool wear with causes and remedies in the CNC knowledge guide; 0.7.0: what speed, feed and depth of cut each do to tool life and finish |
+| MH136 | Selecting cutting conditions | done | `advmill`, `advturn`, `advdrill`, `cncguide` | The advisors suggest speed, feed, width and depth and hold them to the machine; 0.7.0: the general method in the CNC knowledge guide (depth first, then feed, then speed) |
 | MH137 | Tool troubleshooting | partial | `cncguide` | Turning and milling troubleshooting tables (chatter, finish, tool life, burrs); drilling, tapping and grinding tables added in 0.5.0; not a full maker guide |
 | MH138 | Cutting speed formulas; RPM for drills and diameters | done | `rpm` | |
 | MH139 | Speeds and feeds tables for turning (by material) | partial | `advturn` | Starting speeds for common materials (one publisher), feed from the nose radius; not the full range of materials |
@@ -587,7 +589,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 
 | # | Item | Status | BenchMate | What's missing |
 |---|---|---|---|---|
-| MH198 | Torque and tension: tightening, wrench torque, preload, friction | partial | `bolttorque` | VDI 2230 torque from preload with your own friction (cited classes shown); no torque-angle or yield-controlled tightening, no tightening factor (scatter) |
+| MH198 | Torque and tension: tightening, wrench torque, preload, friction | done | `bolttorque`, `fastguide` | VDI 2230 torque from preload with your own friction (cited classes shown); 0.7.0: tightening methods in the fasteners guide (torque control, torque plus angle, tightening to yield, hydraulic tensioning, heat, load-indicating washers). No scatter or tightening factor per method: neither source read prints one |
 | MH199 | Thread tensile-stress area, torque-tension relationships | done | `bolttorque` | Stress area (ISO and Unified), torque-preload relation with the share of each term (`claude/fasteners`) |
 | MH200 | Grade marks, material properties, counterfeit detection | done | `boltgrade`, `fastguide` | ISO 898-1, SAE J429 and ASTM A574 minimums and head marks; 0.7.0: counterfeit fasteners in the fasteners guide (the two marks, tests, papers, the Fastener Quality Act). No list of suspect head marks (not readable) |
 | MH201 | Working strength, engagement length, breaking force, lock wire | done | `threadstrip`, `fastguide`, `boltgrade`, `bolttorque` | 0.7.0: breaking force from the stress area and your own tensile strength, simplified least engagement (one source, marked) and the rules of thumb with differing sources side by side in `threadstrip`; lock wire in `fastguide`; strengths in `boltgrade`, preload in `bolttorque`. The detailed FED-STD-H28 stripping method is not built (no readable free source) |
@@ -743,8 +745,8 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED20 | 5.3 Newton's laws | out of scope? | | |
 | ED21 | 5.4 Simple harmonic motion | out of scope? | | |
 | ED22 | 5.5 Understanding acceleration | out of scope? | | |
-| ED23 | 5.6 Dynamic balancing | partial | `balance` | Permissible unbalance and two-plane split; no balancing procedure (`claude/mechanics`) |
-| ED24 | 5.7 Vibration | partial | `chatter`, `critspeed` | Natural frequency in the chatter finder and shaft critical speed; no general vibration theory |
+| ED23 | 5.6 Dynamic balancing | done | `balance`, `driveguide` | Permissible unbalance and two-plane split in the calculator; 0.7.0: balancing a rotor in place with a trial weight (checks, runs, size of the trial weight, trim) in the drives and maintenance guide. The vector arithmetic for the correction weight is not described in the sources read |
+| ED24 | 5.7 Vibration | done | `chatter`, `critspeed`, `driveguide` | Natural frequency in the chatter finder and shaft critical speed; 0.7.0: free and forced vibration, resonance, damping and what to measure in the drives and maintenance guide |
 | ED25 | 5.8 Machine vibration | done | `driveguide` | 0.6.0: severity zones A to D, machine groups, rigid and flexible supports, zone boundaries as two web pages quote them from ISO 10816-3 (the standard itself was not read; the page says so), fault signatures (mostly one source, marked) |
 | ED26 | 5.9 Machinery noise | out of scope? | | |
 | ED27 | 6.1 Mechanical notation | out of scope? | | |

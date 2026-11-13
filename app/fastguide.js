@@ -34,6 +34,8 @@ const FG_SOURCES = {
   MB_CB: 'B. Marciszewski, Metric Bolt, "Counterfeit bolts: risks and mitigation in military applications", 2025-04-04 (a supplier\'s page)',
   EASA_CB: 'R. A. Huber, EASA, "Counterfeit bolts: tips on how to avoid them", April 2003 (only the introduction is public)',
   LBL_SCI: 'Lawrence Berkeley National Laboratory, "Suspect counterfeit items", 2020-02-18',
+  BSCI_TM: 'Bolt Science Limited, "Methods of tightening threaded fasteners"',
+  AC_ANG: 'Atlas Copco, Z. Mikic, "Beyond torque: using angle and other methods to ensure proper tightening", 2026-04-15',
 };
 // Several pages of one publisher count once.
 const FG_FAMILY = { WP_SW: 'WIKI', WP_SS: 'WIKI', WP_RR: 'WIKI', WP_BSW: 'WIKI', MD_LOCK: 'ENDEAVOR', MD_TS: 'ENDEAVOR', MD_PIN: 'ENDEAVOR', ESS_LN: 'ESSENTRA', ESS_H: 'ESSENTRA', ESS_TS: 'ESSENTRA', FE_LOCK: 'FE', FE_PIN: 'FE' };
@@ -166,7 +168,7 @@ const FG_RING = [
   ['Bevelled ring', 'A 15 degree edge wedges between the groove and the part.', 'Takes up end play rigidly.', ['WP_RR']],
 ];
 function renderFastGuide(el) {
-  const toc = [['fg-eng', 'Thread engagement'], ['fg-lock', 'Keeping fasteners tight'], ['fg-set', 'Set screws'], ['fg-head', 'Heads and drives'], ['fg-tap', 'Self-tapping screws'], ['fg-pin', 'Pins'], ['fg-ring', 'Retaining rings'], ['fg-cb', 'Counterbore and spotface'], ['fg-fake', 'Counterfeit fasteners'], ['fg-brit', 'British fasteners']];
+  const toc = [['fg-eng', 'Thread engagement'], ['fg-lock', 'Keeping fasteners tight'], ['fg-tight', 'Tightening methods'], ['fg-set', 'Set screws'], ['fg-head', 'Heads and drives'], ['fg-tap', 'Self-tapping screws'], ['fg-pin', 'Pins'], ['fg-ring', 'Retaining rings'], ['fg-cb', 'Counterbore and spotface'], ['fg-fake', 'Counterfeit fasteners'], ['fg-brit', 'British fasteners']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Fasteners as a machinist meets them, in our own words: how much thread to engage, what keeps a fastener tight, lock wire, set screw points, screw heads and drives, self-tapping screws, pins, retaining rings and the old British threads. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
@@ -195,6 +197,20 @@ function renderFastGuide(el) {
     fgP('<b>Once only.</b> Wire is used once. A fastener that has been undone gets new wire.', ['WP_SW', 'FAA_SW']) +
     fgP('<b>The wire</b> is usually stainless steel.', ['WP_SW', 'FAA_SW']) +
     fgP('Common diameters are 0.5 to 1 mm (0.020 to 0.041 in); 0.8 mm (0.032 in) is usual on aircraft and in racing. Bend the cut ends under so that nothing sharp sticks out.', ['WP_SW']) +
+
+    '<h2 id="fg-tight">Tightening methods</h2>' +
+    fgP('<b>Torque is a stand-in.</b> What the joint needs is clamp load. Torque only stands in for it, and friction makes the result scatter: two bolts at the same torque do not carry the same load.', ['BSCI_TM', 'AC_ANG']) +
+    fgP('<b>Torque plus angle.</b> Snug the bolt to a low torque, then turn it on by a set angle; the example given is 30 Nm, then 90 degrees. Bolt Science describes the angle taking the bolt past its elastic range, which leaves only a small variation in preload.', ['BSCI_TM', 'AC_ANG']) +
+    fgP('<b>Tightening to yield.</b> The bolt is tightened until it just begins to yield, to get the most clamp load from it. A controller watches how the torque climbs with the angle and stops when the slope changes.', ['BSCI_TM', 'AC_ANG']) +
+    fgP('<b>Where the torque goes.</b> Usually 85 to 95 % of it is used up by friction.', ['BSCI_TM']) +
+    fgP('<b>Torque control</b> is the usual method. The torque is commonly worked out for a direct stress in the thread of 75 % of the yield stress of the bolt. Give the torque with a tolerance: plus or minus 5 % is good practice.', ['BSCI_TM']) +
+    fgP('<b>Angle within the elastic range.</b> There a given angle means a given stretch of the bolt.', ['AC_ANG']) +
+    fgP('<b>Watching the angle</b> also catches faults: a missing washer or a seized or damaged thread shows up as the wrong angle for the torque.', ['AC_ANG']) +
+    fgP('<b>Hydraulic tensioning.</b> A hydraulic puller stretches the bolt, the nut is run down and the pressure is let off. The pressure sets the preload; a little is lost when the pressure is released.', ['BSCI_TM']) +
+    fgP('<b>Heat.</b> The bolt is heated, the nut turned through a set angle, and the preload comes as the bolt cools and shrinks.', ['BSCI_TM']) +
+    fgP('<b>Load-indicating washers</b> have small raised pips that flatten under load. The preload is right when a set gap is left under the head.', ['BSCI_TM']) +
+    '<p class="desc">Neither source prints the scatter of each method in per cent, so none is given here.</p>' +
+    fgP('Torque from preload with your own friction values is in <a href="#/t/bolttorque">bolt torque and preload</a>.', null) +
 
     '<h2 id="fg-set">Set screws</h2>' + fgPoints() +
     fgP('<b>What it is.</b> A set screw has no head and is threaded for its whole length (a grub screw). It is screwed through one part and holds a second part with its point.', ['WP_SS', 'BOLTS_SS']) +

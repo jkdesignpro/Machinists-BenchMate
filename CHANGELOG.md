@@ -12,6 +12,12 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (guide sections: hardenability, case hardening, machinability, vibration, balancing, tightening, cutting conditions)
+- Materials guide: **Hardenability** (hardness against hardenability, the Jominy end-quench test, the ideal critical diameter), **Case hardening** (carburising, carbonitriding, nitriding, ferritic nitrocarburising, induction and flame hardening in a table of temperatures and case depths, each figure with the source that prints it; steels, quenching, distortion, case hardness) and **Machinability** (what it means, how it is judged, the rating against B1112, carbon, sulphur and lead, stainless steel).
+- Drives and maintenance guide: **Vibration in general** (free and forced vibration, resonance and its cure, damping, which quantity to measure) and **Balancing a rotor in place** (checking that it is unbalance, the reference, trial and trim runs, the size of the trial weight, one plane or two, safety).
+- Fasteners guide: **Tightening methods** (torque control, torque plus angle, tightening to yield, hydraulic tensioning, heat, load-indicating washers).
+- CNC knowledge guide: **Speed, feed and depth of cut: which to change** (what each does to tool life and finish, and the order in which to set them).
+
 ### Added (guide sections: adhesives, ratchets, factors of safety, fourth axis)
 - Bearings and seals guide: **Retaining compounds** (what they are for, gaps, the fit, surfaces, heat), **Thread and flange sealants** (anaerobic sealants, PTFE tape and where not to use it, pipe dope, anaerobic against silicone on flanges, cut gaskets) and **Structural adhesives** (epoxy, acrylic, polyurethane and cyanoacrylate compared in a table).
 - Machine elements guide: **Ratchets** with our own drawing of a wheel and pawl, **Elliptical gears**, and **Factors of safety** (what the factor is, design against realised factor, margin of safety, one older rule of thumb by kind of load, and typical figures from two publishers side by side where they differ).
@@ -106,7 +112,12 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (tenth batch)
 - MH293 (adhesives and sealants), BB59 (engineering adhesives), ED43 (factors of safety), MH272 (elliptic and ratchet gearing) and CN35 (4-axis parts) from partial to done. BB8 (types of taps) done with the added kinds of tap. CN6 (common CNC tools) done on re-audit: the tools it names are described in the tooling, cutting tools and toolpath guides.
-- 413 done, 135 partial, 48 missing of 596 in-scope rows, 69 %; 124 more rows to done for the 90 % target.
+- Counted after the tenth batch: 413 done, 135 partial, 48 missing.
+
+### Book audit (eleventh batch)
+- MH56 (hardness and hardenability), MH58 (case hardening), MH134 (work materials: machinability), MH135 and MH136 (speed, feed and depth; selecting cutting conditions), MH198 (tightening methods), ED23 (dynamic balancing: the procedure) and ED24 (vibration) from partial to done. MH31 stays partial: the balancing procedure is added, the counterweight layout of lathe fixtures is not.
+- Not found in the sources read and therefore not given: the scatter of each tightening method, a temperature for induction or flame hardening, and how the correction weight is worked out from the trial run.
+- 421 done, 127 partial, 48 missing of 596 in-scope rows, 71 %; 116 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.

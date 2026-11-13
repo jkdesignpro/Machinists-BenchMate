@@ -42,12 +42,24 @@ const MG_SOURCES = {
   TWI: 'TWI, frequently asked question "What is corrosion?"',
   PM: 'Projectmaterials blog, "EN 10204 2.1 vs 2.2 vs 3.1 vs 3.2"',
   WIP: 'What Is Piping, "What is a material test certificate (mill test certificate)?"',
+  WP_HARD: 'Wikipedia, "Hardenability" (CC BY-SA)',
+  CAM_JOM: 'H. K. D. H. Bhadeshia, "The Jominy end quench test" (phase-trans.msm.cam.ac.uk, University of Cambridge site)',
+  TM_HT: 'Total Materia, article "Hardenability testing", June 2003',
+  TM_SH: 'Total Materia, article "Surface hardening of steels", September 2003 (only the cells of its table that read cleanly)',
+  OU_PNC: 'The Open University, OpenLearn Manupedia, "Plasma nitriding/carburising", 2018-03-09',
+  OU_IFH: 'The Open University, OpenLearn Manupedia, "Induction/flame hardening", 2018-03-09',
+  WP_CN: 'Wikipedia, "Carbonitriding" (CC BY-SA)',
+  PAULO_CN: 'Paulo, "Case hardening basics: nitrocarburizing vs. carbonitriding", 2017-02-15',
+  GS_IH: 'Gear Solutions, Hot Seat column, "Basic principles of induction hardening of steels"',
+  WP_MACH: 'Wikipedia, "Machinability" (CC BY-SA)',
+  INF_MACH: 'Infinita Lab, B. Raval, "Machining performance of ferrous metals: testing, factors & material properties", 2023-06-05, updated 2026-10-01',
   OWN: 'BenchMate reading of the rule in the sources beside it',
 };
 // Several pages of one publisher count once.
 const MG_FAMILY = {
   TM_TS: 'TOTALMAT', TM_AL: 'TOTALMAT', TM_CU: 'TOTALMAT', TM_TI: 'TOTALMAT', TM_MG: 'TOTALMAT',
   MM_CS: 'MATMATCH', MM_H: 'MATMATCH', XOM_AL: 'XOMETRY', XOM_NI: 'XOMETRY', EF_TS: 'EFUNDA', EF_MG: 'EFUNDA', WP_SAE: 'WIKI', WP_CI: 'WIKI',
+  WP_HARD: 'WIKI', WP_CN: 'WIKI', WP_MACH: 'WIKI', TM_HT: 'TOTALMAT', TM_SH: 'TOTALMAT', OU_PNC: 'OU', OU_IFH: 'OU',
 };
 const mgTags = keys => guideTags(keys, MG_SOURCES, MG_FAMILY);
 const mgP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + mgTags(keys)) + '</p>';
@@ -215,8 +227,18 @@ const MG_CERT = [
   ['3.2', 'inspection certificate 3.2', 'yes, as 3.1', 'as 3.1, and countersigned by an independent or purchaser\'s inspector', ['PM', 'WIP']],
 ];
 
+// Case hardening processes: each cell names who prints the figure. Micrometres in the source are written here in mm.
+const MG_CASE = [
+  ['Carburising', 'Carbon diffuses into the surface of a low-carbon steel', 'Total Materia: 815 to 980 °C in gas or liquid, up to 1090 °C in a pack. Open University (plasma): usually below 950 °C', 'Total Materia: up to 1.5 mm. Open University: 0.2 to 2 mm', ['TM_SH', 'OU_PNC']],
+  ['Carbonitriding', 'Carbon and nitrogen together, for cheap low-carbon steels that would not harden well otherwise', 'Total Materia: 760 to 870 °C. Wikipedia: around 850 °C. Paulo: around 1600 °F', 'Total Materia: 0.075 to 0.75 mm. Wikipedia: typically 0.07 to 0.5 mm, 0.75 mm at most', ['TM_SH', 'WP_CN', 'PAULO_CN']],
+  ['Nitriding', 'Nitrogen forms hard nitrides in an alloy steel', 'Total Materia: 480 to 590 °C in gas. Open University (plasma): usually below 550 °C', 'Total Materia: up to 0.75 mm', ['TM_SH', 'OU_PNC']],
+  ['Ferritic nitrocarburising', 'Nitrogen and carbon at a temperature too low to change the structure of the steel', '975 to 1125 °F', 'Shallower than carbonitriding', ['PAULO_CN']],
+  ['Induction hardening', 'A coil induces eddy currents that heat the surface in seconds; a spray or a bath quenches it', 'no figure in the sources read', 'Open University: 0.1 to 10 mm for induction and flame together', ['GS_IH', 'OU_IFH']],
+  ['Flame hardening', 'Oxy-fuel burners heat the surface, which is then quenched', 'no figure in the sources read', 'Open University: 0.1 to 10 mm for induction and flame together', ['OU_IFH', 'TM_SH']],
+];
+
 function renderMatGuide(el) {
-  const toc = [['mg-steel', 'Steel numbers'], ['mg-tool', 'Tool steels'], ['mg-stain', 'Stainless'], ['mg-iron', 'Cast iron'], ['mg-alu', 'Aluminium'], ['mg-cu', 'Copper tempers'], ['mg-other', 'Titanium, magnesium, nickel, zinc'], ['mg-hard', 'Hardness tests'], ['mg-corr', 'Corrosion'], ['mg-cert', 'Mill certificates']];
+  const toc = [['mg-steel', 'Steel numbers'], ['mg-tool', 'Tool steels'], ['mg-stain', 'Stainless'], ['mg-iron', 'Cast iron'], ['mg-alu', 'Aluminium'], ['mg-cu', 'Copper tempers'], ['mg-other', 'Titanium, magnesium, nickel, zinc'], ['mg-hard', 'Hardness tests'], ['mg-harden', 'Hardenability'], ['mg-case', 'Case hardening'], ['mg-mach', 'Machinability'], ['mg-corr', 'Corrosion'], ['mg-cert', 'Mill certificates']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">How to read what is stamped on the bar and printed on the certificate: steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, the names of titanium, magnesium, nickel and zinc alloys, how each hardness test works, the forms of corrosion, and the mill certificate, in our own words. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
@@ -324,6 +346,45 @@ function renderMatGuide(el) {
     mgP('<b>Limit of Brinell.</b> It does not suit very hard material, where the ball itself starts to deform.', ['UNSW', 'WEV']) +
     mgP('<b>Surface.</b> The microhardness tests, Vickers and Knoop at small loads, need a smooth, polished surface.', ['MM_H', 'MST']) +
     mgP('Convert between the scales in <a href="#/t/hardness">hardness conversion</a>.', null) +
+
+    '<h2 id="mg-harden">Hardenability</h2>' +
+    mgP('<b>Hardness and hardenability are two things.</b> Hardness is resistance to indentation. Hardenability is how deep into a section a steel hardens when it is quenched.', ['WP_HARD', 'TM_HT']) +
+    mgP('<b>What decides which.</b> The hardness of quenched steel depends on its carbon content and on how much martensite has formed. Hardenability depends on the composition as a whole, alloying elements included, and on the grain size.', ['TM_HT', 'WP_HARD']) +
+    mgP('<b>The Jominy end-quench test.</b> A standard bar 25.4 mm in diameter and 102 mm long is heated until it is fully austenitic, then set in a rig where a jet of water quenches one end only.', ['CAM_JOM', 'TM_HT', 'WP_HARD']) +
+    mgP('<b>Reading the bar.</b> The cooling rate falls steadily along the bar from the quenched end. Hardness is measured along it (Total Materia: on flats ground 4 mm deep). The farther from the quenched end the hardness holds up, the higher the hardenability.', ['CAM_JOM', 'TM_HT', 'WP_HARD']) +
+    mgP('<b>An example from Cambridge.</b> Two steels with the same 0.4 % carbon: the plain carbon one has a low hardenability beside the one alloyed with nickel, chromium and molybdenum.', ['CAM_JOM']) +
+    mgP('<b>From the bar to a part.</b> The results can be converted to the largest round bar that hardens right through. The ideal critical diameter, Di, is the bar that reaches 50 % martensite at its centre.', ['TM_HT']) +
+    mgP('<b>Quenchants.</b> Brine and water cool steel much faster than oil or air.', ['WP_HARD']) +
+    mgP('<b>Welding.</b> The higher the hardenability, the poorer the weldability.', ['WP_HARD']) +
+    mgP('Temperatures for hardening and tempering are in the <a href="#/t/heattreat">heat treatment reference</a>.', null) +
+
+    '<h2 id="mg-case">Case hardening</h2>' +
+    mgP('<b>The idea.</b> A hard, wear-resistant skin over a core that stays tough.', ['TM_SH', 'OU_PNC']) +
+    guideTable(['Process', 'How', 'Temperature', 'Case depth'], MG_CASE, mgTags) +
+    '<p class="desc">Total Materia\'s table reached us with some damaged cells; only cells that read cleanly are quoted, each beside a second source where one was found. The Open University pages describe the plasma processes and warn that they may be out of date. Depths given in micrometres are written here in mm.</p>' +
+    mgP('<b>Steels for carburising</b> are low in carbon: below 0.4 % and better below 0.25 %, so that the core stays tough.', ['OU_PNC', 'TM_SH']) +
+    mgP('<b>Quench or not.</b> Carburised and carbonitrided parts are quenched to get their hardness. Nitrided parts are not quenched.', ['TM_SH', 'OU_PNC']) +
+    mgP('<b>Distortion.</b> Nitriding, at the lowest temperature and with no quench, distorts least. Carbonitriding runs cooler than carburising, which reduces distortion in the quench.', ['OU_PNC', 'WP_CN', 'TM_SH']) +
+    mgP('<b>Case hardness as printed.</b> Total Materia: 50 to 63 HRC for carburised cases and 50 to 70 HRC for nitrided ones. Open University: up to 1500 HV for nitrides. Wikipedia: 55 to 62 HRC for carbonitrided parts.', ['TM_SH', 'OU_PNC', 'WP_CN']) +
+    mgP('<b>Steels for induction and flame hardening.</b> Medium carbon steels, plain or alloyed: at least 0.3 % carbon, mostly 0.4 to 0.7 % (Open University). The hardness reached depends on the carbon content (Gear Solutions).', ['OU_IFH', 'GS_IH']) +
+    mgP('<b>Induction in production.</b> Fast, repeatable and easy to automate. The equipment is costly and the coil has to be designed and proved for the part, so it suits long runs.', ['GS_IH', 'OU_IFH']) +
+    mgP('<b>Frequency and depth.</b> The higher the frequency of the induction heater, the shallower the hardened layer.', ['GS_IH']) +
+    mgP('<b>Where the case ends.</b> For induction hardening the case depth is usually taken as the depth at which the structure is still at least 50 % martensite.', ['GS_IH']) +
+    mgP('<b>Flame hardening</b> can treat small chosen areas and flat, round or irregular parts. The risks are overheating, burning and distortion.', ['OU_IFH']) +
+    mgP('<b>More carbon, more risk.</b> The higher the carbon content, the greater the risk of cracks and distortion.', ['OU_IFH']) +
+    mgP('Terms and temperatures steel by steel are in the <a href="#/t/heattreat">heat treatment reference</a>.', null) +
+
+    '<h2 id="mg-mach">Machinability</h2>' +
+    mgP('<b>What the word means.</b> How easily a metal can be cut to an acceptable finish, with an acceptable tool life.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>How it is judged.</b> By how long the tool lasts, by the forces and power the cut takes, by the finish, and by how the chips break.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>No agreed measure.</b> Many things affect machinability and there is no widely accepted way to put a number on it.', ['WP_MACH']) +
+    mgP('<b>The rating in per cent.</b> The free-cutting steel B1112 is set at 100 % and other metals are rated against it.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>Carbon.</b> Of the elements, carbon matters most (Infinita Lab). Low-carbon steels are troublesome because they are soft, high-carbon steels because they are strong; Wikipedia puts the best machinability at about 0.20 % carbon.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>Sulphur and lead.</b> Sulphur forms soft inclusions that break the chip and improve the finish. Lead acts as a lubricant in the cut; Infinita Lab notes that it has largely been phased out because it is toxic.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>Stainless steel</b> machines worse than carbon steel. The austenitic grades work-harden quickly and conduct heat poorly, which overheats the tool.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>Hardness and structure.</b> As a rule machinability falls as hardness rises. Annealed, spheroidised steel cuts more easily; martensite is very hard to cut.', ['INF_MACH']) +
+    mgP('<b>Alloying.</b> Chromium, molybdenum and nickel raise strength and hardness and generally lower machinability.', ['INF_MACH']) +
+    mgP('Ratings grade by grade are on the cards of <a href="#/t/materials">material equivalents</a>; the work material groups are in <a href="#/t/iso513">cutting material groups</a>.', null) +
 
     '<h2 id="mg-corr">Forms of corrosion</h2>' +
     guideTable(['Form', 'What happens'], MG_CORR, mgTags) +

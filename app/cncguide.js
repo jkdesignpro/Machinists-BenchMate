@@ -42,6 +42,8 @@ const CNC_SOURCES = {
   CCB_SUB: 'CNC Cookbook, "M98 & M99 G-code: CNC subprograms", last modified 2024-04-30 (cnccookbook.com)',
   MG_SUB: 'B. Fowler, Machinist Guides, "Quick guide to CNC subprograms", 2024-09-08 (machinistguides.com; its example program is not used)',
   IMD_SUB: 'Industrial Monitor Direct, "Fanuc subprogramming: M98, M99, GOTO macro reference", 2026-09-13 (its combined form of the P word is described two ways and is not used)',
+  MMC_EFF: 'Mitsubishi Materials, technical information for turning tools, "Effects of cutting conditions" (mmc-carbide.com)',
+  SECO_PAR: 'Seco Tools, "Tools and parameters still play a key role in machining success" (secotools.com; no author or date shown)',
   OWN: 'BenchMate derivation (geometry), with tests in core/src/tnrc.rs',
 };
 const CNC_INDEPENDENT = { HFO_OP: 'HAAS', HFO_L: 'HAAS', HFO_MP: 'HAAS', LCNC_G: 'LCNC', FMC_D: 'FMC', FMC_T: 'FMC' }; // same publisher family counts once
@@ -390,7 +392,7 @@ function cnGeoExamples() {
 }
 
 function renderCncGuide(el) {
-  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-geo', 'Working out coordinates'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-sub', 'Subprograms'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
+  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-geo', 'Working out coordinates'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-sub', 'Subprograms'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'], ['c-cond', 'Speed, feed and depth'],
     ['c-wear', 'Tool wear'], ['c-trt', 'Turning troubles'], ['c-trm', 'Milling troubles'], ['c-trd', 'Drilling troubles'], ['c-trtap', 'Tapping troubles'], ['c-trg', 'Grinding troubles'], ['c-hold', 'Workholding'], ['c-safe', 'Safety'], ['c-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
@@ -480,6 +482,17 @@ function renderCncGuide(el) {
     cp('Chip load is not always the chip thickness: a small radial depth of cut or a lead angle makes the chip thinner than the feed per tooth. See the <a href="#/t/chipthin">chip thinning</a> tool.', ['CTE']) +
     cp('Too little chip load makes heat and wears the tool out early; too much overloads the tool and the spindle and spoils the cut.', ['WOODWEB']) +
     cp('<b>Chip thickness</b> is set by the feed (and the entering angle in turning, the radial engagement in milling). Each chip breaker and edge works in a range of chip thickness: too thin and the edge rubs, too thick and it breaks. See the chip thinning tool for milling.', []) +
+
+    '<h2 id="c-cond">Speed, feed and depth of cut: which to change</h2>' +
+    cp('<b>Speed wears the tool fastest.</b> Raising the cutting speed shortens tool life more than anything else. Mitsubishi gives figures for turning: 20 % more speed halves the tool life, 50 % more leaves a fifth.', ['MMC_EFF', 'SECO_PAR']) +
+    cp('<b>Feed and depth cost far less tool life</b> than speed does.', ['MMC_EFF', 'SECO_PAR']) +
+    cp('<b>Feed and finish.</b> The feed sets the roughness of the surface, so the finish wanted puts a ceiling on it.', ['MMC_EFF', 'SECO_PAR']) +
+    cp('<b>The order (Seco).</b> Take the largest depth of cut the job allows, to save passes. Then the highest feed that still gives the finish and quality wanted. Set the cutting speed last, to steer for the lowest cost or the highest output.', ['SECO_PAR']) +
+    cp('<b>Not too little.</b> A feed that is too small brings flank wear and a shorter tool life. A depth of cut that is too small rubs in the hardened skin of the work.', ['MMC_EFF']) +
+    cp('<b>Skin and scale.</b> On a cast or unmachined surface take a depth that gets under the hard, dirty skin, as far as the power of the machine allows.', ['MMC_EFF']) +
+    cp('<b>Too slow can chatter.</b> Mitsubishi, for its turning tools: cutting at 65 to 130 SFM tends to chatter, and that shortens tool life.', ['MMC_EFF']) +
+    cp('<b>Energy.</b> A lower speed with a higher feed and a smaller depth also uses less energy.', ['SECO_PAR']) +
+    cp('The sum is in <a href="#/t/toollife">tool life and cost</a>; starting values come from the <a href="#/t/advturn">turning advisor</a> and the <a href="#/t/advmill">milling advisor</a>.', null) +
 
     '<h2 id="c-wear">Tool wear: types, causes and remedies</h2>' +
     '<p class="desc">Change one thing at a time and keep a note of what worked. Look at the worn edge under a lens before deciding. The <a href="#/t/toolwear">tool wear guide</a> has the same entries with a picture index.</p>' +
