@@ -327,6 +327,52 @@ function renderPage(main, page, tabId) {
   if (state.mode === 'expert') openDetails(main);
 }
 // Expert mode opens every evidence table a tool keeps folded. Tools that redraw are caught by the observer.
+// Sources sit under their own folded "Sources" header on every page, so the pages read cleanly.
+// The pass runs after every redraw: a guide's source list, a "Sources" note, a table's Sources column
+// and the source keys after each statement. The keys and columns show again when the reader ticks the
+// box in any Sources fold (one setting for every page). "to be verified" always stays in view.
+function srcFold(title) {
+  const d = document.createElement('details'); d.className = 'srcfold';
+  const sm = document.createElement('summary'); sm.textContent = title || 'Sources'; d.appendChild(sm);
+  const lab = document.createElement('label'); lab.className = 'srcshow';
+  lab.innerHTML = '<input type="checkbox"> Show the source keys beside each statement and in the tables';
+  const cb = lab.firstChild; cb.checked = document.body.classList.contains('showsrc');
+  cb.onchange = () => { setShowSrc(cb.checked); };
+  d.appendChild(lab); return d;
+}
+function setShowSrc(on) {
+  document.body.classList.toggle('showsrc', on); lsSet('bm.showsrc', on ? '1' : '0');
+  $$('.srcshow input').forEach(i => { i.checked = on; });
+}
+function foldSources(root) {
+  if (!root) return;
+  // A guide's list at the bottom: <h2>Sources</h2><ul class="gsl">.
+  $$('h2', root).forEach(h => {
+    if (h.textContent.trim() !== 'Sources' || h.closest('details')) return;
+    const ul = h.nextElementSibling; if (!ul || !ul.matches('ul.gsl')) return;
+    const d = srcFold(); if (h.id) d.id = h.id; h.replaceWith(d); d.appendChild(ul);
+  });
+  // A note with a bold "Sources" heading: the heading and all that follows it fold away.
+  $$('b', root).forEach(b => {
+    if (!/^Sources\b/.test(b.textContent.trim()) || b.closest('details, table, summary')) return;
+    const box = b.parentElement; if (!box || !(box.classList.contains('note') || box.id)) return;
+    const d = srcFold(b.textContent.replace(/:\s*$/, '').trim());
+    const prev = b.previousSibling; if (prev && prev.nodeName === 'BR') box.removeChild(prev);
+    let n = b.nextSibling; if (n && n.nodeName === 'BR') { const x = n; n = n.nextSibling; box.removeChild(x); }
+    const body = document.createElement('div'); body.className = 'srcbody';
+    while (n) { const x = n.nextSibling; body.appendChild(n); n = x; }
+    d.appendChild(body); b.replaceWith(d);
+  });
+  // A table column headed "Sources": hidden with the keys, unless it holds a "to be verified" mark.
+  $$('table', root).forEach(t => {
+    if (t.dataset.sf) return; t.dataset.sf = '1';
+    const hr = t.rows[0]; if (!hr) return;
+    const i = [...hr.cells].findIndex(c => c.textContent.trim() === 'Sources'); if (i < 0) return;
+    const cells = [...t.rows].map(r => r.cells[i]).filter(Boolean);
+    if (cells.some(c => c.querySelector('.gtbv'))) { hr.cells[i].innerHTML = '<span class="sk">Sources</span><span class="nk">Status</span>'; return; }
+    cells.forEach(c => c.classList.add('scol'));
+  });
+}
 function openDetails(root) { $$('details:not([data-kept])', root).forEach(d => { d.open = true; d.dataset.kept = '1'; }); }
 
 // ---- Links with numbers, printing and worked examples ----
@@ -547,8 +593,9 @@ function mountTool(host, t, opts) {
     if (!mini && t.table) {
       let tb = null; try { tb = rows.length ? t.table(v, state.W, sys, dpAdj) : null; } catch (e) { tb = null; }
       if (tb && tb.rows.length) {
-        const box = document.createElement('div'); box.className = 'rtab' + (tb.text ? ' text' : '');
-        box.innerHTML = '<div class="rtabh"><span>' + hesc(tb.title || '') + '</span></div><div class="rtabs"><table><thead><tr>' + tb.head.map(h => '<th>' + hesc(h) + '</th>').join('') + '</tr></thead><tbody>' +
+        const box = document.createElement(tb.fold ? 'details' : 'div'); box.className = 'rtab' + (tb.text ? ' text' : '') + (tb.fold ? ' fold' : '');
+        if (tb.fold) { box.open = lsGet('bm.rtabfold') === '1'; box.dataset.kept = '1'; box.addEventListener('toggle', () => lsSet('bm.rtabfold', box.open ? '1' : '0')); }
+        box.innerHTML = '<' + (tb.fold ? 'summary' : 'div') + ' class="rtabh"><span>' + hesc(tb.title || '') + '</span></' + (tb.fold ? 'summary' : 'div') + '><div class="rtabs"><table><thead><tr>' + tb.head.map(h => '<th>' + hesc(h) + '</th>').join('') + '</tr></thead><tbody>' +
           tb.rows.map(r => '<tr>' + r.map((c, i) => '<td' + (i ? ' class="v"' : '') + '>' + hesc(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
         (tb.copies || []).forEach(([label, text]) => { const b = document.createElement('button'); b.className = 'btn sm'; b.type = 'button'; b.innerHTML = icon('copy') + '<span>' + hesc(label) + '</span>'; b.onclick = () => copyText(text); $('.rtabh', box).appendChild(b); });
         res.appendChild(box);
@@ -691,7 +738,8 @@ async function boot() {
   $$('#units button').forEach(b => { const on = b.dataset.u === state.sys; b.classList.toggle('on', on); });
   document.documentElement.dataset.mode = state.mode;
   $$('#mode button').forEach(b => { const on = b.dataset.m === state.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
-  new MutationObserver(() => { if (state.mode === 'expert' && state.route.kind === 'tool') openDetails($('#main')); }).observe($('#main'), { childList: true, subtree: true });
+  document.body.classList.toggle('showsrc', lsGet('bm.showsrc') === '1');
+  new MutationObserver(() => { foldSources($('#main')); if (state.mode === 'expert' && state.route.kind === 'tool') openDetails($('#main')); }).observe($('#main'), { childList: true, subtree: true });
   initSearch(); initMenu(); applyCompact();
   addEventListener('resize', applyCompact);
   $('#calcbtn').onclick = () => { if (BenchCalc.isOpen) BenchCalc.close(); else BenchCalc.open(); };

@@ -198,7 +198,7 @@ function renderDriveGuide(el) {
     rows.map(r => '<tr><td><b>' + gesc(r[0]) + '</b></td><td>' + gesc(r[1]) + '</td><td>' + dvTags(r[2]) + '</td></tr>').join('') + '</table></div>';
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">What drives a machine and what keeps it running, in our own words: induction motors and their nameplate, lining up two coupled shafts with dial indicators, hydraulics and pneumatics with their fittings, and how machine vibration is judged. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
+    '<p class="desc">What drives a machine and what keeps it running, in our own words: induction motors and their nameplate, lining up two coupled shafts with dial indicators, hydraulics and pneumatics with their fittings, and how machine vibration is judged. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
 
     '<h2 id="dv-cmp">Belt, chain or gears</h2>' +
     '<div id="dvcmp">' + guideTable(['', 'Belt', 'Chain', 'Gears'], DV_CMP, dvTags) + '</div>' +

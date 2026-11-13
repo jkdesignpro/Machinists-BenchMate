@@ -43,6 +43,7 @@ page.on('dialog', d => { problems.push(`[${where}] unexpected dialog: ${d.messag
 // First run: no saved layout, so Home asks what the user mostly does.
 await page.goto(base, { waitUntil: 'load' });
 await page.waitForSelector('#main .onb, #main .dgrid');
+await page.evaluate(() => setShowSrc(true));
 const ver = await page.textContent('#ver');
 if (!/^v\d+\.\d+\.\d+/.test(ver || '')) problems.push(`version label missing: "${ver}"`);
 const open = async (id, wait = 40) => { await page.evaluate(i => openTool(i), id); await page.waitForTimeout(wait); };
@@ -338,7 +339,7 @@ await page.click('#main .tpa button[title^="Reset"]');
 // turning: 25 mm, carbide 800 to 885 ft/min, middle 842.5 = 256.8 m/min: 3270 rpm; feed (0.4 / 3 + 0.4 / 2) / 2 = 0.1667 mm/rev;
 //   kc = 1350 x (0.1667 sin 95)^-0.21 = 1968; Fc = 1968 x 1.016 x 0.1667 = 333 N; Ra = 0.1667^2 / (32 x 0.4) x 1000 = 2.17 um.
 for (const [id, res] of [
-  ['advmill', [/Spindle speed 1,617 RPM/i, /Table feed 457 mm\/min/, /Feed per tooth 0\.0706 mm/, /From the table: chip load \(Harvey Tool, between two printed sizes/]],
+  ['advmill', [/Spindle speed 1,617 RPM/i, /Table feed 457 mm\/min/i, /Feed per tooth 0\.0706 mm/i, /From the table: chip load \(Harvey Tool, between two printed sizes/]],
   ['advdrill', [/Spindle speed 776 RPM/i, /0\.152 mm\/rev/, /Torque 4\.56 N m/, /Point length to add to the depth 3\.004 mm/]],
   ['advream', [/Spindle speed 509 RPM/i, /0\.254 to 0\.381 mm/, /Hole to drill first, Gammons 9\.700 mm/]],
   ['advturn', [/Spindle speed 3,270 RPM/i, /Cutting force 333 N/, /theoretical Ra\) 2\.17 um/]],
@@ -432,13 +433,13 @@ await page.click('#main .tpa button[title^="Reset"]');
 where = 'advtap';
 await open('advtap');
 aT = await advTxt();
-if (!/Spindle speed 291 RPM/i.test(aT) || !/Feed rate \(pitch x spindle speed\) 436\.50 mm\/min/.test(aT) || !/Time in and out [^0-9]*4\.1 s/.test(aT) || !/Nothing/.test(aT)) problems.push(`[${where}] defaults: "${aT.slice(0, 500)}"`);
+if (!/Spindle speed 291 RPM/i.test(aT) || !/Feed rate 436\.50 mm\/min pitch x spindle speed/i.test(aT) || !/Time in and out [^0-9]*4\.1 s/.test(aT) || !/Nothing/.test(aT)) problems.push(`[${where}] defaults: "${aT.slice(0, 500)}"`);
 await advSet('nmax', '250');
 aT = await advTxt();
-if (!/Spindle speed 250 RPM/i.test(aT) || !/Feed rate \(pitch x spindle speed\) 375\.00 mm\/min/.test(aT) || !/Top spindle speed/i.test(aT) || !/needs 291 RPM/.test(aT)) problems.push(`[${where}] speed limit: "${aT.slice(0, 500)}"`);
+if (!/Spindle speed 250 RPM/i.test(aT) || !/Feed rate 375\.00 mm\/min pitch x spindle speed/i.test(aT) || !/Top spindle speed/i.test(aT) || !/needs 291 RPM/.test(aT)) problems.push(`[${where}] speed limit: "${aT.slice(0, 500)}"`);
 await advSet('vfmax', '300');
 aT = await advTxt();
-if (!/Spindle speed 200 RPM/i.test(aT) || !/Feed rate \(pitch x spindle speed\) 300\.00 mm\/min/.test(aT) || !/Top feed rate/i.test(aT) || !/Feed per revolution \(the pitch\) 1\.500 mm\/rev/.test(aT)) problems.push(`[${where}] feed limit: "${aT.slice(0, 600)}"`);
+if (!/Spindle speed 200 RPM/i.test(aT) || !/Feed rate 300\.00 mm\/min pitch x spindle speed/i.test(aT) || !/Top feed rate/i.test(aT) || !/Feed per rev 1\.500 mm\/rev the pitch/i.test(aT)) problems.push(`[${where}] feed limit: "${aT.slice(0, 600)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
 // Plunge roughing: 12 mm carbide end mill, 4 flutes, low carbon steel. Harvey Tool: 100 to 300 ft/min, middle 200 = 60.96 m/min; chip load at
@@ -448,13 +449,13 @@ await page.click('#main .tpa button[title^="Reset"]');
 where = 'advplunge';
 await open('advplunge');
 aT = await advTxt();
-if (!/Spindle speed 1,213 RPM/i.test(aT) || !/Feed rate straight down 85\.6 mm\/min/.test(aT) || !/Cusp left on the wall between plunges 0\.191 mm/.test(aT) || !/Plunges in the row \(one at each end\) 18/.test(aT)) problems.push(`[${where}] defaults: "${aT.slice(0, 700)}"`);
+if (!/Spindle speed 1,213 RPM/i.test(aT) || !/Feed rate down 85\.6 mm\/min/i.test(aT) || !/Cusp left on the wall between plunges 0\.191 mm/.test(aT) || !/Plunges in the row \(one at each end\) 18/.test(aT)) problems.push(`[${where}] defaults: "${aT.slice(0, 700)}"`);
 await page.selectOption('#main [data-id="rule"]', '2');
 aT = await advTxt();
-if (!/Spindle speed 1,617 RPM/i.test(aT) || !/Feed rate straight down 159\.8 mm\/min/.test(aT)) problems.push(`[${where}] CGS rule: "${aT.slice(0, 500)}"`);
+if (!/Spindle speed 1,617 RPM/i.test(aT) || !/Feed rate down 159\.8 mm\/min/i.test(aT)) problems.push(`[${where}] CGS rule: "${aT.slice(0, 500)}"`);
 await advSet('nmax', '1000');
 aT = await advTxt();
-if (!/Spindle speed 1,000 RPM/i.test(aT) || !/Feed rate straight down 98\.8 mm\/min/.test(aT) || !/Top spindle speed/i.test(aT)) problems.push(`[${where}] speed limit: "${aT.slice(0, 500)}"`);
+if (!/Spindle speed 1,000 RPM/i.test(aT) || !/Feed rate down 98\.8 mm\/min/i.test(aT) || !/Top spindle speed/i.test(aT)) problems.push(`[${where}] speed limit: "${aT.slice(0, 500)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
 // Holder and spindle stiffness in the tool deflection page. Solid 12 mm carbide rod, 40 mm out, 100 N: I = pi 12^4 / 64 = 1017.88 mm4,
@@ -479,11 +480,11 @@ where = 'advturn chip breaker';
 await open('advturn');
 await advSet('cbf0', '0.25'); await advSet('cbf1', '0.5'); await advSet('cba0', '1.5'); await advSet('cba1', '4');
 aT = await advTxt();
-if (!/held inside the chip breaker range\) 0\.250 mm\/rev/.test(aT) || !/Depth of cut \(suggested: held inside the chip breaker range\) 1\.500 mm/.test(aT) || !/this cut is inside it/.test(aT) || !/The nose radius rule gives 0\.167 mm\/rev/.test(aT)) problems.push(`[${where}] held: "${aT.slice(0, 700)}"`);
+if (!/Feed per rev 0\.250 mm\/rev suggested: nose radius rule, held inside the chip breaker range/i.test(aT) || !/Depth of cut \(suggested: held inside the chip breaker range\) 1\.500 mm/.test(aT) || !/this cut is inside it/.test(aT) || !/The nose radius rule gives 0\.167 mm\/rev/.test(aT)) problems.push(`[${where}] held: "${aT.slice(0, 700)}"`);
 if (!(await page.$('#res .rwidget rect.cbwin'))) problems.push(`[${where}] no chart`);
 await advSet('f', '0.1');
 aT = await advTxt();
-if (!/Feed per revolution \(yours, locked\) 0\.100 mm\/rev/.test(aT) || !/feed below the range/.test(aT) || !/Outside/i.test(aT) || !/Below the chip breaker range/.test(aT)) problems.push(`[${where}] below: "${aT.slice(0, 700)}"`);
+if (!/Feed per rev 0\.100 mm\/rev yours, locked/i.test(aT) || !/feed below the range/.test(aT) || !/Outside/i.test(aT) || !/Below the chip breaker range/.test(aT)) problems.push(`[${where}] below: "${aT.slice(0, 700)}"`);
 await page.click('#main .tpa button[title^="Reset"]');
 
 // Milling advisor, ball nose: 12 mm ball, depth locked at 2 mm: largest diameter in the cut 2 sqrt(2 x 10) = 8.944 mm, so the table speed
@@ -955,7 +956,7 @@ where = 'rotpoint';
   // B and C by the right-hand rule: B90 takes (25, 10, 40) to X 40, Z -25; C90 takes it to X -10, Y 25
   await set('axis', 1);
   await has(/move: X 40\.000 mm ; .*move: Y 10\.000 mm ; .*move: Z -25\.000 mm/i, 'right-hand B90 should give X 40, Z -25');
-  if (await page.$('#main [data-id="cy"]') && await page.isVisible('#main [data-id="cy"]')) problems.push(`[${where}] the Y of the centre line is asked for on a B axis`);
+  if (await page.$('#main [data-id="cy"]') && await page.isEnabled('#main [data-id="cy"]')) problems.push(`[${where}] the Y of the centre line is asked for on a B axis`);
   await set('axis', 2);
   await has(/move: X -10\.000 mm ; .*move: Y 25\.000 mm ; .*move: Z 40\.000 mm/i, 'right-hand C90 should give X -10, Y 25');
   // centre line off zero: A about Y 10, Z 0 takes the point (0, 40) from the centre line to (-40, 0) from it
@@ -1164,7 +1165,7 @@ where = 'knurl';
   if (!/^0 of 9/.test(await page.textContent('#main #kdone'))) problems.push(`[${where}] Clear the ticks should clear them`);
   await pick('km', 'cp'); await pick('ks', 'mm'); await pick('kf', '0'); await set('kp', 1); await set('kd', 20);
   await has(/Teeth on the wanted diameter 62\.83 .*Blank for 62 teeth 19\.735 mm/, '1 mm pitch on 20 mm is 62.83 teeth, blank 19.735 for 62');
-  const src = await page.$eval('#main', e => e.innerText);
+  const src = await page.$eval('#main', e => e.textContent);
   for (const w of ['Sherline', 'GenSwiss', 'Conrad Hoffman', 'pjsminilathe', 'Read and not used', 'Industrial Monitor Direct']) if (!src.includes(w)) problems.push(`[${where}] the sources note should name ${w}`);
 }
 // Grinding: wheel to work rpm ratio. The two published examples, the three verdicts, wear at constant surface
@@ -1259,7 +1260,7 @@ where = 'gundrill';
   await has(/Coolant pressure 67\.2 bar 974 psi/, '6 mm is 974 psi by the straight line between 0.187 and 0.250 in');
   const rules = await page.$$eval('#main ul.gdrules li', a => a.map(li => li.innerText.replace(/\s+/g, ' ')));
   if (rules.length !== 7 || rules.some(t => !/\[[^\]]+\]$/.test(t))) problems.push(`[${where}] seven rules, each naming its sources: ${rules.length}`);
-  const txt = await page.$eval('#main', e => e.innerText);
+  const txt = await page.$eval('#main', e => e.textContent);
   for (const w of ['Read and not used', 'Master Fluid Solutions', 'UNISIG', 'botek', 'Hartner', 'Ingersoll', 'ISCAR']) if (!txt.includes(w)) problems.push(`[${where}] the sources note should name ${w}`);
 }
 // Tool wear guide: ten wear types, each with its own drawing, causes and remedies; the picture index jumps to
@@ -1866,7 +1867,7 @@ where = 'millsetup';
     const txt = p => p.innerText.replace(/\s+/g, ' ');
     const find = re => ps.find(p => re.test(txt(p)));
     const flagged = re => { const p = find(re); return p ? /to be verified/.test(txt(p)) : null; };
-    return { h2: document.querySelectorAll('#main h2').length, svgs: [...document.querySelectorAll('#main svg.geo')].map(v => v.getAttribute('aria-label')).join(' | '),
+    return { h2: document.querySelectorAll('#main h2, #main details.srcfold[id]').length, svgs: [...document.querySelectorAll('#main svg.geo')].map(v => v.getAttribute('aria-label')).join(' | '),
       steps: (document.querySelector('#main svg.geo')?.querySelectorAll('text.gv').length) || 0,
       tabs: [...document.querySelectorAll('#main table.gtab')].map(t => t.querySelectorAll('tr').length).join(','),
       untagged: ps.filter(p => !p.querySelector('abbr.gsrc') && !p.querySelector('a')).length, tagged: ps.filter(p => p.querySelector('abbr.gsrc')).length,
@@ -1904,7 +1905,7 @@ where = 'toolpaths';
     const ps = [...document.querySelectorAll('#main p')].filter(p => !p.classList.contains('desc') && !p.closest('.whyb'));
     const txt = p => p.innerText.replace(/\s+/g, ' ');
     const flag = ps.map(p => [txt(p).slice(0, 120), /to be verified/.test(txt(p))]);
-    return { h2: document.querySelectorAll('#main h2').length, svgs: document.querySelectorAll('#main svg.geo').length, untagged: ps.filter(p => !p.querySelector('abbr.gsrc') && !p.querySelector('a')).length, tagged: ps.filter(p => p.querySelector('abbr.gsrc')).length,
+    return { h2: document.querySelectorAll('#main h2, #main details.srcfold[id]').length, svgs: document.querySelectorAll('#main svg.geo').length, untagged: ps.filter(p => !p.querySelector('abbr.gsrc') && !p.querySelector('a')).length, tagged: ps.filter(p => p.querySelector('abbr.gsrc')).length,
       tabs: [...document.querySelectorAll('#main table.gtab')].map(t => t.querySelectorAll('tr').length).join(','), srcs: document.querySelectorAll('#main ul.gsl li').length, flag, code: document.querySelector('#main pre.gcode')?.innerText || '', all: document.querySelector('#main').innerText.replace(/\s+/g, ' ') };
   }); };
   // Is the statement that starts with these words marked "to be verified"? undefined when there is no such statement.
@@ -2825,6 +2826,45 @@ where = 'toolpaths';
     const del = await page.$('#main [data-delp="' + (nums.length - 1) + '"]');
     if (del) { await del.click(); await page.waitForTimeout(120); }
     if ((await page.$$eval('#main [data-p][data-c="n"]', a => a.length)) !== before) problems.push(`[${where}] removing the added operation`);
+  }
+
+  // 0.8.0 feedback: sources folded away by default, the feed in the headline, boxes that never move,
+  // the calculator key beside the box (not over its arrows), the slitting saw under Milling, the search box read-only until used.
+  where = 'feedback-080';
+  {
+    await page.evaluate(() => setShowSrc(false));
+    await open('measguide', 200);
+    const vis = sel => page.$$eval(sel, a => a.filter(x => x.offsetParent).length);
+    const g = await page.evaluate(() => ({ all: document.querySelectorAll('#main abbr.gsrc').length, fold: !!document.querySelector('#main details.srcfold#mz-src'), open: !!document.querySelector('#main details.srcfold#mz-src')?.open, list: document.querySelectorAll('#main details.srcfold#mz-src ul.gsl li').length }));
+    const keys0 = await vis('#main abbr.gsrc'), tbv0 = await vis('#main .gtbv');
+    if (keys0 !== 0 || g.all < 50 || !g.fold || g.open || g.list < 20 || tbv0 < 2) problems.push(`[${where}] guide sources should be folded with the keys hidden and "to be verified" kept: ${keys0} of ${g.all} keys shown, fold ${g.fold} open ${g.open}, ${g.list} sources, ${tbv0} flags`);
+    await page.click('#main details.srcfold#mz-src > summary');
+    await page.check('#main details.srcfold#mz-src .srcshow input');
+    if ((await vis('#main abbr.gsrc')) < 50) problems.push(`[${where}] ticking the box should show the source keys`);
+    await page.uncheck('#main details.srcfold#mz-src .srcshow input');
+    if ((await vis('#main abbr.gsrc')) !== 0) problems.push(`[${where}] clearing the box should hide the source keys again`);
+    await open('grindwheel', 200);
+    if (!(await page.$('#main details.srcfold'))) problems.push(`[${where}] a "Sources" note should fold away`);
+    await open('advdrill', 200);
+    const heads = await page.$$eval('#res .hero .hi .hl', a => a.map(x => x.textContent));
+    if (heads.join('|') !== 'Spindle speed|Feed per rev|Feed rate') problems.push(`[${where}] drilling headline should hold speed, feed per rev and feed rate: ${heads.join('|')}`);
+    if (await page.$('#res table td:text-is("Feed rate")')) problems.push(`[${where}] the feed rate should not be repeated in the list`);
+    const tab = await page.$eval('#res details.rtab.fold', d => d.open).catch(() => null);
+    if (tab !== false) problems.push(`[${where}] the table of publishers should be folded: ${tab}`);
+    const geo = await page.evaluate(() => { const l = document.querySelector('#main [data-id="d"]').closest('label'); const r = e => e.getBoundingClientRect(); const i = r(l.querySelector('input')), f = r(l.querySelector('.fx')), u = r(l.querySelector('.u')); return { i: i.right, f0: f.left, f1: f.right, u: u.left }; });
+    if (!(geo.f0 >= geo.i - 0.5 && geo.f1 <= geo.u + 0.5)) problems.push(`[${where}] the calculator key should sit between the box and the unit: ${JSON.stringify(geo)}`);
+    await open('bandsaw', 200);
+    const at = () => page.$eval('#main [data-id="bundle"]', e => { const r = e.getBoundingClientRect(); return Math.round(r.left) + ',' + Math.round(r.top); });
+    const p0 = await at(), b0 = await page.$eval('#main [data-id="b"]', e => [e.disabled, e.closest('label').classList.contains('na'), !!e.offsetParent]);
+    await page.selectOption('#main [data-id="shape"]', '2'); await page.waitForTimeout(60);
+    const p1 = await at(), b1 = await page.$eval('#main [data-id="b"]', e => e.disabled);
+    if (p0 !== p1 || b0.join() !== 'true,true,true' || b1 !== false) problems.push(`[${where}] bandsaw boxes should stay in place, the height greyed out for a round bar: ${p0} / ${p1}, ${b0}, ${b1}`);
+    await page.click('#main .tpa button[title^="Reset"]');
+    const ss = await page.evaluate(() => ({ g: TOOLS.find(t => t.id === 'slitsaw').group, m: WORKSPACES.find(w => w.id === 'milling').sections.find(x => x[0] === 'Speeds and feeds')[1].includes('slitsaw') }));
+    if (ss.g !== 'Milling' || !ss.m) problems.push(`[${where}] the slitting saw belongs to milling: ${JSON.stringify(ss)}`);
+    if (!(await page.$eval('#search', e => e.readOnly && e.getAttribute('autocomplete') === 'off'))) problems.push(`[${where}] the search box should stay read-only until it is used`);
+    if (/Rust/.test(await page.textContent('#status'))) problems.push(`[${where}] the status line should only carry the warning`);
+    await page.evaluate(() => setShowSrc(true));
   }
 
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.

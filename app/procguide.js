@@ -137,7 +137,7 @@ function renderProcGuide(el) {
     rows.map(r => '<tr><td><b>' + gesc(r[0]) + '</b></td><td>' + gesc(r[1]) + '</td><td>' + pgTags(r[2]) + '</td></tr>').join('') + '</table></div>';
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">The processes a machine shop sends out or meets on a drawing, in our own words: cutting plate with water jet, laser, plasma and flame; EDM; ultrasonic, abrasive flow, electron beam and photochemical machining; polishing, buffing and wire brushing; conversion coatings, anodising, plating and thermal spraying. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
+    '<p class="desc">The processes a machine shop sends out or meets on a drawing, in our own words: cutting plate with water jet, laser, plasma and flame; EDM; ultrasonic, abrasive flow, electron beam and photochemical machining; polishing, buffing and wire brushing; conversion coatings, anodising, plating and thermal spraying. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
 
     '<h2 id="pg-cut">Cutting plate and sheet</h2>' +
     two(['Process', 'What it cuts'], PG_CUT) +

@@ -101,7 +101,7 @@ function renderThreadGuide(el) {
   const toc = [['tf-term', 'The parts of a thread'], ['tf-lead', 'Pitch, lead and hand'], ['tf-form', 'Thread forms'], ['tf-kind', 'Coarse, fine, straight, tapered'], ['tf-abbr', 'Abbreviations']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">Screw threads in general, in our own words: what the parts of a thread are called, pitch and lead, the common thread forms and what each is for, and the abbreviations found on drawings, taps and gauges. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers; the seven Wikipedia articles count as one. Sizes and limits are on the pages of each thread, linked below.</p>' +
+    '<p class="desc">Screw threads in general, in our own words: what the parts of a thread are called, pitch and lead, the common thread forms and what each is for, and the abbreviations found on drawings, taps and gauges. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers; the seven Wikipedia articles count as one. Sizes and limits are on the pages of each thread, linked below.</p>' +
 
     '<h2 id="tf-term">The parts of a thread</h2>' + tfTerms() +
     tfP('<b>Major diameter.</b> The largest diameter of the thread: over the crests of a screw, at the roots of a nut.', ['WP_ST', 'KEL']) +

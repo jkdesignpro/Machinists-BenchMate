@@ -191,7 +191,7 @@ function renderCutGuide(el) {
   const toc = [['cg-mill', 'Milling cutters'], ['cg-mat', 'Tool materials'], ['cg-drill', 'Twist drill terms'], ['cg-file', 'Files'], ['cg-broach', 'Broaching'], ['cg-bore', 'Boring tools']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">What the cutting tools are called and what each is for, in our own words: the kinds of milling cutter, the tool materials from high speed steel to diamond, the parts of a twist drill, files and filing, broaches, and boring tools. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
+    '<p class="desc">What the cutting tools are called and what each is for, in our own words: the kinds of milling cutter, the tool materials from high speed steel to diamond, the parts of a twist drill, files and filing, broaches, and boring tools. Every statement was checked against public sources: they are listed under Sources at the bottom, where you can also show the source keys beside each statement. <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
 
     '<h2 id="cg-mill">Kinds of milling cutter</h2>' + cgCutters() +
     cgP('<b>Arbor or shank.</b> Plain, side and the other disc-shaped cutters are usually mounted on an arbor. End mills, T-slot, Woodruff and dovetail cutters are held by a shank and work in vertical and horizontal machines alike.', ['CTE_G', 'AM12']) +

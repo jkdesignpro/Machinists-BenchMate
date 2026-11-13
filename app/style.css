@@ -122,6 +122,14 @@ svg.gdia .gzs{stroke:var(--accent);stroke-width:1.6}
 .gcg dt{font-weight:600;margin-top:4px}
 .gcg dd{margin:0 0 4px;color:var(--ink);line-height:1.5}
 abbr.gsrc{font:10px var(--mono);text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 3px;margin-right:3px;cursor:help;white-space:nowrap}
+body:not(.showsrc) abbr.gsrc,body:not(.showsrc) .scol,body:not(.showsrc) .sk,body.showsrc .nk{display:none}
+details.srcfold{margin:14px 0 6px;border:1px solid var(--line);border-radius:var(--r);padding:0 12px}
+details.srcfold>summary{cursor:pointer;padding:8px 0;font:700 11px var(--sans);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+details.srcfold[open]>summary{color:var(--accent)}
+.note details.srcfold{margin:8px 0 2px}
+.srcshow{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin:0 0 8px;cursor:pointer}
+.srcbody{padding:0 0 10px}
+details.rtab.fold>summary{cursor:pointer;list-style:revert}
 .gtbv{font-size:10.5px;color:var(--warn);border:1px solid var(--warn);border-radius:3px;padding:0 4px;white-space:nowrap}
 .gwarn{color:var(--warn);font-weight:600}
 .gerr{color:var(--err);font-weight:600}

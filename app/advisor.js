@@ -391,7 +391,7 @@ TOOLS.push(
       (e.fz[0] === e.fz[1] ? cl(e.fz[0]) : cl(e.fz[0]) + ' to ' + cl(e.fz[1])) + ' ' + lenU(s), e === used && !(v.vown > 0) ? 'used' : !used ? '' : (e.open || used.open || (e.v[0] <= hi && e.v[1] >= lo)) ? 'speeds overlap' : e.v[0] > hi ? 'prints a higher speed' : 'prints a lower speed']);
     const lm = ADV_LMS[r.m.lms];
     if (lm && r.tm === 2) rows.push([ADV_PUB.lms, lm[0] + ' (milling table; tool material not stated)', (lm[3][0] === lm[3][1] ? sp(lm[3][0]) : sp(lm[3][0]) + ' to ' + sp(lm[3][1])) + ' ' + spdU(s), 'not printed', 'speed only']);
-    return { title: 'What each publisher prints for this material, ' + (r.tm === 1 ? 'carbide' : 'HSS') + ' end mill of this size', head: ['Publisher', 'Row as printed', 'Speed', 'Chip load per tooth', ''], rows, text: true };
+    return { fold: true, title: 'Sources: what each publisher prints for this material, ' + (r.tm === 1 ? 'carbide' : 'HSS') + ' end mill of this size', head: ['Publisher', 'Row as printed', 'Speed', 'Chip load per tooth', ''], rows, text: true };
   },
   // Stability chart: the tool as a round bar of the shank diameter (or a tap test), the cutting force from kc at the mean chip thickness.
   widget: (v, W, s) => {
@@ -691,7 +691,7 @@ TOOLS.push(
     const inch = s === 'inch', sp = x => fmt(inch ? x : x * FT_M, 0);
     const rows = r.entries.map(e => [e.pub, e.row, advRange(e.v[0], e.v[1], sp) + ' ' + spdU(s), e === r.e && !(v.vown > 0) ? 'used' : '']);
     if (r.oo) rows.push([ADV_PUB.oo, r.oo[0] + ' (tool material and operation not stated)', advRange(r.oo[1], r.oo[2], sp) + ' ' + spdU(s), 'for comparison']);
-    return rows.length ? { title: 'What each publisher prints for drilling this material', head: ['Publisher', 'Row as printed', 'Speed', ''], rows, text: true } : null;
+    return rows.length ? { fold: true, title: 'Sources: what each publisher prints for drilling this material', head: ['Publisher', 'Row as printed', 'Speed', ''], rows, text: true } : null;
   },
   sends: (v, W, s) => {
     const r = advDrillRun(v, W, s);
@@ -755,7 +755,7 @@ TOOLS.push(
     const r = advReamRun(v, W, s);
     if (!r || !r.entries.length) return null;
     const inch = s === 'inch', sp = x => fmt(inch ? x : x * FT_M, 0), fd = x => fmt(inch ? x : x * IN_MM, inch ? 4 : 3);
-    return { title: 'What each publisher gives for reaming this material at this size', head: ['Publisher', 'Row or rule', 'Speed', 'Feed per revolution', ''],
+    return { fold: true, title: 'Sources: what each publisher gives for reaming this material at this size', head: ['Publisher', 'Row or rule', 'Speed', 'Feed per revolution', ''],
       rows: r.entries.map(e => [e.pub, e.row, advRange(e.v[0], e.v[1], sp) + ' ' + spdU(s), advRange(e.fz[0], e.fz[1], fd) + ' ' + feedRevU(s) + (e.fnote ? ' (' + e.fnote + ')' : ''), e === r.e && !(v.vown > 0) ? 'used' : '']), text: true };
   },
   working: 'Speed: the reaming column of the speed table, or the class table of a reamer maker, or a rule against the drilling speed for the same material (half, or two thirds). Feed: the reamer maker\'s class table where it prints one, otherwise 2 (to 3) times the feed per revolution a drill of that diameter would take. n = 1000 Vc / (pi D), held to the machine\'s top speed; feed rate = fn x n, held to its top feed. Stock to leave: the reamer maker\'s table by diameter, and about 3 % of the hole diameter; hole to drill first = reamer diameter - stock on the diameter. No force or power is worked out: a reamer removes very little.',
@@ -883,7 +883,7 @@ TOOLS.push(
   panel: (v, W, s) => { const r = advPlungeRun(v, W, s); return !r || r.none ? '' : '<div class="tiles">' + advHoleTiles(r, s) + '</div>' + advHoleCard(r, s, 'feed per tooth'); },
   table: (v, W, s) => {
     const r = advPlungeRun(v, W, s);
-    return r ? { title: 'What each publisher prints about plunging an end mill', head: ['Publisher', 'As printed', 'Used here as', ''], rows: ADV_PLUNGE.map(x => [x.pub, x.row, x.how, x === r.rule ? 'used' : '']), text: true } : null;
+    return r ? { fold: true, title: 'Sources: what each publisher prints about plunging an end mill', head: ['Publisher', 'As printed', 'Used here as', ''], rows: ADV_PLUNGE.map(x => [x.pub, x.row, x.how, x === r.rule ? 'used' : '']), text: true } : null;
   },
   sends: (v, W, s) => {
     const r = advPlungeRun(v, W, s);
@@ -970,7 +970,7 @@ TOOLS.push(
     const inch = s === 'inch', sp = x => fmt(inch ? x : x * FT_M, 0), lm = ADV_LMS[r.m.lms], rows = [];
     if (lm) rows.push([ADV_PUB.lms, lm[0] + ', HSS', advRange(lm[1][0], lm[1][1], sp) + ' ' + spdU(s), r.tm === 2 && !(v.vown > 0) ? 'used' : ''], [ADV_PUB.lms, lm[0] + ', carbide', advRange(lm[2][0], lm[2][1], sp) + ' ' + spdU(s), r.tm === 1 && !(v.vown > 0) ? 'used' : '']);
     if (r.oo) rows.push([ADV_PUB.oo, r.oo[0] + ' (tool material and operation not stated)', advRange(r.oo[1], r.oo[2], sp) + ' ' + spdU(s), 'for comparison']);
-    return rows.length ? { title: 'What each publisher prints for this material', head: ['Publisher', 'Row as printed', 'Speed', ''], rows, text: true } : null;
+    return rows.length ? { fold: true, title: 'Sources: what each publisher prints for this material', head: ['Publisher', 'Row as printed', 'Speed', ''], rows, text: true } : null;
   },
   sends: (v, W, s) => {
     const r = advTurnRun(v, W, s);
