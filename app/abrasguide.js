@@ -29,9 +29,16 @@ const AG_SOURCES = {
   GILSON: 'Gilson Company, "Sieve sizes" (ASTM E11 openings)',
   WP_MESH: 'Wikipedia, "Mesh (scale)" (CC BY-SA)',
   SIGMA: 'Sigma-Aldrich, "Particle size conversion table"',
+  DEF_SG: 'DeFusco, "Surface grinding wheel selection: grit, bond, and grade", 2026-04-12 (a seller)',
+  BACON_SG: 'T. A. Bacon, Introduction to Machining, 11.4 "Application" (Washington open textbook, CC BY 4.0)',
+  AE_FS: 'Abrasive Engineering, "Feeds and speeds" (an excerpt it credits to Farago)',
+  RAD_CG: 'Radiac Abrasives, troubleshooting tips, cylindrical grinding (only the rows that read cleanly)',
+  OKU_CH: 'R. Williams, Okuma, "6 causes of grinding chatter and how to fix them", 2016-03-23',
+  UG_ERR: 'UNITED GRINDING, Motion blog, "Typical grinding errors and how to eliminate them", 2020-12-08',
+  CTE_BURN: 'Cutting Tool Engineering, J. A. Badger, "How to avoid grinding burn", 2014-04-01',
 };
 // Several pages of one publisher count once.
-const AG_FAMILY = { OU_G: 'OU', OU_C: 'OU', CTE_W: 'CTE', CTE_C: 'CTE', CTE_H: 'CTE', MMS_G: 'MMS', MMS_C: 'MMS', MMS_H: 'MMS', WP_HONE: 'WIKI', WP_LAP: 'WIKI', WP_MESH: 'WIKI', EMI4: 'EMI', EMI6: 'EMI' };
+const AG_FAMILY = { OU_G: 'OU', OU_C: 'OU', CTE_W: 'CTE', CTE_C: 'CTE', CTE_H: 'CTE', MMS_G: 'MMS', MMS_C: 'MMS', MMS_H: 'MMS', WP_HONE: 'WIKI', WP_LAP: 'WIKI', WP_MESH: 'WIKI', EMI4: 'EMI', EMI6: 'EMI', CTE_BURN: 'CTE' };
 const agTags = keys => guideTags(keys, AG_SOURCES, AG_FAMILY);
 const agP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + agTags(keys)) + '</p>';
 const agBox = d => '<path class="gfill" d="' + d + '"/><path class="gp" d="' + d + '"/>';
@@ -125,8 +132,20 @@ const AG_SIEVE = [
   ['No. 635', '20 µm', 'not listed', 'not listed', ['GILSON']],
 ];
 
+// Faults on externally ground round work, with causes and remedies as the sources give them.
+const AG_FAULT = [
+  ['Chatter marks', 'Cut too heavy; wheel too hard; wheel out of balance; slender work without support; vibration in or reaching the machine', 'Lighter infeed; a softer wheel or make it act softer (dress coarser, faster work speed); balance the wheel; a steady rest; find the vibration', ['RAD_CG', 'OKU_CH', 'UG_ERR']],
+  ['Burn marks (yellow or brown patches, a spiral)', 'The surface overheats; wheel too hard; too little coolant; a dull wheel whose grains rub', 'A softer or more open wheel; more and better aimed coolant; correct the dressing feed', ['UG_ERR', 'RAD_CG', 'CTE_BURN']],
+  ['Out of round (plunge grinding between centres)', 'Centre holes out of round, out of line or burred; work held too tight on the centres; too little coolant', 'Relap and clean the centre holes; ease the footstock spring; set the coolant flow', ['RAD_CG']],
+  ['Thread pattern at the pitch of the table feed', 'Wheel face not parallel to the table travel; the dresser warm or worn', 'Check the dresser for wear and keep it cooled', ['UG_ERR']],
+  ['Spiral marks', 'The wheel was dressed out of round or spiral', 'Dress in one direction only, perhaps with less dressing feed', ['UG_ERR']],
+  ['Comma-shaped scratches', 'Dirt in the coolant carried through the cut', 'Check the coolant filter; clean the wheel guard', ['UG_ERR']],
+  ['Flat spots', 'Vibration from outside: pumps, fans, presses, fork-lift trucks', 'Find the source and remove or isolate it', ['UG_ERR']],
+  ['Mirror finish, stock left from before', 'Wheel dull: dressed too fine, clogged, or too fine a grit', 'Dress with more feed, several times; check the dresser; a coarser wheel', ['UG_ERR']],
+];
+
 function renderAbrasGuide(el) {
-  const toc = [['ag-fig', 'Grinding in figures'], ['ag-cless', 'Centerless grinding'], ['ag-hone', 'Honing'], ['ag-lap', 'Lapping'], ['ag-super', 'Diamond and CBN wheels'], ['ag-belt', 'Belts and cut-off wheels'], ['ag-point', 'Mounted points'], ['ag-sieve', 'Sieves and mesh']];
+  const toc = [['ag-fig', 'Grinding in figures'], ['ag-surf', 'Surface grinding'], ['ag-fault', 'Faults in cylindrical grinding'], ['ag-cless', 'Centerless grinding'], ['ag-hone', 'Honing'], ['ag-lap', 'Lapping'], ['ag-super', 'Diamond and CBN wheels'], ['ag-belt', 'Belts and cut-off wheels'], ['ag-point', 'Mounted points'], ['ag-sieve', 'Sieves and mesh']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">The abrasive processes beyond the plain grinding wheel, in our own words: the grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding and cut-off wheels, mounted points, and sieves and mesh numbers. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
@@ -140,6 +159,30 @@ function renderAbrasGuide(el) {
     agP('<b>Spark-out.</b> A last pass after the main grinding that lets the strain out of the machine and improves finish and size.', ['MMS_G']) +
     agP('<b>What grinding holds.</b> On a diameter ±0.0065 mm in production and ±0.0025 mm in precision work; finish typically 0.1 to 2 micrometres Ra.', ['OU_G']) +
     agP('Wheel markings are decoded in <a href="#/t/wheelcode">grinding wheel marking</a>; wheel shapes, choice, dressing and truing are in the <a href="#/t/shoptools">shop tools guide</a>; speeds and times in <a href="#/t/grindspeed">grinding wheel speed</a> and <a href="#/t/grindtime">cylindrical grinding time</a>.', null) +
+
+    '<h2 id="ag-surf">Surface grinding</h2>' +
+    agP('<b>The wheel for the work.</b> Aluminium oxide for steel.', ['DEF_SG', 'BACON_SG']) +
+    agP('<b>Other work (DeFusco).</b> Silicon carbide for aluminium, brass and copper; CBN for hardened steel and high speed steel.', ['DEF_SG']) +
+    agP('<b>Grit and grade (DeFusco).</b> Grit 24 to 46 for rough stock removal, 80 to 120 for finishing. Grade runs from A, softest, to Z, hardest: a soft wheel (E to H) for hard work and a harder one (M to R) for soft work. Bacon uses 60 grit for general work.', ['DEF_SG']) +
+    agP('<b>Wheel speed.</b> About 30 to 35 m/s (5500 to 6500 ft/min) at the rim.', ['AE_FS', 'OU_G']) +
+    agP('<b>Table speed.</b> Most often 50 to 100 ft/min.', ['AE_FS']) +
+    agP('<b>Down feed, the sources differ.</b> The figures credited to Farago: 0.001 in (0.025 mm) a pass for roughing and half that for finishing. The Open University, for grinding in general: 0.1 to 0.4 mm roughing, 0.01 to 0.025 mm finishing.', ['AE_FS', 'OU_G']) +
+    agP('<b>Cross feed, the sources differ.</b> Farago: 1/4 to 1/12 of the wheel width a pass for roughing (up to 1/2 to 1/3 in some roughing) and 1/8 to 1/12 for finishing. The Open University: 75 to 90 % of the width for roughing, 10 to 25 % for finishing. Either way the passes overlap.', ['AE_FS', 'OU_G', 'BACON_SG']) +
+    agP('<b>On the magnetic chuck.</b> A bowed part goes concave side down. Switch the magnet on and check that the part is held before you start.', ['BACON_SG']) +
+    agP('<b>Keep it flat.</b> Grind a thin part a little from each side in turn, turning it over several times.', ['BACON_SG']) +
+    agP('<b>Coolant</b> aimed into the nip where the wheel runs into the work.', ['BACON_SG']) +
+    agP('<b>What it holds (Open University, production / precision).</b> Reciprocating table: flatness ±0.005 / ±0.0035 mm, thickness ±0.0075 / ±0.0035 mm.', ['OU_G']) +
+    agP('The time for a surface grinding job is worked out in <a href="#/t/grindsurf">surface grinding time</a>; dressing is in the <a href="#/t/shoptools">shop tools guide</a>.', null) +
+
+    '<h2 id="ag-fault">Faults in cylindrical grinding</h2>' +
+    guideTable(['What you see', 'Usual causes', 'What to do'], AG_FAULT, agTags) +
+    '<p class="desc">Causes and remedies as the sources give them, joined where they agree. A row from one source is marked. Radiac\'s table could only be read in part; its rows whose causes and corrections could not be paired with certainty are not used.</p>' +
+    agP('<b>Why work burns.</b> When the grains do not cut deep enough they rub, and rubbing makes heat. Rubbing grains also stay blunt, which makes it worse.', ['CTE_BURN']) +
+    agP('<b>A burnt shoulder (Badger).</b> Plunge into the shoulder at 60 or 90 degrees rather than 30, aim a small high-pressure coolant jet at the shoulder, or raise the work speed and lower the wheel speed.', ['CTE_BURN']) +
+    agP('<b>Burns crack.</b> An overheated surface can crack later under changing load.', ['UG_ERR']) +
+    agP('<b>Dress at the grinding speed.</b> Dressing at a higher wheel speed than you grind at brings chatter.', ['CTE_BURN']) +
+    agP('<b>Coolant left in the wheel.</b> After stopping, run the wheel on without coolant so that it throws the fluid off; fluid left on one side puts it out of balance.', ['UG_ERR']) +
+    agP('Times and speeds are in <a href="#/t/grindtime">cylindrical grinding time</a> and <a href="#/t/grindspeed">grinding wheel speed</a>.', null) +
 
     '<h2 id="ag-cless">Centerless grinding</h2>' + agCless() +
     agP('<b>No centres, no chuck.</b> The work lies on a work rest blade between the grinding wheel and a smaller regulating wheel.', ['CTE_C', 'MMS_C', 'OU_C']) +

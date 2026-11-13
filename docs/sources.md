@@ -1739,3 +1739,38 @@ All wording is BenchMate's own. A statement with fewer than two independent publ
 - **[MMC_TH]** Mitsubishi Materials, course page "Tool holder selection for external turning", https://www.mmc-carbide.com/permanent/courses/75/tool-holder-selection-for-external-turning.html : the clamping methods P, S, C, D, M and E and where each is used, square inserts. Same publisher as [MMC]. Its tables of holders and lead angles are pictures and were not read.
 - **[OMT_TH]** Jiang.xu, OnMy Toolings, "CNC turning tool holder types: the ultimate selection guide", 2025-12-30, modified 2026-11-02, https://onmytoolings.com/?p=17548 : kinds of clamping, shank, overhang, positive inserts, hand. A seller. Its list of style letters and angles contradicts itself (style A and style E each given two angles) and is not used.
 - Mitsubishi and OnMy Toolings describe the clamping letter M differently (wedge lock against multi-lock); both are shown.
+
+## Guide sections added in the thirteenth batch of 0.7.0, accessed 2026-11-13
+
+All wording is BenchMate's own. A statement with fewer than two independent publishers is marked on the page. Where sources print different figures each is shown with its source.
+
+### Back-up rings for O-rings (`app/bearguide.js`, section in the bearings and seals guide)
+- **[APPLE_BU]** Apple Rubber, seal design guide, "Use of backup rings", https://applerubber.com/seal-design-guide/operating-environment-factors/use-of-backup-rings : extrusion depends on the diametral clearance and the hardness of the rubber, the worked example at 1000 psi and 0.016 in, two rings preferred. Its chart is a picture and was not read.
+- **[MARCO_BU]** Marco Rubber, "Back-up O-rings", https://www.marcorubber.com/o-ring-backup-rings.htm : what back-up rings do, above 1500 psi or with large gaps, both sides when the pressure acts both ways, wider glands, PTFE and 90 Shore A rubber, solid, split, spiral and contoured rings.
+- **[FPW_BU]** P. Heney, Fluid Power World, "Backup rings help prevent O-ring migration", 2017-05-05, https://www.fluidpowerworld.com/backup-rings-help-prevent-o-ring-migration/ : above about 5 MPa (50 bar) and with fast movement, pulses or heat, one ring on the side away from the pressure, filled PTFE for heavier duty, continuous, slotted and spiral rings.
+- The two pressure figures (1500 psi and about 50 bar) differ and are shown side by side.
+
+### Surface grinding (`app/abrasguide.js`, section in the abrasive processes guide)
+- **[DEF_SG]** DeFusco, "Surface grinding wheel selection: grit, bond, and grade", 2026-04-12, https://www.defusco.com/surface-grinding-wheel-selection/ : abrasive by work material, grit ranges, grade letters by hardness of the work, bonds. A seller.
+- **[BACON_SG]** T. A. Bacon, Introduction to Machining, 11.4 "Application" (Washington open textbook, CC BY 4.0), https://openwa.pressbooks.pub/intromachining1/chapter/wa11-4/ : aluminium oxide and 60 grit for steel, cross feed less than the wheel width, the magnetic chuck, coolant at the nip, turning thin parts over. Its down feed figures are given without a unit and are not used.
+- **[AE_FS]** Abrasive Engineering, "Feeds and speeds", https://abrasiveengineering.com/speeds.htm : wheel speed 5500 to 6500 ft/min, table speed 50 to 100 ft/min, down feed 0.001 in roughing and half for finishing, cross feed fractions. The page credits these figures to Farago's book on abrasive methods; they are attributed to Farago on the page. Its table of plunge infeed for cylindrical grinding has a damaged heading and is not used.
+- **[OU_G]** (already listed for the guide): down feed and cross feed for grinding in general, and the tolerances of surface grinding. Its figure for the work speed of surface grinding (given in m/s) looks wrong in what the reader returned and is not used.
+- The down feed and cross feed figures of Farago and the Open University differ widely and are both shown.
+
+### Faults in cylindrical grinding (`app/abrasguide.js`, section in the abrasive processes guide)
+- **[RAD_CG]** Radiac Abrasives, troubleshooting tips, cylindrical grinding, https://radiac.com/troubleshooting-tip-category/cylindrical-grinding/ : chatter marks, burnt work and out-of-round work. The table could be read only in part; rows whose cause and correction could not be paired with certainty (a merged vibration row, short wave marks, wheel loading) are not used.
+- **[OKU_CH]** R. Williams, Okuma, "6 causes of grinding chatter and how to fix them", 2016-03-23, https://okuma.com/blog/blog-grinding-chatter-fixes : six causes of chatter with their fixes.
+- **[UG_ERR]** UNITED GRINDING, Motion blog, "Typical grinding errors and how to eliminate them", 2020-12-08, https://grinding.ch/en/united-grinding/motion/motion-blog/article/news/typical-grinding-errors-and-how-to-eliminate-them : seven surface faults of external cylindrical grinding with causes and remedies. Its figure for the speed ratio of dresser and wheel is not used (not clear in what the reader returned).
+- **[CTE_BURN]** J. A. Badger, Cutting Tool Engineering, "How to avoid grinding burn", 2014-04-01, https://ctemag.com/node/20169 : why grains that rub cause burn, the burnt shoulder, dressing at the grinding speed. Same publisher as the other Cutting Tool Engineering articles of the guide.
+
+### Single-point diamond dressers (`app/shoptools.js`, sub-section in the shop tools guide)
+- **[FLEX_DD]** Flexovit (Saint-Gobain Abrasives), EMEA catalogue 2017, page 232, https://media.saint-gobain.com/Abrasives/Flexovit/EMEA/2017/FI_eu_2017_e-book/files/assets/basic-html/page-232.html : carat from wheel diameter times thickness (below 3000, 3000 to 12000, above 12000), a drag angle of 5 to 15 degrees, turning the diamond every four or five dressings.
+- **[ORG_DD]** Organametrisis, product page for single-point dressing diamonds, https://organametrisis.gr/en/products/sri-ct-diamantia-katharismou-diamorfwshs-smyridotroxwn : the same rule with one figure for each size from 0.25 to 3 ct. A seller; the page does not say whether each figure is a limit.
+- **[NORI_DD]** Noritake, technical support page "Dressing and trueing", https://noritake.co.jp/eng/supports/detail/17 : larger and wider wheels take a larger diamond, usual carat sizes, a tilt of about 15 degrees, depth of the dressing cut by kind of grinding. Its feed rate formula is not used.
+- The two carat tables do not agree; both are shown. The worked comparison on the page (a 200 x 25 mm wheel) is BenchMate's own multiplication.
+- **Read, not used:** UKAM, "How to choose the right diamond dresser for your grinding wheel" (no figures).
+
+### Choosing a tool steel (`app/matguide.js`, sub-section in the materials guide)
+- **[CRU_SEL]** Crucible Industries, eSelector, "Selection of tool & die steels", https://crucible.com/eselector/general/generalpart1.html : wear against toughness, the general-purpose cold work steels, the shock-resisting S grades, what to change for wear, galling, deformation and chipping. A maker of tool steels; its own brand grades are not named in the app.
+- **[PL_TS]** Protolabs, "Tool steel in manufacturing", 2025-09-11, https://www.protolabs.com/en-gb/resources/blog/tool-steel-in-manufacturing/ : uses of O1, A2, D2, S7, H13 and P20, and of high speed steel.
+- With [AIMS_SG] (twelfth batch) for the uses of O1, A2, D2, M2 and H13.

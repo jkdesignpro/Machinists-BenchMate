@@ -36,10 +36,13 @@ const ST_SOURCES = {
   IMD_GW: 'Industrial Monitor Direct, "Grinding wheels for lathe tools: selection guide", 2026-07-31 (only its statements on carbide; its grit figures do not agree with each other)',
   AX_GW: 'Axminster Tools, "Choosing a grinding wheel", 2016-05-19',
   UKAM_DW: 'UKAM Industrial Superhard Tools, "How to select the best diamond grinding wheel for tungsten carbide", 2026-07-23 (a maker of diamond wheels)',
+  FLEX_DD: 'Flexovit (Saint-Gobain Abrasives), EMEA catalogue 2017, page 232, "Single point dressers"',
+  ORG_DD: 'Organametrisis, product page for single-point dressing diamonds (a seller; organametrisis.gr)',
+  NORI_DD: 'Noritake, technical support page "Dressing and trueing"',
   OWN: 'BenchMate arithmetic or reasoning from the sources beside it',
 };
 // Two chapters of one open textbook count once, as do two articles in one magazine.
-const ST_FAMILY = { DONNER: 'WAOPEN', BACON: 'WAOPEN', MMS_SAW: 'GARDNER', MMS_DRESS: 'GARDNER', NILS_BS: 'NILS_L' };
+const ST_FAMILY = { DONNER: 'WAOPEN', BACON: 'WAOPEN', MMS_SAW: 'GARDNER', MMS_DRESS: 'GARDNER', NILS_BS: 'NILS_L', FLEX_DD: 'SAINTGOBAIN' };
 const stTags = keys => guideTags(keys, ST_SOURCES, ST_FAMILY);
 const stP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + stTags(keys)) + '</p>';
 
@@ -98,6 +101,16 @@ const ST_BAND = [
   ['Cast iron', '46 to 75', '33 to 75 (grey iron)', '80 to 100', ['EXC_BS', 'LFC_BS', 'NILS_BS']],
   ['Aluminium and its alloys', '102 to 138', '67 to 163', '250 to 350', ['EXC_BS', 'LFC_BS', 'NILS_BS']],
   ['Copper alloys', '-', '70 to 147', 'brass and bronze 200 to 300, copper 150 to 200', ['LFC_BS', 'NILS_BS']],
+];
+// Size of a single-point dressing diamond from the wheel diameter times its width (both in mm), as two pages print it.
+const ST_DD = [
+  ['0.25 ct', 'below 3000', 'up to 2000', ['FLEX_DD', 'ORG_DD']],
+  ['0.50 ct', '3000 to 12000', '7000', ['FLEX_DD', 'ORG_DD']],
+  ['0.75 ct', '-', '14000', ['ORG_DD']],
+  ['1 ct', 'above 12000', '20000', ['FLEX_DD', 'ORG_DD']],
+  ['1.5 ct', '-', '40000', ['ORG_DD']],
+  ['2 ct', '-', '70000', ['ORG_DD']],
+  ['3 ct', '-', '125000', ['ORG_DD']],
 ];
 const ST_SAW = [
   ['Teeth chipped or broken', 'No break-in, the wrong blade for the job, work not clamped firmly, too much feed, hard spots or scale.', ['FAST']],
@@ -222,6 +235,13 @@ function renderShopTools(el) {
     stP('<b>When.</b> A wheel that is glazed or loaded, has lost its shape, needs more pressure to cut or leaves a poorer finish is due for dressing.', ['PALM']) +
     stP('<b>Open or closed.</b> Dressed open, with fresh sharp points, a wheel removes stock fast and leaves a rougher finish. Dressed closed it rubs more: a better finish, and much slower stock removal.', ['MMS_DRESS']) +
     stP('<b>Tools.</b> A single-point diamond for fine wheels and exact work, a multi-point diamond for larger wheels, crush rolls for special forms. One maker\'s guide holds the diamond at 10 to 15 degrees to the wheel and dresses every 2 to 4 hours of steady use.', ['PALM']) +
+    '<h3 class="gcat" id="st-dd">Single-point diamond dressers</h3>' +
+    stP('<b>Bigger wheel, bigger diamond.</b> The size of the diamond is chosen from the wheel: multiply its diameter by its width, both in mm, and read the carat weight off.', ['FLEX_DD', 'ORG_DD', 'NORI_DD']) +
+    guideTable(['Diamond', 'Flexovit: diameter x width', 'Organametrisis: diameter x width'], ST_DD, stTags) +
+    '<p class="desc">Both figures as printed. Flexovit gives ranges; Organametrisis prints one figure for each size without saying whether it is the largest wheel for that size, so its figures are shown as they stand. They do not agree: a 200 x 25 mm wheel (5000) is 0.50 ct by Flexovit and lies between 0.25 and 0.50 ct by Organametrisis.</p>' +
+    stP('<b>Drag angle.</b> Tilt the diamond so that it trails the wheel and touch on the centre line. Flexovit gives 5 to 15 degrees; Noritake usually 15, and says a smaller angle spoils the finish.', ['FLEX_DD', 'NORI_DD', 'PALM']) +
+    stP('<b>Turn the diamond</b> in its holder every four or five dressings, so that a sharp edge keeps meeting the wheel.', ['FLEX_DD']) +
+    stP('<b>Depth of each dressing pass (Noritake).</b> About 0.005 mm for precision grinding, 0.010 to 0.030 mm for general grinding, up to about 0.040 mm for rough grinding.', ['NORI_DD']) +
     '<h3 class="gcat" id="st-carb">Grinding carbide tools</h3>' +
     stP('<b>The ordinary wheel will not do.</b> Aluminium oxide wheels, grey or white, are for steel and high speed steel. They hardly cut carbide.', ['IMD_GW', 'AX_GW']) +
     stP('<b>Green silicon carbide</b> is the bench grinder wheel for tungsten carbide.', ['IMD_GW', 'AX_GW', 'BACON']) +

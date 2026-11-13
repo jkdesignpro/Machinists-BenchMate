@@ -61,6 +61,8 @@ const MG_SOURCES = {
   MAT_TEMP: 'N. Lewis and Materion Customer Technical Services, "In our element: how does temperature affect material properties?", 2024-01-01 (measured on a copper beryllium alloy)',
   AIMS_SG: 'AIMS Industrial, "Steel grades comparison", 2026-09-29 (a supplier)',
   CS_SG: 'Continental Steel & Tube, carbon and alloy steel grades page (a supplier; no date)',
+  CRU_SEL: 'Crucible Industries, eSelector, "Selection of tool & die steels" (a maker of tool steels; crucible.com)',
+  PL_TS: 'Protolabs, "Tool steel in manufacturing", 2025-09-11',
   OWN: 'BenchMate reading of the rule in the sources beside it',
 };
 // Several pages of one publisher count once.
@@ -302,6 +304,16 @@ function renderMatGuide(el) {
     mgP('<b>Machinability falls as the alloy rises.</b> With W1 as 100, O1 is rated about 90, A2 and S2 about 85, H11 about 75, and D2 and M1 about 50.', ['MHCC']) +
     mgP('<b>Hot work steels by number.</b> H1 to H19 are chromium based and H40 to H59 molybdenum based, with a tungsten based group between them.', ['EF_TS']) +
     mgP('One source calls the T group cobalt tool steel in its heading and tungsten type in its text; the other names it tungsten high speed steel.', ['MHCC', 'EF_TS']) +
+    '<h3 class="gcat" id="mg-tsel">Choosing a tool steel for the job</h3>' +
+    mgP('<b>Wear against toughness.</b> A steel that resists wear better usually breaks more easily, and the other way round. Choose by the way the tool is most likely to fail.', ['CRU_SEL', 'PL_TS']) +
+    mgP('<b>Blows and shock.</b> For punches, chisels and tools that take impact, the shock-resisting S grades such as S7. Avoid a brittle grade like D2 there.', ['CRU_SEL', 'PL_TS']) +
+    mgP('<b>Abrasion.</b> D2 for blanking, stamping and forming tools where wear is the main trouble, including dies for glass-filled plastics.', ['PL_TS', 'AIMS_SG']) +
+    mgP('<b>General cold work.</b> O1, A2 and D2 are the general-purpose cold work steels. O1 for gauges, taps, reamers, small dies and short runs; A2 for punches, knives, gauges and form tools.', ['CRU_SEL', 'PL_TS', 'AIMS_SG']) +
+    mgP('<b>Heat.</b> H13 for die-casting, forging and extrusion dies; Protolabs gives it for work above 400 °C.', ['PL_TS', 'AIMS_SG']) +
+    mgP('<b>Moulds.</b> The pre-hardened P20 for plastic injection moulds in moderate numbers.', ['PL_TS']) +
+    mgP('<b>Cutting tools.</b> High speed steel such as M2 for drills, taps, reamers and end mills.', ['PL_TS', 'AIMS_SG']) +
+    mgP('<b>Wear failure is the better failure.</b> Wear comes on slowly and can be planned for; breakage cannot.', ['CRU_SEL']) +
+    mgP('<b>When the tool fails (Crucible).</b> Wearing: a steel with more alloy, not just more hardness. Galling: keep the surfaces apart with lubricant or a coating such as TiN. Deforming: a new grade helps only if it can be run harder; or lower the load. Chipping and cracking: avoid sharp corners, and temper a part again after EDM before it goes into service.', ['CRU_SEL']) +
     mgP('Ten tool steels with their equivalents are in <a href="#/t/materials">material equivalents</a>.', null) +
 
     '<h2 id="mg-stain">Stainless steel families</h2>' +

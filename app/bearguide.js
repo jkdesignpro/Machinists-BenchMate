@@ -31,6 +31,9 @@ const BG_SOURCES = {
   INC_FS: 'Incure Inc., "Flange sealing methods: a comprehensive guide for manufacturers", modified 2026-08-30',
   MD_SA: 'Machine Design, S. Loushin (3M), "Choosing and using structural adhesives", 2016-12-01',
   GG_SA: 'Gluegun.com, "How to choose a structural adhesive", 2026-02-09',
+  APPLE_BU: 'Apple Rubber, seal design guide, "Use of backup rings"',
+  MARCO_BU: 'Marco Rubber, "Back-up O-rings"',
+  FPW_BU: 'P. Heney, Fluid Power World, "Backup rings help prevent O-ring migration", 2017-05-05',
   OWN: 'BenchMate arithmetic on the rule in the sources beside it',
 };
 // Several documents of one publisher count once.
@@ -146,7 +149,7 @@ const BG_STRUCT = [
 ];
 
 function renderBearGuide(el) {
-  const toc = [['bg-type', 'Bearing types'], ['bg-num', 'Bearing numbers'], ['bg-class', 'Tolerance classes'], ['bg-fit', 'Shaft and housing fits'], ['bg-mount', 'Mounting'], ['bg-seal', 'Shaft seals'], ['bg-lock', 'Threadlockers'], ['bg-ret', 'Retaining compounds'], ['bg-tseal', 'Thread and flange sealants'], ['bg-struct', 'Structural adhesives']];
+  const toc = [['bg-type', 'Bearing types'], ['bg-num', 'Bearing numbers'], ['bg-class', 'Tolerance classes'], ['bg-fit', 'Shaft and housing fits'], ['bg-mount', 'Mounting'], ['bg-seal', 'Shaft seals'], ['bg-bu', 'Back-up rings'], ['bg-lock', 'Threadlockers'], ['bg-ret', 'Retaining compounds'], ['bg-tseal', 'Thread and flange sealants'], ['bg-struct', 'Structural adhesives']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Rolling bearings for the person who has to fit them, in our own words: what each type carries, how to read a bearing number, the tolerance classes, which ring gets the tight fit, how to mount a bearing without hurting it, what a shaft seal asks of the shaft, and the threadlocker colours. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
@@ -225,6 +228,19 @@ function renderBearGuide(el) {
     bgP('<b>Fitting.</b> Oil or grease the lip and the shaft. Chamfer, round or cover every sharp edge the lip has to pass. Press as close to the outside of the seal as possible, and leave it square to the shaft.', ['SEALS']) +
     bgP('<b>Renewing.</b> Fit a new seal after every strip-down, and do not let its lip run in the track of the old one: move it along the bore or fit a wear sleeve.', ['SEALS']) +
     bgP('Static seals are in <a href="#/t/oring">O-ring glands</a>.', null) +
+
+    '<h2 id="bg-bu">Back-up rings for O-rings</h2>' +
+    bgP('<b>What they are for.</b> Under pressure an O-ring is pushed into the clearance gap behind it and can be nibbled away there. A back-up ring blocks or narrows that gap.', ['MARCO_BU', 'FPW_BU', 'APPLE_BU']) +
+    bgP('<b>Gap and hardness.</b> How much pressure an O-ring stands before it extrudes depends on the size of the diametral clearance and on the hardness of the rubber. Beyond that limit, use a harder O-ring, close the gap, or fit back-up rings.', ['APPLE_BU']) +
+    bgP('<b>An example (Apple Rubber).</b> At 1000 psi with a diametral clearance of 0.016 in, a 70 Shore A ring needs a harder compound, back-up rings or less clearance; an 80 Shore A ring is acceptable.', ['APPLE_BU']) +
+    bgP('<b>When, the sources differ.</b> Marco Rubber: above 1500 psi, or with a large gap. Fluid Power World: above about 5 MPa (50 bar), and also with fast movement, heavy pressure pulses, heat or changing temperature.', ['MARCO_BU', 'FPW_BU']) +
+    bgP('<b>Which side.</b> With pressure from one side only, one ring on the side away from the pressure. With pressure from both sides, one ring each side of the O-ring.', ['FPW_BU', 'MARCO_BU']) +
+    bgP('Apple Rubber prefers two rings, one each side, in every case: the gap is then blocked whichever way the pressure acts.', ['APPLE_BU']) +
+    bgP('<b>The groove gets wider.</b> The gland has to be widened to take one or two back-up rings.', ['MARCO_BU']) +
+    bgP('<b>Materials.</b> PTFE, or a hard rubber such as 90 Shore A nitrile or FKM, hard enough to resist extrusion itself.', ['MARCO_BU', 'FPW_BU']) +
+    bgP('<b>Heavier duty</b> calls for filled PTFE, usually glass-filled, sometimes with bronze or carbon.', ['FPW_BU']) +
+    bgP('<b>Solid, split or spiral.</b> Split and spiral rings go in more easily, above all on small diameters; a solid ring has no joint.', ['MARCO_BU', 'FPW_BU']) +
+    bgP('The squeeze, stretch and fill of the O-ring itself are checked in <a href="#/t/oring">O-ring glands</a>.', null) +
 
     '<h2 id="bg-lock">Threadlocker colours</h2>' +
     guideTable(['Colour', 'Strength', 'Fastener size (FE)', 'Taking apart'], BG_LOCK, bgTags) +

@@ -1943,7 +1943,7 @@ where = 'toolpaths';
   // hole saw table prints both charts' figures side by side.
   where = 'shoptools';
   g = await guide('shoptools');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,8,5,5' || g.srcs !== 32) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 7, 4 and 4 rows, 32 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,8,5,5,8' || g.srcs !== 35) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 7, 4, 4 and 7 rows, 35 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 46) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four things have to be right', 'Lip clearance', 'Drill point gauge', 'Order', 'Hacksaw blades', 'Break in a new band saw blade', 'Fluid and brush', 'Bigger saw, slower', 'Speed falls with size', 'The rule', 'Dressing and truing are two jobs'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -1958,7 +1958,7 @@ where = 'toolpaths';
   if (!/8 to 12 degrees/.test(g.all) || !/6 to 9 degrees/.test(g.all) || !/20 to 50 %/.test(g.all) || !/first 100 square inches/.test(g.all) || !/about 27 to 30 m\/min/.test(g.all) || !/12 000 to 18 000 against 4 000 to 10 000/.test(g.all)) problems.push(`[${where}] drill clearance, break-in, hole saw or burr figures are missing`);
   where = 'matguide';
   g = await guide('matguide');
-  if (g.h2 !== 17 || g.svgs !== 4 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,11,9,5' || g.srcs !== 57) problems.push(`[${where}] 17 sections, 4 drawings, 15 tables, 57 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 17 || g.svgs !== 4 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,11,9,5' || g.srcs !== 59) problems.push(`[${where}] 17 sections, 4 drawings, 15 tables, 59 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 77) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four digits', 'First digit', 'A letter in the middle', 'Low, medium and high carbon', 'W, O and A name the quench', 'Austenitic grades are not hardened', 'Two ways to strength', 'H tempers, second digit', 'T651 is', 'On extrusions a fourth digit', 'Grain size tempers', 'Titanium grade 5', 'The letters', 'The number in a ZA name', 'Rockwell scales', 'Vickers angle, sources differ', 'Check the heat number first'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2018,7 +2018,7 @@ where = 'toolpaths';
   }
   where = 'bearguide';
   g = await guide('bearguide');
-  if (g.h2 !== 11 || g.svgs !== 3 || g.tabs !== '10,10,14,6,5,5,5' || g.srcs !== 27) problems.push(`[${where}] 11 sections, 3 drawings, tables of 9, 9, 13, 5, 4, 4 and 4 rows, 27 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 12 || g.svgs !== 3 || g.tabs !== '10,10,14,6,5,5,5' || g.srcs !== 30) problems.push(`[${where}] 12 sections, 3 drawings, tables of 9, 9, 13, 5, 4, 4 and 4 rows, 30 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 57) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Thrust bearings take no radial load', 'How it is built', 'Bore number', 'The four small ones', 'Below 10 mm', 'The example above', 'Medium series', 'Makers differ', 'Which way they run', 'The rule', 'The usual case', 'Too loose', 'Too tight', 'When to ask for C3', 'Leave it wrapped', 'Where to push', 'Press, not hammer', 'How large for cold mounting', 'How hot', 'Never hotter than', 'Sealed and greased bearings', 'No oil bath', 'No flame', 'Induction heaters', 'Roughness', 'Rz, sources differ', 'No spiral'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2045,7 +2045,7 @@ where = 'toolpaths';
   }
   where = 'abrasguide';
   g = await guide('abrasguide');
-  if (g.h2 !== 9 || g.svgs !== 3 || g.tabs !== '4,4,4,33' || g.srcs !== 24) problems.push(`[${where}] 9 sections, 3 drawings, three tables of 3 rows and one of 32, 24 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 11 || g.svgs !== 3 || g.tabs !== '9,4,4,4,33' || g.srcs !== 31) problems.push(`[${where}] 11 sections, 3 drawings, tables of 8, 3, 3, 3 and 32 rows, 31 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 69) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Mesh number. Sieve numbers', 'The sources do not all print', 'Grinding ratio (G ratio)', 'No centres, no chuck', 'Above centre', 'What it is. A slow abrasive process', 'Crosshatch', 'How slow', 'What it is for', 'What it holds. Under 0.001 in', 'Abrasives', 'Single-pass honing', 'Plateau honing', 'What it is. Rubbing the work', 'The lap is the softer one', 'Lap material', 'Silicon carbide', 'Diamond cuts faster', 'Conditioning rings', 'Bright is not flat', 'Checking flatness', 'Diamond wheels grind carbide', 'One carat', 'More is not always better', 'Belt speed', 'Grit by stage', 'The speed limit is not one number'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2058,7 +2058,7 @@ where = 'toolpaths';
     if (!/^50 2\.2 12\.5 %/.test(row('50 ')) || !/^75 3\.3 18\.8 %/.test(row('75 ')) || !/^100 4\.4 25 %/.test(row('100 '))) problems.push(`[${where}] concentration rows: ${row('50 ')} | ${row('75 ')} | ${row('100 ')}`);
     if (!/Most work \(EMI\); contours and hollow grinding \(Xometry\)/.test(row('Contact wheel')) || !/A fixed flat plate Flat surfaces/.test(row('Platen')) || !/the free span between two wheels/.test(row('Slack belt'))) problems.push(`[${where}] belt rows: ${row('Contact wheel')} | ${row('Platen')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
-    if (fl !== 'End-feed 50 No. No. No.') problems.push(`[${where}] only the end-feed and concentration 50 rows and the three finest sieves have one publisher: ${fl}`);
+    if (fl !== 'Out Thread Spiral Comma-shaped Flat Mirror End-feed 50 No. No. No.') problems.push(`[${where}] only six fault rows, the end-feed and concentration 50 rows and the three finest sieves have one publisher: ${fl}`);
     if (!/^No\. 4 4\.75 mm 4\.75 mm \(0\.187 in\) 4\.76 mm \(0\.187 in\)/.test(row('No. 4 ')) || !/^No\. 20 850 µm 0\.85 mm \(0\.0331 in\) 0\.841 mm \(0\.0331 in\)/.test(row('No. 20 ')) || !/^No\. 140 106 µm 0\.105 mm \(0\.0041 in\) 0\.105 mm \(0\.0041 in\)/.test(row('No. 140 ')) || !/^No\. 400 38 µm 0\.037 mm \(0\.0015 in\) 0\.037 mm \(0\.0015 in\)/.test(row('No. 400 ')) || !/^No\. 635 20 µm not listed not listed/.test(row('No. 635 '))) problems.push(`[${where}] sieve rows as each source prints them: ${row('No. 4 ')} | ${row('No. 20 ')} | ${row('No. 140 ')} | ${row('No. 400 ')} | ${row('No. 635 ')}`);
   }
   if (!/Values run from 2 to 200/.test(g.all) || !/12 to 25 % of the work diameter, on a blade with a 30° top face/.test(g.all) || !/100 to 250 ft\/min for the turning hone/.test(g.all) || !/start at about 65 ft\/min/.test(g.all) || !/Rz 3 to 6, Rpk at most 0\.3, Rk 0\.3 to 1\.5 and Rvk 0\.8 to 2\.0 micrometres/.test(g.all) || !/about 280 nanometres \(0\.000011 in\)/.test(g.all) || !/1A1, 6A2C/.test(g.all) || !/4000 to 6000 ft\/min/.test(g.all) || !/At least 10 mm of the shank/.test(g.all) || !/70 to 95 Shore A/.test(g.all)) problems.push(`[${where}] figures from the sources`);
@@ -2751,6 +2751,41 @@ where = 'toolpaths';
 
     s = await sect('toolguide', 't-hold', ['H2']);
     if (s.filter(x => x.k > 0).length !== 12 || !has(s, /^Shank\. Take the largest shank/, 2, false) || !has(s, /^The letter M is described in two ways/, 2, false) || !has(s, /^Hand\. A right-hand holder/, 1, true) || !(await page.$('#main button.tglink[data-id="holdercode"]'))) problems.push(`[${where}] turning holders: ${brief(s)}`);
+    await mode('advanced');
+  }
+
+  // Thirteenth batch of 0.7.0: back-up rings, surface grinding, faults in cylindrical grinding, dressing diamonds, choosing a tool steel.
+  where = 'guides-13';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || '').replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+    const rowsOf = async sel => page.$$eval(sel, r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()));
+
+    let s = await sect('bearguide', 'bg-bu', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^What they are for\./, 3, false) || !has(s, /^When, the sources differ\. Marco Rubber: above 1500 psi.*about 5 MPa \(50 bar\)/, 2, false) || !has(s, /^An example \(Apple Rubber\)\. At 1000 psi .* 0\.016 in/, 1, true) || !(await page.$('#main #bg-bu ~ p a[href="#/t/oring"]'))) problems.push(`[${where}] back-up rings: ${brief(s)}`);
+
+    s = await sect('abrasguide', 'ag-surf', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 11 || !has(s, /^The wheel for the work\. Aluminium oxide for steel/, 2, false) || !has(s, /^Down feed, the sources differ\..*0\.001 in \(0\.025 mm\).*0\.1 to 0\.4 mm/, 2, false) || !has(s, /^Cross feed, the sources differ\..*1\/4 to 1\/12.*75 to 90 %/, 3, false) || !has(s, /^Table speed\. Most often 50 to 100 ft\/min/, 1, true)) problems.push(`[${where}] surface grinding: ${brief(s)}`);
+    s = await sect('abrasguide', 'ag-fault', ['H2']);
+    {
+      const rows = await rowsOf('#main #ag-fault + div table.gtab tr');
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 9 || !/RAD_CG ?OKU_CH ?UG_ERR$/.test(row('Chatter marks')) || /to be verified/.test(row('Burn marks')) || !/to be verified/.test(row('Flat spots'))) problems.push(`[${where}] grinding faults: ${rows.join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 6 || !has(s, /^Why work burns\./, 1, true) || !s.some(x => /could not be paired with certainty/.test(x.t))) problems.push(`[${where}] grinding fault notes: ${brief(s)}`);
+
+    s = await sect('shoptools', 'st-dd', ['H2', 'H3']);
+    {
+      const rows = await rowsOf('#main #st-dd ~ div table.gtab tr');
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (!/^0\.50 ct 3000 to 12000 7000 FLEX_DD ?ORG_DD$/.test(row('0.50 ct')) || !/to be verified/.test(row('3 ct'))) problems.push(`[${where}] dressing diamonds: ${row('0.50 ct')} | ${row('3 ct')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 5 || !has(s, /^Drag angle\..*5 to 15 degrees/, 3, false) || !has(s, /^Turn the diamond/, 1, true) || !s.some(x => /a 200 x 25 mm wheel \(5000\)/.test(x.t))) problems.push(`[${where}] dressing diamonds: ${brief(s)}`);
+
+    s = await sect('matguide', 'mg-tsel', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 9 || !has(s, /^Wear against toughness\./, 2, false) || !has(s, /^General cold work\. O1, A2 and D2/, 3, false) || !has(s, /^When the tool fails \(Crucible\)\..*after EDM/, 1, true)) problems.push(`[${where}] choosing a tool steel: ${brief(s)}`);
     await mode('advanced');
   }
 
