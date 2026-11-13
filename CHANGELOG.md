@@ -12,6 +12,13 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 - Formula library: three entries for the new tool.
 - Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
 
+### Added (probability, coordinates, plastics)
+- New tool **Binomial and Poisson: chance of a count** (Measure and inspect > Quality): the chance of exactly a count, that count or fewer, that count or more, or a range of counts, for defectives in a sample (binomial) or events from a mean count (Poisson), with the mean, the standard deviation and a bar chart. For a binomial it shows the Poisson estimate beside the exact figure. Seven published examples are proofs on the page.
+- CNC knowledge guide: new section **Working out coordinates**: absolute and incremental, arcs by centre (I, J, K) and by radius with the warning both sources give, links to the six tools that find the missing points, and three worked examples that the core works on the page.
+- Machining plastics: the **family** of each of the twelve plastics (amorphous or semi-crystalline) and a table **Families of plastics**: thermoplastics against thermosets and what the two families mean for melting, chemicals, wear, shrinkage, impact and bonding. Where the sources differ (cost, heat) both views are printed.
+- Formula library: four entries for the binomial and Poisson distributions.
+- Core: `binomial_prob`, `binomial_between`, `poisson_prob`, `poisson_between` with one new test that reproduces every published example used (424 tests in all).
+
 ### Added (shop maths 3)
 - New tool **Interpolation (one-way and two-way)** (Shop maths > Calculator and conversion): a value between two rows of a table, the reverse, and a value inside a cell of a two-way table from its four corners. It warns when the point lies outside the known values. Drawn.
 - New tool **Normal distribution: share between limits** (Measure and inspect > Quality): share of parts below, above and between limits in per cent and parts per million, the standard score of each limit, and the value below which a given share falls, on a drawn bell curve.
@@ -52,7 +59,11 @@ Stage 4 of the plan, part 2: tables of dimensions and calculations for the book 
 
 ### Book audit (fifth batch)
 - MH6 (analytic geometry), MH13 (trigonometry), MH19 (interpolation) and MH22 (probability and the normal distribution) from partial to done.
-- 385 done, 163 partial, 48 missing of 596 in-scope rows, 65 %; 152 more rows to done for the 90 % target.
+- Counted after the fifth batch: 385 done, 163 partial, 48 missing.
+
+### Book audit (sixth batch)
+- ED81 (binomial and Poisson distributions), MH174 (coordinate geometry in the CNC introduction), BB58 and ED62 (engineering plastics) from partial to done.
+- 389 done, 159 partial, 48 missing of 596 in-scope rows, 65 %; 148 more rows to done for the 90 % target.
 
 ### Fixed
 - The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.

@@ -2464,6 +2464,77 @@ where = 'toolpaths';
     await mode('advanced');
   }
 
+  // Binomial and Poisson (0.7.0, sixth batch): published examples, refusals, the bar chart; coordinates in the CNC guide; families of plastics.
+  where = 'distrib';
+  {
+    const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+    const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+    const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, String(v)); await page.waitForTimeout(80); };
+    const drawing = async () => page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    await units('mm'); await mode('expert'); await open('distrib', 150);
+    await pick('m', 0); await put('n', '10'); await put('p', '40'); await put('k', '4'); await put('k2', '');
+    let t = await rows();
+    if (!/Chance of exactly 4 25\.0823 %/i.test(t) || !/Mean count 4\.0000/.test(t) || !/Standard deviation of the count 1\.5492/.test(t)) problems.push(`[${where}] Bin(10, 0.4), count 4 (Newcastle: 0.251, mean 4): ${t}`);
+    await put('k', '2'); t = await rows();
+    if (!/Chance of 2 or fewer 16\.7290 %/.test(t) || !/Chance of 2 or more 95\.3643 %/.test(t)) problems.push(`[${where}] Bin(10, 0.4), count 2 (Newcastle: 0.167 and 0.954): ${t}`);
+    await put('n', '300'); await put('p', '1'); await put('k', '5'); t = await rows();
+    if (!/Chance of exactly 5 10\.0985 %/i.test(t) || !/Poisson estimate of exactly 5 \(mean = trials × chance\) 10\.0819 %/.test(t)) problems.push(`[${where}] 300 trials at 1 %, count 5 (IntMath: 0.10099 and 0.10082): ${t}`);
+    let d = await drawing();
+    if (!/10\.1 %/.test(d) || !/exactly 5 \(filled bar\)/.test(d) || !/Binomial, 300 trials at 1 %/.test(d) || !/mean 3/.test(d)) problems.push(`[${where}] drawing, binomial: ${d}`);
+    if ((await page.$$eval('#main .tdia svg rect.hotf', r => r.length)) !== 1) problems.push(`[${where}] exactly one filled bar expected for a single count`);
+    await put('k', '301'); t = await rows();
+    if (!/cannot happen/.test(t) || !/Chance of exactly 301 0\.0000 %/i.test(t)) problems.push(`[${where}] a count above the number of trials: ${t}`);
+    await put('k', '5'); await put('n', '10.5'); t = await rows();
+    if (!/whole number from 1 to 100 000/.test(t)) problems.push(`[${where}] 10.5 trials must be refused: ${t}`);
+    await put('n', '300'); await put('p', '120'); t = await rows();
+    if (!/the chance must be from 0 to 100 %/.test(t)) problems.push(`[${where}] a chance of 120 % must be refused: ${t}`);
+    await put('p', '1'); await put('k2', '3'); t = await rows();
+    if (!/not below the count/.test(t)) problems.push(`[${where}] an upper count below the count must be refused: ${t}`);
+    await pick('m', 1); await put('mu', '3'); await put('k', '2'); await put('k2', '4'); t = await rows();
+    if (!/Chance of 2 to 4 61\.6115 %/.test(t) || !/Chance of 2 or more 80\.0852 %/.test(t) || !/Standard deviation of the count 1\.7321/.test(t) || /Poisson estimate/.test(t)) problems.push(`[${where}] Poisson, mean 3, 2 to 4 (IntMath: 0.61611): ${t}`);
+    d = await drawing();
+    if (!/61\.61 %/.test(d) || !/count 2 to 4 \(filled bars\)/.test(d) || !/Poisson, mean 3/.test(d)) problems.push(`[${where}] drawing, Poisson: ${d}`);
+    if ((await page.$$eval('#main .tdia svg rect.hotf', r => r.length)) !== 3) problems.push(`[${where}] three filled bars expected for counts 2 to 4`);
+    await put('mu', '2.3'); await put('k', '3'); await put('k2', ''); t = await rows();
+    if (!/Chance of 3 or more 40\.396\d %/.test(t)) problems.push(`[${where}] Poisson, mean 2.3, 3 or more (IntMath: 0.40396): ${t}`);
+    await put('mu', '-1'); t = await rows();
+    if (!/the mean count must be from 0 to 100 000/.test(t)) problems.push(`[${where}] a negative mean must be refused: ${t}`);
+    await put('mu', '3'); await put('k', '2'); await pick('m', 0); await put('n', '50'); await put('p', '2');
+
+    where = 'cncguide';
+    await open('cncguide', 250);
+    const ex = (await page.$eval('#main #cgex', e => e.innerText)).replace(/\s+/g, ' ');
+    if (!/length 50\.000, angle 36\.87°/.test(ex) || !/X18\.549 Y6\.412 and X36\.651 Y19\.988/.test(ex) || !/5\.359 on the radius/.test(ex)) problems.push(`[${where}] worked coordinate examples: ${ex}`);
+    if (!(await page.$('#main h2#c-geo')) || !(await page.$('#main .gtoc a[href="#c-geo"]'))) problems.push(`[${where}] no "Working out coordinates" section or contents entry`);
+    const dead = await page.evaluate(() => [...document.querySelectorAll('#main a[href^="#/t/"]')].map(a => a.getAttribute('href').slice(4)).filter(i => !TOOLS.find(x => x.id === i)));
+    if (dead.length) problems.push(`[${where}] links to pages that do not exist: ${dead.join(', ')}`);
+    const geoLinks = await page.$$eval('#main a[href^="#/t/"]', a => a.map(x => x.getAttribute('href').slice(4)));
+    for (const id of ['triangle', 'linecirc', 'fillet', 'arc', 'bolt', 'tnrc']) if (!geoLinks.includes(id)) problems.push(`[${where}] no link to ${id}`);
+
+    where = 'plastics';
+    await open('plastics', 350);
+    await page.selectOption('#main #plp', 'POM'); await page.waitForTimeout(80);
+    let pt = (await page.$eval('#main #plres', e => e.innerText)).replace(/\s+/g, ' ');
+    if (!/Family Semi-crystalline thermoplastic Polymershapes, Xometry Confirmed/.test(pt)) problems.push(`[${where}] acetal must show its family with two publishers: ${pt.slice(0, 300)}`);
+    await page.selectOption('#main #plp', 'PEI'); await page.waitForTimeout(80);
+    pt = (await page.$eval('#main #plres', e => e.innerText)).replace(/\s+/g, ' ');
+    if (!/Family Amorphous thermoplastic Ensinger[^|]*Mitsubishi/.test(pt)) problems.push(`[${where}] PEI must show as amorphous from Ensinger and Mitsubishi: ${pt.slice(0, 300)}`);
+    await page.selectOption('#main #plp', 'PTFE'); await page.waitForTimeout(80);
+    pt = (await page.$eval('#main #plres', e => e.innerText)).replace(/\s+/g, ' ');
+    if (!/Family Semi-crystalline thermoplastic Polymershapes One source/.test(pt)) problems.push(`[${where}] PTFE rests on one publisher and must say so: ${pt.slice(0, 300)}`);
+    await page.selectOption('#main #plp', 'POM'); await page.waitForTimeout(60);
+    const fam = await page.evaluate(() => ({ rows: document.querySelectorAll('#main #plfam tr').length - 1, differ: document.querySelectorAll('#main #plfam .badge.differs').length, all: document.querySelectorAll('#main #plfamall tr').length - 1, one: document.querySelectorAll('#main #plfamall .badge.review').length, text: document.querySelector('#main #plfam').innerText.replace(/\s+/g, ' ') }));
+    if (fam.rows !== 14 || fam.differ !== 2 || fam.all !== 12 || fam.one !== 3) problems.push(`[${where}] families: ${fam.rows} rows (14), ${fam.differ} differing (2), ${fam.all} plastics (12), ${fam.one} on one source (3)`);
+    if (!/TWI: thermoplastics are typically more expensive/.test(fam.text) || !/Xometry: most thermoplastics are priced lower/.test(fam.text) || !/sharp melting point/.test(fam.text)) problems.push(`[${where}] families text: ${fam.text.slice(0, 400)}`);
+    if (await page.evaluate(() => document.querySelector('#main').scrollWidth > document.querySelector('#main').clientWidth + 1)) problems.push(`[${where}] the page scrolls sideways`);
+
+    where = 'formulas';
+    await open('formulas', 200);
+    const fq2 = await page.$('#main input[type="search"]');
+    if (fq2) { await fq2.fill('Poisson'); await fq2.dispatchEvent('input'); await page.waitForTimeout(150); const ft = (await page.$eval('#main', e => e.innerText)).replace(/\s+/g, ' '); if (!/Poisson: chance of exactly k/i.test(ft) || !/IntMath/.test(ft)) problems.push(`[${where}] Poisson in the formula library: ${ft.slice(0, 400)}`); await fq2.fill(''); await fq2.dispatchEvent('input'); }
+    await mode('advanced');
+  }
+
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);

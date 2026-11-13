@@ -1039,9 +1039,23 @@ def build_matref():
             for f in ('density', 'cte'):
                 if f in fields: raise SystemExit(f'matref plastics {key}: {f} is already in the materials data, do not duplicate')
         notes = [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in r['notes']]
-        prow.append({'key': key, 'name': r['name'], 'fields': fields, 'materials': link, 'notes': notes})
+        fam = pl['family'].get(key)
+        if not fam: raise SystemExit(f'matref plastics {key}: no family')
+        if fam[0] not in ('Semi-crystalline', 'Amorphous'): raise SystemExit(f'matref plastics {key}: family {fam[0]}')
+        prow.append({'key': key, 'name': r['name'], 'fields': fields, 'materials': link, 'notes': notes,
+                     'family': {'kind': fam[0], 'src': fam[1], 'status': mr_said(srcs, fam[1])}})
+    # statements on the families of plastics: own words; a row marked "differs" names each publisher's view in its text
+    families = []
+    for row in pl['families']:
+        topic, text, s = row[0], row[1], row[2]
+        status = mr_said(srcs, s)
+        if len(row) > 3:
+            if row[3] != 'differs' or status != 'confirmed': raise SystemExit(f'matref plastics families {topic}: a differing row needs two publishers')
+            status = 'differs'
+        families.append({'topic': topic, 'text': text, 'src': s, 'status': status})
     out['plastics'] = {'fields': pl['_fields'], 'units': pl['_units'], 'rows': prow,
-                       'general': [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in pl['general']]}
+                       'general': [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in pl['general']],
+                       'families': families, 'family_note': pl['_family_note']}
     mi = ev['metalid']
     out['metalid'] = {'spark': mi['spark'], 'tests': [{'test': a, 'text': b, 'src': s, 'status': mr_said(srcs, s)} for a, b, s in mi['tests']]}
     return out

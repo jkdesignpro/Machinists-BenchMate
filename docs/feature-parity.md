@@ -109,6 +109,9 @@ Every item needs: cited source, unit tests against worked examples, own UI.
 | Geometry | Squaring a corner: 3-4-5 rule for any legs, corner angle from a measured diagonal, rise for an angle | done (ours, 0.7.0) | `squaring` | |
 | Shop maths | Interpolation: one-way, reverse and two-way (bilinear), with a warning outside the known values | done (ours, 0.7.0; five published examples reproduced) | `interp` | MH19 |
 | Quality | Normal distribution: share below, above and between limits, standard score, value for a share | done (ours, 0.7.0; published examples reproduced) | `normdist` | MH22 |
+| Quality | Binomial and Poisson: chance of a count, a count or fewer, a count or more, a range; Poisson estimate of a binomial | done (ours, 0.7.0; published examples from three publishers reproduced) | `distrib` | ED81 |
+| Library | CNC guide: working out coordinates (absolute and incremental, arc centres, three worked examples, links to the geometry tools) | done (ours, 0.7.0) | `cncguide` | MH174 |
+| Materials | Families of plastics: thermoplastic and thermoset, amorphous and semi-crystalline, family of each plastic | done (ours, 0.7.0; three plastics on one source, two statements where sources differ, all marked) | `plastics` | BB58, ED62 |
 | Geometry | Line and circle in coordinates: length, angle, slope, distance from a point, tangent and cutting points | done (ours, 0.7.0; six published cases reproduced) | `linecirc` | MH6 |
 | Geometry | Ellipse, parabola and hyperbola: foci, eccentricity, focal length of a dish, asymptotes, points on the curve | done (ours, 0.7.0; parabola length from one source, marked) | `conics` | MH6 |
 | Shop maths | Trig identities in the formula library (nine groups) | done (ours, 0.7.0; two publishers) | `formulas` | MH13 |

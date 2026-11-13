@@ -1232,6 +1232,39 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'A hyperbola with its two branches, asymptotes and foci');
   },
 
+  // Binomial or Poisson distribution as bars; every bar height is a core result.
+  distrib(v, sys, rows) {
+    const W = 520, H = 250, Wm = state.W, pois = v.m === 1, fin = x => typeof x === 'number' && isFinite(x);
+    const mean = dcRow(rows, 'Mean count'), sd = dcRow(rows, 'Standard deviation of the count');
+    if (!fin(mean) || !fin(sd) || !fin(v.k)) return '';
+    const top = pois ? Infinity : v.n, f = v.p / 100, pmf = j => pois ? Wm.poisson_prob(v.mu, j, 0) : Wm.binomial_prob(v.n, f, j, 0);
+    const hasK2 = fin(v.k2) && v.k2 >= v.k, kb = hasK2 ? v.k2 : v.k;
+    // Counts drawn: the mean plus and minus four standard deviations, widened to take in the chosen counts.
+    let a = Math.max(0, Math.floor(mean - 4 * sd - 1)), b = Math.min(top, Math.ceil(mean + 4 * sd + 1));
+    a = Math.max(0, Math.min(a, v.k - 1)); b = Math.min(top, Math.max(b, kb + 1, a + 4));
+    const step = Math.max(1, Math.ceil((b - a + 1) / 160)), xs = [];
+    if (step > 1) { a = v.k - Math.ceil((v.k - a) / step) * step; if (a < 0) a += step; }   // so that the chosen count has its own bar
+    for (let j = a; j <= b; j += step) xs.push(j);
+    const ps = xs.map(pmf), peak = Math.max(...ps.filter(fin), 1e-300);
+    const x0 = 44, x1 = 486, yb = 196, hh = 120, bw = (x1 - x0) / xs.length, X = j => x0 + ((j - a) / step + 0.5) * bw;
+    let h = '';
+    xs.forEach((j, i) => {
+      const hgt = fin(ps[i]) ? ps[i] / peak * hh : 0, on = j >= v.k && j <= kb;
+      h += DK.rect(x0 + i * bw + Math.min(1, bw * 0.12), yb - hgt, Math.max(0.6, bw - 2 * Math.min(1, bw * 0.12)), hgt, on ? 'hotf' : 'hatch');
+    });
+    h += DK.line(x0, yb, x1, yb, 'thin');
+    const ticks = [...new Set([xs[0], xs[xs.length - 1]])];
+    ticks.forEach(j => { h += DK.line(X(j), yb, X(j), yb + 5, 'thin') + DK.text(X(j), yb + 20, String(j), { cls: 'mut' }); });
+    if (mean >= a && mean <= b) h += DK.cl(x0 + ((mean - a) / step + 0.5) * bw, yb + 6, x0 + ((mean - a) / step + 0.5) * bw, yb - hh - 10) + DK.text(x0 + ((mean - a) / step + 0.5) * bw, yb + 36, 'mean ' + dcN(mean), { cls: 'mut' });
+    if (v.k >= a && v.k <= b && step === 1 && !ticks.includes(v.k)) h += DK.text(X(v.k), yb + 20, String(v.k), { cls: 'hott' });
+    if (hasK2 && v.k2 > v.k && v.k2 <= b && step === 1 && !ticks.includes(v.k2)) h += DK.text(X(v.k2), yb + 20, String(v.k2), { cls: 'hott' });
+    const share = hasK2 ? dcRow(rows, 'Chance of ' + v.k + ' to ' + v.k2) : dcRow(rows, 'Chance of exactly ' + v.k);
+    const right = mean - a < (b - a) / 2;
+    if (fin(share)) h += dcResult(right ? x1 : x0, 22, dcN(share, 2) + ' %', hasK2 ? 'count ' + v.k + ' to ' + v.k2 + ' (filled bars)' : 'exactly ' + v.k + ' (filled bar)', right ? 'end' : 'start');
+    h += dcLines(right ? x1 : x0, 55, [pois ? 'Poisson, mean ' + dcN(v.mu) : 'Binomial, ' + v.n + ' trials at ' + dcN(v.p) + ' %', step > 1 ? 'one bar for every ' + step + ' counts' : 'one bar for each count'], { anchor: right ? 'end' : 'start' });
+    return DK.svg(W, H, h, 'Bar chart of the chance of each count, with the chosen counts filled');
+  },
+
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
   sawtpi(v, sys, rows) {
     const W = 520, H = 250, u = dcU(sys);

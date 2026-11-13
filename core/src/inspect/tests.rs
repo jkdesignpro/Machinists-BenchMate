@@ -277,3 +277,45 @@ const IT_LARGE: [[f64; 18]; 8] = [
     let mut bad = xs; bad[3] = f64::NAN;
     assert!(grr_xbar_r(&bad, 3, 2, 2, 0.0, 0).is_nan());
 }
+
+#[test] fn binomial_and_poisson_reproduce_the_published_examples() {
+    let near = |a: f64, b: f64, tol: f64| (a - b).abs() <= tol;
+    // IntMath, "Poisson probability distribution", examples 1 to 5 (five figures printed)
+    assert!(near(poisson_prob(3.0, 1.0, 2.0), 0.95021, 5e-6));
+    assert!(near(poisson_between(3.0, 2.0, 4.0), 0.61611, 5e-6));
+    assert!(near(poisson_prob(0.6, 1.0, 0.0), 0.32929, 5e-6));
+    assert!(near(poisson_prob(2.3, 3.0, 2.0), 0.40396, 5e-6));
+    assert!(near(poisson_prob(0.15, 1.0, 1.0), 0.98981, 5e-6));
+    assert!(near(poisson_prob(5.0, 0.0, 0.0), 0.0067379, 5e-8));
+    assert!(near(poisson_prob(10.0, 10.0, 0.0), 0.12511, 5e-6));
+    assert!(near(poisson_prob(3.0, 5.0, 0.0), 0.10082, 5e-6));
+    assert!(near(binomial_prob(300.0, 0.01, 5.0, 0.0), 0.10099, 5e-6));
+    assert!(near(binomial_prob(300.0, 0.01, 5.0, 6.0), 0.10082, 5e-6) && near(binomial_prob(300.0, 0.01, 0.0, 3.0), 3.0, 1e-12));
+    // Newcastle University, "Poisson distribution (business)", example 2, Po(7) (three places printed)
+    assert!(near(poisson_prob(7.0, 4.0, 0.0), 0.091, 5e-4) && near(poisson_prob(7.0, 8.0, 0.0), 0.130, 5e-4));
+    assert!(near(poisson_prob(7.0, 0.0, 0.0), 0.001, 5e-4) && near(poisson_prob(7.0, 3.0, 1.0), 0.082, 5e-4));
+    // the same page, example 3: Bin(5000, 0.001) and Po(5), one or fewer
+    assert!(near(binomial_prob(5000.0, 0.001, 1.0, 1.0), 0.040, 5e-4) && near(poisson_prob(5.0, 1.0, 1.0), 0.040, 5e-4));
+    // Newcastle University, "Discrete probability models"
+    assert!(near(binomial_prob(9.0, 0.1, 2.0, 0.0), 0.172, 5e-4));
+    assert!(near(binomial_prob(10.0, 0.4, 1.0, 0.0), 0.040, 5e-4) && near(binomial_prob(10.0, 0.4, 4.0, 0.0), 0.251, 5e-4));
+    assert!(near(binomial_prob(10.0, 0.4, 2.0, 1.0), 0.167, 5e-4) && near(binomial_prob(10.0, 0.4, 2.0, 2.0), 0.954, 5e-4));
+    assert!(near(binomial_prob(10.0, 0.4, 0.0, 3.0), 4.0, 1e-12) && near(binomial_prob(10.0, 0.4, 0.0, 5.0), 2.4, 1e-12));
+    // Mathwords, "Binomial distribution": 210/1024 and about 0.208
+    assert!(near(binomial_prob(10.0, 0.5, 6.0, 0.0), 210.0 / 1024.0, 1e-12) && near(binomial_prob(8.0, 0.25, 3.0, 0.0), 0.2076, 5e-5));
+    // own checks: the parts add up, the ends, the standard deviation
+    let all: f64 = (0..=12).map(|k| binomial_prob(12.0, 0.3, k as f64, 0.0)).sum();
+    assert!(near(all, 1.0, 1e-12));
+    assert!(near(binomial_prob(12.0, 0.3, 4.0, 1.0) + binomial_prob(12.0, 0.3, 5.0, 2.0), 1.0, 1e-12));
+    assert!(near(binomial_between(12.0, 0.3, 2.0, 5.0), (2..=5).map(|k| binomial_prob(12.0, 0.3, k as f64, 0.0)).sum::<f64>(), 1e-12));
+    assert!(near(poisson_prob(4.0, 3.0, 1.0) + poisson_prob(4.0, 4.0, 2.0), 1.0, 1e-12));
+    assert!(near(binomial_prob(10.0, 0.4, 0.0, 4.0), 2.4f64.sqrt(), 1e-12) && near(poisson_prob(9.0, 0.0, 4.0), 3.0, 1e-12));
+    assert!(binomial_prob(10.0, 0.0, 0.0, 0.0) == 1.0 && binomial_prob(10.0, 1.0, 10.0, 0.0) == 1.0 && binomial_prob(10.0, 0.4, 11.0, 0.0) == 0.0 && binomial_prob(10.0, 0.4, 11.0, 1.0) == 1.0);
+    assert!(poisson_prob(0.0, 0.0, 0.0) == 1.0 && poisson_prob(0.0, 1.0, 2.0) == 0.0 && poisson_prob(3.0, 0.0, 2.0) == 1.0);
+    // a far tail keeps its figures (not 1 minus nearly 1)
+    assert!(poisson_prob(1.0, 30.0, 2.0) > 0.0 && poisson_prob(1.0, 30.0, 2.0) < 1e-30);
+    // bad inputs
+    assert!(binomial_prob(0.0, 0.5, 0.0, 0.0).is_nan() && binomial_prob(10.5, 0.5, 1.0, 0.0).is_nan() && binomial_prob(10.0, 1.2, 1.0, 0.0).is_nan());
+    assert!(binomial_prob(10.0, 0.5, 2.5, 0.0).is_nan() && binomial_prob(10.0, 0.5, -1.0, 0.0).is_nan() && binomial_prob(200_000.0, 0.5, 1.0, 0.0).is_nan());
+    assert!(poisson_prob(-1.0, 1.0, 0.0).is_nan() && poisson_prob(3.0, 1.5, 0.0).is_nan() && binomial_between(10.0, 0.5, 5.0, 2.0).is_nan() && poisson_between(3.0, 5.0, 2.0).is_nan());
+}

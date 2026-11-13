@@ -94,6 +94,8 @@ Stage 4 of the plan (0.6.0 to 0.8.0) is to bring this to 90 % or more: 329 more 
 
 **Update (0.7.0, fifth batch, 2026-11-12):** shop maths 3 (`interp`, `normdist`, `linecirc`, `conics`) and the trig identities in the formula library. MH6, MH13, MH19 and MH22 from partial to done. Counted from the tables below: 385 done, 163 partial, 48 missing of 596 in-scope rows, 65 %; 152 more rows to done for the 90 % target.
 
+**Update (0.7.0, sixth batch, 2026-11-13):** binomial and Poisson calculator (`distrib`), "Working out coordinates" in the CNC guide, families of plastics on the plastics page. ED81, MH174, BB58 and ED62 from partial to done (BB58's note was out of date: it still counted 5 plastics). MH66 stays partial (no design data). Counted from the tables below: 389 done, 159 partial, 48 missing of 596 in-scope rows, 65 %; 148 more rows to done for the 90 % target.
+
 **Update (branch `claude/cycles`, 2026-11-10):** batches A1 and A2 (cycle generators) are built; the rows they close are marked in section 1. The summary counts were recounted from section 1 after merging the other branches' row changes.
 
 **Update (branch `claude/gmcodes`, 2026-11-10):** batch A4 (G/M-code and macro reference) is built: U92, U93, CN21, CN22, CN81 done; U94, BB73 partial. CN23 and CN24 (program characters and layout) are not covered yet. Summary counts updated for these rows.
@@ -420,7 +422,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH63 | Aluminium: temper designations, alloy designations, heat-treatability | done | `materials`, `matguide` | 0.6.0: series, heat-treatability, F O H W T, H digits, T1 to T10, T651 and the stress-relief codes |
 | MH64 | Magnesium, nickel, titanium alloys | done | `materials`, `matguide` | Ni and Ti grades in `materials`; 0.6.0: titanium grades, nickel families and the magnesium naming rule with tempers. No magnesium grades in the materials table |
 | MH65 | Corrosion types and galvanic corrosion | done | `galvanic`, `matguide` | Galvanic series and two-metal check; 0.6.0: eight forms of corrosion (two of them one source, marked) |
-| MH66 | Plastics: families, properties, design analysis | partial | `materials`, `plastics` | 12 plastics with service temperature and expansion; no design data |
+| MH66 | Plastics: families, properties, design analysis | partial | `materials`, `plastics` | 12 plastics with service temperature and expansion; 0.7.0: families of plastics; no design data |
 | MH67 | Plastics processing (thermoforming, moulding) and additive manufacturing | out of scope? | | |
 | MH68 | Machining plastics | done | `plastics` | Makers' turning data side by side, annealing, notes (`claude/materials-ref`) |
 
@@ -543,7 +545,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | MH171 | Honing | done | `abrasguide` | 0.6.0: motions and crosshatch with drawing, speed, stock, what it holds, abrasives, oil, single-pass and plateau honing; two points where the sources differ show both |
 | MH172 | Laps and lapping | done | `abrasguide` | 0.6.0: principle with drawing, lap softer than the work, abrasives, stock, pressure, speed, grit, conditioning rings, flatness in light bands |
 | MH173 | Nontraditional: water jet, ultrasonic, abrasive flow, laser, plasma, electron beam | done | `procguide` | 0.6.0: water jet, abrasive water jet, laser, plasma and oxyfuel (what each cuts, heat-affected zone, thickness source by source), ultrasonic, abrasive flow and photochemical machining; electron beam from one source, marked; two drawings |
-| MH174 | CNC introduction, coordinate geometry, word address format, program structure | partial | `cncguide` | Axes, coordinate systems, block and word format, modal groups, program order; no coordinate geometry worked examples (`claude/cnc-guide`) |
+| MH174 | CNC introduction, coordinate geometry, word address format, program structure | done | `cncguide`, `linecirc`, `triangle` | Axes, coordinate systems, block and word format, modal groups, program order; 0.7.0: absolute and incremental, arc centres and radius format, three worked coordinate examples and links to the geometry tools |
 | MH175 | M-codes, G20/G21, G90/G91, S, F, inverse time feed, T | done | `gmcodes`, `rotfeed` | G and M codes per control with modal groups; inverse time feed in the rotary feed tool |
 | MH176 | Tool nose radius compensation | done | `tnrc` | Hand compensation and G41/G42 with tip numbers (`claude/cnc-guide`) |
 | MH177 | Rapid, linear, circular and helical interpolation | done | `gmcodes`, `gsim`, `arcfeed`, `helix` | Re-audited in 0.7.0: G0 to G3 in the G and M code reference per control; the backplot reads arcs with I, J, K or R and helical arcs; feed correction on arcs; pitch, ramp angle and feeds of helical interpolation |
@@ -772,7 +774,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED59 | 12.10 Copper alloys | done | `materials`, `matguide` | 0.6.0: temper designations; 12 alloys in `materials` |
 | ED60 | 12.11 Aluminium alloys | done | `materials`, `matguide` | 0.6.0: series and tempers explained |
 | ED61 | 12.12 Titanium alloys | done | `materials`, `matguide` | 0.6.0: grades 1 to 5 and 23, structure classes (one source, marked) |
-| ED62 | 12.13 Engineering plastics | partial | `materials`, `plastics` | 12 plastics in `plastics` |
+| ED62 | 12.13 Engineering plastics | done | `materials`, `plastics` | 12 plastics in `plastics`; 0.7.0: thermoplastic and thermoset, amorphous and semi-crystalline, family of each plastic |
 | ED63 | 12.14 Material traceability and documentation (certificates) | done | `matguide` | 0.6.0: EN 10204 types 2.1 to 3.2, what is on a certificate, checking the heat number |
 | ED64 | 12.15 Corrosion | done | `galvanic`, `matguide` | 0.6.0: eight forms of corrosion; galvanic check in `galvanic` |
 | ED65 | 13.1 Screw fasteners | partial | `bolttorque`, `boltgrade` | Torque, preload and grades; no joint stiffness or fatigue |
@@ -791,7 +793,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | ED78 | 14.4 Taguchi methods | missing | | Low priority |
 | ED79 | 14.5 Statistical process control | done | `capability`, `ctrlchart` | Cp/Cpk; X-bar/R and individuals/MR charts; run rules not applied (`claude/inspection-2`) |
 | ED80 | 14.6 Normal distribution | done | `capability` | |
-| ED81 | 14.7 Binomial and Poisson distributions | partial | `sampling` | Binomial and Poisson OC curves of single sampling plans; ISO 2859-1 / Z1.4 tables not included (copyright); no general distribution calculator (`claude/inspection-2`) |
+| ED81 | 14.7 Binomial and Poisson distributions | done | `sampling`, `distrib` | Binomial and Poisson OC curves of single sampling plans in `sampling`; 0.7.0: general calculator for the chance of a count, with the Poisson estimate of a binomial. ISO 2859-1 / Z1.4 tables not included (copyright) |
 | ED82 | 14.8-14.10 Reliability and design for reliability | out of scope? | | |
 | ED83 | 15.1-15.5 Project engineering (planning, CPA, Gantt, prototyping, value analysis) | out of scope? | | |
 | ED84 | 16.1 Welding processes | out of scope | | |
@@ -867,7 +869,7 @@ Rows follow the section contents pages (main entries, sub-entries grouped).
 | BB55 | Sheet metal and wire gauges; bend allowance | done | `bend`, `gauges` | 0.6.0: gauge tables added |
 | BB56 | Workshop metals | done | `materials`, `matguide` | 0.6.0: families of steel, cast iron, stainless and non-ferrous metals in the materials guide |
 | BB57 | Workpiece material comparison table | done | `materials` | |
-| BB58 | Engineering plastics | partial | `materials` | 5 plastics |
+| BB58 | Engineering plastics | done | `plastics`, `materials` | 0.7.0 re-audit: 12 plastics with service temperature, expansion, density, annealing, makers' turning data and notes; family of each plastic and the families table |
 | BB59 | Engineering adhesives | partial | `bearguide` | 0.6.0: threadlocker colours, strength, removal, cure and application; no structural adhesives, retaining compound selection or sealants |
 | BB60 | Grinding wheels: markings, specs, shapes, faces | done | `shoptools`, `wheelcode` | Markings decoded; eight shapes by type number with a drawing of six, the face of the wheel, choice of abrasive, grit and grade |
 | BB61 | Mounted wheels and points | done | `abrasguide` | 0.6.0: as MH127; no table of shapes, sizes and speeds |

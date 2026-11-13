@@ -85,7 +85,7 @@ const WORKSPACES = [
     ['GD&T', ['gdtguide', 'gdtfcf', 'gdtpos', 'gdtprofu', 'gdtdof', 'gdtstack'], 'frame'],
     ['Fits and finish', ['fitlookup', 'tolmid', 'offsetadj', 'shrinkfit', 'surfacefin', 'prefnum'], 'fit'],
     ['Measuring', ['sinebar', 'scales', 'wires', 'tapergauge', 'dovetail', 'hardness', 'tempcomp'], 'caliper'],
-    ['Quality', ['capability', 'normdist', 'ctrlchart', 'grr', 'sampling'], 'chart'],
+    ['Quality', ['capability', 'normdist', 'distrib', 'ctrlchart', 'grr', 'sampling'], 'chart'],
   ] },
   { id: 'maths', name: 'Shop maths', icon: 'triangle', blurb: 'Calculator, conversions, geometry, stock and engineering sums.', sections: [
     ['Calculator and conversion', ['calc', 'interp', 'convert', 'formulas'], 'calc'],

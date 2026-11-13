@@ -126,6 +126,10 @@ ATI's sheet names 440C in the title but gives no 440C heat treatment.
   PTFE. MCAM rows are trade names, matched to generic plastics by us.
 - Notes per plastic and general practice in our own words, each with the publishers that say
   the same.
+- 0.7.0: the family of each plastic (amorphous or semi-crystalline; nine on two publishers,
+  UHMW-PE, PTFE and PVC on one) and fourteen statements on thermoplastics, thermosets and the
+  two families in our own words. Two of them are marked "sources differ" and print both views
+  (cost, heat). Sources and what was left unread: `docs/sources.md`, Families of plastics.
 
 ## Metal identification (low priority)
 

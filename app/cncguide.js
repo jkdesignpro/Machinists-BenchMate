@@ -371,8 +371,23 @@ function cnTable(head, rows) {
   return '<div class="res cntab" style="max-width:none"><table class="gtab"><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '<th>Sources</th></tr>' +
     rows.map(r => '<tr>' + r.slice(0, 3).map((c, i) => '<td>' + (i ? '' : '<b>') + gesc(c) + (i ? '' : '</b>') + '</td>').join('') + '<td>' + cnTags(r[3]) + '</td></tr>').join('') + '</table></div>';
 }
+// Three worked coordinate examples; every result is worked by the Rust core from the fixed inputs shown.
+function cnGeoExamples() {
+  const W = state.W, f = (x, dp) => (typeof x === 'number' && isFinite(x)) ? x.toFixed(dp === undefined ? 3 : dp) : '-';
+  const p1 = [10, 0], p2 = [50, 30], c = [30, 10], r = 12, run = 20, ang = 15;
+  const lt = k => W.line_two_points(p1[0], p1[1], p2[0], p2[1], k), lc = k => W.line_circle(p1[0], p1[1], p2[0], p2[1], c[0], c[1], r, k);
+  const rows = [
+    ['A straight move from X' + p1[0] + ' Y' + p1[1] + ' to X' + p2[0] + ' Y' + p2[1], 'Its length and its angle from the X axis', 'length <b class="cgv">' + f(lt(0)) + '</b>, angle <b class="cgv">' + f(lt(1), 2) + '°</b>', 'linecirc', 'Line and circle'],
+    ['The same line and a circle of radius ' + r + ' with its centre at X' + c[0] + ' Y' + c[1], 'The two points where the line cuts the circle', 'X<b class="cgv">' + f(lc(1)) + '</b> Y<b class="cgv">' + f(lc(2)) + '</b> and X<b class="cgv">' + f(lc(3)) + '</b> Y<b class="cgv">' + f(lc(4)) + '</b>', 'linecirc', 'Line and circle'],
+    ['A taper at ' + ang + '° to the axis over a length of ' + run, 'How far the surface rises on the radius over that length', '<b class="cgv">' + f(W.rise_for_angle(run, ang)) + '</b> on the radius; a lathe programmed on diameter moves X by twice that', 'triangle', 'Triangle solver'],
+  ];
+  return '<h3>Worked examples</h3><div class="res cntab" style="max-width:none" id="cgex"><table class="gtab"><tr><th>The drawing gives</th><th>The program needs</th><th>Result (worked by BenchMate)</th><th>Tool</th></tr>' +
+    rows.map(x => '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td><td>' + x[2] + '</td><td><a href="#/t/' + x[3] + '">' + x[4] + '</a></td></tr>').join('') + '</table></div>' +
+    '<p class="ms">Numbers in the units of the program. The sources of each calculation are on the page of its tool.</p>';
+}
+
 function renderCncGuide(el) {
-  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
+  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-geo', 'Working out coordinates'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
     ['c-wear', 'Tool wear'], ['c-trt', 'Turning troubles'], ['c-trm', 'Milling troubles'], ['c-trd', 'Drilling troubles'], ['c-trtap', 'Tapping troubles'], ['c-trg', 'Grinding troubles'], ['c-hold', 'Workholding'], ['c-safe', 'Safety'], ['c-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
@@ -391,6 +406,13 @@ function renderCncGuide(el) {
     cp('<b>Work coordinates</b> put zero where the programmer chose on the part: a corner, a bore centre or a datum on the drawing. The work offset is simply the machine position of that part zero, stored in a table on the control and called by G54 to G59.', ['NIST', 'MIT_EM', 'HFO_OP']) +
     cp('<b>More work offsets.</b> Beyond the six standard ones, controls add more: Fanuc G54.1 P1 to P48 (or more as an option), Haas G110 to G129 and G154 P1 to P99, RS274NGC and LinuxCNC G59.1 to G59.3. Each is just another stored part zero.', ['NIST']) +
     cp('<b>On a lathe</b> the work offset normally holds only Z (the face of the part); X zero is the spindle centre line, so the X work offset is left at zero.', ['HFO_OP']) +
+
+    '<h2 id="c-geo">Working out coordinates</h2>' +
+    cp('<b>Absolute and incremental.</b> In absolute mode (G90) every coordinate is a position in the current work coordinate system, measured from the part zero. In incremental mode (G91) every coordinate is a distance from the point where the tool stands. Absolute programs are easier to check against the drawing; incremental suits a pattern that repeats.', ['NIST', 'LCNC_G']) +
+    cp('<b>Arcs by their centre.</b> G02 and G03 need the end point of the arc and its centre. In the centre format I, J and K give the centre as distances from the start point of the arc along X, Y and Z. LinuxCNC can also take them as absolute positions (G90.1); other controls have their own setting, so check which one yours uses.', ['NIST', 'LCNC_G']) +
+    cp('<b>Arcs by their radius.</b> With R instead of I, J and K the control works out the centre. A positive R gives the arc of less than a half circle and a negative R the larger one. Both sources call the radius format bad practice for arcs that are nearly a half circle or nearly a full circle; LinuxCNC gives the reason, that a small change in the end point moves the centre much further, and prefers the centre format throughout. (At exactly 180° the two differ: NIST counts it with the positive R, LinuxCNC says less than 180°.)', ['NIST', 'LCNC_G']) +
+    cp('<b>The points the drawing leaves out.</b> A drawing gives sizes, angles and radii; the program needs the X, Y (or X, Z) of every point where a line meets a line or an arc. Those points come from right-angle triangles and from circles, and BenchMate has a tool for each case: the <a href="#/t/triangle">Triangle solver</a> for tapers and chamfers, <a href="#/t/linecirc">Line and circle</a> for the length and angle of a move and for where a line meets or touches a circle, <a href="#/t/fillet">Fillet and tangent points</a> for a corner radius between two lines or a line and an arc, <a href="#/t/arc">Chord, arc and sagitta</a> for a radius from its width and height, and <a href="#/t/bolt">Bolt circle</a> for hole patterns. For the corrections a lathe tool nose needs when compensation is off, see the <a href="#/t/tnrc">Tool nose radius compensation</a> calculator.', null) +
+    cnGeoExamples() +
 
     '<h2 id="c-offs">Tool length, radius and wear offsets</h2>' +
     cp('<b>Tool length offset (mill).</b> Each tool sticks out a different length from the spindle. Its length is stored in the offset table and switched on with G43 H(number), which adds it to the Z position; G49 cancels it. Then Z0 in the program is the same surface for every tool.', ['NIST', 'MIT_EM']) +

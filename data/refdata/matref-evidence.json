@@ -37,7 +37,12 @@
     "BOEDEKER_T": {"publisher": "Boedeker Plastics", "title": "Plastic turning machining guidelines", "url": "https://www.boedeker.com/Technical-Resources/Plastic-Machining-Guidelines/Plastic-Turning-Machining-Guidelines", "accessed": "2026-11-11", "note": "Prints roughing (0.150 in depth) and finishing (0.025 in) speeds and feeds; we record the span. Its clearance and rake angles match Ensinger's for most plastics, so its angles are counted with Ensinger, not as a second publisher."},
     "WSH": {"publisher": "W.S. Hampshire", "title": "Thermoplastic properties chart (Plastic-Properties.pdf)", "url": "https://catalog.wshampshire.com/Asset/Plastic-Properties.pdf", "accessed": "2026-11-11", "note": "No date printed. Max. operating temperature in degF; thermal expansion in in/in/degF x 10^-5 (converted by us: x 18 gives 10^-6/K)."},
     "PROPLAS_T": {"publisher": "Professional Plastics", "title": "Thermal properties of plastic materials (table)", "url": "https://www.professionalplastics.com/professionalplastics/content/downloads/ThermalPropertiesofPlasticMaterials.pdf", "accessed": "2026-11-11", "note": "No date; 'given as a guide only'. 'Upper working temperature' (degC) is used as the maximum service temperature."},
-    "NAVY_SW": {"publisher": "US Navy (via Integrated Publishing, tpub.com)", "title": "Steelworker training manual, chapter 1, spark test, chip test and magnetic test", "url": "https://tpub.com/steelworker1/6.htm", "accessed": "2026-11-11", "note": "US government training manual (public domain); no NAVEDTRA number shown on the page."}
+    "NAVY_SW": {"publisher": "US Navy (via Integrated Publishing, tpub.com)", "title": "Steelworker training manual, chapter 1, spark test, chip test and magnetic test", "url": "https://tpub.com/steelworker1/6.htm", "accessed": "2026-11-11", "note": "US government training manual (public domain); no NAVEDTRA number shown on the page."},
+    "PSHAPES": {"publisher": "Polymershapes", "title": "K. Gray, Amorphous vs Semicrystalline, 2023-12-22", "url": "https://polymershapes.com/amorphous-vs-semicrystalline/", "accessed": "2026-11-13", "family": "PSHAPES"},
+    "XO_SC": {"publisher": "Xometry", "title": "D. McClements (updated by A. Zidonis), Semi-Crystalline vs Amorphous Polymers, 2023-10-18, updated 2025-05-03", "url": "https://www.xometry.com/resources/materials/semi-crystalline-vs-amorphous-polymers", "accessed": "2026-11-13", "family": "XOMETRY"},
+    "XO_TS": {"publisher": "Xometry", "title": "D. McClements, Thermoplastics vs. Thermosets: Material Differences and Comparisons, 2021-09-29, updated 2025-09-24", "url": "https://www.xometry.com/resources/materials/thermoplastic-vs-thermoset", "accessed": "2026-11-13", "family": "XOMETRY"},
+    "TWI_TS": {"publisher": "TWI", "title": "Thermoset vs Thermoplastic (What is the Difference?)", "url": "https://www.twi-global.com/technical-knowledge/faqs/thermoset-vs-thermoplastic", "accessed": "2026-11-13", "family": "TWI"},
+    "GUND": {"publisher": "The Gund Company", "title": "Thermoplastic Material Selection Guide (technical white paper, TGCR 05/2026)", "url": "https://thegundcompany.com/wp-content/uploads/2023/09/White-Paper-Choosing-a-Thermoplastic-That-Fits-Your-Application-The-Gund-Company.pdf", "accessed": "2026-11-13", "family": "GUND", "note": "The pyramid figure could not be read, so no plastic was classified from it; only the two lists of general properties were used."}
   },
 
   "temper_carbon": {
@@ -366,6 +371,37 @@
       ["Measure at room temperature: a part measured warm from the machine is oversize by its expansion.", []],
       ["Drilling generates the most heat: peck, clear chips, and use a lower speed than turning (MCAM: 25-100 m/min, 90-120° point).", ["MCAM_TK"]],
       ["Test on scrap first; grades and fillers change the right numbers.", ["BOEDEKER_T"]]
+    ],
+    "family": {
+      "POM": ["Semi-crystalline", ["PSHAPES", "XO_SC"]],
+      "PA6": ["Semi-crystalline", ["PSHAPES", "XO_SC"]],
+      "PA66": ["Semi-crystalline", ["PSHAPES", "XO_SC"]],
+      "PEEK": ["Semi-crystalline", ["PSHAPES", "ENSINGER_MG"]],
+      "UHMWPE": ["Semi-crystalline", ["PSHAPES"]],
+      "PTFE": ["Semi-crystalline", ["PSHAPES"]],
+      "PC": ["Amorphous", ["PSHAPES", "XO_SC", "MCAM_TK"]],
+      "PMMA": ["Amorphous", ["PSHAPES", "XO_SC"]],
+      "PVC": ["Amorphous", ["PSHAPES"]],
+      "PP": ["Semi-crystalline", ["PSHAPES", "XO_SC"]],
+      "ABS": ["Amorphous", ["PSHAPES", "XO_SC"]],
+      "PEI": ["Amorphous", ["ENSINGER_MG", "MCAM_TK"]]
+    },
+    "_family_note": "Family as printed for the polymer in general (nylon for both nylons, polyethylene including UHMW for UHMW-PE); Ensinger and Mitsubishi name their own grades (TECAPEEK, TECAPEI, Altron PC, Duratron U1000 PEI). All twelve are thermoplastics: each is named as one by at least one of the sources listed.",
+    "families": [
+      ["Thermoplastic", "A thermoplastic softens and melts when it is heated and sets again when it cools, so it can be melted and shaped again. Named as thermoplastics: polyethylene, polypropylene, polycarbonate, PVC, acrylic, nylon, PTFE and acetal.", ["TWI_TS", "XO_TS"]],
+      ["Thermoset", "A thermoset (epoxy, phenolic, polyurethane, silicone) forms cross-links between its chains when it cures. After that it stays solid when heated and cannot be melted or shaped again.", ["TWI_TS", "XO_TS"]],
+      ["Thermoplastic against thermoset", "Thermosets stand heat better; thermoplastics soften as they warm but are tougher and take a knock better.", ["TWI_TS", "XO_TS"]],
+      ["Cost", "The sources differ. TWI: thermoplastics are typically more expensive than thermosets. Xometry: most thermoplastics are priced lower than thermosets.", ["TWI_TS", "XO_TS"], "differs"],
+      ["Melting", "A semi-crystalline plastic has a sharp melting point. An amorphous plastic has none: it softens little by little over a range of temperature.", ["PSHAPES", "XO_SC", "GUND"]],
+      ["Look", "Amorphous plastics are often transparent or translucent; semi-crystalline plastics are typically opaque.", ["PSHAPES", "GUND"]],
+      ["Chemicals and stress cracking", "Semi-crystalline plastics resist chemicals better. Amorphous plastics have limited chemical resistance and are the ones that crack under stress, which is why the coolant matters for them (see General practice).", ["PSHAPES", "XO_SC", "GUND"]],
+      ["Wear and friction", "Semi-crystalline plastics wear better and slide with less friction: the usual choice for wear and bearing parts. Amorphous plastics wear poorly.", ["PSHAPES", "XO_SC", "GUND"]],
+      ["Shrinkage and size", "Amorphous plastics shrink little and hold their size well. Semi-crystalline plastics shrink more, and not evenly in every direction; Ensinger notes high shrinkage after machining for them.", ["PSHAPES", "XO_SC", "GUND", "ENSINGER_MG"]],
+      ["Stiffness", "Semi-crystalline plastics are the stiffer of the two.", ["PSHAPES", "XO_SC"]],
+      ["Impact", "Amorphous plastics take impact better than semi-crystalline plastics of a similar grade.", ["XO_SC", "GUND"]],
+      ["Repeated load", "Semi-crystalline plastics have good fatigue resistance; amorphous plastics tire sooner.", ["PSHAPES", "GUND"]],
+      ["Bonding", "Amorphous plastics bond well with adhesives; semi-crystalline plastics are difficult to bond.", ["PSHAPES", "GUND"]],
+      ["Heat", "The sources differ. Polymershapes: semi-crystalline plastics are generally better in the heat. Xometry: amorphous plastics generally have the higher temperature resistance, to be confirmed for each material. Go by the maximum service temperature of the plastic itself.", ["PSHAPES", "XO_SC"], "differs"]
     ]
   },
 

@@ -1077,6 +1077,10 @@ f1!(renard_index, c::renard_index, r, x);
 f1!(spc_constant_computed, c::spc_constant_computed_f, n, which);
 f1!(spc_constant_table, c::spc_constant_table_f, n, which);
 f1!(sampling, c::sampling_f, n, ac, p, lot, which);
+f1!(binomial_prob, c::binomial_prob, n, p, k, which);
+f1!(binomial_between, c::binomial_between, n, p, k1, k2);
+f1!(poisson_prob, c::poisson_prob, mu, k, which);
+f1!(poisson_between, c::poisson_between, mu, k1, k2);
 /// X-bar/R chart of the first `n` buffer values in subgroups of `sg`; `which` as in `spc_xbar_r`.
 #[no_mangle] pub extern "C" fn spc_xbar_r_buf(n: f64, sg: f64, which: f64) -> f64 { c::spc_xbar_r(buf(n), sg.max(0.0) as usize, which.max(0.0) as u32) }
 f1!(grr_k, c::grr_k_f, kind, m);

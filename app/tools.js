@@ -2645,6 +2645,55 @@ const TOOLS = [
   ],
 },
 {
+  id: 'distrib', level: 'advanced', group: 'Inspection and quality', title: 'Binomial and Poisson: chance of a count',
+  desc: 'The chance of finding exactly a given count, that count or fewer, that count or more, or a range of counts: defective parts in a sample from the chance of one part being defective (binomial), or events from a mean count such as flaws per sheet or stops per shift (Poisson). With the mean, the standard deviation and a bar chart of the distribution.',
+  fields: s => [
+    { id: 'm', label: 'Model', unit: '', def: 0, options: [[0, 'Binomial: a number of trials, same chance each time'], [1, 'Poisson: a mean count']] },
+    { id: 'n', label: 'Number of trials (parts in the sample)', unit: '', def: 50, when: v => v.m !== 1 },
+    { id: 'p', label: 'Chance on each trial (share defective)', unit: '%', def: 2, when: v => v.m !== 1 },
+    { id: 'mu', label: 'Mean count', unit: '', def: 3, when: v => v.m === 1 },
+    { id: 'k', label: 'Count', unit: '', def: 2 },
+    { id: 'k2', label: 'Up to count (optional)', unit: '', def: '' },
+  ],
+  calc: (v, W) => {
+    const pois = v.m === 1, whole = x => isFinite(x) && x >= 0 && Math.floor(x) === x, big = 100000;
+    if (pois ? !isFinite(v.mu) : (!isFinite(v.n) || !isFinite(v.p))) return [];
+    if (!pois && !(whole(v.n) && v.n >= 1 && v.n <= big)) return [R('Inputs', 'the number of trials must be a whole number from 1 to 100 000', '', 0)];
+    if (!pois && !(v.p >= 0 && v.p <= 100)) return [R('Inputs', 'the chance must be from 0 to 100 %', '', 0)];
+    if (pois && !(v.mu >= 0 && v.mu <= big)) return [R('Inputs', 'the mean count must be from 0 to 100 000', '', 0)];
+    if (!isFinite(v.k)) return [];
+    if (!(whole(v.k) && v.k <= big)) return [R('Inputs', 'the count must be a whole number, 0 or more', '', 0)];
+    const hasK2 = isFinite(v.k2);
+    if (hasK2 && !(whole(v.k2) && v.k2 >= v.k && v.k2 <= big)) return [R('Inputs', 'the upper count must be a whole number, not below the count', '', 0)];
+    const f = v.p / 100;   // per cent to a fraction; every chance below is a core result shown as %
+    const P = w => pois ? W.poisson_prob(v.mu, v.k, w) : W.binomial_prob(v.n, f, v.k, w);
+    const rows = [
+      R('Chance of exactly ' + v.k, P(0) * 100, '%', 4),
+      R('Chance of ' + v.k + ' or fewer', P(1) * 100, '%', 4),
+      R('Chance of ' + v.k + ' or more', P(2) * 100, '%', 4),
+    ];
+    if (hasK2) rows.push(R('Chance of ' + v.k + ' to ' + v.k2, (pois ? W.poisson_between(v.mu, v.k, v.k2) : W.binomial_between(v.n, f, v.k, v.k2)) * 100, '%', 4));
+    rows.push(R('Mean count', P(3), '', 4), R('Standard deviation of the count', P(4), '', 4));
+    if (!pois) {
+      rows.push(R('Poisson estimate of exactly ' + v.k + ' (mean = trials × chance)', P(6) * 100, '%', 4));
+      if (!pois && v.k > v.n) rows.push(R('Note on the count', 'The count is more than the number of trials, so it cannot happen.', '', 0));
+      rows.push(R('Note', 'Binomial: holds when every trial has the same chance and one result does not change the next, as for a sample that is small beside the lot. The Poisson estimate is close when the trials are many and the chance is small; compare the two rows.', '', 0));
+    } else rows.push(R('Note', 'Poisson: holds when the events come one at a time, independently, at a steady average rate. The mean count must be for the same length, area or time as the count you ask about.', '', 0));
+    return rows;
+  },
+  working: 'Binomial: P(X = k) = C(n, k) · p^k · (1 − p)^(n − k), mean n·p, standard deviation √(n·p·(1 − p)). Poisson: P(X = k) = e^(−μ) · μ^k / k!, mean μ, standard deviation √μ. "k or fewer" adds the terms from 0 to k; "k or more" adds the terms from k upwards.',
+  source: 'Binomial: Newcastle University, academic skills kit, "Discrete probability models"; Mathwords, "Binomial distribution". Poisson: Interactive Mathematics (IntMath), "Poisson probability distribution"; Newcastle University, "Poisson distribution (business)". The published worked examples are core tests. See docs/sources.md, Binomial and Poisson distributions.',
+  proof: [
+    { name: 'Binomial, 10 trials at 40 %, count 4', sys: 'mm', vals: { m: 0, n: 10, p: 40, k: 4, k2: '' }, expect: [['Chance of exactly 4', '%', 25.1, 0.05], ['Mean count', '', 4, 0.0000001]], source: 'Newcastle University, Discrete probability models: P(Y = 4) = 0.251, mean 4.' },
+    { name: 'Binomial, 10 trials at 40 %, count 2', sys: 'mm', vals: { m: 0, n: 10, p: 40, k: 2, k2: '' }, expect: [['Chance of 2 or fewer', '%', 16.7, 0.05], ['Chance of 2 or more', '%', 95.4, 0.05]], source: 'Newcastle University, Discrete probability models: 0.167 and 0.954.' },
+    { name: 'Binomial, 10 trials at 50 %, count 6', sys: 'mm', vals: { m: 0, n: 10, p: 50, k: 6, k2: '' }, expect: [['Chance of exactly 6', '%', 20.5078, 0.0001]], source: 'Mathwords, Binomial distribution: 210/1024 = 0.2051.' },
+    { name: 'Binomial, 300 trials at 1 %, count 5, beside its Poisson estimate', sys: 'mm', vals: { m: 0, n: 300, p: 1, k: 5, k2: '' }, expect: [['Chance of exactly 5', '%', 10.099, 0.0005], ['Poisson estimate of exactly 5', '%', 10.082, 0.0005]], source: 'IntMath, Poisson probability distribution, example 5: 0.10099 (binomial) and 0.10082 (Poisson).' },
+    { name: 'Poisson, mean 3, counts 2 to 4', sys: 'mm', vals: { m: 1, mu: 3, k: 2, k2: 4 }, expect: [['Chance of 2 to 4', '%', 61.611, 0.0005]], source: 'IntMath, example 1: 0.61611.' },
+    { name: 'Poisson, mean 2.3, 3 or more', sys: 'mm', vals: { m: 1, mu: 2.3, k: 3, k2: '' }, expect: [['Chance of 3 or more', '%', 40.396, 0.0005]], source: 'IntMath, example 2: 0.40396.' },
+    { name: 'Poisson, mean 7, count 8', sys: 'mm', vals: { m: 1, mu: 7, k: 8, k2: '' }, expect: [['Chance of exactly 8', '%', 13.0, 0.05]], source: 'Newcastle University, Poisson distribution (business), example 2: 0.130.' },
+  ],
+},
+{
   id: 'ctrlchart', level: 'expert', group: 'Inspection and quality', title: 'Control charts (X-bar/R, individuals)',
   desc: 'Individuals and moving range, or X-bar and R charts for subgroups of 2 to 10, from pasted measurements: centre lines, control limits, the charts with points beyond a limit marked, and the A2, D3, D4 constants checked against two tables.',
   render: el => renderCtrlChart(el),
@@ -3000,10 +3049,10 @@ const TOOLS = [
 },
 {
   id: 'plastics', level: 'advanced', group: 'Materials', title: 'Machining plastics',
-  desc: 'Acetal, nylon 6 and 66, PEEK, UHMW-PE, PTFE, PC, acrylic, PVC, PP, ABS and PEI: maximum service temperature, expansion, annealing and each maker\'s starting turning data side by side, with practical notes.',
+  desc: 'Acetal, nylon 6 and 66, PEEK, UHMW-PE, PTFE, PC, acrylic, PVC, PP, ABS and PEI: the family of each (amorphous or semi-crystalline) and what that means in use, thermoplastics against thermosets, maximum service temperature, expansion, annealing and each maker\'s starting turning data side by side, with practical notes.',
   render: el => renderPlastics(el),
   working: 'No calculation: values as printed, converted between ft/min, in/rev, °F and metric units. Makers\' cutting data differ; start low and test on scrap.',
-  source: 'Mitsubishi Chemical Advanced Materials, Ensinger, Boedeker Plastics, W.S. Hampshire, Professional Plastics; density and expansion from the material data. See docs/materials-reference.md.',
+  source: 'Mitsubishi Chemical Advanced Materials, Ensinger, Boedeker Plastics, W.S. Hampshire, Professional Plastics; density and expansion from the material data. Families: Polymershapes, Xometry, TWI, The Gund Company, Ensinger. See docs/materials-reference.md.',
 },
 {
   id: 'metalid', level: 'advanced', group: 'Materials', title: 'Metal identification',

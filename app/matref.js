@@ -156,9 +156,11 @@ async function renderPlastics(el) {
     '<div class="grid" style="max-width:760px"><label class="f"><span>Plastic</span><div class="row"><select id="plp">' + P.rows.map(r => '<option value="' + r.key + '">' + rEsc(r.name) + '</option>').join('') + '</select></div></label></div>' +
     '<div id="plres"></div>' +
     '<div class="res mtab" style="margin:14px 0"><div class="h">General practice</div><table>' + P.general.map(g => '<tr><td>' + rEsc(g.text) + '</td><td>' + mrBadge(g.status) + '<div>' + mrSrcTag(S, g.src) + '</div></td></tr>').join('') + '</table></div>' +
+    '<div class="res mtab" style="margin:14px 0" id="plfam"><div class="h">Families of plastics</div><table><tr><th>Topic</th><th>In our words</th><th>Status</th></tr>' + P.families.map(g => '<tr><td><b>' + rEsc(g.topic) + '</b></td><td>' + rEsc(g.text) + '</td><td>' + mrBadge(g.status) + '<div>' + mrSrcTag(S, g.src) + '</div></td></tr>').join('') + '</table></div>' +
+    '<div class="res mtab" style="margin:14px 0" id="plfamall"><div class="h">All plastics: family</div><table><tr><th>Plastic</th><th>Family</th><th>Status</th></tr>' + P.rows.map(r => '<tr><td><b>' + rEsc(r.name) + '</b></td><td>' + rEsc(r.family.kind) + ' thermoplastic</td><td>' + mrBadge(r.family.status) + '<div>' + mrSrcTag(S, r.family.src) + '</div></td></tr>').join('') + '</table><p class="ms">' + rEsc(P.family_note) + '</p></div>' +
     '<div class="res mtab"><div class="h">All plastics: maximum service temperature</div><table><tr><th>Plastic</th><th>As printed</th><th>Status</th></tr>' + P.rows.map(r => '<tr><td><b>' + rEsc(r.name) + '</b></td>' + cell('max_temp', r.fields.max_temp) + '</tr>').join('') + '</table></div>' +
     '<div class="note">Properties: confirmed = two independent publishers\' printed values or ranges overlap (3 °C or 3 x 10^-6/K slack for converted printings). Cutting data and annealing: confirmed = the same range (2 %, or 3 °C). Speeds and feeds from Boedeker are the span of its roughing and finishing rows. Boedeker\'s angles match Ensinger\'s for most plastics and are counted with Ensinger. Where BenchMate\'s material data already holds a plastic, density and expansion are shown from there (with their own sources) and not repeated here. ' + rEsc(P.units) +
-    '<br><b>Sources</b><br>' + mrSources(S, ['MCAM_TK', 'ENSINGER_MG', 'BOEDEKER_T', 'WSH', 'PROPLAS_T']) + '</div>';
+    '<br><b>Sources</b><br>' + mrSources(S, ['MCAM_TK', 'ENSINGER_MG', 'BOEDEKER_T', 'WSH', 'PROPLAS_T', 'PSHAPES', 'XO_SC', 'XO_TS', 'TWI_TS', 'GUND']) + '</div>';
   const sel = $('#plp', el); sel.value = MRMEM.plastic;
   const order = ['max_temp', 'cte', 'density', 'anneal_hold', 'turn_speed', 'turn_feed', 'clearance', 'rake'];
   function draw() {
@@ -171,6 +173,7 @@ async function renderPlastics(el) {
         '<tr><td colspan="3"><span class="ms">Density and expansion from BenchMate\'s material data (' + rEsc(r.materials.grade) + '), where every value and source is listed. </span><button class="btn" id="plmat">Open Material equivalents</button></td></tr>';
     }
     $('#plres', el).innerHTML = '<div class="res mtab"><div class="h">' + rEsc(r.name) + '</div><table><tr><th>Property or setting</th><th>As printed (hover for the text)</th><th>Status</th></tr>' +
+      '<tr><td><b>Family</b></td><td><span class="mv">' + rEsc(r.family.kind) + ' thermoplastic</span> <span class="ms">' + mrNames(S, r.family.src) + '</span></td><td>' + mrBadge(r.family.status) + '</td></tr>' +
       order.filter(f => r.fields[f]).map(f => '<tr><td><b>' + rEsc(P.fields[f].replace(/ \(.*\)$/, '')) + '</b>' + (f.startsWith('turn') || f === 'clearance' || f === 'rake' ? '<div class="ms">turning, starting value</div>' : '') + '</td>' + cell(f, r.fields[f]) + '</tr>').join('') + mat +
       '</table></div><div class="res mtab" style="margin-top:10px"><div class="h">Notes</div><table>' + r.notes.map(n => '<tr><td>' + rEsc(n.text) + '</td><td>' + mrBadge(n.status) + '<div>' + mrSrcTag(S, n.src) + '</div></td></tr>').join('') + '</table></div>';
     const b = $('#plmat', el); if (b) b.onclick = () => mrOpen('materials');
