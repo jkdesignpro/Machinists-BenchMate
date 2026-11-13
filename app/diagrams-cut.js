@@ -1037,6 +1037,234 @@ Object.assign(DIAGRAMS, {
     return DK.svg(W, H, h, 'Side view of a taper pin: large end diameter D, small end diameter d, length');
   },
 
+  // Thread engagement: section of a screw in a tapped part, to scale. The engaged length is the user's own, or the simplified least length.
+  threadstrip(v, sys, rows) {
+    const W = 520, H = 250, u = dcU(sys), dp = sys === 'inch' ? 4 : 3;
+    const Le = dcRow(rows, 'Least engagement, simplified'), d = v.d, own = dcOk(v.le);
+    if (!dcOk(Le) || !dcOk(d)) return '';
+    const L = own ? v.le : Le, sc = Math.min(110 / d, 120 / Math.max(L, Le)), cx = 200, top = 84, r = d / 2 * sc, bot = top + L * sc;
+    const blockBot = top + Math.max(L, Le) * sc + 26;
+    let h = DK.rect(cx - r - 90, top, 2 * r + 180, blockBot - top, 'hatch');
+    h += DK.poly([[cx - r, 26], [cx + r, 26], [cx + r, bot], [cx - r, bot]], 'tool');
+    h += DK.cl(cx, 14, cx, blockBot + 8);
+    h += DK.dimH(cx - r, cx + r, 16, 'd ' + dcN(d, dp), { from: 26 });
+    h += dcDimV(top, bot, cx + r + 120, (own ? 'your engagement ' : 'least engagement ') + dcN(L, dp), { from: cx + r });
+    if (own) h += dcPl([[cx - r - 60, top + Le * sc], [cx + r + 60, top + Le * sc]], 'dim') + dcLines(cx - r - 88, top + Le * sc - 6, ['simplified least ' + dcN(Le, dp)]);
+    h += dcLines(cx + r + 100, 30, ['section, to scale, ' + u, 'threads not drawn']) + dcLines(cx - r - 86, top + 16, ['tapped part']);
+    return DK.svg(W, H, h, 'Section of a screw in a tapped part: screw diameter and the length of thread engaged');
+  },
+
+  // Depreciation: book value at the end of each year as bars, the salvage value as a dashed line.
+  depreciation(v, sys, rows) {
+    const W = 520, H = 250, n = Math.min(v.life, 40), bv = [];
+    if (!dcOk(v.cost) || !(n >= 1)) return '';
+    for (let k = 1; k <= n; k++) { const r = (rows || []).find(x => x.label === 'Year ' + k + ': book value at the year end'); if (!r || !isFinite(r.value)) return ''; bv.push(r.value); }
+    const x0 = 70, y0 = 200, w = 420, hh = 160, sy = hh / v.cost, step = w / (n + 1), bw = Math.min(34, step * 0.7);
+    let h = DK.line(x0, y0, x0 + w, y0, 'thin') + DK.line(x0, y0, x0, y0 - hh - 8, 'thin');
+    h += DK.rect(x0 + step * 0.5 - bw / 2, y0 - v.cost * sy, bw, v.cost * sy, 'ghost') + DK.text(x0 + step * 0.5, y0 + 16, '0', { cls: 'mut', anchor: 'middle' });
+    bv.forEach((b, i) => {
+      const x = x0 + step * (i + 1.5) - bw / 2;
+      if (b > 0) h += DK.rect(x, y0 - b * sy, bw, b * sy, 'part');
+      if (n <= 12 || (i + 1) % 5 === 0) h += DK.text(x + bw / 2, y0 + 16, String(i + 1), { cls: 'mut', anchor: 'middle' });
+    });
+    if (v.salv > 0 && v.salv <= v.cost) h += dcPl([[x0, y0 - v.salv * sy], [x0 + w, y0 - v.salv * sy]], 'hid') + DK.text(x0 + w, y0 - v.salv * sy - 5, 'salvage ' + dcN(v.salv, 0), { cls: 'mut', anchor: 'end' });
+    h += DK.text(x0 - 6, y0 - v.cost * sy + 4, dcN(v.cost, 0), { cls: 'dimt', anchor: 'end' }) + DK.text(x0 + w / 2, y0 + 36, 'end of year', { cls: 'mut', anchor: 'middle' });
+    h += dcLines(x0 + 8, 20, ['book value at the end of each year']);
+    return DK.svg(W, H, h, 'Bar chart of the book value at the end of each year, with the salvage value as a dashed line');
+  },
+
+  // Block and tackle: a diagram of the rope parts between the fixed and the moving block. Not to scale.
+  tackle(v, sys, rows) {
+    const W = 520, H = 260, n = Math.round(v.n);
+    if (!(n >= 1) || n !== v.n || !dcOk(v.load)) return '';
+    const m = Math.min(n, 12), gap = Math.min(22, 200 / m), cx = 190, x1 = cx - gap * (m - 1) / 2, yT = 56, yB = 150, fu = sys === 'inch' ? 'lbf' : 'N';
+    let h = DK.rect(cx - 110, 22, 220, 10, 'hatch');
+    h += DK.rect(x1 - 14, yT - 14, gap * (m - 1) + 28, 22, 'part') + DK.line(cx, 32, cx, yT - 14, 'ln');
+    h += DK.rect(x1 - 14, yB - 8, gap * (m - 1) + 28, 22, 'tool') + DK.line(cx, yB + 14, cx, yB + 40, 'ln');
+    for (let i = 0; i < m; i++) h += DK.line(x1 + gap * i, yT + 8, x1 + gap * i, yB - 8, 'ln');
+    h += DK.rect(cx - 34, yB + 40, 68, 40, 'part') + DK.text(cx, yB + 65, 'load', { cls: 'txt', anchor: 'middle' });
+    const xp = x1 + gap * (m - 1) + 60, pull = dcRow(rows, 'Pull on the rope at your efficiency'), ideal = dcRow(rows, 'Pull on the rope, ideal');
+    h += dcPl([[x1 + gap * (m - 1) + 14, yT - 3], [xp, yT - 3], [xp, yB + 30]], 'ln') + DK.arrow(xp, yB + 30, xp, yB + 62, 'hot');
+    h += dcResult(xp + 14, yB + 44, dcN(dcOk(pull) ? pull : ideal, 1) + ' ' + fu, dcOk(pull) ? 'pull at your efficiency' : 'ideal pull');
+    h += dcLines(xp + 14, 22, [n + ' rope part' + (n === 1 ? '' : 's') + ' carry the moving block', n > m ? 'only ' + m + ' are drawn' : '', 'diagram, not to scale']);
+    h += dcLines(x1 - 100, yT + 2, ['fixed block']) + dcLines(x1 - 108, yB + 8, ['moving block']);
+    return DK.svg(W, H, h, 'Diagram of a block and tackle: a fixed block, a moving block with the load, the rope parts between them and the hauling rope');
+  },
+
+  // Squaring a corner: the two legs and the diagonal, to scale.
+  squaring(v, sys, rows) {
+    const W = 520, H = 260, u = dcU(sys), dp = sys === 'inch' ? 3 : 1;
+    const c = dcRow(rows, 'Diagonal for a square corner');
+    if (!dcOk(v.a) || !dcOk(v.b) || !dcOk(c)) return '';
+    const sc = Math.min(300 / v.b, 150 / v.a), x0 = 90, y0 = 210, bx = x0 + v.b * sc, ay = y0 - v.a * sc;
+    let h = DK.poly([[x0, y0], [bx, y0], [x0, ay]], 'part');
+    h += dcPl([[x0 + 12, y0], [x0 + 12, y0 - 12], [x0, y0 - 12]], 'thin');
+    h += DK.dimH(x0, bx, y0 + 26, dcN(v.b, dp), { from: y0 }) + dcDimV(ay, y0, x0 - 30, dcN(v.a, dp), { from: x0 });
+    h += DK.dim(x0, ay, bx, y0, 'diagonal ' + dcN(c, dp), { off: 22, hot: true });
+    h += dcLines(bx - 60, 24, ['to scale, ' + u]);
+    return DK.svg(W, H, h, 'A right-angled triangle: the two legs measured from the corner and the diagonal between their ends');
+  },
+
+  // Interpolation: the two known points, the straight line and the point found; or the table cell with its four corners.
+  interp(v, sys, rows) {
+    const W = 520, H = 260, fin = (...a) => a.every(x => typeof x === 'number' && isFinite(x));
+    const dot = (x, y, cls) => DK.circle(x, y, 3.5, cls || 'dimf');
+    if (v.m === 2) {
+      const val = dcRow(rows, 'Value at x and y'), r1 = dcRow(rows, 'On the first-y edge'), r2 = dcRow(rows, 'On the second-y edge');
+      const tx = dcRow(rows, 'Fraction of the way from the first x'), ty = dcRow(rows, 'Fraction of the way from the first y');
+      if (!fin(val, r1, r2, tx, ty)) return '';
+      const x0 = 170, x1 = 370, y0 = 200, y1 = 60, cl = t => dcClamp(t, -0.25, 1.25), px = x0 + cl(tx) * (x1 - x0), py = y0 + cl(ty) * (y1 - y0);
+      let h = DK.rect(x0, y1, x1 - x0, y0 - y1, 'part') + DK.line(px, y0, px, y1, 'hid') + dot(x0, y0) + dot(x1, y0) + dot(x0, y1) + dot(x1, y1);
+      h += DK.text(x0 - 8, y0 + 4, dcN(v.q11), { cls: 'dimt', anchor: 'end' }) + DK.text(x1 + 8, y0 + 4, dcN(v.q21), { cls: 'dimt', anchor: 'start' });
+      h += DK.text(x0 - 8, y1 + 4, dcN(v.q12), { cls: 'dimt', anchor: 'end' }) + DK.text(x1 + 8, y1 + 4, dcN(v.q22), { cls: 'dimt', anchor: 'start' });
+      h += dot(px, y0) + dot(px, y1) + DK.text(px, y0 + 16, dcN(r1), { cls: 'mut' }) + DK.text(px, y1 - 8, dcN(r2), { cls: 'mut' });
+      h += dot(px, py, 'hotf') + DK.text(px + 9, py + 4, dcN(val), { cls: 'hott', anchor: 'start' });
+      h += DK.text(x0, y0 + 34, 'x ' + dcN(v.x1), { cls: 'mut' }) + DK.text(x1, y0 + 34, 'x ' + dcN(v.x2), { cls: 'mut' });
+      h += DK.text(x0 - 70, y0 + 4, 'y ' + dcN(v.ya), { cls: 'mut', anchor: 'end' }) + DK.text(x0 - 70, y1 + 4, 'y ' + dcN(v.yb), { cls: 'mut', anchor: 'end' });
+      h += dcLines(400, 24, ['not to scale']);
+      return DK.svg(W, H, h, 'A table cell with its four corner values, the values found on two edges and the value found inside');
+    }
+    const xq = v.m === 0 ? v.x : dcRow(rows, 'x at y'), yq = v.m === 0 ? dcRow(rows, 'y at x') : v.yg;
+    if (!fin(v.x1, v.x2, v.y1, v.y2, xq, yq) || v.x1 === v.x2) return '';
+    const xa = Math.min(v.x1, v.x2, xq), xb = Math.max(v.x1, v.x2, xq), ya = Math.min(v.y1, v.y2, yq), yb = Math.max(v.y1, v.y2, yq);
+    const X = x => 110 + (x - xa) / ((xb - xa) || 1) * 320, Y = y => 200 - (y - ya) / ((yb - ya) || 1) * 140;
+    const ends = [[v.x1, v.y1], [v.x2, v.y2], [xq, yq]].sort((p, q) => p[0] - q[0]);
+    let h = DK.line(90, 216, 450, 216, 'thin') + DK.line(90, 216, 90, 44, 'thin');
+    h += DK.line(X(ends[0][0]), Y(ends[0][1]), X(ends[2][0]), Y(ends[2][1]), 'ln');
+    h += DK.line(X(xq), Y(yq), X(xq), 216, 'hid') + DK.line(X(xq), Y(yq), 90, Y(yq), 'hid');
+    h += dot(X(v.x1), Y(v.y1)) + dot(X(v.x2), Y(v.y2)) + dot(X(xq), Y(yq), 'hotf');
+    h += DK.text(X(v.x1), Y(v.y1) - 9, '(' + dcN(v.x1) + ', ' + dcN(v.y1) + ')', { cls: 'dimt' }) + DK.text(X(v.x2), Y(v.y2) - 9, '(' + dcN(v.x2) + ', ' + dcN(v.y2) + ')', { cls: 'dimt' });
+    h += DK.text(X(xq), 232, 'x ' + dcN(xq), { cls: v.m === 0 ? 'mut' : 'hott' }) + DK.text(84, Y(yq) + 4, 'y ' + dcN(yq), { cls: v.m === 0 ? 'hott' : 'mut', anchor: 'end' });
+    return DK.svg(W, H, h, 'Two known points joined by a straight line, and the point found on it');
+  },
+
+  // Normal distribution: the bell curve from the core, the limits and the share between or beyond them.
+  normdist(v, sys, rows) {
+    const W = 520, H = 250, Wm = state.W;
+    if (!(typeof v.mean === 'number' && isFinite(v.mean)) || !dcOk(v.sd)) return '';
+    const peak = Wm.normal_pdf(v.mean, v.mean, v.sd), x0 = 40, x1 = 480, yb = 196, hh = 150, n = 96;
+    const X = x => x0 + (x - (v.mean - 4 * v.sd)) / (8 * v.sd) * (x1 - x0), Y = x => yb - Wm.normal_pdf(x, v.mean, v.sd) / peak * hh;
+    const at = i => v.mean - 4 * v.sd + 8 * v.sd * i / n, cl = x => dcClamp(x, v.mean - 4 * v.sd, v.mean + 4 * v.sd);
+    const hasLo = typeof v.lo === 'number' && isFinite(v.lo), hasHi = typeof v.hi === 'number' && isFinite(v.hi);
+    let h = '';
+    const fill = (a, b) => { const pts = [[X(a), yb]]; for (let i = 0; i <= n; i++) { const x = at(i); if (x > a && x < b) pts.push([X(x), Y(x)]); } pts.splice(1, 0, [X(a), Y(a)]); pts.push([X(b), Y(b)], [X(b), yb]); return DK.poly(pts, 'hatch'); };
+    if (hasLo && hasHi && v.hi > v.lo) h += fill(cl(v.lo), cl(v.hi));
+    else if (hasLo) h += fill(v.mean - 4 * v.sd, cl(v.lo));
+    else if (hasHi) h += fill(cl(v.hi), v.mean + 4 * v.sd);
+    const curve = []; for (let i = 0; i <= n; i++) curve.push([X(at(i)), Y(at(i))]);
+    h += dcPl(curve, 'ln') + DK.line(x0, yb, x1, yb, 'thin') + DK.cl(X(v.mean), yb + 6, X(v.mean), yb - hh - 10);
+    h += DK.text(X(v.mean), yb + 20, 'mean ' + dcN(v.mean), { cls: 'mut' });
+    [-3, -2, -1, 1, 2, 3].forEach(k => { h += DK.line(X(v.mean + k * v.sd), yb, X(v.mean + k * v.sd), yb + 5, 'thin') + DK.text(X(v.mean + k * v.sd), yb + 36, (k > 0 ? '+' : '') + k + ' s', { cls: 'mut' }); });
+    const lim = (x, t, anchor) => { const inside = Math.abs(x - v.mean) <= 4 * v.sd; return inside ? DK.line(X(x), yb, X(x), yb - hh - 4, 'hot') + DK.text(X(x) + (anchor === 'end' ? -5 : 5), yb - hh - 10, t + ' ' + dcN(x), { cls: 'hott', anchor }) : ''; };
+    if (hasLo) h += lim(v.lo, 'lower', 'end'); if (hasHi) h += lim(v.hi, 'upper', 'start');
+    const share = hasLo && hasHi ? dcRow(rows, 'Share between the limits') : hasLo ? dcRow(rows, 'Share below the lower limit') : dcRow(rows, 'Share above the upper limit');
+    if (isFinite(share)) h += dcResult(x0, 62, dcN(share, 2) + ' %', hasLo && hasHi ? 'between the limits (hatched)' : 'beyond the limit (hatched)', 'start');
+    h += dcLines(x0, 100, ['s = standard deviation']);
+    return DK.svg(W, H, h, 'Bell curve of a normal distribution with the limits and the hatched share');
+  },
+
+  // Line and circle in coordinates, to scale, Y upwards.
+  linecirc(v, sys, rows) {
+    const W = 520, H = 280, u = dcU(sys), fin = (...a) => a.every(x => typeof x === 'number' && isFinite(x));
+    if (!fin(v.x1, v.y1, v.x2, v.y2) || (v.x1 === v.x2 && v.y1 === v.y2)) return '';
+    const circ = fin(v.cx, v.cy) && dcOk(v.r);
+    const pick = (lab) => dcRow(rows, lab), hits = [];
+    if (fin(pick('First point, X'), pick('First point, Y'))) hits.push([pick('First point, X'), pick('First point, Y')], [pick('Second point, X'), pick('Second point, Y')]);
+    else if (fin(pick('Tangent point, X'), pick('Tangent point, Y'))) hits.push([pick('Tangent point, X'), pick('Tangent point, Y')]);
+    const key = [[v.x1, v.y1], [v.x2, v.y2]].concat(hits);
+    let xa = Math.min(...key.map(p => p[0])), xb = Math.max(...key.map(p => p[0])), ya = Math.min(...key.map(p => p[1])), yb = Math.max(...key.map(p => p[1]));
+    if (circ) { xa = Math.min(xa, v.cx - v.r); xb = Math.max(xb, v.cx + v.r); ya = Math.min(ya, v.cy - v.r); yb = Math.max(yb, v.cy + v.r); }
+    const sc = Math.min(360 / ((xb - xa) || 1), 200 / ((yb - ya) || 1)), ox = 260 - (xa + xb) / 2 * sc, oy = 140 + (ya + yb) / 2 * sc;
+    const X = x => ox + x * sc, Y = y => oy - y * sc, dot = (p, cls) => DK.circle(X(p[0]), Y(p[1]), 3.5, cls || 'dimf');
+    // The line, carried a little past the outermost key point at each end.
+    const dx = v.x2 - v.x1, dy = v.y2 - v.y1, ts = key.map(p => ((p[0] - v.x1) * dx + (p[1] - v.y1) * dy) / (dx * dx + dy * dy)), t0 = Math.min(...ts), t1 = Math.max(...ts), ex = 0.12 * (t1 - t0);
+    let h = '';
+    if (xa <= 0 && xb >= 0) h += DK.cl(X(0), Y(ya) + 8, X(0), Y(yb) - 8); if (ya <= 0 && yb >= 0) h += DK.cl(X(xa) - 8, Y(0), X(xb) + 8, Y(0));
+    if (circ) h += DK.circle(X(v.cx), Y(v.cy), v.r * sc, 'part') + DK.line(X(v.cx) - 5, Y(v.cy), X(v.cx) + 5, Y(v.cy), 'thin') + DK.line(X(v.cx), Y(v.cy) - 5, X(v.cx), Y(v.cy) + 5, 'thin');
+    h += DK.line(X(v.x1 + (t0 - ex) * dx), Y(v.y1 + (t0 - ex) * dy), X(v.x1 + (t1 + ex) * dx), Y(v.y1 + (t1 + ex) * dy), 'ln');
+    h += dot([v.x1, v.y1]) + dot([v.x2, v.y2]) + DK.text(X(v.x1) + 8, Y(v.y1) - 7, '1', { cls: 'dimt', anchor: 'start' }) + DK.text(X(v.x2) + 8, Y(v.y2) - 7, '2', { cls: 'dimt', anchor: 'start' });
+    const dp = sys === 'inch' ? 3 : 2;
+    hits.forEach(p => { h += dot(p, 'hotf') + DK.text(X(p[0]) + 8, Y(p[1]) + 14, '(' + dcN(p[0], dp) + ', ' + dcN(p[1], dp) + ')', { cls: 'hott', anchor: 'start' }); });
+    h += dcLines(12, 20, ['to scale, ' + u + ', Y upwards']);
+    return DK.svg(W, H, h, 'A line through two points and a circle, with the points where they meet');
+  },
+
+  // Ellipse, parabola or hyperbola with its foci, to scale.
+  conics(v, sys, rows) {
+    const W = 520, H = 270, u = dcU(sys), Wm = state.W, cx = 260, cy = 135, dot = (x, y) => DK.circle(x, y, 3.5, 'hotf');
+    const xq = typeof v.x === 'number' && isFinite(v.x) ? v.x : NaN;
+    if (v.k === 1) {
+      const f = dcRow(rows, 'Focal length');
+      if (!dcOk(v.w) || !dcOk(v.d) || !dcOk(f)) return '';
+      const top = Math.max(v.d, Math.min(f, 3 * v.d)), sc = Math.min(340 / v.w, 190 / top), yv = 230, xl = cx - v.w / 2 * sc, xr = cx + v.w / 2 * sc, yr = yv - v.d * sc;
+      // A quadratic curve whose control point is one depth below the vertex is this parabola exactly.
+      let h = '<path class="ln" d="M' + xl.toFixed(1) + ' ' + yr.toFixed(1) + 'Q' + cx + ' ' + (yv + v.d * sc).toFixed(1) + ' ' + xr.toFixed(1) + ' ' + yr.toFixed(1) + '"/>';
+      h += DK.cl(cx, yv + 12, cx, yv - top * sc - 12) + DK.dimH(xl, xr, yr - 18, 'width ' + dcN(v.w), { from: yr }) + dcDimV(yr, yv, xr + 34, 'depth ' + dcN(v.d), { from: xr });
+      if (f <= 3 * v.d) h += dot(cx, yv - f * sc) + DK.text(cx + 9, yv - f * sc + 4, 'focus, ' + dcN(f) + ' above the vertex', { cls: 'hott', anchor: 'start' });
+      else h += dcLines(cx + 12, 40, ['focus ' + dcN(f) + ' above the vertex,', 'beyond the top of this drawing']);
+      h += dcLines(12, 20, ['to scale, ' + u]);
+      return DK.svg(W, H, h, 'A parabola: the dish with its width, depth and focus');
+    }
+    const c = dcRow(rows, 'Centre to each focus');
+    if (!dcOk(v.a) || !dcOk(v.b) || !dcOk(c)) return '';
+    if (v.k === 0) {
+      const sc = Math.min(210 / v.a, 100 / v.b);
+      let h = '<ellipse class="part" cx="' + cx + '" cy="' + cy + '" rx="' + (v.a * sc).toFixed(1) + '" ry="' + (v.b * sc).toFixed(1) + '"/>';
+      h += DK.cl(cx - v.a * sc - 12, cy, cx + v.a * sc + 12, cy) + DK.cl(cx, cy - v.b * sc - 12, cx, cy + v.b * sc + 12);
+      h += dot(cx - c * sc, cy) + dot(cx + c * sc, cy) + DK.text(cx + c * sc, cy + 18, 'focus', { cls: 'hott' }) + DK.text(cx - c * sc, cy + 18, 'focus', { cls: 'hott' });
+      h += DK.dimH(cx, cx + v.a * sc, cy + v.b * sc + 22, 'a ' + dcN(v.a), { from: cy }) + dcDimV(cy - v.b * sc, cy, cx - v.a * sc - 22, 'b ' + dcN(v.b), { from: cx });
+      h += DK.dimH(cx, cx + c * sc, cy - 14, 'c ' + dcN(c), {});
+      const yq = dcRow(rows, 'Y of the curve at X');
+      if (isFinite(xq) && isFinite(yq)) h += DK.circle(cx + xq * sc, cy - yq * sc, 3.5, 'dimf') + DK.text(cx + xq * sc + 8, cy - yq * sc - 6, '(' + dcN(xq) + ', ' + dcN(yq) + ')', { cls: 'dimt', anchor: 'start' });
+      h += dcLines(12, 20, ['to scale, ' + u]);
+      return DK.svg(W, H, h, 'An ellipse with its two half-axes and its two foci');
+    }
+    const xm = Math.max(2.2 * v.a, c * 1.25, isFinite(xq) ? Math.abs(xq) * 1.1 : 0), ym = Wm.hyperbola_prop(v.a, v.b, xm, 3), sc = Math.min(230 / xm, 115 / ym);
+    const br = sg => { const up = [], dn = []; for (let i = 0; i <= 24; i++) { const x = v.a + (xm - v.a) * (i / 24) * (i / 24), y = Wm.hyperbola_prop(v.a, v.b, x, 3); up.push([cx + sg * x * sc, cy - y * sc]); dn.unshift([cx + sg * x * sc, cy + y * sc]); } return dcPl(dn.concat(up), 'ln'); };
+    const ys = Wm.hyperbola_prop(v.a, v.b, 0, 4) * xm;   // asymptote height at the edge of the drawing, from the core slope
+    let h = DK.line(cx - xm * sc, cy + ys * sc, cx + xm * sc, cy - ys * sc, 'hid') + DK.line(cx - xm * sc, cy - ys * sc, cx + xm * sc, cy + ys * sc, 'hid');
+    h += DK.cl(cx - xm * sc - 10, cy, cx + xm * sc + 10, cy) + br(1) + br(-1);
+    h += dot(cx - c * sc, cy) + dot(cx + c * sc, cy) + DK.text(cx + c * sc, cy + 18, 'focus', { cls: 'hott' }) + DK.text(cx - c * sc, cy + 18, 'focus', { cls: 'hott' });
+    h += DK.dimH(cx, cx + v.a * sc, cy - 14, 'a ' + dcN(v.a), {}) + DK.text(cx + xm * sc - 4, cy - ys * sc + 16, 'asymptote', { cls: 'mut', anchor: 'end' });
+    const yq = dcRow(rows, 'Y of the curve at X');
+    if (isFinite(xq) && isFinite(yq)) h += DK.circle(cx + xq * sc, cy - yq * sc, 3.5, 'dimf') + DK.text(cx + xq * sc + 8, cy - yq * sc - 6, '(' + dcN(xq) + ', ' + dcN(yq) + ')', { cls: 'dimt', anchor: 'start' });
+    h += DK.text(cx, 18, 'to scale, ' + u, { cls: 'mut' });
+    return DK.svg(W, H, h, 'A hyperbola with its two branches, asymptotes and foci');
+  },
+
+  // Binomial or Poisson distribution as bars; every bar height is a core result.
+  distrib(v, sys, rows) {
+    const W = 520, H = 250, Wm = state.W, pois = v.m === 1, fin = x => typeof x === 'number' && isFinite(x);
+    const mean = dcRow(rows, 'Mean count'), sd = dcRow(rows, 'Standard deviation of the count');
+    if (!fin(mean) || !fin(sd) || !fin(v.k)) return '';
+    const top = pois ? Infinity : v.n, f = v.p / 100, pmf = j => pois ? Wm.poisson_prob(v.mu, j, 0) : Wm.binomial_prob(v.n, f, j, 0);
+    const hasK2 = fin(v.k2) && v.k2 >= v.k, kb = hasK2 ? v.k2 : v.k;
+    // Counts drawn: the mean plus and minus four standard deviations, widened to take in the chosen counts.
+    let a = Math.max(0, Math.floor(mean - 4 * sd - 1)), b = Math.min(top, Math.ceil(mean + 4 * sd + 1));
+    a = Math.max(0, Math.min(a, v.k - 1)); b = Math.min(top, Math.max(b, kb + 1, a + 4));
+    const step = Math.max(1, Math.ceil((b - a + 1) / 160)), xs = [];
+    if (step > 1) { a = v.k - Math.ceil((v.k - a) / step) * step; if (a < 0) a += step; }   // so that the chosen count has its own bar
+    for (let j = a; j <= b; j += step) xs.push(j);
+    const ps = xs.map(pmf), peak = Math.max(...ps.filter(fin), 1e-300);
+    const x0 = 44, x1 = 486, yb = 196, hh = 120, bw = (x1 - x0) / xs.length, X = j => x0 + ((j - a) / step + 0.5) * bw;
+    let h = '';
+    xs.forEach((j, i) => {
+      const hgt = fin(ps[i]) ? ps[i] / peak * hh : 0, on = j >= v.k && j <= kb;
+      h += DK.rect(x0 + i * bw + Math.min(1, bw * 0.12), yb - hgt, Math.max(0.6, bw - 2 * Math.min(1, bw * 0.12)), hgt, on ? 'hotf' : 'hatch');
+    });
+    h += DK.line(x0, yb, x1, yb, 'thin');
+    const ticks = [...new Set([xs[0], xs[xs.length - 1]])];
+    ticks.forEach(j => { h += DK.line(X(j), yb, X(j), yb + 5, 'thin') + DK.text(X(j), yb + 20, String(j), { cls: 'mut' }); });
+    if (mean >= a && mean <= b) h += DK.cl(x0 + ((mean - a) / step + 0.5) * bw, yb + 6, x0 + ((mean - a) / step + 0.5) * bw, yb - hh - 10) + DK.text(x0 + ((mean - a) / step + 0.5) * bw, yb + 36, 'mean ' + dcN(mean), { cls: 'mut' });
+    if (v.k >= a && v.k <= b && step === 1 && !ticks.includes(v.k)) h += DK.text(X(v.k), yb + 20, String(v.k), { cls: 'hott' });
+    if (hasK2 && v.k2 > v.k && v.k2 <= b && step === 1 && !ticks.includes(v.k2)) h += DK.text(X(v.k2), yb + 20, String(v.k2), { cls: 'hott' });
+    const share = hasK2 ? dcRow(rows, 'Chance of ' + v.k + ' to ' + v.k2) : dcRow(rows, 'Chance of exactly ' + v.k);
+    const right = mean - a < (b - a) / 2;
+    if (fin(share)) h += dcResult(right ? x1 : x0, 22, dcN(share, 2) + ' %', hasK2 ? 'count ' + v.k + ' to ' + v.k2 + ' (filled bars)' : 'exactly ' + v.k + ' (filled bar)', right ? 'end' : 'start');
+    h += dcLines(right ? x1 : x0, 55, [pois ? 'Poisson, mean ' + dcN(v.mu) : 'Binomial, ' + v.n + ' trials at ' + dcN(v.p) + ' %', step > 1 ? 'one bar for every ' + step + ' counts' : 'one bar for each count'], { anchor: right ? 'end' : 'start' });
+    return DK.svg(W, H, h, 'Bar chart of the chance of each count, with the chosen counts filled');
+  },
+
   // Saw pitch: teeth across the thinnest wall and across the longest cut at the pitch (or the coarsest that keeps 3 teeth).
   sawtpi(v, sys, rows) {
     const W = 520, H = 250, u = dcU(sys);

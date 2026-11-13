@@ -1909,7 +1909,7 @@ where = 'toolpaths';
   // Is the statement that starts with these words marked "to be verified"? undefined when there is no such statement.
   const tbv = (g, start) => (g.flag.find(f => f[0].startsWith(start)) || [])[1];
   let g = await guide('toolpaths');
-  if (g.h2 !== 12 || g.svgs !== 3 || g.tabs !== '9,8' || g.srcs !== 8) problems.push(`[${where}] 12 sections, 3 drawings, tables of 8 and 7 rows, 8 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 12 || g.svgs !== 3 || g.tabs !== '9,8' || g.srcs !== 11) problems.push(`[${where}] 12 sections, 3 drawings, tables of 8 and 7 rows, 11 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 32) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Stepover is how far', 'Rules for G41 and G42', 'Getting in', 'Slots', 'Steep or shallow decides']) if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
   for (const k of ['The chain', 'Pencil passes run a small tool', 'Inside corners', 'Deep pockets']) if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
@@ -1926,7 +1926,7 @@ where = 'toolpaths';
   // CNC lathe guide: the two trade magazines have one publisher and the two Haas documents count once.
   where = 'latheguide';
   g = await guide('latheguide');
-  if (g.h2 !== 9 || g.svgs !== 4 || g.tabs !== '9,8,8' || g.srcs !== 10) problems.push(`[${where}] 9 sections, 4 drawings, tables of 8, 7 and 7 rows, 10 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 10 || g.svgs !== 4 || g.tabs !== '9,8,8' || g.srcs !== 17) problems.push(`[${where}] 10 sections, 4 drawings, tables of 8, 7 and 7 rows, 17 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 38) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Spindle and chuck', 'Chuck or collet', 'Through the spindle', 'On centre', 'Slow the feed near the centre', 'Coolant: the sources differ', 'Axial and radial', 'Milling a shape on the face', 'Feed per minute'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -1943,7 +1943,7 @@ where = 'toolpaths';
   // hole saw table prints both charts' figures side by side.
   where = 'shoptools';
   g = await guide('shoptools');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,5,5' || g.srcs !== 19) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 4 and 4 rows, 19 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '6,6,8,5,5,8' || g.srcs !== 35) problems.push(`[${where}] 8 sections, 3 drawings, tables of 5, 5, 7, 4, 4 and 7 rows, 35 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 46) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four things have to be right', 'Lip clearance', 'Drill point gauge', 'Order', 'Hacksaw blades', 'Break in a new band saw blade', 'Fluid and brush', 'Bigger saw, slower', 'Speed falls with size', 'The rule', 'Dressing and truing are two jobs'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -1958,7 +1958,7 @@ where = 'toolpaths';
   if (!/8 to 12 degrees/.test(g.all) || !/6 to 9 degrees/.test(g.all) || !/20 to 50 %/.test(g.all) || !/first 100 square inches/.test(g.all) || !/about 27 to 30 m\/min/.test(g.all) || !/12 000 to 18 000 against 4 000 to 10 000/.test(g.all)) problems.push(`[${where}] drill clearance, break-in, hole saw or burr figures are missing`);
   where = 'matguide';
   g = await guide('matguide');
-  if (g.h2 !== 11 || g.svgs !== 3 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,9,5' || g.srcs !== 38) problems.push(`[${where}] 11 sections, 3 drawings, 13 tables, 38 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 18 || g.svgs !== 4 || g.tabs !== '18,12,6,5,9,6,11,8,9,5,8,7,11,9,5' || g.srcs !== 64) problems.push(`[${where}] 18 sections, 4 drawings, 15 tables, 64 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 77) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Four digits', 'First digit', 'A letter in the middle', 'Low, medium and high carbon', 'W, O and A name the quench', 'Austenitic grades are not hardened', 'Two ways to strength', 'H tempers, second digit', 'T651 is', 'On extrusions a fourth digit', 'Grain size tempers', 'Titanium grade 5', 'The letters', 'The number in a ZA name', 'Rockwell scales', 'Vickers angle, sources differ', 'Check the heat number first'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -1974,7 +1974,7 @@ where = 'toolpaths';
   if (!/under 0\.25 % in one, 0\.05 to 0\.30 % in the other/.test(g.all) || !/0\.0005 to 0\.003 %/.test(g.all) || !/OS025 is 0\.025 mm/.test(g.all) || !/apex angle of 120 degrees/.test(g.all) || !/about 6 % aluminium and 4 % vanadium/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   where = 'measguide';
   g = await guide('measguide');
-  if (g.h2 !== 7 || g.svgs !== 3 || g.tabs !== '5,11,4,8' || g.srcs !== 20) problems.push(`[${where}] 7 sections, 3 drawings, tables of 4, 10, 3 and 7 rows, 20 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 9 || g.svgs !== 3 || g.tabs !== '5,11,4,8' || g.srcs !== 27) problems.push(`[${where}] 9 sections, 3 drawings, tables of 4, 10, 3 and 7 rows, 27 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 54) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Limit dimensions', 'A unilateral tolerance', 'Three kinds of fit', 'Three grades', 'Overall flatness', 'Repeat reading', 'The standard', 'Micrometer, five points', 'Caliper, outside jaws', 'Total indicator reading', 'Indicator. Fix it', 'How much is too much', 'Lay is the direction'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2018,7 +2018,7 @@ where = 'toolpaths';
   }
   where = 'bearguide';
   g = await guide('bearguide');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '10,10,14,6,5,5' || g.srcs !== 21) problems.push(`[${where}] 8 sections, 3 drawings, tables of 9, 9, 13, 5, 4 and 4 rows, 21 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 12 || g.svgs !== 3 || g.tabs !== '10,10,14,6,5,5,5' || g.srcs !== 30) problems.push(`[${where}] 12 sections, 3 drawings, tables of 9, 9, 13, 5, 4, 4 and 4 rows, 30 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 57) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Thrust bearings take no radial load', 'How it is built', 'Bore number', 'The four small ones', 'Below 10 mm', 'The example above', 'Medium series', 'Makers differ', 'Which way they run', 'The rule', 'The usual case', 'Too loose', 'Too tight', 'When to ask for C3', 'Leave it wrapped', 'Where to push', 'Press, not hammer', 'How large for cold mounting', 'How hot', 'Never hotter than', 'Sealed and greased bearings', 'No oil bath', 'No flame', 'Induction heaters', 'Roughness', 'Rz, sources differ', 'No spiral'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2034,7 +2034,7 @@ where = 'toolpaths';
     if (!/Tight on the shaft k6 or m6 \(NRB\); j5, k5, m5 or m6 \(TFL\)/.test(row('Inner ring turns with the shaft')) || !/Sliding fit in the housing H7/.test(row('Outer ring stands still')) || !/N6 \(NHBB\)/.test(row('Outer ring turns'))) problems.push(`[${where}] fit rows: ${row('Inner ring turns with the shaft')} | ${row('Outer ring turns')}`);
     if (!/^Blue Medium Up to 3\/4 in With hand tools/.test(row('Blue')) || !/above 550 °F/.test(row('Red'))) problems.push(`[${where}] threadlocker rows: ${row('Blue')} | ${row('Red')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
-    if (fl !== 'K DB,') problems.push(`[${where}] only the K and DB, DF, DT rows have one publisher: ${fl}`);
+    if (fl !== 'K DB, Cyanoacrylate') problems.push(`[${where}] only the K, the DB, DF, DT and the cyanoacrylate rows have one publisher: ${fl}`);
   }
   if (!/04 is 20 mm, 05 is 25 mm/.test(g.all) || !/00 is 10 mm, 01 is 12 mm, 02 is 15 mm and 03 is 17 mm/.test(g.all) || !/05 times 5 is a 25 mm bore/.test(g.all) || !/120 °C by Schaeffler and Fabrico; Processing Magazine gives 125 °C \(257 °F\)/.test(g.all) || !/about 100 to 110 °C in a workshop at 20 °C/.test(g.all) || !/Ra 0\.2 to 0\.8 micrometres, with Rmax no more than 6\.3/.test(g.all) || !/55 HRC \(600 HV\), hardened at least 0\.3 mm deep/.test(g.all) || !/10 micrometres in ABEC 1, 7 in ABEC 3, 4 in ABEC 5, 2\.5 in ABEC 7 and 1\.5 in ABEC 9/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   {
@@ -2045,11 +2045,11 @@ where = 'toolpaths';
   }
   where = 'abrasguide';
   g = await guide('abrasguide');
-  if (g.h2 !== 8 || g.svgs !== 3 || g.tabs !== '4,4,4' || g.srcs !== 21) problems.push(`[${where}] 8 sections, 3 drawings, three tables of 3 rows, 21 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
-  if (g.untagged !== 0 || g.tagged < 65) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
-  for (const k of ['Grinding ratio (G ratio)', 'No centres, no chuck', 'Above centre', 'What it is. A slow abrasive process', 'Crosshatch', 'How slow', 'What it is for', 'What it holds. Under 0.001 in', 'Abrasives', 'Single-pass honing', 'Plateau honing', 'What it is. Rubbing the work', 'The lap is the softer one', 'Lap material', 'Silicon carbide', 'Diamond cuts faster', 'Conditioning rings', 'Bright is not flat', 'Checking flatness', 'Diamond wheels grind carbide', 'One carat', 'More is not always better', 'Belt speed', 'Grit by stage', 'The speed limit is not one number'])
+  if (g.h2 !== 11 || g.svgs !== 3 || g.tabs !== '9,4,4,4,33' || g.srcs !== 31) problems.push(`[${where}] 11 sections, 3 drawings, tables of 8, 3, 3, 3 and 32 rows, 31 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 69) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Mesh number. Sieve numbers', 'The sources do not all print', 'Grinding ratio (G ratio)', 'No centres, no chuck', 'Above centre', 'What it is. A slow abrasive process', 'Crosshatch', 'How slow', 'What it is for', 'What it holds. Under 0.001 in', 'Abrasives', 'Single-pass honing', 'Plateau honing', 'What it is. Rubbing the work', 'The lap is the softer one', 'Lap material', 'Silicon carbide', 'Diamond cuts faster', 'Conditioning rings', 'Bright is not flat', 'Checking flatness', 'Diamond wheels grind carbide', 'One carat', 'More is not always better', 'Belt speed', 'Grit by stage', 'The speed limit is not one number'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
-  for (const k of ['How large', 'An example', 'Less wheel wear', 'Wheel speed. Most surface grinding', 'Spark-out', 'What grinding holds', 'Regulating wheel', 'What it is. A rubber-bonded', 'On centre', 'How far above', 'Lobing', 'Against lobing and chatter', 'Bores', 'What it holds. Diameter', 'Stock. Usually', 'Which abrasive', 'Hard and soft stones', 'Honing oil', 'Plateau finish, in figures', 'Hard and soft work', 'Stock, pressure, speed', 'Grit. 100 to 280', 'One light band', 'What lapping does not do', 'CBN wheels grind hardened steel', 'Bond', 'Shape code', 'Where the layer sits', 'Wheel speed. Diamond 1200', 'Contact wheel hardness', 'Serrated wheels', 'Backing', 'Cut-off wheels', 'Thin or thick', 'Hard or soft bond', 'Speed marking', 'Overhang', 'Grip', 'Shapes', 'Grit. 36 and coarser'])
+  for (const k of ['Not an exact size', 'Standards. ASTM E11', 'How large', 'An example', 'Less wheel wear', 'Wheel speed. Most surface grinding', 'Spark-out', 'What grinding holds', 'Regulating wheel', 'What it is. A rubber-bonded', 'On centre', 'How far above', 'Lobing', 'Against lobing and chatter', 'Bores', 'What it holds. Diameter', 'Stock. Usually', 'Which abrasive', 'Hard and soft stones', 'Honing oil', 'Plateau finish, in figures', 'Hard and soft work', 'Stock, pressure, speed', 'Grit. 100 to 280', 'One light band', 'What lapping does not do', 'CBN wheels grind hardened steel', 'Bond', 'Shape code', 'Where the layer sits', 'Wheel speed. Diamond 1200', 'Contact wheel hardness', 'Serrated wheels', 'Backing', 'Cut-off wheels', 'Thin or thick', 'Hard or soft bond', 'Speed marking', 'Overhang', 'Grip', 'Shapes', 'Grit. 36 and coarser'])
     if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
   {
     const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
@@ -2058,7 +2058,8 @@ where = 'toolpaths';
     if (!/^50 2\.2 12\.5 %/.test(row('50 ')) || !/^75 3\.3 18\.8 %/.test(row('75 ')) || !/^100 4\.4 25 %/.test(row('100 '))) problems.push(`[${where}] concentration rows: ${row('50 ')} | ${row('75 ')} | ${row('100 ')}`);
     if (!/Most work \(EMI\); contours and hollow grinding \(Xometry\)/.test(row('Contact wheel')) || !/A fixed flat plate Flat surfaces/.test(row('Platen')) || !/the free span between two wheels/.test(row('Slack belt'))) problems.push(`[${where}] belt rows: ${row('Contact wheel')} | ${row('Platen')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
-    if (fl !== 'End-feed 50') problems.push(`[${where}] only the end-feed and concentration 50 rows have one publisher: ${fl}`);
+    if (fl !== 'Out Thread Spiral Comma-shaped Flat Mirror End-feed 50 No. No. No.') problems.push(`[${where}] only six fault rows, the end-feed and concentration 50 rows and the three finest sieves have one publisher: ${fl}`);
+    if (!/^No\. 4 4\.75 mm 4\.75 mm \(0\.187 in\) 4\.76 mm \(0\.187 in\)/.test(row('No. 4 ')) || !/^No\. 20 850 µm 0\.85 mm \(0\.0331 in\) 0\.841 mm \(0\.0331 in\)/.test(row('No. 20 ')) || !/^No\. 140 106 µm 0\.105 mm \(0\.0041 in\) 0\.105 mm \(0\.0041 in\)/.test(row('No. 140 ')) || !/^No\. 400 38 µm 0\.037 mm \(0\.0015 in\) 0\.037 mm \(0\.0015 in\)/.test(row('No. 400 ')) || !/^No\. 635 20 µm not listed not listed/.test(row('No. 635 '))) problems.push(`[${where}] sieve rows as each source prints them: ${row('No. 4 ')} | ${row('No. 20 ')} | ${row('No. 140 ')} | ${row('No. 400 ')} | ${row('No. 635 ')}`);
   }
   if (!/Values run from 2 to 200/.test(g.all) || !/12 to 25 % of the work diameter, on a blade with a 30° top face/.test(g.all) || !/100 to 250 ft\/min for the turning hone/.test(g.all) || !/start at about 65 ft\/min/.test(g.all) || !/Rz 3 to 6, Rpk at most 0\.3, Rk 0\.3 to 1\.5 and Rvk 0\.8 to 2\.0 micrometres/.test(g.all) || !/about 280 nanometres \(0\.000011 in\)/.test(g.all) || !/1A1, 6A2C/.test(g.all) || !/4000 to 6000 ft\/min/.test(g.all) || !/At least 10 mm of the shank/.test(g.all) || !/70 to 95 Shore A/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   {
@@ -2132,7 +2133,7 @@ where = 'toolpaths';
   }
   where = 'elemguide';
   g = await guide('elemguide');
-  if (g.h2 !== 7 || g.svgs !== 3 || g.tabs !== '11,8,5,7,6,6,5,6' || g.srcs !== 17) problems.push(`[${where}] 7 sections, 3 drawings, tables of 10, 7, 4, 6, 5, 5, 4 and 5 rows, 17 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 10 || g.svgs !== 4 || g.tabs !== '11,8,5,7,6,6,5,6,7,9' || g.srcs !== 24) problems.push(`[${where}] 10 sections, 4 drawings, tables of 10, 7, 4, 6, 5, 5, 4, 5, 6 and 8 rows, 24 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 62) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['The basic law', 'Coefficient of friction', 'It belongs to the pair', 'Static and kinetic', 'A rough guide only', 'What it is. Backlash', 'Why gears need some', 'Accuracy', 'How it is made', 'Sharing it', 'What a cam does', 'Followers are named', 'PV. Pressure times sliding speed', 'The shaft counts too', 'Allow for heat', 'Self-locking depends', 'Friction in the nut', 'Not for running all day', 'Rolled or ground'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2148,7 +2149,7 @@ where = 'toolpaths';
     if (!/^Bronze SAE 841 14 MPa \(2000 psi\) 6\.1 m\/s \(1200 sfm\) 1\.75 MPa·m\/s \(50 000 psi·sfm\)/.test(row('Bronze SAE 841')) || !/^Bronze SAE 660 28 MPa \(4000 psi\) 3\.8 m\/s \(750 sfm\) 2\.6 MPa·m\/s \(75 000 psi·sfm\)/.test(row('Bronze SAE 660')) || !/^Nylon 3 MPa \(400 psi\) 1\.83 m\/s \(360 sfm\) 0\.11 MPa·m\/s \(3000 psi·sfm\)/.test(row('Nylon')) || !/^PTFE 3 MPa \(500 psi\) 0\.5 m\/s \(100 sfm\) 0\.04 MPa·m\/s \(1000 psi·sfm\)/.test(row('PTFE 3'))) problems.push(`[${where}] PV rows: ${row('Bronze SAE 841')} | ${row('PTFE 3')}`);
     if (!/Wikipedia: 20 to 25 % for an Acme screw\. Roton: 45 % at a lead angle of 8°, 65 % at 20° About 90 %/.test(row('Efficiency')) || !/Many are self-locking: the load cannot turn the screw Back-drives: the load can turn the screw/.test(row('Holding a load')) || !/Balls roll between the screw and the nut/.test(row('How it works')) || !/Can be preloaded so that there is no play/.test(row('Backlash'))) problems.push(`[${where}] screw rows: ${row('Efficiency')} | ${row('Holding a load')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ').slice(0, 2).join(' ')).join(', ');
-    if (fl !== 'Cast iron, Cast iron, Tungsten carbide, Cast iron, Bronze, aluminium, Aluminium Light,, Face cam, Lift The, Thrust washer, Two half, Babbitt Soft,, Cast iron, Bronze SAE, Bronze SAE, Nylon 3, PTFE 3, Backlash A') problems.push(`[${where}] the rows with one publisher: ${fl}`);
+    if (fl !== 'Cast iron, Cast iron, Tungsten carbide, Cast iron, Bronze, aluminium, Aluminium Light,, Face cam, Lift The, Thrust washer, Two half, Babbitt Soft,, Cast iron, Bronze SAE, Bronze SAE, Nylon 3, PTFE 3, Backlash A, Steady load,, Part of, Load put, Stress swings, Repeated shock, Stresses that, Automobiles 3.0, Bolts no, Heavy-duty shafting, Lifting hooks, Wire ropes') problems.push(`[${where}] the rows with one publisher: ${fl}`);
   }
   if (!/Most dry pairs lie between 0\.3 and 0\.6\. PTFE can be as low as 0\.04/.test(g.all) || !/0\.1 to 0\.4 for steel on steel/.test(g.all) || !/0\.04 in divided by the diametral pitch on average, with 0\.03 as the least and 0\.05 as the most/.test(g.all) || !/a 20° gear gains 41 % more backlash than a 14\.5° gear/.test(g.all) || !/about one sixth of the bending strength/.test(g.all) || !/glass fibre adds about 30 % and carbon fibre about 90 %/.test(g.all) || !/up to 350 HB\. Hardened gears are typically 58 to 65 HRC/.test(g.all) || !/a difference of 30 to 50 HB or more/.test(g.all) || !/0\.2 to 0\.4 µm Ra or better/.test(g.all) || !/about 0\.5 to 1\.0 times the diameter/.test(g.all) || !/greater than the tangent of the lead angle/.test(g.all) || !/at a lead angle of 8° the screw locks; at 20° the load drives it back/.test(g.all) || !/0\.15 to 0\.23 dry and 0\.10 to 0\.16 with machine oil in one source; a screw maker works with 0\.15/.test(g.all) || !/about a third of the driving torque/.test(g.all) || !/29° thread angle/.test(g.all) || !/from C0, the most precise, to C10/.test(g.all) || !/no more than 80 % of its critical speed/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   {
@@ -2160,11 +2161,11 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
-    if (links !== 'bolttorque,spurgear,gearmeasure,worm,heattreat,bearguide,fits,acme,trapezoidal') problems.push(`[${where}] links to other pages: ${links}`);
+    if (links !== 'bolttorque,spurgear,gearmeasure,worm,heattreat,bearguide,fits,acme,trapezoidal,geartrain,planetary,fatigue,column,threadstrip') problems.push(`[${where}] links to other pages: ${links}`);
   }
   where = 'driveguide';
   g = await guide('driveguide');
-  if (g.h2 !== 5 || g.svgs !== 4 || g.tabs !== '15,5,6,10,4,8,10,5,5,5' || g.srcs !== 16) problems.push(`[${where}] 5 sections, 4 drawings, tables of 14, 4, 5, 9, 3, 7, 9, 4, 4 and 4 rows, 16 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.h2 !== 6 || g.svgs !== 4 || g.tabs !== '10,15,5,6,10,4,8,10,5,5,5' || g.srcs !== 23) problems.push(`[${where}] 6 sections, 4 drawings, tables of 9, 14, 4, 5, 9, 3, 7, 9, 4, 4 and 4 rows, 23 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
   if (g.untagged !== 0 || g.tagged < 52) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
   for (const k of ['Stator and rotor', 'Rotating field', 'Induction', 'Synchronous speed is', 'Slip. An induction motor', 'How much slip', 'Offset and angle', 'What misalignment does', 'Soft foot first', 'Bracket sag', 'Thermal growth', 'The limits of the maker', 'Small piston, big load', 'Force of a cylinder', 'The pump makes flow', 'Air preparation', 'What is measured', 'Frequency range', 'Where. At each bearing', 'Two groups of machines', 'Rigid or flexible', 'Standard numbers'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
@@ -2184,7 +2185,7 @@ where = 'toolpaths';
     if (!/^Group 1, rigid support 2\.3 4\.5 7\.1/.test(row('Group 1, rigid')) || !/^Group 1, flexible support 3\.5 7\.1 11\.0/.test(row('Group 1, flexible')) || !/^Group 2, rigid support 1\.4 2\.8 4\.5/.test(row('Group 2, rigid')) || !/^Group 2, flexible support 2\.3 4\.5 7\.1/.test(row('Group 2, flexible'))) problems.push(`[${where}] zone boundaries: ${row('Group 1, rigid')} | ${row('Group 1, flexible')} | ${row('Group 2, rigid')} | ${row('Group 2, flexible')}`);
     if (!/Vibromera: at two and three times the running speed, with axial vibration more than half the radial\. Fabrico and Tractian: at once and twice the running speed/.test(row('Misalignment')) || !/mostly at once the running speed/.test(row('Unbalance'))) problems.push(`[${where}] fault rows: ${row('Misalignment')}`);
     const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ').slice(0, 2).join(' ')).join(', ');
-    if (fl !== 'Voltage The, Frequency and, Full-load amps, Power The, Code letter, Service factor, Efficiency The, Duty Usually, Insulation class, Ambient The, Frame The, Straightedge and, Up to, 1000 to, 2000 to, 3000 to, Above 4000, Reservoir Holds, Check valve, Accumulator Stores, Flow control, 45 degree, Parallel pipe, Push-to-connect A, Unbalance Vibration, Looseness At, Rolling bearing') problems.push(`[${where}] the rows with one publisher: ${fl}`);
+    if (fl !== 'Oil and, Voltage The, Frequency and, Full-load amps, Power The, Code letter, Service factor, Efficiency The, Duty Usually, Insulation class, Ambient The, Frame The, Straightedge and, Up to, 1000 to, 2000 to, 3000 to, Above 4000, Reservoir Holds, Check valve, Accumulator Stores, Flow control, 45 degree, Parallel pipe, Push-to-connect A, Unbalance Vibration, Looseness At, Rolling bearing') problems.push(`[${where}] the rows with one publisher: ${fl}`);
   }
   if (!/1760 rpm \(AutomationDirect\), 1748 rpm \(Machine Design\) and 1746 rpm \(Control Engineering, at 3 % slip\)/.test(g.all) || !/120 times the frequency, divided by the number of poles/.test(g.all) || !/synchronous speed of 1800 rpm/.test(g.all) || !/2 to 5 % as the usual slip/.test(g.all) || !/within 15 degrees of the vertical/.test(g.all) || !/more than 0\.001 in \(0\.025 mm\), look for loose hardware/.test(g.all) || !/no more than 0\.001 in \(0\.025 mm\) runout/.test(g.all) || !/more than 0\.002 in \(0\.05 mm\) as a flange is loosened/.test(g.all) || !/API 686 as 0\.02 mm offset and 0\.03 degrees/.test(g.all) || !/divided by 1714; kilowatts are bar times litres a minute divided by 600/.test(g.all) || !/5 to 10 times that of a hydraulic one/.test(g.all) || !/about 1 hp for every 4 cubic feet a minute/.test(g.all) || !/above 6000 psi \(41 MPa\)/.test(g.all) || !/every five to seven years/.test(g.all) || !/covers 10 to 1000 Hz/.test(g.all) || !/above 300 kW, Group 2 machines from 15 to 300 kW/.test(g.all) || !/at least 25 % above/.test(g.all) || !/above 15 kW running at 120 to 30 000 rpm/.test(g.all) || !/315 mm and more for Group 1, 160 to 315 mm for Group 2/.test(g.all) || !/not from the standards themselves/.test(g.all)) problems.push(`[${where}] figures from the sources`);
   {
@@ -2196,16 +2197,16 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
-    if (links !== 'bearguide,torsion,measguide,pipethreads,oring,chatter') problems.push(`[${where}] links to other pages: ${links}`);
+    if (links !== 'beltdrive,chaindrive,geartrain,bearguide,torsion,measguide,pipethreads,oring,balance,chatter') problems.push(`[${where}] links to other pages: ${links}`);
   }
   where = 'fastguide';
   g = await guide('fastguide');
-  if (g.h2 !== 9 || g.svgs !== 4 || g.tabs !== '11,9,12,7,8,8,8' || g.srcs !== 21) problems.push(`[${where}] 9 sections, 4 drawings, tables of 10, 8, 11, 6, 7, 7 and 7 rows, 21 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
-  if (g.untagged !== 0 || g.tagged < 41) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
-  for (const k of ['Rule of thumb. Nord-Lock', 'Vibration tests named after Junker', 'What it does. Safety wire', 'Torque first', 'Direction. Lead the wire', 'Twists. About 6 to 8', 'Once only', 'The wire is usually stainless', 'What it is. A set screw', 'What they are. A tapping screw', 'Thread-forming screws push', 'Thread-cutting screws have', 'What it is. A retaining ring', 'Whitworth. Joseph Whitworth', 'BSW and BSF', 'BA. The British Association', 'BSP is the British pipe thread', 'Spanners. A Whitworth', 'Two markings', 'Not Unified'])
+  if (g.h2 !== 12 || g.svgs !== 4 || g.tabs !== '11,9,12,7,8,8,8' || g.srcs !== 31) problems.push(`[${where}] 12 sections, 4 drawings, tables of 10, 8, 11, 6, 7, 7 and 7 rows, 31 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 42) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['The aim. Engage enough', 'Rule of thumb. Nord-Lock', 'Vibration tests named after Junker', 'What it does. Safety wire', 'Torque first', 'Direction. Lead the wire', 'Twists. About 6 to 8', 'Once only', 'The wire is usually stainless', 'What it is. A set screw', 'What they are. A tapping screw', 'Thread-forming screws push', 'Thread-cutting screws have', 'What it is. A retaining ring', 'Whitworth. Joseph Whitworth', 'BSW and BSF', 'BA. The British Association', 'BSP is the British pipe thread', 'Spanners. A Whitworth', 'Two markings', 'Not Unified'])
     if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
   // Four Wikipedia articles, three Machine Design articles, three Essentra pages and two Fastener Engineering articles count once each.
-  for (const k of ['The aim. Engage enough', 'The same shop gives three', 'Softer materials', 'Galling is most common', 'Why they come loose', 'Torque and friction', 'One article, written by a washer maker', 'Common diameters are 0.5 to 1 mm', 'Hard or soft', 'A flat on the shaft', 'Marks. A hardened point', 'Not for high torque', 'That tight fit resists', 'They drive with less torque', 'The hole matters', 'Material. Tapping screws', 'Shear. Pins are loaded', 'Standards. ASME B18.27', 'The largest is 0 BA', 'Cycle thread', 'The Unified thread was agreed'])
+  for (const k of ['Fastenal: about 1 times the diameter', 'The same shop gives three', 'Softer materials', 'Galling is most common', 'Why they come loose', 'Torque and friction', 'One article, written by a washer maker', 'Common diameters are 0.5 to 1 mm', 'Hard or soft', 'A flat on the shaft', 'Marks. A hardened point', 'Not for high torque', 'That tight fit resists', 'They drive with less torque', 'The hole matters', 'Material. Tapping screws', 'Shear. Pins are loaded', 'Standards. ASME B18.27', 'The largest is 0 BA', 'Cycle thread', 'The Unified thread was agreed'])
     if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
   {
     const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
@@ -2229,8 +2230,602 @@ where = 'toolpaths';
     const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
     if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
     const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
-    if (links !== 'boltgrade,bolttorque,sti,bearguide,spanner,shcs,clearance,taperpin,whitworth,pipethreads') problems.push(`[${where}] links to other pages: ${links}`);
+    if (links !== 'threadstrip,boltgrade,bolttorque,sti,bearguide,bolttorque,spanner,shcs,clearance,taperpin,shcs,boltgrade,whitworth,pipethreads') problems.push(`[${where}] links to other pages: ${links}`);
   }
+  where = 'threadguide';
+  g = await guide('threadguide');
+  if (g.h2 !== 6 || g.svgs !== 2 || g.tabs !== '11,25' || g.srcs !== 12) problems.push(`[${where}] 6 sections, 2 drawings, tables of 10 and 24 rows, 12 sources: ${g.h2} ${g.svgs} ${g.tabs} ${g.srcs}`);
+  if (g.untagged !== 0 || g.tagged < 24) problems.push(`[${where}] every statement needs source keys: ${g.untagged} without, ${g.tagged} with`);
+  for (const k of ['Major diameter. The largest', 'Minor diameter. The smallest', 'Pitch diameter. The diameter', 'Pitch. The distance along', 'Crest and root', 'Thread angle. The angle between', 'Depth of thread', 'Lead. The distance the nut', 'On a single-start thread', 'ACME against square'])
+    if (tbv(g, k) !== false) problems.push(`[${where}] a two-publisher statement must not be flagged: ${k} (${tbv(g, k)})`);
+  // Seven Wikipedia articles count once.
+  for (const k of ['On a sharp V it lies midway', 'Flank. The surface between', 'A sharp 60° V is 0.866', 'Starts. With more than one', 'Multi-start threads are used', 'Hand. A right-hand thread', 'The price is more friction', 'How a trapezoidal thread is written', 'How a knuckle thread is written', 'Coarse and fine say only', 'Straight and tapered', 'Classes of Unified threads', 'AFT Fasteners lists 2A and 3A', 'How a Unified thread is written'])
+    if (tbv(g, k) !== true) problems.push(`[${where}] a one-publisher statement must say to be verified: ${k} (${tbv(g, k)})`);
+  {
+    const rows = await page.$$eval('#main table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ')));
+    const row = k => rows.find(t => t.startsWith(k)) || '';
+    if (!/^V \(ISO metric, Unified\) 60° A triangle with the tips cut off/.test(row('V (ISO')) || !/^Whitworth \(BSW, BSF\) 55° Rounded crests and roots/.test(row('Whitworth')) || !/^British Association \(BA\) 47\.5°/.test(row('British Association')) || !/^ACME 29° Leadscrews and other power screws; works with a split nut\. Wikipedia: flat crests and roots, a basic height of half the pitch/.test(row('ACME 29')) || !/basic height of 0\.3 of the pitch/.test(row('Stub ACME')) || !/^Metric trapezoidal \(Tr\) 30°/.test(row('Metric trapezoidal')))
+      problems.push(`[${where}] form rows: ${row('V (ISO')} | ${row('Whitworth')} | ${row('ACME 29')} | ${row('Stub ACME')}`);
+    if (!/The least friction of all forms/.test(row('Square')) || !/Engineers Post: depth and thickness are each half the pitch/.test(row('Square')) || !/up to 7° off; the other flank often 45° Takes thrust in one direction/.test(row('Buttress')) || !/30° \(DIN 405\) Fully rounded crests and roots/.test(row('Knuckle')))
+      problems.push(`[${where}] square, buttress and knuckle rows: ${row('Square')} | ${row('Buttress')} | ${row('Knuckle')}`);
+    if (!/^UNC Unified coarse/.test(row('UNC')) || !/^UNEF Unified extra fine/.test(row('UNEF')) || !/AFT Fasteners: Unified with a rounded root\. Wikipedia: external threads only/.test(row('UNR')) || !/^NPT American taper pipe thread/.test(row('NPT ')) || !/^NPTF Dryseal taper pipe thread/.test(row('NPTF')) || !/^ACME-G, ACME-C ACME general purpose and ACME centralizing/.test(row('ACME-G')) || !/^Pg Steel conduit thread \(Panzergewinde\), 80°/.test(row('Pg')) || !/^TPI Threads per inch/.test(row('TPI')))
+      problems.push(`[${where}] abbreviation rows: ${row('UNC')} | ${row('UNR')} | ${row('NPT ')} | ${row('Pg')}`);
+    const fl = rows.filter(t => /to be verified/.test(t)).map(t => t.split(' ')[0]).join(' ');
+    if (fl !== 'Pipe Stub Metric Buttress Knuckle UNEF UNS NF NPTF NPSC NPSM NGT BA M Tr Rd G Pg ET,') problems.push(`[${where}] the rows with one publisher: ${fl}`);
+  }
+  if (!/Tr 60×18\(P9\)LH has a lead of 18 mm and a pitch of 9 mm, so two starts, and is left-hand/.test(g.all) || !/Rd 20 × 1\/8"/.test(g.all) || !/#6-32 UNC 2B/.test(g.all) || !/0\.866 of the pitch deep/.test(g.all) || !/lead = pitch × number of starts/.test(g.all) || !/the left pedal of a bicycle/.test(g.all))
+    problems.push(`[${where}] figures and examples quoted from the sources are missing`);
+  {
+    const d = await page.$$eval('#main svg.geo', s => s.map(e => e.textContent.replace(/\s+/g, ' ')));
+    if (!/pitch/.test(d[0]) || !/crest/.test(d[0]) || !/root/.test(d[0]) || !/flank/.test(d[0]) || !/thread angle/.test(d[0]) || !/half of the major \(M\), pitch \(P\) and minor \(m\) diameters/.test(d[0]) || !/Whitworth/.test(d[1]) || !/Buttress/.test(d[1]) || !/Knuckle \(round\)/.test(d[1]) || !/Square/.test(d[1])) problems.push(`[${where}] drawings: ${d.map(t => t.slice(0, 60)).join(' | ')}`);
+    // The crests of the terms drawing must lie above the pitch line and the roots below it, and the pitch dimension must span exactly one tooth.
+    const f = await page.$$eval('#main svg.geo', s => { const p = [...s[0].querySelectorAll('path')]; const prof = p[1].getAttribute('d'), pl = p[2].getAttribute('d'), dim = p[4].getAttribute('d'); return { crest: +prof.match(/^M30 (\d+)/)[1], depth: +prof.match(/l22 (\d+)/)[1], line: +pl.match(/M22 (\d+)/)[1], span: dim.match(/M(\d+) \d+H(\d+)/).slice(1).map(Number) }; });
+    if (!(f.crest < f.line && f.line < f.crest + f.depth && f.span[1] - f.span[0] === 60)) problems.push(`[${where}] the terms drawing is drawn wrongly: ${JSON.stringify(f)}`);
+    const bad = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).filter(id => !TOOLS.find(t => t.id === id)));
+    if (bad.length) problems.push(`[${where}] links to pages that do not exist: ${bad.join(', ')}`);
+    const links = await page.$$eval('#main a[href^="#/t/"]', a => a.map(e => e.getAttribute('href').slice(4)).join(','));
+    if (links !== 'threaddata,wires,threadid,multistart,whitworth,pipethreads,acme,trapezoidal,buttress,unseries,unjunr,fastguide') problems.push(`[${where}] links to other pages: ${links}`);
+  }
+  // Hexagon screws, nuts and washers: the published rows, both disagreements shown, the drawing, inch nuts.
+  where = 'hexhw';
+  {
+    const txt = async sel => (await page.$eval(sel, e => e.innerText)).replace(/\s+/g, ' ');
+    await units('mm'); await mode('expert'); await open('hexhw', 300);
+    await page.selectOption('#main #hs', 'metric'); await page.selectOption('#main #hz', 'M10'); await page.waitForTimeout(80);
+    let t = await txt('#main #hres');
+    if (!/across flats s 16\.00 mm Confirmed/.test(t) || !/Head height k \(nominal\) 6\.40 mm Confirmed/.test(t) || !/Nut height m, max 8\.40 mm Confirmed/.test(t) || !/Nut height m, min 8\.04 mm Confirmed/.test(t)) problems.push(`[${where}] M10 head and nut (BOLTS, fasteners.eu; Wermac, omdl, fasten.it): ${t}`);
+    if (!/hole d1 10\.00 mm Sources differ also printed: 10\.5 \(fasteners\.eu\)/.test(t) || !/outside diameter d2 20\.00 mm Confirmed/.test(t) || !/thickness h \(nominal\) 2\.00 mm One source/.test(t) || !/least to greatest 1\.80 mm to 2\.20 mm/.test(t)) problems.push(`[${where}] M10 washer, the two printed holes side by side: ${t}`);
+    const dr = await page.$eval('#main #hres .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/clamped parts/.test(dr) || !/d2/.test(dr) || !/to scale/.test(dr)) problems.push(`[${where}] drawing: ${dr}`);
+    await page.selectOption('#main #hz', 'M24'); await page.waitForTimeout(80); t = await txt('#main #hres');
+    if (!/Nut height m, max 21\.50 mm One source differs also printed: 19 \(fasten\.it\)/.test(t) || !/Nut height m, min 20\.20 mm One source differs also printed: 17\.7 \(fasten\.it\)/.test(t) || !/Head height k \(nominal\) 15\.00 mm Confirmed/.test(t)) problems.push(`[${where}] M24: the differing nut height must be shown, not hidden: ${t}`);
+    const tabs = await page.$$eval('#main .mtab table', a => a.map(x => x.rows.length).join(','));
+    if (tabs !== '13,13,13,10') problems.push(`[${where}] table rows (head, nut, washer, inch nut): ${tabs}`);
+    const srcs = await page.$$eval('#main #hsrc b', a => a.length - 1);
+    if (srcs !== 11) problems.push(`[${where}] publishers listed: ${srcs}`);
+    await page.selectOption('#main #hs', 'inch'); await page.selectOption('#main #hz', '1/2'); await page.waitForTimeout(80); t = await txt('#main #hres');
+    if (!/Width across flats 3\/4 in = 19\.05 mm One source/.test(t) || !/Thickness 7\/16 in = 11\.11 mm One source/.test(t) || !/Eugene Fastener/i.test(t)) problems.push(`[${where}] 1/2 inch nut (Eugene Fastener: 3/4 and 7/16): ${t}`);
+    await units('inch'); await open('hexhw', 300); await page.selectOption('#main #hs', 'metric'); await page.selectOption('#main #hz', 'M10'); await page.waitForTimeout(80); t = await txt('#main #hres');
+    if (!/across flats s 0\.6299 in Confirmed/.test(t) || !/Head height k \(nominal\) 0\.2520 in/.test(t)) problems.push(`[${where}] M10 in inch units: ${t}`);
+    await units('mm');
+  }
+
+  // Spanner sizes: metric and inch widths in one list, in order of size.
+  where = 'spanner';
+  {
+    await units('mm'); await open('spanner', 300);
+    const r = await page.$$eval('#main #spx tr', a => a.map(x => x.innerText.replace(/\s+/g, ' ').trim()));
+    const i19 = r.findIndex(x => /^19 mm 19 0\.748 M12 \(old DIN\)/.test(x)), i34 = r.findIndex(x => /^3\/4" 19\.0500 0\.7500 1\/2" \(ASME\)/.test(x)), i13 = r.findIndex(x => /^13 mm 13 0\.512 M8 \(ISO, old DIN\)/.test(x)), i12 = r.findIndex(x => /^1\/2" 12\.7000 0\.5000 5\/16" \(ASME\)/.test(x));
+    if (i19 < 0 || i34 !== i19 + 1 || i13 < 0 || i12 !== i13 - 1) problems.push(`[${where}] order of sizes: 1/2 in before 13 mm, 19 mm before 3/4 in: ${r.slice(10, 26).join(' / ')}`);
+    const mmv = r.slice(1).map(x => parseFloat(x.replace(/^.*?(mm|") /, '')));
+    if (mmv.some((v, i) => i && !(v > mmv[i - 1]))) problems.push(`[${where}] the list must rise in size: ${mmv.join(' ')}`);
+  }
+
+  // Thread engagement and breaking force: the published M10 row, the Grade 5 example, both aluminium rules side by side.
+  where = 'threadstrip';
+  {
+    const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+    const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+    await units('mm'); await mode('expert'); await open('threadstrip', 150);
+    await put('d', '10'); await put('p', '1.5'); await put('uts', ''); await put('le', '');
+    let t = await rows();
+    if (!/Tensile stress area As 57\.99 mm2/i.test(t) || !/Basic pitch diameter 9\.026 mm/.test(t) || !/\(simplified\) 14\.178 mm2\/mm/.test(t) || !/\(one source, to be verified\) 8\.180 mm/.test(t)) problems.push(`[${where}] M10 x 1.5 (Roymech row: 57.9896, 9.0257, 14.1776, 8.1805): ${t}`);
+    if (!/Breaking force enter the tensile strength of the screw/.test(t)) problems.push(`[${where}] the tensile strength must never be filled in: ${t}`);
+    if (!/in steel: 1 × diameter 10\.000 mm/.test(t) || !/\(Roymech only\) 15\.000 mm/.test(t) || !/2 × diameter \(Nord-Lock, Roymech\) 20\.000 mm/.test(t) || !/1\.5 × diameter \(Fastenal\) 15\.000 mm/.test(t)) problems.push(`[${where}] rules of thumb, both aluminium figures with their sources: ${t}`);
+    if (!/holds only where the tapped part is as strong as the screw/.test(t) || /Your engagement/.test(t)) problems.push(`[${where}] note, and no verdict without a length: ${t}`);
+    await put('uts', '800'); await put('le', '6'); t = await rows();
+    if (!/Breaking force of the screw in tension 46,392 N/.test(t) || !/Your engagement below the simplified least length/.test(t)) problems.push(`[${where}] 800 MPa and 6 mm engaged: ${t}`);
+    await put('le', '9'); t = await rows();
+    if (!/Your engagement at or above the simplified least length/.test(t)) problems.push(`[${where}] 9 mm engaged is above 8.18 mm: ${t}`);
+    const dr = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/d 10/.test(dr) || !/your engagement 9/.test(dr) || !/simplified least 8\.18/.test(dr) || !/threads not drawn/.test(dr)) problems.push(`[${where}] drawing: ${dr}`);
+    await put('p', '12'); t = await rows();
+    if (!/Pitch too coarse for this diameter/i.test(t) || /Tensile stress area/i.test(t)) problems.push(`[${where}] a 12 mm pitch on a 10 mm thread must be refused: ${t}`);
+    await put('p', '1.5'); await put('uts', ''); await put('le', '');
+    await units('inch'); await open('threadstrip', 150); await put('d', '0.75'); await put('tpi', '10'); await put('uts', '120000'); t = await rows();
+    if (!/Tensile stress area As 0\.3345 in2/i.test(t) || !/Breaking force of the screw in tension 40,135 lbf/.test(t) || !/Basic pitch diameter 0\.6850 in/.test(t) || !/in steel: 1 × diameter 0\.7500 in/.test(t)) problems.push(`[${where}] 3/4-10 at 120 000 psi (Fastenal: 40 080 lb with the area rounded to 0.3340): ${t}`);
+    await put('uts', '');
+    const src = await page.innerText('#main');
+    if (!/Roymech/.test(src) || !/Fastenal/.test(src) || !/FED-STD-H28 was not readable/.test(src)) problems.push(`[${where}] the source note must name Roymech and Fastenal and say what is not built`);
+    await mode('advanced');
+  }
+  // Shop maths 2: depreciation schedule, block and tackle, squaring a corner. Published examples reproduced.
+  where = 'depreciation';
+  {
+    const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+    const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+    const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, v); await page.waitForTimeout(60); };
+    await units('mm'); await mode('expert'); await open('depreciation', 150);
+    await put('cost', '1000'); await put('salv', '100'); await put('life', '5'); await pick('m', '2'); await put('yr', '2');
+    let t = await rows();
+    if (!/Depreciation in year 2 240\.00/i.test(t) || !/Book value at the end of year 2 460\.00/.test(t) || !/Year 1: depreciation 300\.00/.test(t) || !/Year 5: depreciation 60\.00/.test(t) || !/Year 5: book value at the year end 100\.00/.test(t) || /Year 6:/.test(t)) problems.push(`[${where}] sum of the years' digits (Wikipedia: 300, 240, 180, 120, 60): ${t}`);
+    await pick('m', '1'); await put('fac', '2'); await put('yr', '5'); t = await rows();
+    if (!/Depreciation in year 5 29\.60/i.test(t) || !/Year 4: depreciation 86\.40/.test(t) || !/Year 4: book value at the year end 129\.60/.test(t) || !/Year 5: book value at the year end 100\.00/.test(t) || /does not reach the salvage value/.test(t)) problems.push(`[${where}] declining balance at 40 % (Wikipedia: 400, 240, 144, 86.40, 29.60): ${t}`);
+    await put('salv', '0'); t = await rows();
+    if (!/Year 5: book value at the year end 77\.76/.test(t) || !/does not reach the salvage value by itself/.test(t)) problems.push(`[${where}] with no salvage value the declining balance leaves 77.76 and says so: ${t}`);
+    await pick('m', '0'); await put('cost', '25000'); await put('life', '8'); await put('yr', '1'); t = await rows();
+    if (!/Depreciation in year 1 3,125\.00/i.test(t)) problems.push(`[${where}] straight line (CFI: 3125 a year): ${t}`);
+    const dr = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/book value at the end of each year/.test(dr) || !/25000/.test(dr) || (await page.$$eval('#main .tdia svg rect.part', r => r.length)) !== 7) problems.push(`[${where}] drawing: seven bars above zero for eight years down to nothing: ${dr}`);
+    await put('life', '2.5'); t = await rows();
+    if (!/whole number of years/.test(t)) problems.push(`[${where}] a life of 2.5 years must be refused: ${t}`);
+    await put('life', '8'); await put('salv', '2500');
+    where = 'tackle';
+    await open('tackle', 150); await put('load', '981'); await put('n', '4'); await put('eff', ''); await put('lift', ''); t = await rows();
+    if (!/Pull on the rope, ideal \(no friction\) 245\.3 N/i.test(t) || /at your efficiency/.test(t) || /hauled in/.test(t) || !/rove to advantage/.test(t)) problems.push(`[${where}] ideal pull only when no efficiency is entered: ${t}`);
+    await put('eff', '0.8'); await put('lift', '1'); t = await rows();
+    if (!/Pull on the rope at your efficiency \(one source, to be verified\) 306\.6 N/.test(t) || !/Rope hauled in for this lift \(one source, to be verified\) 4\.00 m/.test(t)) problems.push(`[${where}] Engineering ToolBox example (307 N) and 4 m of rope for 1 m of lift: ${t}`);
+    const dt = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/4 rope parts carry the moving block/.test(dt) || !/306\.6 N/.test(dt) || !/not to scale/.test(dt)) problems.push(`[${where}] drawing: ${dt}`);
+    await put('eff', '1.2'); t = await rows();
+    if (!/Efficiency must be more than 0 and not more than 1/.test(t)) problems.push(`[${where}] an efficiency above 1 must be refused: ${t}`);
+    await put('n', '2.5'); t = await rows();
+    if (!/must be a whole number/.test(t)) problems.push(`[${where}] 2.5 rope parts must be refused: ${t}`);
+    await put('n', '4'); await put('eff', ''); await put('lift', '');
+    where = 'squaring';
+    await open('squaring', 150); await put('a', '900'); await put('b', '1200'); await put('c', ''); await put('run', ''); t = await rows();
+    if (!/Diagonal for a square corner 1,500\.00 mm/i.test(t) || !/6-8-10, 9-12-15/.test(t) || /Angle of the corner/.test(t)) problems.push(`[${where}] 900 and 1200 give 1500: ${t}`);
+    await put('c', '1500'); t = await rows();
+    if (!/Angle of the corner from your diagonal 90\.000 deg/.test(t) || !/Corner square, to the three decimals shown/.test(t)) problems.push(`[${where}] a diagonal of 1500 is square: ${t}`);
+    await put('c', '1510'); t = await rows();
+    if (!/Angle of the corner from your diagonal 90\.(7|8)\d\d deg/.test(t) || !/wider than square/.test(t)) problems.push(`[${where}] a long diagonal means a wide corner: ${t}`);
+    await put('c', '5000'); t = await rows();
+    if (!/cannot make a triangle/.test(t)) problems.push(`[${where}] an impossible diagonal must be refused: ${t}`);
+    await put('c', ''); await put('run', '100'); t = await rows();
+    if (!/Rise over that length at the angle 1\.75 mm/.test(t)) problems.push(`[${where}] 1 degree over 100 mm rises 1.75 mm: ${t}`);
+    await put('run', '');
+    const ds = await page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    if (!/diagonal 1500/.test(ds) || !/to scale/.test(ds)) problems.push(`[${where}] drawing: ${ds}`);
+    await mode('advanced');
+  }
+  // Shop maths 3: interpolation, normal shares, line and circle, conics; each against a published example.
+  where = 'interp';
+  {
+    const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+    const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+    const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, String(v)); await page.waitForTimeout(80); };
+    const drawing = async () => page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    await units('mm'); await mode('expert'); await open('interp', 150);
+    await pick('m', 0); await put('x1', '2'); await put('y1', '4'); await put('x2', '8'); await put('y2', '16'); await put('x', '5');
+    let t = await rows();
+    if (!/y at x 10\.0000/i.test(t) || !/first x to the second 0\.5000/.test(t) || /Warning/.test(t)) problems.push(`[${where}] (2, 4) and (8, 16) at 5 give 10 (FIRGELLI): ${t}`);
+    await put('x', '11'); t = await rows();
+    if (!/y at x 22\.0000/i.test(t) || !/Warning x lies outside the two known values/.test(t)) problems.push(`[${where}] outside the two rows must warn: ${t}`);
+    await put('x2', '2'); t = await rows();
+    if (!/the two x values must differ/.test(t)) problems.push(`[${where}] equal x values must be refused: ${t}`);
+    await put('x1', '20'); await put('y1', '5'); await put('x2', '30'); await put('y2', '7'); await put('x', '25');
+    let d = await drawing();
+    if (!/\(20, 5\)/.test(d) || !/\(30, 7\)/.test(d) || !/y 6/.test(d)) problems.push(`[${where}] drawing, one-way: ${d}`);
+    await pick('m', 1); await put('yg', '6'); t = await rows();
+    if (!/x at y 25\.0000/i.test(t)) problems.push(`[${where}] reverse, y = 6 gives x = 25: ${t}`);
+    await pick('m', 2); t = await rows();
+    if (!/Value at x and y 8\.2500/i.test(t) || !/first-y edge, at x 6\.0000/.test(t) || !/second-y edge, at x 10\.5000/.test(t) || !/along y first gives the same value/.test(t)) problems.push(`[${where}] two-way table 5, 7, 9, 12 at (25, 150) gives 8.25 (mathcheck): ${t}`);
+    d = await drawing();
+    if (!/8\.25/.test(d) || !/10\.5/.test(d) || !/not to scale/.test(d)) problems.push(`[${where}] drawing, two-way: ${d}`);
+    await put('x', '35'); t = await rows();
+    if (!/Warning The point lies outside the cell/.test(t)) problems.push(`[${where}] a point outside the cell must warn: ${t}`);
+    await put('x', '25'); await pick('m', 0);
+
+    where = 'normdist';
+    await open('normdist', 150); await put('mean', '20.05'); await put('sd', '0.02'); await put('lo', '20.03'); await put('hi', '20.08'); await put('p', '');
+    t = await rows();
+    if (!/Share between the limits 77\.45\d\d %/i.test(t) || !/z of the lower limit -1\.000/.test(t) || !/z of the upper limit 1\.500/.test(t) || !/Within 2 standard deviations of the mean 95\.45 %/.test(t) || !/Within 3 standard deviations of the mean 99\.73 %/.test(t)) problems.push(`[${where}] lathe parts 20.03 to 20.08 (IntMath: 0.7745): ${t}`);
+    d = await drawing();
+    if (!/lower 20\.03/.test(d) || !/upper 20\.08/.test(d) || !/77\.45 %/.test(d) || !/between the limits/.test(d)) problems.push(`[${where}] drawing: ${d}`);
+    await put('lo', '20.01'); await put('hi', ''); t = await rows();
+    if (!/Share below the lower limit 2\.275\d %/i.test(t) || /between the limits/i.test(t)) problems.push(`[${where}] below 20.01 (IntMath: 0.0228): ${t}`);
+    await put('lo', ''); await put('mean', '3.25'); await put('sd', '0.6'); await put('p', '95'); t = await rows();
+    if (!/Value with 95 % of the parts below it 4\.23\d\d/i.test(t) || !/z for that share 1\.645/.test(t)) problems.push(`[${where}] the top 5 % starts at about 4.237 (IntMath): ${t}`);
+    await put('p', '100'); t = await rows();
+    if (!/must be more than 0 % and less than 100 %/.test(t)) problems.push(`[${where}] a share of 100 % must be refused: ${t}`);
+    await put('sd', '0'); t = await rows();
+    if (!/standard deviation must be more than 0/.test(t)) problems.push(`[${where}] a zero standard deviation must be refused: ${t}`);
+    await put('mean', '20.05'); await put('sd', '0.02'); await put('lo', '20.03'); await put('hi', '20.08'); await put('p', '');
+
+    where = 'linecirc';
+    await open('linecirc', 150); await put('x1', '-10'); await put('y1', '11'); await put('x2', '10'); await put('y2', '-9'); await put('cx', '3'); await put('cy', '-5'); await put('r', '3');
+    t = await rows();
+    if (!/First point, X 3\.000 mm/.test(t) || !/First point, Y -2\.000 mm/.test(t) || !/Second point, X 6\.000 mm/.test(t) || !/Second point, Y -5\.000 mm/.test(t) || !/Angle of the line from the X axis -45\.0000 deg/.test(t) || !/Chord between the two points 4\.243 mm/.test(t)) problems.push(`[${where}] Rosetta Code case (3, -2) and (6, -5): ${t}`);
+    d = await drawing();
+    if (!/\(3, -2\)/.test(d) || !/\(6, -5\)/.test(d) || !/to scale, mm, Y upwards/.test(d)) problems.push(`[${where}] drawing: ${d}`);
+    await put('x1', '5'); await put('y1', '0'); await put('x2', '5'); await put('y2', '20'); await put('cx', '10'); await put('cy', '10'); await put('r', '5'); t = await rows();
+    if (!/the line touches the circle \(tangent\)/.test(t) || !/Tangent point, X 5\.000 mm/.test(t) || !/Tangent point, Y 10\.000 mm/.test(t) || !/parallel to the Y axis/.test(t)) problems.push(`[${where}] the line x = 5 touches the circle at (5, 10) (Rosetta Code): ${t}`);
+    await put('x1', '0'); await put('y1', '10'); await put('x2', '1'); await put('y2', '13'); await put('cx', '0'); await put('cy', '0'); await put('r', '3'); t = await rows();
+    if (!/Distance from the circle centre to the line 3\.162 mm/.test(t) || !/the line misses the circle/.test(t) || /First point/.test(t)) problems.push(`[${where}] y = 3x + 10 misses the circle of radius 3 (Mathwords): ${t}`);
+    await put('x2', '0'); await put('y2', '10'); t = await rows();
+    if (!/the two points must not be the same/.test(t)) problems.push(`[${where}] two equal points must be refused: ${t}`);
+    await put('x1', '-10'); await put('y1', '11'); await put('x2', '10'); await put('y2', '-9'); await put('cx', '3'); await put('cy', '-5'); await put('r', '3');
+
+    where = 'conics';
+    await open('conics', 150); await pick('k', 0); await put('a', '5'); await put('b', '3'); await put('x', '4'); t = await rows();
+    if (!/Centre to each focus, c 4\.000 mm/i.test(t) || !/Eccentricity c \/ a 0\.80000/.test(t) || !/Y of the curve at X \(above and below the long axis\) 1\.800 mm/.test(t)) problems.push(`[${where}] ellipse 5 and 3 has c = 4 (NUM8ERS): ${t}`);
+    d = await drawing();
+    if (!/focus/.test(d) || !/a 5/.test(d) || !/c 4/.test(d)) problems.push(`[${where}] ellipse drawing: ${d}`);
+    await put('a', '2'); t = await rows();
+    if (!/enter the longer half-axis as a/.test(t)) problems.push(`[${where}] a shorter than b must be refused for an ellipse: ${t}`);
+    await put('a', '4'); await pick('k', 2); await put('x', ''); t = await rows();
+    if (!/Centre to each focus, c 5\.000 mm/i.test(t) || !/Eccentricity c \/ a 1\.25000/.test(t) || !/Slope of the asymptotes, b \/ a 0\.75000/.test(t)) problems.push(`[${where}] hyperbola 4 and 3 has c = 5 and slope 3/4 (NUM8ERS): ${t}`);
+    d = await drawing();
+    if (!/asymptote/.test(d) || !/focus/.test(d)) problems.push(`[${where}] hyperbola drawing: ${d}`);
+    await put('x', '2'); t = await rows();
+    if (!/lies between the two branches/.test(t)) problems.push(`[${where}] a point between the branches must be refused: ${t}`);
+    await put('x', ''); await pick('k', 1); await put('w', '2'); await put('d', '2'); t = await rows();
+    if (!/Focal length \(vertex to focus\) 0\.125 mm/i.test(t) || !/latus rectum\) 0\.500 mm/.test(t) || !/rim to rim \(one source\) 4\.647 mm/.test(t)) problems.push(`[${where}] the dish of y = 2x² has the focal length 1/8 (NUM8ERS): ${t}`);
+    d = await drawing();
+    if (!/width 2/.test(d) || !/depth 2/.test(d) || !/focus, 0\.125 above the vertex/.test(d)) problems.push(`[${where}] parabola drawing: ${d}`);
+    await pick('k', 0); await put('a', '5'); await put('b', '3');
+
+    // Formula library: the trig identities can be found by name.
+    where = 'formulas';
+    await open('formulas', 200);
+    const fq = await page.$('#main input[type="search"]');
+    if (fq) { await fq.fill('Trig identities'); await fq.dispatchEvent('input'); await page.waitForTimeout(150); const ft = (await page.$eval('#main', e => e.innerText)).replace(/\s+/g, ' '); if (!/sum and difference of two angles/i.test(ft) || !/sin 2A = 2 sin A cos A/.test(ft) || !/Joyce/.test(ft)) problems.push(`[${where}] trig identities in the formula library: ${ft.slice(0, 400)}`); await fq.fill(''); await fq.dispatchEvent('input'); }
+    else problems.push(`[${where}] no search box in the formula library`);
+    await mode('advanced');
+  }
+
+  // Binomial and Poisson (0.7.0, sixth batch): published examples, refusals, the bar chart; coordinates in the CNC guide; families of plastics.
+  where = 'distrib';
+  {
+    const rows = async () => (await page.$$eval('#main #res .rrow', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join(' | ');
+    const put = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); await page.waitForTimeout(40); };
+    const pick = async (k, v) => { await page.selectOption(`#main [data-id="${k}"]`, String(v)); await page.waitForTimeout(80); };
+    const drawing = async () => page.$eval('#main .tdia svg', g => g.textContent.replace(/\s+/g, ' '));
+    await units('mm'); await mode('expert'); await open('distrib', 150);
+    await pick('m', 0); await put('n', '10'); await put('p', '40'); await put('k', '4'); await put('k2', '');
+    let t = await rows();
+    if (!/Chance of exactly 4 25\.0823 %/i.test(t) || !/Mean count 4\.0000/.test(t) || !/Standard deviation of the count 1\.5492/.test(t)) problems.push(`[${where}] Bin(10, 0.4), count 4 (Newcastle: 0.251, mean 4): ${t}`);
+    await put('k', '2'); t = await rows();
+    if (!/Chance of 2 or fewer 16\.7290 %/.test(t) || !/Chance of 2 or more 95\.3643 %/.test(t)) problems.push(`[${where}] Bin(10, 0.4), count 2 (Newcastle: 0.167 and 0.954): ${t}`);
+    await put('n', '300'); await put('p', '1'); await put('k', '5'); t = await rows();
+    if (!/Chance of exactly 5 10\.0985 %/i.test(t) || !/Poisson estimate of exactly 5 \(mean = trials × chance\) 10\.0819 %/.test(t)) problems.push(`[${where}] 300 trials at 1 %, count 5 (IntMath: 0.10099 and 0.10082): ${t}`);
+    let d = await drawing();
+    if (!/10\.1 %/.test(d) || !/exactly 5 \(filled bar\)/.test(d) || !/Binomial, 300 trials at 1 %/.test(d) || !/mean 3/.test(d)) problems.push(`[${where}] drawing, binomial: ${d}`);
+    if ((await page.$$eval('#main .tdia svg rect.hotf', r => r.length)) !== 1) problems.push(`[${where}] exactly one filled bar expected for a single count`);
+    await put('k', '301'); t = await rows();
+    if (!/cannot happen/.test(t) || !/Chance of exactly 301 0\.0000 %/i.test(t)) problems.push(`[${where}] a count above the number of trials: ${t}`);
+    await put('k', '5'); await put('n', '10.5'); t = await rows();
+    if (!/whole number from 1 to 100 000/.test(t)) problems.push(`[${where}] 10.5 trials must be refused: ${t}`);
+    await put('n', '300'); await put('p', '120'); t = await rows();
+    if (!/the chance must be from 0 to 100 %/.test(t)) problems.push(`[${where}] a chance of 120 % must be refused: ${t}`);
+    await put('p', '1'); await put('k2', '3'); t = await rows();
+    if (!/not below the count/.test(t)) problems.push(`[${where}] an upper count below the count must be refused: ${t}`);
+    await pick('m', 1); await put('mu', '3'); await put('k', '2'); await put('k2', '4'); t = await rows();
+    if (!/Chance of 2 to 4 61\.6115 %/.test(t) || !/Chance of 2 or more 80\.0852 %/.test(t) || !/Standard deviation of the count 1\.7321/.test(t) || /Poisson estimate/.test(t)) problems.push(`[${where}] Poisson, mean 3, 2 to 4 (IntMath: 0.61611): ${t}`);
+    d = await drawing();
+    if (!/61\.61 %/.test(d) || !/count 2 to 4 \(filled bars\)/.test(d) || !/Poisson, mean 3/.test(d)) problems.push(`[${where}] drawing, Poisson: ${d}`);
+    if ((await page.$$eval('#main .tdia svg rect.hotf', r => r.length)) !== 3) problems.push(`[${where}] three filled bars expected for counts 2 to 4`);
+    await put('mu', '2.3'); await put('k', '3'); await put('k2', ''); t = await rows();
+    if (!/Chance of 3 or more 40\.396\d %/.test(t)) problems.push(`[${where}] Poisson, mean 2.3, 3 or more (IntMath: 0.40396): ${t}`);
+    await put('mu', '-1'); t = await rows();
+    if (!/the mean count must be from 0 to 100 000/.test(t)) problems.push(`[${where}] a negative mean must be refused: ${t}`);
+    await put('mu', '3'); await put('k', '2'); await pick('m', 0); await put('n', '50'); await put('p', '2');
+
+    where = 'cncguide';
+    await open('cncguide', 250);
+    const ex = (await page.$eval('#main #cgex', e => e.innerText)).replace(/\s+/g, ' ');
+    if (!/length 50\.000, angle 36\.87°/.test(ex) || !/X18\.549 Y6\.412 and X36\.651 Y19\.988/.test(ex) || !/5\.359 on the radius/.test(ex)) problems.push(`[${where}] worked coordinate examples: ${ex}`);
+    if (!(await page.$('#main h2#c-geo')) || !(await page.$('#main .gtoc a[href="#c-geo"]'))) problems.push(`[${where}] no "Working out coordinates" section or contents entry`);
+    const dead = await page.evaluate(() => [...document.querySelectorAll('#main a[href^="#/t/"]')].map(a => a.getAttribute('href').slice(4)).filter(i => !TOOLS.find(x => x.id === i)));
+    if (dead.length) problems.push(`[${where}] links to pages that do not exist: ${dead.join(', ')}`);
+    const geoLinks = await page.$$eval('#main a[href^="#/t/"]', a => a.map(x => x.getAttribute('href').slice(4)));
+    for (const id of ['triangle', 'linecirc', 'fillet', 'arc', 'bolt', 'tnrc']) if (!geoLinks.includes(id)) problems.push(`[${where}] no link to ${id}`);
+
+    where = 'plastics';
+    await open('plastics', 350);
+    await page.selectOption('#main #plp', 'POM'); await page.waitForTimeout(80);
+    let pt = (await page.$eval('#main #plres', e => e.innerText)).replace(/\s+/g, ' ');
+    if (!/Family Semi-crystalline thermoplastic Polymershapes, Xometry Confirmed/.test(pt)) problems.push(`[${where}] acetal must show its family with two publishers: ${pt.slice(0, 300)}`);
+    await page.selectOption('#main #plp', 'PEI'); await page.waitForTimeout(80);
+    pt = (await page.$eval('#main #plres', e => e.innerText)).replace(/\s+/g, ' ');
+    if (!/Family Amorphous thermoplastic Ensinger[^|]*Mitsubishi/.test(pt)) problems.push(`[${where}] PEI must show as amorphous from Ensinger and Mitsubishi: ${pt.slice(0, 300)}`);
+    await page.selectOption('#main #plp', 'PTFE'); await page.waitForTimeout(80);
+    pt = (await page.$eval('#main #plres', e => e.innerText)).replace(/\s+/g, ' ');
+    if (!/Family Semi-crystalline thermoplastic Polymershapes One source/.test(pt)) problems.push(`[${where}] PTFE rests on one publisher and must say so: ${pt.slice(0, 300)}`);
+    await page.selectOption('#main #plp', 'POM'); await page.waitForTimeout(60);
+    const fam = await page.evaluate(() => ({ rows: document.querySelectorAll('#main #plfam tr').length - 1, differ: document.querySelectorAll('#main #plfam .badge.differs').length, all: document.querySelectorAll('#main #plfamall tr').length - 1, one: document.querySelectorAll('#main #plfamall .badge.review').length, text: document.querySelector('#main #plfam').innerText.replace(/\s+/g, ' ') }));
+    if (fam.rows !== 14 || fam.differ !== 2 || fam.all !== 12 || fam.one !== 3) problems.push(`[${where}] families: ${fam.rows} rows (14), ${fam.differ} differing (2), ${fam.all} plastics (12), ${fam.one} on one source (3)`);
+    if (!/TWI: thermoplastics are typically more expensive/.test(fam.text) || !/Xometry: most thermoplastics are priced lower/.test(fam.text) || !/sharp melting point/.test(fam.text)) problems.push(`[${where}] families text: ${fam.text.slice(0, 400)}`);
+    if (await page.evaluate(() => document.querySelector('#main').scrollWidth > document.querySelector('#main').clientWidth + 1)) problems.push(`[${where}] the page scrolls sideways`);
+
+    where = 'formulas';
+    await open('formulas', 200);
+    const fq2 = await page.$('#main input[type="search"]');
+    if (fq2) { await fq2.fill('Poisson'); await fq2.dispatchEvent('input'); await page.waitForTimeout(150); const ft = (await page.$eval('#main', e => e.innerText)).replace(/\s+/g, ' '); if (!/Poisson: chance of exactly k/i.test(ft) || !/IntMath/.test(ft)) problems.push(`[${where}] Poisson in the formula library: ${ft.slice(0, 400)}`); await fq2.fill(''); await fq2.dispatchEvent('input'); }
+    await mode('advanced');
+  }
+
+  // Seventh batch of 0.7.0: units, signs and letters for quantities on the symbols page; the decimal places setting for all
+  // calculators; broken tap removal with two publishers for each method; algebra in the formula library.
+  where = 'symbols-2';
+  {
+    await units('mm'); await mode('expert'); await open('symbols', 300);
+    const tab = async id => page.$$eval('#main #' + id + ' tr', r => r.slice(1).map(t => t.innerText.replace(/\s+/g, ' ').trim()));
+    let r = await tab('symsys');
+    if (r.length !== 3 || !/yard is exactly 0\.9144 m and the avoirdupois pound exactly 0\.45359237 kg, so the inch is exactly 25\.4 mm\. Confirmed Wikipedia, NIST$/.test(r[1]) || !/One source Wikipedia$/.test(r[2])) problems.push(`[${where}] systems of units: ${r.join(' ; ')}`);
+    r = await tab('symbase');
+    if (r.length !== 7 || r[0] !== 'length metre m Confirmed NIST, Wikipedia' || !r.includes('thermodynamic temperature kelvin K Confirmed NIST, Wikipedia') || r.some(x => !/Confirmed/.test(x))) problems.push(`[${where}] base units: ${r.join(' ; ')}`);
+    r = await tab('symder');
+    if (r.length !== 22 || !r.includes('pressure, stress pascal Pa N/m² Confirmed NIST, Wikipedia') || !r.includes('force newton N m·kg·s−2 (base units, NIST) Confirmed NIST, Wikipedia') || !r.includes('power, radiant flux watt W J/s Confirmed NIST, Wikipedia') || r.some(x => !/Confirmed/.test(x))) problems.push(`[${where}] derived units: ${r.length} rows: ${r.join(' ; ')}`);
+    r = await tab('symsig');
+    if (r.length !== 26 || !r.includes('≈ is approximately equal to Confirmed Electronics Notes, mathcentre (Loughborough University), Wikipedia') || !r.includes('∥ is parallel to One source Wikipedia') || r.filter(x => /One source/.test(x)).length !== 3) problems.push(`[${where}] mathematical signs: ${r.length} rows: ${r.join(' ; ')}`);
+    r = await tab('symqty');
+    if (r.length !== 37 || !r.some(x => /^Pressure p: Wikipedia and BYJU'S; P: The Physics Hypertextbook p or P Pa Sources differ/.test(x)) || !r.some(x => /^Force F N Confirmed/.test(x)) || !r.some(x => /^Stress σ Pa One source The Physics Hypertextbook$/.test(x)) || r.filter(x => /Sources differ/.test(x)).length !== 3) problems.push(`[${where}] letters for quantities: ${r.length} rows: ${r.join(' ; ')}`);
+    if (await page.evaluate(() => ['symsys', 'symbase', 'symder', 'symsig', 'symqty'].some(id => { const e = document.querySelector('#main #' + id); return e.scrollWidth > e.clientWidth + 1; }))) problems.push(`[${where}] a table is wider than its frame`);
+    if (!(await page.$('#main a[href="#/t/units"]'))) problems.push(`[${where}] no link to the unit converter`);
+
+    where = 'decimal places';
+    await open('taper', 200);
+    const first = async () => (await page.$$eval('#main #res .rrow', x => x.slice(0, 1).map(t => t.innerText.replace(/\s+/g, ' ').trim()))).join('');
+    const std = await first();
+    await page.click('#menubtn'); await page.waitForTimeout(100);
+    await page.click('#menupop #mdp button[data-v="2"]'); await page.waitForTimeout(150);
+    const more = await first();
+    await page.click('#menupop #mdp button[data-v="-1"]'); await page.waitForTimeout(150);
+    const fewer = await first();
+    await page.click('#menupop #mdp button[data-v="0"]'); await page.waitForTimeout(150);
+    const back = await first();
+    const places = s => ((s.match(/\d+\.(\d+)/) || [])[1] || '').length;
+    if (!(places(std) > 0) || places(more) !== places(std) + 2 || places(fewer) !== places(std) - 1 || back !== std) problems.push(`[${where}] the setting for all calculators: standard "${std}", two more "${more}", one fewer "${fewer}", back "${back}"`);
+    await page.evaluate(() => { document.querySelector('#menupop').hidden = true; });
+
+    where = 'toolguide broken taps';
+    await open('toolguide', 300);
+    const bt = await page.evaluate(() => { const h = document.querySelector('#main #t-brk'); const out = []; let n = h.nextElementSibling; while (n && n.tagName !== 'H2') { if (n.querySelector('abbr.gsrc')) out.push({ t: n.innerText.replace(/\s+/g, ' '), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; });
+    if (bt.length !== 7 || bt.some(x => x.k < 2 || x.need)) problems.push(`[${where}] each of the seven statements needs two publishers: ${bt.map(x => x.k + (x.need ? '!' : '')).join(',')}`);
+    if (!bt.some(x => /^Chemical/.test(x.t) && /for aluminium parts only/.test(x.t)) || !bt.some(x => /^EDM/.test(x.t) && /must conduct electricity/.test(x.t))) problems.push(`[${where}] text: ${bt.map(x => x.t.slice(0, 60)).join(' ; ')}`);
+
+    where = 'formulas algebra';
+    await open('formulas', 200);
+    const fq3 = await page.$('#main input[type="search"]');
+    if (fq3) { await fq3.fill('Algebra'); await fq3.dispatchEvent('input'); await page.waitForTimeout(150); const ft = (await page.$eval('#main', e => e.innerText)).replace(/\s+/g, ' '); if (!/6 of \d+ formulas/.test(ft) || !/x = \(−b ± √\(b² − 4ac\)\) \/ \(2a\)/.test(ft) || !/log_b x = ln x \/ ln b/.test(ft) || !/single source/i.test(ft)) problems.push(`[${where}] algebra in the formula library: ${ft.slice(0, 500)}`); await fq3.fill(''); await fq3.dispatchEvent('input'); }
+    await mode('advanced');
+  }
+
+  // Eighth batch of 0.7.0: thread and ball micrometers, thread mills, threading on a CNC lathe, subprograms with worked
+  // examples, and belt against chain against gears. Each section is read back with its source tags.
+  where = 'guides-8';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id) => { await open(tool, 300); return page.evaluate(i => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && n.tagName !== 'H2') { out.push({ t: n.innerText.replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv'), tag: n.tagName }); n = n.nextElementSibling; } return out; }, id); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const linksOk = async id => page.evaluate(i => { const h = document.querySelector('#main #' + i); let n = h && h.nextElementSibling, ok = !!h; while (n && n.tagName !== 'H2') { n.querySelectorAll('a[href^="#/t/"]').forEach(a => { if (!TOOLS.some(t => t.id === a.getAttribute('href').slice(4))) ok = false; }); n = n.nextElementSibling; } return ok; }, id);
+
+    let s = await sect('measguide', 'mz-thr');
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^Thread micrometer\..*reads the pitch diameter/, 2, false) || !has(s, /^It will not agree with wires/, 1, true) || !has(s, /^Ball micrometer/, 2, false) || !(await linksOk('mz-thr'))) problems.push(`[${where}] thread and ball micrometers: ${s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 30)).join(' ; ')}`);
+
+    s = await sect('toolguide', 't-tm');
+    if (s.filter(x => x.k > 0).length !== 18 || !has(s, /^Climb milling a right-hand internal thread: start at the bottom and go round counter-clockwise/, 3, false) || !has(s, /^Partial-profile cutters/, 1, true) || !has(s, /^Blind holes\..*within half a pitch/, 2, false) || !(await page.$('#main button.tglink[data-id="cyctmill"]'))) problems.push(`[${where}] thread mills: ${s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 30)).join(' ; ')}`);
+
+    s = await sect('latheguide', 'l-thread');
+    if (s.filter(x => x.k > 0).length !== 18 || !has(s, /^G32, one move per block/, 2, false) || !has(s, /^More than one start\. The lead is the pitch times the number of starts/, 3, false) || !has(s, /Q180000 is 180°/, 1, true) || !has(s, /^An ordinary outside taper thread, small at the front, takes a negative value/, 2, false) || !(await linksOk('l-thread'))) problems.push(`[${where}] lathe threading: ${s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 30)).join(' ; ')}`);
+
+    s = await sect('cncguide', 'c-sub');
+    const pre = await page.$$eval('#main pre.gcode', a => a.filter(e => /^csub/.test(e.id)).map(e => e.textContent));
+    if (s.filter(x => x.k > 0).length !== 11 || !has(s, /^Call and return\. M98 with P/, 3, false) || !has(s, /^M99 in the main program/, 1, true) || pre.length !== 3 || !/M98 P2000[\s\S]*O2000[\s\S]*G91 G01 Z-7\. F100\.[\s\S]*G90[\s\S]*M99/.test(pre[0]) || !/M98 P3000 L4/.test(pre[1]) || !/M97 P500 L4[\s\S]*M30\nN500 G91/.test(pre[2]) || !(await linksOk('c-sub'))) problems.push(`[${where}] subprograms: ${s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 30)).join(' ; ')} | ${pre.length} examples`);
+
+    s = await sect('driveguide', 'dv-cmp');
+    const cmp = await page.$$eval('#main #dvcmp tr', r => r.map(t => Array.from(t.children).map(c => c.innerText.replace(/\s+/g, ' ').trim())));
+    if (cmp.length !== 10 || cmp[0].join('|') !== '|Belt|Chain|Gears|Sources' || !/^Slip$/.test(cmp[1][0]) || !/No slip/.test(cmp[1][2]) || !/up to 98 % \(UNC Charlotte\)/.test(cmp[2][2]) || !/The sources differ/.test(cmp[8][2]) || !/to be verified/.test(cmp[9][4]) || /to be verified/.test(cmp[1][4]) || !(await linksOk('dv-cmp'))) problems.push(`[${where}] belt, chain or gears: ${cmp.map(r => r.join(' / ').slice(0, 80)).join(' ; ')}`);
+    if (await page.evaluate(() => { const e = document.querySelector('#main #dvcmp .cntab'); return e.scrollWidth > e.clientWidth + 1; })) problems.push(`[${where}] the drives table is wider than its frame`);
+    await mode('advanced');
+  }
+
+  // Ninth batch of 0.7.0: sump care and the mist limit, bench grinder checks, tap rake and tapping fluids, counterbores,
+  // counterfeit fasteners, and the chemical spot tests on the metal identification page.
+  where = 'guides-9';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: n.innerText.replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+
+    let s = await sect('shoptools', 'st-sump', ['H2', 'H3']);
+    if (s.length !== 10 || !has(s, /^Mixing\. Concentrate goes into the water/, 2, false) || !has(s, /^Topping up\. Never plain water/, 1, true) || !has(s, /^Tramp oil/, 3, false)) problems.push(`[${where}] sump care: ${brief(s)}`);
+    s = await sect('shoptools', 'st-mist', ['H2', 'H3']);
+    if (s.length !== 5 || !has(s, /^A limit for mist\. NIOSH recommends no more than 0\.4 mg\/m³ .* or 0\.5 mg\/m³ as total particulate, averaged over a working day of up to 10 hours/, 2, false) || !has(s, /^No compressed air/, 1, true)) problems.push(`[${where}] mist and skin: ${brief(s)}`);
+    s = await sect('shoptools', 'st-bench', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 11 || !has(s, /^Ring test\..*A cracked wheel sounds dead and must not be used/, 2, false) || !has(s, /^Work rest\. No more than 1\/8 in \(3\.2 mm\)/, 3, false) || !has(s, /^Tongue guard\..*no more than 1\/4 in \(6\.4 mm\)/, 3, false) || !has(s, /^Stand to one side/, 1, true)) problems.push(`[${where}] bench grinders: ${brief(s)}`);
+
+    s = await sect('toolguide', 't-rake', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 5 || !has(s, /^Rake \(hook\)\. The angle of the cutting face is matched to the work material/, 2, false) || !has(s, /^Negative hook/, 1, true) || !s.some(x => /No rake angles in degrees are given here/.test(x.t))) problems.push(`[${where}] tap rake: ${brief(s)}`);
+    s = await sect('toolguide', 't-tfluid', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 2 || !has(s, /^By material \(AIMS\)\..*Cast iron: dry where possible/, 1, true) || !(await page.$('#main button.tglink[data-id="shoptools"]'))) problems.push(`[${where}] tapping fluids: ${brief(s)}`);
+
+    s = await sect('fastguide', 'fg-cb', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^Counterbore\. A larger hole with a flat bottom/, 3, false) || !has(s, /^A spotface has no symbol of its own/, 1, true) || !s.some(x => /⌴/.test(x.t))) problems.push(`[${where}] counterbores: ${brief(s)}`);
+    s = await sect('fastguide', 'fg-fake', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^Two marks on the head/, 2, false) || !has(s, /^The US law\. The Fastener Quality Act of 1990/, 2, false) || !has(s, /^It covers metal bolts, nuts, screws and studs of 6 mm \(1\/4 in\) and larger/, 1, true)) problems.push(`[${where}] counterfeit fasteners: ${brief(s)}`);
+
+    await open('metalid', 300);
+    const mt = await page.$$eval('#main .mtab', t => Array.from(t[0].querySelectorAll('tr')).map(r => r.innerText.replace(/\s+/g, ' ').trim()));
+    const mrow = k => mt.find(t => t.startsWith(k)) || '';
+    if (mt.length !== 11 || !/Sources differ/.test(mrow('Nitric acid: stainless or not')) || !/Atlas Steels.*EngineerExcel/.test(mrow('Nitric acid: stainless or not')) || !/darkens within 2 to 4 minutes.*One source/.test(mrow('Molybdenum spot test: 304 from 316')) || !/One source/.test(mrow('Sulphur print: free-machining steel')) || !/Confirmed/.test(mrow('Magnet and stainless')) || !/Confirmed/.test(mrow('When it matters'))) problems.push(`[${where}] metal identification tests: ${mt.length} rows: ${mt.map(t => t.slice(0, 50)).join(' ; ')}`);
+    await mode('advanced');
+  }
+
+  // Tenth batch of 0.7.0: retaining compounds, sealants and structural adhesives, ratchets, elliptical gears, factors of safety,
+  // and the fourth axis in the toolpath guide.
+  where = 'guides-10';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || "").replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+
+    let s = await sect('bearguide', 'bg-ret', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 11 || !has(s, /^What they are\. Anaerobic adhesives for plain round joints, not for threads/, 2, false) || !has(s, /^The gap\. Typically up to 0\.25 mm .*Incure adds up to 0\.5 mm for some grades/, 2, false) || !has(s, /^Heat\. Grades differ/, 1, true)) problems.push(`[${where}] retaining compounds: ${brief(s)}`);
+    s = await sect('bearguide', 'bg-tseal', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 17 || !has(s, /^PTFE tape and fluid power\..*AIMS: never on hydraulic fittings/, 2, false) || !has(s, /^Flange gap\. Up to 0\.5 mm at most/, 2, false) || !has(s, /^Tape colours \(AIMS, Australia\)/, 1, true) || !has(s, /^Cut gaskets/, 1, true)) problems.push(`[${where}] thread and flange sealants: ${brief(s)}`);
+    s = await sect('bearguide', 'bg-struct', ['H2']);
+    {
+      const rows = await page.$$eval('#main table.gtab', t => Array.from(t[t.length - 1].querySelectorAll('tr')).map(r => r.innerText.replace(/\s+/g, ' ').trim()));
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 5 || !/best all-round strength on metals/.test(row('Epoxy')) || /to be verified/.test(row('Epoxy')) || !/Smell and heat while it cures \(Gluegun\.com\)/.test(row('Acrylic (MMA)')) || !/sensitive to moisture/.test(row('Polyurethane')) || !/white bloom.*to be verified/.test(row('Cyanoacrylate'))) problems.push(`[${where}] structural adhesive rows: ${rows.join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 7 || !has(s, /^Preparation decides/, 2, false) || !has(s, /^Temperature\. Two-part adhesives cure faster when warm.*60 to 80 °F/, 1, true)) problems.push(`[${where}] structural adhesives: ${brief(s)}`);
+
+    s = await sect('elemguide', 'me-rat', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 9 || !has(s, /^Lopsided teeth\. One flank of each tooth is a gentle slope, the other is steep/, 2, false) || !has(s, /^Running back\..*up to one tooth spacing/, 2, false) || !has(s, /^Tooth count\..*72 teeth needs a swing of 5°/, 1, true)) problems.push(`[${where}] ratchets: ${brief(s)}`);
+    if (!(await page.$('#main svg.geo[aria-label^="A ratchet wheel with twelve lopsided teeth"]'))) problems.push(`[${where}] the ratchet drawing is missing`);
+    s = await sect('elemguide', 'me-ell', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 7 || !has(s, /^About a focus\./, 2, false) || !has(s, /^How far the ratio swings\. Between 1\/K and K.*up to 3 for a unilobe and up to 2 for a bilobe/, 1, true) || !s.some(x => /No formula for the speed at each angle is given here/.test(x.t))) problems.push(`[${where}] elliptical gears: ${brief(s)}`);
+    s = await sect('elemguide', 'me-fos', ['H2']);
+    {
+      const rows = await page.$$eval('#main table.gtab', t => t.slice(-2).map(x => Array.from(x.querySelectorAll('tr')).map(r => r.innerText.replace(/\s+/g, ' ').trim())));
+      const row = (i, k) => rows[i].find(t => t.startsWith(k)) || '';
+      if (rows[0].length !== 7 || rows[1].length !== 9 || !/not less than 10 EE_FOS ?to be verified/.test(row(0, 'Repeated shock')) || !/^Buildings 2\.0 for each structural member 4 to 6 \(structural steel work\) WP_FOS ?ETB_FOS$/.test(row(1, 'Buildings')) || !/^Pressure vessels 3\.5 to 4\.0 3\.5 to 6 /.test(row(1, 'Pressure vessels')) || !/^Bolts no figure 8\.5 ETB_FOS ?to be verified/.test(row(1, 'Bolts'))) problems.push(`[${where}] factor of safety tables: ${rows[0].join(' | ')} || ${rows[1].join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^What the factor is\..*the load at failure divided by the load allowed/, 2, false) || !has(s, /^Typical figures, two publishers side by side\. Where both print a figure they do not agree/, 2, false) || !has(s, /^Codes come first/, 1, true)) problems.push(`[${where}] factors of safety: ${brief(s)}`);
+
+    s = await sect('toolpaths', 'tp-4ax', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 7 || !has(s, /^Indexing \(3\+1\)\. The rotary axis turns the part to an angle and stops/, 2, false) || !has(s, /^Continuous 4-axis\..*a cam lobe is the usual example/, 2, false) || !has(s, /^Wrapping\./, 2, false) || !has(s, /^Feed on a move that turns the axis/, 1, true)) problems.push(`[${where}] fourth axis: ${brief(s)}`);
+    await open('toolguide', 300);
+    const taps = await page.$$eval('#main p', ps => ps.map(p => ({ t: p.innerText.replace(/\s+/g, ' ').trim(), k: p.querySelectorAll('abbr.gsrc').length, need: !!p.querySelector('.gtbv') })));
+    if (!has(taps, /^Pipe taps cut the internal threads of pipe fittings/, 2, false) || !has(taps, /^Extension taps are taps with a long shank/, 2, false) || !has(taps, /^Interrupted thread taps have a tooth on every other thread only/, 2, false) || !has(taps, /^Combined drill and tap/, 1, true)) problems.push(`[${where}] other kinds of tap: ${brief(taps.filter(x => /taps? /.test(x.t.slice(0, 30))))}`);
+    await mode('advanced');
+  }
+
+  // Eleventh batch of 0.7.0: hardenability, case hardening and machinability, vibration in general and balancing in place,
+  // tightening methods, and which of speed, feed and depth to change.
+  where = 'guides-11';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || '').replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+
+    let s = await sect('matguide', 'mg-harden', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^Hardness and hardenability are two things/, 2, false) || !has(s, /^The Jominy end-quench test\. A standard bar 25\.4 mm in diameter and 102 mm long/, 3, false) || !has(s, /^From the bar to a part/, 1, true)) problems.push(`[${where}] hardenability: ${brief(s)}`);
+    s = await sect('matguide', 'mg-case', ['H2']);
+    {
+      const rows = await page.$$eval('#main #mg-case + p + div table.gtab tr', r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()));
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 7 || !/815 to 980 °C in gas or liquid.*usually below 950 °C.*up to 1\.5 mm.*0\.2 to 2 mm TM_SH ?OU_PNC$/.test(row('Carburising')) || !/480 to 590 °C in gas/.test(row('Nitriding')) || /to be verified/.test(row('Nitriding')) || !/975 to 1125 °F.*to be verified/.test(row('Ferritic nitrocarburising')) || !/no figure in the sources read/.test(row('Induction hardening'))) problems.push(`[${where}] case hardening rows: ${rows.join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 12 || !has(s, /^Quench or not\..*Nitrided parts are not quenched/, 2, false) || !has(s, /^Frequency and depth/, 1, true) || !s.some(x => /only cells that read cleanly are quoted/.test(x.t))) problems.push(`[${where}] case hardening: ${brief(s)}`);
+    s = await sect('matguide', 'mg-mach', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 9 || !has(s, /^The rating in per cent\. The free-cutting steel B1112 is set at 100 %/, 2, false) || !has(s, /^No agreed measure/, 1, true)) problems.push(`[${where}] machinability: ${brief(s)}`);
+
+    s = await sect('driveguide', 'dv-vth', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^Resonance\. When the forcing frequency comes close to a natural frequency/, 2, false) || !has(s, /^Damping takes energy out/, 1, true) || !s.some(x => /No formula for the natural frequency is printed here/.test(x.t))) problems.push(`[${where}] vibration in general: ${brief(s)}`);
+    s = await sect('driveguide', 'dv-bal', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 9 || !has(s, /^Is it unbalance\?.*80 % or more of the total/, 2, false) || !has(s, /^The runs\. 1\. A reference run/, 2, false) || !has(s, /^Size of the trial weight\..*30\/30 rule/, 2, false) || !has(s, /^Trim runs\. Reliable Plant: no more than two/, 1, true)) problems.push(`[${where}] balancing in place: ${brief(s)}`);
+
+    s = await sect('fastguide', 'fg-tight', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^Torque plus angle\..*30 Nm, then 90 degrees/, 2, false) || !has(s, /^Tightening to yield/, 2, false) || !has(s, /^Where the torque goes\. Usually 85 to 95 %/, 1, true) || !s.some(x => /Neither source prints the scatter/.test(x.t))) problems.push(`[${where}] tightening methods: ${brief(s)}`);
+
+    s = await sect('cncguide', 'c-cond', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^Speed wears the tool fastest\..*20 % more speed halves the tool life, 50 % more leaves a fifth/, 2, false) || !has(s, /^The order \(Seco\)\. Take the largest depth of cut/, 1, true) || !(await page.$('#main .gtoc a[href="#c-cond"]'))) problems.push(`[${where}] speed, feed and depth: ${brief(s)}`);
+    await mode('advanced');
+  }
+
+  // Twelfth batch of 0.7.0: the tensile test, heat and cold, steels by use, band speeds, grinding carbide and turning holders.
+  where = 'guides-12';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || '').replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+    const rowsOf = async sel => page.$$eval(sel, r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()));
+
+    let s = await sect('matguide', 'mg-tens', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 12 || !has(s, /^The straight part\..*Young's modulus/, 3, false) || !has(s, /^Proof stress\..*0\.2 %, written Rp0\.2/, 1, true) || !has(s, /^Tensile strength\. The highest stress on the curve/, 3, false) || !(await page.$('#main #mg-tens + svg.geo'))) problems.push(`[${where}] tensile test: ${brief(s)}`);
+    s = await sect('matguide', 'mg-temp', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 8 || !has(s, /^But steel turns brittle\./, 2, false) || !has(s, /^Which steels\..*around 0 °C.*Below -100 °C/, 1, true) || !has(s, /^Creep\..*450 to 550 °C/, 1, true)) problems.push(`[${where}] heat and cold: ${brief(s)}`);
+    {
+      const rows = await rowsOf('#main #mg-use + div table.gtab tr');
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 11 || !/^4340 Crankshafts, heavy-duty axles, aircraft parts 4330, 4340: aerospace, defence, high-stress parts AIMS_SG ?CS_SG$/.test(row('4340')) || !/to be verified/.test(row('52100')) || /to be verified/.test(row('8620'))) problems.push(`[${where}] steels by use: ${rows.join(' | ')}`);
+    }
+
+    s = await sect('shoptools', 'st-band', ['H2', 'H3']);
+    {
+      const rows = await rowsOf('#main #st-band + div table.gtab tr');
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 8 || !/^Cast iron 46 to 75 33 to 75 \(grey iron\) 80 to 100 EXC_BS ?LFC_BS ?NILS_BS$/.test(row('Cast iron')) || !/to be verified/.test(row('Alloy steel')) || /to be verified/.test(row('Tool steel'))) problems.push(`[${where}] band speeds: ${rows.join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 5 || !has(s, /^Short, hard chips: the sources differ\./, 2, false) || !has(s, /^With fluid LFC allows up to 15 % more feed/, 1, true) || !s.some(x => /None of them says which kind of blade/.test(x.t))) problems.push(`[${where}] band speed notes: ${brief(s)}`);
+    s = await sect('shoptools', 'st-carb', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^Green silicon carbide is the bench grinder wheel for tungsten carbide/, 3, false) || !has(s, /^Grit \(UKAM\)\. 80 to 120 .* 230 to 325/, 1, true) || !s.some(x => /Not found in the pages read/.test(x.t))) problems.push(`[${where}] grinding carbide: ${brief(s)}`);
+
+    s = await sect('toolguide', 't-hold', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 12 || !has(s, /^Shank\. Take the largest shank/, 2, false) || !has(s, /^The letter M is described in two ways/, 2, false) || !has(s, /^Hand\. A right-hand holder/, 1, true) || !(await page.$('#main button.tglink[data-id="holdercode"]'))) problems.push(`[${where}] turning holders: ${brief(s)}`);
+    await mode('advanced');
+  }
+
+  // Thirteenth batch of 0.7.0: back-up rings, surface grinding, faults in cylindrical grinding, dressing diamonds, choosing a tool steel.
+  where = 'guides-13';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || '').replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+    const rowsOf = async sel => page.$$eval(sel, r => r.map(t => t.innerText.replace(/\s+/g, ' ').trim()));
+
+    let s = await sect('bearguide', 'bg-bu', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^What they are for\./, 3, false) || !has(s, /^When, the sources differ\. Marco Rubber: above 1500 psi.*about 5 MPa \(50 bar\)/, 2, false) || !has(s, /^An example \(Apple Rubber\)\. At 1000 psi .* 0\.016 in/, 1, true) || !(await page.$('#main #bg-bu ~ p a[href="#/t/oring"]'))) problems.push(`[${where}] back-up rings: ${brief(s)}`);
+
+    s = await sect('abrasguide', 'ag-surf', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 11 || !has(s, /^The wheel for the work\. Aluminium oxide for steel/, 2, false) || !has(s, /^Down feed, the sources differ\..*0\.001 in \(0\.025 mm\).*0\.1 to 0\.4 mm/, 2, false) || !has(s, /^Cross feed, the sources differ\..*1\/4 to 1\/12.*75 to 90 %/, 3, false) || !has(s, /^Table speed\. Most often 50 to 100 ft\/min/, 1, true)) problems.push(`[${where}] surface grinding: ${brief(s)}`);
+    s = await sect('abrasguide', 'ag-fault', ['H2']);
+    {
+      const rows = await rowsOf('#main #ag-fault + div table.gtab tr');
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (rows.length !== 9 || !/RAD_CG ?OKU_CH ?UG_ERR$/.test(row('Chatter marks')) || /to be verified/.test(row('Burn marks')) || !/to be verified/.test(row('Flat spots'))) problems.push(`[${where}] grinding faults: ${rows.join(' | ')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 6 || !has(s, /^Why work burns\./, 1, true) || !s.some(x => /could not be paired with certainty/.test(x.t))) problems.push(`[${where}] grinding fault notes: ${brief(s)}`);
+
+    s = await sect('shoptools', 'st-dd', ['H2', 'H3']);
+    {
+      const rows = await rowsOf('#main #st-dd ~ div table.gtab tr');
+      const row = k => rows.find(t => t.startsWith(k)) || '';
+      if (!/^0\.50 ct 3000 to 12000 7000 FLEX_DD ?ORG_DD$/.test(row('0.50 ct')) || !/to be verified/.test(row('3 ct'))) problems.push(`[${where}] dressing diamonds: ${row('0.50 ct')} | ${row('3 ct')}`);
+    }
+    if (s.filter(x => x.k > 0).length !== 5 || !has(s, /^Drag angle\..*5 to 15 degrees/, 3, false) || !has(s, /^Turn the diamond/, 1, true) || !s.some(x => /where diameter times width is 5000/.test(x.t))) problems.push(`[${where}] dressing diamonds: ${brief(s)}`);
+
+    s = await sect('matguide', 'mg-tsel', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 9 || !has(s, /^Wear against toughness\./, 2, false) || !has(s, /^General cold work\. O1, A2 and D2/, 3, false) || !has(s, /^When the tool fails \(Crucible\)\..*after EDM/, 1, true)) problems.push(`[${where}] choosing a tool steel: ${brief(s)}`);
+    await mode('advanced');
+  }
+
+  // Fourteenth batch of 0.7.0: calibrating a surface plate, V-blocks, laminates and hard rubber, the tool signature.
+  where = 'guides-14';
+  {
+    await units('mm'); await mode('expert');
+    const sect = async (tool, id, stop) => { await open(tool, 300); return page.evaluate(([i, st]) => { const h = document.querySelector('#main #' + i); if (!h) return []; const out = []; let n = h.nextElementSibling; while (n && !st.includes(n.tagName)) { out.push({ t: (n.innerText || n.textContent || '').replace(/\s+/g, ' ').trim(), k: n.querySelectorAll('abbr.gsrc').length, need: !!n.querySelector('.gtbv') }); n = n.nextElementSibling; } return out; }, [id, stop]); };
+    const has = (s, re, k, need) => s.some(x => re.test(x.t) && x.k === k && x.need === need);
+    const brief = s => s.map(x => x.k + (x.need ? '!' : '') + ' ' + x.t.slice(0, 28)).join(' ; ');
+
+    let s = await sect('measguide', 'mz-plate', ['H2']);
+    if (!has(s, /^What a calibration measures\. Two things/, 2, false) || !has(s, /^The methods named\. Cross Company names the Moody method/, 2, false) || !has(s, /^Out of limits\..*0\.001 in/, 2, false)) problems.push(`[${where}] calibrating a plate: ${brief(s)}`);
+    s = await sect('measguide', 'mz-vb', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 7 || !has(s, /^What they are for\. Holding round bar/, 2, false) || !has(s, /^What they are made of\. The two sources describe different kinds/, 2, false) || !has(s, /^The vee\. Tormach gives an included angle of 90/, 1, true) || !s.some(x => /No accuracy figures for V-blocks/.test(x.t))) problems.push(`[${where}] V-blocks: ${brief(s)}`);
+
+    s = await sect('matguide', 'mg-lam', ['H2']);
+    if (s.filter(x => x.k > 0).length !== 10 || !has(s, /^What laminates are\./, 3, false) || !has(s, /^Coolant, the sources differ\./, 3, false) || !has(s, /^Heat\. Keep the work below about 150 °C/, 2, true) || !has(s, /^Hard rubber \(ebonite\)\./, 1, true) || !(await page.$('#main #mg-lam ~ p a[href="#/t/plastics"]'))) problems.push(`[${where}] laminates and hard rubber: ${brief(s)}`);
+
+    s = await sect('toolguide', 't-sig', ['H2', 'H3']);
+    if (s.filter(x => x.k > 0).length !== 3 || !has(s, /^Seven figures in a fixed order\. .*back rake, side rake, end relief, side relief, end cutting edge angle, side cutting edge angle and nose radius/, 2, false) || !has(s, /^Units\..*the sources differ/, 2, false) || !has(s, /^An example\. 0-7-6-8-15-16-0\.8/, 1, true)) problems.push(`[${where}] tool signature: ${brief(s)}`);
+    await mode('advanced');
+  }
+
+  // Setup sheet: the operations are planned in order and printed.
+  where = 'setupsheet ops';
+  {
+    await open('setupsheet', 250);
+    const before = await page.$$eval('#main [data-p][data-c="n"]', a => a.length);
+    await page.click('#main #padd'); await page.waitForTimeout(120);
+    const nums = await page.$$eval('#main [data-p][data-c="n"]', a => a.map(x => x.value));
+    const last = await page.$('#main [data-p="' + (nums.length - 1) + '"][data-c="desc"]');
+    if (last) { await last.fill('Face and centre drill'); await page.waitForTimeout(80); }
+    const pv = (await page.$eval('#main #sprintview', e => e.textContent)).replace(/\s+/g, ' ');
+    if (nums.length !== before + 1 || (before && nums.length > 1 && !/^\d+$/.test(nums[nums.length - 1])) || !/Operations/.test(pv) || !/Face and centre drill/.test(pv)) problems.push(`[${where}] operations: ${before} then ${nums.join(',')} | ${pv.slice(0, 200)}`);
+    const del = await page.$('#main [data-delp="' + (nums.length - 1) + '"]');
+    if (del) { await del.click(); await page.waitForTimeout(120); }
+    if ((await page.$$eval('#main [data-p][data-c="n"]', a => a.length)) !== before) problems.push(`[${where}] removing the added operation`);
+  }
+
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
   where = 'glossary';
   await open('glossary', 150);

@@ -701,8 +701,27 @@ def build_fasteners(drills):
     out['keys_inch'] = build_series(ev['keys_inch'], ['range', 'width', 'square_h', 'rect_h'], order=lambda s: frac_in(s.split('-')[0]))
     out['tslots'] = build_series(ev['tslots'], ['b_min', 'b_max', 'c_min', 'c_max', 'h_min', 'h_max', 'bolt'], order=float, exact=True)
     out['tslot_pitch'] = ev['tslot_pitch']
+    # Metric hexagon heads, nuts and plain washers. The ISO widths across flats of the spanner table also count for the head.
+    hm = {pub: {z: dict(r) for z, r in rows.items()} for pub, rows in ev['hex_metric'].items()}
+    hex_sizes = set(z for rows in hm.values() for z in rows)
+    for pub, rows in ev['af_metric'].items():
+        for z, r in rows.items():
+            if z in hex_sizes and r.get('iso'): hm.setdefault(pub, {}).setdefault(z, {})['s'] = r['iso']
+    out['hex_metric'] = build_series(hm, ['k', 's'], order=mnum, exact=True)
+    out['nut_metric'] = build_series(ev['nut_metric'], ['s_max', 's_min', 'm_max', 'm_min'], order=mnum, exact=True)
+    # One publisher prints a single hole and outside diameter, the other least and greatest: compare hole with least, outside with greatest.
+    wm = {}
+    for pub, rows in ev['washer_metric'].items():
+        for z, r in rows.items():
+            q = dict(r)
+            if 'd1_min' in r: q['d1'] = r['d1_min']
+            if 'd2_max' in r: q['d2'] = r['d2_max']
+            wm.setdefault(pub, {})[z] = q
+    out['washer_metric'] = build_series(wm, ['d1', 'd1_max', 'd2', 'd2_min', 'h', 'h_min', 'h_max'], order=mnum, exact=True)
+    ni = {pub: {z: {'af': f"{frac_in(r['af']):.4f}", 'af_frac': r['af'], 'h': f"{frac_in(r['h']):.4f}", 'h_frac': r['h']} for z, r in rows.items()} for pub, rows in ev['nut_inch'].items()}
+    out['nut_inch'] = build_series(ni, ['af', 'af_frac', 'h', 'h_frac'], order=inch_size)
     out['as568'] = build_series(ev['as568'], ['id', 'id_tol', 'cs', 'cs_tol'], order=int)
-    for k in ('torque_friction', 'oring_rules', 'sae_note', 'clearance_metric_note', 'clearance_inch_note', 'af_metric_note', 'keys_inch_note', 'tslot_pitch_source'):
+    for k in ('torque_friction', 'oring_rules', 'sae_note', 'clearance_metric_note', 'clearance_inch_note', 'af_metric_note', 'keys_inch_note', 'tslot_pitch_source', 'washer_metric_note', 'nut_metric_note', 'nut_inch_note'):
         out[k] = ev.get(k)
     # every row must name at least one publisher; record the publishers of each row
     for sec, v in out.items():
@@ -765,7 +784,46 @@ def build_symbols():
         greek.append({'name': name, 'upper': up, 'lower': lo, 'publishers': by, 'used': ev['greek_used'].get(name, ''),
                       'status': 'confirmed' if len(by) >= 2 else 'review'})
     if len(greek) != 24: raise SystemExit('symbols: expected 24 Greek letters')
-    return {'sources': sources_of(ev), 'prefixes': prefixes, 'constants': constants, 'greek': greek}
+    # SI base units and the 22 derived units with special names: confirmed when two publishers print the same name and symbol
+    # (metre and meter count as the same word) and, for derived units, the same expression in other SI units.
+    srcs = ev['sources']
+    def said(keys):
+        for k in keys:
+            if k not in srcs: raise SystemExit(f'symbols: unknown source {k}')
+        n = len({srcs[k]['publisher'] for k in keys})
+        return 'confirmed' if n >= 2 else 'review' if n == 1 else 'unverified'
+    spell = lambda n: n.replace('meter', 'metre')
+    bpubs = list(ev['base_units'])
+    base = []
+    for q, name, sym in ev['base_units'][bpubs[0]]:
+        printed = {p: [n2, s2] for p in bpubs for q2, n2, s2 in ev['base_units'][p] if q2 == q}
+        same = len({(spell(n2), s2) for n2, s2 in printed.values()}) == 1
+        base.append({'quantity': q, 'name': spell(name), 'sym': sym, 'printed': printed, 'status': 'confirmed' if len(printed) >= 2 and same else 'review'})
+    if len(base) != 7: raise SystemExit('symbols: expected 7 SI base units')
+    dpubs = list(ev['derived_units'])
+    derived = []
+    for q, name, sym, other in ev['derived_units'][dpubs[0]]:
+        printed = {p: [n2, o2] for p in dpubs for q2, n2, s2, o2 in ev['derived_units'][p] if s2 == sym}
+        same = len({tuple(v) for v in printed.values()}) == 1
+        derived.append({'quantity': q, 'name': name, 'sym': sym, 'other': other, 'base': ev['derived_base'].get(sym, ''),
+                        'publishers': list(printed), 'status': 'confirmed' if len(printed) >= 2 and same else 'review'})
+    if len(derived) != 22: raise SystemExit('symbols: expected 22 derived units with special names')
+    for d in derived:
+        if not d['other'] and not d['base']: raise SystemExit(f"symbols: {d['sym']} has no expression")
+    def rows(sec, n):
+        out = []
+        for r in ev[sec]:
+            status = said(r[n])
+            if len(r) > n + 1:
+                if r[n + 1] != 'differs' or status != 'confirmed': raise SystemExit(f'symbols {sec} {r[0]}: a differing row needs two publishers')
+                status = 'differs'
+            out.append(r[:n] + [r[n], status, r[n + 2] if len(r) > n + 2 else ''])
+        return out
+    systems = [{'topic': a, 'text': b, 'src': s, 'status': st} for a, b, s, st, _ in rows('systems', 2)]
+    signs = [{'sign': a, 'meaning': b, 'src': s, 'status': st} for a, b, s, st, _ in rows('signs', 2)]
+    quantities = [{'quantity': a, 'sym': b, 'unit': c, 'src': s, 'status': st, 'who': who} for a, b, c, s, st, who in rows('quantities', 3)]
+    return {'sources': sources_of(ev), 'prefixes': prefixes, 'constants': constants, 'greek': greek,
+            'base': base, 'derived': derived, 'systems': systems, 'signs': signs, 'quantities': quantities}
 
 
 def build_tooling():
@@ -1020,11 +1078,26 @@ def build_matref():
             for f in ('density', 'cte'):
                 if f in fields: raise SystemExit(f'matref plastics {key}: {f} is already in the materials data, do not duplicate')
         notes = [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in r['notes']]
-        prow.append({'key': key, 'name': r['name'], 'fields': fields, 'materials': link, 'notes': notes})
+        fam = pl['family'].get(key)
+        if not fam: raise SystemExit(f'matref plastics {key}: no family')
+        if fam[0] not in ('Semi-crystalline', 'Amorphous'): raise SystemExit(f'matref plastics {key}: family {fam[0]}')
+        prow.append({'key': key, 'name': r['name'], 'fields': fields, 'materials': link, 'notes': notes,
+                     'family': {'kind': fam[0], 'src': fam[1], 'status': mr_said(srcs, fam[1])}})
+    # statements on the families of plastics: own words; a row marked "differs" names each publisher's view in its text
+    families = []
+    for row in pl['families']:
+        topic, text, s = row[0], row[1], row[2]
+        status = mr_said(srcs, s)
+        if len(row) > 3:
+            if row[3] != 'differs' or status != 'confirmed': raise SystemExit(f'matref plastics families {topic}: a differing row needs two publishers')
+            status = 'differs'
+        families.append({'topic': topic, 'text': text, 'src': s, 'status': status})
     out['plastics'] = {'fields': pl['_fields'], 'units': pl['_units'], 'rows': prow,
-                       'general': [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in pl['general']]}
+                       'general': [{'text': t, 'src': s, 'status': mr_said(srcs, s)} for t, s in pl['general']],
+                       'families': families, 'family_note': pl['_family_note']}
     mi = ev['metalid']
-    out['metalid'] = {'spark': mi['spark'], 'tests': [{'test': a, 'text': b, 'src': s, 'status': mr_said(srcs, s)} for a, b, s in mi['tests']]}
+    # A test row may carry a fourth item, 'differs', where two publishers describe the result differently.
+    out['metalid'] = {'spark': mi['spark'], 'tests': [{'test': t[0], 'text': t[1], 'src': t[2], 'status': t[3] if len(t) > 3 else mr_said(srcs, t[2])} for t in mi['tests']]}
     return out
 
 

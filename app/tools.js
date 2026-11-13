@@ -1979,6 +1979,38 @@ const TOOLS = [
   source: 'OpenStax, Algebra and Trigonometry 2e, ch. 10 (non-right triangles: law of sines incl. the ambiguous case, law of cosines). See docs/geometry.md.',
 },
 {
+  id: 'squaring', level: 'simple', group: 'Geometry', title: 'Squaring a corner (3-4-5 rule)',
+  desc: 'The diagonal that makes a corner square for any two legs, the angle of the corner from the diagonal you measured, and the rise over a length for an angle.',
+  fields: s => [
+    { id: 'a', label: 'First leg, measured from the corner', unit: lenU(s), def: s === 'inch' ? 36 : 900 },
+    { id: 'b', label: 'Second leg, measured from the corner', unit: lenU(s), def: s === 'inch' ? 48 : 1200 },
+    { id: 'c', label: 'Diagonal you measured (optional)', unit: lenU(s), def: '' },
+    { id: 'run', label: 'Length for a rise (optional)', unit: lenU(s), def: '' },
+    { id: 'ang', label: 'Angle for the rise', unit: 'deg', def: 1, when: v => v.run > 0 },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.a > 0 && v.b > 0)) return [];
+    const u = lenU(s), dp = s === 'inch' ? 4 : 2, rows = [R('Diagonal for a square corner', W.square_diagonal(v.a, v.b), u, dp)];
+    if (v.c > 0) {
+      const A = W.corner_angle_deg(v.a, v.b, v.c);
+      rows.push(isFinite(A) ? R('Angle of the corner from your diagonal', A, 'deg', 3) : R('Diagonal', 'these three lengths cannot make a triangle', '', 0));
+      const A3 = +A.toFixed(3);   // wording only: compare at the three decimals shown
+      if (isFinite(A)) rows.push(R('Corner', A3 > 90 ? 'wider than square: bring the ends of the legs together' : A3 < 90 ? 'tighter than square: move the ends of the legs apart' : 'square, to the three decimals shown', '', 0));
+    }
+    if (v.run > 0) {
+      const r = W.rise_for_angle(v.run, v.ang);
+      rows.push(isFinite(r) ? R('Rise over that length at the angle', r, u, dp) : R('Angle', 'must be between -90 and 90 degrees', '', 0));
+    }
+    rows.push(R('Note', 'Legs of 3 and 4 parts give a diagonal of 5 parts; so do 6-8-10, 9-12-15 and every other multiple. The larger the triangle, the smaller the effect of a small error with the tape.', '', 0));
+    return rows;
+  },
+  working: 'Diagonal = sqrt(a² + b²). Angle of the corner = acos((a² + b² − c²) / (2 a b)). Rise = length × tan(angle).',
+  source: '3-4-5 rule: Math Open Reference, "3:4:5 triangle" and A Concord Carpenter, "The 3-4-5 method for squaring corners" (R. Robillard, 2018). Pythagoras, the law of cosines and the tangent: OpenStax, Algebra and Trigonometry 2e. See docs/sources.md, Shop maths 2.',
+  proof: [{ name: 'Legs of 3 and 4', sys: 'mm', vals: { a: 3, b: 4, c: 5 },
+    expect: [['Diagonal for a square corner', 'mm', 5, 0.000001], ['Angle of the corner from your diagonal', 'deg', 90, 0.000001]],
+    source: 'Math Open Reference, 3:4:5 triangle: sides in the ratio 3:4:5 make a right triangle.' }],
+},
+{
   id: 'arc', level: 'advanced', group: 'Geometry', title: 'Chord, arc, sagitta and 3-point circle',
   desc: 'Solve an arc from any two of radius, included angle, chord, sagitta (height) and arc length (all ten pairs, with both arcs where two fit); segment and sector areas; centre and radius of the circle through three points.',
   render: el => renderArc(el),
@@ -2051,6 +2083,93 @@ const TOOLS = [
   render: el => renderIrregular(el),
   working: 'Trapezoidal rule: A = d [(first + last) / 2 + all the widths between]. Simpson\'s rule: A = d/3 [first + last + 4 (2nd, 4th, …) + 2 (3rd, 5th, …)], which needs an odd number of widths (an even number of strips).',
   source: 'Geosurab surveying notes, calculation of area of irregular figures (worked example 843.33 m²); Maths at Home, Simpson\'s 1/3 rule (worked example 4053 m²); Class Mathematics, the trapezoidal rule (worked example 760 m²). See docs/sources.md, Areas and volumes by rule.',
+},
+{
+  id: 'linecirc', level: 'advanced', group: 'Geometry', title: 'Line and circle (coordinates)',
+  desc: 'A line through two points: length, angle, slope and where it crosses the axes. With a circle: the distance from the centre to the line, whether the line misses, touches or cuts the circle, and the points where they meet, drawn to scale.',
+  fields: s => [
+    { id: 'x1', label: 'Point 1, X', unit: lenU(s), def: -10 },
+    { id: 'y1', label: 'Point 1, Y', unit: lenU(s), def: 11 },
+    { id: 'x2', label: 'Point 2, X', unit: lenU(s), def: 10 },
+    { id: 'y2', label: 'Point 2, Y', unit: lenU(s), def: -9 },
+    { id: 'cx', label: 'Circle centre, X (optional)', unit: lenU(s), def: 3 },
+    { id: 'cy', label: 'Circle centre, Y', unit: lenU(s), def: -5 },
+    { id: 'r', label: 'Circle radius', unit: lenU(s), def: 3 },
+  ],
+  calc: (v, W, s) => {
+    if (![v.x1, v.y1, v.x2, v.y2].every(isFinite)) return [];
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3, L = w => W.line_two_points(v.x1, v.y1, v.x2, v.y2, w);
+    if (!isFinite(L(0))) return [R('Inputs', 'the two points must not be the same', '', 0)];
+    const rows = [R('Length between the two points', L(0), u, dp), R('Angle of the line from the X axis', L(1), 'deg', 4)];
+    rows.push(isFinite(L(2)) ? R('Slope (rise in Y for 1 along X)', L(2), '', 5) : R('Slope', 'the line is parallel to the Y axis', '', 0));
+    if (isFinite(L(3))) rows.push(R('Crosses the Y axis (X = 0) at Y', L(3), u, dp));
+    if (isFinite(L(4))) rows.push(R('Crosses the X axis (Y = 0) at X', L(4), u, dp));
+    if ([v.cx, v.cy, v.r].every(isFinite)) {
+      if (!(v.r > 0)) return rows.concat([R('Circle', 'the radius must be more than 0', '', 0)]);
+      const C = w => W.line_circle(v.x1, v.y1, v.x2, v.y2, v.cx, v.cy, v.r, w), n = C(0);
+      rows.push(R('Distance from the circle centre to the line', W.point_line_distance(v.cx, v.cy, v.x1, v.y1, v.x2, v.y2), u, dp));
+      if (n === 0) rows.push(R('Line and circle', 'the line misses the circle', '', 0));
+      else if (n === 1) rows.push(R('Line and circle', 'the line touches the circle (tangent)', '', 0), R('Tangent point, X', C(1), u, dp), R('Tangent point, Y', C(2), u, dp));
+      else rows.push(R('Line and circle', 'the line cuts the circle at two points', '', 0), R('First point, X', C(1), u, dp), R('First point, Y', C(2), u, dp), R('Second point, X', C(3), u, dp), R('Second point, Y', C(4), u, dp),
+        R('Chord between the two points', W.line_two_points(C(1), C(2), C(3), C(4), 0), u, dp));
+      if (n === 2) rows.push(R('Note', 'First and second are in the direction from point 1 to point 2. The line is taken as endless: a meeting point can lie beyond your two points.', '', 0));
+    }
+    return rows;
+  },
+  working: 'Angle = atan2(Y2 − Y1, X2 − X1). Distance from a point to the line through two points: |(X2 − X1)(Y1 − Y0) − (X1 − X0)(Y2 − Y1)| / length. The line misses the circle when that distance is more than the radius, touches it when equal and cuts it when less; the two points lie half a chord, √(r² − distance²), either side of the foot of the perpendicular from the centre.',
+  source: 'Distance from a point to a line: Wolfram MathWorld, "Point-Line Distance, 2-Dimensional" and Mathwords, "Circle-line intersection". Miss, touch or cut by comparing the distance with the radius: Mathwords; by the sign of the discriminant: MathWorld, "Circle-Line Intersection". Worked cases: Rosetta Code, "Line circle intersection" and Mathwords. The half-chord construction is our own working of the same geometry, checked against those cases in the core tests. See docs/sources.md, Shop maths 3.',
+  proof: [
+    { name: 'Centre (3, -5), radius 3, line (-10, 11) to (10, -9)', sys: 'mm', vals: { x1: -10, y1: 11, x2: 10, y2: -9, cx: 3, cy: -5, r: 3 },
+      expect: [['First point, X', 'mm', 3, 0.000001], ['First point, Y', 'mm', -2, 0.000001], ['Second point, X', 'mm', 6, 0.000001], ['Second point, Y', 'mm', -5, 0.000001]], source: 'Rosetta Code, Line circle intersection: (3, -2) and (6, -5).' },
+    { name: 'y = x + 1 and the circle of radius 5 at the origin', sys: 'mm', vals: { x1: 0, y1: 1, x2: 1, y2: 2, cx: 0, cy: 0, r: 5 },
+      expect: [['First point, X', 'mm', -4, 0.000001], ['First point, Y', 'mm', -3, 0.000001], ['Second point, X', 'mm', 3, 0.000001], ['Second point, Y', 'mm', 4, 0.000001], ['Angle of the line from the X axis', 'deg', 45, 0.000001]], source: 'Mathwords, worked example 1: (-4, -3) and (3, 4).' },
+    { name: 'y = 3x + 10 and the circle of radius 3 at the origin', sys: 'mm', vals: { x1: 0, y1: 10, x2: 1, y2: 13, cx: 0, cy: 0, r: 3 },
+      expect: [['Distance from the circle centre to the line', 'mm', 3.162, 0.001]], source: 'Mathwords, worked example 2: distance √10 = 3.16, more than the radius, no intersection.' },
+  ],
+},
+{
+  id: 'conics', level: 'advanced', group: 'Geometry', title: 'Ellipse, parabola and hyperbola',
+  desc: 'Ellipse from its two half-axes (foci, eccentricity, a point on the curve), parabola from the width and depth of a dish (focal length, a point on the curve, length along the curve) and hyperbola from its two half-axes (foci, eccentricity, asymptotes, a point on the curve), each with a drawing.',
+  fields: s => [
+    { id: 'k', label: 'Curve', unit: '', def: 0, options: [[0, 'Ellipse'], [1, 'Parabola'], [2, 'Hyperbola']] },
+    { id: 'a', label: 'Half-axis a (the longer one for an ellipse)', unit: lenU(s), def: 5, when: v => v.k !== 1 },
+    { id: 'b', label: 'Half-axis b', unit: lenU(s), def: 3, when: v => v.k !== 1 },
+    { id: 'w', label: 'Width across the dish', unit: lenU(s), def: 2, when: v => v.k === 1 },
+    { id: 'd', label: 'Depth of the dish', unit: lenU(s), def: 2, when: v => v.k === 1 },
+    { id: 'x', label: 'X from the centre line, for a point on the curve (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    const u = lenU(s), dp = s === 'inch' ? 4 : 3, rows = [];
+    if (v.k === 1) {
+      if (!(v.w > 0 && v.d > 0)) return [];
+      const f = W.parabola_prop(v.w, v.d, 0, 0);
+      rows.push(R('Focal length (vertex to focus)', f, u, dp), R('Width of the curve at the focus (latus rectum)', W.parabola_prop(v.w, v.d, 0, 3), u, dp), R('Length along the curve, rim to rim (one source)', W.parabola_prop(v.w, v.d, 0, 4), u, dp));
+      if (isFinite(v.x)) rows.push(R('Height of the curve above the vertex at X', W.parabola_prop(f, 0, v.x, 1), u, dp), R('Length along the curve from the vertex to X (one source)', W.parabola_prop(f, 0, v.x, 2), u, dp));
+      rows.push(R('Note', 'The curve is y = x² / (4 × focal length), with the vertex at the bottom of the dish. Every point of it is as far from the focus as from the directrix, a line one focal length below the vertex.', '', 0));
+      return rows;
+    }
+    if (!(v.a > 0 && v.b > 0)) return [];
+    if (v.k === 0) {
+      if (v.b > v.a) return [R('Inputs', 'enter the longer half-axis as a', '', 0)];
+      const E = w => W.ellipse_prop(v.a, v.b, isFinite(v.x) ? v.x : 0, w);
+      rows.push(R('Centre to each focus, c', E(0), u, dp), R('Eccentricity c / a', E(1), '', 5), R('Half-width of the curve at a focus', E(3), u, dp));
+      if (isFinite(v.x)) rows.push(isFinite(E(2)) ? R('Y of the curve at X (above and below the long axis)', E(2), u, dp) : R('X', 'lies beyond the end of the ellipse', '', 0));
+      rows.push(R('Note', 'The two distances from any point of the ellipse to the foci add up to 2a. Area and perimeter are in Areas and volumes.', '', 0));
+      return rows;
+    }
+    const H = w => W.hyperbola_prop(v.a, v.b, isFinite(v.x) ? v.x : 0, w);
+    rows.push(R('Centre to each focus, c', H(0), u, dp), R('Eccentricity c / a', H(1), '', 5), R('Angle of the asymptotes from the X axis', H(2), 'deg', 4), R('Slope of the asymptotes, b / a', H(4), '', 5));
+    if (isFinite(v.x)) rows.push(isFinite(H(3)) ? R('Y of the curve at X (above and below the axis)', H(3), u, dp) : R('X', 'lies between the two branches: the curve starts at X = a', '', 0));
+    rows.push(R('Note', 'The two distances from any point of the hyperbola to the foci differ by 2a. Far from the centre the curve runs along the asymptotes.', '', 0));
+    return rows;
+  },
+  working: 'Ellipse x²/a² + y²/b² = 1: c = √(a² − b²), eccentricity c / a, y = b √(1 − x²/a²). Parabola y = x²/(4f): a dish of width w and depth d has f = w²/(16 d); length along the curve from the vertex to x: f (t √(1 + t²) + asinh t) with t = x / (2f). Hyperbola x²/a² − y²/b² = 1: c = √(a² + b²), eccentricity c / a, asymptotes y = ± (b/a) x, y = b √(x²/a² − 1).',
+  source: 'Wolfram MathWorld, "Ellipse", "Parabola" and "Hyperbola"; NUM8ERS, "AP Precalculus: Conic Sections" (the same relations for c, the eccentricity, the focal length of a parabola and the asymptotes, with worked examples). The length along a parabola is from MathWorld only. The focal length from width and depth is our own step from y = x²/(4f) at the rim. See docs/sources.md, Shop maths 3.',
+  proof: [
+    { name: 'Ellipse a = 5, b = 3', sys: 'mm', vals: { k: 0, a: 5, b: 3, x: 4 }, expect: [['Centre to each focus, c', 'mm', 4, 0.000001], ['Eccentricity c / a', '', 0.8, 0.000001], ['Y of the curve at X (above and below the long axis)', 'mm', 1.8, 0.000001]], source: 'NUM8ERS, worked example 2: a = 5, b = 3, c = 4, foci 4 either side of the centre.' },
+    { name: 'Hyperbola a = 4, b = 3', sys: 'mm', vals: { k: 2, a: 4, b: 3 }, expect: [['Centre to each focus, c', 'mm', 5, 0.000001], ['Slope of the asymptotes, b / a', '', 0.75, 0.000001]], source: 'NUM8ERS, worked example 3: c = 5, asymptotes of slope 3/4.' },
+    { name: 'Parabola y = 2x²: a dish 2 wide and 2 deep', sys: 'mm', vals: { k: 1, w: 2, d: 2 }, expect: [['Focal length (vertex to focus)', 'mm', 0.125, 0.000001]], source: 'NUM8ERS, worked example 1: y = 2(x − 3)² + 1 has the focal length 1/8.' },
+  ],
 },
 {
   id: 'compound', level: 'advanced', group: 'Geometry', title: 'Compound angles',
@@ -2487,6 +2606,94 @@ const TOOLS = [
   source: 'NIST/SEMATECH e-Handbook of Statistical Methods, 6.1.6 (capability indices, ppm table, ~50 values) and 6.3.2 (d2) (public domain); Minitab support, methods and formulas for normal capability analysis (within and overall sigma). Pp/Ppk as the same formulas on the overall sigma: one source read, to be verified. Normal tail: Numerical Recipes erfc. See docs/shop-helpers.md.',
 },
 {
+  id: 'normdist', level: 'advanced', group: 'Inspection and quality', title: 'Normal distribution: share between limits',
+  desc: 'For a mean and a standard deviation: the share of parts below a limit, above a limit and between two limits, as a percentage and in parts per million, the standard score z of each limit, and the value below which a given share falls. Drawn on the bell curve.',
+  fields: s => [
+    { id: 'mean', label: 'Mean', unit: '', def: 20.05 },
+    { id: 'sd', label: 'Standard deviation', unit: '', def: 0.02 },
+    { id: 'lo', label: 'Lower limit (optional)', unit: '', def: 20.03 },
+    { id: 'hi', label: 'Upper limit (optional)', unit: '', def: 20.08 },
+    { id: 'p', label: 'Share to find a value for (optional)', unit: '%', def: '' },
+  ],
+  calc: (v, W) => {
+    if (!isFinite(v.mean) || !isFinite(v.sd)) return [];
+    if (!(v.sd > 0)) return [R('Inputs', 'the standard deviation must be more than 0', '', 0)];
+    const rows = [], hasLo = isFinite(v.lo), hasHi = isFinite(v.hi);
+    if (hasLo && hasHi && !(v.hi > v.lo)) return [R('Inputs', 'the upper limit must be above the lower limit', '', 0)];
+    const below = W.normal_share_below(v.lo, v.mean, v.sd), above = W.normal_share_above(v.hi, v.mean, v.sd);   // shares as fractions; shown as % and ppm
+    if (hasLo && hasHi) rows.push(R('Share between the limits', W.normal_share_between(v.lo, v.hi, v.mean, v.sd) * 100, '%', 4), R('Outside the limits', W.normal_share_outside(v.lo, v.hi, v.mean, v.sd) * 1e6, 'ppm', 1));
+    if (hasLo) rows.push(R('Share below the lower limit', below * 100, '%', 4), R('Below the lower limit', below * 1e6, 'ppm', 1), R('z of the lower limit', W.normal_z(v.lo, v.mean, v.sd), '', 3));
+    if (hasHi) rows.push(R('Share above the upper limit', above * 100, '%', 4), R('Above the upper limit', above * 1e6, 'ppm', 1), R('z of the upper limit', W.normal_z(v.hi, v.mean, v.sd), '', 3));
+    if (isFinite(v.p)) {
+      const z = W.normal_z_for_share(v.p / 100);
+      if (isFinite(z)) rows.push(R('Value with ' + v.p + ' % of the parts below it', W.normal_value_for_share(v.p / 100, v.mean, v.sd), '', 4), R('z for that share', z, '', 3));
+      else rows.push(R('Share', 'must be more than 0 % and less than 100 %', '', 0));
+    }
+    [1, 2, 3].forEach(k => rows.push(R('Within ' + k + ' standard deviation' + (k > 1 ? 's' : '') + ' of the mean', W.normal_share_within(k) * 100, '%', 2)));
+    rows.push(R('Note', 'True only as far as the measurements follow a normal distribution and the mean and standard deviation are known well. Far out in the tails real processes rarely follow the curve, so treat very small ppm figures as a guide.', '', 0));
+    return rows;
+  },
+  working: 'z = (limit − mean) / standard deviation. The share below a limit is the area under the standard normal curve to the left of z; between two limits it is the difference of the two areas. Within k standard deviations: erf(k / √2). The value for a share is found by searching for the z with that area.',
+  source: 'Interactive Mathematics (IntMath), "Normal probability distributions": z = (X − μ)/σ, areas within 1, 2 and 3 standard deviations, worked examples. Wikipedia, "68–95–99.7 rule": erf(n/√2) and the table of shares. Area under the curve: complementary error function as in the process capability tool. See docs/sources.md, Shop maths 3.',
+  proof: [
+    { name: 'Lathe parts, mean 20.05 mm, standard deviation 0.02 mm, limits 20.03 and 20.08', sys: 'mm', vals: { mean: 20.05, sd: 0.02, lo: 20.03, hi: 20.08 },
+      expect: [['Share between the limits', '%', 77.45, 0.005], ['z of the lower limit', '', -1, 0.0000001], ['z of the upper limit', '', 1.5, 0.0000001]], source: 'IntMath, example 5 (a): 0.7745.' },
+    { name: 'Same parts, below 20.01', sys: 'mm', vals: { mean: 20.05, sd: 0.02, lo: 20.01, hi: '' }, expect: [['Share below the lower limit', '%', 2.28, 0.005]], source: 'IntMath, example 5 (c): 0.0228.' },
+    { name: 'Standard normal, above z = 1.06', sys: 'mm', vals: { mean: 0, sd: 1, lo: '', hi: 1.06 }, expect: [['Share above the upper limit', '%', 14.46, 0.005]], source: 'IntMath, example 4 (a): 0.1446.' },
+    { name: 'Within 2 standard deviations', sys: 'mm', vals: { mean: 0, sd: 1, lo: -2, hi: 2 }, expect: [['Share between the limits', '%', 95.4499736, 0.00002]], source: 'Wikipedia, 68–95–99.7 rule: 0.954499736103642.' },
+    { name: 'Top 5 % of mean 3.25, standard deviation 0.60', sys: 'mm', vals: { mean: 3.25, sd: 0.6, lo: '', hi: '', p: 95 }, expect: [['Value with 95 % of the parts below it', '', 4.237, 0.001]], source: 'IntMath, example 6 (b): about 4.24 (4.237).' },
+  ],
+},
+{
+  id: 'distrib', level: 'advanced', group: 'Inspection and quality', title: 'Binomial and Poisson: chance of a count',
+  desc: 'The chance of finding exactly a given count, that count or fewer, that count or more, or a range of counts: defective parts in a sample from the chance of one part being defective (binomial), or events from a mean count such as flaws per sheet or stops per shift (Poisson). With the mean, the standard deviation and a bar chart of the distribution.',
+  fields: s => [
+    { id: 'm', label: 'Model', unit: '', def: 0, options: [[0, 'Binomial: a number of trials, same chance each time'], [1, 'Poisson: a mean count']] },
+    { id: 'n', label: 'Number of trials (parts in the sample)', unit: '', def: 50, when: v => v.m !== 1 },
+    { id: 'p', label: 'Chance on each trial (share defective)', unit: '%', def: 2, when: v => v.m !== 1 },
+    { id: 'mu', label: 'Mean count', unit: '', def: 3, when: v => v.m === 1 },
+    { id: 'k', label: 'Count', unit: '', def: 2 },
+    { id: 'k2', label: 'Up to count (optional)', unit: '', def: '' },
+  ],
+  calc: (v, W) => {
+    const pois = v.m === 1, whole = x => isFinite(x) && x >= 0 && Math.floor(x) === x, big = 100000;
+    if (pois ? !isFinite(v.mu) : (!isFinite(v.n) || !isFinite(v.p))) return [];
+    if (!pois && !(whole(v.n) && v.n >= 1 && v.n <= big)) return [R('Inputs', 'the number of trials must be a whole number from 1 to 100 000', '', 0)];
+    if (!pois && !(v.p >= 0 && v.p <= 100)) return [R('Inputs', 'the chance must be from 0 to 100 %', '', 0)];
+    if (pois && !(v.mu >= 0 && v.mu <= big)) return [R('Inputs', 'the mean count must be from 0 to 100 000', '', 0)];
+    if (!isFinite(v.k)) return [];
+    if (!(whole(v.k) && v.k <= big)) return [R('Inputs', 'the count must be a whole number, 0 or more', '', 0)];
+    const hasK2 = isFinite(v.k2);
+    if (hasK2 && !(whole(v.k2) && v.k2 >= v.k && v.k2 <= big)) return [R('Inputs', 'the upper count must be a whole number, not below the count', '', 0)];
+    const f = v.p / 100;   // per cent to a fraction; every chance below is a core result shown as %
+    const P = w => pois ? W.poisson_prob(v.mu, v.k, w) : W.binomial_prob(v.n, f, v.k, w);
+    const rows = [
+      R('Chance of exactly ' + v.k, P(0) * 100, '%', 4),
+      R('Chance of ' + v.k + ' or fewer', P(1) * 100, '%', 4),
+      R('Chance of ' + v.k + ' or more', P(2) * 100, '%', 4),
+    ];
+    if (hasK2) rows.push(R('Chance of ' + v.k + ' to ' + v.k2, (pois ? W.poisson_between(v.mu, v.k, v.k2) : W.binomial_between(v.n, f, v.k, v.k2)) * 100, '%', 4));
+    rows.push(R('Mean count', P(3), '', 4), R('Standard deviation of the count', P(4), '', 4));
+    if (!pois) {
+      rows.push(R('Poisson estimate of exactly ' + v.k + ' (mean = trials × chance)', P(6) * 100, '%', 4));
+      if (!pois && v.k > v.n) rows.push(R('Note on the count', 'The count is more than the number of trials, so it cannot happen.', '', 0));
+      rows.push(R('Note', 'Binomial: holds when every trial has the same chance and one result does not change the next, as for a sample that is small beside the lot. The Poisson estimate is close when the trials are many and the chance is small; compare the two rows.', '', 0));
+    } else rows.push(R('Note', 'Poisson: holds when the events come one at a time, independently, at a steady average rate. The mean count must be for the same length, area or time as the count you ask about.', '', 0));
+    return rows;
+  },
+  working: 'Binomial: P(X = k) = C(n, k) · p^k · (1 − p)^(n − k), mean n·p, standard deviation √(n·p·(1 − p)). Poisson: P(X = k) = e^(−μ) · μ^k / k!, mean μ, standard deviation √μ. "k or fewer" adds the terms from 0 to k; "k or more" adds the terms from k upwards.',
+  source: 'Binomial: Newcastle University, academic skills kit, "Discrete probability models"; Mathwords, "Binomial distribution". Poisson: Interactive Mathematics (IntMath), "Poisson probability distribution"; Newcastle University, "Poisson distribution (business)". The published worked examples are core tests. See docs/sources.md, Binomial and Poisson distributions.',
+  proof: [
+    { name: 'Binomial, 10 trials at 40 %, count 4', sys: 'mm', vals: { m: 0, n: 10, p: 40, k: 4, k2: '' }, expect: [['Chance of exactly 4', '%', 25.1, 0.05], ['Mean count', '', 4, 0.0000001]], source: 'Newcastle University, Discrete probability models: P(Y = 4) = 0.251, mean 4.' },
+    { name: 'Binomial, 10 trials at 40 %, count 2', sys: 'mm', vals: { m: 0, n: 10, p: 40, k: 2, k2: '' }, expect: [['Chance of 2 or fewer', '%', 16.7, 0.05], ['Chance of 2 or more', '%', 95.4, 0.05]], source: 'Newcastle University, Discrete probability models: 0.167 and 0.954.' },
+    { name: 'Binomial, 10 trials at 50 %, count 6', sys: 'mm', vals: { m: 0, n: 10, p: 50, k: 6, k2: '' }, expect: [['Chance of exactly 6', '%', 20.5078, 0.0001]], source: 'Mathwords, Binomial distribution: 210/1024 = 0.2051.' },
+    { name: 'Binomial, 300 trials at 1 %, count 5, beside its Poisson estimate', sys: 'mm', vals: { m: 0, n: 300, p: 1, k: 5, k2: '' }, expect: [['Chance of exactly 5', '%', 10.099, 0.0005], ['Poisson estimate of exactly 5', '%', 10.082, 0.0005]], source: 'IntMath, Poisson probability distribution, example 5: 0.10099 (binomial) and 0.10082 (Poisson).' },
+    { name: 'Poisson, mean 3, counts 2 to 4', sys: 'mm', vals: { m: 1, mu: 3, k: 2, k2: 4 }, expect: [['Chance of 2 to 4', '%', 61.611, 0.0005]], source: 'IntMath, example 1: 0.61611.' },
+    { name: 'Poisson, mean 2.3, 3 or more', sys: 'mm', vals: { m: 1, mu: 2.3, k: 3, k2: '' }, expect: [['Chance of 3 or more', '%', 40.396, 0.0005]], source: 'IntMath, example 2: 0.40396.' },
+    { name: 'Poisson, mean 7, count 8', sys: 'mm', vals: { m: 1, mu: 7, k: 8, k2: '' }, expect: [['Chance of exactly 8', '%', 13.0, 0.05]], source: 'Newcastle University, Poisson distribution (business), example 2: 0.130.' },
+  ],
+},
+{
   id: 'ctrlchart', level: 'expert', group: 'Inspection and quality', title: 'Control charts (X-bar/R, individuals)',
   desc: 'Individuals and moving range, or X-bar and R charts for subgroups of 2 to 10, from pasted measurements: centre lines, control limits, the charts with points beyond a limit marked, and the A2, D3, D4 constants checked against two tables.',
   render: el => renderCtrlChart(el),
@@ -2652,11 +2859,11 @@ const TOOLS = [
   source: 'NIST SP 811, appendix B: inch = 0.0254 m exactly (1959 definition). See docs/shop-helpers.md.',
 },
 {
-  id: 'symbols', level: 'advanced', group: 'Shop helpers', title: 'SI prefixes, constants and Greek letters',
-  desc: 'The 24 SI prefixes from quecto to quetta, the seven constants that define the SI, and the Greek alphabet with what each letter stands for in BenchMate\'s formulas.',
+  id: 'symbols', level: 'advanced', group: 'Shop helpers', title: 'Units, signs, symbols and Greek letters',
+  desc: 'How SI and inch-pound units are tied together, the seven SI base units and the 22 named derived units, the 24 SI prefixes from quecto to quetta, the seven constants that define the SI, mathematical signs, the letters used for quantities (F, P, σ, ρ...), and the Greek alphabet with what each letter stands for in BenchMate\'s formulas.',
   render: el => renderSymbols(el),
   working: 'No calculation: the values are shown as the publishers print them.',
-  source: 'BIPM, SI prefixes and SI defining constants; NIST, Metric (SI) prefixes and SP 330 Table 1; University of Warwick and The Engineering ToolBox (Greek alphabet). See docs/sources.md, Units and symbols.',
+  source: 'BIPM, SI prefixes and SI defining constants; NIST, Metric (SI) prefixes, SP 330 Table 1 and SP 811 chapter 4 and Appendix B; Wikipedia (SI units, the international yard and pound); Electronics Notes, mathcentre and Simple English Wikipedia (signs); The Physics Hypertextbook, Wikipedia and BYJU\'S (letters for quantities); University of Warwick and The Engineering ToolBox (Greek alphabet). See docs/sources.md, Units and symbols.',
 },
 {
   id: 'units', level: 'simple', group: 'Shop helpers', title: 'Unit converter',
@@ -2680,6 +2887,104 @@ const TOOLS = [
   source: "Engineering economy interest formulas (Machinery's Handbook 'engineering economics', by name); see docs/sources.md.",
 },
 {
+  id: 'interp', level: 'simple', group: 'Shop helpers', title: 'Interpolation (one-way and two-way)',
+  desc: 'A value between two rows of a table (straight-line interpolation), the reverse, and a value inside a cell of a two-way table from its four corners, with a drawing. Says when the point lies outside the known values.',
+  fields: s => [
+    { id: 'm', label: 'What to find', unit: '', def: 0, options: [[0, 'y at x, between two rows'], [1, 'x at y, between two rows'], [2, 'Value inside a two-way table cell']] },
+    { id: 'x1', label: 'First x', unit: '', def: 20 },
+    { id: 'x2', label: 'Second x', unit: '', def: 30 },
+    { id: 'y1', label: 'y at the first x', unit: '', def: 5, when: v => v.m !== 2 },
+    { id: 'y2', label: 'y at the second x', unit: '', def: 7, when: v => v.m !== 2 },
+    { id: 'ya', label: 'First y', unit: '', def: 100, when: v => v.m === 2 },
+    { id: 'yb', label: 'Second y', unit: '', def: 200, when: v => v.m === 2 },
+    { id: 'q11', label: 'Table value at first x, first y', unit: '', def: 5, when: v => v.m === 2 },
+    { id: 'q21', label: 'Table value at second x, first y', unit: '', def: 7, when: v => v.m === 2 },
+    { id: 'q12', label: 'Table value at first x, second y', unit: '', def: 9, when: v => v.m === 2 },
+    { id: 'q22', label: 'Table value at second x, second y', unit: '', def: 12, when: v => v.m === 2 },
+    { id: 'x', label: 'x wanted', unit: '', def: 25, when: v => v.m !== 1 },
+    { id: 'yg', label: 'y given', unit: '', def: 6, when: v => v.m === 1 },
+    { id: 'y', label: 'y wanted', unit: '', def: 150, when: v => v.m === 2 },
+  ],
+  calc: (v, W) => {
+    const fin = (...a) => a.every(isFinite), rows = [];
+    const out = t => t < 0 || t > 1;
+    if (v.m === 2) {
+      if (!fin(v.x1, v.x2, v.ya, v.yb, v.q11, v.q21, v.q12, v.q22, v.x, v.y)) return [];
+      const B = w => W.bilinear(v.x1, v.x2, v.ya, v.yb, v.q11, v.q21, v.q12, v.q22, v.x, v.y, w);
+      if (!isFinite(B(0))) return [R('Inputs', 'the two x values must differ, and so must the two y values', '', 0)];
+      const tx = W.interp_fraction(v.x1, v.x2, v.x), ty = W.interp_fraction(v.ya, v.yb, v.y);
+      rows.push(R('Value at x and y', B(0), '', 4), R('On the first-y edge, at x', B(1), '', 4), R('On the second-y edge, at x', B(2), '', 4),
+        R('Fraction of the way from the first x to the second', tx, '', 4), R('Fraction of the way from the first y to the second', ty, '', 4));
+      if (out(tx) || out(ty)) rows.push(R('Warning', 'The point lies outside the cell, so this is an extrapolation: the table says nothing about how the value behaves out there.', '', 0));
+      rows.push(R('Note', 'Straight lines are assumed between the four corners. Interpolating along y first gives the same value.', '', 0));
+      return rows;
+    }
+    if (!fin(v.x1, v.x2, v.y1, v.y2)) return [];
+    if (v.m === 0) {
+      if (!isFinite(v.x)) return [];
+      const t = W.interp_fraction(v.x1, v.x2, v.x);
+      if (!isFinite(t)) return [R('Inputs', 'the two x values must differ', '', 0)];
+      rows.push(R('y at x', W.interpolate(v.x1, v.y1, v.x2, v.y2, v.x), '', 4), R('Fraction of the way from the first x to the second', t, '', 4));
+      if (out(t)) rows.push(R('Warning', 'x lies outside the two known values, so this is an extrapolation: the straight line is carried on past what is known.', '', 0));
+    } else {
+      if (!isFinite(v.yg)) return [];
+      const t = W.interp_fraction(v.y1, v.y2, v.yg);
+      if (!isFinite(t)) return [R('Inputs', 'the two y values must differ to find x from y', '', 0)];
+      rows.push(R('x at y', W.interpolate(v.y1, v.x1, v.y2, v.x2, v.yg), '', 4), R('Fraction of the way from the first y to the second', t, '', 4));
+      if (out(t)) rows.push(R('Warning', 'y lies outside the two known values, so this is an extrapolation: the straight line is carried on past what is known.', '', 0));
+    }
+    rows.push(R('Note', 'A straight line is assumed between the two rows. The closer the rows, the smaller the error for a curved relationship.', '', 0));
+    return rows;
+  },
+  working: 'One-way: y = y1 + (x − x1)(y2 − y1) / (x2 − x1); the reverse swaps x and y. Two-way: the same step along x on the first-y edge and on the second-y edge, then once more along y between the two results.',
+  source: 'One-way: mathcheck, "Linear interpolation calculator" and FIRGELLI Automations, "Interpolation calculator, linear" (R. Dickson, 2026). Two-way: mathcheck, "Bilinear interpolation calculator" (formula) and Omni Calculator, "Bilinear interpolation calculator" (A. Szczepanek; method and worked example). See docs/sources.md, Shop maths 3.',
+  proof: [
+    { name: 'Between (2, 4) and (8, 16) at x = 5', sys: 'mm', vals: { m: 0, x1: 2, y1: 4, x2: 8, y2: 16, x: 5 }, expect: [['y at x', '', 10, 0.000001]], source: 'FIRGELLI Automations, simple example: 10.' },
+    { name: 'Reverse: between (1, 2) and (3, 8), y = 5', sys: 'mm', vals: { m: 1, x1: 1, y1: 2, x2: 3, y2: 8, yg: 5 }, expect: [['x at y', '', 2, 0.000001]], source: 'mathcheck: (1, 2) and (3, 8) give y = 5 at x = 2.' },
+    { name: 'Two-way table, x 20 and 30, y 100 and 200', sys: 'mm', vals: { m: 2, x1: 20, x2: 30, ya: 100, yb: 200, q11: 5, q21: 7, q12: 9, q22: 12, x: 25, y: 150 },
+      expect: [['Value at x and y', '', 8.25, 0.000001], ['On the first-y edge, at x', '', 6, 0.000001], ['On the second-y edge, at x', '', 10.5, 0.000001]], source: 'mathcheck, two-way table lookup: edges 6 and 10.5, value 8.25.' },
+    { name: 'Two-way, Omni example', sys: 'mm', vals: { m: 2, x1: 0, x2: 4, ya: 1, yb: 3, q11: 12, q21: 0, q12: -4, q22: 8, x: 1, y: 2 }, expect: [['Value at x and y', '', 4, 0.000001]], source: 'Omni Calculator: 12, 0, -4 and 8 at the corners, point (1, 2): 4.' },
+  ],
+},
+{
+  id: 'depreciation', level: 'advanced', group: 'Shop helpers', title: 'Depreciation schedule',
+  desc: 'How the book value of a machine falls year by year: straight line, declining balance (double declining by default) and sum of the years\' digits, with the whole schedule drawn. Book-keeping only: tax rules differ by country and are not covered.',
+  fields: s => [
+    { id: 'cost', label: 'Cost of the machine', unit: '', def: 25000 },
+    { id: 'salv', label: 'Salvage (resale) value at the end', unit: '', def: 2500 },
+    { id: 'life', label: 'Useful life', unit: 'years', def: 8 },
+    { id: 'm', label: 'Method', unit: '', def: 0, options: [[0, 'Straight line'], [1, 'Declining balance'], [2, 'Sum of the years\' digits']] },
+    { id: 'fac', label: 'Declining balance factor (2 = double declining)', unit: '', def: 2, when: v => v.m === 1 },
+    { id: 'yr', label: 'Year to show', unit: '', def: 1 },
+  ],
+  calc: (v, W) => {
+    if (!(v.cost > 0 && v.life >= 1)) return [];
+    const salv = v.salv > 0 ? v.salv : 0, fac = v.m === 1 ? v.fac : 0;
+    const E = k => W.depreciation_expense(v.m, v.cost, salv, v.life, fac, k), B = k => W.depreciation_book_value(v.m, v.cost, salv, v.life, fac, k);
+    if (!isFinite(B(0))) return [R('Inputs', v.life % 1 ? 'the life must be a whole number of years' : salv > v.cost ? 'the salvage value cannot be more than the cost' : v.m === 1 ? 'the factor must be more than 0 and not more than the life' : 'check the inputs', '', 0)];
+    const rows = [], yr = v.yr >= 1 && v.yr % 1 === 0 ? v.yr : 1;
+    rows.push(R('Depreciation in year ' + yr, E(yr), '', 2), R('Book value at the end of year ' + yr, B(yr), '', 2));
+    const n = v.life > 40 ? 40 : v.life;
+    for (let k = 1; k <= n; k++) rows.push(R('Year ' + k + ': depreciation', E(k), '', 2), R('Year ' + k + ': book value at the year end', B(k), '', 2));
+    if (v.life > 40) rows.push(R('Note', 'Only the first 40 years are listed.', '', 0));
+    if (v.m === 1 && B(v.life) > salv) rows.push(R('Note', 'A declining balance does not reach the salvage value by itself. The book value left after the last year is shown as it is; some book-keepers switch to straight line for the last years, which is not done here.', '', 0));
+    return rows;
+  },
+  working: 'Straight line: (cost − salvage) / life, the same every year. Declining balance: book value at the start of the year × factor / life, cut in the year that would take the book value below the salvage value. Sum of the years\' digits: (cost − salvage) × years of life left at the start of the year / (1 + 2 + ... + life).',
+  source: 'Corporate Finance Institute, "Depreciation methods" (T. Vipond, 2019) and Wikipedia, "Depreciation": both give the three methods; the rule that the book value never goes below the salvage value is from Wikipedia. See docs/sources.md, Shop maths 2.',
+  proof: [
+    { name: 'Sum of the years\' digits, 1000 with 100 salvage over 5 years, year 2', sys: 'mm', vals: { cost: 1000, salv: 100, life: 5, m: 2, yr: 2 },
+      expect: [['Depreciation in year 2', '', 240, 0.005], ['Book value at the end of year 2', '', 460, 0.005]],
+      source: 'Wikipedia, Depreciation, sum-of-years-digits example: 300, 240, 180, 120, 60; book value 700, 460, 280, 160, 100.' },
+    { name: 'Double declining balance, 1000 with 100 salvage over 5 years, year 5', sys: 'mm', vals: { cost: 1000, salv: 100, life: 5, m: 1, fac: 2, yr: 5 },
+      expect: [['Depreciation in year 5', '', 29.6, 0.005], ['Book value at the end of year 5', '', 100, 0.005]],
+      source: 'Wikipedia, Depreciation, declining balance example at 40 %: 400, 240, 144, 86.40 and 29.60 in the last year, to end on the scrap value of 100.' },
+    { name: 'Straight line, 25 000 over 8 years', sys: 'mm', vals: { cost: 25000, salv: 0, life: 8, m: 0, yr: 1 },
+      expect: [['Depreciation in year 1', '', 3125, 0.005]],
+      source: 'Corporate Finance Institute, Depreciation methods: 25 000 over 8 years with no salvage value, 3125 a year.' },
+  ],
+},
+{
   id: 'machines', level: 'simple', group: 'Setup', title: 'Machine profiles',
   desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
   render: el => renderMachines(el),
@@ -2695,7 +3000,7 @@ const TOOLS = [
 },
 {
   id: 'setupsheet', level: 'advanced', group: 'Setup', title: 'Setup sheet',
-  desc: 'A printable setup sheet: job, machine, tool list with stick-out and offsets, work offsets and notes. Saved in this browser; export and import as JSON.',
+  desc: 'A printable setup sheet: job, machine, the operations in order (what is done, holding, tools, speed, feed, what to check), tool list with stick-out and offsets, work offsets and notes. Saved in this browser; export and import as JSON.',
   render: el => renderSetupSheet(el),
   working: 'Nothing is calculated here. Sheets are kept in this browser (localStorage) and can be moved by exporting a JSON file. Print uses a print layout without the app frame.',
   source: 'BenchMate layout.',
@@ -2744,17 +3049,17 @@ const TOOLS = [
 },
 {
   id: 'plastics', level: 'advanced', group: 'Materials', title: 'Machining plastics',
-  desc: 'Acetal, nylon 6 and 66, PEEK, UHMW-PE, PTFE, PC, acrylic, PVC, PP, ABS and PEI: maximum service temperature, expansion, annealing and each maker\'s starting turning data side by side, with practical notes.',
+  desc: 'Acetal, nylon 6 and 66, PEEK, UHMW-PE, PTFE, PC, acrylic, PVC, PP, ABS and PEI: the family of each (amorphous or semi-crystalline) and what that means in use, thermoplastics against thermosets, maximum service temperature, expansion, annealing and each maker\'s starting turning data side by side, with practical notes.',
   render: el => renderPlastics(el),
   working: 'No calculation: values as printed, converted between ft/min, in/rev, °F and metric units. Makers\' cutting data differ; start low and test on scrap.',
-  source: 'Mitsubishi Chemical Advanced Materials, Ensinger, Boedeker Plastics, W.S. Hampshire, Professional Plastics; density and expansion from the material data. See docs/materials-reference.md.',
+  source: 'Mitsubishi Chemical Advanced Materials, Ensinger, Boedeker Plastics, W.S. Hampshire, Professional Plastics; density and expansion from the material data. Families: Polymershapes, Xometry, TWI, The Gund Company, Ensinger. See docs/materials-reference.md.',
 },
 {
   id: 'metalid', level: 'advanced', group: 'Materials', title: 'Metal identification',
-  desc: 'Spark, magnet, chip and file tests to sort an unknown bar into a family of metals, in plain words.',
+  desc: 'Spark, magnet, chip and file tests to sort an unknown bar into a family of metals, and three chemical spot tests (nitric acid, molybdenum, sulphur print) with their limits, in plain words.',
   render: el => renderMetalId(el),
   working: 'No calculation. These tests sort metals into families only; a mill certificate or PMI analysis identifies a grade.',
-  source: 'US Navy Steelworker training manual (spark, chip and magnetic tests). See docs/materials-reference.md.',
+  source: 'US Navy Steelworker training manual (spark, chip and magnetic tests); Atlas Steels Tech Note 1 and EngineerExcel (magnet on stainless, spot tests). See docs/materials-reference.md.',
 },
 {
   id: 'boltgrade', level: 'advanced', group: 'Fasteners', title: 'Bolt grades and property classes',
@@ -2769,6 +3074,48 @@ const TOOLS = [
   render: el => renderBoltTorque(el),
   working: 'MA = F (0.16 P + 0.58 d2 muG + DKm/2 muK); FM = As nu Rp0.2 / sqrt(1 + 3 [3/2 d2/d0 (P/(pi d2) + 1.155 muG)]^2). See the note under the tool.',
   source: 'VDI 2230 Part 1:2015 (R7, R13), by name only; formula also printed by FVA and by Hameedi and Völgyi (2025); friction classes from Bossard. See docs/sources.md.',
+},
+{
+  id: 'threadstrip', level: 'advanced', group: 'Fasteners', title: 'Thread engagement and breaking force',
+  desc: 'How much thread to engage so that the screw breaks before the threads strip, and the force that breaks the screw in tension. The tensile strength is yours to enter; BenchMate never fills it in.',
+  fields: s => [
+    { id: 'd', label: 'Nominal diameter of the thread', unit: lenU(s), def: s === 'inch' ? 0.75 : 10 },
+    s === 'inch' ? { id: 'tpi', label: 'Threads per inch', unit: '', def: 10 } : { id: 'p', label: 'Pitch', unit: 'mm', def: 1.5 },
+    { id: 'uts', label: 'Tensile strength of the screw (optional)', unit: s === 'inch' ? 'psi' : 'MPa', def: '' },
+    { id: 'le', label: 'Your length of engagement (optional)', unit: lenU(s), def: '' },
+  ],
+  calc: (v, W, s) => {
+    const inch = s === 'inch', u = lenU(s), dp = inch ? 4 : 3, au = inch ? 'in2' : 'mm2', sys = inch ? 1 : 0;
+    const p = inch ? W.pitch_tpi(v.tpi) / IN_MM : v.p;   // threads per inch to a pitch in inches: a unit conversion
+    if (!(v.d > 0 && p > 0)) return [];
+    const As = W.stress_area(v.d, p, sys), Le = W.engagement_min_simple(v.d, p, sys);
+    if (!(As > 0 && Le > 0)) return [R('Pitch', 'too coarse for this diameter', '', 0)];
+    const rows = [R('Tensile stress area As', As, au, inch ? 4 : 2)];
+    if (v.uts > 0) rows.push(R('Breaking force of the screw in tension', W.tensile_load(As, v.uts), inch ? 'lbf' : 'N', 0));
+    else rows.push(R('Breaking force', 'enter the tensile strength of the screw', '', 0));
+    rows.push(R('Basic pitch diameter', W.thread_pitch_dia_basic(v.d, p), u, dp),
+      R('Shear area of the thread per unit of engaged length (simplified)', W.thread_shear_area_per_length(v.d, p), au + '/' + u, inch ? 4 : 3),
+      R('Least engagement, simplified, tapped part as strong as the screw (one source, to be verified)', Le, u, dp),
+      R('Rule of thumb in steel: 1 × diameter', W.engagement_by_diameters(v.d, 1), u, dp),
+      R('Rule of thumb in cast iron, brass and bronze: 1.5 × diameter (Roymech only)', W.engagement_by_diameters(v.d, 1.5), u, dp),
+      R('Rule of thumb in aluminium: 2 × diameter (Nord-Lock, Roymech)', W.engagement_by_diameters(v.d, 2), u, dp),
+      R('Rule of thumb in aluminium: 1.5 × diameter (Fastenal)', W.engagement_by_diameters(v.d, 1.5), u, dp));
+    if (v.le > 0) rows.push(R('Your engagement', v.le >= Le
+      ? 'at or above the simplified least length. Compare it with the rule of thumb for the tapped material too.'
+      : 'below the simplified least length: the threads may strip before the screw breaks.', '', 0));
+    rows.push(R('Note', 'The simplified length holds only where the tapped part is as strong as the screw. In a softer tapped material use the rule of thumb or a full calculation, which BenchMate does not do.', '', 0));
+    return rows;
+  },
+  working: 'Breaking force = tensile strength × As. As is the tensile stress area of the thread (ISO metric: 0.7854 (d − 0.9382 P)², Unified inch: 0.7854 (D − 0.9743 P)²). Simplified least engagement: the thread shear area 0.5 π d2 Le is made twice the tensile stress area, so Le = 2 As / (0.5 π d2), with the basic pitch diameter d2 = d − 0.64952 P. Rules of thumb = diameter × the factor shown.',
+  source: 'Breaking force: two Fastenal documents (engineering article "Screw thread design" and the Technical reference guide), one publisher. Simplified engagement: Roymech, "Screw thread calculations", one source, to be verified; Roymech says it is adequate below M6 and conservative above. Rules of thumb: Nord-Lock, Roymech and Fastenal, shown side by side where they differ. The detailed method of FED-STD-H28 was not readable from a free source and is not built. See docs/sources.md, Thread engagement.',
+  proof: [
+    { name: 'M10 × 1.5, simplified least engagement', sys: 'mm', vals: { d: 10, p: 1.5 },
+      expect: [['Tensile stress area As', 'mm2', 57.9896, 0.0005], ['Basic pitch diameter', 'mm', 9.0257, 0.00005], ['Shear area of the thread per unit of engaged length (simplified)', 'mm2/mm', 14.1776, 0.0005], ['Least engagement, simplified, tapped part as strong as the screw (one source, to be verified)', 'mm', 8.1805, 0.0005]],
+      source: 'Roymech, Screw thread calculations, table row M10 × 1.5: pitch diameter 9.0257 mm, tensile stress area 57.9896 mm2, shear area 14.1776 mm2 per mm, simplified engagement 8.1805 mm.', note: 'The same row gives 7.4443 mm by the detailed method, which is not built.' },
+    { name: '3/4-10 Grade 5 screw, breaking force', sys: 'inch', vals: { d: 0.75, tpi: 10, uts: 120000 },
+      expect: [['Breaking force of the screw in tension', 'lbf', 40080, 80]],
+      source: 'Fastenal, Technical reference guide: 3/4-10 SAE J429 Grade 5, 120 000 psi × 0.3340 in2 = 40 080 lb.', note: 'The guide rounds the stress area to 0.3340 in2; the Unified formula gives 0.3345 in2, so the force comes out about 60 lbf higher.' },
+  ],
 },
 {
   id: 'shcs', level: 'simple', group: 'Fasteners', title: 'Socket head cap screws',
@@ -2786,10 +3133,17 @@ const TOOLS = [
 },
 {
   id: 'spanner', level: 'simple', group: 'Fasteners', title: 'Spanner and hex key sizes',
-  desc: 'Width across flats for metric (ISO 272, old DIN, JIS) and inch hex heads, and the hex key for socket head cap screws. Type a spanner size to see which threads it fits.',
+  desc: 'Width across flats for metric (ISO 272, old DIN, JIS) and inch hex heads, and the hex key for socket head cap screws. Type a spanner size to see which threads it fits. Metric and inch sizes are also listed together in order of size.',
   render: el => renderSpanner(el),
   working: 'No calculation: values as printed. The lookup matches within 0.05 mm or 0.001 in.',
   source: 'ISO 272:1982, ASME B18.2.1, ASME B18.3 (by name only); Wikipedia, Accu, SLS Bearings and the socket screw publishers.',
+},
+{
+  id: 'hexhw', level: 'simple', group: 'Fasteners', title: 'Hexagon screws, nuts and washers',
+  desc: 'Metric hexagon head height and width across flats (ISO 4014 / ISO 4017), hexagon nut height (ISO 4032) and plain washer sizes (ISO 7089), with a side view to scale; inch hexagon nut sizes. Differing publishers are shown side by side.',
+  render: el => renderHexhw(el),
+  working: 'No calculation: values as printed.',
+  source: 'ISO 4014, ISO 4017, ISO 4032, ISO 7089, DIN 125, ASME B18.2.2 (by name only); BOLTS open parts library, fasteners.eu, fasten.it, Wermac, the omdl library and Eugene Fastener.',
 },
 {
   id: 'tslots', level: 'advanced', group: 'Fasteners', title: 'T-slots',
@@ -2966,6 +3320,34 @@ const TOOLS = [
   proof: [{ name: 'No. 3/0 taper pin, 1 in long', sys: 'inch', vals: { no: -2, l: 1 },
     expect: [['Small end diameter at this length', 'in', 0.1042, 0.00005], ['Large end diameter (basic)', 'in', 0.125, 0.00005]],
     source: 'Albany County Fasteners, pin size chart: No. 3/0 taper pin, large end 0.1250 in, small end at 1 in of length 0.1042 in.', note: 'Only the rows of that chart that match the standard\'s cut sheet are used; its sizes from 2/0 up do not.' }],
+},
+{
+  id: 'tackle', level: 'advanced', group: 'Machine elements', title: 'Block and tackle',
+  desc: 'The pull needed on the rope of a block and tackle from the load and the number of rope parts that carry the moving block, and the rope hauled in for a lift. The efficiency is yours to enter; left blank, only the ideal figure is shown. This is not a rigging calculation: it says nothing about the safe load of rope, blocks or anchor.',
+  fields: s => [
+    { id: 'load', label: 'Load', unit: s === 'inch' ? 'lbf' : 'N', def: s === 'inch' ? 500 : 981 },
+    { id: 'n', label: 'Rope parts carrying the moving block', unit: '', def: 4 },
+    { id: 'eff', label: 'Efficiency of the tackle, 0 to 1 (optional)', unit: '', def: '' },
+    { id: 'lift', label: 'Lift (optional)', unit: s === 'inch' ? 'ft' : 'm', def: '' },
+  ],
+  calc: (v, W, s) => {
+    if (!(v.load > 0 && v.n > 0)) return [];
+    const fu = s === 'inch' ? 'lbf' : 'N', ideal = W.tackle_effort(v.load, v.n, 1);
+    if (!isFinite(ideal)) return [R('Rope parts', 'must be a whole number, 1 or more', '', 0)];
+    const rows = [R('Pull on the rope, ideal (no friction)', ideal, fu, 1), R('Ideal mechanical advantage (the number of rope parts)', v.n, '', 0)];
+    if (v.eff > 0) {
+      const e = W.tackle_effort(v.load, v.n, v.eff);
+      rows.push(isFinite(e) ? R('Pull on the rope at your efficiency (one source, to be verified)', e, fu, 1) : R('Efficiency', 'must be more than 0 and not more than 1', '', 0));
+    }
+    if (v.lift > 0) rows.push(R('Rope hauled in for this lift (one source, to be verified)', W.tackle_rope_pulled(v.lift, v.n), s === 'inch' ? 'ft' : 'm', 2));
+    rows.push(R('Note', 'Count only the rope parts that carry the moving block. A hauling rope that comes off the moving block counts as one more part (rove to advantage); one that comes off the fixed block only changes the direction of the pull.', '', 0));
+    return rows;
+  },
+  working: 'Ideal pull = load / rope parts. Pull at an efficiency = load / (efficiency × rope parts). Rope hauled in = lift × rope parts.',
+  source: 'Ideal pull: Wikipedia, "Block and tackle" and Engineering ToolBox, "Pulleys". The efficiency form is from Engineering ToolBox alone, the rope hauled in and the note on reeving from Wikipedia alone. See docs/sources.md, Shop maths 2.',
+  proof: [{ name: '100 kg (981 N) on 4 ropes at an efficiency of 0.8', sys: 'mm', vals: { load: 981, n: 4, eff: 0.8 },
+    expect: [['Pull on the rope at your efficiency (one source, to be verified)', 'N', 306.6, 0.5], ['Pull on the rope, ideal (no friction)', 'N', 245.25, 0.05]],
+    source: 'Engineering ToolBox, Pulleys: 100 kg on 4 ropes with an efficiency of 0.8, 981 / 3.2 = 307 N.' }],
 },
 {
   id: 'keys', level: 'advanced', group: 'Machine elements', title: 'Keys and keyways',
@@ -3357,10 +3739,10 @@ const TOOLS = [
 },
 {
   id: 'cncguide', level: 'advanced', group: 'Guides', title: 'CNC knowledge guide',
-  desc: 'Machine axes and the right-hand rule, machine, work and tool coordinates, work, length, radius and wear offsets, program structure, climb and conventional milling, chip formation, tool wear with causes and remedies, turning and milling troubleshooting, workholding and shop safety.',
+  desc: 'Machine axes and the right-hand rule, machine, work and tool coordinates, work, length, radius and wear offsets, program structure, subprograms with three worked examples, climb and conventional milling, chip formation, which of speed, feed and depth of cut to change, tool wear with causes and remedies, turning and milling troubleshooting, workholding and shop safety.',
   render: el => renderCncGuide(el),
   working: 'Reference only. Your machine and control manuals govern. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed in two independent public sources.',
-  source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; others listed under the guide and in docs/sources.md.',
+  source: 'ISO 841:2001 and ISO 6983-1:2009 (cited by name); NIST RS274NGC v3; LinuxCNC docs; Haas Factory Outlet operator and programming manuals; Mitsubishi Materials and Seco Tools (speed, feed and depth); others listed under the guide and in docs/sources.md.',
 },
 {
   id: 'millsetup', level: 'advanced', group: 'Guides', title: 'CNC mill setup guide',
@@ -3371,10 +3753,10 @@ const TOOLS = [
 },
 {
   id: 'toolpaths', level: 'advanced', group: 'Guides', title: 'Milling toolpath guide',
-  desc: 'What each milling toolpath is for and how to set it up: from model to part, 2D and 3D, stepover and stepdown, facing, contours with cutter compensation, pockets and slots and how to enter them, chamfer and radius milling, spot, drill and tap, 3D roughing and finishing, rest machining, pencil passes and tolerances.',
+  desc: 'What each milling toolpath is for and how to set it up: from model to part, 2D and 3D, a fourth axis (indexing and continuous cutting), stepover and stepdown, facing, contours with cutter compensation, pockets and slots and how to enter them, chamfer and radius milling, spot, drill and tap, 3D roughing and finishing, rest machining, pencil passes and tolerances.',
   render: el => renderToolpaths(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. The G-code example is one to adapt, not a proven program.',
-  source: 'Autodesk Fusion blog and Inventor CAM help; MIT Center for Bits and Atoms class page; Helical Solutions Machining Guidebook (2016); MecSoft, Best practices in 3 axis machining; LinuxCNC documentation; Haas Factory Outlet mill programming manual. Listed under the guide and in docs/sources.md.',
+  source: 'Autodesk Fusion blog and Inventor CAM help; MIT Center for Bits and Atoms class page; Helical Solutions Machining Guidebook (2016); MecSoft, Best practices in 3 axis machining; LinuxCNC documentation; Haas Factory Outlet mill programming manual; CNC Cookbook (fourth axis). Listed under the guide and in docs/sources.md.',
 },
 {
   id: 'workholding', level: 'advanced', group: 'Guides', title: 'Workholding guide',
@@ -3385,31 +3767,31 @@ const TOOLS = [
 },
 {
   id: 'latheguide', level: 'advanced', group: 'Guides', title: 'CNC lathe guide',
-  desc: 'Turning on a CNC lathe: the machine, chucks, soft jaws and collets, bar work with a puller or feeder, the common tools and insert shapes, speeds and feeds, the toolpaths in the order they are run with the Haas cycles, parting off, and live tools with the C axis.',
+  desc: 'Turning on a CNC lathe: the machine, chucks, soft jaws and collets, bar work with a puller or feeder, the common tools and insert shapes, speeds and feeds, the toolpaths in the order they are run with the Haas cycles, threading with G32, G92 and G76 (tapered and multi-start threads included), parting off, and live tools with the C axis.',
   render: el => renderLatheGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Cycle numbers are those of the Haas lathe manual read for this page.',
-  source: 'CIMCO CNC programming book, chapter 8; Haas Factory Outlet lathe programming manual (12/2024); Haas cut-off tool sheet; Production Machining and Modern Machine Shop (one publisher); CNC Cookbook; CNC Training Centre; Mitsubishi Materials. See docs/sources.md, "CNC lathe guide".',
+  source: 'CIMCO CNC programming book, chapter 8; Haas Factory Outlet lathe programming manual (12/2024); Haas cut-off tool sheet; Production Machining and Modern Machine Shop (one publisher); CNC Cookbook; CNC Training Centre; Mitsubishi Materials; Haas G32 and G76 pages, Cutting Tool Engineering, Modern Machine Shop and Industrial Monitor Direct (threading). See docs/sources.md, "CNC lathe guide".',
 },
 {
   id: 'shoptools', level: 'advanced', group: 'Guides', title: 'Shop tools guide',
-  desc: 'Bench and toolroom practice: sharpening twist drills and what a badly ground point does, grinding lathe tool bits, hacksaw and band saw blades and breaking a blade in, hole saw speeds from two charts, carbide burr speeds, choosing a cutting fluid, grinding wheel shapes, dressing and truing.',
+  desc: 'Bench and toolroom practice: sharpening twist drills and what a badly ground point does, grinding lathe tool bits, hacksaw and band saw blades and breaking a blade in, band speeds by material from three pages side by side, hole saw speeds from two charts, carbide burr speeds, choosing a cutting fluid, looking after a coolant sump, the recommended limit for coolant mist, grinding wheel shapes, dressing and truing, the size and angle of a dressing diamond, grinding carbide tools (green silicon carbide and diamond wheels), and what to check on a bench grinder before switching on.',
   render: el => renderShopTools(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Speeds are printed as the two charts give them, side by side; the cutting speed for hole saws in mild steel is our arithmetic from both charts.',
-  source: 'TTE work instruction and the Machinery Repairman manual (drills); J. A. Nilsson and mini-lathe.com (tool bits); Introduction to Machining (CC BY), Tameson, Fastenal, Sawblade.com, Modern Machine Shop (saws); RUKO chart at AutomationDirect and Remora Electrical (hole saws); Klingspor and Amana Tool (burrs); American Machinist and FUCHS (fluids); Palmgren and Norton in Modern Machine Shop (dressing). See docs/sources.md, "Shop tools guide".',
+  source: 'TTE work instruction and the Machinery Repairman manual (drills); J. A. Nilsson and mini-lathe.com (tool bits); Introduction to Machining (CC BY), Tameson, Fastenal, Sawblade.com, Modern Machine Shop (saws); Excision, LFC and J. A. Nilsson (band speeds); RUKO chart at AutomationDirect and Remora Electrical (hole saws); Klingspor and Amana Tool (burrs); American Machinist and FUCHS (fluids); Travers Tool and Keller-Heartt (sump care); NIOSH and SAIF (mist and skin); Palmgren and Norton in Modern Machine Shop (dressing); Flexovit, Organametrisis and Noritake (dressing diamonds); Industrial Monitor Direct, Axminster Tools and UKAM (grinding carbide); Rockford Systems, the Asmark Institute and T&M Associates (bench grinders). See docs/sources.md, "Shop tools guide".',
 },
 {
   id: 'matguide', level: 'advanced', group: 'Guides', title: 'Materials guide',
-  desc: 'How to read what is stamped on the bar and printed on the certificate: SAE and AISI steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, titanium, magnesium, nickel and zinc alloy names, how each hardness test works, the forms of corrosion, and the mill certificate.',
+  desc: 'How to read what is stamped on the bar and printed on the certificate: SAE and AISI steel numbers, tool steel letters, choosing a tool steel for the job, stainless and cast iron families, aluminium and copper tempers, titanium, magnesium, nickel and zinc alloy names, how each hardness test works, hardenability and the Jominy test, case hardening (carburising, carbonitriding, nitriding, induction and flame hardening, with a table), machinability, the tensile test with a drawing of the curve, what heat and cold do to strength, steels by what they are used for, machining laminates and hard rubber, the forms of corrosion, and the mill certificate.',
   render: el => renderMatGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
-  source: 'Engineering ToolBox, Machine Design and Wikipedia (steel numbers); Matmatch and Tata Steel (carbon classes); eFunda, Total Materia and the open textbook Metallurgy, CC BY (tool steels); Outokumpu and Aalco (stainless); Acme Foundry and Wikipedia (cast iron); ESAB, Hydro, AlCircle, Xometry, Total Materia and Righton Blackburns (aluminium); Total Materia and National Bronze (copper tempers); Online Metals, eFunda, White Industries, Dynacast and Aludiecasting (other metals); Matmatch, Wevolver, UNSW, Missouri S&T and Welding Advisers (hardness tests); AMPP and TWI (corrosion); Projectmaterials and What Is Piping (certificates). Full list in docs/sources.md, "Materials guide".',
+  source: 'Engineering ToolBox, Machine Design and Wikipedia (steel numbers); Matmatch and Tata Steel (carbon classes); eFunda, Total Materia and the open textbook Metallurgy, CC BY (tool steels); Outokumpu and Aalco (stainless); Acme Foundry and Wikipedia (cast iron); ESAB, Hydro, AlCircle, Xometry, Total Materia and Righton Blackburns (aluminium); Total Materia and National Bronze (copper tempers); Online Metals, eFunda, White Industries, Dynacast and Aludiecasting (other metals); Matmatch, Wevolver, UNSW, Missouri S&T and Welding Advisers (hardness tests); Wikipedia, a University of Cambridge page and Total Materia (hardenability); Total Materia, the Open University, Wikipedia, Paulo and Gear Solutions (case hardening); Wikipedia and Infinita Lab (machinability); Fractory, Wikipedia, MATHalino and TWI (tensile test); Total Materia and Materion (heat and cold); AIMS Industrial and Continental Steel (steels by use); Crucible and Protolabs (choosing a tool steel); Norplex, Cutting Tool Engineering, Xometry and Cassell\'s Cyclopaedia (laminates and hard rubber); AMPP and TWI (corrosion); Projectmaterials and What Is Piping (certificates). Full list in docs/sources.md, "Materials guide".',
 },
 {
   id: 'measguide', level: 'advanced', group: 'Guides', title: 'Measurement guide',
-  desc: 'Inspection practice: the ways a tolerance is written, the ten preferred metric fits and what each is for, surface plate grades and care, checking a micrometer and a caliper against gauge blocks, checking a shaft for runout with V-blocks and a dial indicator, and the surface texture and lay symbols on a drawing.',
+  desc: 'Inspection practice: the ways a tolerance is written, the ten preferred metric fits and what each is for, surface plate grades, care and calibration, V-blocks, checking a micrometer and a caliper against gauge blocks, thread, ball, tube and blade micrometers, checking a shaft for runout with V-blocks and a dial indicator, and the surface texture and lay symbols on a drawing.',
   render: el => renderMeasGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
-  source: 'WisTech Open Blueprint Reading (CC BY) and Machinist Guides (tolerances); Amesweb, Engineers Edge and Fractory (fits); Starrett, Quality Magazine, Mitutoyo and Travers (surface plates and blocks); Quality Magazine, Mitutoyo and Machinist Guides (micrometers and calipers); Fabrico, Acoem and the Machining FAQ (runout); GD&T Basics, Wevolver and Digital Surf (surface texture). Full list in docs/sources.md, "Measurement guide".',
+  source: 'WisTech Open Blueprint Reading (CC BY) and Machinist Guides (tolerances); Amesweb, Engineers Edge and Fractory (fits); Starrett, Quality Magazine, Mitutoyo, Cross Company and Travers (surface plates and blocks); V. Ryan and Tormach (V-blocks); Quality Magazine, Mitutoyo and Machinist Guides (micrometers and calipers); Quality Magazine, Haas, RS Components and Penn Tool (thread and ball micrometers); Fabrico, Acoem and the Machining FAQ (runout); GD&T Basics, Wevolver and Digital Surf (surface texture). Full list in docs/sources.md, "Measurement guide".',
 },
 {
   id: 'cutguide', level: 'advanced', group: 'Guides', title: 'Cutting tools guide',
@@ -3420,17 +3802,17 @@ const TOOLS = [
 },
 {
   id: 'bearguide', level: 'advanced', group: 'Guides', title: 'Bearings and seals guide',
-  desc: 'Rolling bearings for the person who fits them: what each type carries, how to read a bearing number and its suffixes (2RS, ZZ, C3), tolerance classes (P0 to P2, ABEC), which ring gets the tight fit, mounting cold and with heat, what a radial shaft seal asks of the shaft, and the threadlocker colours.',
+  desc: 'Rolling bearings for the person who fits them: what each type carries, how to read a bearing number and its suffixes (2RS, ZZ, C3), tolerance classes (P0 to P2, ABEC), which ring gets the tight fit, mounting cold and with heat, what a radial shaft seal asks of the shaft, back-up rings for O-rings, the threadlocker colours, retaining compounds, thread and flange sealants, and the families of structural adhesive.',
   render: el => renderBearGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
-  source: 'Reliability Solutions, RapidDirect and NSK (types); JTEKT Koyo, NSK, a college hand-out and Southern Cross Bearings (numbers); Wikipedia and NSK (tolerance classes); NHBB, NRB, MinebeaMitsumi and TFL (fits); Processing Magazine, Fabrico and Schaeffler (mounting); Seals-Shop and the University of Stuttgart (shaft seals); Permabond and Fastener Engineering (threadlockers). Full list in docs/sources.md, "Bearings and seals guide".',
+  source: 'Reliability Solutions, RapidDirect and NSK (types); JTEKT Koyo, NSK, a college hand-out and Southern Cross Bearings (numbers); Wikipedia and NSK (tolerance classes); NHBB, NRB, MinebeaMitsumi and TFL (fits); Processing Magazine, Fabrico and Schaeffler (mounting); Seals-Shop and the University of Stuttgart (shaft seals); Apple Rubber, Marco Rubber and Fluid Power World (back-up rings); Permabond and Fastener Engineering (threadlockers); AIMS Industrial and Incure (retaining compounds and sealants); Machine Design and Gluegun.com (structural adhesives). Full list in docs/sources.md, "Bearings and seals guide".',
 },
 {
   id: 'abrasguide', level: 'advanced', group: 'Guides', title: 'Abrasive processes guide',
-  desc: 'The abrasive processes beyond the plain grinding wheel: the grinding ratio and spark-out, centerless grinding (why the work sits above centre, through-feed and infeed, lobing), honing and the crosshatch, lapping and light bands, diamond and CBN wheels (concentration, shape code), belt grinding, cut-off wheels and mounted points.',
+  desc: 'The abrasive processes beyond the plain grinding wheel: the grinding ratio and spark-out, surface grinding (wheel, speeds and feeds, the magnetic chuck), faults in cylindrical grinding with causes and remedies, centerless grinding (why the work sits above centre, through-feed and infeed, lobing), honing and the crosshatch, lapping and light bands, diamond and CBN wheels (concentration, shape code), belt grinding, cut-off wheels and mounted points.',
   render: el => renderAbrasGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where two sources give different figures both are shown.',
-  source: 'The Open University (grinding, centreless grinding); Cutting Tool Engineering, Modern Machine Shop and Production Machining (wheel wear, centerless grinding, honing); American Machinist and Wikipedia (honing, lapping); Kemet (lapping); MISUMI, UKAM and 3M (diamond and CBN wheels); EMI Supply and Xometry (belts); Weiler (cut-off wheels); Norton and PFERD (mounted points). Full list in docs/sources.md, "Abrasive processes guide".',
+  source: 'The Open University (grinding, centreless grinding); Cutting Tool Engineering, Modern Machine Shop and Production Machining (wheel wear, centerless grinding, honing); American Machinist and Wikipedia (honing, lapping); Kemet (lapping); MISUMI, UKAM and 3M (diamond and CBN wheels); EMI Supply and Xometry (belts); Weiler (cut-off wheels); Norton and PFERD (mounted points); DeFusco, the Washington open textbook and Abrasive Engineering (surface grinding); Radiac, Okuma, UNITED GRINDING and Cutting Tool Engineering (grinding faults). Full list in docs/sources.md, "Abrasive processes guide".',
 },
 {
   id: 'drawguide', level: 'advanced', group: 'Guides', title: 'Drawings and weld symbols guide',
@@ -3448,24 +3830,31 @@ const TOOLS = [
 },
 {
   id: 'elemguide', level: 'advanced', group: 'Guides', title: 'Machine elements guide',
-  desc: 'Friction (the laws, static and kinetic, a table of coefficients quoted source by source), backlash in gears and screws (why it is needed, how it is made, anti-backlash gears, compensation), gear materials and their heat treatment, cams and followers (kinds, base circle, pitch curve, pressure angle, rise, dwell and return), plain bearings (forms, materials, PV limits, shaft and clearance), leadscrews against ball screws (efficiency, self-locking, back-driving, preload). Three drawings.',
+  desc: 'Friction (the laws, static and kinetic, a table of coefficients quoted source by source), backlash in gears and screws (why it is needed, how it is made, anti-backlash gears, compensation), gear materials and their heat treatment, cams and followers (kinds, base circle, pitch curve, pressure angle, rise, dwell and return), plain bearings (forms, materials, PV limits, shaft and clearance), leadscrews against ball screws (efficiency, self-locking, back-driving, preload), ratchets, elliptical gears, and factors of safety with typical figures from two publishers side by side. Four drawings.',
   render: el => renderElemGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
-  source: 'Wikipedia, MISUMI and G.U.N.T. (friction); Wikipedia and KHK (backlash); KHK and MachineMfg (gear materials); Wikipedia, a course text and i GET IT (cams); Wikipedia, GlobalSpec and Armoloy (plain bearings); Wikipedia, Machine Design and Roton (leadscrews and ball screws). Full list with URLs in docs/sources.md.',
+  source: 'Wikipedia, MISUMI and G.U.N.T. (friction); Wikipedia and KHK (backlash); KHK and MachineMfg (gear materials); Wikipedia, a course text and i GET IT (cams); Wikipedia, GlobalSpec and Armoloy (plain bearings); Wikipedia, Machine Design and Roton (leadscrews and ball screws); Wikipedia and FIRGELLI (ratchets); Machine Design and Industrial Monitor Direct (elliptical gears); Wikipedia, The Engineering ToolBox and Engineers Edge (factors of safety). Full list with URLs in docs/sources.md.',
 },
 {
   id: 'driveguide', level: 'advanced', group: 'Guides', title: 'Drives and maintenance guide',
-  desc: 'Electric motors (stator and rotor, synchronous speed and slip, reading the nameplate field by field), shaft alignment with dial indicators (offset and angle, soft foot, rim and face against reverse dial, bracket sag, thermal growth), fluid power (force of a cylinder, the parts of a hydraulic circuit, pumps, hydraulics against pneumatics, air preparation, tube and hose fittings), and machine vibration (severity zones A to D with their limits, and what a vibration points to). Four drawings.',
+  desc: 'Belt, chain and gear drives compared point by point, electric motors (stator and rotor, synchronous speed and slip, reading the nameplate field by field), shaft alignment with dial indicators (offset and angle, soft foot, rim and face against reverse dial, bracket sag, thermal growth), fluid power (force of a cylinder, the parts of a hydraulic circuit, pumps, hydraulics against pneumatics, air preparation, tube and hose fittings), and machine vibration (free and forced vibration, resonance and damping, severity zones A to D with their limits, what a vibration points to, and balancing a rotor in place with a trial weight). Four drawings.',
   render: el => renderDriveGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source. The vibration limits were read from two web pages about the ISO standards, not from the standards.',
-  source: 'Machine Design, AutomationDirect and Control Engineering (motors); Fabrico, OpenExamPrep and Tractian (alignment); course slides after Cundiff, OpenExamPrep, Wikipedia, Power & Motion and AutomationPrimer (fluid power); Brennan and MISUMI (fittings); Fabrico, Vibromera and Industrial Monitor Direct (vibration). Full list with URLs in docs/sources.md.',
+  source: 'LearnMech, UNC Charlotte and Design Engineering (belt, chain or gears); Machine Design, AutomationDirect and Control Engineering (motors); Fabrico, OpenExamPrep and Tractian (alignment); course slides after Cundiff, OpenExamPrep, Wikipedia, Power & Motion and AutomationPrimer (fluid power); Brennan and MISUMI (fittings); Fabrico, Vibromera and Industrial Monitor Direct (vibration); Wikipedia and Machine Dynamics (vibration in general); Reliabilityweb and Reliable Plant (balancing in place). Full list with URLs in docs/sources.md.',
 },
 {
   id: 'fastguide', level: 'advanced', group: 'Guides', title: 'Fasteners guide',
-  desc: 'How much thread to engage, why fasteners come loose and ten ways of locking them, safety wire (lock wire), set screw points, screw heads and drives, self-tapping screws (thread-forming against thread-cutting, the common types), pins (dowel, taper, spring, grooved, split), retaining rings, and British fasteners (Whitworth, BSF, BA, BSP and how the spanners are marked). Four drawings.',
+  desc: 'How much thread to engage, why fasteners come loose and ten ways of locking them, safety wire (lock wire), tightening methods (torque, torque plus angle, tightening to yield, hydraulic tensioning, heat, load-indicating washers), set screw points, screw heads and drives, self-tapping screws (thread-forming against thread-cutting, the common types), pins (dowel, taper, spring, grooved, split), retaining rings, counterbore, spotface and countersink, counterfeit fasteners and how they are caught, and British fasteners (Whitworth, BSF, BA, BSP and how the spanners are marked). Four drawings.',
   render: el => renderFastGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where the sources give different figures each is shown with its source.',
-  source: 'Nord-Lock and a university shop (engagement); Machine Design, Fastener Engineering and Essentra (locking); Wikipedia and the FAA (safety wire); Wikipedia, Tameson and bolts.co.uk (set screws); Accu and Essentra (heads and drives); Machine Design, Essentra and Specialty Bolt (tapping screws); Machine Design and Fastener Engineering (pins); Wikipedia and Rotor Clip (retaining rings); the Aircraft Engine Historical Society and Wikipedia (British fasteners). Full list with URLs in docs/sources.md.',
+  source: 'Nord-Lock and a university shop (engagement); Machine Design, Fastener Engineering and Essentra (locking); Wikipedia and the FAA (safety wire); Bolt Science and Atlas Copco (tightening methods); Wikipedia, Tameson and bolts.co.uk (set screws); Accu and Essentra (heads and drives); Machine Design, Essentra and Specialty Bolt (tapping screws); Machine Design and Fastener Engineering (pins); Wikipedia and Rotor Clip (retaining rings); Xometry, Machinist Guides and Fictiv (counterbores); NIST, Metric Bolt, EASA and Lawrence Berkeley National Laboratory (counterfeit fasteners); the Aircraft Engine Historical Society and Wikipedia (British fasteners). Full list with URLs in docs/sources.md.',
+},
+{
+  id: 'threadguide', level: 'advanced', group: 'Guides', title: 'Thread forms and terms',
+  desc: 'What the parts of a screw thread are called (major, minor and pitch diameter, pitch, lead, crest, root, flank, thread angle), single and multi-start, right and left hand, the common thread forms with a drawing of each and what it is for, coarse and fine, straight and tapered, classes of fit, and the abbreviations found on drawings, taps and gauges.',
+  render: el => renderThreadGuide(el),
+  working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements marked "to be verified" were not confirmed by two independent publishers. Where a statement joins two sources, each part names its source.',
+  source: 'Wikipedia (seven articles, counted as one publisher), Kelston Actuation and The Engineers Post (terms and forms); Engineers Edge and AFT Fasteners (abbreviations). Full list in docs/sources.md, Thread forms and terms guide.',
 },
 {
   id: 'glossary', level: 'advanced', group: 'Guides', title: 'Glossary',
@@ -3483,7 +3872,7 @@ const TOOLS = [
 },
 {
   id: 'toolguide', level: 'advanced', group: 'Guides', title: 'Tooling guide',
-  desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps and tap limits, saw blade pitch and broken tap removal.',
+  desc: 'Tool geometry terms (rake, clearance, lead and entering angle, helix, chip breaker, edge hone, the tool signature), tool materials and grades, coatings with the temperatures each publisher prints, end mills, drills and points, reamers, taps with their rake and the fluids for tapping, tap limits, thread mills and how they compare with tapping, choosing a turning tool holder (shank, overhang, clamping), saw blade pitch and broken tap removal.',
   render: el => renderToolGuide(el),
   working: 'Reference only, in our own words. Source keys next to each statement resolve to the list at the bottom; statements without two independent public sources are marked "needs 2nd source". Coating temperatures show every value printed.',
   source: 'Tool and coating makers and distributors listed under the guide and in docs/tooling.md (data/refdata/tooling-evidence.json).',

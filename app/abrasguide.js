@@ -26,9 +26,19 @@ const AG_SOURCES = {
   WEILER: 'Weiler Abrasives, "Cutting wheel guide"',
   NORTON: 'Norton (Saint-Gobain Abrasives), catalogue pages on mounted points',
   PFERD: 'PFERD, safety notes for mounted points and bench grinding wheels (catalogue 3)',
+  GILSON: 'Gilson Company, "Sieve sizes" (ASTM E11 openings)',
+  WP_MESH: 'Wikipedia, "Mesh (scale)" (CC BY-SA)',
+  SIGMA: 'Sigma-Aldrich, "Particle size conversion table"',
+  DEF_SG: 'DeFusco, "Surface grinding wheel selection: grit, bond, and grade", 2026-04-12 (a seller)',
+  BACON_SG: 'T. A. Bacon, Introduction to Machining, 11.4 "Application" (Washington open textbook, CC BY 4.0)',
+  AE_FS: 'Abrasive Engineering, "Feeds and speeds" (an excerpt it credits to Farago)',
+  RAD_CG: 'Radiac Abrasives, troubleshooting tips, cylindrical grinding (only the rows that read cleanly)',
+  OKU_CH: 'R. Williams, Okuma, "6 causes of grinding chatter and how to fix them", 2016-03-23',
+  UG_ERR: 'UNITED GRINDING, Motion blog, "Typical grinding errors and how to eliminate them", 2020-12-08',
+  CTE_BURN: 'Cutting Tool Engineering, J. A. Badger, "How to avoid grinding burn", 2014-04-01',
 };
 // Several pages of one publisher count once.
-const AG_FAMILY = { OU_G: 'OU', OU_C: 'OU', CTE_W: 'CTE', CTE_C: 'CTE', CTE_H: 'CTE', MMS_G: 'MMS', MMS_C: 'MMS', MMS_H: 'MMS', WP_HONE: 'WIKI', WP_LAP: 'WIKI', EMI4: 'EMI', EMI6: 'EMI' };
+const AG_FAMILY = { OU_G: 'OU', OU_C: 'OU', CTE_W: 'CTE', CTE_C: 'CTE', CTE_H: 'CTE', MMS_G: 'MMS', MMS_C: 'MMS', MMS_H: 'MMS', WP_HONE: 'WIKI', WP_LAP: 'WIKI', WP_MESH: 'WIKI', EMI4: 'EMI', EMI6: 'EMI', CTE_BURN: 'CTE' };
 const agTags = keys => guideTags(keys, AG_SOURCES, AG_FAMILY);
 const agP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + agTags(keys)) + '</p>';
 const agBox = d => '<path class="gfill" d="' + d + '"/><path class="gp" d="' + d + '"/>';
@@ -86,11 +96,59 @@ const AG_BELT = [
   ['Slack belt', 'Nothing: the free span between two wheels', 'Contoured parts: deburring, blending, polishing', ['EMI4', 'XOM_B']],
 ];
 
+// Sieve openings as each source prints them, in the source's own units. Nothing is converted or averaged here.
+const AG_SIEVE = [
+  ['No. 4', '4.75 mm', '4.75 mm (0.187 in)', '4.76 mm (0.187 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 5', '4.00 mm', '4.00 mm (0.157 in)', '4.00 mm (0.157 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 6', '3.35 mm', '3.35 mm (0.132 in)', '3.36 mm (0.132 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 7', '2.80 mm', '2.80 mm (0.110 in)', '2.83 mm (0.111 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 8', '2.36 mm', '2.36 mm (0.093 in)', '2.38 mm (0.0937 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 10', '2.00 mm', '2.00 mm (0.079 in)', '2.00 mm (0.0787 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 12', '1.70 mm', '1.70 mm (0.0661 in)', '1.68 mm (0.0661 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 14', '1.40 mm', '1.40 mm (0.0555 in)', '1.41 mm (0.0555 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 16', '1.18 mm', '1.18 mm (0.0469 in)', '1.19 mm (0.0469 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 18', '1.00 mm', '1.00 mm (0.0394 in)', '1.00 mm (0.0394 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 20', '850 µm', '0.85 mm (0.0331 in)', '0.841 mm (0.0331 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 25', '710 µm', '0.71 mm (0.0278 in)', '0.707 mm (0.0278 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 30', '600 µm', '0.60 mm (0.0232 in)', '0.595 mm (0.0234 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 35', '500 µm', '0.50 mm (0.0197 in)', '0.500 mm (0.0197 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 40', '425 µm', '0.425 mm (0.0165 in)', '0.420 mm (0.0165 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 45', '355 µm', '0.355 mm (0.0139 in)', '0.354 mm (0.0139 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 50', '300 µm', '0.300 mm (0.0117 in)', '0.297 mm (0.0117 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 60', '250 µm', '0.250 mm (0.0098 in)', '0.250 mm (0.0098 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 70', '212 µm', '0.212 mm (0.0083 in)', '0.210 mm (0.0083 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 80', '180 µm', '0.180 mm (0.0070 in)', '0.177 mm (0.0070 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 100', '150 µm', '0.150 mm (0.0059 in)', '0.149 mm (0.0059 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 120', '125 µm', '0.125 mm (0.0049 in)', '0.125 mm (0.0049 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 140', '106 µm', '0.105 mm (0.0041 in)', '0.105 mm (0.0041 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 170', '90 µm', '0.090 mm (0.0035 in)', '0.088 mm (0.0035 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 200', '75 µm', '0.075 mm (0.0029 in)', '0.074 mm (0.0029 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 230', '63 µm', '0.063 mm (0.0024 in)', '0.063 mm (0.0025 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 270', '53 µm', '0.053 mm (0.0021 in)', '0.053 mm (0.0021 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 325', '45 µm', '0.044 mm (0.0017 in)', '0.044 mm (0.0017 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 400', '38 µm', '0.037 mm (0.0015 in)', '0.037 mm (0.0015 in)', ['GILSON', 'WP_MESH', 'SIGMA']],
+  ['No. 450', '32 µm', 'not listed', 'not listed', ['GILSON']],
+  ['No. 500', '25 µm', 'not listed', 'not listed', ['GILSON']],
+  ['No. 635', '20 µm', 'not listed', 'not listed', ['GILSON']],
+];
+
+// Faults on externally ground round work, with causes and remedies as the sources give them.
+const AG_FAULT = [
+  ['Chatter marks', 'Cut too heavy; wheel too hard; wheel out of balance; slender work without support; vibration in or reaching the machine', 'Lighter infeed; a softer wheel or make it act softer (dress coarser, faster work speed); balance the wheel; a steady rest; find the vibration', ['RAD_CG', 'OKU_CH', 'UG_ERR']],
+  ['Burn marks (yellow or brown patches, a spiral)', 'The surface overheats; wheel too hard; too little coolant; a dull wheel whose grains rub', 'A softer or more open wheel; more and better aimed coolant; correct the dressing feed', ['UG_ERR', 'RAD_CG', 'CTE_BURN']],
+  ['Out of round (plunge grinding between centres)', 'Centre holes out of round, out of line or burred; work held too tight on the centres; too little coolant', 'Relap and clean the centre holes; ease the footstock spring; set the coolant flow', ['RAD_CG']],
+  ['Thread pattern at the pitch of the table feed', 'Wheel face not parallel to the table travel; the dresser warm or worn', 'Check the dresser for wear and keep it cooled', ['UG_ERR']],
+  ['Spiral marks', 'The wheel was dressed out of round or spiral', 'Dress in one direction only, perhaps with less dressing feed', ['UG_ERR']],
+  ['Comma-shaped scratches', 'Dirt in the coolant carried through the cut', 'Check the coolant filter; clean the wheel guard', ['UG_ERR']],
+  ['Flat spots', 'Vibration from outside: pumps, fans, presses, fork-lift trucks', 'Find the source and remove or isolate it', ['UG_ERR']],
+  ['Mirror finish, stock left from before', 'Wheel dull: dressed too fine, clogged, or too fine a grit', 'Dress with more feed, several times; check the dresser; a coarser wheel', ['UG_ERR']],
+];
+
 function renderAbrasGuide(el) {
-  const toc = [['ag-fig', 'Grinding in figures'], ['ag-cless', 'Centerless grinding'], ['ag-hone', 'Honing'], ['ag-lap', 'Lapping'], ['ag-super', 'Diamond and CBN wheels'], ['ag-belt', 'Belts and cut-off wheels'], ['ag-point', 'Mounted points']];
+  const toc = [['ag-fig', 'Grinding in figures'], ['ag-surf', 'Surface grinding'], ['ag-fault', 'Faults in cylindrical grinding'], ['ag-cless', 'Centerless grinding'], ['ag-hone', 'Honing'], ['ag-lap', 'Lapping'], ['ag-super', 'Diamond and CBN wheels'], ['ag-belt', 'Belts and cut-off wheels'], ['ag-point', 'Mounted points'], ['ag-sieve', 'Sieves and mesh']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
-    '<p class="desc">The abrasive processes beyond the plain grinding wheel, in our own words: the grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding and cut-off wheels, and mounted points. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
+    '<p class="desc">The abrasive processes beyond the plain grinding wheel, in our own words: the grinding ratio and spark-out, centerless grinding, honing, lapping, diamond and CBN wheels, belt grinding and cut-off wheels, mounted points, and sieves and mesh numbers. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
 
     '<h2 id="ag-fig">Grinding in figures</h2>' +
     agP('<b>Grinding ratio (G ratio).</b> The volume of metal ground off divided by the volume of wheel worn away in doing it.', ['OU_G', 'CTE_W']) +
@@ -101,6 +159,30 @@ function renderAbrasGuide(el) {
     agP('<b>Spark-out.</b> A last pass after the main grinding that lets the strain out of the machine and improves finish and size.', ['MMS_G']) +
     agP('<b>What grinding holds.</b> On a diameter ±0.0065 mm in production and ±0.0025 mm in precision work; finish typically 0.1 to 2 micrometres Ra.', ['OU_G']) +
     agP('Wheel markings are decoded in <a href="#/t/wheelcode">grinding wheel marking</a>; wheel shapes, choice, dressing and truing are in the <a href="#/t/shoptools">shop tools guide</a>; speeds and times in <a href="#/t/grindspeed">grinding wheel speed</a> and <a href="#/t/grindtime">cylindrical grinding time</a>.', null) +
+
+    '<h2 id="ag-surf">Surface grinding</h2>' +
+    agP('<b>The wheel for the work.</b> Aluminium oxide for steel.', ['DEF_SG', 'BACON_SG']) +
+    agP('<b>Other work (DeFusco).</b> Silicon carbide for aluminium, brass and copper; CBN for hardened steel and high speed steel.', ['DEF_SG']) +
+    agP('<b>Grit and grade (DeFusco).</b> Grit 24 to 46 for rough stock removal, 80 to 120 for finishing. Grade runs from A, softest, to Z, hardest: a soft wheel (E to H) for hard work and a harder one (M to R) for soft work. Bacon uses 60 grit for general work.', ['DEF_SG']) +
+    agP('<b>Wheel speed.</b> About 30 to 35 m/s (5500 to 6500 ft/min) at the rim.', ['AE_FS', 'OU_G']) +
+    agP('<b>Table speed.</b> Most often 50 to 100 ft/min.', ['AE_FS']) +
+    agP('<b>Down feed, the sources differ.</b> The figures credited to Farago: 0.001 in (0.025 mm) a pass for roughing and half that for finishing. The Open University, for grinding in general: 0.1 to 0.4 mm roughing, 0.01 to 0.025 mm finishing.', ['AE_FS', 'OU_G']) +
+    agP('<b>Cross feed, the sources differ.</b> Farago: 1/4 to 1/12 of the wheel width a pass for roughing (up to 1/2 to 1/3 in some roughing) and 1/8 to 1/12 for finishing. The Open University: 75 to 90 % of the width for roughing, 10 to 25 % for finishing. Either way the passes overlap.', ['AE_FS', 'OU_G', 'BACON_SG']) +
+    agP('<b>On the magnetic chuck.</b> A bowed part goes concave side down. Switch the magnet on and check that the part is held before you start.', ['BACON_SG']) +
+    agP('<b>Keep it flat.</b> Grind a thin part a little from each side in turn, turning it over several times.', ['BACON_SG']) +
+    agP('<b>Coolant</b> aimed into the nip where the wheel runs into the work.', ['BACON_SG']) +
+    agP('<b>What it holds (Open University, production / precision).</b> Reciprocating table: flatness ±0.005 / ±0.0035 mm, thickness ±0.0075 / ±0.0035 mm.', ['OU_G']) +
+    agP('The time for a surface grinding job is worked out in <a href="#/t/grindsurf">surface grinding time</a>; dressing is in the <a href="#/t/shoptools">shop tools guide</a>.', null) +
+
+    '<h2 id="ag-fault">Faults in cylindrical grinding</h2>' +
+    guideTable(['What you see', 'Usual causes', 'What to do'], AG_FAULT, agTags) +
+    '<p class="desc">Causes and remedies as the sources give them, joined where they agree. A row from one source is marked. Radiac\'s table could only be read in part; its rows whose causes and corrections could not be paired with certainty are not used.</p>' +
+    agP('<b>Why work burns.</b> When the grains do not cut deep enough they rub, and rubbing makes heat. Rubbing grains also stay blunt, which makes it worse.', ['CTE_BURN']) +
+    agP('<b>A burnt shoulder (Badger).</b> Plunge into the shoulder at 60 or 90 degrees rather than 30, aim a small high-pressure coolant jet at the shoulder, or raise the work speed and lower the wheel speed.', ['CTE_BURN']) +
+    agP('<b>Burns crack.</b> An overheated surface can crack later under changing load.', ['UG_ERR']) +
+    agP('<b>Dress at the grinding speed.</b> Dressing at a higher wheel speed than you grind at brings chatter.', ['CTE_BURN']) +
+    agP('<b>Coolant left in the wheel.</b> After stopping, run the wheel on without coolant so that it throws the fluid off; fluid left on one side puts it out of balance.', ['UG_ERR']) +
+    agP('Times and speeds are in <a href="#/t/grindtime">cylindrical grinding time</a> and <a href="#/t/grindspeed">grinding wheel speed</a>.', null) +
 
     '<h2 id="ag-cless">Centerless grinding</h2>' + agCless() +
     agP('<b>No centres, no chuck.</b> The work lies on a work rest blade between the grinding wheel and a smaller regulating wheel.', ['CTE_C', 'MMS_C', 'OU_C']) +
@@ -177,6 +259,14 @@ function renderAbrasGuide(el) {
     agP('<b>Shapes.</b> A shapes for medium and heavy blending, B shapes for light deburring and finishing, W shapes for offhand and precision grinding.', ['NORTON']) +
     agP('<b>Grit.</b> 36 and coarser for rough grinding; 60 to 90 for a fine finish and on narrow surfaces.', ['NORTON']) +
     agP('Carbide burrs are in the <a href="#/t/shoptools">shop tools guide</a>.', null) +
+
+    '<h2 id="ag-sieve">Sieves and mesh numbers</h2>' +
+    agP('<b>Mesh number.</b> Sieve numbers began as the number of openings in one inch of the cloth.', ['GILSON', 'WP_MESH']) +
+    agP('<b>Not an exact size.</b> The wires take up room, so the number does not give the opening directly, and different standards give slightly different openings for the same number.', ['WP_MESH']) +
+    agP('<b>Standards.</b> ASTM E11 gives the US series of sieves. ISO 565 gives the nominal metric openings, from 125 mm down to 20 µm, and ISO 3310-1 the tolerances on wires and openings.', ['GILSON']) +
+    agP('<b>The sources do not all print the same opening.</b> For No. 4, 20 and 200, Gilson and Wikipedia print 4.75 mm, 850 µm and 75 µm, and Sigma-Aldrich prints 4.76 mm, 0.841 mm and 0.074 mm. The table shows what each source prints, in its own units.', ['GILSON', 'WP_MESH', 'SIGMA']) +
+    guideTable(['Sieve', 'Gilson (ASTM E11)', 'Wikipedia', 'Sigma-Aldrich'], AG_SIEVE, agTags) +
+    agP('Abrasive grit numbers (FEPA, ANSI, JIS) are under <a href="#/t/gritconv">grit size conversion</a>.', null) +
 
     '<h2 id="ag-src">Sources</h2><ul class="gsl">' + Object.entries(AG_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
     '<p class="desc">Full URLs and access dates are in docs/sources.md, "Abrasive processes guide". No text, figures or tables were copied from the sources.</p>';

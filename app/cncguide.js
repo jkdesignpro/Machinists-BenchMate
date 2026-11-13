@@ -39,6 +39,11 @@ const CNC_SOURCES = {
   CADEM: 'Cadem, "Constant surface speed: why does it always go with a limiting spindle speed?" (cadem.com)',
   CTE: 'C. Tate, "Understanding cutting equations", Cutting Tool Engineering, 2014-07-01 (ctemag.com)',
   WOODWEB: 'WOODWEB knowledge base, "Understanding chip load", 2005-06-19 (woodweb.com)',
+  CCB_SUB: 'CNC Cookbook, "M98 & M99 G-code: CNC subprograms", last modified 2024-04-30 (cnccookbook.com)',
+  MG_SUB: 'B. Fowler, Machinist Guides, "Quick guide to CNC subprograms", 2024-09-08 (machinistguides.com; its example program is not used)',
+  IMD_SUB: 'Industrial Monitor Direct, "Fanuc subprogramming: M98, M99, GOTO macro reference", 2026-09-13 (its combined form of the P word is described two ways and is not used)',
+  MMC_EFF: 'Mitsubishi Materials, technical information for turning tools, "Effects of cutting conditions" (mmc-carbide.com)',
+  SECO_PAR: 'Seco Tools, "Tools and parameters still play a key role in machining success" (secotools.com; no author or date shown)',
   OWN: 'BenchMate derivation (geometry), with tests in core/src/tnrc.rs',
 };
 const CNC_INDEPENDENT = { HFO_OP: 'HAAS', HFO_L: 'HAAS', HFO_MP: 'HAAS', LCNC_G: 'LCNC', FMC_D: 'FMC', FMC_T: 'FMC' }; // same publisher family counts once
@@ -371,8 +376,23 @@ function cnTable(head, rows) {
   return '<div class="res cntab" style="max-width:none"><table class="gtab"><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '<th>Sources</th></tr>' +
     rows.map(r => '<tr>' + r.slice(0, 3).map((c, i) => '<td>' + (i ? '' : '<b>') + gesc(c) + (i ? '' : '</b>') + '</td>').join('') + '<td>' + cnTags(r[3]) + '</td></tr>').join('') + '</table></div>';
 }
+// Three worked coordinate examples; every result is worked by the Rust core from the fixed inputs shown.
+function cnGeoExamples() {
+  const W = state.W, f = (x, dp) => (typeof x === 'number' && isFinite(x)) ? x.toFixed(dp === undefined ? 3 : dp) : '-';
+  const p1 = [10, 0], p2 = [50, 30], c = [30, 10], r = 12, run = 20, ang = 15;
+  const lt = k => W.line_two_points(p1[0], p1[1], p2[0], p2[1], k), lc = k => W.line_circle(p1[0], p1[1], p2[0], p2[1], c[0], c[1], r, k);
+  const rows = [
+    ['A straight move from X' + p1[0] + ' Y' + p1[1] + ' to X' + p2[0] + ' Y' + p2[1], 'Its length and its angle from the X axis', 'length <b class="cgv">' + f(lt(0)) + '</b>, angle <b class="cgv">' + f(lt(1), 2) + '°</b>', 'linecirc', 'Line and circle'],
+    ['The same line and a circle of radius ' + r + ' with its centre at X' + c[0] + ' Y' + c[1], 'The two points where the line cuts the circle', 'X<b class="cgv">' + f(lc(1)) + '</b> Y<b class="cgv">' + f(lc(2)) + '</b> and X<b class="cgv">' + f(lc(3)) + '</b> Y<b class="cgv">' + f(lc(4)) + '</b>', 'linecirc', 'Line and circle'],
+    ['A taper at ' + ang + '° to the axis over a length of ' + run, 'How far the surface rises on the radius over that length', '<b class="cgv">' + f(W.rise_for_angle(run, ang)) + '</b> on the radius; a lathe programmed on diameter moves X by twice that', 'triangle', 'Triangle solver'],
+  ];
+  return '<h3>Worked examples</h3><div class="res cntab" style="max-width:none" id="cgex"><table class="gtab"><tr><th>The drawing gives</th><th>The program needs</th><th>Result (worked by BenchMate)</th><th>Tool</th></tr>' +
+    rows.map(x => '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td><td>' + x[2] + '</td><td><a href="#/t/' + x[3] + '">' + x[4] + '</a></td></tr>').join('') + '</table></div>' +
+    '<p class="ms">Numbers in the units of the program. The sources of each calculation are on the page of its tool.</p>';
+}
+
 function renderCncGuide(el) {
-  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'],
+  const toc = [['c-axes', 'Axes'], ['c-coord', 'Coordinate systems'], ['c-geo', 'Working out coordinates'], ['c-offs', 'Offsets'], ['c-prog', 'Program structure'], ['c-sub', 'Subprograms'], ['c-spin', 'Spindle'], ['c-climb', 'Climb vs conventional'], ['c-chip', 'Chip formation'], ['c-cond', 'Speed, feed and depth'],
     ['c-wear', 'Tool wear'], ['c-trt', 'Turning troubles'], ['c-trm', 'Milling troubles'], ['c-trd', 'Drilling troubles'], ['c-trtap', 'Tapping troubles'], ['c-trg', 'Grinding troubles'], ['c-hold', 'Workholding'], ['c-safe', 'Safety'], ['c-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
@@ -392,6 +412,13 @@ function renderCncGuide(el) {
     cp('<b>More work offsets.</b> Beyond the six standard ones, controls add more: Fanuc G54.1 P1 to P48 (or more as an option), Haas G110 to G129 and G154 P1 to P99, RS274NGC and LinuxCNC G59.1 to G59.3. Each is just another stored part zero.', ['NIST']) +
     cp('<b>On a lathe</b> the work offset normally holds only Z (the face of the part); X zero is the spindle centre line, so the X work offset is left at zero.', ['HFO_OP']) +
 
+    '<h2 id="c-geo">Working out coordinates</h2>' +
+    cp('<b>Absolute and incremental.</b> In absolute mode (G90) every coordinate is a position in the current work coordinate system, measured from the part zero. In incremental mode (G91) every coordinate is a distance from the point where the tool stands. Absolute programs are easier to check against the drawing; incremental suits a pattern that repeats.', ['NIST', 'LCNC_G']) +
+    cp('<b>Arcs by their centre.</b> G02 and G03 need the end point of the arc and its centre. In the centre format I, J and K give the centre as distances from the start point of the arc along X, Y and Z. LinuxCNC can also take them as absolute positions (G90.1); other controls have their own setting, so check which one yours uses.', ['NIST', 'LCNC_G']) +
+    cp('<b>Arcs by their radius.</b> With R instead of I, J and K the control works out the centre. A positive R gives the arc of less than a half circle and a negative R the larger one. Both sources call the radius format bad practice for arcs that are nearly a half circle or nearly a full circle; LinuxCNC gives the reason, that a small change in the end point moves the centre much further, and prefers the centre format throughout. (At exactly 180° the two differ: NIST counts it with the positive R, LinuxCNC says less than 180°.)', ['NIST', 'LCNC_G']) +
+    cp('<b>The points the drawing leaves out.</b> A drawing gives sizes, angles and radii; the program needs the X, Y (or X, Z) of every point where a line meets a line or an arc. Those points come from right-angle triangles and from circles, and BenchMate has a tool for each case: the <a href="#/t/triangle">Triangle solver</a> for tapers and chamfers, <a href="#/t/linecirc">Line and circle</a> for the length and angle of a move and for where a line meets or touches a circle, <a href="#/t/fillet">Fillet and tangent points</a> for a corner radius between two lines or a line and an arc, <a href="#/t/arc">Chord, arc and sagitta</a> for a radius from its width and height, and <a href="#/t/bolt">Bolt circle</a> for hole patterns. For the corrections a lathe tool nose needs when compensation is off, see the <a href="#/t/tnrc">Tool nose radius compensation</a> calculator.', null) +
+    cnGeoExamples() +
+
     '<h2 id="c-offs">Tool length, radius and wear offsets</h2>' +
     cp('<b>Tool length offset (mill).</b> Each tool sticks out a different length from the spindle. Its length is stored in the offset table and switched on with G43 H(number), which adds it to the Z position; G49 cancels it. Then Z0 in the program is the same surface for every tool.', ['NIST', 'MIT_EM']) +
     cp('<b>Cutter radius compensation (mill).</b> G41 keeps the cutter on the left of the programmed path and G42 on the right, looking along the direction of travel; G40 cancels. The radius comes from a D register. Program the part outline and adjust size with the D value.', ['NIST', 'HFO_L']) +
@@ -410,6 +437,28 @@ function renderCncGuide(el) {
     '<h3>Special characters in a program</h3>' + cnTable(['Character', 'Meaning', 'Notes'], PROG_CHARS) +
     cp('<b>Subprograms.</b> Repeated work goes in a subprogram: M98 P(number) calls it and M99 returns (Fanuc, Haas); Haas M97 calls a block inside the same program; LinuxCNC uses O-word subroutines; G65 calls a macro with arguments. See the G and M codes and Macro reference screens for each control.', []) +
     cp('<b>Typical order of one tool:</b> safe start line, tool change and offsets, spindle speed and direction, coolant, rapid to a clear start point, cut, retract to a safe height or position, coolant and spindle off, next tool; finally return to the change position and M30.', ['OWN']) +
+
+    '<h2 id="c-sub">Subprograms</h2>' +
+    cp('<b>Call and return.</b> M98 with P runs the program that has that O number. M99 ends the subprogram and goes back to the block after the call.', ['CCB_SUB', 'MG_SUB', 'IMD_SUB']) +
+    cp('<b>Repeats.</b> L is the number of times it is run. Left out, it runs once.', ['CCB_SUB', 'MG_SUB', 'IMD_SUB']) +
+    cp('Some controls write the number of repeats another way, with K for example.', ['MG_SUB']) +
+    cp('<b>Inside the same program (Haas M97).</b> M97 with P runs the blocks that begin at that N number of the same program. They are put after the M30.', ['CCB_SUB', 'MG_SUB', 'IMD_SUB']) +
+    cp('<b>Nesting.</b> A subprogram can call another one, down to a limit set by the control. Machinist Guides gives four levels for most controls and finds one enough for most work.', ['CCB_SUB', 'MG_SUB']) +
+    cp('<b>Modes carry over.</b> What is modal at the call is still on inside the subprogram, and what the subprogram turns on is still on after the return.', ['MG_SUB']) +
+    cp('<b>Same shape in several places.</b> Write the shape once in incremental moves, go to each start point in the main program and call it there.', ['CCB_SUB', 'MG_SUB']) +
+    cp('<b>Several depths.</b> Write one pass once and call it again for each deeper level.', ['CCB_SUB']) +
+    cp('<b>Macro call.</b> G65 with P also runs another program, and hands the values written in the block to its local variables. M98 hands over nothing.', ['CCB_SUB', 'IMD_SUB']) +
+    cp('<b>M99 with P</b> returns to that N number of the calling program, not to the block after the call. CNC Cookbook finds it confusing and advises against it.', ['CCB_SUB', 'IMD_SUB']) +
+    cp('<b>M99 in the main program</b> starts the program again from the top.', ['IMD_SUB']) +
+    '<h3 class="gcat">Worked examples</h3>' +
+    '<p class="desc">The three examples are our own, in the Fanuc and Haas style that the sources describe, with mm values. They show how the blocks hang together and are not cut-ready programs: prove any program on your own control first.</p>' +
+    cp('<b>1. One shape at three places.</b> The subprogram is written in G91, so it starts from wherever the tool stands, and it goes back to G90 before it returns.', null) +
+    '<pre class="gcode" id="csub1">O1000 (MAIN PROGRAM)\nT1 M06\nG90 G54 G00 X10. Y10.    (first start point)\nG43 H01 Z5. M03 S2000\nM98 P2000                (cut the shape here)\nG00 X60. Y10.            (second start point)\nM98 P2000\nG00 X110. Y10.           (third start point)\nM98 P2000\nG00 Z50. M05\nM30\n\nO2000 (THE SHAPE, FROM WHERE THE TOOL STANDS)\nG91 G01 Z-7. F100.       (down)\nX30. F250.\nY20.\nX-30.\nY-20.\nG00 Z7.                  (up by the same amount)\nG90                      (absolute again)\nM99                      (back to the main program)</pre>' +
+    cp('<b>2. One pass, four depths.</b> Each call goes 1.5 mm deeper than the one before, because the Z move is incremental.', null) +
+    '<pre class="gcode" id="csub2">G90 G00 X0. Y0.\nZ2.\nG01 Z0. F100.            (down to the top of the part)\nM98 P3000 L4             (four passes)\nG90 G00 Z50.\n\nO3000 (ONE PASS)\nG91 G01 Z-1.5 F100.\nX40. F250.\nY25.\nX-40.\nY-25.\nG90\nM99</pre>' +
+    cp('<b>3. Haas M97.</b> The same pass kept in the main program, after the M30.', null) +
+    '<pre class="gcode" id="csub3">G90 G00 X0. Y0.\nZ2.\nG01 Z0. F100.\nM97 P500 L4              (run the blocks from N500 four times)\nG90 G00 Z50.\nM30\nN500 G91 G01 Z-1.5 F100.\nX40. F250.\nY25.\nX-40.\nY-25.\nG90\nM99</pre>' +
+    cp('The codes of each control are in <a href="#/t/gmcodes">G and M codes</a>, and variables, arguments and loops in the <a href="#/t/macroref">macro reference</a>.', null) +
 
     '<h2 id="c-spin">Spindle direction and constant surface speed</h2>' + cnSpin() +
     cp('<b>M03, M04, M05.</b> M03 starts the spindle clockwise at the S speed, M04 starts it counterclockwise and M05 stops it.', ['LCNC_G', 'HURCO_PF', 'HFO_MP']) +
@@ -433,6 +482,17 @@ function renderCncGuide(el) {
     cp('Chip load is not always the chip thickness: a small radial depth of cut or a lead angle makes the chip thinner than the feed per tooth. See the <a href="#/t/chipthin">chip thinning</a> tool.', ['CTE']) +
     cp('Too little chip load makes heat and wears the tool out early; too much overloads the tool and the spindle and spoils the cut.', ['WOODWEB']) +
     cp('<b>Chip thickness</b> is set by the feed (and the entering angle in turning, the radial engagement in milling). Each chip breaker and edge works in a range of chip thickness: too thin and the edge rubs, too thick and it breaks. See the chip thinning tool for milling.', []) +
+
+    '<h2 id="c-cond">Speed, feed and depth of cut: which to change</h2>' +
+    cp('<b>Speed wears the tool fastest.</b> Raising the cutting speed shortens tool life more than anything else. Mitsubishi gives figures for turning: 20 % more speed halves the tool life, 50 % more leaves a fifth.', ['MMC_EFF', 'SECO_PAR']) +
+    cp('<b>Feed and depth cost far less tool life</b> than speed does.', ['MMC_EFF', 'SECO_PAR']) +
+    cp('<b>Feed and finish.</b> The feed sets the roughness of the surface, so the finish wanted puts a ceiling on it.', ['MMC_EFF', 'SECO_PAR']) +
+    cp('<b>The order (Seco).</b> Take the largest depth of cut the job allows, to save passes. Then the highest feed that still gives the finish and quality wanted. Set the cutting speed last, to steer for the lowest cost or the highest output.', ['SECO_PAR']) +
+    cp('<b>Not too little.</b> A feed that is too small brings flank wear and a shorter tool life. A depth of cut that is too small rubs in the hardened skin of the work.', ['MMC_EFF']) +
+    cp('<b>Skin and scale.</b> On a cast or unmachined surface take a depth that gets under the hard, dirty skin, as far as the power of the machine allows.', ['MMC_EFF']) +
+    cp('<b>Too slow can chatter.</b> Mitsubishi, for its turning tools: cutting at 65 to 130 SFM tends to chatter, and that shortens tool life.', ['MMC_EFF']) +
+    cp('<b>Energy.</b> A lower speed with a higher feed and a smaller depth also uses less energy.', ['SECO_PAR']) +
+    cp('The sum is in <a href="#/t/toollife">tool life and cost</a>; starting values come from the <a href="#/t/advturn">turning advisor</a> and the <a href="#/t/advmill">milling advisor</a>.', null) +
 
     '<h2 id="c-wear">Tool wear: types, causes and remedies</h2>' +
     '<p class="desc">Change one thing at a time and keep a note of what worked. Look at the worn edge under a lens before deciding. The <a href="#/t/toolwear">tool wear guide</a> has the same entries with a picture index.</p>' +

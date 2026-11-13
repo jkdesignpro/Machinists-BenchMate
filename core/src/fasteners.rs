@@ -36,8 +36,10 @@ pub fn stress_dia_iso(d: f64, p: f64) -> f64 {
 
 /// Tensile stress area of an ISO metric thread, `As = pi/4 ((d2 + d3)/2)^2`.
 /// M10 x 1.5: 58.0 mm2.
+/// Not a number when the pitch is so coarse that no stress diameter is left.
 pub fn stress_area_iso(d: f64, p: f64) -> f64 {
-    PI / 4.0 * stress_dia_iso(d, p).powi(2)
+    let ds = stress_dia_iso(d, p);
+    if ds > 0.0 { PI / 4.0 * ds.powi(2) } else { f64::NAN }
 }
 
 /// Stress diameter of a Unified inch thread, `D - 0.9743 / n` = `D - 0.9743 P`
@@ -47,8 +49,10 @@ pub fn stress_dia_unified(d: f64, p: f64) -> f64 {
 }
 
 /// Tensile stress area of a Unified inch thread, `As = 0.7854 (D - 0.9743 P)^2`.
+/// Not a number when the pitch is so coarse that no stress diameter is left.
 pub fn stress_area_unified(d: f64, p: f64) -> f64 {
-    PI / 4.0 * stress_dia_unified(d, p).powi(2)
+    let ds = stress_dia_unified(d, p);
+    if ds > 0.0 { PI / 4.0 * ds.powi(2) } else { f64::NAN }
 }
 
 /// f64 interface: `system` 0 = ISO metric, 1 = Unified.
@@ -59,6 +63,38 @@ pub fn stress_area_f(d: f64, p: f64, system: f64) -> f64 {
 /// f64 interface: stress diameter, `system` 0 = ISO metric, 1 = Unified.
 pub fn stress_dia_f(d: f64, p: f64, system: f64) -> f64 {
     if system as i32 == 1 { stress_dia_unified(d, p) } else { stress_dia_iso(d, p) }
+}
+
+// ---------------------------------------------------------------------------
+// Breaking force and thread engagement
+// ---------------------------------------------------------------------------
+
+/// Ultimate tensile (breaking) force of a screw, `F = Rm x As`: tensile
+/// strength times tensile stress area (Fastenal Technical Reference Guide,
+/// "P = St x As"; the minimum ultimate tensile loads of ISO 898-1 are built
+/// the same way). Units follow the inputs: mm2 x MPa = N, in2 x psi = lbf.
+pub fn tensile_load(stress_area: f64, tensile_strength: f64) -> f64 {
+    stress_area * tensile_strength
+}
+
+/// Simplified shear area of a 60 degree thread per unit of engaged length,
+/// `0.5 pi d2` with the basic pitch diameter `d2 = d - 0.649519 P`
+/// (Roymech, "Screw thread calculations": Ass = 0.5 pi dp Le).
+pub fn thread_shear_area_per_length(d: f64, p: f64) -> f64 {
+    0.5 * PI * crate::thread_pitch_dia_basic(d, p)
+}
+
+/// Simplified least length of engagement for which the screw breaks before
+/// the thread strips, screw and tapped part of like strength: the shear area
+/// is made twice the tensile stress area, `Le = 2 As / (0.5 pi d2)` (Roymech).
+/// `system` 0 = ISO metric, 1 = Unified. M10 x 1.5: 8.18 mm.
+pub fn engagement_min_simple(d: f64, p: f64, system: f64) -> f64 {
+    2.0 * stress_area_f(d, p, system) / thread_shear_area_per_length(d, p)
+}
+
+/// A rule-of-thumb engagement given in screw diameters: `k x d`.
+pub fn engagement_by_diameters(d: f64, k: f64) -> f64 {
+    d * k
 }
 
 // ---------------------------------------------------------------------------
@@ -256,6 +292,35 @@ mod tests {
             rel(stress_area_iso(d, p) * 1220.0 / 1000.0, kn, 0.005);
         }
         close(stress_area_iso(10.0, 1.5), 57.99, 0.01);
+    }
+
+    /// Roymech, "Screw thread calculations", table row M10 x 1.5 (6H/6g):
+    /// pitch diameter 9.0257 mm, tensile stress area 57.9896 mm2, simplified
+    /// shear area 14.1776 mm2 per mm, simplified engagement 8.1805 mm
+    /// (accessed 2026-11-12).
+    #[test] fn engagement_simple_reproduces_the_published_m10_row() {
+        close(crate::thread_pitch_dia_basic(10.0, 1.5), 9.0257, 0.00005);
+        close(stress_area_iso(10.0, 1.5), 57.9896, 0.0001);
+        close(thread_shear_area_per_length(10.0, 1.5), 14.1776, 0.00005);
+        close(engagement_min_simple(10.0, 1.5, 0.0), 8.1805, 0.00005);
+        // The same construction with the Unified stress area: a little shorter, since that area is a little smaller.
+        assert!(engagement_min_simple(10.0, 1.5, 1.0) < engagement_min_simple(10.0, 1.5, 0.0));
+        close(engagement_by_diameters(10.0, 1.5), 15.0, 1e-12);
+    }
+
+    /// Fastenal Technical Reference Guide (S7028 Rev. 9), worked example:
+    /// 3/4-10 SAE J429 Grade 5, 120 000 psi x 0.3340 in2 = 40 080 lb
+    /// (accessed 2026-11-12). The Unified formula gives 0.3345 in2.
+    #[test] fn stress_area_refuses_a_pitch_too_coarse_for_the_diameter() {
+        // M10 with a 12 mm pitch has a negative stress diameter: no area, not the square of a negative number.
+        assert!(stress_area_iso(10.0, 12.0).is_nan());
+        assert!(stress_area_unified(0.25, 0.3).is_nan());
+        assert!(engagement_min_simple(10.0, 12.0, 0.0).is_nan());
+    }
+    #[test] fn tensile_load_reproduces_the_published_grade_5_example() {
+        close(tensile_load(0.3340, 120_000.0), 40_080.0, 1e-6);
+        close(stress_area_unified(0.75, 0.1), 0.3340, 0.0006);
+        rel(tensile_load(stress_area_unified(0.75, 0.1), 120_000.0), 40_080.0, 0.002);
     }
 
     /// The ISO and Unified constants differ (0.938194 against 0.9743), so the

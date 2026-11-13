@@ -149,3 +149,7 @@ these are still open:
 - **Setup sheets are stored in the browser** (localStorage key
   `bm.setups`) and exported as `{ "benchmate_setup": 1, "sheet": {...} }`.
   Import adds a new sheet; it never overwrites one.
+- **Operations on a setup sheet** (0.7.0) are kept in the sheet's `ops`
+  list (number, what is done, holding, tools, speed, feed, check). Sheets
+  and files from before 0.7.0 have none and open with an empty list. Nothing
+  on the sheet is calculated.

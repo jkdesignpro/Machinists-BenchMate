@@ -5,6 +5,9 @@
 'use strict';
 
 const DV_SOURCES = {
+  LM_DRV: 'LearnMech, S. Thorat, "Mechanical drives: belt, chain, gear. Advantages and disadvantages", 2016-06-23, modified 2020-05-10',
+  UNCC_BC: 'University of North Carolina at Charlotte, engineering toolkit, "Belts & chains" (no author or date shown; its statements on service life contradict each other and are not used)',
+  DE_DRV: 'Design Engineering, L. Burgess, "Which is better: gear drive or belt and pulley drive system?", 2022-03-01',
   MD_NP: 'Machine Design, D. Basso, "Basics of motor nameplates", 2000-05-01',
   AD_AC: 'AutomationDirect library, C. McDaniel, "How do AC motors work?", 2018-01-02',
   CE_AC: 'Control Engineering, F. J. Bartos, "Anatomy of an AC induction motor"',
@@ -21,9 +24,13 @@ const DV_SOURCES = {
   FAB_VIB: 'Fabrico blog, "ISO 20816 vibration severity zones", 2026-07-07, updated 2026-11-09 (no author shown)',
   VIBRO: 'Vibromera, "ISO 10816 and ISO 20816 vibration standards", 2025-10-31, modified 2026-07-17',
   IMD_VIB: 'Industrial Monitor Direct, "ISO 10816 vibration severity standards for rotating machines", 2026-06-10',
+  WP_VIB: 'Wikipedia, "Vibration" (CC BY-SA)',
+  MDI_VIB: 'V. Wowk, Machine Dynamics, Inc., "A brief tutorial on machine vibration"',
+  RW_FB: 'Reliabilityweb, D. H. Shreve, "Fundamentals for successful field balancing", 2012-07-30',
+  RP_FB: 'Reliable Plant, "Field balancing rotors" (no author or date in the text read)',
 };
 // Several pages of one publisher count once. Machine Design and Power & Motion are magazines of one publisher.
-const DV_FAMILY = { MD_NP: 'ENDEAVOR', PMT: 'ENDEAVOR', FAB_AL: 'FABRICO', FAB_VIB: 'FABRICO', OEP_AL: 'OEP', OEP_FP: 'OEP' };
+const DV_FAMILY = { WP_VIB: 'WP_HM', MD_NP: 'ENDEAVOR', PMT: 'ENDEAVOR', FAB_AL: 'FABRICO', FAB_VIB: 'FABRICO', OEP_AL: 'OEP', OEP_FP: 'OEP' };
 const dvTags = keys => guideTags(keys, DV_SOURCES, DV_FAMILY);
 const dvP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + dvTags(keys)) + '</p>';
 const dvBox = d => '<path class="gfill" d="' + d + '"/><path class="gp" d="' + d + '"/>';
@@ -167,6 +174,18 @@ const DV_LIM = [
   ['Group 2, rigid support', '1.4', '2.8', '4.5', ['FAB_VIB', 'VIBRO']],
   ['Group 2, flexible support', '2.3', '4.5', '7.1', ['FAB_VIB', 'VIBRO']],
 ];
+// Belt, chain and gear drives side by side. A cell that rests on one of the three publishers names it.
+const DV_CMP = [
+  ['Slip', 'A flat belt or V-belt slips a little, so the speed ratio is not exact.', 'No slip: the ratio stays constant.', 'No slip: the ratio stays constant.', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Efficiency', 'Lower than that of a chain or of gears.', 'Higher than a belt; up to 98 % (UNC Charlotte).', 'High.', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Lubrication', 'None.', 'Regular lubrication (UNC Charlotte).', 'Regular lubrication.', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Noise', 'Quiet; damps noise and vibration.', 'Noisier than a belt.', 'Noisy when not lubricated (LearnMech).', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['First cost', 'Low.', 'Higher than a belt.', 'Small drives: cheaper than a belt drive. Large drives: a timing belt is cheaper (Design Engineering).', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Space', 'Not compact (Design Engineering); for shafts far apart (UNC Charlotte).', 'Takes less room than a belt (LearnMech); shafts closer together than with a belt (UNC Charlotte).', 'The most compact; not for shafts far apart (Design Engineering).', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Overload and shock', 'Slips or breaks when overloaded, which protects the machine (LearnMech); takes up swings in the load (Design Engineering).', 'Not stated in the sources read.', 'Can lock up if the tooth form is not kept (LearnMech).', ['LM_DRV', 'DE_DRV']],
+  ['Wear and upkeep', 'Wears and stretches; the tension has to be set again from time to time (LearnMech).', 'The sources differ: upkeep costs more than a belt (LearnMech); low upkeep cost, as for a belt (UNC Charlotte).', 'The longest life of the three (LearnMech).', ['LM_DRV', 'UNCC_BC', 'DE_DRV']],
+  ['Oil and wet', 'Not for oily, greasy or wet places.', 'Works dry or wet.', 'Not stated in the sources read.', ['UNCC_BC']],
+];
 const DV_SIG = [
   ['Unbalance', 'Vibration mostly at once the running speed.', ['VIBRO']],
   ['Misalignment', 'Vibromera: at two and three times the running speed, with axial vibration more than half the radial. Fabrico and Tractian: at once and twice the running speed; Fabrico adds raised axial vibration.', ['VIBRO', 'FAB_AL', 'TRAC']],
@@ -174,12 +193,20 @@ const DV_SIG = [
   ['Rolling bearing damage', 'High-frequency noise.', ['VIBRO']],
 ];
 function renderDriveGuide(el) {
-  const toc = [['dv-mot', 'Electric motors'], ['dv-al', 'Shaft alignment'], ['dv-fp', 'Fluid power'], ['dv-vib', 'Machine vibration']];
+  const toc = [['dv-cmp', 'Belt, chain or gears'], ['dv-mot', 'Electric motors'], ['dv-al', 'Shaft alignment'], ['dv-fp', 'Fluid power'], ['dv-vib', 'Machine vibration']];
   const two = (head, rows) => '<div class="res cntab" style="max-width:none"><table class="gtab"><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '<th>Sources</th></tr>' +
     rows.map(r => '<tr><td><b>' + gesc(r[0]) + '</b></td><td>' + gesc(r[1]) + '</td><td>' + dvTags(r[2]) + '</td></tr>').join('') + '</table></div>';
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">What drives a machine and what keeps it running, in our own words: induction motors and their nameplate, lining up two coupled shafts with dial indicators, hydraulics and pneumatics with their fittings, and how machine vibration is judged. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
+
+    '<h2 id="dv-cmp">Belt, chain or gears</h2>' +
+    '<div id="dvcmp">' + guideTable(['', 'Belt', 'Chain', 'Gears'], DV_CMP, dvTags) + '</div>' +
+    dvP('<b>Timing belts</b> have teeth that keep the two shafts in step.', ['UNCC_BC', 'DE_DRV']) +
+    dvP('Design Engineering prefers a timing belt for high torque and a V-belt for high speed.', ['DE_DRV']) +
+    dvP('UNC Charlotte gives about 35 m/s as the limit of belt speed and a ratio of up to 8 : 1 for a chain.', ['UNCC_BC']) +
+    dvP('Neither a belt nor a chain is the better one in general: it depends on the job.', ['UNCC_BC']) +
+    dvP('Each drive has its calculator: <a href="#/t/beltdrive">belt drive</a>, <a href="#/t/chaindrive">chain drive</a> and <a href="#/t/geartrain">gear train</a>.', null) +
 
     '<h2 id="dv-mot">Electric motors</h2>' + dvMotor() +
     dvP('<b>Stator and rotor.</b> The stator is the fixed outer part of an AC motor. The rotor is the inner part that turns with the shaft.', ['AD_AC', 'CE_AC']) +
@@ -259,8 +286,30 @@ function renderDriveGuide(el) {
     '<p class="desc">Zone boundaries in mm/s RMS, as both sources quote them from ISO 10816-3.</p>' +
     dvP('<b>Standard numbers.</b> The ISO 10816 series has been replaced by ISO 20816.', ['FAB_VIB', 'VIBRO']) +
     dvP('ISO 20816-3 took over from ISO 10816-3 with the zones and values unchanged. It covers machines above 15 kW running at 120 to 30 000 rpm.', ['FAB_VIB']) +
+    '<h3 class="gcat" id="dv-vth">Vibration in general</h3>' +
+    dvP('<b>Free and forced.</b> Free vibration: a system is set moving once and left to itself. Forced vibration: a disturbance that keeps coming drives it.', ['WP_VIB', 'MDI_VIB']) +
+    dvP('<b>In a machine</b> the forcing comes from the parts that turn: unbalance, misalignment, uneven friction, the meshing of gear teeth.', ['WP_VIB', 'MDI_VIB']) +
+    dvP('<b>Resonance.</b> When the forcing frequency comes close to a natural frequency the movement can grow very large and end in failure. A machine may rumble as it passes through a natural frequency while running up or coasting down.', ['WP_VIB', 'MDI_VIB']) +
+    dvP('<b>Curing a resonance.</b> Move the natural frequency by adding mass or stiffness to the part that responds, or add damping.', ['MDI_VIB']) +
+    dvP('<b>Damping</b> takes energy out of the vibration through friction and other resistance. With little damping the system still swings but dies away; at critical damping it just no longer swings; beyond that it is overdamped. The damped natural frequency lies below the undamped one.', ['WP_VIB']) +
+    dvP('<b>Frequency and amplitude.</b> The frequency points to the cause; the amplitude tells how bad it is.', ['MDI_VIB']) +
+    dvP('<b>Which quantity.</b> Displacement matters most at low frequencies, velocity is the useful middle measure for trending, and acceleration matters most at high frequencies.', ['MDI_VIB']) +
+    dvP('<b>It adds up.</b> Vibration wears by fatigue: the damage accumulates with time and cycles.', ['MDI_VIB']) +
+    '<p class="desc">No formula for the natural frequency is printed here: it did not come through from the source read. The chatter finder and the critical speed page work natural frequencies out.</p>' +
     '<h3 class="gcat">What the vibration points to</h3>' +
     two(['Fault', 'What shows'], DV_SIG) +
+    '<h3 class="gcat" id="dv-bal">Balancing a rotor in place</h3>' +
+    dvP('<b>Is it unbalance?</b> Unbalance shows as vibration at once per turn (1x). If the 1x part is 80 % or more of the total, unbalance is the likely cause; below that, look for other faults as well.', ['RW_FB', 'RP_FB']) +
+    dvP('<b>Rule the rest out first.</b> Many faults vibrate at 1x: dirt built up on the rotor, looseness, resonance, misalignment, a bent shaft. Clean and inspect the rotor and put other faults right before balancing.', ['RW_FB', 'RP_FB', 'MDI_VIB']) +
+    dvP('<b>The runs.</b> 1. A reference run: note amplitude and phase. 2. Stop and fix a known trial weight at a known place. 3. A trial run: note amplitude and phase again. 4. Take the trial weight off and fit the correction weight the instrument works out. 5. A trim run, and a trim weight if needed.', ['RW_FB', 'RP_FB']) +
+    dvP('<b>Size of the trial weight.</b> It has to change the reading enough to calculate with. The 30/30 rule asks for a change of 30 % in amplitude or 30 degrees in phase. Too light gives no usable answer; too heavy can wreck the machine.', ['RW_FB', 'RP_FB']) +
+    dvP('<b>A first size.</b> Reliable Plant aims for a force from the trial weight of 10 % of the rotor weight. Reliabilityweb gives, for 1200 to 3600 rpm: ounces = 0.004 x rotor weight in pounds / radius in inches.', ['RW_FB', 'RP_FB']) +
+    dvP('<b>Steady readings.</b> Amplitude and phase must both hold steady. If either wanders, do not call it unbalance.', ['RP_FB']) +
+    dvP('<b>Trim runs.</b> Reliable Plant: no more than two.', ['RP_FB']) +
+    dvP('<b>One plane or two.</b> Reliable Plant advises two planes for every rotor. A narrow overhung rotor, with a diameter at least four times its width, can sometimes be brought within the limit in one.', ['RP_FB']) +
+    dvP('<b>Safety while balancing.</b> Lock the machine out while you work on the rotor, and run at a safe speed with a safe trial weight: the force from unbalance grows with the square of the speed.', ['RW_FB']) +
+    '<p class="desc">How the correction weight is worked out from the two runs is not described in the sources read; balancing instruments do the vector arithmetic.</p>' +
+    dvP('Permissible unbalance and the split between two planes are in <a href="#/t/balance">balancing</a>.', null) +
     dvP('For vibration of the cut itself see the <a href="#/t/chatter">chatter finder</a>.', null) +
 
     '<h2 id="dv-src">Sources</h2><ul class="gsl">' + Object.entries(DV_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +

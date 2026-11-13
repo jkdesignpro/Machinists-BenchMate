@@ -467,6 +467,10 @@ f1!(saw_min_tpi, c::saw_min_tpi, thin, teeth);
 
 // Fasteners and machine elements (core/src/fasteners.rs)
 f1!(stress_area, c::stress_area_f, d, p, system);
+f1!(tensile_load, c::tensile_load, stress_area, tensile_strength);
+f1!(thread_shear_area_per_length, c::thread_shear_area_per_length, d, p);
+f1!(engagement_min_simple, c::engagement_min_simple, d, p, system);
+f1!(engagement_by_diameters, c::engagement_by_diameters, d, k);
 f1!(stress_dia, c::stress_dia_f, d, p, system);
 f1!(bearing_mean_dia, c::bearing_mean_dia, dw, dh);
 f1!(tightening_torque, c::tightening_torque, f, p, d2, mu_g, dkm, mu_k);
@@ -665,6 +669,30 @@ f1!(change_gear_ratio, c::change_gear_ratio, target, leadscrew, fixed);
     let k = t.len();
     set_out(t.iter().flat_map(|t| [t.a as f64, t.b as f64, t.c as f64, t.d as f64, t.ratio]).collect()); k as f64 }
 f1!(capital_recovery_factor, c::capital_recovery_factor, i, n);
+f1!(depreciation_expense, c::depreciation_expense, method, cost, salvage, life, factor, year);
+f1!(depreciation_book_value, c::depreciation_book_value, method, cost, salvage, life, factor, year);
+f1!(tackle_effort, c::tackle_effort, load, parts, efficiency);
+f1!(tackle_rope_pulled, c::tackle_rope_pulled, lift, parts);
+f1!(square_diagonal, c::square_diagonal, a, b);
+f1!(corner_angle_deg, c::corner_angle_deg, a, b, diagonal);
+f1!(rise_for_angle, c::rise_for_angle, run, angle_deg);
+f1!(interp_fraction, c::interp_fraction, x1, x2, x);
+f1!(bilinear, c::bilinear, x1, x2, y1, y2, q11, q21, q12, q22, x, y, which);
+f1!(normal_share_below, c::normal_share_below, x, mean, sigma);
+f1!(normal_share_between, c::normal_share_between, lo, hi, mean, sigma);
+f1!(normal_share_within, c::normal_share_within, k);
+f1!(normal_z, c::normal_z, x, mean, sigma);
+f1!(normal_share_above, c::normal_share_above, x, mean, sigma);
+f1!(normal_share_outside, c::normal_share_outside, lo, hi, mean, sigma);
+f1!(normal_value_for_share, c::normal_value_for_share, p, mean, sigma);
+f1!(normal_z_for_share, c::normal_z_for_share, p);
+f1!(line_two_points, c::line_two_points, x1, y1, x2, y2, which);
+f1!(point_line_distance, c::point_line_distance, x0, y0, x1, y1, x2, y2);
+/// Line and circle: which 0 number of points, 1 xa, 2 ya, 3 xb, 4 yb.
+#[no_mangle] pub extern "C" fn line_circle(x1: f64, y1: f64, x2: f64, y2: f64, cx: f64, cy: f64, r: f64, which: f64) -> f64 { pick(c::line_circle(x1, y1, x2, y2, cx, cy, r), which) }
+f1!(ellipse_prop, c::ellipse_prop, a, b, x, which);
+f1!(parabola_prop, c::parabola_prop, w, d, x, which);
+f1!(hyperbola_prop, c::hyperbola_prop, a, b, x, which);
 #[no_mangle] #[allow(clippy::too_many_arguments)]
 pub extern "C" fn machine_hourly_rate(price: f64, resale: f64, years: f64, interest: f64, hours: f64, fixed: f64, kw: f64, load: f64, kwh: f64, labour: f64, which: f64) -> f64 {
     c::machine_hourly_rate(price, resale, years, interest, hours, fixed, kw, load, kwh, labour, which as u32) }
@@ -1049,6 +1077,10 @@ f1!(renard_index, c::renard_index, r, x);
 f1!(spc_constant_computed, c::spc_constant_computed_f, n, which);
 f1!(spc_constant_table, c::spc_constant_table_f, n, which);
 f1!(sampling, c::sampling_f, n, ac, p, lot, which);
+f1!(binomial_prob, c::binomial_prob, n, p, k, which);
+f1!(binomial_between, c::binomial_between, n, p, k1, k2);
+f1!(poisson_prob, c::poisson_prob, mu, k, which);
+f1!(poisson_between, c::poisson_between, mu, k1, k2);
 /// X-bar/R chart of the first `n` buffer values in subgroups of `sg`; `which` as in `spc_xbar_r`.
 #[no_mangle] pub extern "C" fn spc_xbar_r_buf(n: f64, sg: f64, which: f64) -> f64 { c::spc_xbar_r(buf(n), sg.max(0.0) as usize, which.max(0.0) as u32) }
 f1!(grr_k, c::grr_k_f, kind, m);

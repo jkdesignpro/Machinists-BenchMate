@@ -7,6 +7,7 @@
 const FG_SOURCES = {
   NORD: 'Nord-Lock Group, "The Experts: Thread engagement in a tapped hole" (no author shown)',
   UW: 'University of Wisconsin physics instrument shop, FAQ (no author shown)',
+  FAST_ART: 'Fastenal, engineering article "Screw thread design", rev. 2009 (no author shown)',
   MD_LOCK: 'Machine Design, K. Bock (Nord-Lock), "Proper fastener selection and application are key to bolted joints that won’t loosen or lose clamping force", 2009-06-16',
   FE_LOCK: 'Fastener Engineering, J. Muelaner, "What is the difference between a lock washer and a vibration-resistant washer?", 2020-04-20',
   ESS_LN: 'Essentra Components, "What is a lock nut? How does it work?" (no author or date shown)',
@@ -26,6 +27,15 @@ const FG_SOURCES = {
   RC: 'Rotor Clip, F. Ellison, "Exploring retaining ring styles: a comprehensive guide", 2023-09-06',
   EH_BR: 'Aircraft Engine Historical Society, G. White, "British fastening systems", with S. Moore, "Why British spanners have dual markings"',
   WP_BSW: 'Wikipedia, "British Standard Whitworth" (CC BY-SA)',
+  XO_CB: 'D. McClements, Xometry, "Spotface vs. counterbore holes in machining: their key differences", 2022-12-16, updated 2025-11-19',
+  MG_CB: 'B. Fowler, Machinist Guides, "Counterbores: all about", 2021-02-16, modified 2026-03-01',
+  FIC_CB: 'T. Axsom, Fictiv, "Our guide to counterbore holes", 2023-09-08',
+  NIST_FQA: 'NIST, "Compliance FAQs: Fastener Quality Act (FQA)", content last updated 2019-11-15',
+  MB_CB: 'B. Marciszewski, Metric Bolt, "Counterfeit bolts: risks and mitigation in military applications", 2025-04-04 (a supplier\'s page)',
+  EASA_CB: 'R. A. Huber, EASA, "Counterfeit bolts: tips on how to avoid them", April 2003 (only the introduction is public)',
+  LBL_SCI: 'Lawrence Berkeley National Laboratory, "Suspect counterfeit items", 2020-02-18',
+  BSCI_TM: 'Bolt Science Limited, "Methods of tightening threaded fasteners"',
+  AC_ANG: 'Atlas Copco, Z. Mikic, "Beyond torque: using angle and other methods to ensure proper tightening", 2026-04-15',
 };
 // Several pages of one publisher count once.
 const FG_FAMILY = { WP_SW: 'WIKI', WP_SS: 'WIKI', WP_RR: 'WIKI', WP_BSW: 'WIKI', MD_LOCK: 'ENDEAVOR', MD_TS: 'ENDEAVOR', MD_PIN: 'ENDEAVOR', ESS_LN: 'ESSENTRA', ESS_H: 'ESSENTRA', ESS_TS: 'ESSENTRA', FE_LOCK: 'FE', FE_PIN: 'FE' };
@@ -158,18 +168,19 @@ const FG_RING = [
   ['Bevelled ring', 'A 15 degree edge wedges between the groove and the part.', 'Takes up end play rigidly.', ['WP_RR']],
 ];
 function renderFastGuide(el) {
-  const toc = [['fg-eng', 'Thread engagement'], ['fg-lock', 'Keeping fasteners tight'], ['fg-set', 'Set screws'], ['fg-head', 'Heads and drives'], ['fg-tap', 'Self-tapping screws'], ['fg-pin', 'Pins'], ['fg-ring', 'Retaining rings'], ['fg-brit', 'British fasteners']];
+  const toc = [['fg-eng', 'Thread engagement'], ['fg-lock', 'Keeping fasteners tight'], ['fg-tight', 'Tightening methods'], ['fg-set', 'Set screws'], ['fg-head', 'Heads and drives'], ['fg-tap', 'Self-tapping screws'], ['fg-pin', 'Pins'], ['fg-ring', 'Retaining rings'], ['fg-cb', 'Counterbore and spotface'], ['fg-fake', 'Counterfeit fasteners'], ['fg-brit', 'British fasteners']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Fasteners as a machinist meets them, in our own words: how much thread to engage, what keeps a fastener tight, lock wire, set screw points, screw heads and drives, self-tapping screws, pins, retaining rings and the old British threads. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers. Where the sources give different figures, each figure is shown with its source.</p>' +
 
     '<h2 id="fg-eng">Thread engagement</h2>' + fgEngage() +
-    fgP('<b>The aim.</b> Engage enough thread that the screw breaks before the threads strip.', ['NORD']) +
+    fgP('<b>The aim.</b> Engage enough thread that the screw breaks before the threads strip.', ['NORD', 'FAST_ART']) +
     fgP('<b>Rule of thumb.</b> Nord-Lock: about 1 times the screw diameter in steel and about 2 times in aluminium. The Wisconsin physics shop: about 1.5 times the diameter as the best length.', ['NORD', 'UW']) +
+    fgP('Fastenal: about 1 times the diameter in carbon steel and about 1.5 times in aluminium, with no real gain beyond that.', ['FAST_ART']) +
     fgP('The same shop gives three fully engaged threads as the least, and works an example: a 1/4-20 screw wants 0.375 in, about 7.5 threads.', ['UW']) +
     fgP('<b>Softer materials</b> and special alloys can need more than the rule gives. Then the length has to be calculated.', ['NORD']) +
     fgP('<b>Galling</b> is most common in stainless steel, aluminium and titanium. A lubricant with molybdenum disulphide or graphite helps, and so does pairing two different grades of stainless steel.', ['UW']) +
-    fgP('Strengths are under <a href="#/t/boltgrade">bolt grades and property classes</a>, tightening under <a href="#/t/bolttorque">bolt torque and preload</a>, thread inserts under <a href="#/t/sti">helical insert tapped holes</a>.', null) +
+    fgP('The <a href="#/t/threadstrip">thread engagement and breaking force</a> calculator works these out for a thread. Strengths are under <a href="#/t/boltgrade">bolt grades and property classes</a>, tightening under <a href="#/t/bolttorque">bolt torque and preload</a>, thread inserts under <a href="#/t/sti">helical insert tapped holes</a>.', null) +
 
     '<h2 id="fg-lock">Keeping fasteners tight</h2>' +
     fgP('<b>Why they come loose.</b> Vibration makes the surfaces in contact slip. The friction in the thread is overcome and the clamp load is lost.', ['MD_LOCK']) +
@@ -186,6 +197,20 @@ function renderFastGuide(el) {
     fgP('<b>Once only.</b> Wire is used once. A fastener that has been undone gets new wire.', ['WP_SW', 'FAA_SW']) +
     fgP('<b>The wire</b> is usually stainless steel.', ['WP_SW', 'FAA_SW']) +
     fgP('Common diameters are 0.5 to 1 mm (0.020 to 0.041 in); 0.8 mm (0.032 in) is usual on aircraft and in racing. Bend the cut ends under so that nothing sharp sticks out.', ['WP_SW']) +
+
+    '<h2 id="fg-tight">Tightening methods</h2>' +
+    fgP('<b>Torque is a stand-in.</b> What the joint needs is clamp load. Torque only stands in for it, and friction makes the result scatter: two bolts at the same torque do not carry the same load.', ['BSCI_TM', 'AC_ANG']) +
+    fgP('<b>Torque plus angle.</b> Snug the bolt to a low torque, then turn it on by a set angle; the example given is 30 Nm, then 90 degrees. Bolt Science describes the angle taking the bolt past its elastic range, which leaves only a small variation in preload.', ['BSCI_TM', 'AC_ANG']) +
+    fgP('<b>Tightening to yield.</b> The bolt is tightened until it just begins to yield, to get the most clamp load from it. A controller watches how the torque climbs with the angle and stops when the slope changes.', ['BSCI_TM', 'AC_ANG']) +
+    fgP('<b>Where the torque goes.</b> Usually 85 to 95 % of it is used up by friction.', ['BSCI_TM']) +
+    fgP('<b>Torque control</b> is the usual method. The torque is commonly worked out for a direct stress in the thread of 75 % of the yield stress of the bolt. Give the torque with a tolerance: plus or minus 5 % is good practice.', ['BSCI_TM']) +
+    fgP('<b>Angle within the elastic range.</b> There a given angle means a given stretch of the bolt.', ['AC_ANG']) +
+    fgP('<b>Watching the angle</b> also catches faults: a missing washer or a seized or damaged thread shows up as the wrong angle for the torque.', ['AC_ANG']) +
+    fgP('<b>Hydraulic tensioning.</b> A hydraulic puller stretches the bolt, the nut is run down and the pressure is let off. The pressure sets the preload; a little is lost when the pressure is released.', ['BSCI_TM']) +
+    fgP('<b>Heat.</b> The bolt is heated, the nut turned through a set angle, and the preload comes as the bolt cools and shrinks.', ['BSCI_TM']) +
+    fgP('<b>Load-indicating washers</b> have small raised pips that flatten under load. The preload is right when a set gap is left under the head.', ['BSCI_TM']) +
+    '<p class="desc">Neither source prints the scatter of each method in per cent, so none is given here.</p>' +
+    fgP('Torque from preload with your own friction values is in <a href="#/t/bolttorque">bolt torque and preload</a>.', null) +
 
     '<h2 id="fg-set">Set screws</h2>' + fgPoints() +
     fgP('<b>What it is.</b> A set screw has no head and is threaded for its whole length (a grub screw). It is screwed through one part and holds a second part with its point.', ['WP_SS', 'BOLTS_SS']) +
@@ -223,6 +248,28 @@ function renderFastGuide(el) {
     guideTable(['Ring', 'Fitting', 'Notes'], FG_RING, fgTags) +
     fgP('<b>Standards.</b> ASME B18.27, DIN 471 and DIN 472.', ['WP_RR']) +
     '<p class="desc">Groove dimensions are not listed here yet.</p>' +
+
+    '<h2 id="fg-cb">Counterbore, spotface and countersink</h2>' +
+    fgP('<b>Counterbore.</b> A larger hole with a flat bottom on the same centre as a smaller one, deep enough to take the head of a screw below the surface.', ['XO_CB', 'MG_CB', 'FIC_CB']) +
+    fgP('<b>Spotface.</b> A very shallow counterbore: only deep enough to give the head or the washer a flat seat, on the rough skin of a casting for example.', ['XO_CB', 'MG_CB', 'FIC_CB']) +
+    fgP('<b>Countersink.</b> A conical seat for a screw with a tapered head. Machinist Guides lists 82°, 90° and 100° as the angles.', ['MG_CB', 'FIC_CB']) +
+    fgP('<b>On the drawing.</b> The counterbore symbol ⌴ with the diameter and the depth. Older prints write CBORE.', ['XO_CB', 'MG_CB', 'FIC_CB']) +
+    fgP('A spotface has no symbol of its own: it is the counterbore symbol with SF in it.', ['XO_CB']) +
+    fgP('<b>Making one.</b> Drill the smaller hole first, then cut the counterbore on the same centre.', ['XO_CB', 'FIC_CB']) +
+    fgP('The flat bottom needs a tool with a flat end, not a drill point.', ['XO_CB']) +
+    fgP('<b>Size.</b> The diameter is that of the head plus clearance, the depth the height of the head plus any washer.', ['FIC_CB']) +
+    fgP('Counterbore sizes for socket head cap screws are in <a href="#/t/shcs">socket head cap screws</a>.', null) +
+
+    '<h2 id="fg-fake">Counterfeit fasteners</h2>' +
+    fgP('<b>Suspect and counterfeit.</b> A suspect item is one that may not meet the specification it is sold to. A counterfeit is a copy or substitute passed off without the right to do so.', ['LBL_SCI']) +
+    fgP('<b>Two marks on the head.</b> A graded bolt carries the mark of its grade and the mark of its maker. Check both.', ['MB_CB', 'NIST_FQA']) +
+    fgP('<b>Other signs.</b> A poor finish, marks that are wrong, papers that do not match the goods. A counterfeit can still look right to an untrained eye.', ['MB_CB']) +
+    fgP('<b>Proof is a test.</b> Hardness and tensile tests, and analysis of the steel. Under the US law the tests behind a grade mark are done by an accredited laboratory.', ['MB_CB', 'NIST_FQA']) +
+    fgP('<b>Papers.</b> Ask for the certificate of the lot. The US law has the maker keep, for five years, a record with the lot number, the standard, the chemistry and grade of the material and the test results.', ['NIST_FQA', 'MB_CB']) +
+    fgP('<b>The US law.</b> The Fastener Quality Act of 1990 followed fastener failures in the 1980s. A fastener must meet the specification it is sold to.', ['NIST_FQA', 'EASA_CB']) +
+    fgP('It covers metal bolts, nuts, screws and studs of 6 mm (1/4 in) and larger, with many exemptions.', ['NIST_FQA']) +
+    fgP('<b>Buying.</b> Write the standard and the grade in the order, buy where the lot can be traced, and look at the goods when they arrive.', ['LBL_SCI', 'MB_CB']) +
+    fgP('Grade marks and what each grade must reach are in <a href="#/t/boltgrade">bolt grades and property classes</a>.', null) +
 
     '<h2 id="fg-brit">British fasteners</h2>' +
     fgP('<b>Whitworth.</b> Joseph Whitworth put forward his thread in 1841. It has an angle of 55 degrees, with rounded crests and roots.', ['EH_BR', 'WP_BSW']) +

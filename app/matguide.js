@@ -42,12 +42,40 @@ const MG_SOURCES = {
   TWI: 'TWI, frequently asked question "What is corrosion?"',
   PM: 'Projectmaterials blog, "EN 10204 2.1 vs 2.2 vs 3.1 vs 3.2"',
   WIP: 'What Is Piping, "What is a material test certificate (mill test certificate)?"',
+  WP_HARD: 'Wikipedia, "Hardenability" (CC BY-SA)',
+  CAM_JOM: 'H. K. D. H. Bhadeshia, "The Jominy end quench test" (phase-trans.msm.cam.ac.uk, University of Cambridge site)',
+  TM_HT: 'Total Materia, article "Hardenability testing", June 2003',
+  TM_SH: 'Total Materia, article "Surface hardening of steels", September 2003 (only the cells of its table that read cleanly)',
+  OU_PNC: 'The Open University, OpenLearn Manupedia, "Plasma nitriding/carburising", 2018-03-09',
+  OU_IFH: 'The Open University, OpenLearn Manupedia, "Induction/flame hardening", 2018-03-09',
+  WP_CN: 'Wikipedia, "Carbonitriding" (CC BY-SA)',
+  PAULO_CN: 'Paulo, "Case hardening basics: nitrocarburizing vs. carbonitriding", 2017-02-15',
+  GS_IH: 'Gear Solutions, Hot Seat column, "Basic principles of induction hardening of steels"',
+  WP_MACH: 'Wikipedia, "Machinability" (CC BY-SA)',
+  INF_MACH: 'Infinita Lab, B. Raval, "Machining performance of ferrous metals: testing, factors & material properties", 2023-06-05, updated 2026-10-01',
+  FRAC_SS: 'A. Velling, Fractory, "Stress-strain curve", 2020-06-03, updated 2026-08-19',
+  WP_SS: 'Wikipedia, "Stress-strain curve" (CC BY-SA)',
+  MATH_SS: 'MATHalino, "Stress-strain diagram" (mathalino.com)',
+  TWI_TT: 'TWI, Job Knowledge 69, "Mechanical testing: tensile testing part 1"',
+  TM_TEMP: 'Total Materia, article "Steel properties at low and high temperatures"',
+  MAT_TEMP: 'N. Lewis and Materion Customer Technical Services, "In our element: how does temperature affect material properties?", 2024-01-01 (measured on a copper beryllium alloy)',
+  AIMS_SG: 'AIMS Industrial, "Steel grades comparison", 2026-09-29 (a supplier)',
+  CS_SG: 'Continental Steel & Tube, carbon and alloy steel grades page (a supplier; no date)',
+  CRU_SEL: 'Crucible Industries, eSelector, "Selection of tool & die steels" (a maker of tool steels; crucible.com)',
+  PL_TS: 'Protolabs, "Tool steel in manufacturing", 2025-09-11',
+  NORP_FG: 'ILNorplex (Norplex-Micarta), "Laminate fabrication guide" (a maker of laminates)',
+  PS_TS: 'M. Mush (Atlas Fibre), "Fabricating and cutting thermoset materials", The IAPD Magazine, 2015 (hosted by Polymershapes; prints the same figures as the Norplex guide, so it counts with it)',
+  CTE_PH: 'B. Taylor, Cutting Tool Engineering, "Machining phenolic: dust, wear, and tooling guide", 2023-09-15',
+  XOM_G10: 'G. Paulsen and J. Schadegg, Xometry, "Garolite machining", 2020-10-07, updated 2024-09-10',
+  HAS_EB: 'P. N. Hasluck, Cassell\'s Cyclopaedia of Mechanics, "Turning and polishing ebonite and vulcanite" (early 1900s; chestofbooks.com)',
   OWN: 'BenchMate reading of the rule in the sources beside it',
 };
 // Several pages of one publisher count once.
 const MG_FAMILY = {
   TM_TS: 'TOTALMAT', TM_AL: 'TOTALMAT', TM_CU: 'TOTALMAT', TM_TI: 'TOTALMAT', TM_MG: 'TOTALMAT',
   MM_CS: 'MATMATCH', MM_H: 'MATMATCH', XOM_AL: 'XOMETRY', XOM_NI: 'XOMETRY', EF_TS: 'EFUNDA', EF_MG: 'EFUNDA', WP_SAE: 'WIKI', WP_CI: 'WIKI',
+  WP_HARD: 'WIKI', WP_CN: 'WIKI', WP_MACH: 'WIKI', TM_HT: 'TOTALMAT', TM_SH: 'TOTALMAT', OU_PNC: 'OU', OU_IFH: 'OU',
+  WP_SS: 'WIKI', TWI_TT: 'TWI', TM_TEMP: 'TOTALMAT', XOM_G10: 'XOMETRY', NORP_FG: 'NORPLEX', PS_TS: 'NORPLEX',
 };
 const mgTags = keys => guideTags(keys, MG_SOURCES, MG_FAMILY);
 const mgP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + mgTags(keys)) + '</p>';
@@ -62,6 +90,19 @@ function mgNumber() {
     cnT(364, 18, 'aluminium: 6061-T651', 'gs', 'middle') + box(262, 70, '6061', true) + box(338, 56, 'T6', false) + box(400, 66, '51', false) +
     under(297, ['alloy:', 'magnesium', 'and silicon']) + under(366, ['solution', 'treated,', 'aged']) + under(433, ['stretched', 'to relieve', 'stress']),
     'Two designations taken apart. Steel 4140: 41 is the chromium-molybdenum family and 40 is about 0.40 per cent carbon. Aluminium 6061-T651: 6061 is a magnesium and silicon alloy, T6 is solution heat treated and artificially aged, 51 is stress relieved by stretching');
+}
+// A stress-strain curve of a ductile metal (schematic, not to scale).
+function mgCurve() {
+  const dot = (x, y) => '<circle class="gfill" cx="' + x + '" cy="' + y + '" r="3.5"/><circle class="gp" cx="' + x + '" cy="' + y + '" r="3.5"/>';
+  return cnSvg(480, 230,
+    '<path class="gm" d="M60 20V200H455"/>' + cnT(60, 13, 'stress', 'gs', 'middle') + cnT(455, 218, 'strain', 'gs', 'end') +
+    '<path class="gc" d="M60 86H133M60 46H300"/>' +
+    '<path class="gp" d="M60 200L130 90C150 60 230 46 300 46C350 46 380 56 400 72"/>' +
+    dot(133, 86) + dot(300, 46) + '<path class="gp" d="M394 66L406 78M406 66L394 78"/>' +
+    cnT(150, 150, 'straight line: elastic,', 'gs') + cnT(150, 164, 'slope = Young\'s modulus', 'gs') +
+    cnT(54, 90, 'yield', 'gs', 'end') + cnT(54, 50, 'tensile', 'gs', 'end') + cnT(54, 62, 'strength', 'gs', 'end') +
+    cnT(240, 100, 'plastic: the stretch stays', 'gs', 'middle') + cnT(352, 92, 'necking', 'gs', 'middle') + cnT(412, 76, 'fracture', 'gs'),
+    'A stress-strain curve for a ductile metal, not to scale: a straight elastic line up to the yield point, a rising curve to the tensile strength, then necking and fracture');
 }
 // How the carbon sits in three cast irons (schematic).
 function mgIron() {
@@ -215,8 +256,31 @@ const MG_CERT = [
   ['3.2', 'inspection certificate 3.2', 'yes, as 3.1', 'as 3.1, and countersigned by an independent or purchaser\'s inspector', ['PM', 'WIP']],
 ];
 
+// Uses of common carbon and alloy steels as two suppliers list them.
+const MG_USE = [
+  ['A36', '-', 'General construction and structural uses', ['CS_SG']],
+  ['1018, 1020', '1020: structural sections, case-hardened parts', '1018, with the 1006 to 1050 series: machining, cold-finished products', ['AIMS_SG', 'CS_SG']],
+  ['1045', 'Shafts, axles, gears, couplings', 'With the 1006 to 1050 series: machining, cold-finished products', ['AIMS_SG', 'CS_SG']],
+  ['12L14, 1215, 1144', '-', 'Free-machining steels for precision components', ['CS_SG']],
+  ['4130, 4140', '4140: hydraulic shafts, gears, bolts and studs, axles, crankshafts, mining equipment', '4130, 4140, 4142: aircraft parts, gears, shafts', ['AIMS_SG', 'CS_SG']],
+  ['4340', 'Crankshafts, heavy-duty axles, aircraft parts', '4330, 4340: aerospace, defence, high-stress parts', ['AIMS_SG', 'CS_SG']],
+  ['5160, 6150', '-', 'Springs, automotive components', ['CS_SG']],
+  ['8620', 'Gears, camshafts, sprockets', '8620, 8630: case-hardened parts', ['AIMS_SG', 'CS_SG']],
+  ['9310', '-', '8740, 9310: gears, shafts, aircraft components', ['CS_SG']],
+  ['52100', '-', 'Bearings, precision components', ['CS_SG']],
+];
+// Case hardening processes: each cell names who prints the figure. Micrometres in the source are written here in mm.
+const MG_CASE = [
+  ['Carburising', 'Carbon diffuses into the surface of a low-carbon steel', 'Total Materia: 815 to 980 °C in gas or liquid, up to 1090 °C in a pack. Open University (plasma): usually below 950 °C', 'Total Materia: up to 1.5 mm. Open University: 0.2 to 2 mm', ['TM_SH', 'OU_PNC']],
+  ['Carbonitriding', 'Carbon and nitrogen together, for cheap low-carbon steels that would not harden well otherwise', 'Total Materia: 760 to 870 °C. Wikipedia: around 850 °C. Paulo: around 1600 °F', 'Total Materia: 0.075 to 0.75 mm. Wikipedia: typically 0.07 to 0.5 mm, 0.75 mm at most', ['TM_SH', 'WP_CN', 'PAULO_CN']],
+  ['Nitriding', 'Nitrogen forms hard nitrides in an alloy steel', 'Total Materia: 480 to 590 °C in gas. Open University (plasma): usually below 550 °C', 'Total Materia: up to 0.75 mm', ['TM_SH', 'OU_PNC']],
+  ['Ferritic nitrocarburising', 'Nitrogen and carbon at a temperature too low to change the structure of the steel', '975 to 1125 °F', 'Shallower than carbonitriding', ['PAULO_CN']],
+  ['Induction hardening', 'A coil induces eddy currents that heat the surface in seconds; a spray or a bath quenches it', 'no figure in the sources read', 'Open University: 0.1 to 10 mm for induction and flame together', ['GS_IH', 'OU_IFH']],
+  ['Flame hardening', 'Oxy-fuel burners heat the surface, which is then quenched', 'no figure in the sources read', 'Open University: 0.1 to 10 mm for induction and flame together', ['OU_IFH', 'TM_SH']],
+];
+
 function renderMatGuide(el) {
-  const toc = [['mg-steel', 'Steel numbers'], ['mg-tool', 'Tool steels'], ['mg-stain', 'Stainless'], ['mg-iron', 'Cast iron'], ['mg-alu', 'Aluminium'], ['mg-cu', 'Copper tempers'], ['mg-other', 'Titanium, magnesium, nickel, zinc'], ['mg-hard', 'Hardness tests'], ['mg-corr', 'Corrosion'], ['mg-cert', 'Mill certificates']];
+  const toc = [['mg-steel', 'Steel numbers'], ['mg-tool', 'Tool steels'], ['mg-stain', 'Stainless'], ['mg-iron', 'Cast iron'], ['mg-alu', 'Aluminium'], ['mg-cu', 'Copper tempers'], ['mg-other', 'Titanium, magnesium, nickel, zinc'], ['mg-hard', 'Hardness tests'], ['mg-harden', 'Hardenability'], ['mg-case', 'Case hardening'], ['mg-mach', 'Machinability'], ['mg-tens', 'Tensile test'], ['mg-temp', 'Heat and cold'], ['mg-use', 'Steels by use'], ['mg-lam', 'Laminates and hard rubber'], ['mg-corr', 'Corrosion'], ['mg-cert', 'Mill certificates']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">How to read what is stamped on the bar and printed on the certificate: steel numbers, tool steel letters, stainless and cast iron families, aluminium and copper tempers, the names of titanium, magnesium, nickel and zinc alloys, how each hardness test works, the forms of corrosion, and the mill certificate, in our own words. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
@@ -245,6 +309,16 @@ function renderMatGuide(el) {
     mgP('<b>Machinability falls as the alloy rises.</b> With W1 as 100, O1 is rated about 90, A2 and S2 about 85, H11 about 75, and D2 and M1 about 50.', ['MHCC']) +
     mgP('<b>Hot work steels by number.</b> H1 to H19 are chromium based and H40 to H59 molybdenum based, with a tungsten based group between them.', ['EF_TS']) +
     mgP('One source calls the T group cobalt tool steel in its heading and tungsten type in its text; the other names it tungsten high speed steel.', ['MHCC', 'EF_TS']) +
+    '<h3 class="gcat" id="mg-tsel">Choosing a tool steel for the job</h3>' +
+    mgP('<b>Wear against toughness.</b> A steel that resists wear better usually breaks more easily, and the other way round. Choose by the way the tool is most likely to fail.', ['CRU_SEL', 'PL_TS']) +
+    mgP('<b>Blows and shock.</b> For punches, chisels and tools that take impact, the shock-resisting S grades such as S7. Avoid a brittle grade like D2 there.', ['CRU_SEL', 'PL_TS']) +
+    mgP('<b>Abrasion.</b> D2 for blanking, stamping and forming tools where wear is the main trouble, including dies for glass-filled plastics.', ['PL_TS', 'AIMS_SG']) +
+    mgP('<b>General cold work.</b> O1, A2 and D2 are the general-purpose cold work steels. O1 for gauges, taps, reamers, small dies and short runs; A2 for punches, knives, gauges and form tools.', ['CRU_SEL', 'PL_TS', 'AIMS_SG']) +
+    mgP('<b>Heat.</b> H13 for die-casting, forging and extrusion dies; Protolabs gives it for work above 400 °C.', ['PL_TS', 'AIMS_SG']) +
+    mgP('<b>Moulds.</b> The pre-hardened P20 for plastic injection moulds in moderate numbers.', ['PL_TS']) +
+    mgP('<b>Cutting tools.</b> High speed steel such as M2 for drills, taps, reamers and end mills.', ['PL_TS', 'AIMS_SG']) +
+    mgP('<b>Wear failure is the better failure.</b> Wear comes on slowly and can be planned for; breakage cannot.', ['CRU_SEL']) +
+    mgP('<b>When the tool fails (Crucible).</b> Wearing: a steel with more alloy, not just more hardness. Galling: keep the surfaces apart with lubricant or a coating such as TiN. Deforming: a new grade helps only if it can be run harder; or lower the load. Chipping and cracking: avoid sharp corners, and temper a part again after EDM before it goes into service.', ['CRU_SEL']) +
     mgP('Ten tool steels with their equivalents are in <a href="#/t/materials">material equivalents</a>.', null) +
 
     '<h2 id="mg-stain">Stainless steel families</h2>' +
@@ -324,6 +398,91 @@ function renderMatGuide(el) {
     mgP('<b>Limit of Brinell.</b> It does not suit very hard material, where the ball itself starts to deform.', ['UNSW', 'WEV']) +
     mgP('<b>Surface.</b> The microhardness tests, Vickers and Knoop at small loads, need a smooth, polished surface.', ['MM_H', 'MST']) +
     mgP('Convert between the scales in <a href="#/t/hardness">hardness conversion</a>.', null) +
+
+    '<h2 id="mg-harden">Hardenability</h2>' +
+    mgP('<b>Hardness and hardenability are two things.</b> Hardness is resistance to indentation. Hardenability is how deep into a section a steel hardens when it is quenched.', ['WP_HARD', 'TM_HT']) +
+    mgP('<b>What decides which.</b> The hardness of quenched steel depends on its carbon content and on how much martensite has formed. Hardenability depends on the composition as a whole, alloying elements included, and on the grain size.', ['TM_HT', 'WP_HARD']) +
+    mgP('<b>The Jominy end-quench test.</b> A standard bar 25.4 mm in diameter and 102 mm long is heated until it is fully austenitic, then set in a rig where a jet of water quenches one end only.', ['CAM_JOM', 'TM_HT', 'WP_HARD']) +
+    mgP('<b>Reading the bar.</b> The cooling rate falls steadily along the bar from the quenched end. Hardness is measured along it (Total Materia: on flats ground 4 mm deep). The farther from the quenched end the hardness holds up, the higher the hardenability.', ['CAM_JOM', 'TM_HT', 'WP_HARD']) +
+    mgP('<b>An example from Cambridge.</b> Two steels with the same 0.4 % carbon: the plain carbon one has a low hardenability beside the one alloyed with nickel, chromium and molybdenum.', ['CAM_JOM']) +
+    mgP('<b>From the bar to a part.</b> The results can be converted to the largest round bar that hardens right through. The ideal critical diameter, Di, is the bar that reaches 50 % martensite at its centre.', ['TM_HT']) +
+    mgP('<b>Quenchants.</b> Brine and water cool steel much faster than oil or air.', ['WP_HARD']) +
+    mgP('<b>Welding.</b> The higher the hardenability, the poorer the weldability.', ['WP_HARD']) +
+    mgP('Temperatures for hardening and tempering are in the <a href="#/t/heattreat">heat treatment reference</a>.', null) +
+
+    '<h2 id="mg-case">Case hardening</h2>' +
+    mgP('<b>The idea.</b> A hard, wear-resistant skin over a core that stays tough.', ['TM_SH', 'OU_PNC']) +
+    guideTable(['Process', 'How', 'Temperature', 'Case depth'], MG_CASE, mgTags) +
+    '<p class="desc">Total Materia\'s table reached us with some damaged cells; only cells that read cleanly are quoted, each beside a second source where one was found. The Open University pages describe the plasma processes and warn that they may be out of date. Depths given in micrometres are written here in mm.</p>' +
+    mgP('<b>Steels for carburising</b> are low in carbon: below 0.4 % and better below 0.25 %, so that the core stays tough.', ['OU_PNC', 'TM_SH']) +
+    mgP('<b>Quench or not.</b> Carburised and carbonitrided parts are quenched to get their hardness. Nitrided parts are not quenched.', ['TM_SH', 'OU_PNC']) +
+    mgP('<b>Distortion.</b> Nitriding, at the lowest temperature and with no quench, distorts least. Carbonitriding runs cooler than carburising, which reduces distortion in the quench.', ['OU_PNC', 'WP_CN', 'TM_SH']) +
+    mgP('<b>Case hardness as printed.</b> Total Materia: 50 to 63 HRC for carburised cases and 50 to 70 HRC for nitrided ones. Open University: up to 1500 HV for nitrides. Wikipedia: 55 to 62 HRC for carbonitrided parts.', ['TM_SH', 'OU_PNC', 'WP_CN']) +
+    mgP('<b>Steels for induction and flame hardening.</b> Medium carbon steels, plain or alloyed: at least 0.3 % carbon, mostly 0.4 to 0.7 % (Open University). The hardness reached depends on the carbon content (Gear Solutions).', ['OU_IFH', 'GS_IH']) +
+    mgP('<b>Induction in production.</b> Fast, repeatable and easy to automate. The equipment is costly and the coil has to be designed and proved for the part, so it suits long runs.', ['GS_IH', 'OU_IFH']) +
+    mgP('<b>Frequency and depth.</b> The higher the frequency of the induction heater, the shallower the hardened layer.', ['GS_IH']) +
+    mgP('<b>Where the case ends.</b> For induction hardening the case depth is usually taken as the depth at which the structure is still at least 50 % martensite.', ['GS_IH']) +
+    mgP('<b>Flame hardening</b> can treat small chosen areas and flat, round or irregular parts. The risks are overheating, burning and distortion.', ['OU_IFH']) +
+    mgP('<b>More carbon, more risk.</b> The higher the carbon content, the greater the risk of cracks and distortion.', ['OU_IFH']) +
+    mgP('Terms and temperatures steel by steel are in the <a href="#/t/heattreat">heat treatment reference</a>.', null) +
+
+    '<h2 id="mg-mach">Machinability</h2>' +
+    mgP('<b>What the word means.</b> How easily a metal can be cut to an acceptable finish, with an acceptable tool life.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>How it is judged.</b> By how long the tool lasts, by the forces and power the cut takes, by the finish, and by how the chips break.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>No agreed measure.</b> Many things affect machinability and there is no widely accepted way to put a number on it.', ['WP_MACH']) +
+    mgP('<b>The rating in per cent.</b> The free-cutting steel B1112 is set at 100 % and other metals are rated against it.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>Carbon.</b> Of the elements, carbon matters most (Infinita Lab). Low-carbon steels are troublesome because they are soft, high-carbon steels because they are strong; Wikipedia puts the best machinability at about 0.20 % carbon.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>Sulphur and lead.</b> Sulphur forms soft inclusions that break the chip and improve the finish. Lead acts as a lubricant in the cut; Infinita Lab notes that it has largely been phased out because it is toxic.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>Stainless steel</b> machines worse than carbon steel. The austenitic grades work-harden quickly and conduct heat poorly, which overheats the tool.', ['WP_MACH', 'INF_MACH']) +
+    mgP('<b>Hardness and structure.</b> As a rule machinability falls as hardness rises. Annealed, spheroidised steel cuts more easily; martensite is very hard to cut.', ['INF_MACH']) +
+    mgP('<b>Alloying.</b> Chromium, molybdenum and nickel raise strength and hardness and generally lower machinability.', ['INF_MACH']) +
+    mgP('Ratings grade by grade are on the cards of <a href="#/t/materials">material equivalents</a>; the work material groups are in <a href="#/t/iso513">cutting material groups</a>.', null) +
+
+    '<h2 id="mg-tens">The tensile test: stress, strain and the figures on the certificate</h2>' + mgCurve() +
+    mgP('<b>The test.</b> A test piece is pulled with a steadily rising load until it breaks, and the load and the stretch are recorded all the way.', ['TWI_TT', 'WP_SS']) +
+    mgP('<b>Stress and strain.</b> Stress is the force divided by the cross-section it acts on. Strain is the change in length divided by the length at the start.', ['FRAC_SS']) +
+    mgP('<b>The straight part.</b> At first the stress rises in step with the strain (Hooke\'s law). The slope of that line is Young\'s modulus: it tells how much a part gives elastically under load.', ['FRAC_SS', 'WP_SS', 'TWI_TT']) +
+    mgP('<b>Proportional limit and elastic limit.</b> The proportional limit is where the straight line ends. The elastic limit is the stress beyond which the piece no longer returns to its shape.', ['FRAC_SS', 'MATH_SS']) +
+    mgP('<b>Yield.</b> The stress at which the deformation turns from elastic to plastic, that is, permanent.', ['FRAC_SS', 'TWI_TT']) +
+    mgP('<b>Proof stress.</b> Many metals show no clear yield point. For them the stress that leaves a small stated permanent strain is used, found by drawing a line parallel to the straight part of the curve. Most steel specifications use 0.2 %, written Rp0.2 in EN standards.', ['TWI_TT']) +
+    mgP('<b>Tensile strength.</b> The highest stress on the curve.', ['FRAC_SS', 'WP_SS', 'MATH_SS']) +
+    mgP('<b>Necking and fracture.</b> Past the highest point a ductile piece narrows at one place, the neck, and breaks there, leaving a cup on one side and a cone on the other.', ['FRAC_SS', 'WP_SS']) +
+    mgP('<b>Elongation and reduction of area.</b> Elongation is the stretch at fracture in per cent of the gauge length. Reduction of area is how much the section has shrunk at the break. Both measure ductility: how far the metal deforms before it breaks.', ['TWI_TT']) +
+    mgP('<b>Brittle materials</b> have no clear yield point and do not strain-harden.', ['WP_SS']) +
+    mgP('<b>Engineering and true stress.</b> The usual curve divides by the cross-section at the start, so it falls once the neck forms. Worked on the real, shrinking section, the stress keeps rising.', ['WP_SS']) +
+    mgP('<b>From strength to allowable stress.</b> The strength, yield or tensile, divided by the stress allowed in the part is the factor of safety.', ['MATH_SS']) +
+    mgP('Factors of safety are in the <a href="#/t/elemguide">machine elements guide</a>.', null) +
+
+    '<h2 id="mg-temp">Heat and cold: what temperature does to strength</h2>' +
+    mgP('<b>Getting hotter.</b> Near room temperature the yield strength, the tensile strength and the modulus change little. As the temperature rises they fall away, slowly at first. Materion shows this for a copper beryllium alloy.', ['MAT_TEMP']) +
+    mgP('<b>Getting colder.</b> Metals in general gain tensile and yield strength in the cold.', ['TM_TEMP', 'MAT_TEMP']) +
+    mgP('<b>But steel turns brittle.</b> Steels become more brittle at low temperature, while copper alloys become tougher.', ['MAT_TEMP', 'TM_TEMP']) +
+    mgP('<b>Which steels.</b> Ferritic steels lose their impact strength sharply at around 0 °C. Austenitic alloys keep much of their ductility and shock resistance. Below -100 °C, or where a notch takes a blow, Total Materia prefers an 18/8 austenitic steel or a non-ferrous metal.', ['TM_TEMP']) +
+    mgP('<b>What lowers the temperature at which a steel turns brittle:</b> less carbon, more nickel and manganese, a finer grain, shallower and rounder notches, slower loading.', ['TM_TEMP']) +
+    mgP('<b>Creep.</b> At high temperature a metal under a steady stress slowly keeps deforming. It matters in steam and chemical plant at 450 to 550 °C and in gas turbines.', ['TM_TEMP']) +
+    mgP('<b>Three stages of creep.</b> First the stretching slows; then it runs at a steady, lowest rate; last it speeds up until the part breaks.', ['TM_TEMP']) +
+    mgP('<b>Stress relaxation.</b> Creep and stress relaxation come from diffusion in the metal, with no change of phase, so relaxation can occur at temperatures too low to change the structure.', ['MAT_TEMP']) +
+    mgP('Strength and modulus at room temperature are on the cards of <a href="#/t/materials">material equivalents</a>.', null) +
+
+    '<h2 id="mg-use">Steels by what they are used for</h2>' +
+    guideTable(['Grade', 'AIMS Industrial', 'Continental Steel'], MG_USE, mgTags) +
+    '<p class="desc">Uses as two steel suppliers list them, each in its own column. A row with one supplier is marked. A dash means the supplier does not list the grade.</p>' +
+    mgP('<b>Tool steels (AIMS).</b> O1 for taps, reamers and small dies; A2 for punches, knives and gauges; D2 for dies, punches and shear blades; M2 for drills, end mills and taps; H13 for die-casting, extrusion and forging dies.', ['AIMS_SG']) +
+    mgP('<b>Stainless (AIMS).</b> 304 is the general-purpose grade for indoors and mild outdoor use; 316 is the grade for marine and chemical service.', ['AIMS_SG']) +
+    mgP('Composition and properties grade by grade are on the cards of <a href="#/t/materials">material equivalents</a>.', null) +
+
+    '<h2 id="mg-lam">Machining laminates and hard rubber</h2>' +
+    mgP('<b>What laminates are.</b> Thermosets made of layers of paper, cotton cloth or glass cloth bonded with resin: phenolic for the paper and cotton grades, epoxy for glass grades such as G-10. They do not melt.', ['CTE_PH', 'XOM_G10', 'NORP_FG']) +
+    mgP('<b>They wear tools.</b> The fillers are abrasive and dull cutting edges quickly, the glass grades most of all.', ['CTE_PH', 'XOM_G10', 'NORP_FG']) +
+    mgP('<b>Tool material.</b> Paper and cotton grades can be cut with high speed steel, with carbide for production runs. Glass grades need carbide or diamond; Xometry suggests diamond-coated end mills.', ['NORP_FG', 'CTE_PH', 'XOM_G10']) +
+    mgP('<b>Dust.</b> Cutting makes a fine powder rather than chips, and it must not be breathed. Collect it at the machine, and wear a respirator and eye protection.', ['XOM_G10', 'CTE_PH', 'NORP_FG']) +
+    mgP('<b>Coolant, the sources differ.</b> Norplex: paper grades dry, with air or a vacuum to take the dust; glass grades dry with an exhaust, though water may be used. Cutting Tool Engineering drilled phenolic with water-based flood coolant, which also kept the dust down. Xometry: coolant cuts the dust, but medical G-10 parts are machined dry to keep them clean.', ['NORP_FG', 'CTE_PH', 'XOM_G10']) +
+    mgP('<b>Heat.</b> Keep the work below about 150 °C.', ['NORP_FG', 'PS_TS']) +
+    mgP('<b>Holes come out small.</b> Holes drilled in laminate come out undersize, and more so with a dull drill. Norplex: use a drill about 0.002 in larger than the hole. Cutting Tool Engineering: a 0.315 in drill gave holes of 0.310 to 0.314 in.', ['NORP_FG', 'CTE_PH']) +
+    mgP('<b>Layers that split.</b> Xometry: too much heat and pressure along the grain splits the layers. Norplex: climb mill only, because conventional milling lifts the layers, and back the far side with scrap when drilling through.', ['XOM_G10', 'NORP_FG']) +
+    mgP('<b>Threads, the sources differ.</b> Xometry: mill internal threads instead of tapping them, and turn or thread-mill outside threads instead of using a die. Norplex: taps cut close to size and bind in glass grades, so use carbide taps made oversize; in paper grades use a tap 0.002 in oversize.', ['XOM_G10', 'NORP_FG']) +
+    mgP('<b>Hard rubber (ebonite).</b> An old workshop cyclopaedia: sharp steel tools ground about as for brass or hardwood, a moderate speed and light cuts; rough with a round-nosed tool, finish with a flat brass-finishing tool or a scraper, and polish with emery cloth and then putty powder.', ['HAS_EB']) +
+    '<p class="desc">No speeds are given: the figures printed are for one maker\'s grades or one shop\'s job. Thermoplastics are on <a href="#/t/plastics">Machining plastics</a>.</p>' +
 
     '<h2 id="mg-corr">Forms of corrosion</h2>' +
     guideTable(['Form', 'What happens'], MG_CORR, mgTags) +

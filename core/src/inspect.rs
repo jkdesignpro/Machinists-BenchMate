@@ -427,5 +427,104 @@ pub fn sampling_f(n: f64, c: f64, p: f64, lot: f64, which: f64) -> f64 {
     match which as i32 { 0 => sampling_pa_binomial(n, c, p), 1 => sampling_pa_poisson(n, c, p), 2 => sampling_aoq(n, c, p, lot), _ => f64::NAN }
 }
 
+// ---------------------------------------------------------------------------
+// Binomial and Poisson distributions (general calculator)
+
+/// Largest number of trials, mean count or count the calculator takes, so
+/// that the term-by-term sums stay quick.
+pub const DISTRIB_MAX: f64 = 100_000.0;
+
+/// Sum of the binomial terms C(n, j) p^j (1 - p)^(n - j) for j = a..=b.
+/// The terms are built in logs from j = 0 with the ratio
+/// term(j+1)/term(j) = (n - j)/(j + 1) * p/(1 - p).
+fn binomial_sum(n: u32, p: f64, a: u32, b: u32) -> f64 {
+    let b = b.min(n);
+    if a > b { return 0.0; }
+    if p == 0.0 { return if a == 0 { 1.0 } else { 0.0 }; }
+    if p == 1.0 { return if b == n { 1.0 } else { 0.0 }; }
+    let r = (p / (1.0 - p)).ln();
+    let mut lt = n as f64 * (1.0 - p).ln();
+    let mut s = 0.0;
+    for j in 0..=b {
+        if j >= a { s += lt.exp(); }
+        if j < n { lt += ((n - j) as f64 / (j + 1) as f64).ln() + r; }
+    }
+    s.min(1.0)
+}
+
+/// Sum of the Poisson terms e^-mu mu^j / j! for j = a..=b; with `open` the
+/// sum runs on from a until the terms no longer change it (a or more).
+fn poisson_sum(mu: f64, a: u32, b: u32, open: bool) -> f64 {
+    if mu == 0.0 { return if a == 0 { 1.0 } else { 0.0 }; }
+    if !open && a > b { return 0.0; }
+    let lmu = mu.ln();
+    let mut lt = -mu;
+    let mut s = 0.0;
+    let mut j: u32 = 0;
+    loop {
+        if j >= a {
+            let term = lt.exp();
+            s += term;
+            if open && j as f64 > mu && term < s * 1e-17 { break; }
+        }
+        if (!open && j >= b) || j >= 4_000_000 { break; }
+        lt += lmu - ((j + 1) as f64).ln();
+        j += 1;
+    }
+    s.min(1.0)
+}
+
+fn whole_count(x: f64) -> bool { x >= 0.0 && x <= DISTRIB_MAX && x.fract() == 0.0 }
+
+/// Binomial distribution of the count X in n independent trials, each with
+/// the chance p: P(X = k) = C(n, k) p^k (1 - p)^(n - k).
+/// `which`: 0 P(X = k), 1 P(X <= k), 2 P(X >= k), 3 mean n p,
+/// 4 standard deviation sqrt(n p (1 - p)), 5 variance n p (1 - p),
+/// 6 the Poisson estimate of P(X = k) with the mean n p.
+pub fn binomial_prob(n: f64, p: f64, k: f64, which: f64) -> f64 {
+    if !(whole_count(n) && n >= 1.0 && (0.0..=1.0).contains(&p)) { return f64::NAN; }
+    let w = which as i32;
+    match w { 3 => return n * p, 4 => return (n * p * (1.0 - p)).sqrt(), 5 => return n * p * (1.0 - p), _ => {} }
+    if !whole_count(k) { return f64::NAN; }
+    let (nn, kk) = (n as u32, k as u32);
+    match w {
+        0 => binomial_sum(nn, p, kk, kk),
+        1 => binomial_sum(nn, p, 0, kk),
+        2 => binomial_sum(nn, p, kk, nn),
+        6 => poisson_sum(n * p, kk, kk, false),
+        _ => f64::NAN,
+    }
+}
+
+/// Binomial chance of a count from k1 to k2, both included.
+pub fn binomial_between(n: f64, p: f64, k1: f64, k2: f64) -> f64 {
+    if !(whole_count(n) && n >= 1.0 && (0.0..=1.0).contains(&p) && whole_count(k1) && whole_count(k2) && k2 >= k1) { return f64::NAN; }
+    binomial_sum(n as u32, p, k1 as u32, k2 as u32)
+}
+
+/// Poisson distribution of a count with the mean mu:
+/// P(X = k) = e^-mu mu^k / k!.
+/// `which`: 0 P(X = k), 1 P(X <= k), 2 P(X >= k), 3 mean mu,
+/// 4 standard deviation sqrt(mu), 5 variance mu.
+pub fn poisson_prob(mu: f64, k: f64, which: f64) -> f64 {
+    if !(mu >= 0.0 && mu <= DISTRIB_MAX) { return f64::NAN; }
+    let w = which as i32;
+    match w { 3 | 5 => return mu, 4 => return mu.sqrt(), _ => {} }
+    if !whole_count(k) { return f64::NAN; }
+    let kk = k as u32;
+    match w {
+        0 => poisson_sum(mu, kk, kk, false),
+        1 => poisson_sum(mu, 0, kk, false),
+        2 => poisson_sum(mu, kk, kk, true),
+        _ => f64::NAN,
+    }
+}
+
+/// Poisson chance of a count from k1 to k2, both included.
+pub fn poisson_between(mu: f64, k1: f64, k2: f64) -> f64 {
+    if !(mu >= 0.0 && mu <= DISTRIB_MAX && whole_count(k1) && whole_count(k2) && k2 >= k1) { return f64::NAN; }
+    poisson_sum(mu, k1 as u32, k2 as u32, false)
+}
+
 #[cfg(test)]
 mod tests;

@@ -14,10 +14,17 @@ const LG_SOURCES = {
   CCB_LATHE: 'CNC Cookbook, "Lathe workholding" (no author named; page dated 2010 to 2016)',
   CTC_DRV: 'D. Garner, CNC Training Centre, "Driven tools (live tooling) milling on a CNC lathe", 2024-06-06',
   MMC: 'Mitsubishi Materials, training course page "Insert selection for external turning" (mmc-carbide.com)',
+  HAAS_G32: 'Haas Automation, lathe G-code page "G32 thread cutting" (its figure of the lead did not come through)',
+  HAAS_G76: 'Haas Automation, lathe G-code page "G76 threading cycle, multiple pass"',
+  CTE_SP: 'K. Hanson, Cutting Tool Engineering, "Single-point thread programming can be fun and easy", 2016-08-05',
+  CTE_MS: 'T. Lipton, Cutting Tool Engineering, "Cutting multiple-start threads", 2012-09-01 (manual lathe)',
+  MMS_MS: 'M. Lynch, Modern Machine Shop, "Dealing with multiple start threads on turning centers", 2006-02-01 (only the first part of the page could be read)',
+  IMD_G78: 'Industrial Monitor Direct, "G78 R value for NPT tapered threading: correct calculation method", 2026-05-29 (its angle figures do not agree with each other and are not used)',
+  IMD_MS: 'Industrial Monitor Direct, "Programming Masso G3 G32 taper and multi-start threads", 2026-09-28',
   OWN: 'BenchMate reasoning from the sources beside it',
 };
 // Production Machining and Modern Machine Shop have one publisher; the two Haas documents count once.
-const LG_FAMILY = { PM_COL: 'GARDNER', PM_PART: 'GARDNER', MMS_BAR: 'GARDNER', HFO_LP: 'HAAS', HAAS_CUT: 'HAAS' };
+const LG_FAMILY = { PM_COL: 'GARDNER', PM_PART: 'GARDNER', MMS_BAR: 'GARDNER', MMS_MS: 'GARDNER', HFO_LP: 'HAAS', HAAS_CUT: 'HAAS', HAAS_G32: 'HAAS', HAAS_G76: 'HAAS', CTE_SP: 'CTE', CTE_MS: 'CTE', IMD_G78: 'IMD', IMD_MS: 'IMD' };
 const lgTags = keys => guideTags(keys, LG_SOURCES, LG_FAMILY);
 const lgP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + lgTags(keys)) + '</p>';
 
@@ -106,7 +113,7 @@ const LG_PATHS = [
 ];
 
 function renderLatheGuide(el) {
-  const toc = [['l-parts', 'The machine'], ['l-hold', 'Holding the part'], ['l-bar', 'Bar work'], ['l-tools', 'Tools'], ['l-speed', 'Speeds and feeds'], ['l-paths', 'Toolpaths'], ['l-part', 'Parting off'], ['l-live', 'Live tools'], ['l-src', 'Sources']];
+  const toc = [['l-parts', 'The machine'], ['l-hold', 'Holding the part'], ['l-bar', 'Bar work'], ['l-tools', 'Tools'], ['l-speed', 'Speeds and feeds'], ['l-paths', 'Toolpaths'], ['l-thread', 'Threading'], ['l-part', 'Parting off'], ['l-live', 'Live tools'], ['l-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Turning on a CNC lathe: how the part is held, the common tools, the toolpaths in the order they are run, parting off and live tools, in our own words with our own drawings. Each statement shows the keys of the sources that confirm it (hover a key); anything not confirmed by two independent publishers is marked <span class="gtbv">to be verified</span>. Axes, offsets and nose radius compensation are in the <a href="#/t/cncguide">CNC knowledge guide</a>.</p>' +
@@ -151,6 +158,27 @@ function renderLatheGuide(el) {
     guideTable(['Operation', 'What it does', 'Haas cycle'], LG_PATHS, lgTags) +
     lgP('<b>Nose radius compensation.</b> G41 and G42 start on a straight approach move. The plunging and threading cycles (G74, G75, G76, G92) ignore compensation: cancel it before them.', ['HFO_LP']) +
     lgP('The cycles are named as Haas uses them; other controls use some of the same numbers differently, so check your own in <a href="#/t/gmcodes">G and M codes</a>. The blocks are written for you by <a href="#/t/cycg71">G71 / G70 rough and finish</a>, <a href="#/t/cycgroove">groove and cut-off</a>, <a href="#/t/cycthread">lathe threading</a> and <a href="#/t/cyctaper">lathe taper program</a>.', null) +
+
+    '<h2 id="l-thread">Threading</h2>' +
+    lgP('<b>G32, one move per block.</b> G32 makes a single threading move. Getting into position, the infeed, the pull-out and the way back are each programmed, about four lines for every pass, and a thread takes many passes.', ['HAAS_G32', 'CTE_SP']) +
+    lgP('<b>G92 and G76.</b> G92 makes one whole pass per block, with a new X for each pass. G76 cuts the whole thread from one or two blocks.', ['CTE_SP', 'HFO_LP']) +
+    lgP('<b>Tied to the spindle.</b> In a threading move the feed follows the turning of the spindle, so every pass runs in the groove of the one before. The speed must stay the same from the first pass to the last: thread at a fixed speed (G97), not at constant surface speed.', ['HAAS_G32', 'CTE_SP', 'IMD_MS']) +
+    lgP('<b>F is the lead:</b> how far the tool travels along the thread in one turn.', ['HAAS_G76', 'CTE_SP', 'IMD_MS']) +
+    lgP('<b>Override and feed hold.</b> Haas: the feed override is ignored in G32, and feed hold and single block wait for the end of the threading moves. Cutting Tool Engineering: feed hold does nothing during a threading pass.', ['HAAS_G32', 'CTE_SP']) +
+    lgP('<b>Speed against feed.</b> A coarse thread at a high speed asks a lot of the Z axis: 8 threads per inch at 1600 rpm is 200 in/min.', ['CTE_SP']) +
+    lgP('<b>Room to get up to speed.</b> Start each pass far enough in front of the part for the axis to reach its feed.', ['IMD_MS']) +
+    lgP('<b>G32 on a Haas.</b> G32 is modal and is cancelled by another motion code such as G00. The chamfer codes M23 and M24 do nothing in G32, so a pull-out has to be programmed. Nothing brings the tool back at the end of a pass.', ['HAAS_G32']) +
+    lgP('<b>Tapered thread with G32.</b> Put an X move in the same block as the Z move.', ['HAAS_G32', 'CTE_SP', 'IMD_MS']) +
+    lgP('The lead on a taper: Haas says to program the larger of the lead along X and the lead along Z. Industrial Monitor Direct notes that some controls take F along Z and others along the path, and says to measure the lead on a steep taper.', ['HAAS_G32', 'IMD_MS']) +
+    lgP('<b>Tapered thread in a cycle.</b> The taper is a difference in radius between the start and the end of the threading move, not an angle: the word I in a Haas G76; R in a two-block G76 (Cutting Tool Engineering) and in the one-pass cycle G78 (Industrial Monitor Direct).', ['HAAS_G76', 'IMD_G78', 'CTE_SP']) +
+    lgP('An ordinary outside taper thread, small at the front, takes a negative value.', ['HAAS_G76', 'IMD_G78']) +
+    lgP('An inside taper thread takes a positive value, the length counts from where the tool starts in front of the part, and one make of control turns the signs round: check the manual of yours.', ['IMD_G78']) +
+    lgP('<b>More than one start.</b> The lead is the pitch times the number of starts, and it is the lead that goes in F.', ['MMS_MS', 'CTE_MS', 'IMD_MS']) +
+    lgP('The depth of the thread is that of the pitch, not of the lead.', ['CTE_MS']) +
+    lgP('<b>Getting to the next start.</b> Either begin one pitch further along Z, or turn the start by 360° divided by the number of starts. The two come to the same thread.', ['CTE_MS', 'IMD_MS']) +
+    lgP('Industrial Monitor Direct cuts every start at one depth before going deeper.', ['IMD_MS']) +
+    lgP('<b>Start angle on a Haas.</b> The word Q in G32 gives the angle at which the thread starts, in thousandths of a degree without a decimal point: Q180000 is 180°. It is not modal, so it goes in every block that needs it.', ['HAAS_G32']) +
+    lgP('The passes and the G76 or G92 blocks of a straight, single-start thread are written by <a href="#/t/cycthread">lathe threading</a>; lead, pitch and the shift between starts are worked out in <a href="#/t/multistart">multi-start thread lead and pitch</a>; the taper of pipe threads is in <a href="#/t/pipethreads">pipe threads</a>.', null) +
 
     '<h2 id="l-part">Parting off</h2>' + lgPart() +
     lgP('<b>On centre.</b> Set the cutting edge on the centre line of the spindle. The figures differ a little: within 0.1 mm (0.004 in) in a trade article that quotes a tool maker, within 0.005 in on a machine maker\'s sheet.', ['PM_PART', 'HAAS_CUT']) +

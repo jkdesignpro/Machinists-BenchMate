@@ -4,6 +4,163 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.7.0] - in progress
+Stage 4 of the plan, part 2: tables of dimensions and calculations for the book rows that 0.6.0 left partial. Built on top of 0.6.0.
+
+### Added (thread engagement)
+- New tool **Thread engagement and breaking force** (Reference > Fasteners): for a metric or inch thread it gives the tensile stress area, the force that breaks the screw in tension (the tensile strength is your own entry and is never filled in), the basic pitch diameter, a simplified least length of engagement for a tapped part as strong as the screw, and the rules of thumb for steel, cast iron, brass, bronze and aluminium. Where the sources differ (aluminium: 2 diameters from Nord-Lock and Roymech, 1.5 from Fastenal) both figures are shown with their sources. Your own engagement length is compared with the simplified least length. The simplified length rests on one source and is marked "to be verified"; the detailed method of FED-STD-H28 could not be read from a free source and is not built. Checked against a published M10 x 1.5 row and a published 3/4-10 Grade 5 example. A section drawing to scale shows the screw in the tapped part with the engaged length.
+- Formula library: three entries for the new tool.
+- Fasteners guide: Fastenal added as a second source for the aim of thread engagement (it is no longer marked "to be verified") and for its own rule of thumb; link to the new calculator. 22 sources.
+
+### Added (setup sheet: the operations in order)
+- **Setup sheet**: a table of operations in order (number, what is done, holding and set-up, tools, speed, feed, what to check), numbered in steps of 10, kept with the sheet, in the JSON export and on the printout. Sheets saved before this version open with an empty list.
+
+### Added (guide sections: calibrating a surface plate, V-blocks, laminates and hard rubber, the tool signature)
+- Measurement guide: **calibrating a surface plate** (what is measured, the methods named, what sets the interval, lapping when out of limits) and a new section on **V-blocks** (uses, pairs, the two kinds of material, the vee, marking out and drilling across a bar).
+- Materials guide: **Machining laminates and hard rubber** (what laminates are, tool wear and tool material, dust, coolant with the three sources side by side, heat, undersize holes, splitting layers, threads where the sources differ, and hard rubber from one old source, marked).
+- Tooling guide: **The tool signature** (the seven figures in order, units with the differing nose radius unit, an example).
+- Shop tools guide: the note under the dressing diamond tables names a product of 5000 as its example instead of working out a wheel size.
+
+### Added (guide sections: back-up rings, surface grinding, grinding faults, dressing diamonds, choosing a tool steel)
+- Bearings and seals guide: **Back-up rings for O-rings** (what they do, gap and hardness, when they are needed with the two differing pressure figures, which side, materials and kinds).
+- Abrasive processes guide: **Surface grinding** (the wheel for the work, wheel and table speed, down feed and cross feed from two sources that differ, the magnetic chuck) and **Faults in cylindrical grinding** (a table of eight faults with causes and remedies, and why work burns).
+- Shop tools guide: **Single-point diamond dressers** (carat size from the wheel, two tables side by side, drag angle, turning the diamond, depth of dressing).
+- Materials guide: **Choosing a tool steel for the job** (wear against toughness, which grade for shock, abrasion, heat, moulds and cutting, and what to change when a tool fails).
+
+### Added (guide sections: tensile test, heat and cold, steels by use, band speeds, grinding carbide, turning holders)
+- Materials guide: **The tensile test** with our own drawing of the curve (stress and strain, Young's modulus, proportional and elastic limit, yield and proof stress, tensile strength, necking, elongation and reduction of area, true stress), **Heat and cold** (strength in the cold and the brittleness of ferritic steels, creep and its stages, stress relaxation) and **Steels by what they are used for** (a table from two suppliers side by side, tool steels and stainless).
+- Shop tools guide: **Band speed by material** (three pages side by side in their own units, chips, where the sources differ) and **Grinding carbide tools** (green silicon carbide and diamond wheels, bond, grit, pressure, coolant).
+- Tooling guide: **Choosing a turning tool holder** (shank, overhang, the kinds of clamping, interrupted cuts, hand, what to check before ordering).
+
+### Added (guide sections: hardenability, case hardening, machinability, vibration, balancing, tightening, cutting conditions)
+- Materials guide: **Hardenability** (hardness against hardenability, the Jominy end-quench test, the ideal critical diameter), **Case hardening** (carburising, carbonitriding, nitriding, ferritic nitrocarburising, induction and flame hardening in a table of temperatures and case depths, each figure with the source that prints it; steels, quenching, distortion, case hardness) and **Machinability** (what it means, how it is judged, the rating against B1112, carbon, sulphur and lead, stainless steel).
+- Drives and maintenance guide: **Vibration in general** (free and forced vibration, resonance and its cure, damping, which quantity to measure) and **Balancing a rotor in place** (checking that it is unbalance, the reference, trial and trim runs, the size of the trial weight, one plane or two, safety).
+- Fasteners guide: **Tightening methods** (torque control, torque plus angle, tightening to yield, hydraulic tensioning, heat, load-indicating washers).
+- CNC knowledge guide: **Speed, feed and depth of cut: which to change** (what each does to tool life and finish, and the order in which to set them).
+
+### Added (guide sections: adhesives, ratchets, factors of safety, fourth axis)
+- Bearings and seals guide: **Retaining compounds** (what they are for, gaps, the fit, surfaces, heat), **Thread and flange sealants** (anaerobic sealants, PTFE tape and where not to use it, pipe dope, anaerobic against silicone on flanges, cut gaskets) and **Structural adhesives** (epoxy, acrylic, polyurethane and cyanoacrylate compared in a table).
+- Machine elements guide: **Ratchets** with our own drawing of a wheel and pawl, **Elliptical gears**, and **Factors of safety** (what the factor is, design against realised factor, margin of safety, one older rule of thumb by kind of load, and typical figures from two publishers side by side where they differ).
+- Milling toolpath guide: **A fourth axis: indexing and continuous cutting** (the A axis, 3+1, continuous 4-axis, wrapping, the brake, a caution on feed).
+- Tooling guide: pipe taps, extension taps, interrupted thread taps and the combined drill and tap.
+
+### Added (guide sections: coolant, grinders, taps, fasteners, spot tests)
+- Shop tools guide: **Looking after a sump** (what to check and when, mixing and topping up, tramp oil, when to change the fluid), **Mist and skin** (the limit NIOSH recommends for coolant mist and how to keep it down), and **Bench and pedestal grinders: before you switch on** (ring test, wheel speed, the two guard gaps, where to stand).
+- Tooling guide: **Rake and relief of a tap** and **Fluids for tapping**.
+- Fasteners guide: **Counterbore, spotface and countersink** and **Counterfeit fasteners** (the marks on the head, tests, papers, the US Fastener Quality Act).
+- Metal identification: three **chemical spot tests** (nitric acid, molybdenum, sulphur print) with their limits; the magnet test on stainless now has two sources.
+
+### Added (guide sections: threads, subprograms, drives)
+- Measurement guide: **Thread and ball micrometers** (what a thread micrometer reads, its anvils and how they go with the pitch, setting zero, why it does not agree with wires; ball, tube and blade micrometers).
+- Tooling guide: **Thread mills** (kinds of cutter, what thread milling does better than tapping and where tapping wins, the direction for climb milling an internal thread, several radial passes).
+- CNC lathe guide: **Threading** (G32 against G92 and G76, why the speed must stay fixed, tapered threads with G32 and in a cycle, more than one start, the start angle on a Haas).
+- CNC knowledge guide: **Subprograms** (M98 and M99, repeats, Haas M97, nesting, what carries over, G65) with three worked examples of our own.
+- Drives and maintenance guide: **Belt, chain or gears**, compared point by point; where the sources differ both views are shown.
+
+### Added (units, signs and symbols; algebra; decimal places)
+- **Units, signs, symbols and Greek letters** (was "SI prefixes, constants and Greek letters"): how the SI and inch-pound units are tied together (the yard and pound of 1959, the inch of exactly 25.4 mm), the seven SI base units, the 22 derived units with a name of their own, 26 mathematical signs and the letters used for 37 quantities. Where publishers print different letters (torque, pressure, density) all are shown.
+- Formula library: six **algebra** entries (quadratic formula, powers, logarithms, change of base, factoring); two rest on one source and are marked.
+- **Decimal places for all calculators**: a setting in the display menu (one fewer, standard, one more, two more), added to each calculator's own setting.
+
+### Changed
+- Tool guide, **broken tap removal**: each of the seven statements now has two or three publishers, with the limits one supplier gives (a clean break of M6 or larger for an extractor, alum only for aluminium parts, 3 mm of stub for welding).
+
+### Added (probability, coordinates, plastics)
+- New tool **Binomial and Poisson: chance of a count** (Measure and inspect > Quality): the chance of exactly a count, that count or fewer, that count or more, or a range of counts, for defectives in a sample (binomial) or events from a mean count (Poisson), with the mean, the standard deviation and a bar chart. For a binomial it shows the Poisson estimate beside the exact figure. Seven published examples are proofs on the page.
+- CNC knowledge guide: new section **Working out coordinates**: absolute and incremental, arcs by centre (I, J, K) and by radius with the warning both sources give, links to the six tools that find the missing points, and three worked examples that the core works on the page.
+- Machining plastics: the **family** of each of the twelve plastics (amorphous or semi-crystalline) and a table **Families of plastics**: thermoplastics against thermosets and what the two families mean for melting, chemicals, wear, shrinkage, impact and bonding. Where the sources differ (cost, heat) both views are printed.
+- Formula library: four entries for the binomial and Poisson distributions.
+- Core: `binomial_prob`, `binomial_between`, `poisson_prob`, `poisson_between` with one new test that reproduces every published example used (424 tests in all).
+
+### Added (shop maths 3)
+- New tool **Interpolation (one-way and two-way)** (Shop maths > Calculator and conversion): a value between two rows of a table, the reverse, and a value inside a cell of a two-way table from its four corners. It warns when the point lies outside the known values. Drawn.
+- New tool **Normal distribution: share between limits** (Measure and inspect > Quality): share of parts below, above and between limits in per cent and parts per million, the standard score of each limit, and the value below which a given share falls, on a drawn bell curve.
+- New tool **Line and circle (coordinates)** (Shop maths > Geometry): length, angle, slope and axis crossings of a line through two points; with a circle, the distance from the centre and the points where the line touches or cuts it. Drawn to scale.
+- New tool **Ellipse, parabola and hyperbola** (Shop maths > Geometry): foci and eccentricity, the focal length of a dish from its width and depth, asymptotes, and a point on each curve. Drawn to scale.
+- Formula library: nine groups of **trig identities** (two publishers; one line with one publisher is marked) and eleven entries for the four new tools.
+- Every published worked example used is reproduced in the core tests (three new tests, 423 in all).
+
+### Added (hexagon screws, nuts and washers)
+- New page **Hexagon screws, nuts and washers** (Reference > Fasteners): metric hexagon head height and width across flats (ISO 4014 / ISO 4017), nut width and height (ISO 4032) and plain washer hole, outside diameter and thickness (ISO 7089) for M3 to M36, with a side view of the joint drawn to scale, and inch hexagon nut width and thickness from 1/4 to 1 in. Eight new sources. Where publishers differ (nut height at M6 and M24, washer hole at M10) every printed value is shown.
+- **Spanner and hex key sizes**: a list of the metric and inch widths across flats together in order of size, each converted to the other unit, with the heads each one fits.
+- Not added: inch hexagon bolt head heights. The two free tables that could be read cleanly disagree with each other, so nothing is shown.
+
+### Added (thread forms and terms)
+- New page **Thread forms and terms** (Reference > Guides): the parts of a thread with a drawing (major, minor and pitch diameter, pitch, crest, root, flank, thread angle), lead, starts and hand, ten thread forms with what each is for and a drawing of six of them, coarse and fine, straight and tapered, classes of fit, and 24 abbreviations found on drawings, taps and gauges. 12 public sources; statements with one publisher are marked.
+
+### Added (shop maths 2)
+- New tool **Depreciation schedule** (Shop > Shop helpers): straight line, declining balance (double declining by default, never below the salvage value) and sum of the years' digits, with every year listed and the book value drawn as bars. Three published schedules are reproduced.
+- New tool **Block and tackle** (Reference > Machine elements): pull on the rope from the load and the rope parts that carry the moving block, with your own efficiency if you enter one (never filled in), and the rope hauled in for a lift, with a diagram. Not a rigging calculation.
+- New tool **Squaring a corner (3-4-5 rule)** (Shop maths > Geometry): the diagonal that makes a corner square, the angle of the corner from the diagonal you measured, and the rise over a length for an angle, drawn to scale.
+- Abrasive processes guide: new section **Sieves and mesh numbers** with the openings of sieves No. 4 to No. 635 as three sources print them, side by side (they do not all agree, and nothing is averaged). 24 sources.
+- Formula library: nine entries for the three new tools.
+
+### Book audit (second batch)
+- MH24 (depreciation), MH133 (sieves and mesh), ED75 (pulley mechanisms) and BB29 (3-4-5 rule and rise for an angle) from partial to done.
+- Re-audit of rows whose notes were out of date: MH145 (facing at constant surface speed has been in `partofftime` since 0.2.0), MH177 (the G and M code reference, the backplot with helical arcs, arc feed and helical interpolation cover it) and CN11 (the advisors give starting speeds and feeds by material) from partial to done.
+- Counted after the second batch: 375 done, 173 partial, 48 missing.
+
+### Book audit (third batch)
+- MH218 (thread forms and definitions), BB6 (abbreviations for standard threads) and BB7 (thread forms used in engineering) from partial to done.
+- Counted after the third batch: 378 done, 170 partial, 48 missing.
+
+### Book audit (fourth batch)
+- MH204 (metric hex screws, bolts, nuts and washers) and BB5 (socket size cross-reference inch and metric) from partial to done.
+- Re-audit: BB49 (bolt and screw heads, types and drives) to done; its note predated the fasteners guide of 0.6.0, which covers eleven head shapes and six drives.
+- MH202 (inch bolts, nuts and washers) stays partial: inch nuts added, bolt heads and washers not.
+- Counted after the fourth batch: 381 done, 167 partial, 48 missing.
+
+### Book audit (fifth batch)
+- MH6 (analytic geometry), MH13 (trigonometry), MH19 (interpolation) and MH22 (probability and the normal distribution) from partial to done.
+- Counted after the fifth batch: 385 done, 163 partial, 48 missing.
+
+### Book audit (sixth batch)
+- ED81 (binomial and Poisson distributions), MH174 (coordinate geometry in the CNC introduction), BB58 and ED62 (engineering plastics) from partial to done.
+- Counted after the sixth batch: 389 done, 159 partial, 48 missing.
+
+### Book audit (seventh batch)
+- MH300 (mathematical signs and letter symbols), ED3 (units systems), ED7 (essential mathematics), U105 (decimal precision), BB13 and MH252 (broken taps) from partial to done; ED10 (engineering abbreviations) done on re-audit.
+- Counted after the seventh batch: 396 done, 152 partial, 48 missing.
+
+### Book audit (eighth batch)
+- MH245 (thread and ball micrometers), MH260 (thread milling methods), MH181 (thread cutting on CNC lathes), MH182 (subprograms) and ED76 (drive types) from partial to done.
+- Counted after the eighth batch: 401 done, 147 partial, 48 missing.
+
+### Book audit (ninth batch)
+- MH158 (metalworking fluids), MH166 (grinding wheel safety), MH249 (tapping), MH200 (grade marks and counterfeit fasteners) and MH51 (identifying metals) from partial to done. MH112 (counterboring) gained the practice and stays partial: counterbore sizes are listed for socket head cap screws only.
+- Counted after the ninth batch: 406 done, 142 partial, 48 missing.
+
+### Book audit (tenth batch)
+- MH293 (adhesives and sealants), BB59 (engineering adhesives), ED43 (factors of safety), MH272 (elliptic and ratchet gearing) and CN35 (4-axis parts) from partial to done. BB8 (types of taps) done with the added kinds of tap. CN6 (common CNC tools) done on re-audit: the tools it names are described in the tooling, cutting tools and toolpath guides.
+- Counted after the tenth batch: 413 done, 135 partial, 48 missing.
+
+### Book audit (eleventh batch)
+- MH56 (hardness and hardenability), MH58 (case hardening), MH134 (work materials: machinability), MH135 and MH136 (speed, feed and depth; selecting cutting conditions), MH198 (tightening methods), ED23 (dynamic balancing: the procedure) and ED24 (vibration) from partial to done. MH31 stays partial: the balancing procedure is added, the counterweight layout of lathe fixtures is not.
+- Not found in the sources read and therefore not given: the scatter of each tightening method, a temperature for induction or flame hardening, and how the correction weight is worked out from the trial run.
+- Counted after the eleventh batch: 421 done, 127 partial, 48 missing.
+
+### Book audit (twelfth batch)
+- MH49 (effect of temperature on strength), MH53 (applications of steels), MH132 (carbide tool grinding and diamond wheels), MH156 (band speeds), MH98 and BB69 (choosing a holder) from partial to done. MH33 gains the tensile test and stays partial (no stress concentration for stepped shafts or grooves); BB26 gains the speed table and stays partial (no blade widths).
+- Counted after the twelfth batch: 427 done, 121 partial, 48 missing.
+
+### Book audit (thirteenth batch)
+- MH54 (tool steel selection), MH164 (dressing diamonds), MH167 (cylindrical grinding troubles) and MH169 (surface grinding) from partial to done. MH294 gains back-up rings and stays partial (no ISO 3601 G series, no -9xx sizes).
+- Counted after the thirteenth batch: 431 done, 117 partial, 48 missing.
+
+### Book audit (fourteenth batch)
+- MH90 (surface plates, V-blocks and their calibration), MH96 (single-point tool terms) and MH160 (laminates and hard rubber) from partial to done.
+- Counted after the fourteenth batch: 434 done, 114 partial, 48 missing.
+
+### Book audit (fifteenth batch)
+- CN80 (process planning form) from partial to done: the setup sheet now holds the operations in order.
+- 435 done, 113 partial, 48 missing of 596 in-scope rows, 73 %; 102 more rows to done for the 90 % target.
+
+### Fixed
+- The tensile stress area returned a value for a pitch far too coarse for the diameter (the square of a negative stress diameter). It now returns no value and the new page says so.
+
+### Book audit (first batch)
+- MH201 (working strength, engagement length, breaking force, lock wire) from partial to done.
+
 ## [0.6.0] - 2026-11-12
 Stage 4 of the plan, part 1: book references, in seventeen batches. Built on top of 0.5.0. The book audit (docs/parity-audit.md) stands at 367 done, 181 partial and 48 missing of 596 in-scope rows, 62 %; the target of 90 % is carried on in 0.7.0 and 0.8.0.
 

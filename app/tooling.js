@@ -14,7 +14,7 @@ const TG_EXTRA = {
   OWN: { publisher: 'BenchMate', title: 'Own derivation (geometry), with tests in core/src/tooling.rs' },
 };
 // USCTI's tapping tips are GWS Tool Group's text: one publisher family.
-const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS' };
+const TG_FAMILY = { USCTI: 'GWS', GWS: 'GWS', MSC_TM: 'MSC', REGAL_TG: 'REGAL', AIMS_CF: 'AIMS_BT', MMC_TH: 'MMC', PT_TH: 'PROTOOL_TM' };
 let TG_SRC = TG_EXTRA;
 function tgTags(keys) {
   const ks = keys || [];
@@ -72,7 +72,7 @@ async function renderToolGuide(el) {
   TG_SRC = Object.assign({}, TG_EXTRA, T.sources);
   const S = T.sources;
   const toc = [['t-geo', 'Tool geometry'], ['t-mat', 'Tool materials'], ['t-coat', 'Coatings'], ['t-em', 'End mills'], ['t-dr', 'Drills'], ['t-rm', 'Reamers'], ['t-tap', 'Taps'],
-    ['t-lim', 'Tap limits'], ['t-saw', 'Saw blades'], ['t-brk', 'Broken taps'], ['t-src', 'Sources']];
+    ['t-lim', 'Tap limits'], ['t-tm', 'Thread mills'], ['t-hold', 'Turning holders'], ['t-saw', 'Saw blades'], ['t-brk', 'Broken taps'], ['t-src', 'Sources']];
   const coatRows = [
     ['TiN', 'Titanium nitride. Gold. The general purpose coating for HSS and carbide drills, taps and end mills.', ['HARTNER', 'GWS']],
     ['TiCN', 'Titanium carbonitride. Harder than TiN, for edges under high mechanical load or impact, such as taps and interrupted cuts; lower heat limit.', ['HARTNER', 'PRODINC']],
@@ -97,6 +97,10 @@ async function renderToolGuide(el) {
     tp('<b>Nose (corner) radius</b>: a larger radius gives a stronger corner and, at the same feed, a better finish, but more radial force and chatter. See the ' + tgLink('finish', 'Surface finish from nose radius') + ' tool.', []) +
     tp('<b>Chip breaker</b>: a groove or bumps pressed into the rake face that curl and break the chip. Each breaker works in a range of feed and depth; makers print that range for each one. The letters after the ISO code are the maker\'s breaker (see ' + tgLink('insertcode', 'Insert designation') + ').', []) +
     tp('<b>Edge preparation (hone)</b>: a small radius or chamfer (land) ground or brushed on the edge. A sharp edge cuts with the least force for finishing and sticky materials; a honed or chamfered edge resists chipping in steel, cast iron and interrupted cuts. The insert code letter for the edge condition (F sharp, E rounded, T chamfered, S both) is in the insert designation tool.', []) +
+    '<h3 class="gcat" id="t-sig">The tool signature</h3>' +
+    tp('<b>Seven figures in a fixed order.</b> The signature of a single-point tool lists back rake, side rake, end relief, side relief, end cutting edge angle, side cutting edge angle and nose radius, in that order.', ['VIK_TS', 'TB_TS']) +
+    tp('<b>Units.</b> The six angles are in degrees. For the nose radius the sources differ: one gives millimetres; the other gives inches in one place and millimetres in another. State the unit with the figure.', ['VIK_TS', 'TB_TS']) +
+    tp('<b>An example.</b> 0-7-6-8-15-16-0.8 is a tool with 0° back rake, 7° side rake, 6° end relief, 8° side relief, a 15° end cutting edge angle, a 16° side cutting edge angle and a 0.8 mm nose radius.', ['VIK_TS']) +
 
     '<h2 id="t-mat">Tool materials, substrates and grades</h2>' +
     tp('<b>HSS and cobalt HSS</b> are tough and cheap, can be ground sharp, and are used for taps, drills, reamers and form tools, at lower speeds. <b>Cemented carbide</b> is hard tungsten carbide grains held in a cobalt binder; less cobalt and finer grains make it harder and more wear resistant, more cobalt makes it tougher. <b>Cermet</b> (titanium carbonitride based) gives good finish in steel at high speed. <b>Ceramics</b> (alumina, silicon nitride, whisker reinforced) run very fast in cast iron and nickel alloys. <b>CBN</b> cuts hardened steel and cast iron; <b>PCD</b> cuts aluminium, copper, composites and wood, never steel.', []) +
@@ -143,6 +147,22 @@ async function renderToolGuide(el) {
     tp('<b>Forming (roll) taps</b> have no cutting edges: lobes push the metal into the thread shape, so they make no chips, need no flutes, and give a thread that is generally stronger than a cut one.', ['MSC', 'RS', 'TRAVERS']) +
     tp('They need a ductile material (aluminium, mild and low to medium alloy steels, and similar) and a larger hole than a cutting tap. Good lubrication matters because the tap works by pressure.', ['MSC', 'RS']) +
     tp('<b>Forming tap hole.</b> hole = D − 0.0068 × % × P (inch: D − 0.0068 × % / TPI; metric: D − % × P / 147.06). Use 65 to 75 % thread; forming above 75 % is not recommended. The full comparison of makers is shown under the forming mode of the ' + tgLink('tapdrill', 'Tap drill size') + ' tool.', ['BESLY', 'NAT']) +
+    tp('<b>Pipe taps</b> cut the internal threads of pipe fittings. They come straight or tapered to suit the pipe thread.', ['XO_TAP', 'CCB_TAP']) +
+    tp('<b>Extension taps</b> are taps with a long shank, for holes that are hard to reach such as the hub of a pulley.', ['XO_TAP', 'CCB_TAP']) +
+    tp('<b>Interrupted thread taps</b> have a tooth on every other thread only; Xometry gives the reason as better chip removal.', ['XO_TAP', 'CCB_TAP']) +
+    tp('<b>Combined drill and tap.</b> One tool drills the hole and taps it without a tool change.', ['XO_TAP']) +
+
+    '<h3 class="gcat" id="t-rake">Rake and relief of a tap</h3>' +
+    tp('<b>Rake (hook).</b> The angle of the cutting face is matched to the work material.', ['REGAL_TG', 'GSR_RAKE']) +
+    tp('<b>Positive hook</b> for soft materials that make long, stringy chips, such as aluminium, mild steel and some stainless steels. The edge is weaker and chips more easily.', ['REGAL_TG']) +
+    tp('<b>Negative hook</b> for materials that make broken or powdery chips, such as cast iron, carbon steels and hardened material. The edge is much stronger.', ['REGAL_TG']) +
+    tp('<b>Colour rings.</b> Machine taps often carry a coloured ring for the material group they are ground for. The makers have no common system; GSR gives red for tempered steels, blue for stainless, yellow for aluminium and white for grey cast iron as the trend.', ['GSR_RAKE']) +
+    tp('<b>Relief.</b> Every tap is ground with back taper: it gets slightly smaller toward the shank. Taps for tough, hard or springy materials are also relieved behind the cutting edge of each thread.', ['REGAL_TG']) +
+    '<p class="desc">No rake angles in degrees are given here: neither maker prints them on the pages read, so the tap maker\'s catalogue is the place to look.</p>' +
+    '<h3 class="gcat" id="t-tfluid">Fluids for tapping</h3>' +
+    tp('<b>Tapping needs lubrication.</b> AIMS: a paste for hand tapping, put on the tap before each hole; neat cutting oil or an EP soluble oil for machine tapping in steel. Fully synthetic fluids form no oil film and are not suited to tapping.', ['AIMS_CF']) +
+    tp('<b>By material (AIMS).</b> Aluminium: a fluid made for aluminium, or kerosene; not an oil with active sulphur, which stains it. Stainless steel: neat EP oil, and plenty of it. Cast iron: dry where possible. Brass, copper and bronze: a light oil without active sulphur, which stains them too. Titanium: a heavy EP neat oil.', ['AIMS_CF']) +
+    '<p>The general rule for choosing a fluid, from two publishers, is in the ' + tgLink('shoptools', 'Shop tools guide') + '.</p>' +
 
     '<h2 id="t-lim">Tap limits (H, L and D numbers)</h2>' +
     tp('<b>H numbers (inch).</b> A ground-thread tap is marked with the pitch diameter band it is made to, in steps of 0.0005 in above the basic pitch diameter: H1 is basic to basic + 0.0005, H2 + 0.0005 to + 0.0010, and so on through 1 in. "GH3" is a ground thread tap to H3.', ['OSG', 'MSC']) +
@@ -152,21 +172,57 @@ async function renderToolGuide(el) {
     tp('<b>Choosing.</b> The tap must cut inside the internal thread\'s pitch diameter tolerance, allowing for the hole cutting a little larger than the tap. MSC says to choose the largest H number that still gives the class of fit, for tap life; Cutting Tool Supply gives a "40 % rule" (tap about 40 % of the tolerance above the minimum). OSG prints a recommended number per size and class. Forming taps are made to their own limits, often higher: use the maker\'s chart.', ['MSC', 'CTS']) +
     '<p>The ' + tgLink('taplimits', 'Tap pitch diameter limits') + ' tool works these out for any thread and class.</p>' +
 
+    '<h2 id="t-tm">Thread mills</h2>' +
+    '<p class="desc">A thread mill cuts a thread by going round the hole or the boss while it moves along the axis. Our own summary of what the sources below say; the program is written by the ' + tgLink('cyctmill', 'Thread milling program') + ' tool.</p>' +
+    tp('<b>The machine</b> has to move X, Y and Z at the same time.', ['HARVEY_TM']) +
+    tp('Most modern controls have a cycle for it.', ['PROTOOL_TM']) +
+    tp('<b>Single-profile (single-form) cutters</b> have one cutting tooth and make the thread one turn at a time. Protool calls them the slower kind.', ['HARVEY_TM', 'MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Full-profile (multi-form) cutters</b> carry the whole thread form on several teeth and finish the thread in one orbit, for one pitch only. Harvey lists a tri-form cutter as well.', ['PROTOOL_TM', 'HARVEY_TM']) +
+    tp('<b>Partial-profile cutters</b>, with a 60° or 55° point, cover a range of pitches.', ['PROTOOL_TM']) +
+    tp('<b>One tool, many threads.</b> A thread mill cuts any diameter that has its pitch.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('The same tool cuts right-hand and left-hand threads, inside and outside.', ['MSC_TM', 'HARVEY_TM']) +
+    tp('<b>Against tapping: no tap to break.</b> Thread milling suits materials and parts where a broken tap is the worry.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Blind holes.</b> The thread can run close to the bottom of the hole: MSC says within half a pitch.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Hard and tough materials</b> are easier to thread mill than to tap. Protool names titanium, Inconel, hardened steel and stainless.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Power.</b> Thread milling takes less power than tapping; a large tap needs a lot of torque and a rigid spindle.', ['MSC_TM', 'PROTOOL_TM']) +
+    tp('<b>Size.</b> A tight thread is put right with the cutter radius offset.', ['PROTOOL_TM']) +
+    tp('<b>Where tapping wins.</b> Tapping is quicker on small holes made in large numbers in free-cutting material.', ['PROTOOL_TM']) +
+    tp('<b>Climb milling a right-hand internal thread:</b> start at the bottom and go round counter-clockwise on the way up, with the spindle turning clockwise.', ['HARVEY_TM', 'IMD_TM', 'PROTOOL_TM']) +
+    tp('<b>A left-hand internal thread</b> is climb milled from the top down, also counter-clockwise.', ['HARVEY_TM', 'IMD_TM']) +
+    tp('<b>Several radial passes.</b> In tough material, or with a long tool, step out to size over two or three orbits. It spares the tool, bends it less and gives a better thread.', ['HARVEY_TM', 'PROTOOL_TM']) +
+    tp('<b>Chips.</b> Clear them with coolant: chips that are cut a second time push the thread out of tolerance.', ['HARVEY_TM']) +
+    tp('<b>Cutter diameter.</b> Harvey: no larger than the job needs.', ['HARVEY_TM']) +
+
+    '<h2 id="t-hold">Choosing a turning tool holder</h2>' +
+    tp('<b>Shank.</b> Take the largest shank the turret or tool post accepts: a larger shank makes a stiffer set-up.', ['PT_TH', 'OMT_TH']) +
+    tp('<b>Overhang.</b> Let the holder stick out only as far as the job needs. Boring bars suffer most: deflection from a long overhang is the main enemy of internal turning.', ['PT_TH', 'OMT_TH']) +
+    tp('<b>Lever lock (P)</b> is the commonest way of clamping the insert. Mitsubishi: it does not suit heavy interrupted cuts.', ['MMC_TH', 'OMT_TH']) +
+    tp('<b>Screw (S)</b> is the simplest and most compact: a screw through the tapered hole of the insert. It is used on small holders and boring bars and holds positive inserts.', ['MMC_TH', 'OMT_TH']) +
+    tp('<b>Top clamp (C)</b> presses the insert into its pocket from above, so it holds inserts that have no hole.', ['MMC_TH', 'OMT_TH']) +
+    tp('<b>Double clamp (D)</b> holds even in heavy interrupted cutting.', ['MMC_TH']) +
+    tp('<b>The letter M</b> is described in two ways: Mitsubishi calls it wedge lock and suggests it for copying; OnMy Toolings calls it multi-lock and rates it for the most secure hold.', ['MMC_TH', 'OMT_TH']) +
+    tp('<b>Interrupted cuts</b> want a stronger insert shape and a holder that clamps securely.', ['PT_TH', 'MMC_TH']) +
+    tp('<b>Insert shape.</b> Where no square shoulder has to be finished, a square insert gives four cutting edges a side.', ['MMC_TH']) +
+    tp('<b>Positive inserts</b> are sharper and cut with less force and heat.', ['OMT_TH']) +
+    tp('<b>Hand.</b> A right-hand holder, cutting towards the chuck, is the commonest.', ['OMT_TH']) +
+    tp('<b>Before ordering</b> check the insert designation, the hand, the shank size, the centre height and the approach angle.', ['PT_TH']) +
+    '<p class="desc">No angles are given here: Mitsubishi\'s tables of holders and lead angles are pictures and could not be read, and the other list of style letters does not agree with itself. The letters of a holder are decoded in ' + tgLink('holdercode', 'Toolholder designation (ISO 5608)') + '.</p>' +
+
     '<h2 id="t-saw">Saw blades and tooth pitch</h2>' +
     tp('<b>At least three teeth in the cut.</b> Choose a pitch that keeps at least three teeth in the thinnest section the blade crosses (the wall of a tube or the leg of an angle); with fewer, teeth snag and strip.', ['STARRETT', 'RMT']) +
     tp('<b>Not too many.</b> With too many teeth in the cut the gullets fill with chips. Starrett\'s rule of thumb is no more than about 10 to 14 teeth in soft materials; RMT prefers 6 to 12. The two upper figures differ and both are shown by the ' + tgLink('sawtpi', 'Saw blade pitch (TPI)') + ' tool.', ['STARRETT', 'RMT']) +
     tp('<b>Size and pitch.</b> Thin or small sections need a finer pitch (more teeth per inch); large solid sections need a coarser one. Bundles are judged by the size of the whole bundle.', ['STARRETT', 'RMT']) +
     tp('<b>Hole saws</b>: speed charts were not compared from two independent makers, so no hole saw speeds are given here. Use the maker\'s chart for the saw and material.', []) +
 
-    '<h2 id="t-brk">Broken tap removal (summary)</h2>' +
-    '<p class="desc">Low priority, own summary of one source so far. Think about the part\'s value and material before choosing a method; stop the machine and lock it out before working on a part still in it.</p>' +
-    tp('<b>Extractor</b>: steel fingers slid down the flutes and turned with a wrench, for HSS taps with a stub showing and not jammed hard. Back the tap out gently, with oil, rocking it.', ['RAPID']) +
-    tp('<b>Shatter and pick out</b>: HSS is brittle, so a punch can break the tap up; then the pieces come out with pliers or a pick. Risk of damage to the thread and the part.', ['RAPID']) +
-    tp('<b>EDM</b> (a tap burner or sinker): erodes the core of the tap without force and without heating the part, for valuable parts and carbide taps; slow, and limited by the part size and hole direction.', ['RAPID']) +
-    tp('<b>Drill or grind it out</b>: grind the stub flat and drill with carbide, or open the hole and fit a helical insert or a larger thread.', ['RAPID']) +
-    tp('<b>Chemical</b>: some solutions dissolve the tap steel faster than the part (aluminium parts). Acids are hazardous: follow the product\'s safety data sheet, ventilate, protect skin and eyes.', ['RAPID']) +
-    tp('<b>Weld a nut on</b> a protruding stub and turn it out with a wrench (the heat also helps break it loose); hard on small parts.', ['RAPID']) +
-    tp('<b>Prevention</b>: the right tap drill (see ' + tgLink('tapdrill', 'Tap drill size') + '), the right tap type for the hole, square alignment, good lubrication and chip removal, deep enough blind holes, sound taps replaced when worn, and no forcing.', ['RAPID']) +
+    '<h2 id="t-brk">Broken tap removal</h2>' +
+    '<p class="desc">Our own summary; each method below is described by at least two publishers. Think about the part\'s value and material before choosing a method; stop the machine and lock it out before working on a part still in it.</p>' +
+    tp('<b>Extractor</b>: steel fingers slid down the flutes and turned with a wrench, for HSS taps with a stub showing and not jammed hard. Back the tap out gently, with oil, rocking it. It needs a clean break: AIMS puts the limit at M6 and larger and says it fails on a shattered tap, a break below the surface and taps under M4.', ['RAPID', 'AIMS_BT', 'MFGSHOP_BT']) +
+    tp('<b>Shatter and pick out</b>: HSS is brittle, so a punch can break the tap up; then the pieces come out with pliers or a pick. Risk of damage to the thread and the part. In a through hole the tap can be driven through with a punch as a last resort (AIMS).', ['RAPID', 'MFGSHOP_BT']) +
+    tp('<b>EDM</b> (a tap burner or sinker): erodes the core of the tap without force and without heating the part, for valuable parts and carbide taps; slow, and limited by the part size and hole direction. The part must conduct electricity; AIMS calls it the only method that reliably removes a shattered tap without destroying the hole.', ['RAPID', 'AIMS_BT', 'MFGSHOP_BT']) +
+    tp('<b>Drill or grind it out</b>: grind the stub flat and drill with carbide, or open the hole and fit a helical insert or a larger thread. Carbide is used because it is harder than the tap; the cutter must be in line with the tap or it wanders into the thread.', ['RAPID', 'AIMS_BT', 'MFGSHOP_BT']) +
+    tp('<b>Chemical</b>: some solutions dissolve the tap steel faster than the part (aluminium parts). Acids are hazardous: follow the product\'s safety data sheet, ventilate, protect skin and eyes. AIMS names alum, which dissolves the steel of the tap, for aluminium parts only: not steel, stainless steel, cast iron or brass.', ['RAPID', 'AIMS_BT']) +
+    tp('<b>Weld a nut on</b> a protruding stub and turn it out with a wrench (the heat also helps break it loose); hard on small parts. AIMS wants 3 mm or more of the tap standing proud and warns that thin aluminium warps.', ['RAPID', 'AIMS_BT', 'MFGSHOP_BT']) +
+    tp('<b>Prevention</b>: the right tap drill (see ' + tgLink('tapdrill', 'Tap drill size') + '), the right tap type for the hole, square alignment, good lubrication and chip removal, deep enough blind holes, sound taps replaced when worn, and no forcing. AIMS: drill a blind hole at least 3 pitches deeper than the thread, and back the tap off every one or two turns to break the chips.', ['RAPID', 'AIMS_BT', 'MFGSHOP_BT']) +
 
     '<h2 id="t-src">Sources</h2><ul class="gsl">' + Object.entries(TG_SRC).map(([k, v]) => '<li><b>' + k + '</b> ' + rEsc(v.publisher) + ', ' + rEsc(v.title) + (v.url ? ' (' + rEsc(v.url) + ')' : '') + (v.accessed ? ', accessed ' + rEsc(v.accessed) : '') + '</li>').join('') + '</ul>' +
     '<p class="desc">Full notes are in data/refdata/tooling-evidence.json and docs/tooling.md. No text, figures or tables were copied from handbooks, standards or maker catalogues.</p>';

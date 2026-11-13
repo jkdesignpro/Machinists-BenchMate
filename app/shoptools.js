@@ -23,10 +23,26 @@ const ST_SOURCES = {
   BACON: 'T. A. Bacon, Introduction to Machining, 11.2 "Grinding wheels" (Washington open textbook, CC BY 4.0)',
   PALM: 'Palmgren, "How to dress a grinding wheel for optimal performance", 2024-10-02',
   MMS_DRESS: 'D. Goetz (Norton, Saint-Gobain Abrasives), Modern Machine Shop, "Optimize grinding processes with proper truing and dressing tools", 2019-07-20',
+  TRAV_COOL: 'Travers Tool, "Keeping your cool: 5 steps to coolant success", 2021-05-13',
+  KH_COOL: 'B. McGrath, Keller-Heartt, "Metalworking coolant management: practical shop checklist", 2026-04-21',
+  NIOSH_MWF: 'NIOSH (US National Institute for Occupational Safety and Health), topic page "Metalworking fluids" (archived)',
+  SAIF_MWF: 'SAIF Corporation, industrial hygiene bulletin "Metalworking fluids", March 2026',
+  ROCK_GR: 'J. Brigham, Rockford Systems, "Grinder safety: understanding safeguarding standards for bench and pedestal grinders", 2017-03-01, modified 2026-04-01',
+  ASMARK_GR: 'Asmark Institute, compliance library, "Guarding and clearances, grinders", modified 2026-04-28',
+  TM_GR: 'T&M Associates, safety alert "Bench grinder safety", September 2014 (hosted by the University of Notre Dame)',
+  EXC_BS: 'A. Grace, Excision, "What speed and feed should I run my bandsaw at?", 2024-10-03',
+  LFC_BS: 'LFC, "Blade speed and feed settings for a metal bandsaw", 2025-07-08 (no author)',
+  NILS_BS: 'J. A. Nilsson, Machine shop tutorials, band saw, "Speeds and materials" (jonilsson.github.io, CC BY-SA 4.0)',
+  IMD_GW: 'Industrial Monitor Direct, "Grinding wheels for lathe tools: selection guide", 2026-07-31 (only its statements on carbide; its grit figures do not agree with each other)',
+  AX_GW: 'Axminster Tools, "Choosing a grinding wheel", 2016-05-19',
+  UKAM_DW: 'UKAM Industrial Superhard Tools, "How to select the best diamond grinding wheel for tungsten carbide", 2026-07-23 (a maker of diamond wheels)',
+  FLEX_DD: 'Flexovit (Saint-Gobain Abrasives), EMEA catalogue 2017, page 232, "Single point dressers"',
+  ORG_DD: 'Organametrisis, product page for single-point dressing diamonds (a seller; organametrisis.gr)',
+  NORI_DD: 'Noritake, technical support page "Dressing and trueing"',
   OWN: 'BenchMate arithmetic or reasoning from the sources beside it',
 };
 // Two chapters of one open textbook count once, as do two articles in one magazine.
-const ST_FAMILY = { DONNER: 'WAOPEN', BACON: 'WAOPEN', MMS_SAW: 'GARDNER', MMS_DRESS: 'GARDNER' };
+const ST_FAMILY = { DONNER: 'WAOPEN', BACON: 'WAOPEN', MMS_SAW: 'GARDNER', MMS_DRESS: 'GARDNER', NILS_BS: 'NILS_L', FLEX_DD: 'SAINTGOBAIN' };
 const stTags = keys => guideTags(keys, ST_SOURCES, ST_FAMILY);
 const stP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + stTags(keys)) + '</p>';
 
@@ -76,6 +92,26 @@ const ST_FAULTS = [
   ['Too much clearance', 'The edge is thin, cannot carry the heat away and breaks down.', ['TTE']],
   ['Too little clearance', 'There is hardly a cutting edge: the drill rubs, and forcing the feed can break it.', ['TTE']],
 ];
+// Band speeds as three pages print them, each in its own unit.
+const ST_BAND = [
+  ['Carbon and mild steel', '72 to 104 (structural and free-cutting steel)', '60 to 108 (carbon steel)', '100 to 150 (mild steel)', ['EXC_BS', 'LFC_BS', 'NILS_BS']],
+  ['Alloy steel', '-', '34 to 98', '-', ['LFC_BS']],
+  ['Tool steel', '-', '62; high speed steel 25 to 36', '50 to 70 (annealed)', ['LFC_BS', 'NILS_BS']],
+  ['Stainless steel', '31 to 52 (its row "stainless steels (high)")', '26; chromium stainless 26 to 62', '60 to 80', ['EXC_BS', 'LFC_BS', 'NILS_BS']],
+  ['Cast iron', '46 to 75', '33 to 75 (grey iron)', '80 to 100', ['EXC_BS', 'LFC_BS', 'NILS_BS']],
+  ['Aluminium and its alloys', '102 to 138', '67 to 163', '250 to 350', ['EXC_BS', 'LFC_BS', 'NILS_BS']],
+  ['Copper alloys', '-', '70 to 147', 'brass and bronze 200 to 300, copper 150 to 200', ['LFC_BS', 'NILS_BS']],
+];
+// Size of a single-point dressing diamond from the wheel diameter times its width (both in mm), as two pages print it.
+const ST_DD = [
+  ['0.25 ct', 'below 3000', 'up to 2000', ['FLEX_DD', 'ORG_DD']],
+  ['0.50 ct', '3000 to 12000', '7000', ['FLEX_DD', 'ORG_DD']],
+  ['0.75 ct', '-', '14000', ['ORG_DD']],
+  ['1 ct', 'above 12000', '20000', ['FLEX_DD', 'ORG_DD']],
+  ['1.5 ct', '-', '40000', ['ORG_DD']],
+  ['2 ct', '-', '70000', ['ORG_DD']],
+  ['3 ct', '-', '125000', ['ORG_DD']],
+];
 const ST_SAW = [
   ['Teeth chipped or broken', 'No break-in, the wrong blade for the job, work not clamped firmly, too much feed, hard spots or scale.', ['FAST']],
   ['Cracks from the back edge', 'Too much feed, worn or over-tight back-up guides, wrong band tension, band not tracking.', ['FAST']],
@@ -98,7 +134,7 @@ const ST_FLUID = [
 ];
 
 function renderShopTools(el) {
-  const toc = [['st-drill', 'Sharpening drills'], ['st-bit', 'Lathe tool bits'], ['st-saw', 'Hacksaw and band saw'], ['st-hole', 'Hole saws'], ['st-burr', 'Carbide burrs'], ['st-fluid', 'Cutting fluids'], ['st-wheel', 'Grinding wheels'], ['st-src', 'Sources']];
+  const toc = [['st-drill', 'Sharpening drills'], ['st-bit', 'Lathe tool bits'], ['st-saw', 'Hacksaw and band saw'], ['st-band', 'Band speeds'], ['st-hole', 'Hole saws'], ['st-burr', 'Carbide burrs'], ['st-fluid', 'Cutting fluids'], ['st-wheel', 'Grinding wheels'], ['st-carb', 'Grinding carbide'], ['st-src', 'Sources']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Bench and toolroom practice: sharpening drills and lathe tool bits, choosing saw blades and breaking them in, hole saw and burr speeds, choosing a cutting fluid, and grinding wheel shapes with dressing and truing, in our own words with our own drawings. Each statement shows the keys of the sources that confirm it (hover a key); anything not confirmed by two independent publishers is marked <span class="gtbv">to be verified</span>. Wear eye protection at any grinder, and keep its guards and tool rest in place.</p>' +
@@ -139,6 +175,13 @@ function renderShopTools(el) {
     stP('<b>Fluid and brush.</b> Keep sawing fluid on the cut and the chip brush working, so that chips are not carried back into the cut.', ['MMS_SAW', 'FAST']) +
     stP('Band sawing wants a richer mix of fluid than other machining.', ['MMS_SAW']) +
     '<p class="desc">What a band saw blade shows, and the usual causes:</p>' + guideTable(['What you see', 'Usual causes'], ST_SAW, stTags) +
+    '<h3 class="gcat" id="st-band">Band speed by material</h3>' +
+    guideTable(['Material', 'Excision, m/min', 'LFC, m/min', 'Nilsson, ft/min'], ST_BAND, stTags) +
+    '<p class="desc">Band speeds as three pages print them, each in its own unit. None of them says which kind of blade its figures are for. Once converted, Nilsson\'s figures are well below the other two for steel, tool steel, stainless steel and cast iron. Treat them as a range to start in and go by the blade maker\'s chart where you have one. Excision\'s figures are for sections of 10 to 100 mm.</p>' +
+    stP('<b>Harder and bigger means slower.</b> Hard materials and large sections want a lower band speed and a lower feed. Nilsson keeps hardened material to 30 to 50 ft/min at most, with a carbide blade.', ['EXC_BS', 'NILS_BS']) +
+    stP('<b>Chips, again.</b> Thin, curled, silvery chips mean speed and feed are right. Chips like dust: slow the band and feed harder.', ['EXC_BS', 'LFC_BS']) +
+    stP('<b>Short, hard chips: the sources differ.</b> Excision: thick, hard, short chips that are blue or brown call for less speed and less feed. LFC: hard, strong, short chips call for more speed and less feed.', ['EXC_BS', 'LFC_BS']) +
+    stP('<b>With fluid</b> LFC allows up to 15 % more feed.', ['LFC_BS']) +
     stP('The pitch for a section is worked out in <a href="#/t/sawtpi">saw blade pitch</a> and the time for a cut in <a href="#/t/bandsaw">band saw cut time</a>.', null) +
 
     '<h2 id="st-hole">Hole saws</h2>' +
@@ -163,6 +206,23 @@ function renderShopTools(el) {
     stP('<b>Copper.</b> One article warns that neat oils with their additives can attack copper.', ['AM']) +
     stP('<b>Looking after it.</b> Fluids mixed with water need care: check the concentration with a refractometer and make up what evaporates. They carry more risk of skin trouble than oil does.', ['AM', 'FUCHS', 'MMS_SAW']) +
     stP('Reading a refractometer is in <a href="#/t/coolconc">coolant concentration</a>, and topping up a sump in <a href="#/t/coolmix">coolant mixing</a>.', null) +
+    '<h3 class="gcat" id="st-sump">Looking after a sump</h3>' +
+    stP('<b>Concentration.</b> Check it with a refractometer as a routine. Keller-Heartt checks every day and writes the figure down, along with the level and a look for floating oil, dirt and foam.', ['KH_COOL', 'TRAV_COOL']) +
+    stP('Keller-Heartt gives 5 to 10 % for most work and up to 12 % or more for aluminium and difficult alloys. Too weak: poor lubrication, rust and shorter tool life. Too strong: foam, mist and waste. The figure for your fluid is its maker\'s.', ['KH_COOL']) +
+    stP('<b>Mixing.</b> Concentrate goes into the water, never water into the concentrate.', ['TRAV_COOL', 'KH_COOL']) +
+    stP('<b>Topping up.</b> Never plain water and never plain concentrate: add a mix, weaker than the first charge when the sump is too strong and stronger when it is too weak.', ['TRAV_COOL']) +
+    stP('<b>Tramp oil.</b> Oil that leaks from the machine floats on the coolant. Skim it off: Travers explains that the layer shuts out the air, which suits the bacteria that spoil a sump.', ['TRAV_COOL', 'KH_COOL', 'SAIF_MWF']) +
+    stP('<b>Chips and fines.</b> Take them out regularly. They give bacteria and fungus a place to grow.', ['TRAV_COOL', 'KH_COOL']) +
+    stP('<b>By the week, month and quarter (Keller-Heartt).</b> pH tested and written down each week; dip slides for bacteria and fungi and a look at the filters each month; the water quality checked and a deeper clean each quarter.', ['KH_COOL']) +
+    stP('<b>A machine that stands idle.</b> Run the coolant for a few hours a day, or fit an aerator.', ['TRAV_COOL']) +
+    stP('<b>Cleaning.</b> Clean the sump regularly, and always before new fluid goes in.', ['TRAV_COOL', 'SAIF_MWF']) +
+    stP('<b>When to change the fluid.</b> A foul smell, slime, a change of colour or a low pH. A biocide keeps the count down but does not clear slime: that takes a clean-out and a fresh charge.', ['SAIF_MWF']) +
+    '<h3 class="gcat" id="st-mist">Mist and skin</h3>' +
+    stP('<b>A limit for mist.</b> NIOSH recommends no more than 0.4 mg/m³ of metalworking fluid aerosol as thoracic particulate, or 0.5 mg/m³ as total particulate, averaged over a working day of up to 10 hours. It is a recommendation, not a regulation.', ['NIOSH_MWF', 'SAIF_MWF']) +
+    stP('<b>Why.</b> Breathing the mist is linked with asthma, chronic bronchitis, hypersensitivity pneumonitis and poorer lung function, and skin contact with irritant and allergic dermatitis.', ['NIOSH_MWF', 'SAIF_MWF']) +
+    stP('<b>Keeping the mist in.</b> Enclosures and splash guards on the machine, and a mist collector or local exhaust that is kept in working order.', ['NIOSH_MWF', 'SAIF_MWF']) +
+    stP('<b>No compressed air</b> to blow fluid off parts or clothes.', ['SAIF_MWF']) +
+    stP('<b>Skin.</b> Gloves where they are safe near turning parts, an apron, washing with mild soap and water and not with solvent or an abrasive cleaner, and a change of clothes that are soaked with fluid.', ['SAIF_MWF', 'NIOSH_MWF']) +
 
     '<h2 id="st-wheel">Grinding wheels: shapes, dressing and truing</h2>' + stWheels() +
     stP('<b>Shapes by number.</b> Type 1 straight, type 2 cylinder, type 4 tapered, type 5 recessed on one side, type 7 recessed on both sides, type 11 flaring cup, type 12 dish, type 13 saucer.', ['BACON']) +
@@ -175,6 +235,37 @@ function renderShopTools(el) {
     stP('<b>When.</b> A wheel that is glazed or loaded, has lost its shape, needs more pressure to cut or leaves a poorer finish is due for dressing.', ['PALM']) +
     stP('<b>Open or closed.</b> Dressed open, with fresh sharp points, a wheel removes stock fast and leaves a rougher finish. Dressed closed it rubs more: a better finish, and much slower stock removal.', ['MMS_DRESS']) +
     stP('<b>Tools.</b> A single-point diamond for fine wheels and exact work, a multi-point diamond for larger wheels, crush rolls for special forms. One maker\'s guide holds the diamond at 10 to 15 degrees to the wheel and dresses every 2 to 4 hours of steady use.', ['PALM']) +
+    '<h3 class="gcat" id="st-dd">Single-point diamond dressers</h3>' +
+    stP('<b>Bigger wheel, bigger diamond.</b> The size of the diamond is chosen from the wheel: multiply its diameter by its width, both in mm, and read the carat weight off.', ['FLEX_DD', 'ORG_DD', 'NORI_DD']) +
+    guideTable(['Diamond', 'Flexovit: diameter x width', 'Organametrisis: diameter x width'], ST_DD, stTags) +
+    '<p class="desc">Both figures as printed. Flexovit gives ranges; Organametrisis prints one figure for each size without saying whether it is the largest wheel for that size, so its figures are shown as they stand. They do not agree: where diameter times width is 5000, Flexovit gives 0.50 ct, while 5000 lies between the figures Organametrisis prints for 0.25 ct and 0.50 ct.</p>' +
+    stP('<b>Drag angle.</b> Tilt the diamond so that it trails the wheel and touch on the centre line. Flexovit gives 5 to 15 degrees; Noritake usually 15, and says a smaller angle spoils the finish.', ['FLEX_DD', 'NORI_DD', 'PALM']) +
+    stP('<b>Turn the diamond</b> in its holder every four or five dressings, so that a sharp edge keeps meeting the wheel.', ['FLEX_DD']) +
+    stP('<b>Depth of each dressing pass (Noritake).</b> About 0.005 mm for precision grinding, 0.010 to 0.030 mm for general grinding, up to about 0.040 mm for rough grinding.', ['NORI_DD']) +
+    '<h3 class="gcat" id="st-carb">Grinding carbide tools</h3>' +
+    stP('<b>The ordinary wheel will not do.</b> Aluminium oxide wheels, grey or white, are for steel and high speed steel. They hardly cut carbide.', ['IMD_GW', 'AX_GW']) +
+    stP('<b>Green silicon carbide</b> is the bench grinder wheel for tungsten carbide.', ['IMD_GW', 'AX_GW', 'BACON']) +
+    stP('<b>Diamond</b> is much harder than carbide and keeps cutting. UKAM, which makes diamond wheels, does not rate aluminium oxide or silicon carbide as efficient on carbide for most precision work.', ['UKAM_DW', 'IMD_GW']) +
+    stP('<b>Bond (UKAM).</b> Resin bond for tool and cutter grinding: it cuts with lower forces. Metal bond wears far longer and is for heavy stock removal. Vitrified bond is rigid and lets coolant in.', ['UKAM_DW']) +
+    stP('<b>Grit (UKAM).</b> 80 to 120 for heavy stock removal, 230 to 325 for precision finishing.', ['UKAM_DW']) +
+    stP('<b>Light pressure.</b> Forced, carbide chips and cracks finely at the edge, and the heat of grinding stays local.', ['IMD_GW', 'UKAM_DW']) +
+    stP('<b>Coolant</b> goes into the grinding zone, not just onto the turning wheel.', ['UKAM_DW']) +
+    stP('<b>A diamond wheel</b> is conditioned when it stops cutting well, not by the clock.', ['UKAM_DW']) +
+    stP('<b>A green wheel</b> rarely needs dressing: it sheds its dull grain by itself.', ['IMD_GW']) +
+    stP('<b>CBN</b>, a relative of synthetic diamond, is a wheel for high speed steel: it leaves a fine, even edge and needs no dressing.', ['AX_GW']) +
+    '<p class="desc">Not found in the pages read: whether a diamond wheel may touch the steel shank of a brazed tool, and what to do about the dust of carbide. Ask the wheel maker and follow your shop rules on both.</p>' +
+    '<h3 class="gcat" id="st-bench">Bench and pedestal grinders: before you switch on</h3>' +
+    stP('<b>Ring test.</b> Before a wheel is mounted, tap it lightly on the side with something that is not metal, such as the handle of a screwdriver. A sound wheel gives a clear ring. A cracked wheel sounds dead and must not be used.', ['ROCK_GR', 'TM_GR']) +
+    stP('The wheel has to be dry and clean for the test. Tap it in several places round the wheel.', ['TM_GR']) +
+    stP('<b>Speed.</b> The grinder must not turn faster than the speed marked on the wheel.', ['ROCK_GR', 'TM_GR']) +
+    stP('<b>Work rest.</b> No more than 1/8 in (3.2 mm) from the wheel, so that the work cannot be dragged down between the rest and the wheel. Clamp it tight after setting it.', ['ROCK_GR', 'ASMARK_GR', 'TM_GR']) +
+    stP('<b>Tongue guard.</b> The adjustable guard at the top of the opening: no more than 1/4 in (6.4 mm) from the wheel.', ['ROCK_GR', 'ASMARK_GR', 'TM_GR']) +
+    stP('<b>Set both again as the wheel wears.</b> The gaps open up as the wheel gets smaller.', ['ROCK_GR', 'ASMARK_GR']) +
+    stP('When the rest can no longer be brought close enough, the wheel is due for replacement.', ['TM_GR']) +
+    stP('<b>Guard.</b> The hood covers the end of the spindle, the nut and the flange, and leaves no more than 90° of the wheel open.', ['ASMARK_GR', 'ROCK_GR']) +
+    stP('<b>Stand to one side</b> when the grinder starts, and let it run for a full minute before you grind: a damaged wheel is most likely to break up in that first minute.', ['ROCK_GR']) +
+    stP('<b>Eyes.</b> Safety glasses or goggles, with a face shield over them. The spark shield on the grinder does not count as eye protection.', ['TM_GR']) +
+    stP('The gaps and the 90° opening are those of the US rule 29 CFR 1910.215 as these pages report it. The rule itself was not read.', ['ROCK_GR', 'ASMARK_GR']) +
     stP('The marking on a wheel is decoded in <a href="#/t/wheelcode">grinding wheel marking</a>, and its speed is checked in <a href="#/t/grindspeed">wheel speed</a>.', null) +
 
     '<h2 id="st-src">Sources</h2><ul class="gsl">' + Object.entries(ST_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +

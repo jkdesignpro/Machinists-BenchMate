@@ -1,4 +1,4 @@
-// Bearings and seals guide (parity MH283, MH284, ED66, ED67, ED71; part of MH293).
+// Bearings and seals guide (parity MH283, MH284, ED66, ED67, ED71, MH293, BB59).
 // All wording and drawings are BenchMate's own. Every statement carries the keys of the public sources read for
 // it (docs/sources.md, "Bearings and seals guide"); one with fewer than two independent publishers is shown as
 // "to be verified". Where two sources give different figures both are shown.
@@ -25,10 +25,19 @@ const BG_SOURCES = {
   IMA: 'University of Stuttgart, Institute of Machine Components, TechSheet 104170, "Optimal shaft counterfaces for radial shaft seals: plunge grinding"',
   PERMA: 'Permabond, "What do the threadlocker colors mean?"',
   FE: 'Fastener Engineering, S. Ay (Hernon Manufacturing), "A guide to choosing and using threadlockers"',
+  AIMS_TL: 'AIMS Industrial, "Thread locking & sealing: Loctite, PTFE & anaerobic sealant guide", 2026-09-29',
+  INC_RC: 'Incure Inc., "Threadlockers vs. retaining compounds: a manufacturer\'s guide", 2025-07-19',
+  INC_TS: 'Incure Inc., "The industrial professional\'s guide to thread sealants", 2025-12-08',
+  INC_FS: 'Incure Inc., "Flange sealing methods: a comprehensive guide for manufacturers", modified 2026-08-30',
+  MD_SA: 'Machine Design, S. Loushin (3M), "Choosing and using structural adhesives", 2016-12-01',
+  GG_SA: 'Gluegun.com, "How to choose a structural adhesive", 2026-02-09',
+  APPLE_BU: 'Apple Rubber, seal design guide, "Use of backup rings"',
+  MARCO_BU: 'Marco Rubber, "Back-up O-rings"',
+  FPW_BU: 'P. Heney, Fluid Power World, "Backup rings help prevent O-ring migration", 2017-05-05',
   OWN: 'BenchMate arithmetic on the rule in the sources beside it',
 };
 // Several documents of one publisher count once.
-const BG_FAMILY = { NSK_T: 'NSK', NSK_D: 'NSK', NSK_C: 'NSK' };
+const BG_FAMILY = { NSK_T: 'NSK', NSK_D: 'NSK', NSK_C: 'NSK', INC_RC: 'INCURE', INC_TS: 'INCURE', INC_FS: 'INCURE' };
 const bgTags = keys => guideTags(keys, BG_SOURCES, BG_FAMILY);
 const bgP = (html, keys) => '<p>' + html + (keys === null ? '' : ' ' + bgTags(keys)) + '</p>';
 const bgBox = d => '<path class="gfill" d="' + d + '"/><path class="gp" d="' + d + '"/>';
@@ -131,9 +140,16 @@ const BG_LOCK = [
   ['Red', 'High', '3/4 in to 1 in', 'Heat and tools; Permabond says local heat above 550 °F', ['PERMA', 'FE']],
   ['Green', 'Wicking grade: thin, creeps into fasteners already assembled', 'Assembled fasteners', 'Local heat and hand tools', ['PERMA', 'FE']],
 ];
+// Families of structural adhesive: what each source prints, in our own words.
+const BG_STRUCT = [
+  ['Epoxy', 'The best all-round strength on metals and the widest range of grades; Gluegun.com adds the best resistance to chemicals and heat', 'Wants clean, prepared surfaces: oil has to come off. Fast rigid grades are brittle (Machine Design)', ['MD_SA', 'GG_SA']],
+  ['Acrylic (MMA)', 'Fast, with little surface preparation; Machine Design: the highest strength on plastics, and some grades bond oily metal', 'Smell and heat while it cures (Gluegun.com); stands vibration and impact less well than epoxy (Machine Design)', ['MD_SA', 'GG_SA']],
+  ['Polyurethane', 'Flexible; good in fatigue (Gluegun.com)', 'Lower strength, more so when hot; two-part grades are sensitive to moisture (Machine Design)', ['MD_SA', 'GG_SA']],
+  ['Cyanoacrylate (instant glue)', 'Good shear strength on many plastics and rubbers', 'Rigid, poor in peel and impact; may need a primer; can leave a white bloom', ['MD_SA']],
+];
 
 function renderBearGuide(el) {
-  const toc = [['bg-type', 'Bearing types'], ['bg-num', 'Bearing numbers'], ['bg-class', 'Tolerance classes'], ['bg-fit', 'Shaft and housing fits'], ['bg-mount', 'Mounting'], ['bg-seal', 'Shaft seals'], ['bg-lock', 'Threadlockers']];
+  const toc = [['bg-type', 'Bearing types'], ['bg-num', 'Bearing numbers'], ['bg-class', 'Tolerance classes'], ['bg-fit', 'Shaft and housing fits'], ['bg-mount', 'Mounting'], ['bg-seal', 'Shaft seals'], ['bg-bu', 'Back-up rings'], ['bg-lock', 'Threadlockers'], ['bg-ret', 'Retaining compounds'], ['bg-tseal', 'Thread and flange sealants'], ['bg-struct', 'Structural adhesives']];
   el.innerHTML =
     '<nav class="gtoc">' + toc.map(([a, t]) => '<a href="#' + a + '">' + t + '</a>').join('') + '</nav>' +
     '<p class="desc">Rolling bearings for the person who has to fit them, in our own words: what each type carries, how to read a bearing number, the tolerance classes, which ring gets the tight fit, how to mount a bearing without hurting it, what a shaft seal asks of the shaft, and the threadlocker colours. The small grey keys after each statement name the public sources it was checked against (list at the bottom). <span class="gtbv">to be verified</span> marks a statement not yet confirmed by two independent publishers.</p>' +
@@ -213,6 +229,19 @@ function renderBearGuide(el) {
     bgP('<b>Renewing.</b> Fit a new seal after every strip-down, and do not let its lip run in the track of the old one: move it along the bore or fit a wear sleeve.', ['SEALS']) +
     bgP('Static seals are in <a href="#/t/oring">O-ring glands</a>.', null) +
 
+    '<h2 id="bg-bu">Back-up rings for O-rings</h2>' +
+    bgP('<b>What they are for.</b> Under pressure an O-ring is pushed into the clearance gap behind it and can be nibbled away there. A back-up ring blocks or narrows that gap.', ['MARCO_BU', 'FPW_BU', 'APPLE_BU']) +
+    bgP('<b>Gap and hardness.</b> How much pressure an O-ring stands before it extrudes depends on the size of the diametral clearance and on the hardness of the rubber. Beyond that limit, use a harder O-ring, close the gap, or fit back-up rings.', ['APPLE_BU']) +
+    bgP('<b>An example (Apple Rubber).</b> At 1000 psi with a diametral clearance of 0.016 in, a 70 Shore A ring needs a harder compound, back-up rings or less clearance; an 80 Shore A ring is acceptable.', ['APPLE_BU']) +
+    bgP('<b>When, the sources differ.</b> Marco Rubber: above 1500 psi, or with a large gap. Fluid Power World: above about 5 MPa (50 bar), and also with fast movement, heavy pressure pulses, heat or changing temperature.', ['MARCO_BU', 'FPW_BU']) +
+    bgP('<b>Which side.</b> With pressure from one side only, one ring on the side away from the pressure. With pressure from both sides, one ring each side of the O-ring.', ['FPW_BU', 'MARCO_BU']) +
+    bgP('Apple Rubber prefers two rings, one each side, in every case: the gap is then blocked whichever way the pressure acts.', ['APPLE_BU']) +
+    bgP('<b>The groove gets wider.</b> The gland has to be widened to take one or two back-up rings.', ['MARCO_BU']) +
+    bgP('<b>Materials.</b> PTFE, or a hard rubber such as 90 Shore A nitrile or FKM, hard enough to resist extrusion itself.', ['MARCO_BU', 'FPW_BU']) +
+    bgP('<b>Heavier duty</b> calls for filled PTFE, usually glass-filled, sometimes with bronze or carbon.', ['FPW_BU']) +
+    bgP('<b>Solid, split or spiral.</b> Split and spiral rings go in more easily, above all on small diameters; a solid ring has no joint.', ['MARCO_BU', 'FPW_BU']) +
+    bgP('The squeeze, stretch and fill of the O-ring itself are checked in <a href="#/t/oring">O-ring glands</a>.', null) +
+
     '<h2 id="bg-lock">Threadlocker colours</h2>' +
     guideTable(['Colour', 'Strength', 'Fastener size (FE)', 'Taking apart'], BG_LOCK, bgTags) +
     bgP('<b>How it sets.</b> The liquid hardens once tightening the threads has shut the air out.', ['FE']) +
@@ -220,6 +249,49 @@ function renderBearGuide(el) {
     bgP('<b>Putting it on.</b> Threads clean and dry; a drop on the first few threads of the bolt is enough, tightening spreads it.', ['FE']) +
     bgP('<b>Colours are a habit, not a rule.</b> They come from old US military specifications and not every product follows them: there is a red low-strength threadlocker, and retaining compounds are green too. Go by the product number and its data sheet.', ['PERMA']) +
     bgP('Tightening torque and preload are in <a href="#/t/bolttorque">bolt torque and preload</a>.', null) +
+
+    '<h2 id="bg-ret">Retaining compounds</h2>' +
+    bgP('<b>What they are.</b> Anaerobic adhesives for plain round joints, not for threads: a bearing in its housing, a bush in a bore, a sleeve, gear or pulley on a shaft.', ['AIMS_TL', 'INC_RC']) +
+    bgP('<b>What they do.</b> The liquid fills the small clearance between the two parts and hardens there, so the whole surface carries the load.', ['AIMS_TL', 'INC_RC']) +
+    bgP('<b>Setting.</b> As with a threadlocker: liquid in air, hard once it is shut in between close-fitting metal surfaces.', ['AIMS_TL', 'INC_RC']) +
+    bgP('<b>The gap.</b> Typically up to 0.25 mm (AIMS gives this as the clearance on the diameter for Loctite 638); Incure adds up to 0.5 mm for some grades.', ['AIMS_TL', 'INC_RC']) +
+    bgP('<b>The fit.</b> A retaining compound can add to a press or shrink fit or take its place (Incure). AIMS advises a clearance fit, H7/g6 or looser, and lets the adhesive do the holding.', ['AIMS_TL', 'INC_RC']) +
+    bgP('<b>Surfaces to be bonded.</b> Clean, with heavy oil removed. On stainless steel and other less active surfaces use the activator (primer) of the maker, or the cure is slow.', ['AIMS_TL', 'INC_RC']) +
+    bgP('<b>Active and passive.</b> AIMS counts mild steel, cast iron, copper and brass as active; stainless steel, zinc and chrome plating, anodised aluminium and black oxide as passive.', ['AIMS_TL']) +
+    bgP('<b>Against threadlockers.</b> Retaining compounds are thicker, fill larger gaps and have a higher shear strength.', ['INC_RC']) +
+    bgP('<b>No fretting.</b> With the gap filled, the small movements that cause fretting corrosion stop.', ['INC_RC']) +
+    bgP('<b>Heat.</b> Grades differ: AIMS lists Loctite 638 to 150 °C and 648 to 200 °C. Go by the data sheet.', ['AIMS_TL']) +
+    bgP('<b>Getting it apart again</b> is often hard, and some grades are meant to stay for good.', ['INC_RC']) +
+    bgP('Fits without adhesive are in <a href="#/t/shrinkfit">shrink and press fits</a> and <a href="#/t/fits">ISO limits and fits</a>.', null) +
+
+    '<h2 id="bg-tseal">Thread and flange sealants</h2>' +
+    bgP('<b>Anaerobic thread sealant.</b> A liquid or paste that hardens inside the thread of a metal fitting once the air is shut out.', ['AIMS_TL', 'INC_TS']) +
+    bgP('<b>It needs time.</b> Unlike tape, it has a cure time before the joint is at full strength. AIMS gives one hour to handle and 24 hours to full cure for Loctite 567.', ['AIMS_TL', 'INC_TS']) +
+    bgP('<b>Stainless steel</b> and other less active metals may need a primer for a full, fast cure.', ['AIMS_TL', 'INC_TS']) +
+    bgP('<b>Putting it on.</b> Threads clean and free of oil and cutting fluid. Incure starts the bead a thread or two back from the end.', ['AIMS_TL', 'INC_TS']) +
+    bgP('<b>PTFE tape and fluid power.</b> Tape can shred as the joint is made up, and the shreds travel to valves and filters (Incure). AIMS: never on hydraulic fittings.', ['AIMS_TL', 'INC_TS']) +
+    bgP('<b>Tape in general.</b> Cheap, and it keeps without limit. It stands vibration and changes of temperature poorly: the wrap can loosen and creep.', ['INC_TS']) +
+    bgP('<b>Tape colours (AIMS, Australia).</b> White for water and low pressure, yellow for gas; white tape is not allowed on gas connections there. Local rules decide.', ['AIMS_TL']) +
+    bgP('<b>Pipe dope.</b> The older solvent-based pastes harden as the solvent leaves. They are messy, and the result depends on how thickly the paste went on.', ['INC_TS']) +
+    bgP('<b>Metal threads.</b> Most anaerobic sealants are made for metal threads.', ['INC_TS']) +
+    bgP('<b>Anaerobic flange sealant.</b> For rigid, machined metal faces in place of a cut gasket: gearboxes, pumps and the like.', ['AIMS_TL', 'INC_FS']) +
+    bgP('<b>Flange gap.</b> Up to 0.5 mm at most. AIMS lists one grade to 0.25 mm and another to 0.5 mm.', ['AIMS_TL', 'INC_FS']) +
+    bgP('<b>Rough, cast or flexible faces.</b> Use a formed-in-place silicone (RTV) there: it cures to a flexible rubber and bridges larger gaps. Stamped covers are the usual case.', ['AIMS_TL', 'INC_FS']) +
+    bgP('<b>Clean faces.</b> An anaerobic sealant bridges only very small voids, so the faces must be clean and free of deep scores.', ['INC_FS']) +
+    bgP('<b>No tightening again.</b> The cured film does not shrink or relax, so the bolts keep their load.', ['INC_FS']) +
+    bgP('<b>Pressure.</b> A silicone seal generally holds less pressure than an anaerobic one.', ['INC_FS']) +
+    bgP('<b>Not together with a soft gasket.</b> Anaerobic flange sealants do not bond well to rubber, paper or composite gaskets.', ['AIMS_TL']) +
+    bgP('<b>Cut gaskets.</b> A soft gasket follows uneven and rougher faces, but it creeps and relaxes with time, and the bolts lose load.', ['INC_FS']) +
+    bgP('Pipe thread sizes are in <a href="#/t/pipethreads">pipe threads</a>.', null) +
+
+    '<h2 id="bg-struct">Structural adhesives</h2>' +
+    guideTable(['Family', 'Strong points', 'Weak points'], BG_STRUCT, bgTags) +
+    bgP('<b>Preparation decides.</b> Both sources put the state of the surfaces first: clean, and abraded or primed where the adhesive asks for it.', ['MD_SA', 'GG_SA']) +
+    bgP('<b>Toughened and flexible epoxies.</b> Toughened grades do best in shear, peel, impact, vibration and fatigue together; flexible grades peel better and take knocks.', ['MD_SA']) +
+    bgP('<b>Heat-cured epoxy.</b> One-part grades cured at 250 to 350 °F give the highest shear strength on metal.', ['MD_SA']) +
+    bgP('<b>Joints that move.</b> For an assembly that flexes or vibrates choose a flexible adhesive; choosing on strength alone is a mistake.', ['GG_SA']) +
+    bgP('<b>Temperature.</b> Two-part adhesives cure faster when warm: about half the working time for every 10 °C. Apply at 60 to 80 °F and not below about 40 °F.', ['MD_SA']) +
+    bgP('<b>Try it.</b> No table replaces a test on your own parts.', ['GG_SA']) +
 
     '<h2 id="bg-src">Sources</h2><ul class="gsl">' + Object.entries(BG_SOURCES).map(([k, v]) => '<li><b>' + k + '</b> ' + gesc(v) + '</li>').join('') + '</ul>' +
     '<p class="desc">Full URLs and access dates are in docs/sources.md, "Bearings and seals guide". No text, figures or tables were copied from the sources.</p>';
