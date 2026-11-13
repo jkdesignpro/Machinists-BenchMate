@@ -1,0 +1,76 @@
+{
+ "note": "Wrought magnesium alloys (0.8.0). Designations, composition limits and properties as each source prints them. Read 2026-11-13. Machining magnesium: see the non-ferrous section of the materials guide (fire risk of fine chips).",
+ "sources": {
+  "AIRCRAFT_AZ31B": {"title": "Magnesium Alloy AZ31B data page", "url": "https://aircraftmaterials.com/data/magnesium/az31b.html", "publisher": "Aircraft Materials", "accessed": "2026-11-13"},
+  "AIRCRAFT_AZ80A": {"title": "Magnesium Alloy AZ80A data page", "url": "https://aircraftmaterials.com/data/magnesium/az80a.html", "publisher": "Aircraft Materials", "accessed": "2026-11-13", "notes": "The composition line prints single figures (Al 8.50, Zn 0.50, Mn 0.15) with no limits; read as nominal and not recorded as limits."},
+  "AIRCRAFT_ZK60A": {"title": "Magnesium Alloy ZK60A data page", "url": "https://aircraftmaterials.com/data/magnesium/zk60a.html", "publisher": "Aircraft Materials", "accessed": "2026-11-13"},
+  "SMITHS_AZ31B": {"title": "AZ31B Magnesium, magnesium alloys technical datasheet", "url": "https://www.smithshp.com/assets/pdf/magnesium/az31b-magnesium-english.pdf", "publisher": "Smiths High Performance", "accessed": "2026-11-13", "revision": "SHP/english/datasheets/az31b/11.02.2025"},
+  "MIF_AZ31B": {"title": "AZ31B (3.5312, M11311) Magnesium", "url": "https://makeitfrom.com/material-properties/AZ31B-3.5312-M11311-Magnesium", "publisher": "MakeItFrom.com", "accessed": "2026-11-13", "notes": "Composition printed as permitted ranges '0 to x'; recorded as maxima. Mechanical values printed as ranges without a temper; not recorded."},
+  "MIF_AZ80A": {"title": "AZ80A (3.5812, M11800) Magnesium", "url": "https://www.makeitfrom.com/material-properties/AZ80A-3.5812-M11800-Magnesium", "publisher": "MakeItFrom.com", "accessed": "2026-11-13", "notes": "Composition printed as permitted ranges; '0 to x' recorded as maxima. Mechanical values without a temper; not recorded."},
+  "MIF_ZK60A": {"title": "ZK60A (MgZn6Zr, M16600) Magnesium", "url": "https://www.makeitfrom.com/material-properties/ZK60A-MgZn6Zr-M16600-Magnesium", "publisher": "MakeItFrom.com", "accessed": "2026-11-13", "notes": "Mechanical values without a temper; not recorded."}
+ },
+ "grades": [
+  {"grade": "AZ31B", "family": "Magnesium", "iso_group": "N", "printed": [
+   {"source": "AIRCRAFT_AZ31B", "printed_as": "Magnesium Alloy AZ31B",
+    "values": {"astm": "AZ31B", "uns": null, "w_nr": "3.5312", "other": "EN 1753 MG-P-62; AMS 4375; AMS 4376; AMS 4377; AMS 4382; BS 3370 MAG-S-1110; AFNOR G-A3Z1 (AIR)"},
+    "verbatim_row": "Werkstoff WS 3.5312 | EN1753 MG-P-62 | BS 3370 MAG-S-1110, MAG-E-111M | AMS 4375, 4376, 4377, 4382 | ASTM B90, B107 | AIR/AFNOR G-A3Z1",
+    "composition": {"basis": "Chemical composition limits, weight %", "elements": {"Al": "2.5-3.5", "Zn": "0.7-1.3", "Mn": "min 0.2", "Si": "max 0.05", "Cu": "max 0.05", "Ca": "max 0.04", "Fe": "max 0.005", "Ni": "max 0.005"}, "verbatim": "Al 2.5 - 3.5 | Zn 0.7 - 1.3 | Mn 0.2 min | Si 0.05 max | Cu 0.05 max | Ca 0.04 max | Fe 0.005 max | Ni 0.005 max | Others 0.30 max total | Mg bal"}},
+   {"source": "SMITHS_AZ31B", "printed_as": "AZ31B Magnesium", "values": {"astm": "AZ31B"},
+    "composition": {"basis": "Chemical composition, weight %, min and max", "elements": {"Al": "2.5-3.5", "Zn": "0.7-1.3", "Mn": "0.2-1.0"}, "verbatim": "Min. Mg Bal Al 2.50 Zn 0.70 Mn 0.20 | Max. Mg Bal Al 3.50 Zn 1.30 Mn 1.00"},
+    "properties": [
+     {"prop": "rm", "value": 220, "unit": "MPa", "cond": "AZ31B-O", "condition": "O temper, 1.5 to 6.3 mm", "basis": "min", "verbatim": "AZ31B-O 1.5-6.3 mm | 105 MPa | 220 MPa | 10%"},
+     {"prop": "rp02", "value": 105, "unit": "MPa", "cond": "AZ31B-O", "condition": "O temper, 1.5 to 6.3 mm", "basis": "min", "verbatim": "AZ31B-O 1.5-6.3 mm | 105 MPa | 220 MPa | 10%"},
+     {"prop": "rm", "value": 270, "unit": "MPa", "cond": "AZ31B-H24", "condition": "H24 temper, 0.5 to 6.3 mm", "basis": "min", "verbatim": "AZ31B-H24 0.5-6.3 mm | 200 MPa | 270 MPa | 5%"},
+     {"prop": "rp02", "value": 200, "unit": "MPa", "cond": "AZ31B-H24", "condition": "H24 temper, 0.5 to 6.3 mm", "basis": "min", "verbatim": "AZ31B-H24 0.5-6.3 mm | 200 MPa | 270 MPa | 5%"}
+    ]},
+   {"source": "MIF_AZ31B", "printed_as": "AZ31B (3.5312, M11311) Magnesium",
+    "values": {"astm": "AZ31B", "uns": "M11311", "w_nr": "3.5312", "iso": "WD21151"},
+    "composition": {"basis": "Permitted ranges, % weight", "elements": {"Al": "2.4-3.6", "Zn": "0.5-1.5", "Mn": "0.05-1.0", "Si": "max 0.1", "Fe": "max 0.05", "Cu": "max 0.05", "Ca": "max 0.04", "Ni": "max 0.005"}, "verbatim": "Mg 93.6 to 97.1 | Al 2.4 to 3.6 | Zn 0.5 to 1.5 | Mn 0.050 to 1.0 | Si 0 to 0.1 | Fe 0 to 0.050 | Cu 0 to 0.050 | Ca 0 to 0.040 | Ni 0 to 0.0050 | res. 0 to 0.3"},
+    "properties": [
+     {"prop": "density", "value": 1.7, "unit": "g/cm3", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Density 1.7 g/cm3 110 lb/ft3"},
+     {"prop": "e_modulus", "value": 45, "unit": "GPa", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Elastic (Young's, Tensile) Modulus 45 GPa 6.5 x 10^6 psi"},
+     {"prop": "k", "value": 100, "unit": "W/m.K", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Thermal Conductivity 100 W/m-K"},
+     {"prop": "cte", "value": 26, "unit": "um/m.K", "cond": "RT", "condition": "basis not stated", "basis": "typical", "verbatim": "Thermal Expansion 26 um/m-K"}
+    ]}
+  ]},
+  {"grade": "AZ80A", "family": "Magnesium", "iso_group": "N", "printed": [
+   {"source": "AIRCRAFT_AZ80A", "printed_as": "Magnesium Alloy AZ80A",
+    "values": {"astm": "AZ80A", "w_nr": "3.5812", "other": "EN 1753 MG-P-61; AMS 4360 (cancelled); AFNOR G-A7Z1 (AIR)"},
+    "verbatim_row": "Werkstoff WS 3.5812 | EN 1753 MG-P-61 | AMS 4360 AZ80A-T5 Forging (cancelled) | ASTM B91, B107 | AIR/AFNOR G-A7Z1",
+    "properties": [
+     {"prop": "density", "value": 1.80, "unit": "sg", "cond": "RT", "condition": "specific gravity", "basis": "typical", "verbatim": "Specific Gravity 1.80"},
+     {"prop": "rm", "value": 290, "unit": "MPa", "cond": "T5 forging", "condition": "forgings, precipitation treated", "basis": "typical", "verbatim": "Tensile Strength 290 MPa | Yield Strength 200 MPa | Elongation 6 | Hardness 60 VPN"},
+     {"prop": "rp02", "value": 200, "unit": "MPa", "cond": "T5 forging", "condition": "forgings, precipitation treated", "basis": "typical", "verbatim": "Tensile Strength 290 MPa | Yield Strength 200 MPa | Elongation 6 | Hardness 60 VPN"}
+    ]},
+   {"source": "MIF_AZ80A", "printed_as": "AZ80A (3.5812, M11800) Magnesium",
+    "values": {"astm": "AZ80A", "uns": "M11800", "w_nr": "3.5812", "iso": "WD21170"},
+    "composition": {"basis": "Permitted ranges, % weight", "elements": {"Al": "7.8-9.2", "Zn": "0.2-0.8", "Mn": "0.12-0.5", "Si": "max 0.1", "Cu": "max 0.05", "Ni": "max 0.005", "Fe": "max 0.005"}, "verbatim": "Mg 89 to 91.9 | Al 7.8 to 9.2 | Zn 0.2 to 0.8 | Mn 0.12 to 0.5 | Si 0 to 0.1 | Cu 0 to 0.050 | Ni 0 to 0.0050 | Fe 0 to 0.0050 | res. 0 to 0.3"},
+    "properties": [
+     {"prop": "density", "value": 1.7, "unit": "g/cm3", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Density 1.7 g/cm3 110 lb/ft3"},
+     {"prop": "e_modulus", "value": 46, "unit": "GPa", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Elastic Modulus 46 GPa 6.6 x 10^6 psi"},
+     {"prop": "k", "value": 77, "unit": "W/m.K", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Thermal Conductivity 77 W/m-K"},
+     {"prop": "cte", "value": 26, "unit": "um/m.K", "cond": "RT", "condition": "basis not stated", "basis": "typical", "verbatim": "Thermal Expansion 26 um/m-K"}
+    ]}
+  ]},
+  {"grade": "ZK60A", "family": "Magnesium", "iso_group": "N", "printed": [
+   {"source": "AIRCRAFT_ZK60A", "printed_as": "Magnesium Alloy ZK60A",
+    "values": {"astm": "ZK60A", "uns": "M16600", "other": "AMS 4352 (extrusions T5); AMS 4362 (forgings T5)"},
+    "verbatim_row": "UNS M16600 | ASTM B107, B191 | AMS 4352 ZK60A-T5 Extrusions | AMS 4362 ZK60A-T5 Forgings",
+    "composition": {"basis": "Chemical composition limits, weight %", "elements": {"Zn": "4.8-6.2", "Zr": "min 0.45"}, "verbatim": "Al - | Zn 4.8 - 6.2 | Mn - | Zr 0.45 (min) | Other 0.30 | Specific Gravity 1.83"},
+    "properties": [
+     {"prop": "density", "value": 1.83, "unit": "sg", "cond": "RT", "condition": "specific gravity", "basis": "typical", "verbatim": "Specific Gravity 1.83"},
+     {"prop": "rm", "value": 45, "unit": "ksi", "cond": "T5 bar", "condition": "T5 bar, cross-section under 5 sq in", "basis": "typical", "verbatim": "< 5 | 45 | 36 | 4"},
+     {"prop": "rp02", "value": 36, "unit": "ksi", "cond": "T5 bar", "condition": "T5 bar, cross-section under 5 sq in", "basis": "typical", "verbatim": "< 5 | 45 | 36 | 4"}
+    ]},
+   {"source": "MIF_ZK60A", "printed_as": "ZK60A (MgZn6Zr, M16600) Magnesium",
+    "values": {"astm": "ZK60A", "uns": "M16600", "en_name": "MgZn6Zr"},
+    "composition": {"basis": "Permitted ranges, % weight", "elements": {"Zn": "4.8-6.2", "Zr": "0.45-1.0"}, "verbatim": "Mg 92.5 to 94.8 | Zn 4.8 to 6.2 | Zr 0.45 to 1.0 | res. 0 to 0.3"},
+    "properties": [
+     {"prop": "density", "value": 1.9, "unit": "g/cm3", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Density 1.9 g/cm3 120 lb/ft3"},
+     {"prop": "e_modulus", "value": 46, "unit": "GPa", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Elastic Modulus 46 GPa 6.6 x 10^6 psi"},
+     {"prop": "k", "value": 120, "unit": "W/m.K", "cond": "RT", "condition": "room temperature", "basis": "typical", "verbatim": "Thermal Conductivity 120 W/m-K"},
+     {"prop": "cte", "value": 26, "unit": "um/m.K", "cond": "RT", "condition": "basis not stated", "basis": "typical", "verbatim": "Thermal Expansion 26 um/m-K"}
+    ]}
+  ]}
+ ]
+}

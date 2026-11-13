@@ -36,12 +36,14 @@ FAMILY_FIELDS = {
     "Cast iron": [("common", "Common name"), ("en_name", "EN 1561 / 1563 name"), ("en_number", "EN number"),
                   ("din_en_name", "Old DIN name"), ("w_nr", "Old DIN W.-Nr."), ("astm", "ASTM"), ("bs", "Old BS"), ("jis", "JIS")],
     "Plastic": [("abbrev", "Abbreviation"), ("generic", "Generic name"), ("trade", "Trade names")],
+    "Magnesium": [("astm", "ASTM"), ("uns", "UNS"), ("w_nr", "W.-Nr."), ("iso", "ISO"), ("en_name", "EN name"), ("other", "Other specifications")],
 }
 # Field(s) whose agreement decides the status; the first one with data is used.
 # Aluminium: AA and EN AW numbers are the same registered number, so agreement
 # is judged on the cross-system numbers that actually cause confusion.
 KEY_FIELD = {"Steel": ["en_number"], "Aluminium": ["din_wnr", "bs_old", "en_aw"], "Copper alloy": ["en_number"],
-             "Titanium": ["w_nr"], "Nickel alloy": ["w_nr"], "Cast iron": ["w_nr"], "Plastic": ["abbrev"]}
+             "Titanium": ["w_nr"], "Nickel alloy": ["w_nr"], "Cast iron": ["w_nr"], "Plastic": ["abbrev"],
+             "Magnesium": ["w_nr", "uns"]}
 
 def publisher(key, src):
     if key in COPIES: return COPIES[key]
@@ -172,7 +174,7 @@ def build_props(name, printed):
 # an element only when both ends are the same number (0.03 and 0.030 are the same number); nothing
 # is averaged and a maximum never agrees with a range. Element order for the chart: carbon first,
 # then the usual order of a mill certificate.
-ELEMENTS = ["C", "Mn", "Si", "P", "S", "Cr", "Ni", "Mo", "N", "Cu", "Al", "Ti", "Nb", "V", "W", "Co", "Pb", "Bi", "Mg", "Zn", "Fe", "Sn", "Be", "B"]
+ELEMENTS = ["C", "Mn", "Si", "P", "S", "Cr", "Ni", "Mo", "N", "Cu", "Al", "Ti", "Nb", "V", "W", "Co", "Pb", "Bi", "Mg", "Zn", "Fe", "Sn", "Be", "B", "Zr", "Ca", "Y"]
 
 def parse_limit(txt, where):
     t = txt.strip()
