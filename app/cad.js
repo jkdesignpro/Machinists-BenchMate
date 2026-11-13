@@ -8,7 +8,7 @@
 
 const CAD_LAYER = ['OUTLINE', 'HOLES', 'CENTRE'];
 const CAD_MEM = {};
-const CAD_OPT = { marks: true, origin: 0, ver: 2000 };
+const CAD_OPT = { marks: true, origin: 0, ver: 2000, explode: false };
 try { Object.assign(CAD_OPT, JSON.parse(localStorage.getItem('bm.cadopt') || '{}')); } catch (e) {}
 const cadSaveOpt = () => { try { localStorage.setItem('bm.cadopt', JSON.stringify(CAD_OPT)); } catch (e) {} };
 
@@ -110,7 +110,7 @@ function cadPreview(d, u, dp) {
 
 function cadBuild(W, shape, vals) {
   const n = toBuf(W, vals);
-  const len = W.dxf_build(shape, n, state.sys === 'inch' ? 1 : 0, CAD_OPT.ver === 12 ? 1 : 0, CAD_OPT.marks ? 1 : 0, +CAD_OPT.origin);
+  const len = W.dxf_build(shape, n, state.sys === 'inch' ? 1 : 0, CAD_OPT.ver === 12 ? 1 : 0, CAD_OPT.marks ? 1 : 0, +CAD_OPT.origin, CAD_OPT.explode ? 1 : 0);
   const txt = new TextDecoder().decode(new Uint8Array(W.memory.buffer, W.text_ptr(), Math.abs(len)));
   return len < 0 ? { err: txt } : { dxf: txt, d: cadRead(W) };
 }
@@ -127,12 +127,14 @@ function renderDxf(el, toolId) {
       '<div class="grid">' + sh.fields.map(f => sfield(f[1], f[2] === 'sel' ? gsel(f[0], f[5], v[f[0]]) : sinp(f[0], v[f[0]]), unit(f))).join('') + '</div>' +
       '<div class="mfilter cadopt"><label class="chk"><input type="checkbox" id="cadmarks"' + (CAD_OPT.marks ? ' checked' : '') + '> Centre marks</label>' +
       '<label class="chk">Origin ' + gsel('origin', [[0, 'Centre of the shape'], [1, 'Lower-left corner']], CAD_OPT.origin) + '</label>' +
-      '<label class="chk">DXF ' + gsel('ver', [[2000, 'R2000 (LWPOLYLINE, units)'], [12, 'R12 (widest CAM support)']], CAD_OPT.ver) + '</label></div>' +
-      '<div id="cadprev"></div><div class="mfilter cadopt"><input type="text" id="cadname" aria-label="File name" style="width:220px;font-family:var(--mono)"><button class="btn" id="caddl">Download DXF</button><span class="desc" id="cadinfo" style="margin:0"></span></div>' +
+      '<label class="chk">DXF ' + gsel('ver', [[2000, 'R2000 (LWPOLYLINE, units)'], [12, 'R12 (widest CAM support)']], CAD_OPT.ver) + '</label>' +
+      '<label class="chk" title="Write each outline as separate LINE and ARC entities instead of one polyline. For programs that draw the rounded ends of a polyline as straight lines, or do not read polylines at all"><input type="checkbox" id="cadexpl"' + (CAD_OPT.explode ? ' checked' : '') + '> Outlines as separate lines and arcs</label></div>' +
+      '<div id="cadprev"></div><div class="mfilter cadopt"><input type="text" id="cadname" aria-label="File name" style="width:220px;font-family:var(--mono)"><button class="btn" id="caddl">Download DXF</button><button class="btn" id="cadsk" title="Open this shape in the 2D sketcher to add to it or measure it (it replaces the sketch; Undo there brings the old one back)">Open in the sketcher</button><span class="desc" id="cadinfo" style="margin:0"></span></div>' +
       '<div class="res" id="cadres"></div><div class="res" id="cadholes" style="margin-top:12px"></div>';
     el.querySelectorAll('#cadvar button').forEach(b => b.onclick = () => { mem.shape = +b.dataset.v; draw(); });
     el.querySelectorAll('.grid [data-k]').forEach(i => i.oninput = i.onchange = () => { v[i.dataset.k] = i.value; calc(); });
     el.querySelector('#cadmarks').onchange = e => { CAD_OPT.marks = e.target.checked; cadSaveOpt(); calc(); };
+    el.querySelector('#cadexpl').onchange = e => { CAD_OPT.explode = e.target.checked; cadSaveOpt(); calc(); };
     el.querySelector('.cadopt [data-k="origin"]').onchange = e => { CAD_OPT.origin = +e.target.value; cadSaveOpt(); calc(); };
     el.querySelector('.cadopt [data-k="ver"]').onchange = e => { CAD_OPT.ver = +e.target.value; cadSaveOpt(); calc(); };
     el.querySelector('#cadname').value = mem.file || '';
@@ -142,6 +144,11 @@ function renderDxf(el, toolId) {
       let name = (mem.file || el.querySelector('#cadname').placeholder || 'shape.dxf').trim().replace(/[\\/:*?"<>|]+/g, '_');
       if (!/\.dxf$/i.test(name)) name += '.dxf';
       saveFile(name, last.dxf, 'application/dxf');
+    };
+    el.querySelector('#cadsk').onclick = () => {
+      if (!last) return;
+      try { skImport(last.dxf, el.querySelector('#cadname').value || el.querySelector('#cadname').placeholder); location.hash = '#/t/sketch'; }
+      catch (x) { toast('Could not open it in the sketcher: ' + x.message); }
     };
     calc();
   };
@@ -154,12 +161,12 @@ function renderDxf(el, toolId) {
     const nameEl = el.querySelector('#cadname');
     if (!mem.file) nameEl.placeholder = sh.name + '-' + (sys === 'inch' ? 'inch' : 'mm') + '.dxf';
     if (r.err) {
-      last = null; dl.disabled = true; prev.innerHTML = ''; hl.innerHTML = ''; hl.style.display = 'none';
+      last = null; dl.disabled = true; el.querySelector('#cadsk').disabled = true; prev.innerHTML = ''; hl.innerHTML = ''; hl.style.display = 'none';
       res.innerHTML = stable('Check the values', [['<span class="warn">' + sesc(r.err) + '</span>', '', '']]);
       el.querySelector('#cadinfo').textContent = '';
       return;
     }
-    last = r; dl.disabled = false;
+    last = r; dl.disabled = false; el.querySelector('#cadsk').disabled = false;
     prev.innerHTML = cadPreview(r.d, u, dp);
     const [x0, y0, x1, y1] = r.d.ext, cnt = {};
     r.d.ents.forEach(e => { cnt[e.layer] = (cnt[e.layer] || 0) + 1; });

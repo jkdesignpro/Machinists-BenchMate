@@ -43,26 +43,30 @@ const HUBS = {
     tabs: [['insertcode', 'Insert (ISO 1832)'], ['holdercode', 'Holder (ISO 5608)'], ['iso513', 'Material groups (ISO 513)']] },
   tapergauge: { title: 'Ball and roll checks', icon: 'caliper', desc: 'Measure countersinks, tapered bores and tapers with balls and rolls.',
     tabs: [['ballcone', 'Ball in a countersink'], ['taperrolls', 'Taper over rolls']] },
+  chipthinning: { title: 'Chip thinning', icon: 'path', desc: 'Feed per tooth for the chip thickness you want: narrow widths of cut, entering angles, high-feed cutters and round inserts.',
+    tabs: [['chipthin', 'Narrow width of cut'], ['leadthin', 'Entering angle and round inserts']] },
+  holeforce: { title: 'Drill and tap forces', icon: 'drill', desc: 'Torque, thrust and power for drilling, and the torque a tap needs.',
+    tabs: [['drillforce', 'Drill thrust and torque'], ['taptorque', 'Tap torque']] },
   saws: { title: 'Bandsaw', icon: 'saw', desc: 'Cut time and the blade pitch for the section being cut.',
     tabs: [['bandsaw', 'Cut time'], ['sawtpi', 'Blade pitch']] },
 };
 
 const WORKSPACES = [
   { id: 'turning', name: 'Turning', icon: 'turning', blurb: 'Speeds, inserts, boring bars, tapers and cut times for lathe work.', sections: [
-    ['Speeds and feeds', ['rpm', 'feeds', 'mrr', 'toollife'], 'gauge'],
+    ['Speeds and feeds', ['advturn', 'rpm', 'feeds', 'mrr', 'kcforce', 'toollife'], 'gauge'],
     ['Tooling', ['inserts', 'boringbar', 'tnrc'], 'insert'],
     ['Operations', ['turntime', 'taper', 'surfacefin', 'knurl'], 'turning'],
     ['Programs', ['cycg71', 'cycgroove', 'cyctaper', 'threadprog'], 'code'],
-    ['Stock and workholding', ['bar', 'chuckforce', 'changegears'], 'material'],
+    ['Stock and workholding', ['bar', 'chuckforce', 'slender', 'changegears'], 'material'],
   ] },
   { id: 'milling', name: 'Milling', icon: 'milling', blurb: 'Speeds and feeds, engagement, deflection and chatter for mills.', sections: [
-    ['Speeds and feeds', ['rpm', 'feeds', 'mrr', 'cutopt', 'toollife'], 'gauge'],
-    ['Engagement', ['chipthin', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
+    ['Speeds and feeds', ['advmill', 'advplunge', 'rpm', 'feeds', 'mrr', 'kcforce', 'cutopt', 'toollife'], 'gauge'],
+    ['Engagement', ['chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
     ['Tool behaviour', ['deflection', 'runout', 'chatter'], 'wave'],
     ['Other milling', ['surfacefin', 'slitsaw', 'indexing'], 'saw'],
   ] },
   { id: 'holes', name: 'Holes and threads', icon: 'threads', blurb: 'Drilling, tapping, thread data for every standard, and thread programs.', sections: [
-    ['Drilling', ['drills', 'drilldepth', 'cycdrill', 'clearance'], 'drill'],
+    ['Drilling', ['advdrill', 'advream', 'advtap', 'drills', 'drilldepth', 'holeforce', 'cycdrill', 'clearance'], 'drill'],
     ['Tapping and thread data', ['threaddata', 'threadid', 'taplimits', 'wires', 'sti', 'coating', 'multistart'], 'tap'],
     ['Thread standards', ['pipethreads', 'whitworth', 'acme', 'trapezoidal', 'buttress', 'unseries', 'unm', 'unjunr'], 'thread'],
     ['Thread programs', ['threadprog'], 'code'],
@@ -87,9 +91,10 @@ const WORKSPACES = [
   ] },
   { id: 'program', name: 'Programming', icon: 'programming', blurb: 'G and M codes, macros, cycle generators, backplot and DXF.', sections: [
     ['Codes', ['gmcodes', 'macroref'], 'code'],
-    ['Cycle generators', ['cycdrill', 'threadprog', 'cyctaper', 'cycgroove', 'cycg71', 'cycbroach'], 'code'],
-    ['Simulate and draw', ['gsim', 'holepattern', 'dxfshapes'], 'play'],
+    ['Cycle generators', ['cycdrill', 'threadprog', 'cyctaper', 'cycgroove', 'cycg71', 'cycbroach', 'engrave'], 'code'],
+    ['Simulate and draw', ['gsim', 'sketch', 'holepattern', 'dxfshapes'], 'play'],
     ['Setup', ['setupsheet', 'tnrc', 'offsetadj'], 'sheet'],
+    ['Rotary axis', ['rotpoint', 'rotfeed'], 'angle'],
   ] },
   { id: 'reference', name: 'Reference', icon: 'reference', blurb: 'Materials, fasteners, machine elements, guides and shop helpers.', sections: [
     ['Materials', ['materials', 'hardness', 'heattreat', 'tempercolours', 'galvanic', 'plastics', 'metalid'], 'material'],
@@ -109,7 +114,7 @@ const SIMPLE_PAGES = ['calc', 'rpm', 'feeds', 'drills', 'threaddata', 'wires', '
 // Icon for a page when the section icon is not specific enough.
 const PAGE_ICON = {
   calc: 'calc', rpm: 'gauge', threaddata: 'thread', wires: 'thread', triangle: 'triangle', weight: 'material', hardness: 'bars',
-  sinebar: 'angle', machines: 'machine', toollib: 'toollib', gsim: 'play', chatter: 'wave', boringbar: 'beam', deflection: 'beam',
+  sinebar: 'angle', machines: 'machine', toollib: 'toollib', gsim: 'play', sketch: 'dxf', chatter: 'wave', boringbar: 'beam', deflection: 'beam',
   taper: 'angle', knurl: 'surface', formulas: 'book', gmcodes: 'code', materials: 'material', bolttorque: 'nut', oring: 'bearing',
   setupsheet: 'sheet', scales: 'caliper', gdtfcf: 'frame', gdtguide: 'book', capability: 'chart', ctrlchart: 'chart', sampling: 'chart',
   spline: 'gear', cycbroach: 'code', keys: 'fit', tempcomp: 'flame', heattreat: 'flame', tempercolours: 'flame', coolant: 'drop',

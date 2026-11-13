@@ -1,6 +1,6 @@
 //! G-code program generators for drilling, tapping, thread milling, lathe
-//! threading, tapers, grooving and cut-off, keyway broaching and G71/G70
-//! profile roughing. Every program comes from a per-control dialect table;
+//! threading, tapers, grooving and cut-off, keyway broaching, G71/G70
+//! profile roughing and text engraving. Every program comes from a per-control dialect table;
 //! a cycle is only generated for a control whose syntax was confirmed from
 //! the maker's public manual or two independent public sources (see
 //! docs/cycles.md). Output is deterministic and covered by golden tests.
@@ -45,13 +45,16 @@ pub mod cyc {
     pub const GROOVE: u32 = 6;
     pub const BROACH: u32 = 7;
     pub const G71: u32 = 8;
+    pub const ENGRAVE: u32 = 9;
+    /// Spindle and feed words on their own (no program around them).
+    pub const WORDS: u32 = 10;
 }
 
 /// Whether a control has a confirmed generator for a cycle. Generic
 /// (Fanuc-style, G-code system A on lathes) and Haas only; everything else
 /// is "not yet supported" until its syntax is confirmed and recorded.
 pub fn supported(ctrl: Ctrl, cycle: u32) -> bool {
-    matches!(ctrl, Ctrl::Generic | Ctrl::Haas) && (1..=8).contains(&cycle)
+    matches!(ctrl, Ctrl::Generic | Ctrl::Haas) && (1..=10).contains(&cycle)
 }
 
 // ---------------------------------------------------------------------------
@@ -66,6 +69,10 @@ pub struct Move { pub kind: u8, pub x: f64, pub y: f64, pub z: f64, pub cx: f64,
 #[derive(Clone, Debug, Default)]
 pub struct Program {
     pub text: String,
+    /// The cycle blocks on their own, for pasting into a program that already
+    /// has its tool change, offsets and spindle start: a short header saying
+    /// what must be true before them, then the same blocks as in `text`.
+    pub snippet: String,
     pub moves: Vec<Move>,
     /// Start point of the moves (x, y, z).
     pub start: [f64; 3],
@@ -110,11 +117,26 @@ pub fn fnum(v: f64, dp: usize) -> String {
 struct B {
     metric: bool, ctrl: Ctrl, lines: Vec<String>, moves: Vec<Move>, pos: [f64; 3], start: [f64; 3],
     warn: Vec<String>, max_rpm: f64, max_feed: f64,
+    /// The cycle blocks are lines b0..b1; `needs` is what must be true before them.
+    b0: usize, b1: usize, needs: Vec<String>,
 }
 
 impl B {
     fn new(metric: bool, ctrl: Ctrl, _lathe: bool, start: [f64; 3]) -> B {
-        B { metric, ctrl, lines: vec![], moves: vec![], pos: start, start, warn: vec![], max_rpm: 0.0, max_feed: 0.0 }
+        B { metric, ctrl, lines: vec![], moves: vec![], pos: start, start, warn: vec![], max_rpm: 0.0, max_feed: 0.0, b0: 0, b1: 0, needs: vec![] }
+    }
+    /// The cycle blocks start with the next line. `needs`: what the lines before them set up
+    /// (no brackets inside: each becomes a comment).
+    fn body(&mut self, needs: Vec<String>) { self.b0 = self.lines.len(); self.b1 = self.b0; self.needs = needs; }
+    /// The cycle blocks end with the last line written.
+    fn body_end(&mut self) { self.b1 = self.lines.len(); }
+    fn snippet(&self, what: &str) -> String {
+        if self.b1 <= self.b0 { return String::new(); }
+        let mut t = format!("(BENCHMATE SNIPPET - {} - {} - {})\n", what, self.ctrl.label(), if self.metric { "MM" } else { "INCH" });
+        for n in &self.needs { t += &format!("(BEFORE THESE BLOCKS: {})\n", n); }
+        t += "(CHECK EVERY LINE AGAINST YOUR CONTROL MANUAL)\n";
+        for l in &self.lines[self.b0..self.b1] { t += l; t.push('\n'); }
+        t
     }
     fn dp(&self) -> usize { if self.metric { 3 } else { 4 } }
     fn n(&self, v: f64) -> String { fnum(v, self.dp()) }
@@ -177,7 +199,8 @@ impl B {
     fn dwell(&mut self, s: f64) { let p = self.pos; self.mv(4, p[0], p[1], p[2], 0.0, 0.0, 0.0, s); }
     fn done(self, table: Vec<f64>) -> Program {
         let mut text = self.lines.join("\n"); text.push('\n');
-        Program { text, moves: self.moves, start: self.start, table, warnings: self.warn, max_rpm: self.max_rpm, max_feed: self.max_feed, error: None }
+        let snippet = self.snippet("CYCLE BLOCKS ONLY");
+        Program { text, snippet, moves: self.moves, start: self.start, table, warnings: self.warn, max_rpm: self.max_rpm, max_feed: self.max_feed, error: None }
     }
     fn units_line(&self) -> &'static str { if self.metric { "G21" } else { "G20" } }
 }
@@ -198,6 +221,10 @@ fn lathe_spindle_on(b: &mut B, sp: &Spindle, start_dia: f64) {
         b.l(format!("G97 S{} M03", sp.rpm.round() as i64));
         b.rpm(sp.rpm);
     }
+}
+/// What the spindle start of a lathe program set up, in words for a snippet header.
+fn spindle_need(sp: &Spindle) -> String {
+    if sp.css { format!("SPINDLE ON: G50 S{} THEN G96 S{} M03", sp.max_rpm.round() as i64, sp.v.round() as i64) } else { format!("SPINDLE ON: G97 S{} M03", sp.rpm.round() as i64) }
 }
 fn lathe_spindle_off(b: &mut B, sp: &Spindle, end_dia: f64) {
     if sp.css { b.l(format!("G97 S{}", sp.rpm_at(end_dia, b.metric).round() as i64)); }
@@ -287,6 +314,10 @@ pub fn gen_drill(j: &DrillJob) -> Program {
     if !generic_rigid { b.l(format!("S{} M03", j.rpm.round() as i64)); }
     b.rpm(j.rpm);
     b.l(format!("G43 H{} Z{}{}", j.tool, b.n(j.z_init), if j.coolant { " M08" } else { "" }));
+    let mut needs = vec!["G90 G17, WORK OFFSET AND TOOL LENGTH OFFSET ACTIVE".to_string()];
+    if !generic_rigid { needs.push(format!("SPINDLE ON: S{} M03", j.rpm.round() as i64)); }
+    needs.push(format!("TOOL AT Z{}, THE INITIAL LEVEL", b.n(j.z_init)));
+    b.body(needs);
     if generic_rigid { b.l(format!("M29 S{}", j.rpm.round() as i64)); }
     let ret = if j.ret_r { "G99" } else { "G98" };
     let mut words = format!("{} G{} X{} Y{} Z{} R{}", ret, j.cycle, b.n(x0), b.n(y0), b.n(j.z), b.n(j.r));
@@ -300,6 +331,7 @@ pub fn gen_drill(j: &DrillJob) -> Program {
     b.l(words);
     for (x, y) in j.holes.iter().skip(1) { b.l(format!("X{} Y{}", b.n(*x), b.n(*y))); }
     b.l("G80");
+    b.body_end();
     b.l(format!("G00 Z{}", b.n(j.z_init)));
     if j.coolant { b.l("M09"); }
     b.l("M05");
@@ -389,6 +421,10 @@ pub fn gen_thread_mill(j: &ThreadMillJob) -> Program {
     b.l(format!("G00 G{} X{} Y{}", j.wcs, b.n(j.cx), b.n(j.cy)));
     b.l(format!("S{} M03", j.rpm.round() as i64)); b.rpm(j.rpm);
     b.l(format!("G43 H{} Z{} M08", j.tool, b.n(j.z_clear)));
+    let mut needs = vec!["G90 G17, WORK OFFSET AND TOOL LENGTH OFFSET ACTIVE".to_string(), format!("SPINDLE ON: S{} M03", j.rpm.round() as i64)];
+    if j.comp { needs.push(format!("D{} HOLDS THE TOOL RADIUS {}", j.d_reg, b.n(rt))); }
+    needs.push(format!("TOOL AT Z{}", b.n(j.z_clear)));
+    b.body(needs);
     let comp_word = if j.climb { "G41" } else { "G42" };
     let mut table = vec![];
     let total = j.passes + j.spring;
@@ -445,6 +481,7 @@ pub fn gen_thread_mill(j: &ThreadMillJob) -> Program {
         b.l(format!("G00 Z{}", b.n(j.z_clear)));
         b.rapid_to(tex, tey, j.z_clear);
     }
+    b.body_end();
     b.l("M09"); b.l("M05"); b.l("G91 G28 Z0."); b.l("G90");
     b.footer();
     if !j.internal { b.warn.push("External: the approach and exit points are outside the thread diameter; check they clear clamps and shoulders.".into()); }
@@ -506,6 +543,7 @@ pub fn gen_lathe_thread(j: &LatheThreadJob) -> Program {
     b.l(format!("T{:02}{:02}", j.tool, j.tool));
     b.l(format!("G97 S{} M03", j.rpm.round() as i64)); b.rpm(j.rpm);
     b.l(format!("G00 X{} Z{} M08", b.xd(r_start), b.n(j.z_start)));
+    b.body(vec![format!("SPINDLE ON AT CONSTANT RPM: G97 S{} M03", j.rpm.round() as i64), format!("TOOL AT THE START POINT X{} Z{}", b.xd(r_start), b.n(j.z_start))]);
     let feed_min = j.lead * j.rpm;
     let len = j.z_start - j.z_end;
     let t_pass = len / feed_min * 60.0;
@@ -551,6 +589,7 @@ pub fn gen_lathe_thread(j: &LatheThreadJob) -> Program {
         }
         if j.infeed_angle > 0.0 && j.depth * tan > j.z_start - j.z_end { b.warn.push("Flank infeed shift is longer than the thread: check the start Z.".into()); }
     }
+    b.body_end();
     b.l(format!("G00 X{} Z{}", b.xd(r_start), b.n(j.z_start)));
     b.l("M09"); b.l("M05");
     b.footer();
@@ -608,6 +647,7 @@ pub fn gen_taper(j: &TaperJob) -> Program {
     b.l(format!("T{:02}{:02}", j.tool, j.tool));
     lathe_spindle_on(&mut b, &j.sp, j.back_dia);
     b.l(format!("G00 X{} Z{} M08", b.xd(rb + s * j.clear), b.n(zc)));
+    b.body(vec![spindle_need(&j.sp), "FEED PER REVOLUTION ACTIVE, G99".to_string(), format!("TOOL AT X{} Z{}", b.xd(rb + s * j.clear), b.n(zc))]);
     let target = rf + s * a; // last roughing level at the front
     let mut levels = vec![];
     let mut k = 1;
@@ -649,6 +689,7 @@ pub fn gen_taper(j: &TaperJob) -> Program {
     b.lfeed_to(rb + s * j.clear, zf - l, j.f_finish, &j.sp);
     b.l(format!("G00 Z{}", b.n(zc)));
     b.rapid_to(rb + s * j.clear, 0.0, zc);
+    b.body_end();
     b.l("M09");
     lathe_spindle_off(&mut b, &j.sp, j.back_dia + 2.0 * s * j.clear);
     b.l("M05");
@@ -694,6 +735,7 @@ pub fn gen_groove(j: &GrooveJob) -> Program {
     b.l(format!("T{:02}{:02}", j.tool, j.tool));
     lathe_spindle_on(&mut b, &j.sp, j.stock_dia);
     b.l(format!("G00 X{} Z{} M08", b.xd(rcl), b.n(zs[0])));
+    b.body(vec![spindle_need(&j.sp), "FEED PER REVOLUTION ACTIVE, G99".to_string(), format!("TOOL AT X{} Z{}", b.xd(rcl), b.n(zs[0]))]);
     let mut first = true;
     for z in zs.iter() {
         if !first { b.l(format!("G00 Z{}", b.n(*z))); }
@@ -723,6 +765,7 @@ pub fn gen_groove(j: &GrooveJob) -> Program {
         b.l(format!("G00 X{}", b.xd(rcl)));
         b.rapid_to(rcl, 0.0, *z);
     }
+    b.body_end();
     b.l("M09");
     lathe_spindle_off(&mut b, &j.sp, j.stock_dia);
     b.l("M05");
@@ -779,6 +822,11 @@ pub fn gen_broach(j: &BroachJob) -> Program {
         b.l(format!("G00 G{} X{} Y{}", j.wcs, b.n(j.cx), b.n(j.cy)));
         b.l(format!("G43 H{} Z{} M08", j.tool, b.n(j.z_start)));
     }
+    b.body(if j.lathe {
+        vec!["SPINDLE STOPPED, ORIENTED AND LOCKED".to_string(), "FEED PER MINUTE ACTIVE, G98".to_string(), format!("TOOL AT X{} Z{}", b.xd(rb - j.lift), b.n(j.z_start))]
+    } else {
+        vec!["SPINDLE STOPPED, ORIENTED AND LOCKED".to_string(), "G90 G17 G94, WORK OFFSET AND TOOL LENGTH OFFSET ACTIVE".to_string(), format!("TOOL AT X{} Y{} Z{}", b.n(j.cx), b.n(j.cy), b.n(j.z_start))]
+    });
     let mut table = vec![];
     for (i, d) in ds.iter().enumerate() {
         let r = rb + d;
@@ -805,6 +853,7 @@ pub fn gen_broach(j: &BroachJob) -> Program {
             b.rapid_to(lx, ly, j.z_start);
         }
     }
+    b.body_end();
     if j.lathe { b.l(format!("G00 X{}", b.xd(rb - j.lift))); } else { b.l(format!("G00 X{} Y{}", b.n(j.cx), b.n(j.cy))); b.l("G91 G28 Z0."); b.l("G90"); }
     b.l("M09");
     b.footer();
@@ -874,6 +923,7 @@ pub fn gen_g71(j: &G71Job) -> Program {
     b.l(format!("T{:02}{:02}", j.tool, j.tool));
     lathe_spindle_on(&mut b, &j.sp, j.stock_dia);
     b.l(format!("G00 X{} Z{} M08", b.xd(rcl), b.n(zc)));
+    b.body(vec![spindle_need(&j.sp), "FEED PER REVOLUTION ACTIVE, G99".to_string(), format!("TOOL AT THE START POINT X{} Z{}", b.xd(rcl), b.n(zc))]);
     let ns = j.n_start;
     // Profile blocks: N ns G00 X first; G01 Z first; then each point; then out to the stock.
     let mut blocks = vec![format!("G00 X{}", b.xd(first.0 / 2.0)), format!("G01 Z{} F{}", b.n(first.1), b.feed(j.f_finish))];
@@ -889,6 +939,7 @@ pub fn gen_g71(j: &G71Job) -> Program {
     }
     for (i, t) in blocks.iter().enumerate() { b.l(format!("N{} {}", ns + i as u32, t)); }
     b.l(format!("G70 P{} Q{}", ns, nf));
+    b.body_end();
     b.l(format!("G00 X{} Z{}", b.xd(rcl), b.n(zc)));
     b.l("M09");
     lathe_spindle_off(&mut b, &j.sp, j.stock_dia);
@@ -932,6 +983,142 @@ pub fn gen_g71(j: &G71Job) -> Program {
 }
 
 // ---------------------------------------------------------------------------
+// Mill: engraving along strokes (text from core/src/engrave.rs, or any open lines)
+
+#[derive(Clone, Debug)]
+pub struct EngraveJob {
+    pub metric: bool, pub ctrl: Ctrl, pub prog: u32, pub tool: u32, pub wcs: u32,
+    pub rpm: f64, pub feed: f64, pub plunge: f64,
+    /// Height above the surface for moves between strokes (Z0 is the surface).
+    pub z_safe: f64,
+    /// Depth of the engraving below the surface (a positive number).
+    pub depth: f64,
+    pub coolant: bool,
+    /// What is engraved, for the program header.
+    pub text: String,
+    /// Strokes in the XY plane; a stroke with one point is a dot.
+    pub strokes: Vec<Vec<(f64, f64)>>,
+}
+
+/// Points an engraving program may hold (keeps the text a size a control can load).
+pub const ENGRAVE_MAX_POINTS: usize = 50_000;
+
+/// Text that is safe inside a G-code comment: capitals, digits, space and a
+/// few signs; anything else (brackets above all) becomes a full stop.
+pub fn comment_text(s: &str, max: usize) -> String {
+    let t: String = s.chars().map(|c| if c == '\n' || c == '\r' || c == '\t' { ' ' } else { c })
+        .map(|c| c.to_ascii_uppercase())
+        .map(|c| if c.is_ascii_uppercase() || c.is_ascii_digit() || " .,-+/:=#*".contains(c) { c } else { '.' }).collect();
+    let t = t.split_whitespace().collect::<Vec<_>>().join(" ");
+    if t.chars().count() > max { let mut u: String = t.chars().take(max.saturating_sub(3)).collect(); u.push_str("..."); u } else { t }
+}
+
+/// Engraving program: for each stroke a rapid above its start, a plunge at
+/// the plunge feed, the stroke at the cutting feed and a rapid lift. Plain
+/// G00 and G01 moves only, so it reads the same on every control listed as
+/// supported. Z0 is the surface being engraved.
+pub fn gen_engrave(j: &EngraveJob) -> Program {
+    if !supported(j.ctrl, cyc::ENGRAVE) { return Program::err("This control is not yet supported for this program."); }
+    if j.strokes.is_empty() { return Program::err("Nothing to engrave."); }
+    let points: usize = j.strokes.iter().map(|s| s.len()).sum();
+    if points > ENGRAVE_MAX_POINTS { return Program::err("Too much to engrave in one program: shorten the text or split it."); }
+    if j.strokes.iter().flatten().any(|p| !p.0.is_finite() || !p.1.is_finite()) { return Program::err("The text position is not a number."); }
+    if !(j.rpm > 0.0) { return Program::err("Enter the spindle speed."); }
+    if !(j.feed > 0.0) { return Program::err("Enter the cutting feed."); }
+    if !(j.plunge > 0.0) { return Program::err("Enter the plunge feed."); }
+    if !(j.depth > 0.0) { return Program::err("Enter the depth of the engraving (a positive number)."); }
+    if !(j.z_safe > 0.0) { return Program::err("Enter the safe height above the surface for moves between letters."); }
+    let dp = if j.metric { 3 } else { 4 };
+    let k = 10f64.powi(dp);
+    // The program holds rounded numbers; the moves use the same ones.
+    let q = |v: f64| (v * k).round() / k;
+    let strokes: Vec<Vec<(f64, f64)>> = j.strokes.iter().map(|s| {
+        let mut out: Vec<(f64, f64)> = Vec::with_capacity(s.len());
+        for p in s { let r = (q(p.0), q(p.1)); if out.last() != Some(&r) { out.push(r); } }
+        out
+    }).filter(|s| !s.is_empty()).collect();
+    let (zs, zd) = (q(j.z_safe), -q(j.depth));
+    if zd == 0.0 { return Program::err("The depth is too small to show in the program."); }
+    let (x0, y0) = strokes[0][0];
+    let mut b = B::new(j.metric, j.ctrl, false, [x0, y0, zs]);
+    let mut notes = vec![format!("T{} - {} STROKES - DEPTH {} - SAFE Z{}", j.tool, strokes.len(), b.n(-zd), b.n(zs))];
+    let t = comment_text(&j.text, 48);
+    if !t.is_empty() { notes.push(format!("TEXT: {}", t)); }
+    notes.push("Z0 = THE SURFACE BEING ENGRAVED".into());
+    b.header(j.prog, "ENGRAVE", &notes);
+    b.l(format!("{} G17 G40 G49 G80 G90", b.units_line()));
+    b.l(format!("T{} M06", j.tool));
+    b.l(format!("G00 G{} X{} Y{}", j.wcs, b.n(x0), b.n(y0)));
+    b.l(format!("S{} M03", j.rpm.round() as i64));
+    b.rpm(j.rpm);
+    b.l(format!("G43 H{} Z{}{}", j.tool, b.n(zs), if j.coolant { " M08" } else { "" }));
+    b.body(vec!["G90 G17, WORK OFFSET AND TOOL LENGTH OFFSET ACTIVE".to_string(), format!("SPINDLE ON: S{} M03", j.rpm.round() as i64), format!("TOOL AT X{} Y{} Z{}", b.n(x0), b.n(y0), b.n(zs)), "Z0 SET ON THE SURFACE BEING ENGRAVED".to_string()]);
+    for (i, s) in strokes.iter().enumerate() {
+        let (x, y) = s[0];
+        if i > 0 { b.l(format!("G00 X{} Y{}", b.n(x), b.n(y))); b.rapid_to(x, y, zs); }
+        b.l(format!("G01 Z{} F{}", b.n(zd), b.feed(j.plunge)));
+        b.feed_to(x, y, zd, j.plunge);
+        for (n, p) in s.iter().enumerate().skip(1) {
+            b.l(if n == 1 { format!("X{} Y{} F{}", b.n(p.0), b.n(p.1), b.feed(j.feed)) } else { format!("X{} Y{}", b.n(p.0), b.n(p.1)) });
+            b.feed_to(p.0, p.1, zd, j.feed);
+        }
+        b.l(format!("G00 Z{}", b.n(zs)));
+        let pos = b.pos; b.rapid_to(pos[0], pos[1], zs);
+    }
+    b.body_end();
+    if j.coolant { b.l("M09"); }
+    b.l("M05");
+    b.l("G91 G28 Z0.");
+    b.l("G90");
+    b.footer();
+    b.warn.push("Z0 must be set on the surface being engraved. The depth is small, so an uneven or tilted surface shows: skim it, or use a spring-loaded engraving holder.".into());
+    b.done(vec![])
+}
+
+// ---------------------------------------------------------------------------
+// Spindle and feed words on their own
+
+/// Spindle start and feed word for pasting into a program: no tool change,
+/// no moves. Mill: `S.. M03` and an F word in feed per minute (G94). Lathe:
+/// `G97 S.. M03`, or `G50 S..` and `G96 S.. M03`, and an F word per
+/// revolution (G99) or per minute (G98), G-code system A.
+#[derive(Clone, Copy, Debug)]
+pub struct WordsJob {
+    pub metric: bool, pub ctrl: Ctrl, pub lathe: bool,
+    /// Lathe spindle (mill: `rpm` only).
+    pub sp: Spindle,
+    /// Lathe: feed per revolution (true) or per minute.
+    pub per_rev: bool,
+    /// Feed, 0 or less = no feed word.
+    pub feed: f64,
+}
+
+pub fn gen_words(j: &WordsJob) -> Program {
+    if !supported(j.ctrl, cyc::WORDS) { return Program::err("This control is not yet supported."); }
+    let spin = if j.lathe && j.sp.css { j.sp.v > 0.0 } else { j.sp.rpm > 0.0 };
+    if !spin && !(j.feed > 0.0) { return Program::err("Enter a spindle speed or a feed."); }
+    let mut b = B::new(j.metric, j.ctrl, j.lathe, [0.0; 3]);
+    b.body(vec![]);
+    if spin {
+        if j.lathe {
+            if let Some(e) = check_lathe_spindle(&j.sp) { return Program::err(e); }
+            if j.sp.css { b.l(format!("G50 S{}", j.sp.max_rpm.round() as i64)); b.l(format!("G96 S{} M03", j.sp.v.round() as i64)); b.rpm(j.sp.max_rpm); }
+            else { b.l(format!("G97 S{} M03", j.sp.rpm.round() as i64)); b.rpm(j.sp.rpm); }
+        } else { b.l(format!("S{} M03", j.sp.rpm.round() as i64)); b.rpm(j.sp.rpm); }
+    }
+    if j.feed > 0.0 {
+        let mode = if !j.lathe { "FEED PER MINUTE, G94" } else if j.per_rev { "FEED PER REVOLUTION, G99" } else { "FEED PER MINUTE, G98" };
+        b.l(format!("({}: PUT THIS WORD ON THE FIRST CUTTING BLOCK)", mode));
+        b.l(format!("F{}", b.feed(j.feed)));
+    }
+    b.body_end();
+    let snippet = b.snippet("SPINDLE AND FEED WORDS");
+    let mut p = b.done(vec![]);
+    p.text = snippet.clone(); p.snippet = snippet;
+    p
+}
+
+// ---------------------------------------------------------------------------
 // Flat parameter parsing for the WebAssembly wrapper (see wasm/src/lib.rs).
 
 fn g(v: &[f64], i: usize) -> f64 { v.get(i).copied().unwrap_or(f64::NAN) }
@@ -965,6 +1152,8 @@ fn spindle(v: &[f64], i: usize) -> Spindle { Spindle { css: gb(v, i), v: g(v, i 
 /// - G71: 4 internal, 5 stock dia, 6 doc, 7 retract, 8 u, 9 w, 10 f rough,
 ///   11 f finish, 12 clear, 13 n start, 14 css, 15 v, 16 max rpm, 17 rpm,
 ///   18 point count n, 19.. diameter, z.
+/// - WORDS: 4 lathe, 5 css, 6 v, 7 max rpm, 8 rpm, 9 feed per revolution
+///   (lathe), 10 feed. Program number and tool are not used.
 pub fn run_flat(cycle: u32, v: &[f64]) -> Program {
     let (metric, ctrl, prog, tool) = (gb(v, 0), Ctrl::from_f(g(v, 1)), gu(v, 2), gu(v, 3).max(1));
     match cycle {
@@ -996,6 +1185,7 @@ pub fn run_flat(cycle: u32, v: &[f64]) -> Program {
             gen_g71(&G71Job { metric, ctrl, prog, tool, internal: gb(v, 4), stock_dia: g(v, 5), doc: g(v, 6), retract: g(v, 7), u: g(v, 8), w: g(v, 9),
                 f_rough: g(v, 10), f_finish: g(v, 11), clear: g(v, 12), n_start: gu(v, 13).max(1), sp: spindle(v, 14), profile: pairs(v, 19, n) })
         }
+        cyc::WORDS => gen_words(&WordsJob { metric, ctrl, lathe: gb(v, 4), sp: spindle(v, 5), per_rev: gb(v, 9), feed: g(v, 10) }),
         _ => Program::err("Unknown cycle."),
     }
 }

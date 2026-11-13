@@ -114,6 +114,14 @@ pub fn ball_eff_dia(d: f64, ap: f64, tilt_deg: f64) -> f64 {
     d * a.sin()
 }
 
+/// Cutting speed to ask for at the nominal diameter `d` so that the speed at a smaller
+/// effective diameter `de` comes out at `vc`: the spindle speed is the same for both, and
+/// the cutting speed goes with the diameter, so it is `vc d / de`.
+pub fn speed_at_nominal_dia(vc: f64, d: f64, de: f64) -> f64 {
+    if !(vc > 0.0 && d > 0.0 && de > 0.0) { return f64::NAN; }
+    vc * d / de
+}
+
 /// Smallest effective diameter in cut (0 when the tool centre is in the cut, i.e. tilt <= theta0).
 pub fn ball_min_dia(d: f64, ap: f64, tilt_deg: f64) -> f64 {
     if !(d > 0.0 && ap > 0.0) || !(0.0..90.0).contains(&tilt_deg) { return f64::NAN; }
@@ -385,6 +393,10 @@ mod tests {
         // ISCAR form, no tilt: D 10, ap 1 -> 2 sqrt(10 - 1) = 6.0
         assert!(close(ball_eff_dia(10.0, 1.0, 0.0), 6.0, 1e-12));
         assert_eq!(ball_min_dia(10.0, 1.0, 0.0), 0.0);
+        // the same spindle speed gives 60 m/min at the 6 mm diameter in the cut and 100 m/min at the full 10 mm
+        assert!(close(speed_at_nominal_dia(60.0, 10.0, 6.0), 100.0, 1e-12) && speed_at_nominal_dia(60.0, 10.0, 0.0).is_nan());
+        // at half the diameter or deeper the whole diameter is in the cut
+        assert!(close(ball_eff_dia(10.0, 5.0, 0.0), 10.0, 1e-12) && close(ball_eff_dia(10.0, 8.0, 0.0), 10.0, 1e-12));
         // Tilt 15 deg: theta0 = acos(0.8) = 36.87 deg, De = 10 sin(51.87) = 7.8673
         assert!(close(ball_eff_dia(10.0, 1.0, 15.0), 10.0 * (0.8f64.acos() + 15f64.to_radians()).sin(), 1e-12));
         // Tilt 45 deg: band 8.13..81.87 deg, min De = 10 sin(8.13 deg) = 1.4142

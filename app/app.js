@@ -396,6 +396,20 @@ function proofPanel(t) {
 
 // ---- The standard calculator view: inputs, results, drawing ----
 // opts.mini: the small version used by Home widgets (main inputs, main results).
+// The word shown beside a slider: its labels spread evenly from one end to the other.
+function sliderWord(sl, val) {
+  const L = sl.labels || []; if (!L.length) return String(val) + (sl.suffix || '');
+  const t = (Number(val) - sl.min) / ((sl.max - sl.min) || 1);
+  return L[Math.max(0, Math.min(L.length - 1, Math.round(t * (L.length - 1))))];
+}
+// Open another calculator with some of its boxes filled from this one (same units).
+function sendTo(id, vals) {
+  const t = TOOLS.find(x => x.id === id);
+  if (t && t.render) { handoff(id, vals); return; }
+  const k = id + ':' + state.sys, sv = state.vals[k] || (state.vals[k] = {});
+  Object.entries(vals).forEach(([f, x]) => { if (x !== undefined && x !== null && (typeof x !== 'number' || isFinite(x))) sv[f] = String(typeof x === 'number' ? +x.toPrecision(6) : x); });
+  saveVals(); openTool(id);
+}
 function mountTool(host, t, opts) {
   const mini = !!opts.mini, sys = state.sys;
   const fields = t.fields(sys);
@@ -416,18 +430,29 @@ function mountTool(host, t, opts) {
     let inp;
     // A field with `options: [[value, label], ...]` renders as a drop-down; the value is still a number.
     if (f.options) { inp = document.createElement('select'); f.options.forEach(([val, txt]) => { const o = document.createElement('option'); o.value = val; o.textContent = txt; inp.appendChild(o); }); }
+    // A field with `slider: { min, max, step, labels }` renders as a slider; the words under it come from `labels`.
+    else if (f.slider) { inp = document.createElement('input'); inp.type = 'range'; inp.min = f.slider.min; inp.max = f.slider.max; inp.step = f.slider.step || 1; lab.classList.add('sl'); }
     else { inp = document.createElement('input'); inp.type = 'number'; inp.step = 'any'; inp.inputMode = 'decimal'; }
     inp.value = saved[f.id] !== undefined ? saved[f.id] : f.def; inp.dataset.id = f.id;
     inp.oninput = inp.onchange = () => { saved[f.id] = inp.value; const p = pairOf(f.id); if (p) { src[p.a + p.b] = f.id; saved['_src_' + p.a] = f.id; } saveVals(); update(); };
     const u = document.createElement('span'); u.className = 'u'; u.textContent = f.unit;
     row.append(inp, u);
-    if (!f.options && !mini && window.BenchCalc) { const cb = document.createElement('button'); cb.type = 'button'; cb.className = 'fx'; cb.innerHTML = icon('calc'); cb.title = 'Work this value out in the calculator'; cb.setAttribute('aria-label', cb.title); cb.tabIndex = -1; cb.onclick = e => { e.preventDefault(); BenchCalc.open(inp); }; row.appendChild(cb); }
+    if (f.slider) { const say = () => { u.textContent = sliderWord(f.slider, inp.value); }; inp.addEventListener('input', say); say(); }
+    // A field with `lock: true` is one the tool can suggest (t.suggest): blank shows the suggestion, a typed value is locked.
+    let lock = null;
+    if (f.lock) {
+      lock = document.createElement('button'); lock.type = 'button'; lock.className = 'flock'; lab.classList.add('lk');
+      lock.onclick = e => { e.preventDefault(); inp.value = inp.value !== '' ? '' : (inp.placeholder || ''); saved[f.id] = inp.value; saveVals(); update(); };
+      row.appendChild(lock);
+    }
+    if (!f.options && !f.slider && !mini && window.BenchCalc) { const cb = document.createElement('button'); cb.type = 'button'; cb.className = 'fx'; cb.innerHTML = icon('calc'); cb.title = 'Work this value out in the calculator'; cb.setAttribute('aria-label', cb.title); cb.tabIndex = -1; cb.onclick = e => { e.preventDefault(); BenchCalc.open(inp); }; row.appendChild(cb); }
     lab.append(span, row);
     // `when(v)`: show the field only when it applies (e.g. to the chosen shape).
     if (f.when) lab.dataset.when = f.id;
+    if (f.wide && !mini) lab.style.gridColumn = '1 / -1';
     const hide = !fieldShown(f) || (mini && shownCount >= 4 && !pairOf(f.id));
     if (hide) { lab.classList.add('lvhide'); if (saved[f.id] === undefined) inp.dataset.def = f.def; } else shownCount++;
-    els[f.id] = { lab, inp, f }; return lab;
+    els[f.id] = { lab, inp, f, lock, u }; return lab;
   };
   fields.forEach(f => {
     const p = pairOf(f.id);
@@ -450,6 +475,8 @@ function mountTool(host, t, opts) {
       let out = NaN; try { out = fn(v, state.W, sys); } catch (e) {}
       const e = els[to].inp; e.value = isFinite(out) ? String(+out.toPrecision(7)) : ''; saved[to] = e.value; v[to] = isFinite(out) ? out : NaN;
       els[to].lab.classList.add('calcd'); els[from].lab.classList.remove('calcd'); vc[to] = p.both ? v[to] : NaN;
+      // A slider that is the worked-out half of a pair shows the true figure beside it (the handle stops at the ends of its track).
+      if (els[to].f.slider) els[to].u.textContent = isFinite(out) ? sliderWord(els[to].f.slider, +out.toPrecision(3)) : '';
     });
     fields.forEach(f => { if (f.when) { let on = true; try { on = !!f.when(v); } catch (e) {} els[f.id].lab.hidden = !on; } });
     // Required boxes: a box with a starting value must hold a number.
@@ -467,11 +494,47 @@ function mountTool(host, t, opts) {
       res.innerHTML = '<div class="hero rrow' + (w0 ? ' over' : '') + (longTxt ? ' txt' : '') + '"><div class="hl">' + hero.label + '</div><div class="hv"><b>' + fmt(hero.value, dp(hero)) + '</b><span>' + hero.unit + '</span></div>' + (w0 ? '<div class="wmsg">' + icon('info') + w0 + '</div>' : '') + '</div>' +
         (rest.length ? '<table>' + rest.map(r => { const w = warn(r); return '<tr class="rrow' + (w ? ' over' : '') + '"><td>' + r.label + (w ? '<div class="wmsg">' + w + '</div>' : '') + '</td><td class="v' + (typeof r.value === 'string' && r.value.length > 24 ? ' txt' : '') + (r.value === 'PASS' || r.value === 'OK' ? ' good' : r.value === 'FAIL' ? ' fail' : '') + '">' + fmt(r.value, dp(r)) + '</td><td class="u">' + r.unit + '</td></tr>'; }).join('') + '</table>' : '');
     }
+    // Suggested values for the lock fields: shown in the empty box; a typed value is the user's and is kept.
+    if (t.suggest) {
+      let sg = {}; try { sg = t.suggest(vc, state.W, sys) || {}; } catch (e) { sg = {}; }
+      fields.forEach(f => { if (!f.lock) return; const e = els[f.id], x = sg[f.id], locked = e.inp.value !== '';
+        e.inp.placeholder = isFinite(x) ? String(+Number(x).toPrecision(4)) : '';
+        e.lab.classList.toggle('locked', locked);
+        // Redraw the icon only when the state changes: replacing it during a press (the box's change event fires first) would swallow the click.
+        if (e.lock.dataset.on !== String(locked)) { e.lock.dataset.on = String(locked); e.lock.innerHTML = icon(locked ? 'lock' : 'unlock'); }
+        e.lock.title = locked ? 'Locked: your value is kept and the advice works around it. Click to unlock.' : 'Suggested value. Type your own to lock it, or click to lock this one.';
+        e.lock.setAttribute('aria-label', e.lock.title); e.lock.setAttribute('aria-pressed', locked ? 'true' : 'false'); });
+    }
+    // A tool may put a panel under its headline result (t.panel -> HTML): status tiles, what limits the cut.
+    if (!mini && t.panel && rows.length) {
+      let ph = ''; try { ph = t.panel(v, state.W, sys, rows) || ''; } catch (e) { ph = ''; }
+      const hero = $('.hero', res);
+      if (ph && hero) { const box = document.createElement('div'); box.className = 'rpanel'; box.innerHTML = ph; hero.after(box); }
+    }
+    // A tool may offer to pass its results on (t.sends -> [[label, tool id, values]]).
+    if (!mini && t.sends && rows.length) {
+      let list = []; try { list = t.sends(v, state.W, sys, rows) || []; } catch (e) { list = []; }
+      if (list.length) {
+        const bar = document.createElement('div'); bar.className = 'rsend';
+        list.forEach(([label, id, vals]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn sm'; b.innerHTML = icon('arrow') + '<span>' + hesc(label) + '</span>'; b.onclick = () => sendTo(id, vals); bar.appendChild(b); });
+        res.appendChild(bar);
+      }
+    }
+    // A tool may offer the G-code its result turns into (t.snip -> what snipBox in snippets.js draws).
+    if (!mini && t.snip && rows.length && typeof snipBox === 'function') {
+      let sp = null; try { sp = t.snip(v, state.W, sys, rows); } catch (e) { sp = null; }
+      if (sp) { const box = document.createElement('div'); box.className = 'rsnipbox'; res.appendChild(box); snipBox(box, Object.assign({ id: t.id }, sp)); }
+    }
+    // A tool may add a live widget under its results (t.widget -> a function that fills the box it is given), for example a chart with a marker to drag.
+    if (!mini && t.widget && rows.length) {
+      let fill = null; try { fill = t.widget(v, state.W, sys, rows); } catch (e) { fill = null; }
+      if (fill) { const box = document.createElement('div'); box.className = 'rwidget'; res.appendChild(box); try { fill(box); } catch (e) { box.remove(); } }
+    }
     // A tool may add a table under its results (t.table): { head, rows, dp, copies: [[label, text]] }.
     if (!mini && t.table) {
       let tb = null; try { tb = rows.length ? t.table(v, state.W, sys, dpAdj) : null; } catch (e) { tb = null; }
       if (tb && tb.rows.length) {
-        const box = document.createElement('div'); box.className = 'rtab';
+        const box = document.createElement('div'); box.className = 'rtab' + (tb.text ? ' text' : '');
         box.innerHTML = '<div class="rtabh"><span>' + hesc(tb.title || '') + '</span></div><div class="rtabs"><table><thead><tr>' + tb.head.map(h => '<th>' + hesc(h) + '</th>').join('') + '</tr></thead><tbody>' +
           tb.rows.map(r => '<tr>' + r.map((c, i) => '<td' + (i ? ' class="v"' : '') + '>' + hesc(c) + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
         (tb.copies || []).forEach(([label, text]) => { const b = document.createElement('button'); b.className = 'btn sm'; b.type = 'button'; b.innerHTML = icon('copy') + '<span>' + hesc(label) + '</span>'; b.onclick = () => copyText(text); $('.rtabh', box).appendChild(b); });
@@ -601,7 +664,7 @@ async function boot() {
   const resp = await fetch('benchmate.wasm');
   const { instance } = await WebAssembly.instantiate(await resp.arrayBuffer(), {});
   state.W = instance.exports;
-  $('#ver').textContent = 'v0.2.0';
+  $('#ver').textContent = 'v0.4.0';
   refreshMachineSelect();
   $('#machine').onchange = e => { Profiles.setActive(e.target.value); renderMain(); };
   $$('#mode button').forEach(b => b.onclick = () => setMode(b.dataset.m));

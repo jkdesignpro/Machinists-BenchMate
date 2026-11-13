@@ -586,6 +586,8 @@ mod tests {
             ("ring", shape::RING, &[50.0, 30.0]), ("keyhole", shape::KEYHOLE, &[20.0, 8.0, 25.0, 0.0]),
             ("dflat", shape::D_FLAT, &[20.0, 17.0, 0.0]), ("doubled", shape::DOUBLE_D, &[20.0, 16.0, 90.0]),
         ];
+        // file, width and height of everything, width and height of the part, has polyline arcs, has old-style polylines
+        let mut expected = String::new();
         for (name, k, p) in cases {
             let d = build(k, p, true).unwrap();
             for (vn, ver) in [("r2000", Version::R2000), ("r12", Version::R12)] {
@@ -595,6 +597,21 @@ mod tests {
             }
             let mut ll = d.clone(); ll.origin_lower_left();
             std::fs::write(format!("{dir}/{name}-r2000-mm-ll.dxf"), write_dxf(&ll, Units::Mm, Version::R2000)).unwrap();
+            // Outlines taken apart into lines and arcs, for programs that do not read polyline arcs.
+            let x = crate::dxf::Doc::from_drawing(&d).exploded();
+            std::fs::write(format!("{dir}/{name}-r2000-mm-la.dxf"), crate::dxf::write_doc(&x, Units::Mm, Version::R2000)).unwrap();
+            std::fs::write(format!("{dir}/{name}-r12-mm-la.dxf"), crate::dxf::write_doc(&x, Units::Mm, Version::R12)).unwrap();
+            // What another program should measure: the size of everything, and of the part alone
+            // (outline and holes, without the centre marks). For scripts/check_dxf_cad.py.
+            let (a, b) = (d.extents().unwrap(), d.part_extents().unwrap());
+            let bulges = d.entities.iter().any(|e| matches!(e, Entity::Poly { v, .. } if v.iter().any(|p| p.2 != 0.0)));
+            let polys = d.entities.iter().any(|e| matches!(e, Entity::Poly { .. }));
+            for f in ["r2000-mm", "r12-mm", "r2000-mm-la", "r12-mm-la"] {
+                let la = f.ends_with("-la");
+                expected.push_str(&format!("{name}-{f}.dxf\t{}\t{}\t{}\t{}\t{}\t{}\n", a.2 - a.0, a.3 - a.1, b.2 - b.0, b.3 - b.1,
+                    if !la && bulges { 1 } else { 0 }, if !la && polys && f.starts_with("r12") { 1 } else { 0 }));
+            }
         }
+        std::fs::write(format!("{dir}/expected-shapes.tsv"), expected).unwrap();
     }
 }

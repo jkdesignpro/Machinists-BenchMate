@@ -89,51 +89,145 @@ function parseInsert(code) {
   return { shape: m[1], clear: m[2], tol: m[3], type: m[4], size: m[5], thick: m[6], corner: m[7] || '', edge, hand, cb: rest.join('-') };
 }
 
+// Outline of an insert from the Rust core: vertices [x, y, bulge, arc radius] in mm,
+// centre of the inscribed circle at 0,0, counter-clockwise; null when the core refuses.
+function insOutline(W, letter, d, r) {
+  const n = W.insert_outline(letter.charCodeAt(0), d, r);
+  if (!(n > 0)) return null;
+  const v = [];
+  for (let i = 0; i < n; i++) v.push([W.list_out(4 * i), W.list_out(4 * i + 1), W.list_out(4 * i + 2), W.list_out(4 * i + 3)]);
+  return v;
+}
+// SVG path of an outline; px(x, y) places a point of the drawing on the picture, k is its scale.
+function insPath(v, px, k) {
+  const f = q => q[0].toFixed(2) + ' ' + q[1].toFixed(2);
+  let s = 'M' + f(px(v[0][0], v[0][1]));
+  v.forEach((p, i) => {
+    const q = v[(i + 1) % v.length], rr = (p[3] * k).toFixed(2);
+    s += (p[2] ? 'A' + rr + ' ' + rr + ' 0 0 0 ' : 'L') + f(px(q[0], q[1]));
+  });
+  return s + 'Z';
+}
+// Small picture of a shape for its key.
+function insIcon(W, letter) {
+  const S = 26, v = insOutline(W, letter, 1, 0);
+  if (!v) return insertSvg(letter, W).replace(/width="150" height="150"/, 'width="' + S + '" height="' + S + '"').replace(/<text[^>]*>schematic<\/text>/, '').replace(/stroke-width="2"/g, 'stroke-width="9"');
+  const c = letter.charCodeAt(0), w = W.insert_dim(c, 1, 0, 6), h = W.insert_dim(c, 1, 0, 7), x0 = W.insert_dim(c, 1, 0, 11), y0 = W.insert_dim(c, 1, 0, 12);
+  const k = (S - 4) / Math.max(w, h), px = (x, y) => [(S - w * k) / 2 + (x - x0) * k, (S + h * k) / 2 - (y - y0) * k];
+  return '<svg viewBox="0 0 ' + S + ' ' + S + '" width="' + S + '" height="' + S + '" aria-hidden="true"><path d="' + insPath(v, px, k) + '" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+}
+// Top view and section of an insert, to scale. g: { shape, d, r, s, clr, hole, d1 } in mm and degrees
+// (r, s, clr may be NaN when the code does not give them). Every number printed is an input or a core result.
+function insDrawing(W, g) {
+  const c = g.shape.charCodeAt(0), r = g.r > 0 ? g.r : 0;
+  const v = insOutline(W, g.shape, g.d, r);
+  if (!v) return '';
+  const w = W.insert_dim(c, g.d, r, 6), h = W.insert_dim(c, g.d, r, 7), x0 = W.insert_dim(c, g.d, r, 11), y0 = W.insert_dim(c, g.d, r, 12);
+  const TW = 430, M = 88, k = Math.min((TW - 2 * M) / w, 190 / h), TH = Math.round(h * k + 96);
+  const px = (x, y) => [(TW - w * k) / 2 + (x - x0) * k, (TH + h * k) / 2 - (y - y0) * k];
+  const o = px(0, 0), f = q => q[0].toFixed(1) + ',' + q[1].toFixed(1), T = (x, y, t, anchor, extra) => '<text x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" font-size="11" text-anchor="' + (anchor || 'middle') + '" fill="currentColor"' + (extra || '') + '>' + t + '</text>';
+  let top = '<path id="iout" d="' + insPath(v, px, k) + '" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="2"/>';
+  if (g.shape !== 'R') top += '<circle cx="' + o[0].toFixed(1) + '" cy="' + o[1].toFixed(1) + '" r="' + (g.d / 2 * k).toFixed(1) + '" fill="none" stroke="var(--accent)" stroke-dasharray="4 3"/>';
+  const hr = g.d1 > 0 ? g.d1 / 2 : 0.2 * g.d, hdash = g.d1 > 0 ? '' : ' stroke-dasharray="2 3" opacity=".7"'; // hole to size when a table gives it, else for position only
+  if (g.hole) top += '<circle id="ihole" cx="' + o[0].toFixed(1) + '" cy="' + o[1].toFixed(1) + '" r="' + (hr * k).toFixed(1) + '" fill="none" stroke="currentColor"' + hdash + '/>';
+  top += '<path d="M' + (o[0] - 6) + ' ' + o[1] + 'h12M' + o[0] + ' ' + (o[1] - 6) + 'v12" stroke="currentColor" opacity=".6"/>';
+  top += T(o[0], o[1] + g.d / 2 * k * 0.62, (g.shape === 'R' ? 'Ø ' : 'd ') + fLen(g.d), 'middle', ' style="fill:var(--accent)"');
+  if (g.shape !== 'R') {
+    const sharp = r > 0 ? insOutline(W, g.shape, g.d, 0) : v, A = px(sharp[0][0], sharp[0][1]), B = px(sharp[1][0], sharp[1][1]);
+    // edge length: a dimension line outside the first side, between the sharp corners
+    const mx = (A[0] + B[0]) / 2 - o[0], my = (A[1] + B[1]) / 2 - o[1], ml = Math.hypot(mx, my), nx = mx / ml, ny = my / ml, off = 20;
+    const A2 = [A[0] + nx * off, A[1] + ny * off], B2 = [B[0] + nx * off, B[1] + ny * off];
+    let ang = Math.atan2(B2[1] - A2[1], B2[0] - A2[0]) * 180 / Math.PI; if (ang > 90 || ang < -90) ang += 180;
+    const tm = [(A2[0] + B2[0]) / 2 + nx * 12, (A2[1] + B2[1]) / 2 + ny * 12];
+    top += '<path d="M' + f(A) + 'L' + f([A2[0] + nx * 4, A2[1] + ny * 4]) + 'M' + f(B) + 'L' + f([B2[0] + nx * 4, B2[1] + ny * 4]) + 'M' + f(A2) + 'L' + f(B2) + '" stroke="currentColor" stroke-width="1" opacity=".75" fill="none"/>' +
+      [A2, B2].map(q => '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="2" fill="currentColor"/>').join('') +
+      T(tm[0], tm[1] + 4, 'l ' + fLen(W.insert_dim(c, g.d, r, 0)), 'middle', ' transform="rotate(' + ang.toFixed(1) + ' ' + tm[0].toFixed(1) + ' ' + tm[1].toFixed(1) + ')"');
+    // first corner: its angle and radius, written outside the corner on its bisector
+    const cx = A[0] - o[0], cy = A[1] - o[1], cl = Math.hypot(cx, cy), ux = cx / cl, uy = cy / cl;
+    const lab = fx(W.insert_dim(c, g.d, r, 9), 0) + '°' + (r > 0 ? ', r ' + fLen(r) : g.r === 0 ? ', sharp' : '');
+    const sg = -uy * nx + ux * ny > 0 ? -1 : 1, lx = ux * 9 - uy * 13 * sg, ly = uy * 9 + ux * 13 * sg; // beyond the corner, on the side away from the dimension line
+    top += T(A[0] + lx, A[1] + ly + 4, lab, lx > 3 ? 'start' : lx < -3 ? 'end' : 'middle');
+  }
+  let out = '<figure class="insfig"><svg id="itop" viewBox="0 0 ' + TW + ' ' + TH + '" width="' + TW + '" height="' + TH + '" role="img" aria-label="insert ' + g.shape + ' seen from above, to scale">' + top + '</svg><figcaption>Top view, to scale</figcaption></figure>';
+  if (g.s > 0) {
+    const base = g.clr >= 0 ? W.insert_base_ic(g.d, g.s, g.clr) : NaN, bw = isFinite(base) ? base : g.d;
+    const SW = 300, SH = Math.max(120, g.s * k + 84), xl = (SW - g.d * k) / 2 - 20, yt = 34, yb = yt + g.s * k, xc = xl + g.d * k / 2;
+    let sec = '<path id="isec" d="M' + f([xl, yt]) + 'L' + f([xl + g.d * k, yt]) + 'L' + f([xc + bw * k / 2, yb]) + 'L' + f([xc - bw * k / 2, yb]) + 'Z" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="2"/>';
+    if (g.hole) sec += '<path d="M' + f([xc - hr * k, yt]) + 'V' + yb.toFixed(1) + 'M' + f([xc + hr * k, yt]) + 'V' + yb.toFixed(1) + '" stroke="currentColor" stroke-dasharray="2 3" opacity=".7"/>' +
+      (g.d1 > 0 ? T(xc, (yt + yb) / 2 + 4, 'd1 ' + fLen(g.d1)) : '');
+    const xr = xl + g.d * k + 16;
+    sec += '<path d="M' + f([xl + g.d * k + 3, yt]) + 'H' + (xr + 4) + 'M' + f([xc + bw * k / 2 + 3, yb]) + 'H' + (xr + 4) + 'M' + xr + ' ' + yt + 'V' + yb.toFixed(1) + '" stroke="currentColor" opacity=".75" fill="none"/>' +
+      T(xr + 6, (yt + yb) / 2 + 4, 's ' + fLen(g.s), 'start') + T(xc, yt - 10, (g.shape === 'R' ? 'Ø ' : 'd ') + fLen(g.d)) +
+      T(xc, yb + 16, g.clr > 0 && isFinite(base) ? 'bottom face ' + fLen(base) + ', flanks ' + g.clr + '°' : g.clr === 0 ? 'flanks square to the face (0°)' : '');
+    out += '<figure class="insfig"><svg id="iside" viewBox="0 0 ' + SW + ' ' + SH.toFixed(0) + '" width="' + SW + '" height="' + SH.toFixed(0) + '" role="img" aria-label="section of the insert, to scale">' + sec + '</svg><figcaption>Section across the inscribed circle, same scale</figcaption></figure>';
+  }
+  return '<div class="insdraw">' + out + '</div>';
+}
+
 async function renderInsertCode(el) {
   const R = await loadRef(el); if (!R) return;
   const W = state.W, X = R.inserts; if (!X) { el.textContent = 'Insert data not built.'; return; }
   const m = RMEM.ins || (RMEM.ins = { code: 'CNMG120408-PM', ic: 12.7 });
-  const I = X.insert, opt = (codes, cur, txt) => Object.keys(codes).map(k => '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + k + ' ' + rEsc(txt(k)) + '</option>').join('');
+  const I = X.insert;
+  const types = Object.keys(Object.assign({}, I.type_hole, I.type_cb)).sort();
+  const typeTxt = k => [I.type_hole[k] && IC_TEXT.hole[I.type_hole[k].value], I.type_cb[k] && IC_TEXT.cb[I.type_cb[k].value]].filter(Boolean).join(', ');
+  const shapeTxt = k => (SHAPE_NAME[k] || '') + (I.shape[k] && I.shape[k].value !== 'round' ? ' ' + I.shape[k].value + ' deg' : '');
+  // One row of keys per position: [key value, small caption, tooltip, picture].
+  const byVal = o => Object.keys(o).sort((a, b) => parseFloat(o[a].value) - parseFloat(o[b].value));
+  const key = ([v, cap, tip, pic]) => '<button type="button" data-v="' + rEsc(v) + '" title="' + rEsc(tip || '') + '">' + (pic || '') + '<b>' + rEsc(v || '-') + '</b>' + (cap ? '<i>' + rEsc(cap) + '</i>' : '') + '</button>';
+  const row = (i, label, keys) => '<div class="ikrow"><span class="iklab">' + label + '</span><div class="seg ikeys" id="b' + i + '">' + keys.map(key).join('') + '</div></div>';
   el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f"><span>Insert designation (metric, ISO 1832)</span><div class="row"><input id="ic" type="text" spellcheck="false" style="text-transform:uppercase" value="' + rEsc(m.code) + '"></div></label></div>' +
-    '<div class="res" style="margin-bottom:12px"><div class="h">Build a code</div><div class="grid" style="max-width:760px">' +
-    '<label class="f"><span>1 Shape</span><div class="row"><select id="b1"></select></div></label>' +
-    '<label class="f"><span>2 Clearance</span><div class="row"><select id="b2"></select></div></label>' +
-    '<label class="f"><span>3 Tolerance class</span><div class="row"><select id="b3"></select></div></label>' +
-    '<label class="f"><span>4 Type</span><div class="row"><select id="b4"></select></div></label>' +
-    '<label class="f"><span>5 Inscribed circle</span><div class="row"><select id="b5"></select><span class="u">mm</span></div></label>' +
-    '<label class="f"><span>6 Thickness</span><div class="row"><select id="b6"></select></div></label>' +
-    '<label class="f"><span>7 Corner radius</span><div class="row"><select id="b7"></select></div></label>' +
-    '<label class="f"><span>Maker chipbreaker (optional)</span><div class="row"><input id="b8" type="text" spellcheck="false" style="text-transform:uppercase"></div></label>' +
+    '<div class="res" style="margin-bottom:12px"><div class="h">Build a code: tap one key in each row</div><div class="ikpad">' +
+    row(1, '1 Shape', Object.keys(I.shape).sort().map(k => [k, I.shape[k].value === 'round' ? 'round' : I.shape[k].value + '°', shapeTxt(k), insIcon(W, k)])) +
+    row(2, '2 Clearance', Object.keys(I.clearance).sort().map(k => [k, I.clearance[k].value + '°', 'clearance angle ' + I.clearance[k].value + ' deg'])) +
+    row(3, '3 Tolerance', Object.keys(I.tol_d).sort().map(k => [k, '±' + I.tol_d[k].value.replace('-', ' to '), 'd +/-' + I.tol_d[k].value + ' mm, m +/-' + I.tol_m[k].value + ' mm, s +/-' + I.tol_s[k].value + ' mm'])) +
+    row(4, '4 Type', types.map(k => [k, I.type_hole[k] ? { none: 'no hole', cyl: 'hole', screw: 'screw', special: 'special' }[I.type_hole[k].value] : '', typeTxt(k)])) +
+    '<div class="ikrow"><span class="iklab">5 Size</span><div class="seg ikeys" id="b5"></div></div>' +
+    row(6, '6 Thickness', byVal(I.thickness).map(k => [k, I.thickness[k].value, 'thickness ' + I.thickness[k].value + ' mm'])) +
+    row(7, '7 Corner', [['00', 'sharp', 'sharp corner']].concat(byVal(I.corner).map(k => [k, 'r ' + I.corner[k].value, 'corner radius ' + I.corner[k].value + ' mm']), [['M0', 'round', 'round insert']])) +
+    row(9, '9 Hand', [['', 'none', 'no hand letter']].concat(Object.keys(I.hand).map(k => [k, I.hand[k].value, IC_TEXT.hand[I.hand[k].value] || '']))) +
+    '<div class="ikrow"><span class="iklab">Maker code</span><input id="b8" type="text" spellcheck="false" placeholder="chipbreaker, optional" style="text-transform:uppercase;max-width:200px"></div>' +
     '</div></div><div id="ires"></div>' +
     '<div class="note"><b>How the code works:</b> positions 1 to 7 are fixed by ISO 1832 (shape, clearance angle, tolerance class, fixing and chipbreaker type, size, thickness, corner), 8 and 9 (edge condition, hand) are optional, and anything after a hyphen is the maker\'s own chipbreaker or grade code, which differs between makers. ' +
     'The size number is the cutting edge length in whole millimetres. Every ISO insert with equal corners on each side is a tangential polygon: all its sides touch the inscribed circle d. A side between corners of angles a1 and a2 is then l = (d/2)(cot(a1/2) + cot(a2/2)); for a rhombic insert of corner angle a this is d / sin a, for a triangle d x 1.732, for a square d. The code is l with the decimals dropped (round inserts: the diameter). The edge lengths are computed by the Rust core and checked against the Mitsubishi, Korloy and Walter size tables. ' +
     'Inch inserts use a different numbering (ANSI B212.4: size in eighths of an inch of d, thickness in sixteenths, corner in sixty-fourths) and are not decoded here. ' +
     'Each meaning is shown with the makers whose code keys print it; Confirmed = two or more makers agree. Clearance angle letters are for the insert\'s own relief; position 4 letters are shown only where a maker key could be read.' +
-    '<br><b>Standard:</b> ISO 1832:2017, Indexable inserts for cutting tools: designation (current per iso.org).</div><div class="note" id="isrc"></div>';
-  const ic = $('#ic', el), B = i => $('#b' + i, el);
-  const shapeTxt = k => (SHAPE_NAME[k] || '') + (I.shape[k] && I.shape[k].value !== 'round' ? ' ' + I.shape[k].value + ' deg' : '');
-  B(1).innerHTML = opt(I.shape, '', shapeTxt);
-  B(2).innerHTML = opt(I.clearance, '', k => I.clearance[k].value + ' deg');
-  B(3).innerHTML = opt(I.tol_d, '', k => 'd +/-' + I.tol_d[k].value + ' mm');
-  const types = Object.keys(Object.assign({}, I.type_hole, I.type_cb)).sort();
-  B(4).innerHTML = types.map(k => '<option value="' + k + '">' + k + ' ' + rEsc([I.type_hole[k] && IC_TEXT.hole[I.type_hole[k].value], I.type_cb[k] && IC_TEXT.cb[I.type_cb[k].value]].filter(Boolean).join(', ')) + '</option>').join('');
-  B(5).innerHTML = IC_SIZES.map(d => '<option value="' + d + '">' + d + ' (' + fx(d / IN_MM, 4).replace(/0+$/, '') + ' in)</option>').join('');
-  B(6).innerHTML = opt(I.thickness, '', k => I.thickness[k].value + ' mm');
-  B(7).innerHTML = opt(I.corner, '', k => 'r ' + I.corner[k].value + ' mm') + '<option value="00">00 sharp corner</option><option value="M0">M0 round insert</option>';
+    '<br><b>The drawing</b> is worked out by the Rust core from the shape, the inscribed circle and the corner radius alone: a corner of angle a sits at (d/2) / sin(a/2) from the centre, the radius meets each side r / tan(a/2) from the sharp corner, and its tip sits r (1/sin(a/2) - 1) back from it. The section shows the flanks leaning in by the clearance angle, so the bottom face is smaller by 2 s tan(clearance). ' +
+    'The corner height m is how far the nose tip stands beyond the inscribed circle (triangles: above the opposite side); it is the dimension the tolerance class limits. The 18 values of m printed in ISO 3364:1997 (the edition before the current ISO 3364:2017, which was not read) for triangular, square and 55 degree inserts all agree with this outline to 0.001 mm when the radius is taken as the inch size the standard works from (code 08 = 1/32 in = 0.794 mm); with the nominal 0.8 mm the result is 0.002 mm different, far inside any tolerance class. ' +
+    'It is the nominal outline: chipbreaker, edge preparation and wiper flats are the maker\'s and are not drawn. The fixing hole is drawn to size where ISO 3364 gives it (cylindrical hole, 0 degree clearance) and otherwise as a dashed circle for position only. Shapes A, B, K and L (parallelograms and the rectangle) are not fixed by the inscribed circle, so they are shown as a sketch without dimensions.' +
+    '<br><b>Standards:</b> ISO 1832:2017, Indexable inserts for cutting tools: designation (current per iso.org). ISO 3364, Indexable hardmetal (carbide) inserts with rounded corners, with cylindrical fixing hole: dimensions (1997 edition read; current edition 2017).</div><div class="note" id="isrc"></div>';
+  const ic = $('#ic', el), cbIn = $('#b8', el);
+  // The picked key of each row; a row with nothing picked gives ''.
+  const pick = {}, rowEl = i => $('#b' + i, el);
+  const show = i => rowEl(i).querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === pick[i]));
+  const setPick = (i, v) => { if ([...rowEl(i).querySelectorAll('button')].some(b => b.dataset.v === v)) { pick[i] = v; show(i); } };
   function sizeCode(shape, d) {
     if (shape === 'R') return String(Math.round(d)).padStart(2, '0');
     const l = W.insert_edge_length_shape(d, shape.charCodeAt(0));
     return isFinite(l) ? String(W.insert_size_code(l)).padStart(2, '0') : '';
   }
+  // Size keys depend on the shape: each shows the inscribed circle and the size number it gives.
+  let sizeFor = null;
+  function sizeKeys(shape) {
+    if (sizeFor === shape) { show(5); return; }
+    sizeFor = shape;
+    rowEl(5).innerHTML = IC_SIZES.map(d => key([String(d), sizeCode(shape, d) ? 'code ' + sizeCode(shape, d) : 'no code', 'inscribed circle ' + d + ' mm (' + fx(d / IN_MM, 4).replace(/0+$/, '') + ' in)'])).join('');
+    rowEl(5).querySelectorAll('button').forEach(b => b.onclick = () => { pick[5] = b.dataset.v; fromBuilder(); });
+    show(5);
+  }
+  let edgeLetter = '', cur = null;
   function fromCode() {
     m.code = ic.value;
     const p = parseInsert(ic.value), out = $('#ires', el);
+    cur = null;
     if (!p) { out.innerHTML = '<div class="res"><span class="warn">Not a metric ISO 1832 designation. Expected 4 letters, then size, thickness and corner numbers, for example CNMG 12 04 08, TCMT 16T308, VBMT 160404, RCMT 10T3M0; a maker chipbreaker may follow a hyphen.</span></div>'; return; }
-    [[1, p.shape], [2, p.clear], [3, p.tol], [4, p.type], [6, p.thick], [7, p.corner]].forEach(([i, v]) => { if ([...B(i).options].some(o => o.value === v)) B(i).value = v; });
-    B(8).value = p.cb;
+    [[1, p.shape], [2, p.clear], [3, p.tol], [4, p.type], [6, p.thick], [7, p.corner], [9, p.hand]].forEach(([i, v]) => { pick[i] = ''; show(i); setPick(i, v); });
+    edgeLetter = p.edge;
+    if (document.activeElement !== cbIn) cbIn.value = p.cb;
     // inscribed circle(s) whose computed size code matches the printed one
     const ics = IC_SIZES.filter(d => sizeCode(p.shape, d) === p.size);
-    if (ics.length) { B(5).value = String(ics.includes(m.ic) ? m.ic : ics[0]); m.ic = +B(5).value; }
+    if (ics.length) m.ic = ics.includes(m.ic) ? m.ic : ics[0];
+    sizeKeys(p.shape); pick[5] = ics.length ? String(m.ic) : ''; show(5);
     const d = ics.length ? m.ic : NaN;
     const sh = I.shape[p.shape], l = p.shape === 'R' ? +p.size : W.insert_edge_length_shape(d, p.shape.charCodeAt(0));
     const tolRow = I.tol_d[p.tol] ? 'd +/-' + consText(I.tol_d[p.tol]) + ' mm, m +/-' + consText(I.tol_m[p.tol]) + ' mm, s +/-' + consText(I.tol_s[p.tol]) + ' mm' : '-';
@@ -152,16 +246,71 @@ async function renderInsertCode(el) {
     if (p.edge) rows.push(['8 Edge <b>' + p.edge + '</b>', '<td class="v">' + (I.edge[p.edge] ? consText(I.edge[p.edge], IC_TEXT.edge) : 'edge preparation letter (meaning not confirmed by a maker key here)') + '</td>' + evCell(X.sources, I.edge[p.edge])]);
     if (p.hand) rows.push(['9 Hand <b>' + p.hand + '</b>', '<td class="v">' + (I.hand[p.hand] ? consText(I.hand[p.hand], IC_TEXT.hand) : '-') + '</td>' + evCell(X.sources, I.hand[p.hand])]);
     if (p.cb) rows.push(['Maker code <b>' + rEsc(p.cb) + '</b>', '<td class="v">chipbreaker or grade of one maker; look it up in that maker\'s catalogue</td><td></td>']);
-    out.innerHTML = '<div class="res"><div class="h">' + rEsc(p.shape + p.clear + p.tol + p.type + ' ' + p.size + ' ' + p.thick + ' ' + p.corner + (p.edge || p.hand ? ' ' + p.edge + p.hand : '') + (p.cb ? '-' + p.cb : '')) + '</div><div style="padding:8px 12px">' + insertSvg(p.shape, W) + '</div><table class="codes">' + rowsHtml(rows) + '</table></div>';
+    // The drawing: the shape's own inscribed circle (round inserts: the diameter the code prints), radius, thickness, clearance.
+    const name = p.shape + p.clear + p.tol + p.type + p.size + p.thick + p.corner + p.edge + p.hand;
+    const g = { shape: p.shape, d: p.shape === 'R' ? (ics.length ? d : +p.size) : d, r: I.corner[p.corner] ? +I.corner[p.corner].value : p.corner === '00' ? 0 : NaN,
+      s: I.thickness[p.thick] ? +I.thickness[p.thick].value : NaN, clr: I.clearance[p.clear] ? +I.clearance[p.clear].value : NaN, hole: !!hole && hole.value !== 'none' };
+    // Fixing hole size: ISO 3364 gives it for the cylindrical hole of inserts with 0 degree clearance.
+    const d1c = hole && hole.value === 'cyl' && g.clr === 0 && I.hole_d1 ? I.hole_d1[String(g.d)] : null;
+    g.d1 = d1c ? +d1c.value : NaN;
+    const c = p.shape.charCodeAt(0), r = g.r > 0 ? g.r : 0;
+    const drawn = g.d > 0 ? insDrawing(W, g) : '';
+    const refused = g.d > 0 && !drawn && SHAPE_CORNERS[p.shape] ? gsGet(-W.insert_outline(c, g.d, r)) : '';
+    let dims = '', acts = '';
+    if (drawn) {
+      cur = { g, name, r };
+      const dr = [], D = (label, w, how) => { const x = W.insert_dim(c, g.d, r, w); if (isFinite(x)) dr.push([label, calcCell(fBoth(x), how)]); };
+      if (p.shape !== 'R') {
+        D('Cutting edge, sharp corner to sharp corner', 0, 'l = (d/2)(cot(a1/2) + cot(a2/2))');
+        if (r > 0) {
+          D('Straight part of the edge between the radii', 1, '(d/2 - r)(cot(a1/2) + cot(a2/2))');
+          D('Radius meets the edge, from the sharp corner', 5, 'r / tan(a/2)');
+          D('Nose tip sits back from the sharp corner', 4, 'r (1/sin(a/2) - 1)');
+        }
+        D(r > 0 ? 'Centre to the nose tip' : 'Centre to the corner', 3, r > 0 ? '(d/2) / sin(a/2) less the line above' : '(d/2) / sin(a/2)');
+        D('Corner height m', 13, W.insert_dim(c, g.d, r, 10) === 3 ? 'nose tip above the opposite side' : 'nose tip beyond the inscribed circle');
+        const w = W.insert_dim(c, g.d, r, 6), h = W.insert_dim(c, g.d, r, 7);
+        dr.push(['Overall, as drawn', calcCell('<span class="mv">' + fLen(w) + ' x ' + fLen(h) + ' ' + uLen() + '</span>', 'extents of the outline')]);
+      }
+      const base = g.s > 0 && g.clr > 0 ? W.insert_base_ic(g.d, g.s, g.clr) : NaN;
+      if (isFinite(base)) dr.push(['Bottom face ' + (p.shape === 'R' ? 'diameter' : 'inscribed circle'), calcCell(fBoth(base), 'd - 2 s tan(clearance)')]);
+      if (d1c) dr.push(['Fixing hole d1', '<td class="v">' + fBoth(g.d1) + '</td>' + evCell(X.sources, d1c)]);
+      if (isNaN(g.r) && p.shape !== 'R') dr.push(['Corner', '<td class="v"><span class="warn">corner code not known here: drawn sharp</span></td><td></td>']);
+      dims = dr.length ? '<table class="codes" id="idims">' + rowsHtml(dr) + '</table>' : '';
+      acts = '<div class="mfilter insacts"><button class="btn" id="iadv"' + (r > 0 ? '' : ' disabled') + ' title="Opens the turning advisor with this nose radius filled in">Use in the turning advisor</button>' +
+        '<button class="btn" id="ifin"' + (r > 0 ? '' : ' disabled') + ' title="Opens the surface finish calculator with this nose radius filled in">Finish from this radius</button>' +
+        '<button class="btn" id="isave" title="Adds this insert to your tool library, so the advisors can pick it">Save to my tools</button>' +
+        '<button class="btn" id="isk" title="Opens the outline and its inscribed circle in the 2D sketcher, in millimetres (it replaces the sketch; Undo there brings the old one back)">Open in the sketcher</button>' +
+        '<button class="btn" id="idxf" title="The outline and its inscribed circle as a DXF file in millimetres">Download DXF</button></div>';
+    }
+    out.innerHTML = '<div class="res"><div class="h">' + rEsc(p.shape + p.clear + p.tol + p.type + ' ' + p.size + ' ' + p.thick + ' ' + p.corner + (p.edge || p.hand ? ' ' + p.edge + p.hand : '') + (p.cb ? '-' + p.cb : '')) + '</div>' +
+      (drawn ? drawn + acts + dims : '<div style="padding:8px 12px">' + insertSvg(p.shape, W) + (refused ? '<p class="warn" id="inodraw">Not drawn to scale: ' + rEsc(refused) + '.</p>' : '') + '</div>') + '<table class="codes">' + rowsHtml(rows) + '</table></div>';
+    const on = (id, fn) => { const b = $('#' + id, out); if (b) b.onclick = fn; };
+    on('iadv', () => sendTo('advturn', { re: toUser(cur.r) }));
+    on('ifin', () => sendTo('finish', { r: toUser(cur.r) }));
+    on('isave', () => {
+      const nm = cur.name + (p.cb ? '-' + p.cb : '');
+      if (ToolLib.all().some(t => t.type === 'Turning insert' && t.name === nm)) { toast(nm + ' is already in your tools'); return; }
+      ToolLib.upsert({ name: nm, type: 'Turning insert', units: 'mm', cr: cur.r > 0 ? String(cur.r) : '', notes: 'From the insert designation page: inscribed circle ' + cur.g.d + ' mm' });
+      toast(nm + ' saved to your tools');
+    });
+    const dxf = () => { const n = W.insert_dxf(c, cur.g.d, cur.r, 0); return n > 0 ? gsGet(n) : null; };
+    on('isk', () => {
+      const t = dxf(); if (!t) return;
+      try { skImport(t, cur.name + '.dxf'); location.hash = '#/t/sketch'; } catch (x) { toast('Could not open it in the sketcher: ' + x.message); }
+    });
+    on('idxf', () => { const t = dxf(); if (t) saveFile(cur.name + '.dxf', t, 'application/dxf'); });
   }
   function fromBuilder() {
-    const sh = B(1).value, d = +B(5).value; m.ic = d;
-    const c = sh + B(2).value + B(3).value + B(4).value + sizeCode(sh, d) + B(6).value + (sh === 'R' ? 'M0' : B(7).value) + (B(8).value.trim() ? '-' + B(8).value.trim().toUpperCase() : '');
-    ic.value = c; fromCode();
+    const sh = pick[1] || 'C', d = +pick[5] || m.ic; m.ic = d;
+    const cb = cbIn.value.trim().toUpperCase();
+    ic.value = sh + (pick[2] || 'N') + (pick[3] || 'M') + (pick[4] || 'G') + sizeCode(sh, d) + (pick[6] || '04') + (sh === 'R' ? 'M0' : pick[7] === 'M0' || !pick[7] ? '08' : pick[7]) + edgeLetter + (pick[9] || '') + (cb ? '-' + cb : '');
+    fromCode();
   }
   ic.oninput = fromCode;
-  for (let i = 1; i <= 8; i++) B(i)[i === 8 ? 'oninput' : 'onchange'] = fromBuilder;
-  $('#isrc', el).innerHTML = '<b>Sources (maker code keys)</b><br>' + sourceList(X.sources);
+  cbIn.oninput = fromBuilder;
+  [1, 2, 3, 4, 6, 7, 9].forEach(i => rowEl(i).querySelectorAll('button').forEach(b => b.onclick = () => { pick[i] = b.dataset.v; fromBuilder(); }));
+  $('#isrc', el).innerHTML = '<b>Sources (maker code keys and ISO 3364)</b><br>' + sourceList(X.sources);
   fromCode();
 }
 

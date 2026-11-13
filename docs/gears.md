@@ -18,7 +18,7 @@ no table is copied from Machinery's Handbook or from the standards.
 | Helical gears (`helicalgear`) | mt, at, base helix angle, normal, transverse and axial pitch, lead, zv, centre distance with normal profile shift, tips for standard clearance, transverse, overlap and total contact ratio. |
 | Gear train ratio (`geartrain`) | Simple and compound ratio for up to four pairs, output speed and direction, and a change-gear finder for a wanted ratio from a gear set (smallest, largest, step). |
 | Planetary gear set (`planetary`) | Willis' formula for any blank speed, the three usual ratios, planet teeth, equal spacing check. |
-| Involute splines (`spline`) | ANSI B92.1 and ISO 4156, 30 degree flat root side fit: D, Db, p, basic s = e, major and minor diameters, measurement over and between pins. |
+| Involute splines (`spline`) | ANSI B92.1 and ISO 4156, 30 degree flat root side fit: D, Db, p, basic s = e, major and minor diameters, measurement over and between pins. Live drawing of one tooth space of the shaft and of the hub, enlarged, with the pin, where it touches, and a check that the pin can measure (0.4.0). |
 | Worm and wheel (`worm`) | Lead, lead angle, ratio, wheel pitch diameter, centre distance, normal module. |
 
 ## Formulas and sources
@@ -68,6 +68,13 @@ no table is copied from Machinery's Handbook or from the standards.
 - Ideal pins (external and internal, with shift) touch the flanks at d + 2 x m,
   checked with the independent contact-diameter formula.
 - Spline basic dimensions for ANSI 8/16 x 24 and ISO m 2 x 20; spline pins touch at D.
+- **Tooth space drawing (0.4.0, `space_view`)**: for ANSI 8/16 x 24, ISO m 2 x 21 (odd),
+  ANSI 12/24 x 9 (root below the base circle) and ISO m 1 x 60, external and internal:
+  the thickness measured on the drawn profile at the pitch circle is the calculator's
+  tooth thickness or space width; the pin centre is where the measurement over or between
+  pins puts it (odd tooth counts included); the contact point is half a pin diameter from
+  the pin centre, on the pitch circle for the ideal pin, and on the same circle as the
+  independent contact-diameter formula; no drawn point is nearer the pin centre than that.
 - Trains, Willis (24 / 72 set), change-gear finder (exact 1 : 9 from 20..80 by 5), worm,
   tooth outline symmetry and bounds.
 
@@ -89,4 +96,13 @@ no table is copied from Machinery's Handbook or from the standards.
   only (no published worked value checked).
 - **Odd tooth count helical over balls**: transverse formula; the true two-ball reading is
   slightly smaller (FRENCO).
+- **Tooth space drawing**: the flanks are the true involute, psi(r) = t / d + inv a - inv a_r
+  (the same relation as the over-pins formulas, KHK and SDP/SI). Below the base circle (splines
+  of fewer than about 10 teeth) the flank is drawn as a radial line; the real root fillet depends
+  on the cutting tool and is not drawn. Where the source gives no minor diameter (ISO internal;
+  ANSI external finer than 12/24) the drawing uses m (z - 1) or m (z - 1.35) and says so under
+  the picture. The three pin checks (does not touch the involute, sits on the root, does not
+  stand proud of the teeth) are our own geometry on the nominal profile, not limits from a
+  standard: a real part has fillets, chamfers and tolerances.
+- SAE J499a (parallel side splines): no free source found yet; not included.
 - Spline fit classes, tolerances and effective/actual space width limits are not included.

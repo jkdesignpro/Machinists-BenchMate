@@ -55,6 +55,20 @@
    "url": "https://iscar.com/Catalogs/flipview/flipview2022/english-1/TURNING-CATALOG-42_2022-p121-254/files/basic-html/page2.html",
    "accessed": "2026-11-10",
    "note": "Maker. The HTML view is scrambled; used only for insert type A (hole, no chipbreaker), where letter and text were together."
+  },
+  "ISO3364": {
+   "publisher": "ISO",
+   "title": "ISO 3364:1997, Indexable hardmetal (carbide) inserts with rounded corners, with cylindrical fixing hole: Dimensions (third edition; public preview, pages 1 to 9)",
+   "url": "https://cdn.standards.iteh.ai/samples/23733/1b8d97bdd1584c9b94ec6a034fee61a1/ISO-3364-1997.pdf",
+   "accessed": "2026-11-11",
+   "note": "Standard. The edition read is the third, of 1997, in its public preview; the current edition is ISO 3364:2017 (iso.org/standard/69204.html), which was not read and may differ. Used: the insert types it covers (A without chip breakers, M chip breakers on one face, G chip breakers on both faces, all with a cylindrical fixing hole and 0 degree clearance), Table 1 fixing hole d1 for each inscribed circle, and the printed corner heights m of the triangular, square and 55 degree rhombic inserts as check values for the outline (core/src/insert.rs). The text layer of the tables is scrambled: the m values were matched to their inserts by size, not by row."
+  },
+  "TUNGALOY": {
+   "publisher": "Tungaloy",
+   "title": "General catalogue 2023-2024, section B (turning inserts), CNMG dimension table",
+   "url": "https://tungaloy.com/wpdata/wp-content/uploads/GC_2023-2024_G_B_Insert.pdf",
+   "accessed": "2026-11-11",
+   "note": "Maker. Used: fixing hole D1 of the CNMG 09 and 12 inserts (IC 9.525 and 12.7 mm). Only the first part of the file could be read."
   }
  },
  "insert": {
@@ -234,6 +248,11 @@
    },
    "ISCAR": {
     "A": "cyl"
+   },
+   "ISO3364": {
+    "A": "cyl",
+    "M": "cyl",
+    "G": "cyl"
    }
   },
   "type_cb": {
@@ -246,6 +265,11 @@
    },
    "ISCAR": {
     "A": "none"
+   },
+   "ISO3364": {
+    "A": "none",
+    "M": "one",
+    "G": "both"
    }
   },
   "thickness": {
@@ -308,6 +332,20 @@
     "R": "right",
     "L": "left",
     "N": "neutral"
+   }
+  },
+  "hole_d1": {
+   "ISO3364": {
+    "6.35": "2.26",
+    "9.525": "3.81",
+    "12.7": "5.16",
+    "15.875": "6.35",
+    "19.05": "7.94",
+    "25.4": "9.12"
+   },
+   "TUNGALOY": {
+    "9.525": "3.81",
+    "12.7": "5.16"
    }
   }
  },
