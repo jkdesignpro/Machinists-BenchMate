@@ -24,6 +24,9 @@
 .brand small{color:var(--muted);font:500 11px var(--mono);letter-spacing:.04em}
 #searchbox{position:relative;flex:1 1 340px;max-width:440px;min-width:120px}
 #search{width:100%;height:32px;border-radius:2px;font-family:var(--mono);padding:0 14px 0 34px;background:var(--field) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237b8794' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M15.2 15.2 20 20M17 10.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z'/%3E%3C/svg%3E") 11px center/16px no-repeat}
+#searchpop .sh.kid{padding-left:34px}
+#searchpop .sh.kid b{font-weight:500}
+#searchpop .shk{width:18px;text-align:center;color:var(--accent);font-weight:700}
 #searchpop{position:absolute;top:38px;left:0;right:0;min-width:320px;background:var(--panel);border:2px solid var(--edge);border-radius:var(--r2);box-shadow:0 10px 24px rgba(0,0,0,.4);padding:6px;max-height:70vh;overflow:auto;z-index:50}
 .sh{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;border-radius:var(--r);padding:7px 8px;cursor:pointer}
 .sh:hover,.sh.on{background:var(--sel)}
@@ -342,6 +345,7 @@ svg.dk{font:11.5px var(--sans);overflow:visible}
 .dk .dkhl{stroke:var(--muted);stroke-width:1;opacity:.55}
 .dk .ghost{fill:none;stroke:var(--muted);stroke-width:1.1;stroke-dasharray:5 4}
 .dk .ln{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round}
+.dk .cons{fill:none;stroke:var(--accent);stroke-width:1.1;stroke-dasharray:6 3}
 .dk .thin{fill:none;stroke:var(--muted);stroke-width:1}
 .dk .hid{fill:none;stroke:var(--muted);stroke-width:1.1;stroke-dasharray:5 3}
 .dk .cl{fill:none;stroke:var(--muted);stroke-width:.9;stroke-dasharray:12 3 2 3}
@@ -420,3 +424,37 @@ label.f.lk .fx{right:76px}
 .rwidget .lobebtn{padding:6px 16px 0}
 .rwidget .lobebtn:empty{display:none}
 .rwidget .lobenote{margin:8px 16px 0;font-size:11.5px;color:var(--muted);line-height:1.45}
+
+/* What is this for? (0.8.0) */
+.tpb>details.about{margin:0 0 12px;border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--panel);max-width:900px}
+.tpb>details.about>summary{cursor:pointer;padding:8px 12px;font-weight:600}
+.tpb>details.about .aboutb{padding:0 14px 6px;line-height:1.5}
+.tpb>details.about .aboutb p{margin:0 0 9px}
+.tpb>details.about .abs{font-size:12px;color:var(--muted)}
+/* Machine builder (0.8.0): type cards, sections, what each box is used for */
+.mtypes{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:8px 0 14px;max-width:960px}
+.mtype{text-align:left;padding:9px 11px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;display:grid;gap:3px;border-radius:var(--r)}
+.mtype small{color:var(--muted);font-size:12px;line-height:1.3}
+.mtype.on{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+details.msec{margin:0 0 10px;max-width:960px;border-top:1px solid var(--line)}
+details.msec>summary{cursor:pointer;padding:8px 0;font-weight:600}
+.muse{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.muse.chk{color:var(--accent)}
+
+/* Milling strategy (0.8.0) */
+.msh{margin:16px 0 6px;font-size:15px}
+.msh small{font-weight:400;color:var(--muted)}
+.mscard{max-width:860px;margin:0 0 10px}
+.msv{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.msv span{font-weight:700}
+.msv b{font-size:14.5px}
+.msv.good span{color:var(--good,#3c3)}
+.msv.caution span{color:var(--warn)}
+.msv.over span{color:var(--err)}
+.msv.note span{color:var(--muted)}
+.mscard li.over .msm{color:var(--err)}
+.mscard li.good .msm{color:var(--good,#3c3)}
+.mscard li.note{color:var(--muted)}
+.mscard ul{margin:6px 0 0;padding-left:0;list-style:none}
+.mscard li{margin:0 0 5px;padding-left:22px;position:relative}
+.msm{position:absolute;left:0;width:16px;text-align:center;font-weight:700}

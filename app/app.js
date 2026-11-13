@@ -170,17 +170,58 @@ function renderRail() {
 }
 
 // ---- Search (top bar) ----
+// 0.8.0. A tool is found by its title first, then by the everyday words machinists use for it (SEARCH_KEYS),
+// then by its description. Under each tool come the sections inside it whose headings match (the index built
+// by scripts/build_search.py: headings only, never body text, so a common word does not flood the list).
+// A thread size (M12, M10 x 1.25, 1/4-20) goes straight to Thread data with that size.
+let SEARCH_IDX = null;
+function loadSearchIdx() { if (SEARCH_IDX) return; SEARCH_IDX = {}; fetch('data/searchindex.json').then(r => r.json()).then(j => {
+  SEARCH_IDX = j || {};
+  // The first search may have run before the index arrived: run it again so the sections show.
+  const inp = document.getElementById('search'); if (inp && inp.value.trim() && document.activeElement === inp) inp.dispatchEvent(new Event('input'));
+}).catch(() => {}); }
+const SEARCH_KEYS = {
+  advmill: 'feeds and speeds sfm surface speed chip load ipt ipm end mill feed rate cutting data',
+  advturn: 'feeds and speeds sfm surface speed css insert feed per rev ipr lathe cutting data',
+  advdrill: 'feeds and speeds sfm ipr drill feed cutting data', advream: 'reamer feeds and speeds', advtap: 'tapping speed tap feed rigid tapping',
+  advplunge: 'plunge milling z axis roughing', rpm: 'rpm sfm surface speed spindle speed', feeds: 'ipm ipr ipt feed rate conversion',
+  threaddata: 'thread sizes pitch diameter tap size major minor unc unf metric', drills: 'drill sizes number letter fractional tap drill chart',
+  chipthinning: 'radial chip thinning rcte hsm adaptive', helix: 'helical interpolation ramping', deflection: 'end mill deflection stick-out',
+  chatter: 'stability lobes vibration', surfacefin: 'ra finish nose radius cusp scallop', bandsaw: 'band saw cut time', weight: 'stock weight mass',
+  fitlookup: 'iso fits h7 g6 tolerance hole shaft', prefnum: 'renard r5 r10 r20 r40 r80 preferred numbers', millstrat: 'trochoidal adaptive hem hsm high efficiency dynamic milling toolpath strategy plunge high feed', gmcodes: 'g codes m codes g-code',
+};
 function searchHits(q) {
   q = q.trim().toLowerCase(); if (!q) return [];
+  loadSearchIdx();
   const words = q.split(/\s+/), out = [];
-  const score = (title, rest) => { const t = title.toLowerCase(), all = t + ' ' + rest.toLowerCase(); if (!words.every(w => all.includes(w))) return 0; return (t.startsWith(q) ? 4 : 0) + (t.includes(q) ? 3 : 0) + (words.every(w => t.includes(w)) ? 2 : 0) + 1; };
+  // Whole-word start counts for more than a match inside a word ("tap" finds "Tapping" before "Spline taper").
+  const starts = (t, w) => new RegExp('(^|[^a-z0-9])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(t);
+  const score = (title, keys, rest) => {
+    const t = title.toLowerCase(), k = (keys || '').toLowerCase(), all = t + ' ' + k + ' ' + rest.toLowerCase();
+    if (!words.every(w => all.includes(w))) return 0;
+    return (t.startsWith(q) ? 6 : 0) + (t.includes(q) ? 3 : 0) + words.filter(w => starts(t, w)).length * 2 + (words.every(w => t.includes(w)) ? 2 : 0) + (words.every(w => starts(k, w)) ? 3 : 0) + 1;
+  };
+  const inside = (id, title) => ((SEARCH_IDX || {})[id] || []).filter(h => { const t = h[1].toLowerCase(); return words.every(w => t.includes(w)); }).slice(0, 3)
+    .map(h => ({ id, anchor: h[0], title: h[1], sub: 'In ' + title, child: true }));
+  // A thread size typed straight in.
+  const th = q.match(/^m\s?(\d+(?:\.\d+)?)(?:\s*x\s*(\d+(?:\.\d+)?))?$/) || q.match(/^(#?\d+(?:\/\d+)?(?:-\d+\/\d+)?)\s*-\s*(\d+)(?:\s*(unc|unf|unef))?$/);
+  if (th && PAGES.threaddata && pageShown(PAGES.threaddata)) out.push({ s: 50, id: 'threaddata', thread: q, title: 'Thread data and limits: ' + q.toUpperCase(), sub: 'Open this size', icon: PAGES.threaddata.icon });
   Object.values(PAGES).forEach(p => {
     if (!pageShown(p)) return;
-    const s = score(p.title, p.desc || ''); if (s) out.push({ s: s + 0.5, id: p.id, title: p.title, sub: p.desc, icon: p.icon });
-    pageTabs(p).forEach(tb => { const st = score(tb.tool.title, (tb.tool.desc || '') + ' ' + tb.label + ' ' + (tb.tool.group || '')); if (st) out.push({ s: st, id: tb.id, title: tb.tool.title, sub: 'In ' + p.title, icon: p.icon }); });
-    if (!p.tabs && p.tool && !s) { const sg = score('', p.tool.group || ''); if (sg) out.push({ s: 0.5, id: p.id, title: p.title, sub: p.desc, icon: p.icon }); }
+    const s = score(p.title, SEARCH_KEYS[p.id], p.desc || ''), kids = inside(p.id, p.title);
+    if (s || kids.length) out.push({ s: (s ? s + 0.5 : 0.4) + kids.length * 0.3, id: p.id, title: p.title, sub: p.desc, icon: p.icon, kids });
+    pageTabs(p).forEach(tb => { const st = score(tb.tool.title, SEARCH_KEYS[tb.tool.id], (tb.tool.desc || '') + ' ' + tb.label + ' ' + (tb.tool.group || '')); if (st) out.push({ s: st, id: tb.id, title: tb.tool.title, sub: 'In ' + p.title, icon: p.icon }); });
+    if (!p.tabs && p.tool && !s && !kids.length) { const sg = score('', '', p.tool.group || ''); if (sg) out.push({ s: 0.5, id: p.id, title: p.title, sub: p.desc, icon: p.icon }); }
   });
-  return out.sort((a, b) => b.s - a.s || a.title.localeCompare(b.title)).slice(0, 14);
+  // Tools in order, each followed by the sections inside it that match; at most 12 tools.
+  const tools = out.sort((a, b) => b.s - a.s || a.title.localeCompare(b.title)).slice(0, 12), flat = [];
+  tools.forEach(h => { flat.push(h); (h.kids || []).forEach(k => flat.push(Object.assign({ icon: h.icon }, k))); });
+  return flat;
+}
+// Open a section inside a page: open the page, then scroll to the heading once it is drawn.
+function openAnchor(id, anchor) {
+  openTool(id);
+  let n = 0; const t = setInterval(() => { const e = document.getElementById(anchor); if (e || ++n > 40) { clearInterval(t); if (e) e.scrollIntoView({ block: 'start', behavior: 'smooth' }); } }, 75);
 }
 function initSearch() {
   const inp = $('#search'), pop = $('#searchpop'); let hits = [], sel = 0;
@@ -190,10 +231,10 @@ function initSearch() {
     if (!q.trim()) { close(); return; }
     pop.hidden = false;
     if (/#\/t\/\S+/.test(q)) { pop.innerHTML = '<div class="shn">Press Enter to open this link.</div>'; return; }
-    pop.innerHTML = hits.length ? hits.map((h, i) => '<button class="sh' + (i === sel ? ' on' : '') + '" data-i="' + i + '">' + icon(h.icon) + '<span><b>' + hesc(h.title) + '</b><small>' + hesc(h.sub || '') + '</small></span></button>').join('')
+    pop.innerHTML = hits.length ? hits.map((h, i) => '<button class="sh' + (h.child ? ' kid' : '') + (i === sel ? ' on' : '') + '" data-i="' + i + '">' + (h.child ? '<span class="shk">§</span>' : icon(h.icon)) + '<span><b>' + hesc(h.title) + '</b><small>' + hesc(h.sub || '') + '</small></span></button>').join('')
       : '<div class="shn">No tool matches' + (state.mode === 'simple' ? ' in Simple mode. Switch to Advanced to search every tool.' : '.') + '</div>';
   };
-  const pick = i => { const h = hits[i]; if (!h) return; inp.value = ''; close(); inp.blur(); openTool(h.id); };
+  const pick = i => { const h = hits[i]; if (!h) return; inp.value = ''; close(); inp.blur(); if (h.thread) { window.PENDING_THREAD = h.thread; openTool(h.id); } else if (h.anchor) openAnchor(h.id, h.anchor); else openTool(h.id); };
   // On the Mac the app runs at tauri://localhost, and the system AutoFill offers any password saved for
   // "localhost" (another app's, for one) in the first text box it finds, as a chip over the box that cannot be removed.
   // The box stays read-only until it is clicked or focused, so AutoFill does not take it for a login box,
@@ -281,6 +322,14 @@ function renderPage(main, page, tabId) {
   $$('.tabs button', wrap).forEach(b => b.onclick = () => go('#/t/' + page.id + '/' + b.dataset.tab));
   main.appendChild(wrap);
   const acts = $('.tpa', wrap), body = $('.tpb', wrap);
+  // What is this for? (0.8.0): a folded plain explanation on the less familiar tools; open or shut is remembered per tool.
+  const ab = typeof ABOUT !== 'undefined' && ABOUT[t.id];
+  if (ab) {
+    const d = document.createElement('details'); d.className = 'about'; d.dataset.kept = '1'; d.open = lsGet('bm.about.' + t.id) === '1';
+    d.innerHTML = '<summary>What is this for?</summary><div class="aboutb">' + ab.use + '</div>';
+    $('summary', d).addEventListener('click', () => setTimeout(() => lsSet('bm.about.' + t.id, d.open ? '1' : '0')));
+    body.appendChild(d);
+  }
   const act = (name, title, fn, cls) => { const b = document.createElement('button'); b.className = 'ib ' + (cls || ''); b.innerHTML = icon(name); b.title = title; b.setAttribute('aria-label', title); b.onclick = fn; acts.appendChild(b); return b; };
   const why = document.createElement('details'); why.className = 'why';
   why.innerHTML = '<summary>Formula and sources</summary><div class="whyb"><p><b>' + (t.render ? 'Note' : 'Working') + ':</b> <span class="w"></span></p><p><b>Sources:</b> <span class="s"></span></p></div>';
@@ -787,7 +836,7 @@ async function boot() {
   document.documentElement.dataset.mode = state.mode;
   $$('#mode button').forEach(b => { const on = b.dataset.m === state.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
   document.body.classList.toggle('showsrc', lsGet('bm.showsrc') === '1');
-  new MutationObserver(() => { foldSources($('#main')); if (state.mode === 'expert' && state.route.kind === 'tool') openDetails($('#main')); }).observe($('#main'), { childList: true, subtree: true });
+  new MutationObserver(() => { foldSources($('#main')); if (typeof enhanceThreadSelect === 'function') document.querySelectorAll('#main select#hk, #main select#tk, #main select#qk, #main select#lk').forEach(enhanceThreadSelect); if (state.mode === 'expert' && state.route.kind === 'tool') openDetails($('#main')); }).observe($('#main'), { childList: true, subtree: true });
   initSearch(); initMenu(); applyCompact();
   addEventListener('resize', applyCompact);
   $('#calcbtn').onclick = () => { if (BenchCalc.isOpen) BenchCalc.close(); else BenchCalc.open(); };

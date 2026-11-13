@@ -233,6 +233,13 @@ const TOOLS = [
   source: "Sandvik Coromant milling formulas (circular and helical interpolation); Machinery's Handbook",
 },
 {
+  id: 'millstrat', level: 'advanced', group: 'Milling', title: 'Milling strategy: which roughing toolpath',
+  desc: 'Adaptive or trochoidal (high-efficiency milling), traditional roughing, plunge roughing or high-feed milling: which suits the feature, the tool reach and your machine (how its control copes with many short moves, its rigidity and guideways), with the reasons the sources give.',
+  render: el => renderMillStrategy(el),
+  working: 'No calculation: each strategy is marked from published advice. A reason that rules a strategy out marks it Not suited; otherwise two or more reasons for, beyond those against, mark it a Good fit (BenchMate\'s own weighting). A reach or depth over 3 x the tool diameter counts as long (BenchMate\'s own line; no source sets one).',
+  source: 'J. Ball, MoldMaking Technology 2018; D. Grandt and S. Tiehen, Productivity Inc. 2020; W. Leventon, Cutting Tool Engineering 2025; SolidCAM blog 2026; B. Kennedy, Cutting Tool Engineering 2012; American Machinist 2010; Tungaloy (high-feed milling). Statements from one publisher are marked. See docs/strategy.md.',
+},
+{
   id: 'helix', level: 'advanced', group: 'Milling', title: 'Helical interpolation and ramping',
   pick: { map: { d: 'dia' } },
   desc: 'Helix pitch per turn from a ramp angle, or the ramp angle from a pitch, and the axial (Z) feed. Angles are at the tool-centre path.',
@@ -996,11 +1003,12 @@ const TOOLS = [
 },
 {
   id: 'bandsaw', level: 'advanced', group: 'Sawing', title: 'Bandsaw cut time',
-  desc: 'Time to cut through a round, rectangular or tube section, one piece or a bundle (pieces across and layers high), from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
+  desc: 'Time to cut through a round, square, hexagon, rectangular or flat bar, a round, square or rectangular tube, or an angle, one piece or a bundle (pieces across and layers high), from the down-feed rate or the cutting rate (area per minute) your saw or blade maker gives, and the chip per tooth from the blade speed and pitch.',
   fields: s => [
-    { id: 'shape', label: 'Section', unit: '', def: 1, options: [[1, 'Round bar'], [2, 'Rectangle (cut through the height)'], [3, 'Tube']] },
-    { id: 'a', label: 'Diameter, or width of the rectangle', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
-    { id: 'b', label: 'Rectangle height, or tube wall', unit: lenU(s), def: '', when: v => v.shape !== 1 },
+    { id: 'shape', label: 'Section', unit: '', def: 1, options: [[1, 'Round bar'], [4, 'Square bar'], [5, 'Hexagon bar (lying on a flat)'], [2, 'Rectangle or flat bar'], [3, 'Round tube'], [6, 'Square tube (box section)'], [7, 'Rectangular tube (box section)'], [8, 'Angle']] },
+    { id: 'a', label: 'A: diameter, side, width or across flats', unit: lenU(s), def: s === 'inch' ? 4 : 100 },
+    { id: 'c', label: 'C: height the blade cuts down through', unit: lenU(s), def: '', when: v => [2, 7, 8].includes(v.shape) },
+    { id: 'b', label: 'Wall or thickness t', unit: lenU(s), def: '', when: v => [3, 6, 7, 8].includes(v.shape) },
     { id: 'bundle', label: 'Cut', unit: '', def: 0, options: [[0, 'Single piece'], [1, 'Bundle']] },
     { id: 'nx', label: 'Pieces across (side by side, across the blade)', unit: '', def: 3, when: v => v.bundle === 1 },
     { id: 'ny', label: 'Layers high (stacked in the feed direction)', unit: '', def: 2, when: v => v.bundle === 1 },
@@ -1014,24 +1022,24 @@ const TOOLS = [
     const bun = v.bundle === 1, nx = bun ? v.nx : 1, ny = bun ? v.ny : 1;
     if (bun && !(nx >= 1 && ny >= 1)) return [R('Bundle', 'Enter at least 1 piece across and 1 layer', '', 0)];
     if (bun && (nx % 1 || ny % 1)) return [R('Bundle', 'Pieces and layers are whole numbers', '', 0)];
-    const S = k => W.saw_section(v.shape, v.a, v.b > 0 ? v.b : 0, nx, ny, k);
+    const S = k => W.saw_section_ext(v.shape, v.a, v.b > 0 ? v.b : 0, v.c > 0 ? v.c : 0, nx, ny, k);
     const area = S(0), h = S(1), wid = S(2);
-    if (!isFinite(area)) return [R('Section', v.shape === 3 ? 'Enter a wall thinner than half the diameter' : 'Enter the height', '', 0)];
+    if (!isFinite(area)) return [R('Section', ({ 2: 'Enter the height C', 3: 'Enter a wall t thinner than half the diameter', 6: 'Enter a wall t thinner than half the side', 7: 'Enter the height C and a wall t thinner than half the smaller side', 8: 'Enter the height C and a thickness t smaller than both legs' })[v.shape] || 'Check the sizes', '', 0)];
     const au = s === 'inch' ? 'in2' : 'cm2', ak = s === 'inch' ? 1 : 0.01;
     const rows = [R(bun ? 'Metal area cut (' + S(3) + ' pieces)' : 'Area cut', area * ak, au, 2), R('Height the blade feeds through', h, lenU(s), 2), R('Effective width (longest path of the blade in the work)', wid, lenU(s), 2)];
     if (v.vf > 0) rows.push(R('Cut time from the down-feed', h / v.vf, 'min', 2));
     if (v.rate > 0) { const t = W.saw_cut_time(area * ak, v.rate); rows.push(R('Cut time from the cutting rate', t, 'min', 2)); rows.push(R('Average down-feed at that rate', h / t, feedMinU(s), 2)); if (bun) rows.push(R('Cut time per piece', t / S(3), 'min', 3)); }
     if (bun && v.vf > 0) rows.push(R('Cut time per piece (down-feed)', h / v.vf / S(3), 'min', 3));
-    if (bun && v.shape !== 2) rows.push(R('Note', 'Rounds and tubes leave gaps: the blade cuts metal only part of the way down, so the down-feed time and the cutting-rate time differ. Makers quote rates for solid sections; a bundle usually cuts slower than the rate suggests.', '', 0));
+    if (bun && ![2, 4, 6, 7].includes(v.shape)) rows.push(R('Note', 'Rounds, hexagons, tubes and angles leave gaps: the blade cuts metal only part of the way down, so the down-feed time and the cutting-rate time differ. Makers quote rates for solid sections; a bundle usually cuts slower than the rate suggests.', '', 0));
     if (v.vf > 0 && v.vb > 0 && v.tpi > 0) {
       const c = s === 'inch' ? W.bandsaw_chip_per_tooth(v.vf * IN_MM, v.vb * FT_M, v.tpi) / IN_MM : W.bandsaw_chip_per_tooth(v.vf, v.vb, v.tpi);
       rows.push(R('Feed per tooth (depth each tooth takes)', c, lenU(s), s === 'inch' ? 6 : 5));
     }
     return rows;
   },
-  working: 'Time = height / down-feed rate, or metal area / cutting rate (the square inches or cm2 per minute figure saw makers quote: the cut area divided by the minutes per cut). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle W x H. Bundle of n across and m high, packed square: metal area = n m x piece area, height = m x piece height (D for rounds and tubes), effective width = n x piece width. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker. For a bundle the makers base the blade pitch on the average section (Fabricating and Metalworking, 2020) and keep at least three teeth in the work (The Tube and Pipe Journal, 2007).',
+  working: 'Time = height / down-feed rate, or metal area / cutting rate (the square inches or cm2 per minute figure saw makers quote: the cut area divided by the minutes per cut). Round area pi D^2 / 4, tube pi (D^2 - (D - 2t)^2) / 4, rectangle A x C, square A^2, hexagon (sqrt 3 / 2) A^2 with A across flats (lying on a flat, the blade crosses the corners, 2A / sqrt 3), square tube A^2 - (A - 2t)^2, rectangular tube A C - (A - 2t)(C - 2t), angle t (A + C - t); tubes and angles with sharp corners, so a little over the real area. Bundle of n across and m high, packed square: metal area = n m x piece area, height = m x piece height (D for rounds and tubes), effective width = n x piece width. Teeth per minute = blade speed x teeth per foot (or per metre); feed per tooth = down-feed / teeth per minute. Down-feed and cutting rates depend on the material, blade and machine: take them from your saw or blade maker. For a bundle the makers base the blade pitch on the average section (Fabricating and Metalworking, 2020) and keep at least three teeth in the work (The Tube and Pipe Journal, 2007).',
   source: "Starrett Bulletin 193 (cutting rate in square inches per minute, minutes per cut for each bar area); Machinery's Handbook 31st ed., band saw blades, p. 1245 (cutting time = area / cutting rate, by name); KASCO (teeth per minute = teeth per foot x blade speed); bundles: A. Popson, 'Bundles of joy', The Tube and Pipe Journal, 2007; 'How to optimize sawing operations', Fabricating and Metalworking, 2020. See docs/sources.md.",
-  proof: [{ name: 'A 5.5 in2 section at 4 in2 per minute', sys: 'inch', vals: { shape: 2, a: 2.75, b: 2, rate: 4 }, expect: [['Cut time from the cutting rate', 'min', 1.375, 1e-9]],
+  proof: [{ name: 'A 5.5 in2 section at 4 in2 per minute', sys: 'inch', vals: { shape: 2, a: 2.75, c: 2, rate: 4 }, expect: [['Cut time from the cutting rate', 'min', 1.375, 1e-9]],
     source: "Machinery's Handbook, 31st ed., band saw blades (by name): cutting time = area / cutting rate, 5.5 in2 at 4 in2 per minute is 1.375 minutes.", note: 'The 2.75 x 2 in rectangle is only a way to enter 5.5 in2.' }],
 },
 {
@@ -1893,7 +1901,7 @@ const TOOLS = [
   desc: 'List the ISO 3 preferred numbers of a Renard series between two values, with the theoretical value, the step and the rounding, or find the preferred number nearest to yours.',
   render: el => renderPrefNum(el),
   working: 'Term i = 10^(i/R) (theoretical); rounded values from the published series; nearest term i = round(R log10 x).',
-  source: 'ISO 3:1973 (by name); values from the iTeh Standards preview of ISO 3:1973 and Wikipedia (Renard series). See docs/inspection.md.',
+  source: 'ISO 3:1973 (by name); values from the iTeh Standards preview of ISO 3:1973 and Wikipedia (Renard series). Use and history (What is this for?): K. O. Kverneland, Machine Design, 5 Nov. 1998, and Wikipedia (Renard series). See docs/inspection.md.',
 },
 {
   id: 'bolt', level: 'simple', group: 'Geometry', title: 'Bolt circle',
@@ -2986,7 +2994,7 @@ const TOOLS = [
 },
 {
   id: 'machines', level: 'simple', group: 'Setup', title: 'Machine profiles',
-  desc: 'Add your machines once. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and max feed.',
+  desc: 'Add your machines once: pick the kind of machine (mill, 5-axis, lathe, Swiss-type, mill-turn, router) and fill in what it has. The active machine (top bar) is used to check every result: spindle speed range, power (with the torque curve at low speed), live tool speed and top feed. The rest (work volume, axes, guideways, thermal compensation, backlash, how the control copes with many short moves) describes the machine for you and for the pages that ask about it.',
   render: el => renderMachines(el),
   working: 'Power available at speed n: P(n) = min(P_max, T_max x 2 pi n / 60 000). Constant torque below base speed, constant power above it.',
   source: 'Standard spindle power/torque characteristic [SAN]. Machine limits come from the builder\'s spec sheet or manual.',

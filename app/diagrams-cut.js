@@ -822,11 +822,24 @@ Object.assign(DIAGRAMS, {
 
   // Bandsaw: the section being cut (to scale), the blade part way through, the down-feed and the time.
   bandsaw(v, sys, rows) {
-    const W = 520, H = 280, u = dcU(sys), shape = v.shape === 2 ? 2 : v.shape === 3 ? 3 : 1, a = v.a, b = v.b;
-    const ok = dcOk(a) && (shape === 1 || dcOk(b)), cx = 150, cy = 150;
-    const ww = shape === 2 ? a : a, hh = shape === 2 ? b : a, s = ok ? Math.min(220 / ww, 170 / hh) : 1, Wp = ok ? ww * s : 160, Hp = ok ? hh * s : 160;
+    const W = 520, H = 280, u = dcU(sys), shape = [1, 2, 3, 4, 5, 6, 7, 8].includes(v.shape) ? v.shape : 1, a = v.a, b = v.b, c = v.c;
+    const needC = [2, 7, 8].includes(shape), needT = [3, 6, 7, 8].includes(shape), cx = 150, cy = 150;
+    const ok = dcOk(a) && (!needC || dcOk(c)) && (!needT || dcOk(b)), wid = dcRow(rows, 'Effective width (longest path of the blade in the work)'), hgt = dcRow(rows, 'Height the blade feeds through');
+    // Width across the blade and height in the feed direction, from the tool's rows (one piece), else from the inputs.
+    const bx = v.bundle === 1 && v.nx >= 1 ? Math.floor(v.nx) : 1, by = v.bundle === 1 && v.ny >= 1 ? Math.floor(v.ny) : 1;
+    const ww = dcOk(wid) ? wid / bx : a, hh = dcOk(hgt) ? hgt / by : needC ? c : a;
+    const s = ok ? Math.min(220 / ww, 170 / hh) : 1, Wp = ok ? ww * s : 160, Hp = ok ? hh * s : 160, tp = ok && needT ? Math.max(2, b * s) : 14;
     let h = '';
-    const sec = cls => shape === 2 ? DK.rect(cx - Wp / 2, cy - Hp / 2, Wp, Hp, cls) : shape === 3 ? dcRing(cx, cy, Math.max(1, Wp / 2 - (ok ? b * s : 18)), Wp / 2, cls) : DK.circle(cx, cy, Wp / 2, cls);
+    const x0 = cx - Wp / 2, x1 = cx + Wp / 2, y0 = cy - Hp / 2, y1 = cy + Hp / 2, P = pts => 'M' + pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join('L') + 'Z';
+    const box = (i, j, k, l) => [[i, j], [k, j], [k, l], [i, l]], hole = (i, j, k, l) => [[i, j], [i, l], [k, l], [k, j]];
+    const sec = cls => {
+      if (shape === 1) return DK.circle(cx, cy, Wp / 2, cls);
+      if (shape === 3) return dcRing(cx, cy, Math.max(1, Wp / 2 - tp), Wp / 2, cls);
+      if (shape === 5) return DK.path(P([[x0 + Wp / 4, y0], [x1 - Wp / 4, y0], [x1, cy], [x1 - Wp / 4, y1], [x0 + Wp / 4, y1], [x0, cy]]), cls);
+      if (shape === 6 || shape === 7) return DK.path(P(box(x0, y0, x1, y1)) + P(hole(x0 + tp, y0 + tp, x1 - tp, y1 - tp)), cls);
+      if (shape === 8) return DK.path(P([[x0, y1], [x1, y1], [x1, y1 - tp], [x0 + tp, y1 - tp], [x0 + tp, y0], [x0, y0]]), cls);
+      return DK.rect(x0, y0, Wp, Hp, cls);
+    };
     const yb = cy - Hp / 2 + Hp * 0.36;
     h += sec('hatch') + '<clipPath id="dcbsc"><rect x="0" y="0" width="' + W + '" height="' + yb.toFixed(1) + '"/></clipPath><g clip-path="url(#dcbsc)">' + sec('part') + '</g>';
     h += DK.cl(cx - Wp / 2 - 12, cy, cx + Wp / 2 + 12, cy) + DK.cl(cx, cy - Hp / 2 - 12, cx, cy + Hp / 2 + 12);
@@ -838,12 +851,14 @@ Object.assign(DIAGRAMS, {
     const t1 = dcRow(rows, 'Cut time from the down-feed'), t2 = dcRow(rows, 'Cut time from the cutting rate'), area = (rows.find(r => r.label === 'Area cut') || {});
     h += DK.arrow(34, yb + 4, 34, yb + 50, 'hot') + DK.text(40, yb + 64, 'down-feed', { cls: 'mut', anchor: 'middle' });
     h += DK.text(cx, cy - Hp / 2 - 8, 'cut', { cls: 'mut' });
-    h += dcDimV(cy - Hp / 2, cy + Hp / 2, cx + Wp / 2 + 74, 'h ' + dcL(shape === 2 ? b : a, u, 'h'), { from: cx + (shape === 2 ? Wp / 2 : 0) + 2 });
-    if (shape !== 2) h += DK.dimH(cx - Wp / 2, cx + Wp / 2, cy + Hp / 2 + 22, 'Ø ' + dcL(a, u, 'D'), { from: cy, below: true });
-    else h += DK.dimH(cx - Wp / 2, cx + Wp / 2, cy + Hp / 2 + 22, 'width ' + dcL(a, u, 'W'), { from: cy + Hp / 2 + 2, below: true });
+    const round = shape === 1 || shape === 3, flatSide = !round && shape !== 5;
+    h += dcDimV(y0, y1, cx + Wp / 2 + 74, (shape === 5 ? 'A ' : needC ? 'C ' : round ? 'h ' : 'A ') + dcL(needC ? c : a, u, 'h'), { from: cx + (flatSide ? Wp / 2 : 0) + 2 });
+    if (round) h += DK.dimH(x0, x1, y1 + 22, 'Ø ' + dcL(a, u, 'D'), { from: cy, below: true });
+    else if (shape === 5) h += DK.dimH(x0, x1, y1 + 22, 'across corners', { from: cy, below: true });
+    else h += DK.dimH(x0, x1, y1 + 22, 'A ' + dcL(a, u, 'W'), { from: y1 + 2, below: true });
     const x = 360, cpt = dcRow(rows, 'Feed per tooth');
     h += DK.text(x, 40, dcOk(t1) ? 'time ' + dcN(t1) + ' min' : dcOk(t2) ? 'time ' + dcN(t2) + ' min' : 'time: enter a rate', { cls: 'hott', anchor: 'start' });
-    h += dcLines(x, 58, [shape === 3 && dcOk(b) ? 'tube wall ' + dcN(b) + ' ' + u : '', dcOk(t1) && dcOk(t2) ? '(' + dcN(t2) + ' min from the rate)' : '', isFinite(area.value) ? 'area ' + dcN(area.value) + ' ' + dcUnit(area.unit) : '', dcOk(v.vf) ? 'down-feed ' + dcN(v.vf) + ' ' + dcFU(sys) : '', dcOk(cpt) ? 'chip per tooth ' + dcN(cpt) : '']);
+    h += dcLines(x, 58, [needT && dcOk(b) ? (shape === 8 ? 'thickness t ' : 'wall t ') + dcN(b) + ' ' + u : '', dcOk(t1) && dcOk(t2) ? '(' + dcN(t2) + ' min from the rate)' : '', isFinite(area.value) ? 'area ' + dcN(area.value) + ' ' + dcUnit(area.unit) : '', dcOk(v.vf) ? 'down-feed ' + dcN(v.vf) + ' ' + dcFU(sys) : '', dcOk(cpt) ? 'chip per tooth ' + dcN(cpt) : '']);
     return DK.svg(W, H, h, 'Bandsaw cut through a section');
   },
 

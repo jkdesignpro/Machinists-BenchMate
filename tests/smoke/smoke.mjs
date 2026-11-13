@@ -126,7 +126,7 @@ await mode('advanced');
 where = 'drawings';
 const NO_DRAWING = new Set(['drillchart', 'gritconv', 'prefnum', 'gmcodes', 'macroref', 'abbrev', 'units', 'symbols', 'gauges', 'calc', 'formulas',
   'machines', 'toollib', 'setupsheet', 'materials', 'tempercolours', 'heattreat', 'plastics', 'metalid',
-  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade', 'holdertorque', 'glossary']);
+  'gsim', 'sketch', 'insertcode', 'gdtfcf', 'boltgrade', 'holdertorque', 'glossary', 'millstrat']);
 await units('inch');
 const noDrawing = [];
 for (const id of meta.tools) {
@@ -237,7 +237,7 @@ await page.fill('#ipv', '9'); await page.dispatchEvent('#ipv', 'input');
 if (!/No standard thread/.test(await page.textContent('#ires'))) problems.push(`[${where}] an 8.4 mm bore with a 9 mm pitch should match nothing`);
 await page.fill('#ipv', '1.5'); await page.dispatchEvent('#ipv', 'input');
 await page.click('#ires a[data-i="0"]');
-await page.waitForSelector('#hk');
+await page.waitForSelector('#hk', { state: 'attached' });
 if ((await page.inputValue('#hk')) !== 'M10x1.5') problems.push(`[${where}] the link should open M10 x 1.5 in Thread data, got ${await page.inputValue('#hk')}`);
 await open('threadid');
 await page.waitForSelector('#ib');
@@ -1528,7 +1528,8 @@ where = 'wireedm';
 where = 'rollblank';
 {
   const txt = async id => (await page.innerText('#main #' + id)).replace(/\s+/g, ' ');
-  const pick = async (id, v) => { await page.selectOption('#main #' + id, v); await page.waitForTimeout(80); };
+  // A thread list is hidden behind its type and size lists (0.8.0): set it as the app does.
+  const pick = async (id, v) => { if (await page.isHidden('#main #' + id)) await page.$eval('#main #' + id, (e, v) => { e.value = v; e.dispatchEvent(new Event('change')); }, v); else await page.selectOption('#main #' + id, v); await page.waitForTimeout(80); };
   const meas = async v => { await page.fill('#main #rbm', v); await page.dispatchEvent('#main #rbm', 'input'); await page.waitForTimeout(60); };
   await units('mm'); await open('rollblank', 250);
   await pick('rbk', 'M10x1.5'); await pick('rbc', '6g');
@@ -2855,9 +2856,9 @@ where = 'toolpaths';
     if (!(geo.f0 >= geo.i - 0.5 && geo.f1 <= geo.u + 0.5)) problems.push(`[${where}] the calculator key should sit between the box and the unit: ${JSON.stringify(geo)}`);
     await open('bandsaw', 200);
     const at = () => page.$eval('#main [data-id="bundle"]', e => { const r = e.getBoundingClientRect(); return Math.round(r.left) + ',' + Math.round(r.top); });
-    const p0 = await at(), b0 = await page.$eval('#main [data-id="b"]', e => [e.disabled, e.closest('label').classList.contains('na'), !!e.offsetParent]);
+    const p0 = await at(), b0 = await page.$eval('#main [data-id="c"]', e => [e.disabled, e.closest('label').classList.contains('na'), !!e.offsetParent]);
     await page.selectOption('#main [data-id="shape"]', '2'); await page.waitForTimeout(60);
-    const p1 = await at(), b1 = await page.$eval('#main [data-id="b"]', e => e.disabled);
+    const p1 = await at(), b1 = await page.$eval('#main [data-id="c"]', e => e.disabled);
     if (p0 !== p1 || b0.join() !== 'true,true,true' || b1 !== false) problems.push(`[${where}] bandsaw boxes should stay in place, the height greyed out for a round bar: ${p0} / ${p1}, ${b0}, ${b1}`);
     await page.click('#main .tpa button[title^="Reset"]');
     const ss = await page.evaluate(() => ({ g: TOOLS.find(t => t.id === 'slitsaw').group, m: WORKSPACES.find(w => w.id === 'milling').sections.find(x => x[0] === 'Speeds and feeds')[1].includes('slitsaw') }));
@@ -2901,6 +2902,103 @@ where = 'toolpaths';
     if (await page.$('#main [data-id="tm"] option[value="6"]')) problems.push(`[${where}] the drilling advisor keeps HSS and carbide only`);
 
     await mode(m0);
+  }
+
+  // 0.8.0: search inside pages, thread sizes in two steps and in their own units, more bandsaw sections.
+  where = 'search-080';
+  {
+    const q = async t => { await page.click('#search'); await page.fill('#search', t); await page.waitForTimeout(250); return page.$$eval('#searchpop .sh', a => a.map(x => (x.classList.contains('kid') ? '- ' : '') + x.querySelector('b').textContent)); };
+    let r = await q('v-block');
+    if (r[0] !== 'Measurement guide' || r[1] !== '- V-blocks') problems.push(`[${where}] a section heading should be found under its guide: ${r.join(' | ')}`);
+    r = await q('speed');
+    if (r.length > 30 || !r.includes('Milling advisor')) problems.push(`[${where}] "speed" should list the advisors and stay short: ${r.length}`);
+    r = await q('m12');
+    if (r[0] !== 'Thread data and limits: M12') problems.push(`[${where}] a thread size goes to Thread data: ${r[0]}`);
+    await page.keyboard.press('Enter'); await page.waitForTimeout(500);
+    if ((await page.inputValue('#main #hk')) !== 'M12x1.75') problems.push(`[${where}] M12 should open the coarse pitch: ${await page.inputValue('#main #hk')}`);
+    r = await q('tool signature'); await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter'); await page.waitForTimeout(900);
+    const top = await page.evaluate(() => { const e = document.getElementById('t-sig'); return e ? e.getBoundingClientRect().top : null; });
+    if (top === null || top < 0 || top > 400) problems.push(`[${where}] picking a section should scroll to it: ${top}`);
+  }
+  where = 'thread-080';
+  {
+    await open('threaddata', 400);
+    const ty = '#main select[aria-label="Thread type"]', sz = '#main select[aria-label="Size"]';
+    const types = await page.$$eval(ty + ' option', a => a.map(o => o.value));
+    if (types.join(',') !== 'mc,mf,UNC,UNF,UNEF,custom') problems.push(`[${where}] thread types: ${types}`);
+    await page.selectOption(ty, 'UNC'); await page.waitForTimeout(150);
+    const n = await page.$$eval(sz + ' option', a => a.length), first = await page.$eval(sz, e => e.options[0].textContent);
+    if (n < 10 || n > 40 || /UNF/.test(first)) problems.push(`[${where}] UNC sizes only: ${n}, ${first}`);
+    await page.selectOption(ty, 'custom'); await page.waitForTimeout(150);
+    await page.selectOption('#hs', 'metric'); await page.fill('#hd', '50'); await page.fill('#hp', '0.4'); await page.dispatchEvent('#hp', 'input'); await page.waitForTimeout(150);
+    let t = await page.$eval('#hres', e => e.innerText.replace(/\s+/g, ' '));
+    if (!/Pitch P 0\.4000 mm|Pitch P [^|]*0\.400/i.test(t) && !/1\.9685 in|50\.000 mm/.test(t)) problems.push(`[${where}] M50 x 0.4 typed in mm: ${t.slice(0, 200)}`);
+    if ((await page.textContent('#hdu')) !== 'mm' || (await page.textContent('#hpu')) !== 'mm') problems.push(`[${where}] metric sizes are typed in mm whatever the units`);
+    await page.selectOption('#hs', 'unified'); await page.fill('#hd', '1/4'); await page.fill('#hp', '10'); await page.dispatchEvent('#hp', 'input'); await page.waitForTimeout(150);
+    t = await page.$eval('#hres', e => e.innerText.replace(/\s+/g, ' '));
+    if ((await page.textContent('#hpu')) !== 'TPI' || !/10\.00 TPI/.test(t) || !/6\.350 mm|0\.2500 in/.test(t)) problems.push(`[${where}] 1/4 in x 10 TPI: ${t.slice(0, 200)}`);
+    await page.selectOption(ty, 'mc'); await page.waitForTimeout(150);
+  }
+  where = 'bandsaw-080';
+  {
+    await open('bandsaw', 200);
+    const shapes = await page.$$eval('#main [data-id="shape"] option', a => a.map(o => o.value).join(','));
+    if (shapes !== '1,4,5,2,3,6,7,8') problems.push(`[${where}] sections: ${shapes}`);
+    const set = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, String(v)); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); };
+    await page.selectOption('#main [data-id="shape"]', '5'); await set('a', 50); await page.waitForTimeout(80);
+    let t = await page.$eval('#res', e => e.innerText.replace(/\s+/g, ' '));
+    // hexagon 50 across flats: sqrt3/2 x 2500 = 2165.06 mm2 = 21.65 cm2 (mm) or in2 (inch); across corners 57.74
+    if (!/21\.65|2,165|3\.36/.test(t) && !/57\.74/.test(t)) problems.push(`[${where}] hexagon: ${t.slice(0, 200)}`);
+    await page.selectOption('#main [data-id="shape"]', '8'); await set('c', 50); await set('b', 5); await page.waitForTimeout(80);
+    t = await page.$eval('#res', e => e.innerText.replace(/\s+/g, ' '));
+    if (!/4\.75|475/.test(t)) problems.push(`[${where}] angle 50 x 50 x 5 is 475 area units: ${t.slice(0, 200)}`);
+    await page.click('#main .tpa button[title^="Reset"]');
+  }
+
+  // 0.8.0: "What is this for?" on the less familiar tools; the machine builder per machine type.
+  where = 'about-080';
+  {
+    await open('prefnum', 300);
+    const ab = await page.evaluate(() => { const d = document.querySelector('#main details.about'); return d ? { open: d.open, sum: d.querySelector('summary').textContent, txt: d.textContent } : null; });
+    if (!ab || ab.sum !== 'What is this for?' || !/Kverneland/.test(ab.txt) || !/425 to 17 \(one publisher, to be verified\)/.test(ab.txt)) problems.push(`[${where}] preferred numbers should explain what they are for, with sources: ${ab && ab.txt.slice(0, 160)}`);
+    for (const id of ['gdtstack', 'capability', 'grr', 'chatter', 'tempcomp']) { await open(id, 120); if (!(await page.$('#main details.about'))) problems.push(`[${where}] ${id} has no "What is this for?"`); }
+  }
+  where = 'millstrat-080';
+  {
+    await open('millstrat', 200);
+    const st = async () => page.$$eval('#msres .mscard .msv', a => a.map(x => x.querySelector('b').textContent + '=' + x.querySelector('span').textContent));
+    await page.selectOption('#main [data-k="small"]', 'Stutters or stops between moves'); await page.waitForTimeout(60);
+    let r = await st();
+    if (!r.includes('Adaptive or trochoidal (high-efficiency milling)=Not suited')) problems.push(`[${where}] a control that stutters rules out trochoidal: ${r}`);
+    await page.selectOption('#main [data-k="small"]', 'Runs them smoothly at the programmed feed'); await page.selectOption('#main [data-k="feat"]', '4'); await page.waitForTimeout(60);
+    r = await st();
+    if (r[0] !== 'Adaptive or trochoidal (high-efficiency milling)=Good fit') problems.push(`[${where}] a pocket on a smooth control should favour trochoidal: ${r}`);
+    await page.selectOption('#main [data-k="rig"]', 'Light (bench or hobby machine)'); await page.waitForTimeout(60);
+    const txt = await page.$eval('#msres', e => e.textContent);
+    if (!/Sources differ on a light machine/.test(txt) || !/one publisher, to be verified/.test(txt)) problems.push(`[${where}] the disagreement on rigidity and the one-publisher marks should show`);
+    await page.selectOption('#main [data-k="small"]', 'Not known'); await page.selectOption('#main [data-k="rig"]', 'Medium'); await page.selectOption('#main [data-k="feat"]', '3');
+  }
+  where = 'machines-080';
+  {
+    await units('mm'); await open('machines', 200);
+    await page.click('#mnew'); await page.waitForTimeout(80);
+    const secs = async () => page.$$eval('#mform details.msec summary', a => a.map(x => x.textContent).join('|'));
+    await page.click('#mform .mtype[data-t="swiss"]'); await page.waitForTimeout(60);
+    const sw = await secs(), swk = await page.$$eval('#mform [data-k]', a => a.map(x => x.dataset.k));
+    if (!/Sub spindle/.test(sw) || !/Live \(driven\) tools/.test(sw) || !swk.includes('radial') || !swk.includes('axial') || !swk.includes('gb') || swk.includes('kin')) problems.push(`[${where}] Swiss-type should ask for guide bushing, radial and axial tools, sub spindle: ${sw}`);
+    await page.fill('#mform [data-k="name"]', 'Smoke five');
+    await page.click('#mform .mtype[data-t="mill5"]'); await page.waitForTimeout(60);
+    const mk = await page.$$eval('#mform [data-k]', a => a.map(x => x.dataset.k));
+    if (!mk.includes('kin') || !mk.includes('tcp') || mk.includes('radial') || (await page.inputValue('#mform [data-k="name"]')) !== 'Smoke five') problems.push(`[${where}] 5-axis should ask for the rotary layout and keep the name typed`);
+    for (const [k, v] of [['tx', '762'], ['ty', '508'], ['tz', '508'], ['rpm_max', '12000']]) await page.fill(`#mform [data-k="${k}"]`, v);
+    await page.$$eval('#mform details.msec', a => a.forEach(d => { d.open = true; }));
+    await page.selectOption('#mform [data-k="gx"]', 'Linear guides (rails)'); await page.selectOption('#mform [data-k="thermal"]', 'Spindle and axes');
+    await page.click('#msave'); await page.waitForTimeout(100);
+    const m = await page.evaluate(() => Profiles.all().find(x => x.name === 'Smoke five'));
+    if (!m || m.type !== '5-axis mill / machining centre' || m.tx !== '762' || m.gx !== 'Linear guides (rails)' || m.thermal !== 'Spindle and axes') problems.push(`[${where}] saved machine: ${JSON.stringify(m)}`);
+    const row = await page.$eval('#main .res', e => e.innerText);
+    if (!/travel 762 x 508 x 508 mm/.test(row)) problems.push(`[${where}] the list should sum up the machine: ${row.slice(0, 200)}`);
+    if (m) await page.evaluate(id => { Profiles.remove(id); refreshMachineSelect(); }, m.id);
   }
 
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.
@@ -3051,8 +3149,8 @@ await mode('advanced');
 await units('mm');
 await page.evaluate(() => localStorage.removeItem('bm.thrhist'));
 await open('threaddata', 300);
-await page.waitForSelector('#hk');
-await page.selectOption('#hk', 'M12x1.75');
+await page.waitForSelector('#hk', { state: 'attached' });
+await page.$eval('#hk', (e, v) => { e.value = v; e.dispatchEvent(new Event('change')); }, 'M12x1.75');
 await page.waitForTimeout(60);
 const th0 = await page.evaluate(() => [(JSON.parse(localStorage.getItem('bm.thrhist') || '[]')[0] || {}).key, (document.querySelector('#hhist .fchip') || {}).textContent || '']);
 if (th0[0] !== 'M12x1.75' || !/M12 x 1\.75/.test(th0[1])) problems.push(`[${where}] last thread not first in Recent threads: ${JSON.stringify(th0)}`);
@@ -3079,8 +3177,8 @@ if (tmStd.join(' ') !== '16 2 0 1') problems.push(`[${where}] Fill from a standa
 where = 'threaddata to lathe G76 (inch)';
 await units('inch');
 await open('threaddata', 200);
-await page.waitForSelector('#hk');
-await page.selectOption('#hk', '1/2-13 UNC');
+await page.waitForSelector('#hk', { state: 'attached' });
+await page.$eval('#hk', (e, v) => { e.value = v; e.dispatchEvent(new Event('change')); }, '1/2-13 UNC');
 await page.click('#hgolathe');
 await page.waitForSelector('#main [data-k="major"]');
 const lt = await page.evaluate(() => [location.hash, document.querySelector('#main [data-k="major"]').value, document.querySelector('#main [data-k="pitch"]').value]);

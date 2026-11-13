@@ -150,6 +150,20 @@ computed. The screen shows both and the percentage difference.
 Wikipedia's "Preferred number" article (same publisher) also prints R5 and is
 not counted again.
 
+**What is this for (0.8.0).** The tool opens with a folded explanation of what
+preferred numbers are used for, read on 2026-11-13:
+
+| Statement | Kverneland, Machine Design, 5 Nov. 1998 | Wikipedia, "Renard series" | Status |
+|---|---|---|---|
+| Charles Renard, French army officer, 1870s | 1870s | about 1877 | two publishers |
+| Steps | 60 % (R5), 25 % (R10), 12 % (R20) | ratios 1.58, 1.26, 1.12, 1.06 | two publishers, shown side by side |
+| R5 first choice, R10 second, R20 third | yes | not stated | one publisher |
+| Balloon rope diameters cut from 425 to 17 | yes | not stated (mentions an 1886 instruction for captive balloon troops) | to be verified |
+| Adopted by ISO in 1949 as R3, now ISO 3 | not stated | yes | to be verified |
+| Uses | screw threads, steel plates and sheets, round bars, lifting capacities, hydraulic cylinder diameters | fuse current ratings, capacitor voltage ratings, nail lengths | each as printed |
+| Nearest Renard number keeps the largest relative error smallest | not stated | yes | one publisher |
+| Thousands of dollars saved per fastener size removed | yes | not stated | to be verified |
+
 ## 4. Micrometer and vernier reading
 
 Already covered by `scales` (our own drawings of the scales and a breakdown of

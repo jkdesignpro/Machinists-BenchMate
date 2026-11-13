@@ -63,7 +63,7 @@ const WORKSPACES = [
   ] },
   { id: 'milling', name: 'Milling', icon: 'milling', blurb: 'Speeds and feeds, engagement, deflection and chatter for mills.', sections: [
     ['Speeds and feeds', ['advmill', 'advplunge', 'rpm', 'feeds', 'slitsaw', 'mrr', 'kcforce', 'cutopt', 'toollife'], 'gauge'],
-    ['Engagement', ['chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
+    ['Engagement', ['millstrat', 'chipthinning', 'cornerfeeds', 'helix', 'ballnose'], 'path'],
     ['Tool behaviour', ['deflection', 'runout', 'chatter'], 'wave'],
     ['Tool holding', ['holdertorque', 'machinetapers'], 'nut'],
     ['Other milling', ['surfacefin', 'chamfermill', 'indexing'], 'saw'],

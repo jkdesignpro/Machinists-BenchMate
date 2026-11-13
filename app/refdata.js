@@ -92,6 +92,55 @@ function threadSelect(opts, cur) {
   return '<option value="custom"' + (cur === 'custom' ? ' selected' : '') + '>Other: enter major diameter and pitch</option><optgroup label="ISO metric (ISO 261 / ISO 262)">' + g('metric') + '</optgroup><optgroup label="Unified inch (ASME B1.1)">' + g('unified') + '</optgroup>';
 }
 
+// 0.8.0: a thread list in two steps instead of one long list: first the type (ISO metric coarse, metric fine,
+// UNC, UNF, UNEF ... or Other), then the standard sizes of that type. The original <select> stays as the
+// single source of the value (hidden), so every tool that reads it or sets it keeps working.
+function threadType(o) {
+  if (o.value === 'custom') return 'custom';
+  if (/^M/.test(o.value)) return /\(coarse\)/.test(o.textContent) ? 'mc' : 'mf';
+  const m = o.value.match(/ (\S+)$/); return m ? m[1] : 'other';
+}
+const THREAD_TYPE_NAMES = { mc: 'ISO metric, coarse', mf: 'ISO metric, fine', UNC: 'UNC (Unified coarse)', UNF: 'UNF (Unified fine)', UNEF: 'UNEF (Unified extra fine)', custom: 'Other size: type the diameter and pitch' };
+function enhanceThreadSelect(sel) {
+  if (!sel || sel.dataset.tp) return; sel.dataset.tp = '1';
+  const all = [...sel.querySelectorAll('option')].map(o => ({ value: o.value, text: o.textContent, type: threadType(o) }));
+  const ORD = ['mc', 'mf', 'UNC', 'UNF', 'UNEF'], rank = t => t === 'custom' ? 99 : ORD.includes(t) ? ORD.indexOf(t) : 50;
+  const types = [...new Set(all.map(o => o.type))].sort((a, b) => rank(a) - rank(b));
+  const lab = sel.closest('label'), ty = document.createElement('select'), sz = document.createElement('select');
+  ty.innerHTML = types.map(t => '<option value="' + rEsc(t) + '">' + rEsc(THREAD_TYPE_NAMES[t] || t) + '</option>').join('');
+  ty.setAttribute('aria-label', 'Thread type'); sz.setAttribute('aria-label', 'Size');
+  const tlab = document.createElement('label'); tlab.className = 'f'; tlab.innerHTML = '<span>Thread type</span><div class="row"></div>'; $('.row', tlab).appendChild(ty);
+  lab.parentNode.insertBefore(tlab, lab);
+  $('span', lab).textContent = 'Size'; sel.hidden = true; sel.before(sz);
+  const fill = t => {
+    const list = all.filter(o => o.type === t);
+    sz.innerHTML = list.map(o => '<option value="' + rEsc(o.value) + '">' + rEsc(t === 'custom' ? 'Type it in the boxes below' : o.text.replace(/ \((coarse|fine)\)$/, '').replace(/ (UNC|UNF|UNEF)$/, '')) + '</option>').join('');
+    sz.disabled = t === 'custom'; lab.classList.toggle('na', t === 'custom');
+  };
+  const sync = () => { const o = all.find(x => x.value === sel.value) || all[0]; if (!o) return; if (ty.value !== o.type) { ty.value = o.type; fill(o.type); } sz.value = o.value; };
+  const pick = v => { desc.set.call(sel, v); sel.dispatchEvent(new Event('change')); };
+  ty.onchange = () => {
+    // Keep near the size already shown: the first size of the new type at or above its diameter.
+    const was = all.find(x => x.value === sel.value), dia = was ? parseFloat(String(was.text).replace(/^M/, '')) : NaN;
+    fill(ty.value);
+    const list = all.filter(o => o.type === ty.value);
+    const next = (ty.value === 'mc' || ty.value === 'mf') && (was && /^M/.test(was.value)) && isFinite(dia) ? (list.find(o => parseFloat(o.text.replace(/^M/, '')) >= dia - 1e-9) || list[0]) : list[0];
+    if (next) pick(next.value);
+  };
+  sz.onchange = () => pick(sz.value);
+  // A value set by code (recent threads, a link) moves both lists with it.
+  const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+  Object.defineProperty(sel, 'value', { configurable: true, get() { return desc.get.call(this); }, set(v) { desc.set.call(this, v); sync(); } });
+  sync();
+}
+// Size of a thread typed in the "Other" boxes: a fraction or mixed number of inches is read too (1/4, 1-1/4, 1 1/4).
+function parseSize(txt) {
+  const t = String(txt || '').trim().replace(/["”]$/, '').trim();
+  let m = t.match(/^(\d+)[ -](\d+)\/(\d+)$/); if (m) return +m[1] + m[2] / m[3];
+  m = t.match(/^(\d+)\/(\d+)$/); if (m) return m[1] / m[2];
+  return t === '' ? NaN : Number(t);
+}
+
 // ------------------------------------------------------------------ tap drills
 const DRILL_SERIES = [['number', 'Number'], ['letter', 'Letter'], ['fraction', 'Fractional'], ['metric', 'Metric']];
 // Nearest drill at or below and above `mm` in each series (a lookup in the drill chart).
@@ -321,19 +370,38 @@ async function renderThreadData(el) {
   const R = await loadRef(el); if (!R) return;
   const W = state.W, opts = threadOptions(R), T = R.threads;
   const m = RMEM.thd || (RMEM.thd = { key: 'M10x1.5', d: 10, p: 1.5, int: 0 });
+  // A size typed in the top-bar search (M12, M10 x 1.25, 1/4-20): the coarse pitch when no pitch is given.
+  if (window.PENDING_THREAD) {
+    const q = String(window.PENDING_THREAD).toLowerCase().replace(/\s+/g, ''); window.PENDING_THREAD = null;
+    const mm = q.match(/^m(\d+(?:\.\d+)?)(?:x(\d+(?:\.\d+)?))?$/), un = q.match(/^(#?[\d\/-]+?)-(\d+)(unc|unf|unef)?$/);
+    const hit = mm ? opts.filter(o => o.sys === 'metric' && Math.abs(o.d - +mm[1]) < 1e-9 && (!mm[2] || Math.abs(o.p - +mm[2]) < 1e-9)).sort((a, b) => b.p - a.p)[0]
+      : un ? opts.find(o => o.sys === 'unified' && o.key.toLowerCase().replace(/\s+/g, '').startsWith(un[1] + '-' + un[2] + (un[3] || ''))) : null;
+    if (hit) { m.key = hit.key; m.d = hit.d; m.p = hit.p; m.sys = hit.sys; }
+  }
   el.innerHTML = '<div class="grid" style="max-width:760px"><label class="f"><span>Thread</span><div class="row"><select id="hk">' + threadSelect(opts, m.key) + '</select></div></label>' +
-    '<label class="f cust"><span>Major diameter</span><div class="row"><input id="hd" type="number" step="any"><span class="u">' + uLen() + '</span></div></label>' +
-    '<label class="f cust"><span>Pitch' + (inMode() ? ' (threads per inch)' : '') + '</span><div class="row"><input id="hp" type="number" step="any"><span class="u">' + (inMode() ? 'TPI' : 'mm') + '</span></div></label>' +
-    '<label class="f cust"><span>Thread system (for tolerances)</span><div class="row"><select id="hs"><option value="metric">ISO metric</option><option value="unified">Unified inch</option></select></div></label></div>' +
+    '<label class="f cust"><span>Thread system</span><div class="row"><select id="hs"><option value="metric">ISO metric: diameter and pitch in mm</option><option value="unified">Unified inch: diameter in inches, threads per inch</option></select></div></label>' +
+    '<label class="f cust"><span>Major diameter</span><div class="row"><input id="hd" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"><span class="u" id="hdu"></span></div></label>' +
+    '<label class="f cust"><span id="hpl">Pitch</span><div class="row"><input id="hp" type="number" step="any"><span class="u" id="hpu"></span></div></label>' +
+    '<p class="desc cust" id="hcm" style="grid-column:1/-1;margin:0"></p></div>' +
     '<div class="thhist" id="hhist"></div><div id="hres"></div><div class="thgo" id="hgo"></div><div class="note"><b>Working:</b> Basic profile (ISO 68-1:2023, ASME B1.1-2024): H = 0.866025 P; pitch diameter d2 = D - 0.649519 P; basic minor diameter D1 = D - 1.082532 P (internal thread); ISO external minor diameter d3 = D - 1.226869 P (rounded root used for tolerancing). ' +
     'ISO metric tolerances from the ISO 965-1 formulas: Td2(6) = 90 P^0.4 d^0.1 (d = geometric mean of the diameter step), TD2 = 1.32 Td2(6), Td(6) = 180 P^(2/3) - 3.15 P^(-1/2), TD1(6) = 230 P^0.7 (P >= 1 mm) or 433 P - 190 P^1.22, es(g) = -(15 + 11 P), each rounded to the R40 series. The standard\'s own tables (ISO 965-2/-3) are normative and differ from these formulas by one R40 step for some sizes (found for M3, M10, M20, M36, M39, M42 against published tables); BenchMate shows published limits where two publishers print them and marks computed ones. ISO 965-1 was revised in 2026 (ISO 965-1:2026); the formulas here were checked against tables published under the 2013 and earlier editions. ' +
     'Unified: PD tolerance 2A = 0.0015 D^(1/3) + 0.0015 sqrt(LE) + 0.015 P^(2/3) with LE = D (reproduces all 30 class 2A rows checked in a published table), 1A 1.5x, 3A 0.75x, 1B 1.95x, 2B 1.3x, 3B 0.975x; allowance 1A/2A = 0.3 x Td2(2A), 3A/3B none; major tolerance 2A/3A = 0.060 P^(2/3); rounded to 0.0001 in. Class 2B minor diameter limits are computed (rule in the table note); 1B and 3B minor limits are not. TD2 of internal classes is the factor times the unrounded 2A tolerance, then rounded, which is the order that reproduces the published 2B table.<br><b>Sources:</b> thread series and limits as listed below; formulas: ISO 68-1:2023, ISO 965-1:2013/2026 (formula clause), ASME B1.1-2024 (Table 4 title gives the 2A formula).</div><div class="note" id="hsrc"></div>';
   const k = $('#hk', el), hd = $('#hd', el), hp = $('#hp', el), hs = $('#hs', el);
+  // A thread of another size is typed in the units of its own system, whatever the units of the app:
+  // ISO metric in mm with a pitch in mm (M50 x 0.4), Unified in inches with threads per inch (1/4 x 10 TPI).
+  // So a metric diameter with an inch pitch cannot be typed.
+  const uni = () => hs.value === 'unified';
+  function custUnits() {
+    $('#hdu', el).textContent = uni() ? 'in' : 'mm'; $('#hpu', el).textContent = uni() ? 'TPI' : 'mm';
+    $('#hpl', el).textContent = uni() ? 'Threads per inch' : 'Pitch';
+    hd.placeholder = uni() ? 'e.g. 1/4 or 0.25' : 'e.g. 50'; hp.placeholder = uni() ? 'e.g. 10' : 'e.g. 0.4';
+    $('#hcm', el).textContent = uni() ? 'Unified: diameter in inches (a fraction such as 1/4 or 1-1/4 is fine) and threads per inch.' : 'ISO metric: diameter and pitch in millimetres, for example 50 and 0.4 for M50 x 0.4.';
+  }
   function setCustom() {
     const c = k.value === 'custom';
     el.querySelectorAll('.cust').forEach(x => x.style.display = c ? '' : 'none');
-    hd.value = +toUser(m.d).toFixed(inMode() ? 4 : 3); hp.value = inMode() ? +(IN_MM / m.p).toFixed(3) : +m.p.toFixed(4);
-    hs.value = m.sys || 'metric';
+    hs.value = m.sys || 'metric'; custUnits();
+    hd.value = uni() ? +(m.d / IN_MM).toFixed(4) : +m.d.toFixed(3); hp.value = uni() ? +(IN_MM / m.p).toFixed(3) : +m.p.toFixed(4);
   }
   // A small copy button for one value: copies the number as shown, without its unit.
   const cpy = (txt, what) => { const t = rEsc(what || 'Copy ' + txt); return '<button type="button" class="cpy" data-copy="' + rEsc(txt) + '" title="' + t + '" aria-label="' + t + '">' + icon('copy') + '</button>'; };
@@ -342,7 +410,7 @@ async function renderThreadData(el) {
   function row(label, mm, extra) { return '<tr><td>' + label + (extra || '') + '</td><td class="v">' + fBoth(mm) + cpy(fLen(mm)) + '</td></tr>'; }
   // Recent threads (last 10 looked up, newest first), kept in this browser. Sizes in mm.
   const histKey = t => t.key && t.key !== 'custom' ? t.key : 'custom:' + (+t.d.toFixed(4)) + 'x' + (+t.p.toFixed(5)) + ':' + t.sys;
-  const histLabel = t => { const o = t.key !== 'custom' && opts.find(x => x.key === t.key); return o ? o.label : fLen(t.d) + ' ' + uLen() + ' x ' + (t.sys === 'unified' || inMode() ? fx(IN_MM / t.p, 2) + ' TPI' : fx(t.p, 3) + ' mm') + ' (other)'; };
+  const histLabel = t => { const o = t.key !== 'custom' && opts.find(x => x.key === t.key); return o ? o.label : t.sys === 'unified' ? fx(t.d / IN_MM, 4) + ' in x ' + fx(IN_MM / t.p, 2) + ' TPI (other)' : 'M' + fx(t.d, 3) + ' x ' + fx(t.p, 3) + ' (other)'; };
   const hist = () => { const h = lsJson('bm.thrhist', []); return Array.isArray(h) ? h.filter(t => t && t.d > 0 && t.p > 0) : []; };
   function remember(t) {
     const id = histKey(t);
@@ -366,7 +434,7 @@ async function renderThreadData(el) {
     m.key = k.value;
     let sel = opts.find(o => o.key === k.value), d, p, sys, tpi;
     if (sel) { d = sel.d; p = sel.p; sys = sel.sys; tpi = sel.tpi; m.d = d; m.p = p; }
-    else { d = fromUser(parseFloat(hd.value)); const pv = parseFloat(hp.value); p = inMode() ? IN_MM / pv : pv; tpi = inMode() ? pv : undefined; sys = hs.value; m.sys = sys; if (d > 0 && p > 0) { m.d = d; m.p = p; } }
+    else { sys = hs.value; const dv = parseSize(hd.value), pv = parseFloat(hp.value); d = sys === 'unified' ? dv * IN_MM : dv; p = sys === 'unified' ? IN_MM / pv : pv; tpi = sys === 'unified' ? pv : undefined; m.sys = sys; if (d > 0 && p > 0) { m.d = d; m.p = p; } }
     const out = $('#hres', el);
     cur = null; drawGo();
     if (!(d > 0 && p > 0 && p < d)) { out.innerHTML = '<div class="res"><table><tr><td class="warn">Enter the thread size.</td></tr></table></div>'; return; }
@@ -435,7 +503,10 @@ async function renderThreadData(el) {
   $('#hres', el).addEventListener('click', e => { const b = e.target.closest('button.cpy'); if (b) copyText(b.dataset.copy); });
   // A thread counts as looked up when it is picked, or when a typed size is finished (change, not every key).
   const look = () => { if (cur) remember(cur); };
-  k.onchange = () => { setCustom(); upd(); look(); }; hd.oninput = upd; hp.oninput = upd; hs.onchange = () => { upd(); look(); };
+  k.onchange = () => { setCustom(); upd(); look(); }; hd.oninput = upd; hp.oninput = upd;
+  // Changing the system keeps the size and shows it in the new units.
+  hs.onchange = () => { m.sys = hs.value; setCustom(); upd(); look(); };
+  enhanceThreadSelect(k);
   hd.onchange = look; hp.onchange = look;
   setCustom(); upd(); drawHist();
 }

@@ -12,7 +12,8 @@ A free, open-source (AGPLv3) machinist's calculator, built to sit beside the mac
 - **Calculator**: opens over any page (Alt+C) and from any number box.
 - **Every calculator**: a large main result, a drawing, linked boxes where either value can be typed, decimals, reset, copy, pin, print, a link that reopens it with the same numbers, "Formula and sources", and on a growing number of tools a published worked example to check the maths against.
 - **Machine control look**: styled as a CNC control panel, with results on readout screens and hard keys. Dark, Light or Auto theme, and an accent colour you choose from swatches or a colour picker.
-- **Compact view** for a narrow window; search with Ctrl+K.
+- **Compact view** for a narrow window.
+- **Search** (Ctrl+K): finds tools by name or everyday word, the sections inside guides and reference pages, and thread sizes typed straight in (M12, 1/4-20).
 
 See `docs/design.md` for the look, the shell and how a tool and its drawing are added.
 
@@ -90,6 +91,9 @@ Parametric 2D shapes exported as DXF for CAM: bolt circle (with outside diameter
 **2D sketcher** (0.4.0): draw points, lines, arcs through three points, circles, rectangles and one-line text on named, coloured layers. Snaps to ends, crossings, middles, centres, quadrants, tangents, square onto a line, the nearest point of a line and a grid; typed points (`x,y`, `@dx,dy`, `@length<angle`, `r5`, `d10`); level-or-upright lock; move, copy, delete; undo and redo. Select one entity for its length, radius, area and angles; two lines for the angle between them and where they meet; two holes for the centre distance. Measure any two points. **Open a DXF** (lines, arcs, circles, points, text, polylines with arcs, layers and units are read; anything else is counted and listed) and **save a DXF** in R2000 or R12, as polylines or as separate lines and arcs. The drawing and all its geometry live in the Rust core.
 
 **Insert builder** (0.4.0): decode a metric ISO 1832 insert code or tap one together key by key, and see the insert drawn to scale from above and in section: the real outline with its corner radii, the inscribed circle, edge length, corner height, thickness, clearance and (where ISO 3364 gives it) the fixing hole. One key sends the nose radius to the turning advisor or the finish calculator, saves the insert in the tool library, or opens the outline in the sketcher or as a DXF. The outline is worked out in the Rust core and reproduces the 18 corner heights printed in ISO 3364:1997.
+
+## Machine profiles, milling strategy and backlash (0.8.0)
+**Machine profiles** are built per machine type (mill, 5-axis, lathe, Swiss-type, mill-turn, router): axes and layout, work volume, spindles and live tools, feeds, guideways, scales, thermal compensation, backlash per axis, and how the control copes with many short moves. **Milling strategy** marks adaptive or trochoidal, traditional, plunge and high-feed roughing for the feature, the reach and the machine, with sourced reasons (`docs/strategy.md`). **Backlash** reads lost motion from an indicator test, rotary play as an angle, and gear backlash from the centre distance (`docs/backlash.md`). The less familiar tools open with a folded **What is this for?**.
 
 ## Speeds and feeds advisor and cutting forces (0.3.0)
 **0.8.0:** the feed is shown as large as the spindle speed; the inputs are grouped under headings (the job, the tool, the cut) with the rest folded away; tool materials now include cermet, ceramic, CBN and PCD; a **Coating** list (15 coatings, common ones first, with a find box) and a card that says what the tool material and coating suit and what to avoid for the work material, with the sources.
