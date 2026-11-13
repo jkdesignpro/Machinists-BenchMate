@@ -7,7 +7,17 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 ## [0.8.0] - in progress
 Work on the feedback after using 0.7.0.
 
-### Changed
+### Added (tool materials and coatings in the advisors)
+- Milling and turning advisors: the tool material can now also be cermet, ceramic, CBN or PCD. No speed table for these is built in, so the advisor asks for the maker's cutting speed for the grade (and, for milling, its chip load) and then checks the cut as before.
+- Milling, drilling and turning advisors: a new **Coating** box with 15 choices, the common ones first (uncoated, TiN, TiCN, TiAlN, AlTiN, AlCrN, ZrN, DLC, CVD diamond) and the rest under "More" (CVD multilayer on inserts, TiSiN and AlTiSiN nanocomposites, TiB2, CrN, MoS2, steam oxide). A find button beside the box narrows the list as you type.
+- A **Tool material and coating** card under the result says what the choice suits and what it should not be used on for the chosen work material, worst first: for example PCD or diamond on steel or cast iron, or TiAlN and AlTiN on aluminium. Where the sources disagree (AlCrN on aluminium) both are shown. It lists each source's highest working temperature for the coating as printed, °F where the source prints °F, without converting. A coating never changes the speed or feed worked out: the maker's chart for the coated tool comes first.
+- Seven new sources read on 2026-11-13: Production Machining (PMPA), AIMS Industrial Supplies (coatings and tool materials, counted as one publisher), NTK Cutting Tools, Kennametal, Mitsubishi Materials and WIDIA in Modern Machine Shop. AlCrN's 1100 °C is now printed by two publishers (Oerlikon Balzers and AIMS).
+
+### Changed (sources)
+- Sources sit under their own folded **Sources** heading on every page. In the guides the source list at the bottom is folded, and the source keys after each statement and the Sources columns of the tables are hidden until you tick "Show the source keys" in any Sources fold (one setting for all pages). "to be verified" always stays in view; in tables it sits under a "Status" heading while the keys are hidden. Notes that end with a "Sources" heading fold the same way, and the advisors' tables of what each publisher prints are folded (open or shut is remembered).
+
+### Changed (advisors)
+- The inputs of the milling, drilling and turning advisors are grouped under headings: the job, the tool, the cut, with your own figures, the insert and chip breaker, the machine limits and the expert inputs folded away. Each heading remembers whether you left it open.
 - Advisors (milling, plunge roughing, drilling, reaming, tapping, turning): the feed is now shown as large as the spindle speed at the top of the result, with a short note on where it came from, instead of only in the list below. The tiles under it no longer repeat the spindle speed and feed; they say only whether they are inside the machine's top speed and top feed.
 - Any tool can now put more than one figure in the headline: a result row marked `big` sits beside the first one.
 - The calculator button in a number box is now its own small key between the box and the unit, always there and dim until the pointer is over the box. It used to sit over the box's up and down arrows.

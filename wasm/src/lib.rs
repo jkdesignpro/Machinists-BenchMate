@@ -521,6 +521,7 @@ f1!(centre_drill_dia, c::centre_drill_dia, z, dp, l, angle);
 f1!(spot_chamfer_dia, c::spot_chamfer_dia, z, angle);
 f1!(chamfer_mill, c::chamfer_mill, w, angle, tip, clear, dia, which);
 f1!(saw_section, c::saw_section, shape, a, b, nx, ny, which);
+f1!(saw_section_ext, c::saw_section_ext, shape, a, t, hc, nx, ny, which);
 f1!(saw_cut_time, c::saw_cut_time, area, rate);
 f1!(edm_kerf, c::edm_kerf, d, gap);
 f1!(edm_offset, c::edm_offset, d, gap, stock);

@@ -331,6 +331,29 @@ function renderPage(main, page, tabId) {
 // The pass runs after every redraw: a guide's source list, a "Sources" note, a table's Sources column
 // and the source keys after each statement. The keys and columns show again when the reader ticks the
 // box in any Sources fold (one setting for every page). "to be verified" always stays in view.
+// Find box for a long list: type to narrow it, click or Enter to pick. The list itself stays a normal drop-down.
+function listFind(sel, options, anchor) {
+  $$('.lfind').forEach(x => x.remove());
+  const box = document.createElement('div'); box.className = 'lfind';
+  box.innerHTML = '<input type="text" placeholder="Type to find" aria-label="Find in the list" autocomplete="off" spellcheck="false"><div class="lfl"></div>';
+  const q = $('input', box), list = $('.lfl', box); let hits = [], at = 0;
+  const pick = o => { sel.value = o[0]; sel.dispatchEvent(new Event('change')); box.remove(); sel.focus(); };
+  const draw = () => {
+    const w = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    hits = options.filter(o => w.every(x => String(o[1]).toLowerCase().includes(x))); at = Math.min(at, Math.max(0, hits.length - 1));
+    list.innerHTML = hits.length ? hits.map((o, i) => '<button type="button" data-i="' + i + '"' + (i === at ? ' class="on"' : '') + '>' + hesc(o[1]) + '</button>').join('') : '<div class="shn">Nothing in this list matches.</div>';
+    $$('button', list).forEach(b => b.onmousedown = e => { e.preventDefault(); pick(hits[+b.dataset.i]); });
+  };
+  q.oninput = () => { at = 0; draw(); };
+  q.onkeydown = e => {
+    if (e.key === 'ArrowDown') { at = Math.min(at + 1, hits.length - 1); draw(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { at = Math.max(at - 1, 0); draw(); e.preventDefault(); }
+    else if (e.key === 'Enter') { if (hits[at]) pick(hits[at]); e.preventDefault(); }
+    else if (e.key === 'Escape') { box.remove(); sel.focus(); }
+  };
+  q.onblur = () => setTimeout(() => box.remove(), 150);
+  anchor.after(box); draw(); q.focus();
+}
 function srcFold(title) {
   const d = document.createElement('details'); d.className = 'srcfold';
   const sm = document.createElement('summary'); sm.textContent = title || 'Sources'; d.appendChild(sm);
@@ -483,7 +506,15 @@ function mountTool(host, t, opts) {
     const row = document.createElement('div'); row.className = 'row';
     let inp;
     // A field with `options: [[value, label], ...]` renders as a drop-down; the value is still a number.
-    if (f.options) { inp = document.createElement('select'); f.options.forEach(([val, txt]) => { const o = document.createElement('option'); o.value = val; o.textContent = txt; inp.appendChild(o); }); }
+    if (f.options) {
+      inp = document.createElement('select');
+      const opt = ([val, txt]) => { const o = document.createElement('option'); o.value = val; o.textContent = txt; return o; };
+      // `common: [values]`: those options first, under "Common", the rest under "More".
+      if (f.common) {
+        const g1 = document.createElement('optgroup'), g2 = document.createElement('optgroup'); g1.label = 'Common'; g2.label = 'More';
+        f.options.forEach(o => (f.common.includes(o[0]) ? g1 : g2).appendChild(opt(o))); inp.append(g1, g2);
+      } else f.options.forEach(o => inp.appendChild(opt(o)));
+    }
     // A field with `slider: { min, max, step, labels }` renders as a slider; the words under it come from `labels`.
     else if (f.slider) { inp = document.createElement('input'); inp.type = 'range'; inp.min = f.slider.min; inp.max = f.slider.max; inp.step = f.slider.step || 1; lab.classList.add('sl'); }
     else { inp = document.createElement('input'); inp.type = 'number'; inp.step = 'any'; inp.inputMode = 'decimal'; }
@@ -491,6 +522,12 @@ function mountTool(host, t, opts) {
     inp.oninput = inp.onchange = () => { saved[f.id] = inp.value; const p = pairOf(f.id); if (p) { src[p.a + p.b] = f.id; saved['_src_' + p.a] = f.id; } saveVals(); update(); };
     const u = document.createElement('span'); u.className = 'u'; u.textContent = f.unit;
     row.append(inp, u);
+    // `search: true` on a list: a find box that narrows a long list as you type.
+    if (f.options && f.search && !mini) {
+      const sb = document.createElement('button'); sb.type = 'button'; sb.className = 'fx fsrch'; sb.innerHTML = icon('search'); sb.title = 'Find in this list'; sb.setAttribute('aria-label', sb.title);
+      sb.onclick = e => { e.preventDefault(); listFind(inp, f.options, row); };
+      row.insertBefore(sb, u);
+    }
     if (f.slider) { const say = () => { u.textContent = sliderWord(f.slider, inp.value); }; inp.addEventListener('input', say); say(); }
     // A field with `lock: true` is one the tool can suggest (t.suggest): blank shows the suggestion, a typed value is locked.
     let lock = null;
@@ -508,16 +545,27 @@ function mountTool(host, t, opts) {
     if (hide) { lab.classList.add('lvhide'); if (saved[f.id] === undefined) inp.dataset.def = f.def; } else shownCount++;
     els[f.id] = { lab, inp, f, lock, u }; return lab;
   };
+  let into = grid;
   fields.forEach(f => {
+    if (f.sec && !mini) {
+      const d = document.createElement('details'); d.className = 'fsec'; d.dataset.kept = '1';
+      const key = 'bm.fsec.' + t.id + '.' + f.sec[0], pref = lsGet(key);
+      d.open = pref ? pref === '1' : !f.sec[1];
+      d.innerHTML = '<summary>' + hesc(f.sec[0]) + '</summary><div class="grid"></div>';
+      d.addEventListener('toggle', () => lsSet(key, d.open ? '1' : '0'));
+      grid.appendChild(d); into = $('.grid', d);
+    }
     const p = pairOf(f.id);
     if (p && f.id === p.b) return;
     if (p && f.id === p.a) {
       const fb = fields.find(x => x.id === p.b), box = document.createElement('div'); box.className = 'pair';
       const sw = document.createElement('span'); sw.className = 'swap'; sw.innerHTML = icon('units'); sw.title = 'Type in either box; the other is worked out';
-      box.append(makeField(f), sw, makeField(fb)); grid.appendChild(box); return;
+      box.append(makeField(f), sw, makeField(fb)); into.appendChild(box); return;
     }
-    grid.appendChild(makeField(f));
+    into.appendChild(makeField(f));
   });
+  // A section with nothing to show in this mode is left out.
+  $$('details.fsec', grid).forEach(d => { d.hidden = !$$('label.f:not(.lvhide)', d).length; });
   const read = () => { const v = {}; fields.forEach(f => { const e = els[f.id].inp; const x = e.dataset.def !== undefined ? e.dataset.def : e.value; v[f.id] = x === '' ? NaN : parseFloat(x); }); return v; };
   let last = [];
   function update() {

@@ -354,7 +354,7 @@ for (const [id, res] of [
 // Locks and the limit card on the milling advisor: a 0.5 kW spindle limits the cut, and a typed depth is never changed.
 where = 'advmill locks';
 await open('advmill');
-const advSet = async (k, v) => { await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); };
+const advSet = async (k, v) => { await page.$eval(`#main [data-id="${k}"]`, e => { const d = e.closest('details'); if (d) d.open = true; }); await page.fill(`#main [data-id="${k}"]`, v); await page.dispatchEvent(`#main [data-id="${k}"]`, 'input'); };
 const advTxt = async () => (await page.$eval('#res', e => e.innerText.replace(/\s+/g, ' ')));
 if ((await page.getAttribute('#main [data-id="ae"]', 'placeholder')) !== '6' || (await page.getAttribute('#main [data-id="ap"]', 'placeholder')) !== '12') problems.push(`[${where}] suggested width and depth are not shown in the empty boxes`);
 await advSet('pmax', '0.5');
@@ -2865,6 +2865,42 @@ where = 'toolpaths';
     if (!(await page.$eval('#search', e => e.readOnly && e.getAttribute('autocomplete') === 'off'))) problems.push(`[${where}] the search box should stay read-only until it is used`);
     if (/Rust/.test(await page.textContent('#status'))) problems.push(`[${where}] the status line should only carry the warning`);
     await page.evaluate(() => setShowSrc(true));
+  }
+
+  // 0.8.0: tool materials and coatings in the advisors, inputs under headings, the find box on a long list.
+  where = 'advisor-coatings';
+  {
+    const m0 = await page.evaluate(() => state.mode); await mode('advanced');
+    await open('advmill', 200);
+    const secs = await page.$$eval('#main details.fsec', a => a.filter(d => !d.hidden).map(d => d.querySelector('summary').textContent + (d.open ? '+' : '-')));
+    if (secs.slice(0, 3).join('|') !== 'The job+|The tool+|The cut+' || !secs.some(x => /^Your own figures/.test(x) && x.endsWith('-'))) problems.push(`[${where}] milling inputs under headings, the rest folded: ${secs.join('|')}`);
+    const groups = await page.$$eval('#main [data-id="coat"] optgroup', a => a.map(g => g.label + ':' + g.children.length));
+    if (groups.join(',') !== 'Common:10,More:6') problems.push(`[${where}] coating list, common ones first: ${groups}`);
+    const card = async () => page.$eval('#res', e => (e.querySelector('.tmcard') || {}).textContent || '');
+    await page.selectOption('#main [data-id="mat"]', '15'); await page.selectOption('#main [data-id="coat"]', '5'); await page.waitForTimeout(80);
+    let c = await card();
+    if (!/not advised for aluminium/.test(c) || !/about 1400 °F/.test(c) || /760/.test(c)) problems.push(`[${where}] AlTiN on aluminium should be a caution with the temperatures as printed: ${c.slice(0, 300)}`);
+    await page.selectOption('#main [data-id="coat"]', '6'); await page.waitForTimeout(80);
+    if (!/The sources differ/.test(await card())) problems.push(`[${where}] AlCrN on aluminium: the sources differ`);
+    await page.selectOption('#main [data-id="mat"]', '3'); await page.selectOption('#main [data-id="tm"]', '6'); await page.waitForTimeout(80);
+    c = await card();
+    const t0 = await page.$eval('#res', e => e.innerText);
+    if (!/PCD is not for steel or cast iron/.test(c) || !/No speed table for cermet, ceramic, CBN or PCD/.test(t0)) problems.push(`[${where}] PCD on steel: ${c.slice(0, 200)} / ${t0.slice(0, 200)}`);
+    await page.click('#main details.fsec:has([data-id="vown"]) > summary');
+    await page.fill('#main [data-id="vown"]', '300'); await page.dispatchEvent('#main [data-id="vown"]', 'input');
+    await page.fill('#main [data-id="fzown"]', '0.002'); await page.dispatchEvent('#main [data-id="fzown"]', 'input');
+    if (!/Spindle speed/i.test(await page.$eval('#res .hero', e => e.innerText))) problems.push(`[${where}] PCD with the maker's speed and chip load should give a result`);
+    await page.click('#main [data-id="coat"] ~ .fsrch'); await page.keyboard.type('diamond like'); await page.keyboard.press('Enter'); await page.waitForTimeout(60);
+    if ((await page.inputValue('#main [data-id="coat"]')) !== '8') problems.push(`[${where}] the find box should pick DLC`);
+    await page.click('#main .tpa button[title^="Reset"]');
+    await page.click('#main details.fsec:has([data-id="vown"]) > summary');
+    await open('advturn', 200);
+    const cbFold = await page.evaluate(() => { const f = TOOLS.find(t => t.id === 'advturn').fields('mm').find(x => x.id === 'kap'); return f && f.sec && f.sec[1] === true; });
+    if (!cbFold || !(await page.$('#main details.fsec:has([data-id="cbf0"])'))) problems.push(`[${where}] the chip breaker inputs should sit under their own heading, folded by default`);
+    await open('advdrill', 200);
+    if (await page.$('#main [data-id="tm"] option[value="6"]')) problems.push(`[${where}] the drilling advisor keeps HSS and carbide only`);
+
+    await mode(m0);
   }
 
   // Glossary: own wording, every link opens a page that exists, and the search narrows the list.

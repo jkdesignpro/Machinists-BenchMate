@@ -151,6 +151,24 @@ label.f .fx .ic{width:15px;height:15px}
 label.f .row:hover .fx,label.f .row:focus-within .fx{opacity:1}
 label.f .fx:focus-visible{opacity:1}
 label.f.na{opacity:.38}
+label.f .fsrch{opacity:.7}
+.tg .grid>details.fsec{grid-column:1/-1;border-top:1px solid var(--line);padding-top:4px}
+.tg .grid>details.fsec:first-child{border-top:0;padding-top:0}
+details.fsec>summary{cursor:pointer;padding:6px 0 8px;font:700 11px var(--sans);text-transform:uppercase;letter-spacing:.1em;color:var(--accent)}
+details.fsec:not([open])>summary{color:var(--muted)}
+details.fsec>.grid{margin:0 0 8px}
+.lfind{position:relative;z-index:30;margin-top:4px;border:2px solid var(--edge);border-radius:var(--r);background:var(--panel);padding:6px}
+.lfind input{width:100%;height:30px}
+.lfind .lfl{max-height:240px;overflow:auto;margin-top:4px;display:flex;flex-direction:column}
+.lfind .lfl button{text-align:left;border:0;background:none;color:var(--ink);padding:5px 8px;border-radius:2px;cursor:pointer;font-size:13px}
+.lfind .lfl button.on,.lfind .lfl button:hover{background:var(--accent);color:var(--accent-ink,#000)}
+.tmcard{margin:10px 16px;border:1px solid var(--line);border-left:3px solid var(--accent);padding:8px 12px}
+.tmcard .tmh{font:700 10.5px var(--sans);text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:4px}
+.tmcard .tmrow{font-size:13px;margin:4px 0;padding-left:10px;border-left:3px solid transparent}
+.tmcard .tmrow.good{border-left-color:var(--good,#3c3)}
+.tmcard .tmrow.caution{border-left-color:var(--warn)}
+.tmcard .tmrow.over{border-left-color:var(--err);font-weight:600}
+.tmcard .tmrow.note{color:var(--muted);font-size:12px}
 label.f.na input,label.f.na select{cursor:not-allowed;background:none;border-style:dashed}
 label.f.na .fx,label.f.na .flock{visibility:hidden}
 label.f .fx:hover{color:var(--accent)}
