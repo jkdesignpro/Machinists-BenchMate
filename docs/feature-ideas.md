@@ -100,10 +100,12 @@ Found while working through the 24 points of the 0.8.0 feedback. None is built y
 4. **The machine profile's work volume is not used yet.** It could warn when a part, a bolt circle or an
    engraving is larger than the travel, and the Swiss bar capacity could check the bar planner.
 5. **More stock sizes.** Rectangular tube, channel, I-beam, flat bar and round tube, each with two publishers.
-6. **Arc fitting elsewhere.** The engraving arc fit (`fit_arcs`) could also tidy DXF imports and the
-   sketcher's output, and the G71 profile could take arcs.
-7. **Still open from the plan:** offline install (PWA), settings import and export, reordering lists,
-   chatter listener and vibration check, the assistant, phone layout and translations.
+6. **Arc fitting elsewhere.** Done in 0.8.0: *Lines to arcs* in the sketcher (DXF imports) and G02/G03
+   arcs in the G71 profile.
+7. **Still open from the plan:** done in 0.8.0: offline web version (service worker; an app icon is
+   still needed for browsers to offer an install), settings save and load, arranging the side panel.
+   The chatter listener was already in. Still open: vibration check (phone sensor), the assistant,
+   a proper phone layout and translations.
 8. **Later (owner, 2026-11-13): the assistant and the thread callout scan.** Both are parked on the roadmap.
    Open question when they are picked up: run them on the owner's own Claude API key (optional, online only
    when used), offline only (search of BenchMate's pages, on-device text reading), or both.

@@ -3042,6 +3042,7 @@ where = 'second-round-080';
   let t = await page.$eval('#hres', e => e.innerText.replace(/\s+/g, ' '));
   if (!/P\/8 .*0\.188 mm/.test(t) || !/P\/4 .*0\.375 mm/.test(t) || !/3\.028 deg/.test(t) || !/Largest wire 1\.010363 P/.test(t)) problems.push(`[${where}] thread data flats, lead angle, wires: ${t.slice(0, 300)}`);
   await open('drillchart', 300);
+  await page.fill('#dq', ''); await page.dispatchEvent('#dq', 'input'); await page.waitForTimeout(200);
   t = await page.$eval('#main', e => e.innerText);
   if (!/#107/.test(t) || !/#98/.test(t)) problems.push(`[${where}] micro drills #98 to #107 should be listed`);
   await open('grindspeed', 300);

@@ -18,6 +18,11 @@ Work on the feedback after using 0.7.0.
 - **Guide sections**: machining magnesium (chips, coolant, fire), high speed steel hardening and tempering with M2 from two makers side by side and cold treatment, metallurgy terms, how metals fail, micromachining, 3D tool compensation, threading insert shims and lead angle, straight pipe threads (NPSC, NPSL, NPSM, NPSF).
 - **Calculator basic view**: a Basic / Full switch; Basic shows the digits and the four functions on bigger keys only.
 - **Dashboard widgets**: size buttons S, M, W, L (new, two thirds) and F replace the cycling button, and a corner handle resizes by dragging: the width snaps to the nearest size and the height is free; double-click the handle to fit the height again.
+- **Arcs in G71** (Turning > G71 / G70 cycle): a profile line can end in `G02 R2` or `G03 R2`, so corner radii and fillets go into the program as arcs. The arc is checked point by point (every 3 degrees) for the rise toward the chuck that Type I G71 needs, so a radius too small for its two points or an arc that turns back is refused with the line number. A note asks you to check G02 and G03 against your lathe's manual, as the view flips between front and rear tool posts.
+- **Lines to arcs in the sketcher**: one button turns imported polylines (a DXF made of short lines) back into arcs and lines within a tolerance you set (default 0.01 mm, 0.0005 in), and reports how many segments it took out. Undo brings the lines back.
+- **Settings to a file**: in the menu, *Save to file* writes every setting, favourite, dashboard, tool library entry, machine profile, saved input and sketch into one JSON file; *Load file* reads one back after asking, so you can move BenchMate to another computer or keep a backup. Files that are not BenchMate settings are refused.
+- **Arrange the side panel**: an *Arrange* button on the Favourites and Workspaces headings shows up and down arrows to put them in your own order; the order is kept.
+- **Offline web version**: the web version now stores itself on the first visit (a service worker) and opens without a network after that; a web app manifest is included. There is no app icon yet, so browsers may not offer to install it as an app. The desktop app does not need this and does not use it.
 
 ### Changed (second feedback round)
 - The side panel: clicking the open workspace (Milling, Turning...) closes it; clicking again opens it.
@@ -25,9 +30,11 @@ Work on the feedback after using 0.7.0.
 
 ### Fixed (second feedback round)
 - Thread data and the other thread pickers: the size list was empty on opening and did not follow a change of thread type.
+- Dashboard: a single click on a widget's resize handle no longer redraws the dashboard, so double-click to fit the height works.
 
 ### Not done, searched for
 - UNR external minor diameter limits and involute spline fit class tolerances (ANSI B92.1, ISO 4156): no public source prints them outside the standards themselves; the pages read are listed in docs/sources.md.
+- A vibration check from a phone's motion sensor: left for the phone version, as a desktop has no such sensor. The chatter listener (microphone) is already in Milling.
 
 ### Added (tool materials and coatings in the advisors)
 - Milling and turning advisors: the tool material can now also be cermet, ceramic, CBN or PCD. No speed table for these is built in, so the advisor asks for the maker's cutting speed for the grade (and, for milling, its chip load) and then checks the cut as before.

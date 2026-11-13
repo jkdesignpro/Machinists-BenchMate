@@ -350,9 +350,9 @@ Store list is the fuller of the two store lists.
 | U105 | Adjustable decimal precision | done | `app.js` | More and fewer decimal places on each calculator (remembered per tool); 0.7.0: one setting for all calculators in the display menu |
 | U106 | Favourites | done | `app.js` (star button, Home widget) |  |
 | U107 | Home dashboard | done | `dashboard.js` |  |
-| U108 | Arrange menu (reorder) | partial | `dashboard.js` | Home widgets can be reordered and resized; the tool lists and the rail cannot be rearranged |
+| U108 | Arrange menu (reorder) | partial | `dashboard.js`, `app.js` | Home widgets can be reordered and resized; the side panel's favourites and workspaces can be arranged (0.8.0); the tools inside a workspace keep their order |
 | U109 | Tool library (save tools, one-tap fill) | done | `toollib` |  |
-| U110 | Offline use | partial |  | Runs from local files with no network calls, and the desktop app (Tauri) bundles it; no browser install (no manifest or service worker) |
+| U110 | Offline use | done | `sw.js` | Runs with no network calls; the desktop app (Tauri) bundles it, and from 0.8.0 the web version stores itself (service worker) and opens offline; a manifest is included (no icon yet, so no install prompt) |
 | U111 | Web app / link to desktop | partial |  | BenchMate is a web app and a desktop app; no phone-to-desktop link |
 | U112 | iOS and Android apps | missing |  | Later phase |
 | U113 | 23 languages | missing |  | English only |
