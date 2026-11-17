@@ -2,7 +2,15 @@
 
 A free, open-source (AGPLv3) machinist's calculator, built to sit beside the machine. Native, offline, no account. For all machinists and all machines: mills, lathes, Swiss-type and more.
 
-**Status:** v0.7.0 in progress (0.2.0 is on main; 0.3.0 to 0.6.0 are complete and on pull requests to main). 220 tools on 184 pages. The Rust formula core and the app UI work in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
+**Status:** v0.8.1, an early public version: 223 tools on 187 pages. Feedback is very welcome (see *Feedback* below). The Rust formula core and the app UI run in a browser and as a native desktop app (Tauri 2) for Windows, macOS (Apple Silicon) and Linux.
+
+**Try it in your browser:** https://jkdesignpro.github.io/Machinists-BenchMate/ (nothing to install; after the first visit it works offline, and Chrome or Edge can install it as an app). Or download the desktop app from the [Releases page](https://github.com/jkdesignpro/Machinists-BenchMate/releases).
+
+| Home dashboard | Milling advisor |
+|---|---|
+| ![Home dashboard with small calculators](docs/screenshots/home.png) | ![Milling advisor: speed, feed, power, deflection and what limits the cut](docs/screenshots/advmill.png) |
+| **Thread data and limits** | **G71 / G70 program with backplot** |
+| ![Thread data with the basic profile drawing](docs/screenshots/threaddata.png) | ![G71 roughing backplot, time estimate and checks](docs/screenshots/cycg71.png) |
 
 ## How the app is organised
 - **Modes** (top bar): **Simple** shows 16 everyday tools with only their main inputs; **Advanced** shows every tool; **Expert** also opens every working, constant and evidence table. A mode never changes a calculation.
@@ -25,6 +33,14 @@ Get the files from the [Releases page](https://github.com/jkdesignpro/Machinists
 - **Linux (x86_64):** `chmod +x Machinists-BenchMate_<version>_linux_x86_64.AppImage` and run it, or on Debian/Ubuntu `sudo apt install ./machinists-benchmate_<version>_amd64.deb`.
 
 Check a download against `SHA256SUMS.txt` on the release page if you like (`sha256sum -c`, or `certutil -hashfile <file> SHA256` on Windows).
+
+## Feedback
+BenchMate is checked against published sources, but it is young and there will be mistakes. Please [open an issue](https://github.com/jkdesignpro/Machinists-BenchMate/issues/new/choose):
+- **Wrong value or formula**: the tool, what you typed, what it shows, what you expected, and where the right value comes from (standard, handbook page, maker's catalogue). Accuracy reports get looked at first.
+- **Bug**: what happened, with a screenshot if you can, and the version (in the menu, top right).
+- **Feature idea**: what you would use at the machine and for what job.
+
+Results are a guide: check them against your tooling maker's data and your machine before you cut, and prove out any generated program in single block.
 
 ## Principles
 - **Accuracy first.** Every formula cites a standard reference (Machinery's Handbook, ISO, manufacturer-published formulas) in its doc comment, and has a unit test against a worked example.

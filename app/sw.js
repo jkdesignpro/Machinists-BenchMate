@@ -2,7 +2,7 @@
 // Offline use of the web version: every file of the app is stored on the first visit; after that
 // pages are served from the network when it answers and from the store when it does not.
 'use strict';
-const STORE = 'benchmate-d60bfbd65dd2';
+const STORE = 'benchmate-01cbe0bcdf5f';
 const FILES = [
 "./",
 "about.js",
@@ -55,6 +55,10 @@ const FILES = [
 "gmcodes.js",
 "grinding.js",
 "gsim.js",
+"icons/apple-touch-icon.png",
+"icons/favicon-32.png",
+"icons/icon-192.png",
+"icons/icon-512.png",
 "icons.js",
 "index.html",
 "inspect.js",

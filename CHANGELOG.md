@@ -4,6 +4,15 @@ All notable changes to Machinists BenchMate. Versions follow semver.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-17
+Getting ready for public feedback.
+
+### Added
+- **Web version on GitHub Pages**: a workflow (`.github/workflows/pages.yml`) publishes the app to https://jkdesignpro.github.io/Machinists-BenchMate/ whenever a release is published, so BenchMate can be tried in a browser without installing; it works offline after the first visit. The owner turns Pages on once (Settings > Pages > Source: GitHub Actions).
+- **App icons for the web version** (from the desktop icon) in the manifest and the page, so browsers can offer to install it as an app; a page description for link previews.
+- **Feedback forms** on GitHub: *Wrong value or formula* (asks for the source), *Bug* and *Feature idea*. The menu says where to report a problem.
+- **README**: current status, a link to the web version, four screenshots (`docs/screenshots/`) and a Feedback section.
+
 ## [0.8.0] - 2026-11-13
 Work on the feedback after using 0.7.0.
 

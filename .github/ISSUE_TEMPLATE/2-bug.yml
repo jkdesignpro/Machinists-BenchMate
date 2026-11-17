@@ -1,0 +1,24 @@
+name: Bug
+description: Something does not work, looks broken or crashes.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: A screenshot helps a lot.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to make it happen again
+      placeholder: "1. Open ...  2. Type ...  3. Click ..."
+  - type: input
+    id: version
+    attributes:
+      label: BenchMate version and where it runs
+      placeholder: "v0.8.1, macOS 15 Apple Silicon desktop / Chrome on Windows (web)"
+    validations:
+      required: true
