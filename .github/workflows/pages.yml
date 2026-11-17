@@ -1,0 +1,55 @@
+name: Web version (GitHub Pages)
+
+# Publishes the web version of the app (the same app/ folder the desktop app wraps) to GitHub Pages,
+# so people can try BenchMate in a browser without installing anything. After the first visit it
+# works offline (service worker, scripts/gen_sw.py).
+# Runs when a release is published (the site then matches the release) or by hand.
+# One-time setup by the owner: Settings > Pages > Build and deployment > Source: GitHub Actions.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build the web version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build WebAssembly and data into app/
+        run: bash scripts/build-web.sh
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app
+
+  deploy:
+    name: Publish to GitHub Pages
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

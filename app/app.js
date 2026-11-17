@@ -914,7 +914,7 @@ function initMenu() {
       '<button class="mlink" data-go="#/t/toollib">' + icon('toollib') + 'Tool library</button>' +
       '<div class="mrow msets"><span>Settings</span><div class="seg"><button id="msetexp" title="Save every setting, favourite, dashboard, tool, machine and saved input to a file">Save to file</button><button id="msetimp" title="Replace the settings here with those in a saved file">Load file</button></div><input type="file" id="msetfile" accept=".json,application/json" hidden></div>' +
       '<div id="msetask"></div>' +
-      '<div class="mabout">Machinists BenchMate ' + hesc($('#ver').textContent) + '. Open source, AGPL-3.0. Results are a guide: check them before you cut.</div>';
+      '<div class="mabout">Machinists BenchMate ' + hesc($('#ver').textContent) + '. Open source, AGPL-3.0. Results are a guide: check them before you cut. Found a bug or a wrong value? Tell us at github.com/jkdesignpro/Machinists-BenchMate/issues (with your source, if it is a value).</div>';
     $$('#mtheme button', pop).forEach(b => b.onclick = () => { lsSet('bm.theme', b.dataset.v); setTheme(b.dataset.v); paint(); if (state.route.kind !== 'home') renderMain(); });
     const accent = c => { lsSet('bm.accent', c); setAccent(c); };
     $$('#maccent button', pop).forEach(b => b.onclick = () => { accent(b.dataset.c); paint(); });
@@ -954,7 +954,7 @@ async function boot() {
   const resp = await fetch('benchmate.wasm');
   const { instance } = await WebAssembly.instantiate(await resp.arrayBuffer(), {});
   state.W = instance.exports;
-  $('#ver').textContent = 'v0.8.0';
+  $('#ver').textContent = 'v0.8.1';
   refreshMachineSelect();
   $('#machine').onchange = e => { Profiles.setActive(e.target.value); renderMain(); };
   $$('#mode button').forEach(b => b.onclick = () => setMode(b.dataset.m));

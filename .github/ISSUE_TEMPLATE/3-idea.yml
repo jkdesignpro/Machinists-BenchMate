@@ -1,0 +1,20 @@
+name: Feature idea
+description: A calculator, table, guide or improvement you would use at the machine.
+title: "[Idea] "
+labels: ["idea"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What job would it help with?
+      description: The machine, the part or the situation. This helps decide how it should work.
+  - type: textarea
+    id: source
+    attributes:
+      label: Formula or data source, if you know one

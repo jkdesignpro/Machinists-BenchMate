@@ -1,0 +1,49 @@
+name: Wrong value or formula
+description: A result, table value or formula that does not match a published source or your shop experience.
+title: "[Value] "
+labels: ["wrong value"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Accuracy is the point of BenchMate, so these reports matter most.
+        Please say where the right value comes from: a standard, a handbook, a maker's catalogue or web page.
+        Do not paste whole pages of a copyrighted book or catalogue; a reference and the one number are enough.
+  - type: input
+    id: tool
+    attributes:
+      label: Which tool or page?
+      placeholder: "e.g. Thread data, M10 x 1.5"
+    validations:
+      required: true
+  - type: textarea
+    id: inputs
+    attributes:
+      label: What you typed in (and inch or mm)
+    validations:
+      required: true
+  - type: input
+    id: got
+    attributes:
+      label: What BenchMate shows
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Your source
+      description: Standard and clause, book and page, or a link.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: BenchMate version
+      description: Shown in the menu (top right). Desktop or web?
+      placeholder: "v0.8.1, Windows desktop"
